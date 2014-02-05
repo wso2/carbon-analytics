@@ -1,0 +1,168 @@
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html> 
+ <head> 
+  <title>Interactive Stacked Area Chart</title> 
+  <script type="text/javascript" src="../../3rdparty/protovis-r3.1.js"></script>
+ </head> 
+ <body> 
+  <script type="text/javascript+protovis"> 
+ 
+// Data
+ 
+var start_datestr = '2010/1/1';
+var start_date = Date.parse(start_datestr, "%Y/%m/%d");
+var max_sum = 27
+var data = [
+{
+ title: "Count 1",
+ values:[5, 3, 5, 1],
+ datestrs:["2010/1/1", "2010/1/2", "2010/1/3", "2010/1/4"],
+ max_sum: max_sum
+},
+{
+ title: "Count 2",
+ values: [1, 3, 5, 1]
+},
+{
+ title: "Count 3",
+ values: [1, 3, 5, 1]
+},
+{
+ title: "Count 4",
+ values: [1, 3, 7, 1]
+},
+{
+ title: "Count 5",
+ values: [1, 3, 5, 1]
+}];
+ 
+var w = 600;
+var h = 300;
+ 
+data[0].dates = data[0].datestrs.map(function(x) Date.parse(x, "%Y/%m/%d"));
+ 
+var x = pv.Scale.linear(0, data[0].values.length - 1).range(0, w);
+var y = pv.Scale.linear(0, data[0].max_sum).range(0, h);
+ 
+var vis = new pv.Panel()
+  .width(w + 100)
+  .height(h)
+  .bottom(20)
+  .left(20)
+  .right(10)
+  .top(5)
+  .def('i', -1)
+  .strokeStyle("#ccc");
+ 
+var colorScale = pv.Colors.category10();
+ 
+// vis
+// +------ legendpanel
+//         +------ dot (1 .. datalength)
+// +------ panels
+//         +------ panel (1 .. datalength)
+//                 +------ area (1 .. valueslength)
+//                 +------ dot (1 .. valueslength)
+// +------ rule (xaxis)
+// +------ rule (yaxis)
+ 
+// Legend on right side of stacked area plot.
+ 
+var legendpanel = vis.add(pv.Panel)
+ .left(w)
+ .width(100)
+ .strokeStyle("#000")
+ .height(h);
+ 
+legendpanel.add(pv.Label)
+ .top(15)
+ .left(30)
+ .font('10px italic')
+ .text("Legend");
+ 
+legendpanel.add(pv.Dot)
+ .data(data)
+ .event("mouseover", function() this.root.i(this.index) )
+ .event("mouseout", function() this.root.i(-1) )
+ .left(15)
+ .top(function(d) 10 + ((data.length - this.index) * 20))
+ .fillStyle(colorScale.by(pv.index))
+ .strokeStyle(function(d) this.root.i() == this.index ? "#000" : "#ccc")
+ .anchor("right").add(pv.Label)
+   .text(function(d) d.title);
+ 
+<!-- A panel to store scales (x,y) and the mouseover index (y) -->
+var panels = vis.add(pv.Panel);
+ 
+var panel = panels.add(pv.Panel)
+  .reverse(true)
+  .def("x", -1)
+  .def("y", -1)
+  .data(data);
+ 
+var area = panel.add(pv.Area)
+  .data(function(a) a.values)
+  .event("mouseover", function() this.root.i(this.parent.index) )
+  .event("mouseout", function() this.root.i(-1) )
+<!-- Encode x,y position of mouse on move. -->
+  .event("mousemove", function() panel.x(x.invert(panel.mouse().x)).y(y.invert(h - panel.mouse().y)))
+  .left(function(d) x(this.index))
+  .bottom(pv.Layout.stack())
+  .height(function(d) y(d))
+  .fillStyle(function(d) {
+     return (this.root.i() == this.parent.index ?
+       colorScale.range()[this.parent.index].brighter(0.5) :
+       colorScale.range()[this.parent.index])
+     });
+ 
+/* Mouseover Dot */
+ 
+// We compare x with newx, but y is a stacked value, not directly
+// this.parent.index, but sum of all of them.
+ 
+area.anchor("top").add(pv.Dot)
+  .visible(function() this.parent.index == this.root.i())
+  .size(4)
+  .strokeStyle("#ccc")
+  .fillStyle("#ccc")
+  .anchor("right").add(pv.Label);
+ 
+/* X and Y axes. */
+ 
+// use visible to omit every other mark.
+vis.add(pv.Rule)
+  .data(x.ticks())
+  .visible(function(d) !(this.index % 2))
+  .left(function(d) x(d))
+  .strokeStyle("rgba(128,128,128,.1)")
+ .anchor("bottom").add(pv.Label)
+  .text(function(d) new Date(d).format("%b %d"));
+ 
+vis.add(pv.Rule)
+   .data(y.ticks())
+   .visible(function() !(this.index % 2))
+   .bottom(function(d) Math.round(y(d)) - .5)
+  .strokeStyle("rgba(128,128,128,.2)") .anchor("left").add(pv.Label)
+  .text(function(d) d.toFixed());
+ 
+vis.render();
+ 
+  </script> 
+ </body> 
+</html> 

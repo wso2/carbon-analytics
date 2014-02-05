@@ -1,0 +1,110 @@
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html>
+    <head>
+    <title>TreeView Example</title>   
+    <script type="text/javascript" src="../wso2vis.js"></script>
+    <link rel="stylesheet" type="text/css" href="../3rdparty/yui/build/treeview/assets/skins/sam/treeview.css"/>
+    <link rel="stylesheet" type="text/css" href="../3rdparty/yui/build/calendar/assets/skins/sam/calendar.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/DateRange.css"/>    
+    <link rel="stylesheet" type="text/css" href="../3rdparty/yui/build/fonts/fonts-min.css"/>
+
+    </head>
+    <body>
+        <table>
+            <tr>
+                <td valign="top">
+                    <div id="dateRange" style="width:360px;"></div>
+                    <div id="treeArea" style="width:360px;overflow:auto;"></div>
+                </td>
+                <td valign="top">
+                    <div id="chart1"></div><br>
+                    <div id="chart2"></div>
+                </td>
+            </tr>
+        </table>
+
+        <script language="javascript" type="application/javascript">
+            var dataProviderTree = new wso2vis.p.ProviderGET("http://localhost/wso2vis/examples/tree_data.php");
+            var dataProviderChart1 = new wso2vis.p.ProviderGET("http://localhost/wso2vis/examples/generator_xy1.php");
+            var dataProviderChart2 = new wso2vis.p.ProviderGET("http://localhost/wso2vis/examples/generator_xy2.php");
+            var timer = new wso2vis.u.Timer(5000);
+
+            function globalTick() {
+                dataProviderTree.pullData();
+            }
+
+            function dataRangeClicked() {
+            }
+
+            window.onload = function () {                
+                var dr = new wso2vis.c.DateRange()
+						 .canvas("dateRange");
+			    dr.create();
+			    dr.onApplyClicked = dataRangeClicked;
+
+                var tv = new wso2vis.s.form.TreeView()
+						 .canvas("treeArea")
+                         .dataField(["node"])
+                         .nodeLabel(["label"])
+                         .nodeValue(["value"])
+                         .nodeChildren(["children"]);
+			    tv.create();
+
+                var lineChart1 = new wso2vis.s.chart.protovis.LineChart2("chart1","Request / Response / Fault Count","");
+                lineChart1.dataField(["level0", "data"])
+                    .subDataField(["set"])
+	                .xDataValue(["x", "@count"])
+                    .yDataValue(["y", "@count"])
+                    .dataLabel(["@name"])
+                    .xLabel(["x", "@name"])
+                    .width(300)
+                    .height(250)
+                    .legend(true)
+                    .marks(true);
+                //lineChart1.onTooltip = lineChart1Tooltip;
+                lineChart1.load();
+
+                var lineChart2 = new wso2vis.s.chart.protovis.LineChart2("chart2","Maximum / Minimum / Average Response Time","");
+                lineChart2.dataField(["level0", "data"])
+                    .subDataField(["set"])
+	                .xDataValue(["x", "@count"])
+                    .yDataValue(["y", "@count"])
+                    .dataLabel(["@name"])
+                    .xLabel(["x", "@name"])
+                    .width(300)
+                    .height(250)
+                    .legend(true)
+                    .marks(true);
+                //lineChart2.onTooltip = lineChart2Tooltip;
+                lineChart2.load();
+
+                dataProviderTree.addDataReceiver(tv);
+                dataProviderChart1.addDataReceiver(lineChart1);
+                dataProviderChart2.addDataReceiver(lineChart2);
+
+                timer.tick = globalTick;
+
+                dataProviderTree.initialize();
+                dataProviderChart1.initialize();
+                dataProviderChart2.initialize();
+                //timer.startTimer();
+            }
+        </script>
+	</body>
+</html>

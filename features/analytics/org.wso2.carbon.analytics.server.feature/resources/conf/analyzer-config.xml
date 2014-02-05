@@ -1,0 +1,9 @@
+<analyzerConfig xmlns="http://wso2.org/carbon/analytics">
+    <analyzers>
+        <analyzer>
+            <name>resolvePath</name>
+            <class>org.wso2.carbon.analytics.hive.extension.builtin.ResolvePathAnalyzer</class>
+            <parameters>path</parameters>
+        </analyzer>
+    </analyzers>
+</analyzerConfig>

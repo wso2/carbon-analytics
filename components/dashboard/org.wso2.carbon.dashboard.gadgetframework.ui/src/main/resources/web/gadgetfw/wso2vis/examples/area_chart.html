@@ -1,0 +1,89 @@
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html>
+	<head>
+        <title>Protovis Area Chart Example</title>
+        <script type="text/javascript" src="../wso2vis.js"></script>
+
+        <script language="javascript" type="text/javascript">
+
+            var dataProvider = new wso2vis.p.ProviderGET("http://localhost/wso2vis/examples/generator2.php");
+            var dataFilter = new wso2vis.f.BasicFilter(["services", "service"], ["@name"]);
+
+            var timer = new wso2vis.u.Timer(1000);
+
+            function globalTick() {
+                dataProvider.pullData();
+            }
+
+            function areaTooltip(data) {
+                return data["@name"];
+            }
+
+            function areaOnClick(data) {
+                alert("clicked: " + data["@name"]);
+            }
+
+            window.onload = function () {
+                
+                var areaChart = new wso2vis.s.chart.protovis.AreaChart("chart","Request count per Service","");
+
+                areaChart.dataField(["services", "service"])
+	                .dataValue(["stats", "requestCount"])
+                    .dataLabel(["@name"])
+                    .width(600)
+                    .height(300)
+                    .band(10)
+                    .legend(false)
+                    .marks(true)
+                    .xSuffix("s")
+					.dirFromLeft(true);
+
+                areaChart.onTooltip = areaTooltip;
+                areaChart.onClick = areaOnClick;
+                areaChart.load(); // width, height, band - (optional)
+
+                dataProvider.addDataReceiver(dataFilter);
+                dataFilter.addDataReceiver(areaChart);
+
+                dataProvider.initialize();
+
+                timer.tick = globalTick;
+                timer.startTimer();
+            }
+		</script>
+        <style>
+            div#qTip {
+                padding: 3px;
+                border: 1px solid #666;
+                border-right-width: 2px;
+                border-bottom-width: 2px;
+                display: none;
+                background: #999;
+                color: #FFF;
+                font: bold 10px Verdana, Arial, sans-serif;
+                text-align: left;
+                position: absolute;
+                z-index: 1000;
+            }
+        </style>
+	</head>
+	<body>
+    	<div id="chart"></div>
+	</body>
+</html>

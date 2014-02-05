@@ -1,0 +1,1561 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ax2115="http://bean.common.dashboard.carbon.wso2.org/xsd" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://org.wso2.wsf/tools" xmlns:ax2114="http://bean.dashboard.carbon.wso2.org/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:tns="http://dashboard.carbon.wso2.org" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://dashboard.carbon.wso2.org">
+    <wsdl:documentation>DashboardService</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema xmlns:ax2116="http://bean.common.dashboard.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://bean.dashboard.carbon.wso2.org/xsd">
+            <xs:import namespace="http://bean.common.dashboard.carbon.wso2.org/xsd"/>
+            <xs:complexType name="DashboardContentBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="backendHttpPort" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="defaultGadgetUrlSet" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="portalCss" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="readOnlyMode" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="tabLayout" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="tabs" nillable="true" type="ax2116:Tab"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema xmlns:ax2117="http://bean.dashboard.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://org.wso2.wsf/tools">
+            <xs:import namespace="http://bean.dashboard.carbon.wso2.org/xsd"/>
+            <xs:element name="setGadgetPrefs">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="userId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="gadgetId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="prefId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="value" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="dashboardName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setGadgetPrefsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setGadgetLayout">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="userId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tabId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="newLayout" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="dashboardName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setGadgetLayoutResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="removeTab">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="userId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tabId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="dashboardName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="removeTabResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="removeGadget">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="userId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tabId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="gadgetId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="dashboardName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="removeGadgetResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="populateDefaultThreeColumnLayout">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="userId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tabId" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="populateDefaultThreeColumnLayoutResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="populateDashboardTab">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tabId" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="populateDashboardTabResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="populateCustomLayouts">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="userId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tabId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="layout" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="dashboard" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="populateCustomLayoutsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="moveGadgetToTab">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="userId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="dashboardName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="sourceGadgetId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tab" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="moveGadgetToTabResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isSessionValid">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isSessionValidResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isSelfRegistrationEnabled">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isSelfRegistrationEnabledResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isReadOnlyMode">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="userId" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isReadOnlyModeResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isExternalGadgetAdditionEnabled">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isExternalGadgetAdditionEnabledResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTabTitle">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="userId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tabId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="dashboardName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTabTitleResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTabLayoutWithNames">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="userId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="dashboard" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTabLayoutWithNamesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTabLayout">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="userId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="dashboardName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTabLayoutResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTabContentAsJson">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="userId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="dashboardName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tDomain" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="backendServerURL" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tabId" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTabContentAsJsonResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getPortalStylesUrl">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="user" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getPortalStylesUrlResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getGadgetUrlsToLayout">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="userId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tabId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="dashboardName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="backendServerURL" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getGadgetUrlsToLayoutResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getGadgetPrefs">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="userId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="gadgetId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="prefId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="dashboardName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getGadgetPrefsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getGadgetLayout">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="userId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tabId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="dashboardName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getGadgetLayoutResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getDefaultGadgetUrlSet">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="userId" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getDefaultGadgetUrlSetResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getDashboardContentAsJson">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="userId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="dashboardName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tDomain" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="backendServerURL" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getDashboardContentAsJsonResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getDashboardContent">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="userId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="dashboardName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tDomain" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="backendServerURL" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getDashboardContentResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2114:DashboardContentBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getBackendHttpPort">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getBackendHttpPortResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="duplicateTab">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="userId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="dashboardName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="sourceTabId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="newTabName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="duplicateTabResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:int"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="copyGadget">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="userId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="dashboardName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="sourceGadgetId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tab" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="grp" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="copyGadgetResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addNewTab">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="userId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tabTitle" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="dashboardName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addNewTabResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:int"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addGadgetToUser">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="userId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tabId" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="url" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="dashboardName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="gadgetGroup" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addGadgetToUserResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://bean.common.dashboard.carbon.wso2.org/xsd">
+            <xs:complexType name="Tab">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="gadgetLayout" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="gadgets" nillable="true" type="ax2115:Gadget"/>
+                    <xs:element minOccurs="0" name="tabId" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="tabName" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="Gadget">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="comments" nillable="true" type="ax2115:Comment"/>
+                    <xs:element minOccurs="0" name="defaultGadget" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="gadgetDesc" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="gadgetId" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="gadgetName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="gadgetPath" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="gadgetPrefs" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="gadgetScreenBase64" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="gadgetUrl" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="rating" nillable="true" type="xs:float"/>
+                    <xs:element minOccurs="0" name="thumbUrl" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="unsignedUserGadget" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="userCount" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="Comment">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="authorUserName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="commentPath" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="commentText" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="createTime" nillable="true" type="xs:date"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="removeTabRequest">
+        <wsdl:part name="parameters" element="ns:removeTab"/>
+    </wsdl:message>
+    <wsdl:message name="removeTabResponse">
+        <wsdl:part name="parameters" element="ns:removeTabResponse"/>
+    </wsdl:message>
+    <wsdl:message name="addGadgetToUserRequest">
+        <wsdl:part name="parameters" element="ns:addGadgetToUser"/>
+    </wsdl:message>
+    <wsdl:message name="addGadgetToUserResponse">
+        <wsdl:part name="parameters" element="ns:addGadgetToUserResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getDashboardContentAsJsonRequest">
+        <wsdl:part name="parameters" element="ns:getDashboardContentAsJson"/>
+    </wsdl:message>
+    <wsdl:message name="getDashboardContentAsJsonResponse">
+        <wsdl:part name="parameters" element="ns:getDashboardContentAsJsonResponse"/>
+    </wsdl:message>
+    <wsdl:message name="isReadOnlyModeRequest">
+        <wsdl:part name="parameters" element="ns:isReadOnlyMode"/>
+    </wsdl:message>
+    <wsdl:message name="isReadOnlyModeResponse">
+        <wsdl:part name="parameters" element="ns:isReadOnlyModeResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getBackendHttpPortRequest">
+        <wsdl:part name="parameters" element="ns:getBackendHttpPort"/>
+    </wsdl:message>
+    <wsdl:message name="getBackendHttpPortResponse">
+        <wsdl:part name="parameters" element="ns:getBackendHttpPortResponse"/>
+    </wsdl:message>
+    <wsdl:message name="removeGadgetRequest">
+        <wsdl:part name="parameters" element="ns:removeGadget"/>
+    </wsdl:message>
+    <wsdl:message name="removeGadgetResponse">
+        <wsdl:part name="parameters" element="ns:removeGadgetResponse"/>
+    </wsdl:message>
+    <wsdl:message name="isExternalGadgetAdditionEnabledRequest">
+        <wsdl:part name="parameters" element="ns:isExternalGadgetAdditionEnabled"/>
+    </wsdl:message>
+    <wsdl:message name="isExternalGadgetAdditionEnabledResponse">
+        <wsdl:part name="parameters" element="ns:isExternalGadgetAdditionEnabledResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getGadgetLayoutRequest">
+        <wsdl:part name="parameters" element="ns:getGadgetLayout"/>
+    </wsdl:message>
+    <wsdl:message name="getGadgetLayoutResponse">
+        <wsdl:part name="parameters" element="ns:getGadgetLayoutResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getTabLayoutWithNamesRequest">
+        <wsdl:part name="parameters" element="ns:getTabLayoutWithNames"/>
+    </wsdl:message>
+    <wsdl:message name="getTabLayoutWithNamesResponse">
+        <wsdl:part name="parameters" element="ns:getTabLayoutWithNamesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="isSelfRegistrationEnabledRequest">
+        <wsdl:part name="parameters" element="ns:isSelfRegistrationEnabled"/>
+    </wsdl:message>
+    <wsdl:message name="isSelfRegistrationEnabledResponse">
+        <wsdl:part name="parameters" element="ns:isSelfRegistrationEnabledResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getDefaultGadgetUrlSetRequest">
+        <wsdl:part name="parameters" element="ns:getDefaultGadgetUrlSet"/>
+    </wsdl:message>
+    <wsdl:message name="getDefaultGadgetUrlSetResponse">
+        <wsdl:part name="parameters" element="ns:getDefaultGadgetUrlSetResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getDashboardContentRequest">
+        <wsdl:part name="parameters" element="ns:getDashboardContent"/>
+    </wsdl:message>
+    <wsdl:message name="getDashboardContentResponse">
+        <wsdl:part name="parameters" element="ns:getDashboardContentResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getGadgetPrefsRequest">
+        <wsdl:part name="parameters" element="ns:getGadgetPrefs"/>
+    </wsdl:message>
+    <wsdl:message name="getGadgetPrefsResponse">
+        <wsdl:part name="parameters" element="ns:getGadgetPrefsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getGadgetUrlsToLayoutRequest">
+        <wsdl:part name="parameters" element="ns:getGadgetUrlsToLayout"/>
+    </wsdl:message>
+    <wsdl:message name="getGadgetUrlsToLayoutResponse">
+        <wsdl:part name="parameters" element="ns:getGadgetUrlsToLayoutResponse"/>
+    </wsdl:message>
+    <wsdl:message name="setGadgetPrefsRequest">
+        <wsdl:part name="parameters" element="ns:setGadgetPrefs"/>
+    </wsdl:message>
+    <wsdl:message name="setGadgetPrefsResponse">
+        <wsdl:part name="parameters" element="ns:setGadgetPrefsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="setGadgetLayoutRequest">
+        <wsdl:part name="parameters" element="ns:setGadgetLayout"/>
+    </wsdl:message>
+    <wsdl:message name="setGadgetLayoutResponse">
+        <wsdl:part name="parameters" element="ns:setGadgetLayoutResponse"/>
+    </wsdl:message>
+    <wsdl:message name="populateDashboardTabRequest">
+        <wsdl:part name="parameters" element="ns:populateDashboardTab"/>
+    </wsdl:message>
+    <wsdl:message name="populateDashboardTabResponse">
+        <wsdl:part name="parameters" element="ns:populateDashboardTabResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getTabTitleRequest">
+        <wsdl:part name="parameters" element="ns:getTabTitle"/>
+    </wsdl:message>
+    <wsdl:message name="getTabTitleResponse">
+        <wsdl:part name="parameters" element="ns:getTabTitleResponse"/>
+    </wsdl:message>
+    <wsdl:message name="isSessionValidRequest">
+        <wsdl:part name="parameters" element="ns:isSessionValid"/>
+    </wsdl:message>
+    <wsdl:message name="isSessionValidResponse">
+        <wsdl:part name="parameters" element="ns:isSessionValidResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getTabLayoutRequest">
+        <wsdl:part name="parameters" element="ns:getTabLayout"/>
+    </wsdl:message>
+    <wsdl:message name="getTabLayoutResponse">
+        <wsdl:part name="parameters" element="ns:getTabLayoutResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getTabContentAsJsonRequest">
+        <wsdl:part name="parameters" element="ns:getTabContentAsJson"/>
+    </wsdl:message>
+    <wsdl:message name="getTabContentAsJsonResponse">
+        <wsdl:part name="parameters" element="ns:getTabContentAsJsonResponse"/>
+    </wsdl:message>
+    <wsdl:message name="moveGadgetToTabRequest">
+        <wsdl:part name="parameters" element="ns:moveGadgetToTab"/>
+    </wsdl:message>
+    <wsdl:message name="moveGadgetToTabResponse">
+        <wsdl:part name="parameters" element="ns:moveGadgetToTabResponse"/>
+    </wsdl:message>
+    <wsdl:message name="populateCustomLayoutsRequest">
+        <wsdl:part name="parameters" element="ns:populateCustomLayouts"/>
+    </wsdl:message>
+    <wsdl:message name="populateCustomLayoutsResponse">
+        <wsdl:part name="parameters" element="ns:populateCustomLayoutsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="populateDefaultThreeColumnLayoutRequest">
+        <wsdl:part name="parameters" element="ns:populateDefaultThreeColumnLayout"/>
+    </wsdl:message>
+    <wsdl:message name="populateDefaultThreeColumnLayoutResponse">
+        <wsdl:part name="parameters" element="ns:populateDefaultThreeColumnLayoutResponse"/>
+    </wsdl:message>
+    <wsdl:message name="copyGadgetRequest">
+        <wsdl:part name="parameters" element="ns:copyGadget"/>
+    </wsdl:message>
+    <wsdl:message name="copyGadgetResponse">
+        <wsdl:part name="parameters" element="ns:copyGadgetResponse"/>
+    </wsdl:message>
+    <wsdl:message name="duplicateTabRequest">
+        <wsdl:part name="parameters" element="ns:duplicateTab"/>
+    </wsdl:message>
+    <wsdl:message name="duplicateTabResponse">
+        <wsdl:part name="parameters" element="ns:duplicateTabResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getPortalStylesUrlRequest">
+        <wsdl:part name="parameters" element="ns:getPortalStylesUrl"/>
+    </wsdl:message>
+    <wsdl:message name="getPortalStylesUrlResponse">
+        <wsdl:part name="parameters" element="ns:getPortalStylesUrlResponse"/>
+    </wsdl:message>
+    <wsdl:message name="addNewTabRequest">
+        <wsdl:part name="parameters" element="ns:addNewTab"/>
+    </wsdl:message>
+    <wsdl:message name="addNewTabResponse">
+        <wsdl:part name="parameters" element="ns:addNewTabResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="DashboardServicePortType">
+        <wsdl:operation name="removeTab">
+            <wsdl:input message="tns:removeTabRequest" wsaw:Action="urn:removeTab"/>
+            <wsdl:output message="tns:removeTabResponse" wsaw:Action="urn:removeTabResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="addGadgetToUser">
+            <wsdl:input message="tns:addGadgetToUserRequest" wsaw:Action="urn:addGadgetToUser"/>
+            <wsdl:output message="tns:addGadgetToUserResponse" wsaw:Action="urn:addGadgetToUserResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getDashboardContentAsJson">
+            <wsdl:input message="tns:getDashboardContentAsJsonRequest" wsaw:Action="urn:getDashboardContentAsJson"/>
+            <wsdl:output message="tns:getDashboardContentAsJsonResponse" wsaw:Action="urn:getDashboardContentAsJsonResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="isReadOnlyMode">
+            <wsdl:input message="tns:isReadOnlyModeRequest" wsaw:Action="urn:isReadOnlyMode"/>
+            <wsdl:output message="tns:isReadOnlyModeResponse" wsaw:Action="urn:isReadOnlyModeResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getBackendHttpPort">
+            <wsdl:input message="tns:getBackendHttpPortRequest" wsaw:Action="urn:getBackendHttpPort"/>
+            <wsdl:output message="tns:getBackendHttpPortResponse" wsaw:Action="urn:getBackendHttpPortResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="removeGadget">
+            <wsdl:input message="tns:removeGadgetRequest" wsaw:Action="urn:removeGadget"/>
+            <wsdl:output message="tns:removeGadgetResponse" wsaw:Action="urn:removeGadgetResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="isExternalGadgetAdditionEnabled">
+            <wsdl:input message="tns:isExternalGadgetAdditionEnabledRequest" wsaw:Action="urn:isExternalGadgetAdditionEnabled"/>
+            <wsdl:output message="tns:isExternalGadgetAdditionEnabledResponse" wsaw:Action="urn:isExternalGadgetAdditionEnabledResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getGadgetLayout">
+            <wsdl:input message="tns:getGadgetLayoutRequest" wsaw:Action="urn:getGadgetLayout"/>
+            <wsdl:output message="tns:getGadgetLayoutResponse" wsaw:Action="urn:getGadgetLayoutResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getTabLayoutWithNames">
+            <wsdl:input message="tns:getTabLayoutWithNamesRequest" wsaw:Action="urn:getTabLayoutWithNames"/>
+            <wsdl:output message="tns:getTabLayoutWithNamesResponse" wsaw:Action="urn:getTabLayoutWithNamesResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="isSelfRegistrationEnabled">
+            <wsdl:input message="tns:isSelfRegistrationEnabledRequest" wsaw:Action="urn:isSelfRegistrationEnabled"/>
+            <wsdl:output message="tns:isSelfRegistrationEnabledResponse" wsaw:Action="urn:isSelfRegistrationEnabledResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getDefaultGadgetUrlSet">
+            <wsdl:input message="tns:getDefaultGadgetUrlSetRequest" wsaw:Action="urn:getDefaultGadgetUrlSet"/>
+            <wsdl:output message="tns:getDefaultGadgetUrlSetResponse" wsaw:Action="urn:getDefaultGadgetUrlSetResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getDashboardContent">
+            <wsdl:input message="tns:getDashboardContentRequest" wsaw:Action="urn:getDashboardContent"/>
+            <wsdl:output message="tns:getDashboardContentResponse" wsaw:Action="urn:getDashboardContentResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getGadgetPrefs">
+            <wsdl:input message="tns:getGadgetPrefsRequest" wsaw:Action="urn:getGadgetPrefs"/>
+            <wsdl:output message="tns:getGadgetPrefsResponse" wsaw:Action="urn:getGadgetPrefsResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getGadgetUrlsToLayout">
+            <wsdl:input message="tns:getGadgetUrlsToLayoutRequest" wsaw:Action="urn:getGadgetUrlsToLayout"/>
+            <wsdl:output message="tns:getGadgetUrlsToLayoutResponse" wsaw:Action="urn:getGadgetUrlsToLayoutResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="setGadgetPrefs">
+            <wsdl:input message="tns:setGadgetPrefsRequest" wsaw:Action="urn:setGadgetPrefs"/>
+            <wsdl:output message="tns:setGadgetPrefsResponse" wsaw:Action="urn:setGadgetPrefsResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="setGadgetLayout">
+            <wsdl:input message="tns:setGadgetLayoutRequest" wsaw:Action="urn:setGadgetLayout"/>
+            <wsdl:output message="tns:setGadgetLayoutResponse" wsaw:Action="urn:setGadgetLayoutResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="populateDashboardTab">
+            <wsdl:input message="tns:populateDashboardTabRequest" wsaw:Action="urn:populateDashboardTab"/>
+            <wsdl:output message="tns:populateDashboardTabResponse" wsaw:Action="urn:populateDashboardTabResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getTabTitle">
+            <wsdl:input message="tns:getTabTitleRequest" wsaw:Action="urn:getTabTitle"/>
+            <wsdl:output message="tns:getTabTitleResponse" wsaw:Action="urn:getTabTitleResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="isSessionValid">
+            <wsdl:input message="tns:isSessionValidRequest" wsaw:Action="urn:isSessionValid"/>
+            <wsdl:output message="tns:isSessionValidResponse" wsaw:Action="urn:isSessionValidResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getTabLayout">
+            <wsdl:input message="tns:getTabLayoutRequest" wsaw:Action="urn:getTabLayout"/>
+            <wsdl:output message="tns:getTabLayoutResponse" wsaw:Action="urn:getTabLayoutResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getTabContentAsJson">
+            <wsdl:input message="tns:getTabContentAsJsonRequest" wsaw:Action="urn:getTabContentAsJson"/>
+            <wsdl:output message="tns:getTabContentAsJsonResponse" wsaw:Action="urn:getTabContentAsJsonResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="moveGadgetToTab">
+            <wsdl:input message="tns:moveGadgetToTabRequest" wsaw:Action="urn:moveGadgetToTab"/>
+            <wsdl:output message="tns:moveGadgetToTabResponse" wsaw:Action="urn:moveGadgetToTabResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="populateCustomLayouts">
+            <wsdl:input message="tns:populateCustomLayoutsRequest" wsaw:Action="urn:populateCustomLayouts"/>
+            <wsdl:output message="tns:populateCustomLayoutsResponse" wsaw:Action="urn:populateCustomLayoutsResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="populateDefaultThreeColumnLayout">
+            <wsdl:input message="tns:populateDefaultThreeColumnLayoutRequest" wsaw:Action="urn:populateDefaultThreeColumnLayout"/>
+            <wsdl:output message="tns:populateDefaultThreeColumnLayoutResponse" wsaw:Action="urn:populateDefaultThreeColumnLayoutResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="copyGadget">
+            <wsdl:input message="tns:copyGadgetRequest" wsaw:Action="urn:copyGadget"/>
+            <wsdl:output message="tns:copyGadgetResponse" wsaw:Action="urn:copyGadgetResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="duplicateTab">
+            <wsdl:input message="tns:duplicateTabRequest" wsaw:Action="urn:duplicateTab"/>
+            <wsdl:output message="tns:duplicateTabResponse" wsaw:Action="urn:duplicateTabResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getPortalStylesUrl">
+            <wsdl:input message="tns:getPortalStylesUrlRequest" wsaw:Action="urn:getPortalStylesUrl"/>
+            <wsdl:output message="tns:getPortalStylesUrlResponse" wsaw:Action="urn:getPortalStylesUrlResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="addNewTab">
+            <wsdl:input message="tns:addNewTabRequest" wsaw:Action="urn:addNewTab"/>
+            <wsdl:output message="tns:addNewTabResponse" wsaw:Action="urn:addNewTabResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="DashboardServiceSoap11Binding" type="tns:DashboardServicePortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="removeTab">
+            <soap:operation soapAction="urn:removeTab" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addGadgetToUser">
+            <soap:operation soapAction="urn:addGadgetToUser" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getDashboardContentAsJson">
+            <soap:operation soapAction="urn:getDashboardContentAsJson" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isReadOnlyMode">
+            <soap:operation soapAction="urn:isReadOnlyMode" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getBackendHttpPort">
+            <soap:operation soapAction="urn:getBackendHttpPort" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getTabLayoutWithNames">
+            <soap:operation soapAction="urn:getTabLayoutWithNames" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="removeGadget">
+            <soap:operation soapAction="urn:removeGadget" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isExternalGadgetAdditionEnabled">
+            <soap:operation soapAction="urn:isExternalGadgetAdditionEnabled" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getGadgetLayout">
+            <soap:operation soapAction="urn:getGadgetLayout" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isSelfRegistrationEnabled">
+            <soap:operation soapAction="urn:isSelfRegistrationEnabled" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getDefaultGadgetUrlSet">
+            <soap:operation soapAction="urn:getDefaultGadgetUrlSet" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getDashboardContent">
+            <soap:operation soapAction="urn:getDashboardContent" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setGadgetPrefs">
+            <soap:operation soapAction="urn:setGadgetPrefs" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getGadgetUrlsToLayout">
+            <soap:operation soapAction="urn:getGadgetUrlsToLayout" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getGadgetPrefs">
+            <soap:operation soapAction="urn:getGadgetPrefs" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setGadgetLayout">
+            <soap:operation soapAction="urn:setGadgetLayout" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="populateDashboardTab">
+            <soap:operation soapAction="urn:populateDashboardTab" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isSessionValid">
+            <soap:operation soapAction="urn:isSessionValid" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getTabTitle">
+            <soap:operation soapAction="urn:getTabTitle" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getTabLayout">
+            <soap:operation soapAction="urn:getTabLayout" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getTabContentAsJson">
+            <soap:operation soapAction="urn:getTabContentAsJson" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="moveGadgetToTab">
+            <soap:operation soapAction="urn:moveGadgetToTab" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="populateCustomLayouts">
+            <soap:operation soapAction="urn:populateCustomLayouts" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="populateDefaultThreeColumnLayout">
+            <soap:operation soapAction="urn:populateDefaultThreeColumnLayout" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="copyGadget">
+            <soap:operation soapAction="urn:copyGadget" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="duplicateTab">
+            <soap:operation soapAction="urn:duplicateTab" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addNewTab">
+            <soap:operation soapAction="urn:addNewTab" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getPortalStylesUrl">
+            <soap:operation soapAction="urn:getPortalStylesUrl" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="DashboardServiceSoap12Binding" type="tns:DashboardServicePortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="removeTab">
+            <soap12:operation soapAction="urn:removeTab" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addGadgetToUser">
+            <soap12:operation soapAction="urn:addGadgetToUser" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getDashboardContentAsJson">
+            <soap12:operation soapAction="urn:getDashboardContentAsJson" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isReadOnlyMode">
+            <soap12:operation soapAction="urn:isReadOnlyMode" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getBackendHttpPort">
+            <soap12:operation soapAction="urn:getBackendHttpPort" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getTabLayoutWithNames">
+            <soap12:operation soapAction="urn:getTabLayoutWithNames" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="removeGadget">
+            <soap12:operation soapAction="urn:removeGadget" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isExternalGadgetAdditionEnabled">
+            <soap12:operation soapAction="urn:isExternalGadgetAdditionEnabled" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getGadgetLayout">
+            <soap12:operation soapAction="urn:getGadgetLayout" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isSelfRegistrationEnabled">
+            <soap12:operation soapAction="urn:isSelfRegistrationEnabled" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getDefaultGadgetUrlSet">
+            <soap12:operation soapAction="urn:getDefaultGadgetUrlSet" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getDashboardContent">
+            <soap12:operation soapAction="urn:getDashboardContent" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setGadgetPrefs">
+            <soap12:operation soapAction="urn:setGadgetPrefs" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getGadgetUrlsToLayout">
+            <soap12:operation soapAction="urn:getGadgetUrlsToLayout" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getGadgetPrefs">
+            <soap12:operation soapAction="urn:getGadgetPrefs" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setGadgetLayout">
+            <soap12:operation soapAction="urn:setGadgetLayout" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="populateDashboardTab">
+            <soap12:operation soapAction="urn:populateDashboardTab" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isSessionValid">
+            <soap12:operation soapAction="urn:isSessionValid" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getTabTitle">
+            <soap12:operation soapAction="urn:getTabTitle" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getTabLayout">
+            <soap12:operation soapAction="urn:getTabLayout" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getTabContentAsJson">
+            <soap12:operation soapAction="urn:getTabContentAsJson" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="moveGadgetToTab">
+            <soap12:operation soapAction="urn:moveGadgetToTab" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="populateCustomLayouts">
+            <soap12:operation soapAction="urn:populateCustomLayouts" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="populateDefaultThreeColumnLayout">
+            <soap12:operation soapAction="urn:populateDefaultThreeColumnLayout" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="copyGadget">
+            <soap12:operation soapAction="urn:copyGadget" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="duplicateTab">
+            <soap12:operation soapAction="urn:duplicateTab" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addNewTab">
+            <soap12:operation soapAction="urn:addNewTab" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getPortalStylesUrl">
+            <soap12:operation soapAction="urn:getPortalStylesUrl" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="DashboardServiceHttpBinding" type="tns:DashboardServicePortType">
+        <http:binding verb="POST"/>
+        <wsdl:operation name="removeTab">
+            <http:operation location="removeTab"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addGadgetToUser">
+            <http:operation location="addGadgetToUser"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getDashboardContentAsJson">
+            <http:operation location="getDashboardContentAsJson"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isReadOnlyMode">
+            <http:operation location="isReadOnlyMode"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getBackendHttpPort">
+            <http:operation location="getBackendHttpPort"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getTabLayoutWithNames">
+            <http:operation location="getTabLayoutWithNames"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="removeGadget">
+            <http:operation location="removeGadget"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isExternalGadgetAdditionEnabled">
+            <http:operation location="isExternalGadgetAdditionEnabled"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getGadgetLayout">
+            <http:operation location="getGadgetLayout"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isSelfRegistrationEnabled">
+            <http:operation location="isSelfRegistrationEnabled"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getDefaultGadgetUrlSet">
+            <http:operation location="getDefaultGadgetUrlSet"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getDashboardContent">
+            <http:operation location="getDashboardContent"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setGadgetPrefs">
+            <http:operation location="setGadgetPrefs"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getGadgetUrlsToLayout">
+            <http:operation location="getGadgetUrlsToLayout"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getGadgetPrefs">
+            <http:operation location="getGadgetPrefs"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setGadgetLayout">
+            <http:operation location="setGadgetLayout"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="populateDashboardTab">
+            <http:operation location="populateDashboardTab"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isSessionValid">
+            <http:operation location="isSessionValid"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getTabTitle">
+            <http:operation location="getTabTitle"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getTabLayout">
+            <http:operation location="getTabLayout"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getTabContentAsJson">
+            <http:operation location="getTabContentAsJson"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="moveGadgetToTab">
+            <http:operation location="moveGadgetToTab"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="populateCustomLayouts">
+            <http:operation location="populateCustomLayouts"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="populateDefaultThreeColumnLayout">
+            <http:operation location="populateDefaultThreeColumnLayout"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="copyGadget">
+            <http:operation location="copyGadget"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="duplicateTab">
+            <http:operation location="duplicateTab"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addNewTab">
+            <http:operation location="addNewTab"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getPortalStylesUrl">
+            <http:operation location="getPortalStylesUrl"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="DashboardService">
+        <wsdl:port name="DashboardServiceHttpSoap11Endpoint" binding="tns:DashboardServiceSoap11Binding">
+            <soap:address location="http://bam.cloud-test.wso2.com:9767/services/DashboardService.DashboardServiceHttpSoap11Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="DashboardServiceHttpsSoap11Endpoint" binding="tns:DashboardServiceSoap11Binding">
+            <soap:address location="https://bam.cloud-test.wso2.com:9447/services/DashboardService.DashboardServiceHttpsSoap11Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="DashboardServiceHttpsSoap12Endpoint" binding="tns:DashboardServiceSoap12Binding">
+            <soap12:address location="https://bam.cloud-test.wso2.com:9447/services/DashboardService.DashboardServiceHttpsSoap12Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="DashboardServiceHttpSoap12Endpoint" binding="tns:DashboardServiceSoap12Binding">
+            <soap12:address location="http://bam.cloud-test.wso2.com:9767/services/DashboardService.DashboardServiceHttpSoap12Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="DashboardServiceHttpsEndpoint" binding="tns:DashboardServiceHttpBinding">
+            <http:address location="https://bam.cloud-test.wso2.com:9447/services/DashboardService.DashboardServiceHttpsEndpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="DashboardServiceHttpEndpoint" binding="tns:DashboardServiceHttpBinding">
+            <http:address location="http://bam.cloud-test.wso2.com:9767/services/DashboardService.DashboardServiceHttpEndpoint/"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

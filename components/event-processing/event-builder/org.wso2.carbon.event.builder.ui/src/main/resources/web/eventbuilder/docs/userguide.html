@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html>
+<head><title>Event Builder - User Guide</title>
+
+    <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all"/>
+</head>
+<body>
+<h1>Event Builder</h1>
+
+<h2>Configuring WSO2Event Event Builder </h2>
+
+<p>WSO2Event Event Builder converts events/streams from an input adaptor that supports WSO2-Events
+   into an event stream that is compatible with the event processor. WSO2-Event has three data types
+   (meta, correlation and payload), which can be mapped to the CEP backend runtime event attributes
+   by specifying the mapping in the event builder.</p>
+
+<p>You can configure through the management console as explained below or by manually adding an XML
+   file as explained in step 5. </p>
+<ol>
+    <li>Start the CEP, log in to its management console, select <strong>Event Builders</strong> and
+        click<strong> Add Event Builder</strong>.
+    </li><br/>
+    <li>Enter details in the form that appears and click the<strong> Add Event Builder</strong>
+        button at the end of the form. For example,<br/>
+        <br/><img src="../images/wso2-builder.png" alt="Create Event Builder"/>
+        <br/>
+        <ul>
+            <li>Event Builder Name : Property to uniquely identify an event formatter
+                configuration
+            </li><br/>
+            <li>Input Event Adaptor (marked as <strong>1</strong> in the screenshot) : The input
+                event adaptor used to publish events to the CEP. This drop-down list only displays
+                the adaptors that are already created. In this example, we select an Input WSO2Event
+                Event Adaptor already created.
+            </li><br/>
+            <li>Input Event Adaptor properties (marked as <strong>2</strong> in the screenshot) :
+                Properties required by the input event adaptor depending on the input event adaptor
+                type selected before. For example, if you select WSO2Event, then the required
+                properties are: <br/>
+                <ul>
+                    <li>Stream Definition - Stream name of the incoming WSO2Event stream
+                    </li>
+                    <li>Stream Version - Version of the incoming stream
+                    </li>
+                </ul>
+            </li><br/>
+            <li>Input Mapping Type (marked as <strong>3</strong> in the screenshot): Select <code>WSO2Event</code>
+                mapping type. This property changes based on the event adaptor selected. It lists
+                only the mapping types supported by a particular event adaptor.
+                <br/>
+            </li>
+            <li>Mapping properties (marked as <strong>4</strong> in the screenshot) : Map the
+                incoming stream to the outgoing stream received by the event processor. In this
+                case, mappings are further divided as meta data, correlation data and payload data.
+                Provide the necessary details in the input fields:<br/>
+                <ul>
+                    <li>Enter the attribute name of the incoming stream in <strong>Input Attribute
+                                                                                   Name</strong>
+                    </li><br/>
+                    <li>Enter the attribute name for the outgoing stream in <strong>Mapped
+                                                                                    To</strong>
+                    </li><br/>
+                    <li>Select the data type of the attribute from the <strong>To Stream Data
+                                                                               Type</strong>
+                        drop-down
+                    </li><br/>
+                    <li>
+                        <p>Click <strong>Add</strong> to add the individual attribute mapping to the
+                           event builder</p>
+
+                        <p>For the correct properties to show, you must selected a input event
+                           adaptor that supports WSO2Event mapping type.</p>
+
+                    </li><br/>
+                </ul>
+            </li>
+            <li>To Stream Name/Version : Stream name/version of the outgoing stream</li>
+        </ul>
+    </li><br/>
+    <li>After a builder is successfully created, you can change its configuration and redeploy it.
+        To do this, click the <strong>Edit</strong> link associated with it. You can also click the
+        other links associated with it to delete or enable statistics and tracing.
+    </li><br/>
+    <li>An XML based editor opens allowing you to edit the event builder configuration from the UI
+        itself, without having to edit the file in the file system. Do your modifications and click
+        <strong>Update</strong>.
+    </li><br/>
+    <li>
+        <p>Alternatively, you can specify an event builder configuration using an XML file and save
+           it in <code>&lt;PRODUCT_HOME&gt;/repository/deployment/server/eventbuilders</code>
+           directory, which is the event builder deployment directory. Since hot deployment is
+           enabled, you can simply add/remove files to deploy/undeploy from the server.<br/> <br/>Create
+           the XML file with the following WSO2Event based event builder configurations. Event
+           builder implementation must start with <code>&lt;eventbuilder&gt;</code> root element and
+           the namespace set to <code> <a href="http://wso2.org/carbon/eventbuilder">http://wso2.org/carbon/eventbuilder</a>
+            </code>as in the example below.</p>
+        <br/>
+        <pre>&lt;eventBuilder name="SearchStatBuilder" xmlns="http://wso2.org/carbon/eventbuilder"&gt;
+                &lt;from eventAdaptorName="localEventReceiver" eventAdaptorType="wso2event"&gt;
+                    &lt;property name="stream"&gt;access_Analytics&lt;/property&gt;
+                    &lt;property name="version"&gt;1.0.0&lt;/property&gt;
+                    &lt;/from&gt;
+                &lt;mapping type="wso2event"&gt;
+                    &lt;property&gt;
+                        &lt;from dataType="meta" name="ipAdd"/&gt;
+                        &lt;to name="ipAddress" type="string"/&gt;
+                    &lt;/property&gt;
+                    &lt;property&gt;
+                        &lt;from dataType="payload" name="username"/&gt;
+                        &lt;to name="username" type="string"/&gt;
+                    &lt;/property&gt;
+                    &lt;property&gt;
+                        &lt;from dataType="payload" name="keywords"/&gt;
+                        &lt;to name="searchTerms" type="string"/&gt;
+                    &lt;/property&gt;
+                &lt;/mapping&gt;
+                &lt;to streamName="searchStatistics" version="1.0.0"&gt;
+            &lt;/eventBuilder&gt;</pre>
+
+        <p>Here if custom mapping disabled, then it is considered as a pass-through event builder
+           which allows to send all the events without pre-configured mapping. But this feature is
+           only implemented for wso2Event builder. (you cannot configure execution plan for
+           pass-through event builder in UI level, you have to create it in the back-end, because
+           CEP don't about the stream definition until first event comes to CEP. Then you can
+           configure the execution plan and event formatter in back-end and deploy it.
+        </p>
+    </li><br/>
+</ol>
+
+<p>For more details on creating different types of event builders, Please refer the official
+   documentation <a href="http://docs.wso2.org/display/CEP300/Working+with+Event+Builders">Here.</a>
+</p>
+
+</body>
+</html>

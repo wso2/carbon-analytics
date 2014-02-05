@@ -1,0 +1,94 @@
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html>
+    <head>
+    <title>TreeView Example</title>
+    <script type="text/javascript" src="../wso2vis.js"></script>	
+    <link rel="stylesheet" type="text/css" href="../3rdparty/yui/build/treeview/assets/skins/sam/treeview.css"/>
+    <link rel="stylesheet" type="text/css" href="../3rdparty/yui/build/fonts/fonts-min.css"/>
+
+    <script language="javascript" type="application/javascript">
+            var dataProvider = new wso2vis.p.ProviderGET("http://localhost/wso2vis/examples/tree_data.php");
+            var timer = new wso2vis.u.Timer(5000);
+
+            var allowedDepth = 0;
+            var allowedParentNode = "Proxy Services";//optional
+
+            function globalTick() {
+                dataProvider.pullData();
+            }
+
+            function isRestrictedNode(node) {
+                if ( node.depth >= allowedDepth ) {
+                    if ( (allowedParentNode !== undefined) && (node.parent.label !== allowedParentNode) ) {
+                        return true;
+                    }
+                    return false;
+                }
+            }
+
+            window.onload = function () {
+
+                var tv = new wso2vis.s.form.TreeView()
+						 .canvas("workArea")
+                         .dataField(["node"])
+                         .nodeLabel(["label"])
+                         .nodeValue(["value"])
+                         .nodeChildren(["children"]);
+
+			    tv.create();
+
+                tv.onExpand = function(n) { 
+                    if( !isRestrictedNode(n) ) {
+                        console.log(n);
+                    } else {
+                        console.log("restricted node!");
+                    }
+                    //return false;
+                };
+
+                tv.onCollapse = function(n) { 
+                    if( !isRestrictedNode(n) ) {
+                        console.log(n);
+                    } else {
+                        console.log("restricted node!");
+                    }
+                    //return false;
+                };
+
+                tv.onLabelClick = function(n) {
+                    if( !isRestrictedNode(n) ) {
+                        console.log(n);
+                    } else {
+                        console.log("restricted node!");
+                    }
+                };
+
+                dataProvider.addDataReceiver(tv);
+
+                timer.tick = globalTick;
+
+                dataProvider.initialize();
+                //timer.startTimer();
+            }
+    </script>
+    </head>
+    <body>
+        <div id="workArea"></div>
+	</body>
+</html>    

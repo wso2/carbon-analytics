@@ -1,0 +1,162 @@
+<%@ page contentType="text/html; charset=iso-8859-1" language="java" %>
+
+<%@ page import="org.apache.axis2.context.ConfigurationContext" %>
+<%@ page import="org.wso2.carbon.CarbonConstants" %>
+<%@ page import="org.wso2.carbon.analytics.hive.stub.HiveExecutionServiceStub.QueryResult" %>
+<%@ page import="org.wso2.carbon.analytics.hive.stub.HiveExecutionServiceStub.QueryResultRow" %>
+<%@ page import="org.wso2.carbon.analytics.hive.ui.client.HiveExecutionClient" %>
+<%@ page import="org.wso2.carbon.analytics.hive.ui.client.HiveScriptStoreClient" %>
+<%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
+<%@ page import="org.wso2.carbon.utils.ServerConstants" %>
+<%@ page import="java.util.regex.Matcher" %>
+<%@ page import="java.util.regex.Pattern" %>
+
+<!--
+~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+~
+~ WSO2 Inc. licenses this file to you under the Apache License,
+~ Version 2.0 (the "License"); you may not use this file except
+~ in compliance with the License.
+~ You may obtain a copy of the License at
+~
+~ http://www.apache.org/licenses/LICENSE-2.0
+~
+~ Unless required by applicable law or agreed to in writing,
+~ software distributed under the License is distributed on an
+~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+~ KIND, either express or implied. See the License for the
+~ specific language governing permissions and limitations
+~ under the License.
+-->
+
+<%
+    String serverURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);
+    ConfigurationContext configContext =
+            (ConfigurationContext) config.getServletContext().getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
+    String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
+
+    String scriptName = request.getParameter("scriptName");
+    try {
+        HiveExecutionClient client = new HiveExecutionClient(cookie, serverURL, configContext);
+        HiveScriptStoreClient storeClient = new HiveScriptStoreClient(cookie, serverURL, configContext);
+   if (null == scriptName || scriptName.trim().isEmpty() || !storeClient.isTaskRunning(scriptName)) {
+        String scriptContent = storeClient.getScript(scriptName);
+        QueryResult[] results = null;
+        if (scriptContent != null && !scriptContent.equals("")) {
+            Pattern regex = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'");
+            Matcher regexMatcher = regex.matcher(scriptContent);
+            String formattedScript = "";
+            while (regexMatcher.find()) {
+                String temp = "";
+                if (regexMatcher.group(1) != null) {
+                    // Add double-quoted string without the quotes
+                    temp = regexMatcher.group(1).trim().replaceAll(";", "%%");
+                    temp = "\"" + temp + "\"";
+                } else if (regexMatcher.group(2) != null) {
+                    // Add single-quoted string without the quotes
+                    temp = regexMatcher.group(2).trim().replaceAll(";", "%%");
+                    temp = "\'" + temp + "\'";
+                } else {
+                    temp = regexMatcher.group().trim();
+                }
+                formattedScript += temp + " ";
+            }
+            String[] queries = formattedScript.split(";");
+            scriptContent = "";
+            for (String aquery : queries) {
+                aquery = aquery.trim();
+                if (!aquery.equals("")) {
+                    aquery = aquery.replaceAll("%%\n", ";");
+                    aquery = aquery.replaceAll("%% ", ";");
+                    aquery = aquery.replaceAll(" %% ", ";");
+                    aquery = aquery.replaceAll("%%", ";");
+                    scriptContent = scriptContent + aquery + ";" + "\n";
+                }
+            }
+            results = client.executeScript(scriptName, scriptContent);
+        }
+
+
+%>
+<div id="returnedResults">
+
+    <% if (null != results) {
+        for (QueryResult result : results) {
+    %>
+
+    Query: <span class="queryView"><%=result.getQuery()%></span>
+    <%
+        QueryResultRow[] rows = result.getResultRows();
+        if (null != rows && rows.length > 0) {
+            String[] columnNames = result.getColumnNames();
+    %>
+    <b>Results:
+        <table class="result">
+            <tbody>
+
+            <tr>
+                <% for (String aColumnName : columnNames) {
+                %>
+
+                <td class="resultCol"><b><%=aColumnName%>
+                </b>
+                </td>
+
+                <% }
+
+                %>
+            </tr>
+            <%
+                for (QueryResultRow aRow : rows) {
+
+            %>
+            <tr>
+
+                <%
+                    String[] colValues = aRow.getColumnValues();
+                    for (String aValue : colValues) {
+                %>
+                <td class="resultCol"><%=aValue%>
+                </td>
+
+                <% }
+                %>
+            </tr>
+            <%
+                }
+            %>
+            </tbody>
+        </table>
+        <br/>
+        <br/>
+        <span class="queryInfo"><%=rows.length%> rows returned.</span><br/>
+            <% } else {
+        %>
+        <br/>
+        <br/>
+        <span class="queryInfo">Query Executed</span>
+        <br/>
+            <%
+                }  %>
+        <hr color="#888888"/>
+            <%
+            }
+            }
+        %>
+</div>
+<%
+} else {
+%>
+<div id="returnedResults">
+    <span class="errorView"> <b>WARNING: </b> Scheduled task for the script : <%=scriptName%> is already running.
+        Please try again after the scheduled task is completed.</span>
+</div>
+<% }
+} catch (Exception e) {
+%>
+<div id="returnedResults">
+    <span class="errorView"> <b>ERROR: </b><%=e.getMessage()%> </span>
+</div>
+
+<% }
+%>

@@ -1,0 +1,18 @@
+<analytics>
+    <cluster>
+        <AgglomerativeCluster>3938</AgglomerativeCluster>
+        <CommunityStructure>3812</CommunityStructure>
+        <HierarchicalCluster>6714</HierarchicalCluster>
+        <MergeEdge>743</MergeEdge>
+    </cluster>
+    <graph>
+        <BetweennessCentrality>3534</BetweennessCentrality>
+        <LinkDistance>5731</LinkDistance>
+        <MaxFlowMinCut>7840</MaxFlowMinCut>
+        <ShortestPaths>5914</ShortestPaths>
+        <SpanningTree>3416</SpanningTree>
+    </graph>
+    <optimization>
+        <AspectRatioBanker>7074</AspectRatioBanker>
+    </optimization>
+</analytics>

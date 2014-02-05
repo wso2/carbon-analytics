@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>
+   <title>Analytics- User Guide</title>
+  <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all"/>
+</head>
+
+<body>
+<h1>Analytics</h1>
+<p>Running summarizations and data analytics on captured data is carried out using the BAM analytics framework. The analytics framework is powered by Apache Hadoop for scaling out data processing operations on large number of data processing nodes in order to handle large data volumes. For writing analytic scripts a SQL (HiveQL) like language is provided using integrated Apache Hive.</p>
+<br/>
+
+<ol>
+    <li><h2><i>Writing an analytic script</i></h2></li>
+    <br/>
+    <p>Follow the instructions below to add an analytic script.</p>
+    <br/>
+    <ol>
+        <li>Log on to the Business Activity Monitor Management Console.</li>
+        <br/>
+        <img src="images/1.png"/>
+        <br/>
+        <br/>
+        <li>In the "Main" menu, under "Manage" category click "Add" under "Analytics" menu item to get to the "Script Editor" window.</li>
+         <br/>
+        <img src="images/2.png"/>
+        <br/>
+        <br/>
+        <li>Now provide a script name and add the required HiveQL script in the editor pane as shown below.</li>
+         <br/>
+        <img src="images/3.png"/>
+        <br/>
+        <br/>
+        <li>Click "Run" to execute the script and view results if required. The results will get shown in the panel below the script editor as follows.</li>
+         <br/>
+        <img src="images/4.png"/>
+        <br/>
+        <br/>
+        <li>Click "Save" to save the script. Click "No" in the pop up dialog box if it is not required to schedule the script immediately. Else click "Yes" to schedule the script before saving. See the section on scheduling scripts for more information.</li>
+        <br/>
+        <br/>
+        <li>Now it will be redirected to "Available Scripts" page where saved script will be shown as below.</li>
+        <br/>
+        <img src="images/5.png"/>
+        <br/>
+        <br/>
+        <br/>
+    </ol>
+
+
+     <li><h2><i>Scheduling a script</i></h2></li>
+    There are several ways to reach script scheduling UI.
+     <br/>
+    <br/>
+    <ul>
+        <li>Via "Available Scripts" window if the script has already been saved.</li>
+        <br/>
+        <img src="images/6.png"/>
+        <br/>
+        <br/>
+        <li>In "Script Editor" window while editing a saved script.</li>
+        <br/>
+        <img src="images/7.png"/>
+        <br/>
+        <br/><li>Via pop up dialog when saving the script.</li>
+        <br/>
+        <br/>
+    </ul>
+
+    <p>There are couple of ways to specify the scheduling interval for the script to run.</p>
+    <ol>
+        <li>Cron expression. This is more flexible since Cron allows for fine grained interval and scheduling specifications. For more information see Quartz documentation.</li>
+          <br/>
+        <img src="images/8.png"/>
+        <br/>
+        <br/>
+         <li>Simple scheduling. This can be used to specify some common scheduling schemes.</li>
+          <br/>
+        <img src="images/9.png"/>
+        <br/>
+        <br/>
+    </ol>
+
+</ol>
+
+
+</body>
+
+</html>

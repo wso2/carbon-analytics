@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<executionPlan name="FastMovingStocksExecutionPlan" statistics="disable"
+               trace="disable" xmlns="http://wso2.org/carbon/eventprocessor">
+    <description>This execution plan analyzes two streams and predicts fast moving stock quotes</description>
+    <siddhiConfiguration>
+        <property name="siddhi.enable.distributed.processing">false</property>
+        <property name="siddhi.persistence.snapshot.time.interval.minutes">0</property>
+    </siddhiConfiguration>
+    <importedStreams>
+        <stream as="AllStockQuotes" name="org.wso2.sample.stock.quote.basic" version="1.0.0" passthroughFlow="enable" />
+        <stream as="TwitterFeed" name="org.wso2.sample.twitter.feed" version="1.0.0" passthroughFlow="enable" />
+    </importedStreams>
+    <queryExpressions><![CDATA[
+        from AllStockQuotes#window.time(1 min)
+        select symbol,price, avg(price) as averagePrice
+        group by symbol
+        having ((price > averagePrice*1.02) or (averagePrice*0.98 > price ))
+        insert into FastMovingStockQuotes;
+
+        from TwitterFeed#window.time(1 min)
+        select company as company, sum(wordCount) as words
+        group by company having (words > 10)
+        insert into HighFrequentTweets;
+
+        from FastMovingStockQuotes#window.time(1 min) as fastMovingStockQuotes
+        join HighFrequentTweets#window.time(1 min) as highFrequentTweets on fastMovingStockQuotes.symbol==highFrequentTweets.company
+        select fastMovingStockQuotes.symbol as company, fastMovingStockQuotes.averagePrice as amount, highFrequentTweets.words as words
+        insert into PredictedStockQuotes;
+  ]]></queryExpressions>
+    <exportedStreams>
+        <stream name="org.wso2.sample.predicted.stock.quotes"
+                valueOf="PredictedStockQuotes" version="1.0.0" passthroughFlow="enable" />
+    </exportedStreams>
+</executionPlan>

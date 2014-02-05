@@ -1,0 +1,258 @@
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:ax2103="http://beans.custom.registry.carbon.wso2.org/xsd" xmlns:ns="http://services.custom.registry.carbon.wso2.org" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" targetNamespace="http://services.custom.registry.carbon.wso2.org">
+    <wsdl:documentation>CustomUIAdminService</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema xmlns:ax2104="http://beans.custom.registry.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://services.custom.registry.carbon.wso2.org">
+    <xs:import namespace="http://beans.custom.registry.carbon.wso2.org/xsd"/>
+    <xs:element name="isAuthorized">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" name="path" nillable="true" type="xs:string"/>
+                <xs:element minOccurs="0" name="action" nillable="true" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="isAuthorizedResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="Exception">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="Exception" nillable="true" type="xs:anyType"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="Exception">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" name="Exception" nillable="true" type="ns:Exception"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="getTextContent">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" name="path" nillable="true" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="getTextContentResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="addTextContent">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" name="parentPath" nillable="true" type="xs:string"/>
+                <xs:element minOccurs="0" name="resourceName" nillable="true" type="xs:string"/>
+                <xs:element minOccurs="0" name="mediaType" nillable="true" type="xs:string"/>
+                <xs:element minOccurs="0" name="description" nillable="true" type="xs:string"/>
+                <xs:element minOccurs="0" name="content" nillable="true" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="updateTextContent">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" name="path" nillable="true" type="xs:string"/>
+                <xs:element minOccurs="0" name="content" nillable="true" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://beans.custom.registry.carbon.wso2.org/xsd">
+    <xs:complexType name="ResourceMetadata">
+        <xs:sequence/>
+    </xs:complexType>
+</xs:schema>
+    </wsdl:types>
+    <wsdl:message name="isAuthorizedRequest">
+        <wsdl:part name="parameters" element="ns:isAuthorized"/>
+    </wsdl:message>
+    <wsdl:message name="isAuthorizedResponse">
+        <wsdl:part name="parameters" element="ns:isAuthorizedResponse"/>
+    </wsdl:message>
+    <wsdl:message name="updateTextContentRequest">
+        <wsdl:part name="parameters" element="ns:updateTextContent"/>
+    </wsdl:message>
+    <wsdl:message name="Exception">
+        <wsdl:part name="parameters" element="ns:Exception"/>
+    </wsdl:message>
+    <wsdl:message name="addTextContentRequest">
+        <wsdl:part name="parameters" element="ns:addTextContent"/>
+    </wsdl:message>
+    <wsdl:message name="getTextContentRequest">
+        <wsdl:part name="parameters" element="ns:getTextContent"/>
+    </wsdl:message>
+    <wsdl:message name="getTextContentResponse">
+        <wsdl:part name="parameters" element="ns:getTextContentResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="CustomUIAdminServicePortType">
+        <wsdl:operation name="isAuthorized">
+            <wsdl:input message="ns:isAuthorizedRequest" wsaw:Action="urn:isAuthorized"/>
+            <wsdl:output message="ns:isAuthorizedResponse" wsaw:Action="urn:isAuthorizedResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="updateTextContent">
+            <wsdl:input message="ns:updateTextContentRequest" wsaw:Action="urn:updateTextContent"/>
+            <wsdl:fault message="ns:Exception" name="Exception" wsaw:Action="urn:updateTextContentException"/>
+        </wsdl:operation>
+        <wsdl:operation name="addTextContent">
+            <wsdl:input message="ns:addTextContentRequest" wsaw:Action="urn:addTextContent"/>
+            <wsdl:fault message="ns:Exception" name="Exception" wsaw:Action="urn:addTextContentException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getTextContent">
+            <wsdl:input message="ns:getTextContentRequest" wsaw:Action="urn:getTextContent"/>
+            <wsdl:output message="ns:getTextContentResponse" wsaw:Action="urn:getTextContentResponse"/>
+            <wsdl:fault message="ns:Exception" name="Exception" wsaw:Action="urn:getTextContentException"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="CustomUIAdminServiceSoap11Binding" type="ns:CustomUIAdminServicePortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="isAuthorized">
+            <soap:operation soapAction="urn:isAuthorized" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="updateTextContent">
+            <soap:operation soapAction="urn:updateTextContent" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="Exception">
+                <soap:fault use="literal" name="Exception"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addTextContent">
+            <soap:operation soapAction="urn:addTextContent" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="Exception">
+                <soap:fault use="literal" name="Exception"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getTextContent">
+            <soap:operation soapAction="urn:getTextContent" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="Exception">
+                <soap:fault use="literal" name="Exception"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="CustomUIAdminServiceSoap12Binding" type="ns:CustomUIAdminServicePortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="isAuthorized">
+            <soap12:operation soapAction="urn:isAuthorized" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="updateTextContent">
+            <soap12:operation soapAction="urn:updateTextContent" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="Exception">
+                <soap12:fault use="literal" name="Exception"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addTextContent">
+            <soap12:operation soapAction="urn:addTextContent" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="Exception">
+                <soap12:fault use="literal" name="Exception"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getTextContent">
+            <soap12:operation soapAction="urn:getTextContent" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="Exception">
+                <soap12:fault use="literal" name="Exception"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="CustomUIAdminServiceHttpBinding" type="ns:CustomUIAdminServicePortType">
+        <http:binding verb="POST"/>
+        <wsdl:operation name="isAuthorized">
+            <http:operation location="CustomUIAdminService/isAuthorized"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="isAuthorized"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="isAuthorized"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="updateTextContent">
+            <http:operation location="CustomUIAdminService/updateTextContent"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="updateTextContent"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="addTextContent">
+            <http:operation location="CustomUIAdminService/addTextContent"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="addTextContent"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getTextContent">
+            <http:operation location="CustomUIAdminService/getTextContent"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getTextContent"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getTextContent"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="CustomUIAdminService">
+        <wsdl:port name="CustomUIAdminServiceHttpsSoap11Endpoint" binding="ns:CustomUIAdminServiceSoap11Binding">
+            <soap:address location="https://10.100.1.193:9443/services/CustomUIAdminService.CustomUIAdminServiceHttpsSoap11Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="CustomUIAdminServiceHttpsSoap12Endpoint" binding="ns:CustomUIAdminServiceSoap12Binding">
+            <soap12:address location="https://10.100.1.193:9443/services/CustomUIAdminService.CustomUIAdminServiceHttpsSoap12Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="CustomUIAdminServiceHttpsEndpoint" binding="ns:CustomUIAdminServiceHttpBinding">
+            <http:address location="https://10.100.1.193:9443/services/CustomUIAdminService.CustomUIAdminServiceHttpsEndpoint/"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

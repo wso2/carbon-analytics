@@ -1,0 +1,183 @@
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<properties>
+    <!--orientation-->
+    <property>
+        <name>Width</name>
+        <function>width</function>
+        <validation></validation>
+        <type>int</type>
+    </property>
+    <property>
+        <name>Height</name>
+        <function>height</function>
+        <validation></validation>
+        <type>int</type>
+    </property>
+    <property>
+        <name>Top</name>
+        <function>top</function>
+        <validation></validation>
+        <type>int</type>
+    </property>
+    <property>
+        <name>Left</name>
+        <function>left</function>
+        <validation></validation>
+        <type>int</type>
+    </property>
+    <property>
+        <name>Bottom</name>
+        <function>bottom</function>
+        <validation></validation>
+        <type>int</type>
+    </property>
+    <property>
+        <name>Right</name>
+        <function>right</function>
+        <validation></validation>
+        <type>int</type>
+    </property>
+    <property>
+        <name>Anchor X</name>
+        <function>anchorX</function>
+        <validation></validation>
+        <type>int</type>
+    </property>
+    <property>
+        <name>Anchor Y</name>
+        <function>anchorY</function>
+        <validation></validation>
+        <type>int</type>
+    </property>
+    <property>
+        <name>Padding Top</name>
+        <function>padding_top</function>
+        <validation></validation>
+        <type>int</type>
+    </property>
+    <property>
+        <name>Padding Left</name>
+        <function>padding_left</function>
+        <validation></validation>
+        <type>int</type>
+    </property>
+    <property>
+        <name>Padding Bottom</name>
+        <function>padding_bottom</function>
+        <validation></validation>
+        <type>int</type>
+    </property>
+    <property>
+        <name>Padding Right</name>
+        <function>padding_right</function>
+        <validation></validation>
+        <type>int</type>
+    </property>
+    <property>
+        <name>Margin Top</name>
+        <function>margin_top</function>
+        <validation></validation>
+        <type>int</type>
+    </property>
+    <property>
+        <name>Margin Left</name>
+        <function>margin_left</function>
+        <validation></validation>
+        <type>int</type>
+    </property>
+    <property>
+        <name>Margin Bottom</name>
+        <function>margin_bottom</function>
+        <validation></validation>
+        <type>int</type>
+    </property>
+    <property>
+        <name>Margin Right</name>
+        <function>margin_right</function>
+        <validation></validation>
+        <type>int</type>
+    </property>
+    <property>
+        <name>Legend X</name>
+        <function>legendX</function>
+        <validation></validation>
+        <type>int</type>
+    </property>
+    <property>
+        <name>Legend Y</name>
+        <function>legendY</function>
+        <validation></validation>
+        <type>int</type>
+    </property>
+    <property>
+        <name>Label Angle - X</name>
+        <function>label_angleX</function>
+        <validation></validation>
+        <type>float</type>
+    </property>
+    <property>
+        <name>Lebel Margin</name>
+        <function>label_margin</function>
+        <validation></validation>
+        <type>float</type>
+    </property>
+    <!--configurations-->
+    <property>
+        <name>Data Field</name>
+        <function>dataField</function>
+        <validation></validation>
+        <type>string</type>
+    </property>
+    <property>
+        <name>Data Value</name>
+        <function>dataValue</function>
+        <validation></validation>
+        <type>string</type>
+    </property>
+    <property>
+        <name>Data Label</name>
+        <function>dataLabel</function>
+        <validation></validation>
+        <type>string</type>
+    </property>
+    <property>
+        <name>Show Percent</name>
+        <function>showPercent</function>
+        <validation></validation>
+        <type>boolean</type>
+    </property>
+    <property>
+        <name>Show Value</name>
+        <function>showValue</function>
+        <validation></validation>
+        <type>boolean</type>
+    </property>
+    <property>
+        <name>Font Family</name>
+        <function>fontFamily</function>
+        <validation></validation>
+        <type>string</type>
+    </property>
+    <property>
+        <name>Font Size</name>
+        <function>fontSize</function>
+        <validation></validation>
+        <type>string</type>
+    </property>
+</properties>

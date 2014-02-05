@@ -1,0 +1,24 @@
+<gg:gadgetgen xmlns:gg="http://wso2.com/bam/gadgetgen">
+    <gg:jdbcurl>
+        jdbc:h2:/Users/mackie/tmp/jaggery-1.0.0_M4/repository/database/WSO2CARBON_DB;DB_CLOSE_ON_EXIT=FALSE
+    </gg:jdbcurl>
+    <gg:username>wso2carbon</gg:username>
+    <gg:password>wso2carbon</gg:password>
+    <gg:driver>org.h2.Driver</gg:driver>
+    <gg:sql>select * from productsummary</gg:sql>
+    <gg:gadget-title>Gadget Generation Magnifique</gg:gadget-title>
+    <gg:gadget-filename>generated-gadget</gg:gadget-filename>
+    <gg:refresh-rate>10</gg:refresh-rate>
+    <gg:bar-xlabel>Product Name</gg:bar-xlabel>
+    <gg:bar-xcolumn>prod_name</gg:bar-xcolumn>
+    <gg:bar-ylabel>Total Amount (Rs.)</gg:bar-ylabel>
+    <gg:bar-ycolumn>total_amount</gg:bar-ycolumn>
+    <gg:bar-title>Product vs Total Amount</gg:bar-title>
+    <gg:BarChart>
+        <gg:bar-xlabel>Product Name</gg:bar-xlabel>
+        <gg:bar-xcolumn>prod_name</gg:bar-xcolumn>
+        <gg:bar-ylabel>Total Amount (Rs.)</gg:bar-ylabel>
+        <gg:bar-ycolumn>total_amount</gg:bar-ycolumn>
+        <gg:bar-title>Product vs Total Amount</gg:bar-title>
+    </gg:BarChart>
+</gg:gadgetgen>

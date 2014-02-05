@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~ Copyright (c) 2009-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ Licensed under the Apache License, Version 2.0 (the "License");
+ ~ you may not use this file except in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~      http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing, software
+ ~ distributed under the License is distributed on an "AS IS" BASIS,
+ ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ~ See the License for the specific language governing permissions and
+ ~ limitations under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <groupId>org.wso2.carbon</groupId>
+        <artifactId>carbon-components</artifactId>
+        <version>4.3.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.wso2.carbon</groupId>
+    <artifactId>dashboard</artifactId>
+    <packaging>pom</packaging>
+    <name>WSO2 Carbon - Dashboard Aggregator Module</name>
+    <url>http://wso2.org</url>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.dashboard.common</artifactId>
+                <version>${wso2carbon.version.dashboard}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.dashboard.mgt.gadgetrepo.common</artifactId>
+                <version>${wso2carbon.version.dashboard}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.dashboard</artifactId>
+                <version>${wso2carbon.version.dashboard}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.registry.social.api</artifactId>
+                <version>${wso2carbon.version.dashboard}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.registry.social.impl</artifactId>
+                <version>${wso2carbon.version.dashboard}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.dashboard.ui</artifactId>
+                <version>${wso2carbon.version.dashboard}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.dashboard.social.common</artifactId>
+                <version>${wso2carbon.version.dashboard}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.dashboard.social</artifactId>
+                <version>${wso2carbon.version.dashboard}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.dashboard.mgt.theme.common</artifactId>
+                <version>${wso2carbon.version.dashboard}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.logging</artifactId>
+                <version>${wso2carbon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.application.deployer</artifactId>
+                <version>${wso2carbon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2.wso2</groupId>
+                <artifactId>axis2</artifactId>
+                <version>${axis2.wso2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.shindig.wso2</groupId>
+                <artifactId>shindig</artifactId>
+                <version>${shindig.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.core</artifactId>
+                <version>${wso2carbon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.ui</artifactId>
+                <version>${wso2carbon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.registry.resource.ui</artifactId>
+                <version>${wso2carbon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.registry.resource.stub</artifactId>
+                <version>${wso2carbon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.registry.resource</artifactId>
+                <version>${wso2carbon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.core.services</artifactId>
+                <version>${wso2carbon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.server.admin.ui</artifactId>
+                <version>${wso2carbon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-adb-codegen</artifactId>
+                <version>${axis2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.server.admin</artifactId>
+                <version>${wso2carbon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.user.core</artifactId>
+                <version>${wso2carbon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.batik.wso2</groupId>
+                <artifactId>batik</artifactId>
+                <version>${batik.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.dashboard.mgt.theme.stub</artifactId>
+                <version>${wso2carbon.version.dashboard}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.dashboard.mgt.gadgetrepo.stub</artifactId>
+                <version>${wso2carbon.version.dashboard}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.dashboard.stub</artifactId>
+                <version>${wso2carbon.version.dashboard}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.dashboard.mgt.oauth.stub</artifactId>
+                <version>${wso2carbon.version.dashboard}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.dashboard.social.stub</artifactId>
+                <version>${wso2carbon.version.dashboard}</version>
+            </dependency>
+			<dependency>
+				<groupId>com.google.guice.wso2</groupId>
+				<artifactId>guice2</artifactId>
+				<version>2.0.0.wso2v2</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.guava.wso2</groupId>
+				<artifactId>guava</artifactId>
+				<version>${google.guava.wso2.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.json.wso2</groupId>
+				<artifactId>json</artifactId>
+				<version>${orbit.version.json}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.googlecode.json-simple.wso2</groupId>
+				<artifactId>json-simple</artifactId>
+				<version>${orbit.version.json-simple}</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-lang.wso2</groupId>
+				<artifactId>commons-lang</artifactId>
+				<version>${orbit.version.commons.lang}</version>
+			</dependency>
+			
+        </dependencies>
+    </dependencyManagement>
+
+    <modules>
+        <module>org.wso2.carbon.dashboard.common</module>
+        <module>org.wso2.carbon.dashboard</module>
+        <module>org.wso2.carbon.dashboard.ui</module>
+        <module>org.wso2.carbon.dashboard.mgt.gadgetrepo.common</module>
+        <module>org.wso2.carbon.dashboard.mgt.gadgetrepo</module>
+        <module>org.wso2.carbon.dashboard.mgt.gadgetrepo.ui</module>
+        <module>org.wso2.carbon.dashboard.mgt.users</module>
+        <module>org.wso2.carbon.dashboard.mgt.users.ui</module>
+        <module>org.wso2.carbon.dashboard.gadgetrepopopulator</module>
+        <module>org.wso2.carbon.dashboard.dashboardpopulator</module>
+        <module>org.wso2.carbon.dashboard.themepopulator</module>
+        <module>org.wso2.carbon.dashboard.gadgetframework.ui</module>
+        <module>org.wso2.carbon.dashboard.mgt.theme.common</module>
+        <module>org.wso2.carbon.dashboard.mgt.theme</module>
+        <module>org.wso2.carbon.dashboard.mgt.theme.ui</module>
+        <module>org.wso2.carbon.dashboard.social.common</module>
+        <module>org.wso2.carbon.dashboard.social</module>
+        <module>org.wso2.carbon.dashboard.social.ui</module>
+        <module>org.wso2.carbon.dashboard.mgt.oauth</module>
+        <module>org.wso2.carbon.dashboard.mgt.oauth.ui</module>
+    </modules>
+
+    <properties>
+        <wso2carbon.version.dashboard>${wso2carbon.version}</wso2carbon.version.dashboard>
+        <axis2.osgi.version.range.dashboard>${axis2.osgi.version.range}
+        </axis2.osgi.version.range.dashboard>
+        <axis2.version.dashboard>${axis2.version}</axis2.version.dashboard>
+    </properties>
+
+</project>

@@ -1,0 +1,1232 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://internal.admin.formatter.event.carbon.wso2.org" xmlns:ax2108="http://internal.admin.formatter.event.carbon.wso2.org/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://internal.admin.formatter.event.carbon.wso2.org">
+    <wsdl:documentation>EventFormatterAdminService</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://internal.admin.formatter.event.carbon.wso2.org/xsd">
+            <xs:complexType name="OutputEventAdaptorInfoDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="eventAdaptorName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="eventAdaptorType" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="EventFormatterPropertyDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="defaultValue" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="displayName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="hint" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="key" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="options" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="required" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="secured" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="value" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="EventFormatterConfigurationInfoDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="enableStats" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="enableTracing" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="eventFormatterName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="inputStreamId" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="mappingType" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="outEventAdaptorName" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="EventFormatterConfigurationFileDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="eventFormatterName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="EventFormatterConfigurationDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="eventFormatterName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="fromStreamNameWithVersion" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="jsonOutputMappingDto" nillable="true" type="ax2108:JSONOutputMappingDto"/>
+                    <xs:element minOccurs="0" name="mapOutputMappingDto" nillable="true" type="ax2108:MapOutputMappingDto"/>
+                    <xs:element minOccurs="0" name="mappingType" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="streamDefinition" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="textOutputMappingDto" nillable="true" type="ax2108:TextOutputMappingDto"/>
+                    <xs:element minOccurs="0" name="toPropertyConfigurationDto" nillable="true" type="ax2108:ToPropertyConfigurationDto"/>
+                    <xs:element minOccurs="0" name="wso2EventOutputMappingDto" nillable="true" type="ax2108:WSO2EventOutputMappingDto"/>
+                    <xs:element minOccurs="0" name="xmlOutputMappingDto" nillable="true" type="ax2108:XMLOutputMappingDto"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="JSONOutputMappingDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="mappingText" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="registryResource" type="xs:boolean"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="MapOutputMappingDto">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2108:EventOutputPropertyDto"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="EventOutputPropertyDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="valueOf" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="TextOutputMappingDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="mappingText" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="registryResource" type="xs:boolean"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ToPropertyConfigurationDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="eventAdaptorName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="eventAdaptorType" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="outputEventAdaptorMessageConfiguration" nillable="true" type="ax2108:EventFormatterPropertyDto"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="WSO2EventOutputMappingDto">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="correlationWSO2EventOutputPropertyConfigurationDto" nillable="true" type="ax2108:EventOutputPropertyDto"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="metaWSO2EventOutputPropertyConfigurationDto" nillable="true" type="ax2108:EventOutputPropertyDto"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="payloadWSO2EventOutputPropertyConfigurationDto" nillable="true" type="ax2108:EventOutputPropertyDto"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="XMLOutputMappingDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="mappingXMLText" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="registryResource" type="xs:boolean"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="EventOutputPropertyConfigurationDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="valueOf" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema xmlns:ax2109="http://internal.admin.formatter.event.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://internal.admin.formatter.event.carbon.wso2.org">
+            <xs:import namespace="http://internal.admin.formatter.event.carbon.wso2.org/xsd"/>
+            <xs:element name="undeployInactiveEventFormatterConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="undeployActiveEventFormatterConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventFormatterName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setTracingEnabled">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventFormatterName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="flag" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setStatisticsEnabled">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventFormatterName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="flag" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getSupportedMappingTypes">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventAdaptorName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getSupportedMappingTypesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getStreamDefinition">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getStreamDefinitionResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getOutputEventAdaptorInfo">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getOutputEventAdaptorInfoResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2109:OutputEventAdaptorInfoDto"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getInactiveEventFormatterConfigurationContent">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getInactiveEventFormatterConfigurationContentResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getEventFormatterStatusAsString">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="filename" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getEventFormatterStatusAsStringResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getEventFormatterProperties">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventAdaptorName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getEventFormatterPropertiesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2109:EventFormatterPropertyDto"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllStreamSpecificActiveEventFormatterConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="streamId" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllStreamSpecificActiveEventFormatterConfigurationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2109:EventFormatterConfigurationInfoDto"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllInactiveEventFormatterConfiguration">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllInactiveEventFormatterConfigurationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2109:EventFormatterConfigurationFileDto"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllEventStreamNames">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllEventStreamNamesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllActiveEventFormatterConfiguration">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllActiveEventFormatterConfigurationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2109:EventFormatterConfigurationInfoDto"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getActiveEventFormatterConfigurationContent">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventFormatterName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getActiveEventFormatterConfigurationContentResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getActiveEventFormatterConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventFormatterName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getActiveEventFormatterConfigurationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2109:EventFormatterConfigurationDto"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="editInactiveEventFormatterConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventFormatterConfiguration" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="editActiveEventFormatterConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventFormatterConfiguration" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="eventFormatterName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployXmlEventFormatterConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventFormatterName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="eventAdaptorName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="eventAdaptorType" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="textData" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2109:EventFormatterPropertyDto"/>
+                        <xs:element minOccurs="0" name="dataFrom" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployWSO2EventFormatterConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventFormatterName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="eventAdaptorName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="eventAdaptorType" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="metaData" nillable="true" type="ax2109:EventOutputPropertyConfigurationDto"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="correlationData" nillable="true" type="ax2109:EventOutputPropertyConfigurationDto"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="payloadData" nillable="true" type="ax2109:EventOutputPropertyConfigurationDto"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2109:EventFormatterPropertyDto"/>
+                        <xs:element minOccurs="0" name="mappingEnabled" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployTextEventFormatterConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventFormatterName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="eventAdaptorName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="eventAdaptorType" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="textData" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2109:EventFormatterPropertyDto"/>
+                        <xs:element minOccurs="0" name="dataFrom" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployMapEventFormatterConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventFormatterName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="eventAdaptorName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="eventAdaptorType" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="mapData" nillable="true" type="ax2109:EventOutputPropertyConfigurationDto"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2109:EventFormatterPropertyDto"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployJsonEventFormatterConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventFormatterName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="eventAdaptorName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="eventAdaptorType" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="jsonData" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2109:EventFormatterPropertyDto"/>
+                        <xs:element minOccurs="0" name="dataFrom" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="getEventFormatterPropertiesRequest">
+        <wsdl:part name="parameters" element="ns:getEventFormatterProperties"/>
+    </wsdl:message>
+    <wsdl:message name="getEventFormatterPropertiesResponse">
+        <wsdl:part name="parameters" element="ns:getEventFormatterPropertiesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getAllStreamSpecificActiveEventFormatterConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:getAllStreamSpecificActiveEventFormatterConfiguration"/>
+    </wsdl:message>
+    <wsdl:message name="getAllStreamSpecificActiveEventFormatterConfigurationResponse">
+        <wsdl:part name="parameters" element="ns:getAllStreamSpecificActiveEventFormatterConfigurationResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getEventFormatterStatusAsStringRequest">
+        <wsdl:part name="parameters" element="ns:getEventFormatterStatusAsString"/>
+    </wsdl:message>
+    <wsdl:message name="getEventFormatterStatusAsStringResponse">
+        <wsdl:part name="parameters" element="ns:getEventFormatterStatusAsStringResponse"/>
+    </wsdl:message>
+    <wsdl:message name="deployTextEventFormatterConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:deployTextEventFormatterConfiguration"/>
+    </wsdl:message>
+    <wsdl:message name="deployTextEventFormatterConfigurationResponse"/>
+    <wsdl:message name="getActiveEventFormatterConfigurationContentRequest">
+        <wsdl:part name="parameters" element="ns:getActiveEventFormatterConfigurationContent"/>
+    </wsdl:message>
+    <wsdl:message name="getActiveEventFormatterConfigurationContentResponse">
+        <wsdl:part name="parameters" element="ns:getActiveEventFormatterConfigurationContentResponse"/>
+    </wsdl:message>
+    <wsdl:message name="setStatisticsEnabledRequest">
+        <wsdl:part name="parameters" element="ns:setStatisticsEnabled"/>
+    </wsdl:message>
+    <wsdl:message name="setStatisticsEnabledResponse"/>
+    <wsdl:message name="undeployInactiveEventFormatterConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:undeployInactiveEventFormatterConfiguration"/>
+    </wsdl:message>
+    <wsdl:message name="undeployInactiveEventFormatterConfigurationResponse"/>
+    <wsdl:message name="getAllEventStreamNamesRequest">
+        <wsdl:part name="parameters" element="ns:getAllEventStreamNames"/>
+    </wsdl:message>
+    <wsdl:message name="getAllEventStreamNamesResponse">
+        <wsdl:part name="parameters" element="ns:getAllEventStreamNamesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="deployJsonEventFormatterConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:deployJsonEventFormatterConfiguration"/>
+    </wsdl:message>
+    <wsdl:message name="deployJsonEventFormatterConfigurationResponse"/>
+    <wsdl:message name="getAllInactiveEventFormatterConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:getAllInactiveEventFormatterConfiguration"/>
+    </wsdl:message>
+    <wsdl:message name="getAllInactiveEventFormatterConfigurationResponse">
+        <wsdl:part name="parameters" element="ns:getAllInactiveEventFormatterConfigurationResponse"/>
+    </wsdl:message>
+    <wsdl:message name="undeployActiveEventFormatterConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:undeployActiveEventFormatterConfiguration"/>
+    </wsdl:message>
+    <wsdl:message name="undeployActiveEventFormatterConfigurationResponse"/>
+    <wsdl:message name="deployMapEventFormatterConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:deployMapEventFormatterConfiguration"/>
+    </wsdl:message>
+    <wsdl:message name="deployMapEventFormatterConfigurationResponse"/>
+    <wsdl:message name="getOutputEventAdaptorInfoRequest">
+        <wsdl:part name="parameters" element="ns:getOutputEventAdaptorInfo"/>
+    </wsdl:message>
+    <wsdl:message name="getOutputEventAdaptorInfoResponse">
+        <wsdl:part name="parameters" element="ns:getOutputEventAdaptorInfoResponse"/>
+    </wsdl:message>
+    <wsdl:message name="deployWSO2EventFormatterConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:deployWSO2EventFormatterConfiguration"/>
+    </wsdl:message>
+    <wsdl:message name="deployWSO2EventFormatterConfigurationResponse"/>
+    <wsdl:message name="getAllActiveEventFormatterConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:getAllActiveEventFormatterConfiguration"/>
+    </wsdl:message>
+    <wsdl:message name="getAllActiveEventFormatterConfigurationResponse">
+        <wsdl:part name="parameters" element="ns:getAllActiveEventFormatterConfigurationResponse"/>
+    </wsdl:message>
+    <wsdl:message name="deployXmlEventFormatterConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:deployXmlEventFormatterConfiguration"/>
+    </wsdl:message>
+    <wsdl:message name="deployXmlEventFormatterConfigurationResponse"/>
+    <wsdl:message name="getInactiveEventFormatterConfigurationContentRequest">
+        <wsdl:part name="parameters" element="ns:getInactiveEventFormatterConfigurationContent"/>
+    </wsdl:message>
+    <wsdl:message name="getInactiveEventFormatterConfigurationContentResponse">
+        <wsdl:part name="parameters" element="ns:getInactiveEventFormatterConfigurationContentResponse"/>
+    </wsdl:message>
+    <wsdl:message name="setTracingEnabledRequest">
+        <wsdl:part name="parameters" element="ns:setTracingEnabled"/>
+    </wsdl:message>
+    <wsdl:message name="setTracingEnabledResponse"/>
+    <wsdl:message name="getActiveEventFormatterConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:getActiveEventFormatterConfiguration"/>
+    </wsdl:message>
+    <wsdl:message name="getActiveEventFormatterConfigurationResponse">
+        <wsdl:part name="parameters" element="ns:getActiveEventFormatterConfigurationResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getStreamDefinitionRequest">
+        <wsdl:part name="parameters" element="ns:getStreamDefinition"/>
+    </wsdl:message>
+    <wsdl:message name="getStreamDefinitionResponse">
+        <wsdl:part name="parameters" element="ns:getStreamDefinitionResponse"/>
+    </wsdl:message>
+    <wsdl:message name="editInactiveEventFormatterConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:editInactiveEventFormatterConfiguration"/>
+    </wsdl:message>
+    <wsdl:message name="editInactiveEventFormatterConfigurationResponse"/>
+    <wsdl:message name="editActiveEventFormatterConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:editActiveEventFormatterConfiguration"/>
+    </wsdl:message>
+    <wsdl:message name="editActiveEventFormatterConfigurationResponse"/>
+    <wsdl:message name="getSupportedMappingTypesRequest">
+        <wsdl:part name="parameters" element="ns:getSupportedMappingTypes"/>
+    </wsdl:message>
+    <wsdl:message name="getSupportedMappingTypesResponse">
+        <wsdl:part name="parameters" element="ns:getSupportedMappingTypesResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="EventFormatterAdminServicePortType">
+        <wsdl:operation name="getEventFormatterProperties">
+            <wsdl:input message="ns:getEventFormatterPropertiesRequest" wsaw:Action="urn:getEventFormatterProperties"/>
+            <wsdl:output message="ns:getEventFormatterPropertiesResponse" wsaw:Action="urn:getEventFormatterPropertiesResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getAllStreamSpecificActiveEventFormatterConfiguration">
+            <wsdl:input message="ns:getAllStreamSpecificActiveEventFormatterConfigurationRequest" wsaw:Action="urn:getAllStreamSpecificActiveEventFormatterConfiguration"/>
+            <wsdl:output message="ns:getAllStreamSpecificActiveEventFormatterConfigurationResponse" wsaw:Action="urn:getAllStreamSpecificActiveEventFormatterConfigurationResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getEventFormatterStatusAsString">
+            <wsdl:input message="ns:getEventFormatterStatusAsStringRequest" wsaw:Action="urn:getEventFormatterStatusAsString"/>
+            <wsdl:output message="ns:getEventFormatterStatusAsStringResponse" wsaw:Action="urn:getEventFormatterStatusAsStringResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="deployTextEventFormatterConfiguration">
+            <wsdl:input message="ns:deployTextEventFormatterConfigurationRequest" wsaw:Action="urn:deployTextEventFormatterConfiguration"/>
+            <wsdl:output message="ns:deployTextEventFormatterConfigurationResponse" wsaw:Action="urn:deployTextEventFormatterConfigurationResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveEventFormatterConfigurationContent">
+            <wsdl:input message="ns:getActiveEventFormatterConfigurationContentRequest" wsaw:Action="urn:getActiveEventFormatterConfigurationContent"/>
+            <wsdl:output message="ns:getActiveEventFormatterConfigurationContentResponse" wsaw:Action="urn:getActiveEventFormatterConfigurationContentResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="setStatisticsEnabled">
+            <wsdl:input message="ns:setStatisticsEnabledRequest" wsaw:Action="urn:setStatisticsEnabled"/>
+            <wsdl:output message="ns:setStatisticsEnabledResponse" wsaw:Action="urn:setStatisticsEnabledResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="undeployInactiveEventFormatterConfiguration">
+            <wsdl:input message="ns:undeployInactiveEventFormatterConfigurationRequest" wsaw:Action="urn:undeployInactiveEventFormatterConfiguration"/>
+            <wsdl:output message="ns:undeployInactiveEventFormatterConfigurationResponse" wsaw:Action="urn:undeployInactiveEventFormatterConfigurationResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getAllEventStreamNames">
+            <wsdl:input message="ns:getAllEventStreamNamesRequest" wsaw:Action="urn:getAllEventStreamNames"/>
+            <wsdl:output message="ns:getAllEventStreamNamesResponse" wsaw:Action="urn:getAllEventStreamNamesResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="deployJsonEventFormatterConfiguration">
+            <wsdl:input message="ns:deployJsonEventFormatterConfigurationRequest" wsaw:Action="urn:deployJsonEventFormatterConfiguration"/>
+            <wsdl:output message="ns:deployJsonEventFormatterConfigurationResponse" wsaw:Action="urn:deployJsonEventFormatterConfigurationResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getAllInactiveEventFormatterConfiguration">
+            <wsdl:input message="ns:getAllInactiveEventFormatterConfigurationRequest" wsaw:Action="urn:getAllInactiveEventFormatterConfiguration"/>
+            <wsdl:output message="ns:getAllInactiveEventFormatterConfigurationResponse" wsaw:Action="urn:getAllInactiveEventFormatterConfigurationResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="undeployActiveEventFormatterConfiguration">
+            <wsdl:input message="ns:undeployActiveEventFormatterConfigurationRequest" wsaw:Action="urn:undeployActiveEventFormatterConfiguration"/>
+            <wsdl:output message="ns:undeployActiveEventFormatterConfigurationResponse" wsaw:Action="urn:undeployActiveEventFormatterConfigurationResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="deployMapEventFormatterConfiguration">
+            <wsdl:input message="ns:deployMapEventFormatterConfigurationRequest" wsaw:Action="urn:deployMapEventFormatterConfiguration"/>
+            <wsdl:output message="ns:deployMapEventFormatterConfigurationResponse" wsaw:Action="urn:deployMapEventFormatterConfigurationResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getOutputEventAdaptorInfo">
+            <wsdl:input message="ns:getOutputEventAdaptorInfoRequest" wsaw:Action="urn:getOutputEventAdaptorInfo"/>
+            <wsdl:output message="ns:getOutputEventAdaptorInfoResponse" wsaw:Action="urn:getOutputEventAdaptorInfoResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="deployWSO2EventFormatterConfiguration">
+            <wsdl:input message="ns:deployWSO2EventFormatterConfigurationRequest" wsaw:Action="urn:deployWSO2EventFormatterConfiguration"/>
+            <wsdl:output message="ns:deployWSO2EventFormatterConfigurationResponse" wsaw:Action="urn:deployWSO2EventFormatterConfigurationResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getAllActiveEventFormatterConfiguration">
+            <wsdl:input message="ns:getAllActiveEventFormatterConfigurationRequest" wsaw:Action="urn:getAllActiveEventFormatterConfiguration"/>
+            <wsdl:output message="ns:getAllActiveEventFormatterConfigurationResponse" wsaw:Action="urn:getAllActiveEventFormatterConfigurationResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="deployXmlEventFormatterConfiguration">
+            <wsdl:input message="ns:deployXmlEventFormatterConfigurationRequest" wsaw:Action="urn:deployXmlEventFormatterConfiguration"/>
+            <wsdl:output message="ns:deployXmlEventFormatterConfigurationResponse" wsaw:Action="urn:deployXmlEventFormatterConfigurationResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getInactiveEventFormatterConfigurationContent">
+            <wsdl:input message="ns:getInactiveEventFormatterConfigurationContentRequest" wsaw:Action="urn:getInactiveEventFormatterConfigurationContent"/>
+            <wsdl:output message="ns:getInactiveEventFormatterConfigurationContentResponse" wsaw:Action="urn:getInactiveEventFormatterConfigurationContentResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="setTracingEnabled">
+            <wsdl:input message="ns:setTracingEnabledRequest" wsaw:Action="urn:setTracingEnabled"/>
+            <wsdl:output message="ns:setTracingEnabledResponse" wsaw:Action="urn:setTracingEnabledResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveEventFormatterConfiguration">
+            <wsdl:input message="ns:getActiveEventFormatterConfigurationRequest" wsaw:Action="urn:getActiveEventFormatterConfiguration"/>
+            <wsdl:output message="ns:getActiveEventFormatterConfigurationResponse" wsaw:Action="urn:getActiveEventFormatterConfigurationResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getStreamDefinition">
+            <wsdl:input message="ns:getStreamDefinitionRequest" wsaw:Action="urn:getStreamDefinition"/>
+            <wsdl:output message="ns:getStreamDefinitionResponse" wsaw:Action="urn:getStreamDefinitionResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="editInactiveEventFormatterConfiguration">
+            <wsdl:input message="ns:editInactiveEventFormatterConfigurationRequest" wsaw:Action="urn:editInactiveEventFormatterConfiguration"/>
+            <wsdl:output message="ns:editInactiveEventFormatterConfigurationResponse" wsaw:Action="urn:editInactiveEventFormatterConfigurationResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="editActiveEventFormatterConfiguration">
+            <wsdl:input message="ns:editActiveEventFormatterConfigurationRequest" wsaw:Action="urn:editActiveEventFormatterConfiguration"/>
+            <wsdl:output message="ns:editActiveEventFormatterConfigurationResponse" wsaw:Action="urn:editActiveEventFormatterConfigurationResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getSupportedMappingTypes">
+            <wsdl:input message="ns:getSupportedMappingTypesRequest" wsaw:Action="urn:getSupportedMappingTypes"/>
+            <wsdl:output message="ns:getSupportedMappingTypesResponse" wsaw:Action="urn:getSupportedMappingTypesResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="EventFormatterAdminServiceSoap11Binding" type="ns:EventFormatterAdminServicePortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="getAllStreamSpecificActiveEventFormatterConfiguration">
+            <soap:operation soapAction="urn:getAllStreamSpecificActiveEventFormatterConfiguration" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getEventFormatterProperties">
+            <soap:operation soapAction="urn:getEventFormatterProperties" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployTextEventFormatterConfiguration">
+            <soap:operation soapAction="urn:deployTextEventFormatterConfiguration" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getEventFormatterStatusAsString">
+            <soap:operation soapAction="urn:getEventFormatterStatusAsString" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveEventFormatterConfigurationContent">
+            <soap:operation soapAction="urn:getActiveEventFormatterConfigurationContent" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setStatisticsEnabled">
+            <soap:operation soapAction="urn:setStatisticsEnabled" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployInactiveEventFormatterConfiguration">
+            <soap:operation soapAction="urn:undeployInactiveEventFormatterConfiguration" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllEventStreamNames">
+            <soap:operation soapAction="urn:getAllEventStreamNames" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllInactiveEventFormatterConfiguration">
+            <soap:operation soapAction="urn:getAllInactiveEventFormatterConfiguration" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployJsonEventFormatterConfiguration">
+            <soap:operation soapAction="urn:deployJsonEventFormatterConfiguration" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployActiveEventFormatterConfiguration">
+            <soap:operation soapAction="urn:undeployActiveEventFormatterConfiguration" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployMapEventFormatterConfiguration">
+            <soap:operation soapAction="urn:deployMapEventFormatterConfiguration" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getOutputEventAdaptorInfo">
+            <soap:operation soapAction="urn:getOutputEventAdaptorInfo" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployWSO2EventFormatterConfiguration">
+            <soap:operation soapAction="urn:deployWSO2EventFormatterConfiguration" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllActiveEventFormatterConfiguration">
+            <soap:operation soapAction="urn:getAllActiveEventFormatterConfiguration" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getInactiveEventFormatterConfigurationContent">
+            <soap:operation soapAction="urn:getInactiveEventFormatterConfigurationContent" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployXmlEventFormatterConfiguration">
+            <soap:operation soapAction="urn:deployXmlEventFormatterConfiguration" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setTracingEnabled">
+            <soap:operation soapAction="urn:setTracingEnabled" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getStreamDefinition">
+            <soap:operation soapAction="urn:getStreamDefinition" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveEventFormatterConfiguration">
+            <soap:operation soapAction="urn:getActiveEventFormatterConfiguration" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editActiveEventFormatterConfiguration">
+            <soap:operation soapAction="urn:editActiveEventFormatterConfiguration" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editInactiveEventFormatterConfiguration">
+            <soap:operation soapAction="urn:editInactiveEventFormatterConfiguration" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getSupportedMappingTypes">
+            <soap:operation soapAction="urn:getSupportedMappingTypes" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="EventFormatterAdminServiceSoap12Binding" type="ns:EventFormatterAdminServicePortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="getAllStreamSpecificActiveEventFormatterConfiguration">
+            <soap12:operation soapAction="urn:getAllStreamSpecificActiveEventFormatterConfiguration" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getEventFormatterProperties">
+            <soap12:operation soapAction="urn:getEventFormatterProperties" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployTextEventFormatterConfiguration">
+            <soap12:operation soapAction="urn:deployTextEventFormatterConfiguration" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getEventFormatterStatusAsString">
+            <soap12:operation soapAction="urn:getEventFormatterStatusAsString" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveEventFormatterConfigurationContent">
+            <soap12:operation soapAction="urn:getActiveEventFormatterConfigurationContent" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setStatisticsEnabled">
+            <soap12:operation soapAction="urn:setStatisticsEnabled" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployInactiveEventFormatterConfiguration">
+            <soap12:operation soapAction="urn:undeployInactiveEventFormatterConfiguration" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllEventStreamNames">
+            <soap12:operation soapAction="urn:getAllEventStreamNames" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllInactiveEventFormatterConfiguration">
+            <soap12:operation soapAction="urn:getAllInactiveEventFormatterConfiguration" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployJsonEventFormatterConfiguration">
+            <soap12:operation soapAction="urn:deployJsonEventFormatterConfiguration" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployActiveEventFormatterConfiguration">
+            <soap12:operation soapAction="urn:undeployActiveEventFormatterConfiguration" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployMapEventFormatterConfiguration">
+            <soap12:operation soapAction="urn:deployMapEventFormatterConfiguration" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getOutputEventAdaptorInfo">
+            <soap12:operation soapAction="urn:getOutputEventAdaptorInfo" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployWSO2EventFormatterConfiguration">
+            <soap12:operation soapAction="urn:deployWSO2EventFormatterConfiguration" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllActiveEventFormatterConfiguration">
+            <soap12:operation soapAction="urn:getAllActiveEventFormatterConfiguration" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getInactiveEventFormatterConfigurationContent">
+            <soap12:operation soapAction="urn:getInactiveEventFormatterConfigurationContent" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployXmlEventFormatterConfiguration">
+            <soap12:operation soapAction="urn:deployXmlEventFormatterConfiguration" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setTracingEnabled">
+            <soap12:operation soapAction="urn:setTracingEnabled" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getStreamDefinition">
+            <soap12:operation soapAction="urn:getStreamDefinition" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveEventFormatterConfiguration">
+            <soap12:operation soapAction="urn:getActiveEventFormatterConfiguration" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editActiveEventFormatterConfiguration">
+            <soap12:operation soapAction="urn:editActiveEventFormatterConfiguration" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editInactiveEventFormatterConfiguration">
+            <soap12:operation soapAction="urn:editInactiveEventFormatterConfiguration" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getSupportedMappingTypes">
+            <soap12:operation soapAction="urn:getSupportedMappingTypes" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="EventFormatterAdminServiceHttpBinding" type="ns:EventFormatterAdminServicePortType">
+        <http:binding verb="POST"/>
+        <wsdl:operation name="getAllStreamSpecificActiveEventFormatterConfiguration">
+            <http:operation location="getAllStreamSpecificActiveEventFormatterConfiguration"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getEventFormatterProperties">
+            <http:operation location="getEventFormatterProperties"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployTextEventFormatterConfiguration">
+            <http:operation location="deployTextEventFormatterConfiguration"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getEventFormatterStatusAsString">
+            <http:operation location="getEventFormatterStatusAsString"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveEventFormatterConfigurationContent">
+            <http:operation location="getActiveEventFormatterConfigurationContent"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setStatisticsEnabled">
+            <http:operation location="setStatisticsEnabled"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployInactiveEventFormatterConfiguration">
+            <http:operation location="undeployInactiveEventFormatterConfiguration"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllEventStreamNames">
+            <http:operation location="getAllEventStreamNames"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllInactiveEventFormatterConfiguration">
+            <http:operation location="getAllInactiveEventFormatterConfiguration"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployJsonEventFormatterConfiguration">
+            <http:operation location="deployJsonEventFormatterConfiguration"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployActiveEventFormatterConfiguration">
+            <http:operation location="undeployActiveEventFormatterConfiguration"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployMapEventFormatterConfiguration">
+            <http:operation location="deployMapEventFormatterConfiguration"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getOutputEventAdaptorInfo">
+            <http:operation location="getOutputEventAdaptorInfo"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployWSO2EventFormatterConfiguration">
+            <http:operation location="deployWSO2EventFormatterConfiguration"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllActiveEventFormatterConfiguration">
+            <http:operation location="getAllActiveEventFormatterConfiguration"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getInactiveEventFormatterConfigurationContent">
+            <http:operation location="getInactiveEventFormatterConfigurationContent"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployXmlEventFormatterConfiguration">
+            <http:operation location="deployXmlEventFormatterConfiguration"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setTracingEnabled">
+            <http:operation location="setTracingEnabled"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getStreamDefinition">
+            <http:operation location="getStreamDefinition"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveEventFormatterConfiguration">
+            <http:operation location="getActiveEventFormatterConfiguration"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editActiveEventFormatterConfiguration">
+            <http:operation location="editActiveEventFormatterConfiguration"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editInactiveEventFormatterConfiguration">
+            <http:operation location="editInactiveEventFormatterConfiguration"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getSupportedMappingTypes">
+            <http:operation location="getSupportedMappingTypes"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="EventFormatterAdminService">
+        <wsdl:port name="EventFormatterAdminServiceHttpsSoap11Endpoint" binding="ns:EventFormatterAdminServiceSoap11Binding">
+            <soap:address location="https://10.100.0.44:9443/services/EventFormatterAdminService.EventFormatterAdminServiceHttpsSoap11Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="EventFormatterAdminServiceHttpsSoap12Endpoint" binding="ns:EventFormatterAdminServiceSoap12Binding">
+            <soap12:address location="https://10.100.0.44:9443/services/EventFormatterAdminService.EventFormatterAdminServiceHttpsSoap12Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="EventFormatterAdminServiceHttpsEndpoint" binding="ns:EventFormatterAdminServiceHttpBinding">
+            <http:address location="https://10.100.0.44:9443/services/EventFormatterAdminService.EventFormatterAdminServiceHttpsEndpoint/"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

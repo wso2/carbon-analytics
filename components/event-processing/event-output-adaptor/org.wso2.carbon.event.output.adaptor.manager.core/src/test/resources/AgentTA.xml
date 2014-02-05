@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ta:eventAdaptor name="AgentTA" type="agent"
+                     xmlns:ta="http://wso2.org/carbon/eventadaptormanager">
+    <ta:input>
+        <ta:property name="receiverURL">tcp://localhost:7611</ta:property>
+    </ta:input>
+    <ta:output>
+        <ta:property name="authenticatorURL">ssl://localhost:7711</ta:property>
+    </ta:output>
+    <ta:property name="username">mohan</ta:property>
+    <ta:property name="password">mohan</ta:property>
+</ta:eventAdaptor>

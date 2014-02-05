@@ -1,0 +1,99 @@
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html>
+	<head>
+        <title>Protovis Column Chart Example</title>
+        <script type="text/javascript" src="../wso2vis-min.js"></script>
+        <link rel="stylesheet" type="text/css" media="screen" href="../css/smoothness/jquery-ui-1.8rc3.custom.css" />
+
+        <script language="javascript" type="text/javascript">
+
+            var dataProvider = new wso2vis.p.ProviderGET("http://localhost/wso2vis/examples/generator2.php");
+            var dataFilter = new wso2vis.f.BasicFilter(["services", "service"], ["@name"]);
+
+            var timer = new wso2vis.u.Timer(5000);
+
+            function globalTick() {
+                dataProvider.pullData();
+            }
+
+            function colTooltip(data) {
+                return data["@name"] + " - Requests: "+ data["stats"]["requestCount"];
+            }
+
+            function colClick(data) {
+                alert("Clicked Server: " + data["@name"]);
+            }
+
+            function errorMsg() {
+                return "Oops! I can't find any data.";
+            }
+
+            window.onload = function () {
+
+                var colChart = new wso2vis.s.chart.protovis.ColumnChart("chart","Request count per Service","");
+
+                colChart.dataField(["services", "service"])
+			            .dataValue(["stats", "requestCount"])
+			            .dataLabel(["@name"])
+                        .width(350)
+                        .height(400)
+                        .paddingTop(25)
+                        .paddingBottom(70)
+                        .paddingLeft(20)
+                        .paddingRight(20)
+                        .marks(false) //default - false
+                        .titleFont("11px arial") // [ <'font-style'> || <'font-variant'> || <'font-weight'> ]? <'font-size'> <'font-family'> ]
+                        .labelFont("11px sans-serif")
+                        .msgDiv("error");
+
+                colChart.onTooltip = colTooltip;
+                colChart.onClick = colClick;
+                colChart.messageInterceptFunction = errorMsg;
+                colChart.load();
+
+                dataProvider.addDataReceiver(dataFilter);
+                dataFilter.addDataReceiver(colChart);
+
+                dataProvider.initialize();
+
+                timer.tick = globalTick;
+                timer.startTimer();
+            }
+		</script>
+        <style>
+            div#qTip {
+                padding: 3px;
+                border: 1px solid #666;
+                border-right-width: 2px;
+                border-bottom-width: 2px;
+                display: none;
+                background: #999;
+                color: #FFF;
+                font: bold 10px Verdana, Arial, sans-serif;
+                text-align: left;
+                position: absolute;
+                z-index: 1000;
+            }
+        </style>
+	</head>
+	<body>
+	    <div id="error"></div>
+    	<div id="chart"></div>
+	</body>
+</html>

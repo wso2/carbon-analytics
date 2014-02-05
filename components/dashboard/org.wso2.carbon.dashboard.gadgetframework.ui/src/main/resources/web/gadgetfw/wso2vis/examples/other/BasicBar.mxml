@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (c) 2009 Team Axiis
+
+     Permission is hereby granted, free of charge, to any person
+     obtaining a copy of this software and associated documentation
+     files (the "Software"), to deal in the Software without
+     restriction, including without limitation the rights to use,
+     copy, modify, merge, publish, distribute, sublicense, and/or sell
+     copies of the Software, and to permit persons to whom the
+     Software is furnished to do so, subject to the following
+     conditions:
+
+     The above copyright notice and this permission notice shall be
+     included in all copies or substantial portions of the Software.
+
+     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+     EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+     OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+     NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+     HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+     WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+     OTHER DEALINGS IN THE SOFTWARE.
+-->
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml"
+    xmlns:charts="org.axiis.charts.*"
+    layout="absolute"
+    backgroundGradientColors="[0xDDDDDD,0xF5F5F5]"
+    creationComplete="init();"
+    xmlns:axiis="http://www.axiis.org/2009"
+    xmlns:series="org.axiis.charts.series.*"
+    xmlns:groupings="org.axiis.charts.groupings.*"
+    xmlns:degrafa="http://www.degrafa.com/2007"
+    xmlns:paint="org.axiis.paint.*"
+    xmlns:axis="org.axiis.charts.axis.*"
+    xmlns:labels="org.axiis.charts.labels.*" viewSourceURL="srcview/index.html">
+
+    <mx:Script>
+        <![CDATA[
+            import com.adobe.serialization.json.JSON;
+            import flash.external.*;
+
+
+            public function init():void
+            {
+                if (ExternalInterface.available){
+                    ExternalInterface.addCallback("setTitle", setTitle);
+                    ExternalInterface.addCallback("setDesc", setDesc);
+                    ExternalInterface.addCallback("setData", setData);
+
+                    ExternalInterface.call("setup");
+                }
+            }
+
+            public function setTitle(_title:String):void
+            {
+                title = _title;
+            }
+
+            public function setDesc(_desc:String):void
+            {
+                subTitle = _desc;
+            }
+
+            public function setData(_data:String):void
+            {
+                var o:Object = JSON.decode(_data);
+
+                vScale.maxValue = "55";
+                dataProvider = o.country;
+
+                dc.invalidateDisplayList();
+            }
+        ]]>
+    </mx:Script>
+
+    <!--<mx:String id="countryData" source="../data/2008_Olympics.xml"/>-->
+
+    <!--  GLOBAL VARIABLES -->
+    <mx:Object id="dataProvider"/>
+    <mx:String id="verticalField"/>
+    <mx:String id="dataField">medal</mx:String>
+    <mx:String id="labelField">name</mx:String>
+    <mx:String id="childDataField">count</mx:String>
+    <mx:String id="childLabelField">category</mx:String>
+    <mx:Number id="percentGap">.02</mx:Number>
+
+    <mx:String id="title"></mx:String>
+    <mx:String id="subTitle"></mx:String>
+    
+    <mx:Label fontSize="22" fontFamily="Myriad Pro" htmlText="{title}" top="25" right="20" color="0"/>
+    <mx:Label fontSize="14" fontFamily="Myriad Pro" htmlText="{subTitle}" top="52" right="20" color="0x333333" alpha=".9" />
+
+    <axiis:LinearScale id="vScale" dataProvider="{dataProvider}" minLayout="0" minValue="0" maxLayout="{hLayout.width}"/>
+
+    <axiis:DataCanvas id="dc"
+        height="{Math.max(400,this.height*.8)}"
+        width="{this.width*.8}"
+        top="100"
+        horizontalCenter="0"
+        showDataTips="false"
+        strokes="{strokes}"
+        fills="{fills}"
+        palettes="{palettes}">
+
+        <!-- Background -->
+        <axiis:backgroundGeometries>
+            <axis:HAxis horizontalScale="{vScale}"
+                tickStroke="{axisStroke}"
+                x="70"
+                width="{dc.width-70}"
+                y="5"
+                height="{hLayout.height}"
+                showDataTips="false"
+                fontFamily="Myriad Pro"
+                fontColor="0"
+                fontSize="14"
+                tickGap="5"/>
+        </axiis:backgroundGeometries>
+
+        <!-- Layouts -->
+        <axiis:layouts>
+            <axiis:VBoxLayout id="hLayout"
+                x="70"
+                y="0"
+                height="{dc.height-25}"
+                width="{dc.width-70}"
+                percentGap="{percentGap}"
+                dataProvider="{dataProvider}"
+                dataField="{dataField}"
+                labelField="{labelField}">
+                <axiis:layouts>
+
+                    <!-- Cluster Group -->
+                    <groupings:BarCluster id="myCluster"
+                        width="{hLayout.currentReference.width}"
+                        height="{hLayout.currentReference.height*.73}"
+                        y="0"
+                        x="0"
+                        dataProvider="{hLayout.currentValue}"
+                        dataField="{childDataField}"
+                        labelField="{childLabelField}"
+                        percentGap=".07"
+                        fill="{clusterFill}"
+                        stroke="{barStroke}"
+                        horizontalScale="{vScale}"
+                        fontFamily="Myriad Pro"
+                        fontColor="{outerPalette.currentColor}"/>
+
+                    <!-- Stack Group (same data) -->
+                    <!--<groupings:BarStack id="myStack"
+                        y="{hLayout.currentReference.height*.75}"
+                        x="0"
+                        height="{hLayout.currentReference.height*.2}"
+                        width="{hLayout.currentReference.width}"
+                        dataProvider="{hLayout.currentValue}"
+                        dataField="{childDataField}"
+                        labelField="{childLabelField}"
+                        fontColor="0xFFFFFF"
+                        fill="{clusterFill}"
+                        stroke="{barStroke}"
+                        horizontalScale="{vScale}"
+                        fontFamily="Arial"
+                        showLabel="true"/>-->
+
+                </axiis:layouts>
+
+                <!-- Bottom Bracket -->
+                <!--<axiis:drawingGeometries>
+                    <labels:VBracket height="{hLayout.currentReference.height}"
+                        width="60"
+                        fontFamily="Myriad Pro"
+                        fontSize="13"
+                        fontColor="{outerPalette.currentColor}"
+                        y="{hLayout.currentReference.y}"
+                        x="-70"
+                        labelValue="{hLayout.currentLabel}"
+                        markerStroke="{myStroke}"/>
+                </axiis:drawingGeometries>-->
+
+            </axiis:VBoxLayout>
+        </axiis:layouts>
+    </axiis:DataCanvas>
+
+    <mx:Array id="palettes">
+        <paint:LayoutAutoPalette id="outerPalette" layout="{hLayout}" colorFrom="0x3333CC" colorTo="0xCC3333"/>
+        <paint:LayoutAutoPalette id="clusterPalette" layout="{myCluster}" colorFrom="{outerPalette.currentColor}" colorTo="{outerPalette.currentColor | 0x337f00}"/>
+        <paint:LayoutAutoPalette id="stackPalette" layout="{myCluster}" colorFrom="{outerPalette.currentColor}" colorTo="{outerPalette.currentColor | 0x337f00}"/>
+    </mx:Array>
+    <mx:Array id="fills">
+        <degrafa:LinearGradientFill id="clusterFill" angle="235">
+            <degrafa:GradientStop color="{clusterPalette.currentColor}"/>
+            <degrafa:GradientStop color="{clusterPalette.currentColor | 0x333333}" alpha=".85"/>
+        </degrafa:LinearGradientFill>
+        <degrafa:LinearGradientFill id="stackFill" angle="180">
+            <degrafa:GradientStop color="{stackPalette.currentColor}"/>
+            <degrafa:GradientStop color="{stackPalette.currentColor | 0x333333}" alpha=".7"/>
+        </degrafa:LinearGradientFill>
+    </mx:Array>
+    <mx:Array id="strokes">
+        <degrafa:LinearGradientStroke id="barStroke" pixelHinting="true" angle="45">
+            <degrafa:GradientStop color="0xFFFFFF" alpha=".7"/>
+            <degrafa:GradientStop color="0xFFFFFF" alpha=".3"/>
+        </degrafa:LinearGradientStroke>
+        <degrafa:SolidStroke color="0xFFFFFF" alpha=".3"/>
+        <degrafa:SolidStroke id="axisStroke" color="0x222222" pixelHinting="true"/>
+        <degrafa:SolidStroke id="myStroke" color="{outerPalette.currentColor}" alpha=".5"/>
+        <degrafa:SolidStroke id="myStroke2"
+            color="{outerPalette.currentColor}"
+            alpha=".7"
+            weight="6"
+            caps="none"/>
+    </mx:Array>
+
+</mx:Application>

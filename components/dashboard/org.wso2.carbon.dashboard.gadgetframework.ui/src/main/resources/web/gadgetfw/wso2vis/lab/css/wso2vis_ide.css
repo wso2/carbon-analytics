@@ -1,0 +1,190 @@
+body{
+    background:#efefef;
+    color:#777;
+    font-family:Helvetica, Arial;
+    font-size:11px;
+}
+
+#container {
+    width:1200px;
+    height:850px;
+    text-align:center;
+}
+
+#tabs {
+	width:1200px;
+	height:850px;
+}
+
+#design-view {
+    width:1200px;
+    height:717px;
+    border-style:solid;
+    border-color:#ccc;
+    border-width:1px;
+	padding:0px;
+	border:0px;
+}
+
+#toolbar {
+    width:1200px;
+    height:40px;
+}
+
+.draggable { 
+    width:40px;
+    height:40px;
+    text-align:center;
+	margin-left:5px;
+	margin-right:5px;
+	margin-top:0;
+	float:left;
+}
+
+#droppable {
+	background-color:#FFF;
+    width:980px;
+    height:650px;
+    padding:0.5em;
+    margin:10px;
+	float:left;
+}
+
+#canvaz { 
+    width:980px;
+    height:650px;
+    padding:0.5em;
+    margin:10px;
+	float:left;
+}
+
+#property-grid {
+	padding-top:10px;
+	width:150px;
+	float:left;
+	font-size:10px;
+	text-align:left;
+	font-family:Verdana, Geneva, sans-serif;
+}
+
+#property-grid-top h1{
+	font-size:10px;
+	font-family:Verdana, Geneva, sans-serif;
+	text-align:left;
+	padding-bottom:2px;
+}
+
+#property-grid-top select{
+	font-size:10px;
+	font-family:Verdana, Geneva, sans-serif;
+	text-align:left;
+	margin-bottom:10px;
+}
+
+#property-grid table tr td {
+	font-size:10px;
+	font-family:Verdana, Geneva, sans-serif;
+}
+
+
+#code-view {
+	width:1200px;
+    height:717px;
+    font-family:Inconsolata, Monaco, Consolas, 'Andale Mono', 'Bitstream Vera Sans Mono', 'Courier New', Courier, monospace;
+    text-align:left;
+    display:block;
+}
+
+#code-view texarea{
+	width:1200px;
+    height:717px;
+	border:none;
+}
+
+
+
+#toolbarend {
+	clear:both;
+}
+
+
+
+.ui-state-default-droppable {
+}
+
+.ui-state-hover-droppable {
+    background:none;
+    border-style:dashed;
+    border-color:#777;
+    border-width:2px;
+}
+
+.toolbtn {
+    width: 40px;
+    height: 40px;
+    margin: 0.5em;
+    border-style:solid;
+    border-color:#ccc;
+    border-width:0px;
+    cursor:hand;
+    -moz-border-radius:5px;
+    -webkit-border-radius:5px;
+}
+
+.toolbtn:hover {
+    margin: 0.4em;
+    border-width:1px;
+}
+
+.piechartbtn {
+	background-image: url('../images/piechart_icon.png');    
+}
+
+.piechartbtn:hover {
+    margin: 0.4em;
+    border-width:1px;
+}
+
+.columnchartbtn {
+	background-image:url('../images/columnchart_icon.png')
+}
+
+.columnchartbtn:hover {
+    margin: 0.4em;
+    border-width:1px;
+}
+
+.linechartbtn {
+	background-image: url('../images/linechart_icon.png');    
+}
+
+.linechartbtn:hover {
+    margin: 0.4em;
+    border-width:1px;
+}
+
+.areachartbtn {
+	background-image: url('../images/areachart_icon.png');    
+}
+
+.areachartbtn:hover {
+    margin: 0.4em;
+    border-width:1px;
+}
+
+.dataprovider1btn {
+	background-image: url('../images/dataprovider1_icon.png');    
+}
+
+.dataprovider1btn:hover {
+    margin: 0.4em;
+    border-width:1px;
+}
+
+.hbox {
+    float:left;
+}
+
+.vbox {
+
+}

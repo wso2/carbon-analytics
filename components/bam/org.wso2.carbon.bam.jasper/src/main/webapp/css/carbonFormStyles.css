@@ -1,0 +1,269 @@
+.placeholderClass {
+    color: #ccc;
+}
+
+#tabs ul li {
+/* webkit */
+    background-image: -webkit-gradient( linear, left top, left bottom, from( #cdd6e3 ), to( #ffffff ) ); /* mozilla - FF3.6+ */
+    background-image: -moz-linear-gradient( top, #cdd6e3 0%, #ffffff 100% ); /* IE 5.5 - 7 */
+    filter: progid:DXImageTransform.Microsoft.gradient( gradientType = 0, startColor = 0, endColorStr = #cdd6e3 ); /* IE8 */
+    -ms-filter: progid: DXImageTransform . Microsoft . gradient( gradientType = 0, startColor = 0, endColoStr = #cdd6e3 );
+
+    padding: 2px 8px 3px;
+    color: #fff;
+    text-decoration: none;
+    line-height: 1;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+
+    border-bottom: none;
+    height: 20px;
+    margin-right: 5px;
+    border-top: solid 1px #b2ccdd;
+    border-left: solid 1px #b2ccdd;
+    border-right: solid 1px #b2ccdd;
+}
+
+#tabs ul li a {
+    color: #00608f;
+    padding: 2px;
+    font-size: .8em;
+}
+
+#tabs ul li.ui-tabs-selected {
+    background-image: none;
+    background-color: #fff;
+}
+
+#tabs ul li.ui-tabs-selected a {
+    color: #000;
+}
+
+#workArea {
+    border-top: solid 1px #ccc;
+    border-left: solid 1px #ccc;
+    border-right: solid 1px #ccc;
+    padding-bottom: 0px;
+}
+
+.carbonFormTable {
+    color: #555;
+    width: 100%;
+    padding-left: 10px;
+}
+
+.carbonFormTable td {
+    vertical-align: top;
+    font-size: 12px;
+    padding-bottom: 5px !important;
+}
+
+.carbonFormTable input[type=text] {
+/* webkit */
+    background-image: -webkit-gradient( linear, left top, left bottom, from( #f2f2f2 ), to( #ffffff ) ); /* mozilla - FF3.6+ */
+    background-image: -moz-linear-gradient( top, #f2f2f2 0%, #ffffff 100% ); /* IE 5.5 - 7 */
+    filter: progid:DXImageTransform.Microsoft.gradient( gradientType = 0, startColorStr = #f2f2f2ff, endColorStr = #ffffffff ); /* IE8 */
+    -ms-filter: progid: DXImageTransform . Microsoft . gradient( gradientType = 0, startColorStr = #f2f2f2ff, endColoStr = #ffffffff );
+
+    background-repeat: repeat-x;
+    border: 1px solid #58697d;
+    min-width: 230px;
+    height: 20px;
+    color: #333333;
+    padding: 3px;
+    margin-right: 4px;
+    margin-bottom: 2px; /*font-family:tahoma, arial, sans-serif;*/
+}
+
+.carbonFormTable td.labelField, .carbonFormTable label.labelField {
+    font-weight: bold;
+}
+
+.leftCol-small {
+    width: 100px;
+}
+
+.buttonRow {
+    padding: 10px; /* webkit */
+    background-image: -webkit-gradient( linear, left top, left bottom, from( #f2f2f2 ), to( #ffffff ) ); /* mozilla - FF3.6+ */
+    background-image: -moz-linear-gradient( top, #f2f2f2 0%, #ffffff 100% ); /* IE 5.5 - 7 */
+    filter: progid:DXImageTransform.Microsoft.gradient( gradientType = 0, startColorStr = #f2f2f2ff, endColorStr = #ffffffff ); /* IE8 */
+    -ms-filter: progid: DXImageTransform . Microsoft . gradient( gradientType = 0, startColorStr = #f2f2f2ff, endColoStr = #ffffffff );
+
+    border: solid 1px #b8c9d0;
+}
+
+.ui-tabs .ui-tabs-panel {
+    padding: 0px;
+}
+
+.togglebleTitle {
+/*background:transparent url(../images/arrowDownUp.png) no-repeat left -20px;*/
+    cursor: pointer;
+}
+
+.sectionSeperator {
+    color: #000;
+    text-transform: capitalize;
+    font-size: 12px;
+    font-weight: bold;
+
+    background-image: -webkit-gradient( linear, left top, left bottom, from( #ffffff ), to( #dddddd ) ); /* mozilla - FF3.6+ */
+    background-image: -moz-linear-gradient( top, #ffffff 0%, #dddddd 100% ); /* IE 5.5 - 7 */
+    filter: progid:DXImageTransform.Microsoft.gradient( gradientType = 0, startColorStr = #ffffff, endColorStr = #dddddd ); /* IE8 */
+    -ms-filter: progid: DXImageTransform . Microsoft . gradient( gradientType = 0, startColorStr = #ffffff, endColoStr = #dddddd );
+
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    border: solid 1px #888888;
+    padding: 2px 10px 2px 5px;
+    width: auto;
+
+    -moz-box-shadow: 3px 3px 2px #ddd;
+    -webkit-box-shadow: 3px 3px 2px #ddd;
+    box-shadow: 3px 3px 2px #ddd;
+    margin-bottom: 10px;
+    clear: both;
+}
+
+.sectionSeperator img {
+    margin-left: 20px;
+}
+
+.contentHidden {
+/*background:transparent url(../images/arrowDownUp.png) no-repeat left 5px !important; */
+    color: #fff;
+    background-image: -webkit-gradient( linear, left top, left bottom, from( #555555 ), to( #dddddd ) ); /* mozilla - FF3.6+ */
+    background-image: -moz-linear-gradient( top, #888888 0%, #eeeeee 100% ); /* IE 5.5 - 7 */
+    filter: progid:DXImageTransform.Microsoft.gradient( gradientType = 0, startColorStr = #555555, endColorStr = #dddddd ); /* IE8 */
+    -ms-filter: progid: DXImageTransform . Microsoft . gradient( gradientType = 0, startColorStr = #555555, endColoStr = #dddddd );
+}
+
+.sectionSub {
+    padding-left: 10px;
+    padding-bottom: 10px;
+}
+
+.sectionHelp {
+    padding-bottom: 10px;
+    font-style: italic;
+    background: transparent url( ../images/help-small-icon.png ) no-repeat left top;
+    text-indent: 20px;
+}
+
+.button, .button:visited {
+    background-image: -webkit-gradient( linear, left top, left bottom, from( #555555 ), to( #000000 ) ); /* mozilla - FF3.6+ */
+    background-image: -moz-linear-gradient( top, #555555 0%, #000000 100% ); /* IE 5.5 - 7 */
+    filter: progid:DXImageTransform.Microsoft.gradient( gradientType = 0, startColorStr = #555555, endColorStr = #000000 ); /* IE8 */
+    -ms-filter: progid: DXImageTransform . Microsoft . gradient( gradientType = 0, startColorStr = #555555, endColoStr = #000000 );
+
+    background-color: #222;
+    display: inline-block;
+    padding: 2px 10px 2px;
+    color: #fff;
+    text-decoration: none;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -moz-box-shadow: 0 1px 3px rgba( 0, 0, 0, 0.6 );
+    -webkit-box-shadow: 0 1px 3px rgba( 0, 0, 0, 0.6 );
+    text-shadow: 0 -1px 1px rgba( 0, 0, 0, 0.25 );
+    border-bottom: 1px solid rgba( 0, 0, 0, 0.25 );
+    position: relative;
+    cursor: pointer
+}
+
+.button:hover, .button:focus {
+    background-image: -webkit-gradient( linear, left top, left bottom, from( #666666 ), to( #111111 ) ); /* mozilla - FF3.6+ */
+    background-image: -moz-linear-gradient( top, #666666 0%, #111111 100% ); /* IE 5.5 - 7 */
+    filter: progid:DXImageTransform.Microsoft.gradient( gradientType = 0, startColorStr = #666666, endColorStr = #111111 ); /* IE8 */
+    -ms-filter: progid: DXImageTransform . Microsoft . gradient( gradientType = 0, startColorStr = #666666, endColoStr = #111111 );
+    background-color: #222;
+}
+.button_disabled:hover, .button_disabled:focus, .button_disabled{
+    background-image:none;
+    background-color:transparent;
+    color:#999;
+}
+.txtbox-small {
+    width: 20px;
+}
+
+.txtbox-med {
+    width: 100px;
+}
+
+.txtbox-big {
+    width: 200px;
+}
+
+.leftCol-small {
+    width: 150px;
+}
+
+.leftCol-med {
+    width: 250px;
+}
+
+.leftCol-big {
+    width: 350px;
+}
+
+.expandedTextarea {
+    width: 99%;
+    height: 150px;
+}
+.sectionInputs{
+    background-color:#eee;
+    border:solid 1px #999;
+    padding:3px 0px 3px 3px;
+}
+.sectionInputs div.sectionHelp{
+    margin:10px 5px 0px 5px;
+}
+ul.items{
+    margin:0px;
+    list-style-type:none;
+}
+ul.items li{
+    padding:5px 0px;
+}
+
+/* Tempory overrides */
+.ui-tabs-nav li a{
+    background:none;
+}
+.multipleSelectBox{
+    width:100%;
+}
+.multipleSelectBox td{
+    vertical-align:middle;
+    width:50%;
+}
+.multipleSelectBox td.middleCell{
+    width:20px;
+}
+.multipleSelectBox select{
+    width:100%;
+    height:100px;
+}
+.carbon-icons{
+    padding-left:20px;
+    background:transparent url(../images/default-menu-icon.gif) no-repeat 0px 0px;
+    color: #0066cc;
+    cursor:pointer;
+}
+.addAllLink{
+    background-image:url(../images/add.gif);
+}
+.removeAllLink{
+    background-image:url(../images/delete.gif);
+}
+.ui-tabs-nav{
+    border:none;
+}
+div.buttonRow{
+    margin-left:0px !important;
+}
+

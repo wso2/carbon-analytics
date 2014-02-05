@@ -1,0 +1,2649 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://services.resource.registry.carbon.wso2.org" xmlns:ax2482="http://utils.services.resource.registry.carbon.wso2.org/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ax2479="http://common.registry.carbon.wso2.org/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ax2477="http://beans.resource.registry.carbon.wso2.org/xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://services.resource.registry.carbon.wso2.org">
+    <wsdl:documentation>ResourceAdminService</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema xmlns:ax2481="http://common.registry.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://beans.resource.registry.carbon.wso2.org/xsd">
+            <xs:import namespace="http://common.registry.carbon.wso2.org/xsd"/>
+            <xs:complexType name="ContentDownloadBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="content" nillable="true" type="xs:base64Binary"/>
+                    <xs:element minOccurs="0" name="lastUpdatedTime" nillable="true" type="xs:dateTime"/>
+                    <xs:element minOccurs="0" name="mediatype" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="resourceName" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="VersionsBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="deleteLocked" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="deletePermissionAllowed" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="loggedIn" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="permalink" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="putAllowed" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="resourcePath" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="versionPaths" nillable="true" type="ax2477:VersionPath"/>
+                    <xs:element minOccurs="0" name="writeLocked" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="VersionPath">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="activeResourcePath" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="completeVersionPath" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="updatedOn" nillable="true" type="xs:dateTime"/>
+                    <xs:element minOccurs="0" name="updater" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="versionNumber" type="xs:long"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ResourceTreeEntryBean">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="children" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="collection" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="symlink" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="PermissionBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="authorizeAllowed" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="deleteAllowed" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="pathWithVersion" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="putAllowed" type="xs:boolean"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="roleNames" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="rolePermissions" nillable="true" type="ax2477:PermissionEntry"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="userNames" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="userPermissions" nillable="true" type="ax2477:PermissionEntry"/>
+                    <xs:element minOccurs="0" name="versionView" type="xs:boolean"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="PermissionEntry">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="authorizeAllow" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="authorizeDeny" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="deleteAllow" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="deleteDeny" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="readAllow" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="readDeny" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="userName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="writeAllow" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="writeDeny" type="xs:boolean"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="MetadataBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="activeResourcePath" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="author" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="collection" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="contentPath" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="deleteLocked" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="description" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="formattedCreatedOn" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="formattedLastModified" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="lastUpdater" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="mediaType" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="navigatablePaths" nillable="true" type="ax2481:WebResourcePath"/>
+                    <xs:element minOccurs="0" name="path" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="pathWithVersion" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="permalink" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="putAllowed" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="resourceVersion" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="serverBaseURL" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="versionView" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="writeLocked" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ContentBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="absent" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="collection" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="contentPath" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="loggedIn" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="mediaType" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="pathWithVersion" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="putAllowed" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="realPath" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="versionView" type="xs:boolean"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="CollectionContentBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="childCount" type="xs:int"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="childPaths" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="collectionTypes" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="pathWithVersion" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="remoteInstances" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="versionView" type="xs:boolean"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://common.registry.carbon.wso2.org/xsd">
+            <xs:complexType name="ResourceData">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="absent" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="authorUserName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="averageRating" type="xs:float"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="averageStars" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="createdOn" nillable="true" type="xs:dateTime"/>
+                    <xs:element minOccurs="0" name="deleteAllowed" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="description" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="externalLink" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="formattedCreatedOn" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="getAllowed" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="link" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="mounted" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="putAllowed" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="realPath" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="relativePath" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="resourcePath" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="resourceType" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="tagCounts" nillable="true" type="ax2479:TagCount"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="TagCount">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="key" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="value" nillable="true" type="xs:long"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="WebResourcePath">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="navigateName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="navigatePath" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://utils.services.resource.registry.carbon.wso2.org/xsd">
+            <xs:complexType name="ResourceServiceException">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="message" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema xmlns:ax2480="http://common.registry.carbon.wso2.org/xsd" xmlns:ax2478="http://beans.resource.registry.carbon.wso2.org/xsd" xmlns:ax2483="http://utils.services.resource.registry.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://services.resource.registry.carbon.wso2.org">
+            <xs:import namespace="http://beans.resource.registry.carbon.wso2.org/xsd"/>
+            <xs:import namespace="http://common.registry.carbon.wso2.org/xsd"/>
+            <xs:import namespace="http://utils.services.resource.registry.carbon.wso2.org/xsd"/>
+            <xs:element name="ResourceAdminServiceException">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="ResourceAdminServiceException" nillable="true" type="ns:Exception"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:complexType name="Exception">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="Message" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="updateTextContent">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="resourcePath" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="contentText" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="updateTextContentResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="updateMediaType">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="path" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="mediaType" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setSessionResourcePath">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="resourcePath" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setDescription">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="path" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="description" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="restoreVersion">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="versionPath" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="restoreVersionResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="renameResource">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="parentPath" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="oldResourcePath" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="newResourceName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="renameResourceResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="removeExtension">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="removeExtensionResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="moveResource">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="parentPath" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="oldResourcePath" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="destinationPath" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="resourceName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="moveResourceResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="listExtensions">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="listExtensionsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="importResource">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="parentPath" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="resourceName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="mediaType" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="description" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="fetchURL" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="symlinkLocation" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="properties" nillable="true" type="ns:ArrayOfString"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:complexType name="ArrayOfString">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="array" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="importResourceResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="hasAssociations">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="path" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="hasAssociationsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getZipWithDependencies">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="path" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getZipWithDependenciesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2478:ContentDownloadBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getVersionsBean">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="path" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getVersionsBeanResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2478:VersionsBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTextContent">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="path" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTextContentResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getSessionResourcePath">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getSessionResourcePathResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getResourceTreeEntry">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="resourcePath" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getResourceTreeEntryResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2478:ResourceTreeEntryBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getResourceData">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="paths" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getResourceDataResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2480:ResourceData"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getProperty">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="resourcePath" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="key" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getPropertyResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getPermissions">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="path" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getPermissionsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2478:PermissionBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getMimeTypeFromHuman">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="mediaType" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getMimeTypeFromHumanResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getMetadata">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="path" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getMetadataResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2478:MetadataBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getMediatypeDefinitions">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getMediatypeDefinitionsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getHumanReadableMediaTypes">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getHumanReadableMediaTypesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getCustomUIMediatypeDefinitions">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getCustomUIMediatypeDefinitionsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getContentDownloadBean">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="path" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getContentDownloadBeanResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2478:ContentDownloadBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getContentBean">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="path" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getContentBeanResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2478:ContentBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getCollectionMediatypeDefinitions">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getCollectionMediatypeDefinitionsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getCollectionContent">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="path" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getCollectionContentResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2478:CollectionContentBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteVersionHistory">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="path" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="snapshotId" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteVersionHistoryResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="delete">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="pathToDelete" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="createVersion">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="resourcePath" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="createVersionResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="copyResource">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="parentPath" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="oldResourcePath" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="destinationPath" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="resourceName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="copyResourceResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="changeUserPermissions">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="resourcePath" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="permissionInput" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="changeUserPermissionsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="changeRolePermissions">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="resourcePath" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="permissionsInput" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="changeRolePermissionsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="ResourceAdminServiceResourceServiceException">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="ResourceServiceException" nillable="true" type="ax2482:ResourceServiceException"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addUserPermission">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="pathToAuthorize" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="userToAuthorize" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="actionToAuthorize" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="permissionType" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addUserPermissionResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addTextResource">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="parentPath" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="mediaType" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="description" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="content" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addTextResourceResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addTextContent">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="parentPath" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="mediaType" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="description" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="content" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addTextContentResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addSymbolicLink">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="parentPath" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="targetPath" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addRolePermission">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="pathToAuthorize" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="roleToAuthorize" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="actionToAuthorize" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="permissionType" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addRolePermissionResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addResource">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="path" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="mediaType" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="description" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="content" nillable="true" type="xs:base64Binary"/>
+                        <xs:element minOccurs="0" name="symlinkLocation" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="properties" nillable="true" type="ns:ArrayOfString"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addResourceResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addRemoteLink">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="parentPath" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="instance" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="targetPath" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addExtension">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="content" nillable="true" type="xs:base64Binary"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addExtensionResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addCollection">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="parentPath" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="collectionName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="mediaType" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="description" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addCollectionResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="deleteRequest">
+        <wsdl:part name="parameters" element="ns:delete"/>
+    </wsdl:message>
+    <wsdl:message name="deleteResponse">
+        <wsdl:part name="parameters" element="ns:deleteResponse"/>
+    </wsdl:message>
+    <wsdl:message name="ResourceAdminServiceException">
+        <wsdl:part name="parameters" element="ns:ResourceAdminServiceException"/>
+    </wsdl:message>
+    <wsdl:message name="getContentBeanRequest">
+        <wsdl:part name="parameters" element="ns:getContentBean"/>
+    </wsdl:message>
+    <wsdl:message name="getContentBeanResponse">
+        <wsdl:part name="parameters" element="ns:getContentBeanResponse"/>
+    </wsdl:message>
+    <wsdl:message name="deleteVersionHistoryRequest">
+        <wsdl:part name="parameters" element="ns:deleteVersionHistory"/>
+    </wsdl:message>
+    <wsdl:message name="deleteVersionHistoryResponse">
+        <wsdl:part name="parameters" element="ns:deleteVersionHistoryResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getHumanReadableMediaTypesRequest">
+        <wsdl:part name="parameters" element="ns:getHumanReadableMediaTypes"/>
+    </wsdl:message>
+    <wsdl:message name="getHumanReadableMediaTypesResponse">
+        <wsdl:part name="parameters" element="ns:getHumanReadableMediaTypesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getZipWithDependenciesRequest">
+        <wsdl:part name="parameters" element="ns:getZipWithDependencies"/>
+    </wsdl:message>
+    <wsdl:message name="getZipWithDependenciesResponse">
+        <wsdl:part name="parameters" element="ns:getZipWithDependenciesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="listExtensionsRequest">
+        <wsdl:part name="parameters" element="ns:listExtensions"/>
+    </wsdl:message>
+    <wsdl:message name="listExtensionsResponse">
+        <wsdl:part name="parameters" element="ns:listExtensionsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="addUserPermissionRequest">
+        <wsdl:part name="parameters" element="ns:addUserPermission"/>
+    </wsdl:message>
+    <wsdl:message name="addUserPermissionResponse">
+        <wsdl:part name="parameters" element="ns:addUserPermissionResponse"/>
+    </wsdl:message>
+    <wsdl:message name="ResourceAdminServiceResourceServiceException">
+        <wsdl:part name="parameters" element="ns:ResourceAdminServiceResourceServiceException"/>
+    </wsdl:message>
+    <wsdl:message name="restoreVersionRequest">
+        <wsdl:part name="parameters" element="ns:restoreVersion"/>
+    </wsdl:message>
+    <wsdl:message name="restoreVersionResponse">
+        <wsdl:part name="parameters" element="ns:restoreVersionResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getContentDownloadBeanRequest">
+        <wsdl:part name="parameters" element="ns:getContentDownloadBean"/>
+    </wsdl:message>
+    <wsdl:message name="getContentDownloadBeanResponse">
+        <wsdl:part name="parameters" element="ns:getContentDownloadBeanResponse"/>
+    </wsdl:message>
+    <wsdl:message name="setDescriptionRequest">
+        <wsdl:part name="parameters" element="ns:setDescription"/>
+    </wsdl:message>
+    <wsdl:message name="getResourceDataRequest">
+        <wsdl:part name="parameters" element="ns:getResourceData"/>
+    </wsdl:message>
+    <wsdl:message name="getResourceDataResponse">
+        <wsdl:part name="parameters" element="ns:getResourceDataResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getCollectionMediatypeDefinitionsRequest">
+        <wsdl:part name="parameters" element="ns:getCollectionMediatypeDefinitions"/>
+    </wsdl:message>
+    <wsdl:message name="getCollectionMediatypeDefinitionsResponse">
+        <wsdl:part name="parameters" element="ns:getCollectionMediatypeDefinitionsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getMediatypeDefinitionsRequest">
+        <wsdl:part name="parameters" element="ns:getMediatypeDefinitions"/>
+    </wsdl:message>
+    <wsdl:message name="getMediatypeDefinitionsResponse">
+        <wsdl:part name="parameters" element="ns:getMediatypeDefinitionsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="changeRolePermissionsRequest">
+        <wsdl:part name="parameters" element="ns:changeRolePermissions"/>
+    </wsdl:message>
+    <wsdl:message name="changeRolePermissionsResponse">
+        <wsdl:part name="parameters" element="ns:changeRolePermissionsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getResourceTreeEntryRequest">
+        <wsdl:part name="parameters" element="ns:getResourceTreeEntry"/>
+    </wsdl:message>
+    <wsdl:message name="getResourceTreeEntryResponse">
+        <wsdl:part name="parameters" element="ns:getResourceTreeEntryResponse"/>
+    </wsdl:message>
+    <wsdl:message name="addTextResourceRequest">
+        <wsdl:part name="parameters" element="ns:addTextResource"/>
+    </wsdl:message>
+    <wsdl:message name="addTextResourceResponse">
+        <wsdl:part name="parameters" element="ns:addTextResourceResponse"/>
+    </wsdl:message>
+    <wsdl:message name="importResourceRequest">
+        <wsdl:part name="parameters" element="ns:importResource"/>
+    </wsdl:message>
+    <wsdl:message name="importResourceResponse">
+        <wsdl:part name="parameters" element="ns:importResourceResponse"/>
+    </wsdl:message>
+    <wsdl:message name="addRemoteLinkRequest">
+        <wsdl:part name="parameters" element="ns:addRemoteLink"/>
+    </wsdl:message>
+    <wsdl:message name="getCustomUIMediatypeDefinitionsRequest">
+        <wsdl:part name="parameters" element="ns:getCustomUIMediatypeDefinitions"/>
+    </wsdl:message>
+    <wsdl:message name="getCustomUIMediatypeDefinitionsResponse">
+        <wsdl:part name="parameters" element="ns:getCustomUIMediatypeDefinitionsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="changeUserPermissionsRequest">
+        <wsdl:part name="parameters" element="ns:changeUserPermissions"/>
+    </wsdl:message>
+    <wsdl:message name="changeUserPermissionsResponse">
+        <wsdl:part name="parameters" element="ns:changeUserPermissionsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="addSymbolicLinkRequest">
+        <wsdl:part name="parameters" element="ns:addSymbolicLink"/>
+    </wsdl:message>
+    <wsdl:message name="updateTextContentRequest">
+        <wsdl:part name="parameters" element="ns:updateTextContent"/>
+    </wsdl:message>
+    <wsdl:message name="updateTextContentResponse">
+        <wsdl:part name="parameters" element="ns:updateTextContentResponse"/>
+    </wsdl:message>
+    <wsdl:message name="addRolePermissionRequest">
+        <wsdl:part name="parameters" element="ns:addRolePermission"/>
+    </wsdl:message>
+    <wsdl:message name="addRolePermissionResponse">
+        <wsdl:part name="parameters" element="ns:addRolePermissionResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getMetadataRequest">
+        <wsdl:part name="parameters" element="ns:getMetadata"/>
+    </wsdl:message>
+    <wsdl:message name="getMetadataResponse">
+        <wsdl:part name="parameters" element="ns:getMetadataResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getSessionResourcePathRequest">
+        <wsdl:part name="parameters" element="ns:getSessionResourcePath"/>
+    </wsdl:message>
+    <wsdl:message name="getSessionResourcePathResponse">
+        <wsdl:part name="parameters" element="ns:getSessionResourcePathResponse"/>
+    </wsdl:message>
+    <wsdl:message name="addTextContentRequest">
+        <wsdl:part name="parameters" element="ns:addTextContent"/>
+    </wsdl:message>
+    <wsdl:message name="addTextContentResponse">
+        <wsdl:part name="parameters" element="ns:addTextContentResponse"/>
+    </wsdl:message>
+    <wsdl:message name="addCollectionRequest">
+        <wsdl:part name="parameters" element="ns:addCollection"/>
+    </wsdl:message>
+    <wsdl:message name="addCollectionResponse">
+        <wsdl:part name="parameters" element="ns:addCollectionResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getMimeTypeFromHumanRequest">
+        <wsdl:part name="parameters" element="ns:getMimeTypeFromHuman"/>
+    </wsdl:message>
+    <wsdl:message name="getMimeTypeFromHumanResponse">
+        <wsdl:part name="parameters" element="ns:getMimeTypeFromHumanResponse"/>
+    </wsdl:message>
+    <wsdl:message name="addResourceRequest">
+        <wsdl:part name="parameters" element="ns:addResource"/>
+    </wsdl:message>
+    <wsdl:message name="addResourceResponse">
+        <wsdl:part name="parameters" element="ns:addResourceResponse"/>
+    </wsdl:message>
+    <wsdl:message name="renameResourceRequest">
+        <wsdl:part name="parameters" element="ns:renameResource"/>
+    </wsdl:message>
+    <wsdl:message name="renameResourceResponse">
+        <wsdl:part name="parameters" element="ns:renameResourceResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getVersionsBeanRequest">
+        <wsdl:part name="parameters" element="ns:getVersionsBean"/>
+    </wsdl:message>
+    <wsdl:message name="getVersionsBeanResponse">
+        <wsdl:part name="parameters" element="ns:getVersionsBeanResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getPropertyRequest">
+        <wsdl:part name="parameters" element="ns:getProperty"/>
+    </wsdl:message>
+    <wsdl:message name="getPropertyResponse">
+        <wsdl:part name="parameters" element="ns:getPropertyResponse"/>
+    </wsdl:message>
+    <wsdl:message name="moveResourceRequest">
+        <wsdl:part name="parameters" element="ns:moveResource"/>
+    </wsdl:message>
+    <wsdl:message name="moveResourceResponse">
+        <wsdl:part name="parameters" element="ns:moveResourceResponse"/>
+    </wsdl:message>
+    <wsdl:message name="copyResourceRequest">
+        <wsdl:part name="parameters" element="ns:copyResource"/>
+    </wsdl:message>
+    <wsdl:message name="copyResourceResponse">
+        <wsdl:part name="parameters" element="ns:copyResourceResponse"/>
+    </wsdl:message>
+    <wsdl:message name="setSessionResourcePathRequest">
+        <wsdl:part name="parameters" element="ns:setSessionResourcePath"/>
+    </wsdl:message>
+    <wsdl:message name="createVersionRequest">
+        <wsdl:part name="parameters" element="ns:createVersion"/>
+    </wsdl:message>
+    <wsdl:message name="createVersionResponse">
+        <wsdl:part name="parameters" element="ns:createVersionResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getCollectionContentRequest">
+        <wsdl:part name="parameters" element="ns:getCollectionContent"/>
+    </wsdl:message>
+    <wsdl:message name="getCollectionContentResponse">
+        <wsdl:part name="parameters" element="ns:getCollectionContentResponse"/>
+    </wsdl:message>
+    <wsdl:message name="hasAssociationsRequest">
+        <wsdl:part name="parameters" element="ns:hasAssociations"/>
+    </wsdl:message>
+    <wsdl:message name="hasAssociationsResponse">
+        <wsdl:part name="parameters" element="ns:hasAssociationsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getTextContentRequest">
+        <wsdl:part name="parameters" element="ns:getTextContent"/>
+    </wsdl:message>
+    <wsdl:message name="getTextContentResponse">
+        <wsdl:part name="parameters" element="ns:getTextContentResponse"/>
+    </wsdl:message>
+    <wsdl:message name="removeExtensionRequest">
+        <wsdl:part name="parameters" element="ns:removeExtension"/>
+    </wsdl:message>
+    <wsdl:message name="removeExtensionResponse">
+        <wsdl:part name="parameters" element="ns:removeExtensionResponse"/>
+    </wsdl:message>
+    <wsdl:message name="updateMediaTypeRequest">
+        <wsdl:part name="parameters" element="ns:updateMediaType"/>
+    </wsdl:message>
+    <wsdl:message name="getPermissionsRequest">
+        <wsdl:part name="parameters" element="ns:getPermissions"/>
+    </wsdl:message>
+    <wsdl:message name="getPermissionsResponse">
+        <wsdl:part name="parameters" element="ns:getPermissionsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="addExtensionRequest">
+        <wsdl:part name="parameters" element="ns:addExtension"/>
+    </wsdl:message>
+    <wsdl:message name="addExtensionResponse">
+        <wsdl:part name="parameters" element="ns:addExtensionResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="ResourceAdminServicePortType">
+        <wsdl:operation name="delete">
+            <wsdl:input message="ns:deleteRequest" wsaw:Action="urn:delete"/>
+            <wsdl:output message="ns:deleteResponse" wsaw:Action="urn:deleteResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:deleteResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getContentBean">
+            <wsdl:input message="ns:getContentBeanRequest" wsaw:Action="urn:getContentBean"/>
+            <wsdl:output message="ns:getContentBeanResponse" wsaw:Action="urn:getContentBeanResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:getContentBeanResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="deleteVersionHistory">
+            <wsdl:input message="ns:deleteVersionHistoryRequest" wsaw:Action="urn:deleteVersionHistory"/>
+            <wsdl:output message="ns:deleteVersionHistoryResponse" wsaw:Action="urn:deleteVersionHistoryResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:deleteVersionHistoryResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getHumanReadableMediaTypes">
+            <wsdl:input message="ns:getHumanReadableMediaTypesRequest" wsaw:Action="urn:getHumanReadableMediaTypes"/>
+            <wsdl:output message="ns:getHumanReadableMediaTypesResponse" wsaw:Action="urn:getHumanReadableMediaTypesResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:getHumanReadableMediaTypesResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getZipWithDependencies">
+            <wsdl:input message="ns:getZipWithDependenciesRequest" wsaw:Action="urn:getZipWithDependencies"/>
+            <wsdl:output message="ns:getZipWithDependenciesResponse" wsaw:Action="urn:getZipWithDependenciesResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:getZipWithDependenciesResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="listExtensions">
+            <wsdl:input message="ns:listExtensionsRequest" wsaw:Action="urn:listExtensions"/>
+            <wsdl:output message="ns:listExtensionsResponse" wsaw:Action="urn:listExtensionsResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:listExtensionsResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="addUserPermission">
+            <wsdl:input message="ns:addUserPermissionRequest" wsaw:Action="urn:addUserPermission"/>
+            <wsdl:output message="ns:addUserPermissionResponse" wsaw:Action="urn:addUserPermissionResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceResourceServiceException" name="ResourceAdminServiceResourceServiceException" wsaw:Action="urn:addUserPermissionResourceAdminServiceResourceServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="restoreVersion">
+            <wsdl:input message="ns:restoreVersionRequest" wsaw:Action="urn:restoreVersion"/>
+            <wsdl:output message="ns:restoreVersionResponse" wsaw:Action="urn:restoreVersionResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:restoreVersionResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getContentDownloadBean">
+            <wsdl:input message="ns:getContentDownloadBeanRequest" wsaw:Action="urn:getContentDownloadBean"/>
+            <wsdl:output message="ns:getContentDownloadBeanResponse" wsaw:Action="urn:getContentDownloadBeanResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:getContentDownloadBeanResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="setDescription">
+            <wsdl:input message="ns:setDescriptionRequest" wsaw:Action="urn:setDescription"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:setDescriptionResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getResourceData">
+            <wsdl:input message="ns:getResourceDataRequest" wsaw:Action="urn:getResourceData"/>
+            <wsdl:output message="ns:getResourceDataResponse" wsaw:Action="urn:getResourceDataResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:getResourceDataResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getCollectionMediatypeDefinitions">
+            <wsdl:input message="ns:getCollectionMediatypeDefinitionsRequest" wsaw:Action="urn:getCollectionMediatypeDefinitions"/>
+            <wsdl:output message="ns:getCollectionMediatypeDefinitionsResponse" wsaw:Action="urn:getCollectionMediatypeDefinitionsResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:getCollectionMediatypeDefinitionsResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getMediatypeDefinitions">
+            <wsdl:input message="ns:getMediatypeDefinitionsRequest" wsaw:Action="urn:getMediatypeDefinitions"/>
+            <wsdl:output message="ns:getMediatypeDefinitionsResponse" wsaw:Action="urn:getMediatypeDefinitionsResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:getMediatypeDefinitionsResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="changeRolePermissions">
+            <wsdl:input message="ns:changeRolePermissionsRequest" wsaw:Action="urn:changeRolePermissions"/>
+            <wsdl:output message="ns:changeRolePermissionsResponse" wsaw:Action="urn:changeRolePermissionsResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:changeRolePermissionsResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getResourceTreeEntry">
+            <wsdl:input message="ns:getResourceTreeEntryRequest" wsaw:Action="urn:getResourceTreeEntry"/>
+            <wsdl:output message="ns:getResourceTreeEntryResponse" wsaw:Action="urn:getResourceTreeEntryResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:getResourceTreeEntryResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="addTextResource">
+            <wsdl:input message="ns:addTextResourceRequest" wsaw:Action="urn:addTextResource"/>
+            <wsdl:output message="ns:addTextResourceResponse" wsaw:Action="urn:addTextResourceResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:addTextResourceResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="importResource">
+            <wsdl:input message="ns:importResourceRequest" wsaw:Action="urn:importResource"/>
+            <wsdl:output message="ns:importResourceResponse" wsaw:Action="urn:importResourceResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:importResourceResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="addRemoteLink">
+            <wsdl:input message="ns:addRemoteLinkRequest" wsaw:Action="urn:addRemoteLink"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:addRemoteLinkResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getCustomUIMediatypeDefinitions">
+            <wsdl:input message="ns:getCustomUIMediatypeDefinitionsRequest" wsaw:Action="urn:getCustomUIMediatypeDefinitions"/>
+            <wsdl:output message="ns:getCustomUIMediatypeDefinitionsResponse" wsaw:Action="urn:getCustomUIMediatypeDefinitionsResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:getCustomUIMediatypeDefinitionsResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="changeUserPermissions">
+            <wsdl:input message="ns:changeUserPermissionsRequest" wsaw:Action="urn:changeUserPermissions"/>
+            <wsdl:output message="ns:changeUserPermissionsResponse" wsaw:Action="urn:changeUserPermissionsResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:changeUserPermissionsResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="addSymbolicLink">
+            <wsdl:input message="ns:addSymbolicLinkRequest" wsaw:Action="urn:addSymbolicLink"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:addSymbolicLinkResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="updateTextContent">
+            <wsdl:input message="ns:updateTextContentRequest" wsaw:Action="urn:updateTextContent"/>
+            <wsdl:output message="ns:updateTextContentResponse" wsaw:Action="urn:updateTextContentResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:updateTextContentResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="addRolePermission">
+            <wsdl:input message="ns:addRolePermissionRequest" wsaw:Action="urn:addRolePermission"/>
+            <wsdl:output message="ns:addRolePermissionResponse" wsaw:Action="urn:addRolePermissionResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceResourceServiceException" name="ResourceAdminServiceResourceServiceException" wsaw:Action="urn:addRolePermissionResourceAdminServiceResourceServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getMetadata">
+            <wsdl:input message="ns:getMetadataRequest" wsaw:Action="urn:getMetadata"/>
+            <wsdl:output message="ns:getMetadataResponse" wsaw:Action="urn:getMetadataResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:getMetadataResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getSessionResourcePath">
+            <wsdl:input message="ns:getSessionResourcePathRequest" wsaw:Action="urn:getSessionResourcePath"/>
+            <wsdl:output message="ns:getSessionResourcePathResponse" wsaw:Action="urn:getSessionResourcePathResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:getSessionResourcePathResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="addTextContent">
+            <wsdl:input message="ns:addTextContentRequest" wsaw:Action="urn:addTextContent"/>
+            <wsdl:output message="ns:addTextContentResponse" wsaw:Action="urn:addTextContentResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:addTextContentResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="addCollection">
+            <wsdl:input message="ns:addCollectionRequest" wsaw:Action="urn:addCollection"/>
+            <wsdl:output message="ns:addCollectionResponse" wsaw:Action="urn:addCollectionResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:addCollectionResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getMimeTypeFromHuman">
+            <wsdl:input message="ns:getMimeTypeFromHumanRequest" wsaw:Action="urn:getMimeTypeFromHuman"/>
+            <wsdl:output message="ns:getMimeTypeFromHumanResponse" wsaw:Action="urn:getMimeTypeFromHumanResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:getMimeTypeFromHumanResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="addResource">
+            <wsdl:input message="ns:addResourceRequest" wsaw:Action="urn:addResource"/>
+            <wsdl:output message="ns:addResourceResponse" wsaw:Action="urn:addResourceResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:addResourceResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="renameResource">
+            <wsdl:input message="ns:renameResourceRequest" wsaw:Action="urn:renameResource"/>
+            <wsdl:output message="ns:renameResourceResponse" wsaw:Action="urn:renameResourceResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:renameResourceResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getVersionsBean">
+            <wsdl:input message="ns:getVersionsBeanRequest" wsaw:Action="urn:getVersionsBean"/>
+            <wsdl:output message="ns:getVersionsBeanResponse" wsaw:Action="urn:getVersionsBeanResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:getVersionsBeanResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getProperty">
+            <wsdl:input message="ns:getPropertyRequest" wsaw:Action="urn:getProperty"/>
+            <wsdl:output message="ns:getPropertyResponse" wsaw:Action="urn:getPropertyResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:getPropertyResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="moveResource">
+            <wsdl:input message="ns:moveResourceRequest" wsaw:Action="urn:moveResource"/>
+            <wsdl:output message="ns:moveResourceResponse" wsaw:Action="urn:moveResourceResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:moveResourceResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="copyResource">
+            <wsdl:input message="ns:copyResourceRequest" wsaw:Action="urn:copyResource"/>
+            <wsdl:output message="ns:copyResourceResponse" wsaw:Action="urn:copyResourceResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:copyResourceResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="setSessionResourcePath">
+            <wsdl:input message="ns:setSessionResourcePathRequest" wsaw:Action="urn:setSessionResourcePath"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:setSessionResourcePathResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="createVersion">
+            <wsdl:input message="ns:createVersionRequest" wsaw:Action="urn:createVersion"/>
+            <wsdl:output message="ns:createVersionResponse" wsaw:Action="urn:createVersionResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:createVersionResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getCollectionContent">
+            <wsdl:input message="ns:getCollectionContentRequest" wsaw:Action="urn:getCollectionContent"/>
+            <wsdl:output message="ns:getCollectionContentResponse" wsaw:Action="urn:getCollectionContentResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:getCollectionContentResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="hasAssociations">
+            <wsdl:input message="ns:hasAssociationsRequest" wsaw:Action="urn:hasAssociations"/>
+            <wsdl:output message="ns:hasAssociationsResponse" wsaw:Action="urn:hasAssociationsResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:hasAssociationsResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getTextContent">
+            <wsdl:input message="ns:getTextContentRequest" wsaw:Action="urn:getTextContent"/>
+            <wsdl:output message="ns:getTextContentResponse" wsaw:Action="urn:getTextContentResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:getTextContentResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="removeExtension">
+            <wsdl:input message="ns:removeExtensionRequest" wsaw:Action="urn:removeExtension"/>
+            <wsdl:output message="ns:removeExtensionResponse" wsaw:Action="urn:removeExtensionResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:removeExtensionResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="updateMediaType">
+            <wsdl:input message="ns:updateMediaTypeRequest" wsaw:Action="urn:updateMediaType"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:updateMediaTypeResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getPermissions">
+            <wsdl:input message="ns:getPermissionsRequest" wsaw:Action="urn:getPermissions"/>
+            <wsdl:output message="ns:getPermissionsResponse" wsaw:Action="urn:getPermissionsResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:getPermissionsResourceAdminServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="addExtension">
+            <wsdl:input message="ns:addExtensionRequest" wsaw:Action="urn:addExtension"/>
+            <wsdl:output message="ns:addExtensionResponse" wsaw:Action="urn:addExtensionResponse"/>
+            <wsdl:fault message="ns:ResourceAdminServiceException" name="ResourceAdminServiceException" wsaw:Action="urn:addExtensionResourceAdminServiceException"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="ResourceAdminServiceSoap11Binding" type="ns:ResourceAdminServicePortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="deleteVersionHistory">
+            <soap:operation soapAction="urn:deleteVersionHistory" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="delete">
+            <soap:operation soapAction="urn:delete" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getHumanReadableMediaTypes">
+            <soap:operation soapAction="urn:getHumanReadableMediaTypes" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getContentBean">
+            <soap:operation soapAction="urn:getContentBean" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="listExtensions">
+            <soap:operation soapAction="urn:listExtensions" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getZipWithDependencies">
+            <soap:operation soapAction="urn:getZipWithDependencies" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addUserPermission">
+            <soap:operation soapAction="urn:addUserPermission" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceResourceServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceResourceServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="restoreVersion">
+            <soap:operation soapAction="urn:restoreVersion" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getContentDownloadBean">
+            <soap:operation soapAction="urn:getContentDownloadBean" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="setDescription">
+            <soap:operation soapAction="urn:setDescription" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getResourceData">
+            <soap:operation soapAction="urn:getResourceData" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getCollectionMediatypeDefinitions">
+            <soap:operation soapAction="urn:getCollectionMediatypeDefinitions" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getMediatypeDefinitions">
+            <soap:operation soapAction="urn:getMediatypeDefinitions" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getResourceTreeEntry">
+            <soap:operation soapAction="urn:getResourceTreeEntry" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="changeRolePermissions">
+            <soap:operation soapAction="urn:changeRolePermissions" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="importResource">
+            <soap:operation soapAction="urn:importResource" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addTextResource">
+            <soap:operation soapAction="urn:addTextResource" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getCustomUIMediatypeDefinitions">
+            <soap:operation soapAction="urn:getCustomUIMediatypeDefinitions" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addRemoteLink">
+            <soap:operation soapAction="urn:addRemoteLink" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="changeUserPermissions">
+            <soap:operation soapAction="urn:changeUserPermissions" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addSymbolicLink">
+            <soap:operation soapAction="urn:addSymbolicLink" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updateTextContent">
+            <soap:operation soapAction="urn:updateTextContent" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getSessionResourcePath">
+            <soap:operation soapAction="urn:getSessionResourcePath" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getMetadata">
+            <soap:operation soapAction="urn:getMetadata" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addRolePermission">
+            <soap:operation soapAction="urn:addRolePermission" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceResourceServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceResourceServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addTextContent">
+            <soap:operation soapAction="urn:addTextContent" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addCollection">
+            <soap:operation soapAction="urn:addCollection" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getMimeTypeFromHuman">
+            <soap:operation soapAction="urn:getMimeTypeFromHuman" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="renameResource">
+            <soap:operation soapAction="urn:renameResource" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addResource">
+            <soap:operation soapAction="urn:addResource" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getVersionsBean">
+            <soap:operation soapAction="urn:getVersionsBean" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="moveResource">
+            <soap:operation soapAction="urn:moveResource" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getProperty">
+            <soap:operation soapAction="urn:getProperty" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="setSessionResourcePath">
+            <soap:operation soapAction="urn:setSessionResourcePath" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="copyResource">
+            <soap:operation soapAction="urn:copyResource" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="createVersion">
+            <soap:operation soapAction="urn:createVersion" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getCollectionContent">
+            <soap:operation soapAction="urn:getCollectionContent" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="hasAssociations">
+            <soap:operation soapAction="urn:hasAssociations" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getTextContent">
+            <soap:operation soapAction="urn:getTextContent" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="removeExtension">
+            <soap:operation soapAction="urn:removeExtension" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updateMediaType">
+            <soap:operation soapAction="urn:updateMediaType" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addExtension">
+            <soap:operation soapAction="urn:addExtension" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getPermissions">
+            <soap:operation soapAction="urn:getPermissions" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="ResourceAdminServiceSoap12Binding" type="ns:ResourceAdminServicePortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="deleteVersionHistory">
+            <soap12:operation soapAction="urn:deleteVersionHistory" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="delete">
+            <soap12:operation soapAction="urn:delete" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getHumanReadableMediaTypes">
+            <soap12:operation soapAction="urn:getHumanReadableMediaTypes" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getContentBean">
+            <soap12:operation soapAction="urn:getContentBean" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="listExtensions">
+            <soap12:operation soapAction="urn:listExtensions" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getZipWithDependencies">
+            <soap12:operation soapAction="urn:getZipWithDependencies" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addUserPermission">
+            <soap12:operation soapAction="urn:addUserPermission" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceResourceServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceResourceServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="restoreVersion">
+            <soap12:operation soapAction="urn:restoreVersion" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getContentDownloadBean">
+            <soap12:operation soapAction="urn:getContentDownloadBean" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="setDescription">
+            <soap12:operation soapAction="urn:setDescription" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getResourceData">
+            <soap12:operation soapAction="urn:getResourceData" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getCollectionMediatypeDefinitions">
+            <soap12:operation soapAction="urn:getCollectionMediatypeDefinitions" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getMediatypeDefinitions">
+            <soap12:operation soapAction="urn:getMediatypeDefinitions" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getResourceTreeEntry">
+            <soap12:operation soapAction="urn:getResourceTreeEntry" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="changeRolePermissions">
+            <soap12:operation soapAction="urn:changeRolePermissions" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="importResource">
+            <soap12:operation soapAction="urn:importResource" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addTextResource">
+            <soap12:operation soapAction="urn:addTextResource" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getCustomUIMediatypeDefinitions">
+            <soap12:operation soapAction="urn:getCustomUIMediatypeDefinitions" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addRemoteLink">
+            <soap12:operation soapAction="urn:addRemoteLink" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="changeUserPermissions">
+            <soap12:operation soapAction="urn:changeUserPermissions" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addSymbolicLink">
+            <soap12:operation soapAction="urn:addSymbolicLink" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updateTextContent">
+            <soap12:operation soapAction="urn:updateTextContent" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getSessionResourcePath">
+            <soap12:operation soapAction="urn:getSessionResourcePath" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getMetadata">
+            <soap12:operation soapAction="urn:getMetadata" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addRolePermission">
+            <soap12:operation soapAction="urn:addRolePermission" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceResourceServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceResourceServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addTextContent">
+            <soap12:operation soapAction="urn:addTextContent" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addCollection">
+            <soap12:operation soapAction="urn:addCollection" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getMimeTypeFromHuman">
+            <soap12:operation soapAction="urn:getMimeTypeFromHuman" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="renameResource">
+            <soap12:operation soapAction="urn:renameResource" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addResource">
+            <soap12:operation soapAction="urn:addResource" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getVersionsBean">
+            <soap12:operation soapAction="urn:getVersionsBean" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="moveResource">
+            <soap12:operation soapAction="urn:moveResource" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getProperty">
+            <soap12:operation soapAction="urn:getProperty" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="setSessionResourcePath">
+            <soap12:operation soapAction="urn:setSessionResourcePath" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="copyResource">
+            <soap12:operation soapAction="urn:copyResource" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="createVersion">
+            <soap12:operation soapAction="urn:createVersion" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getCollectionContent">
+            <soap12:operation soapAction="urn:getCollectionContent" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="hasAssociations">
+            <soap12:operation soapAction="urn:hasAssociations" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getTextContent">
+            <soap12:operation soapAction="urn:getTextContent" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="removeExtension">
+            <soap12:operation soapAction="urn:removeExtension" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updateMediaType">
+            <soap12:operation soapAction="urn:updateMediaType" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addExtension">
+            <soap12:operation soapAction="urn:addExtension" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getPermissions">
+            <soap12:operation soapAction="urn:getPermissions" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ResourceAdminServiceException">
+                <soap12:fault use="literal" name="ResourceAdminServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="ResourceAdminServiceHttpBinding" type="ns:ResourceAdminServicePortType">
+        <http:binding verb="POST"/>
+        <wsdl:operation name="deleteVersionHistory">
+            <http:operation location="deleteVersionHistory"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="delete">
+            <http:operation location="delete"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getHumanReadableMediaTypes">
+            <http:operation location="getHumanReadableMediaTypes"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getContentBean">
+            <http:operation location="getContentBean"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="listExtensions">
+            <http:operation location="listExtensions"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getZipWithDependencies">
+            <http:operation location="getZipWithDependencies"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addUserPermission">
+            <http:operation location="addUserPermission"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="restoreVersion">
+            <http:operation location="restoreVersion"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getContentDownloadBean">
+            <http:operation location="getContentDownloadBean"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setDescription">
+            <http:operation location="setDescription"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getResourceData">
+            <http:operation location="getResourceData"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getCollectionMediatypeDefinitions">
+            <http:operation location="getCollectionMediatypeDefinitions"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getMediatypeDefinitions">
+            <http:operation location="getMediatypeDefinitions"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getResourceTreeEntry">
+            <http:operation location="getResourceTreeEntry"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="changeRolePermissions">
+            <http:operation location="changeRolePermissions"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="importResource">
+            <http:operation location="importResource"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addTextResource">
+            <http:operation location="addTextResource"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getCustomUIMediatypeDefinitions">
+            <http:operation location="getCustomUIMediatypeDefinitions"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addRemoteLink">
+            <http:operation location="addRemoteLink"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="changeUserPermissions">
+            <http:operation location="changeUserPermissions"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addSymbolicLink">
+            <http:operation location="addSymbolicLink"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="updateTextContent">
+            <http:operation location="updateTextContent"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getSessionResourcePath">
+            <http:operation location="getSessionResourcePath"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getMetadata">
+            <http:operation location="getMetadata"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addRolePermission">
+            <http:operation location="addRolePermission"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addTextContent">
+            <http:operation location="addTextContent"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addCollection">
+            <http:operation location="addCollection"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getMimeTypeFromHuman">
+            <http:operation location="getMimeTypeFromHuman"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="renameResource">
+            <http:operation location="renameResource"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addResource">
+            <http:operation location="addResource"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getVersionsBean">
+            <http:operation location="getVersionsBean"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="moveResource">
+            <http:operation location="moveResource"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getProperty">
+            <http:operation location="getProperty"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setSessionResourcePath">
+            <http:operation location="setSessionResourcePath"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="copyResource">
+            <http:operation location="copyResource"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="createVersion">
+            <http:operation location="createVersion"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getCollectionContent">
+            <http:operation location="getCollectionContent"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="hasAssociations">
+            <http:operation location="hasAssociations"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getTextContent">
+            <http:operation location="getTextContent"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="removeExtension">
+            <http:operation location="removeExtension"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="updateMediaType">
+            <http:operation location="updateMediaType"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="addExtension">
+            <http:operation location="addExtension"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getPermissions">
+            <http:operation location="getPermissions"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="ResourceAdminService">
+        <wsdl:port name="ResourceAdminServiceHttpsSoap11Endpoint" binding="ns:ResourceAdminServiceSoap11Binding">
+            <soap:address location="https://10.0.0.14:9443/services/ResourceAdminService.ResourceAdminServiceHttpsSoap11Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="ResourceAdminServiceHttpsSoap12Endpoint" binding="ns:ResourceAdminServiceSoap12Binding">
+            <soap12:address location="https://10.0.0.14:9443/services/ResourceAdminService.ResourceAdminServiceHttpsSoap12Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="ResourceAdminServiceHttpsEndpoint" binding="ns:ResourceAdminServiceHttpBinding">
+            <http:address location="https://10.0.0.14:9443/services/ResourceAdminService.ResourceAdminServiceHttpsEndpoint/"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

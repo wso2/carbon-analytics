@@ -1,0 +1,27 @@
+.tool-box-table-view{
+
+}
+.tool-box-table-view tbody tr td{
+      padding: 4px 0;
+}
+    /*-- overriding carbon styles --*/
+    #toolBoxes tbody tr td{
+        padding: 8px 0;
+        vertical-align: top!important;
+    }
+
+
+    .toolBoxInfo{
+        background-attachment: scroll;
+        background-clip: border-box;
+        background-color: transparent;
+        background-image: url("../images/more-info.gif");
+        background-origin: padding-box;
+        background-position: 16px 2px;
+        background-repeat: no-repeat;
+        background-size: 10px auto;
+        color: #8B8B8B;
+        font-style: italic;
+        padding: 0 0 2px 30px;
+        position: relative;
+    }

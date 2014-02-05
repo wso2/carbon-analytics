@@ -1,0 +1,241 @@
+/*
+  Copyright 2006-2009 WSO2, Inc. http://www.wso2.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+/*Begin Gadget Styles*/
+.gadgets-gadget-chrome {
+   border: 1px solid #CCCCCC;
+   cursor: move;
+   margin: 10px !important;
+   height: auto !important;
+   width: auto !important;
+   *width: 98% !important;
+}
+
+.gadgets-gadget {
+    border: none;
+}
+
+.gadgets-gadget-title-bar {
+    padding-top: 2px;
+    padding-left: 5px;
+    background-image: url(../images/table-header.gif);
+    background-position: left bottom;
+    background-repeat: repeat-x;
+    border-bottom: 2px solid #CCCCCC;
+    font-weight: normal;
+    height: 22px;
+    line-height: 20px;
+}
+
+.gadgets-gadget-title {
+    font-weight: bold;
+    color: #000;
+    float: left;
+    font-size: 10px;
+}
+
+.gadgets-gadget-title-button-bar {
+    font-size: smaller;
+}
+
+.gadgets-gadget-user-prefs-dialog {
+    background-color: #e5ecf9;
+}
+
+.gadgets-gadget-user-prefs-dialog-action-bar {
+    background: #FFFFFF url(../../admin/images/buttonRow-bg.gif);
+    background-position: left top;
+    background-repeat: repeat-x;
+    border-bottom: 1px solid #CCCCCC;
+    text-align: left;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 3px;
+}
+
+.gadgets-gadget-title-button {
+    width: 16px;
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    cursor: pointer;
+    color: #386698;
+    height: 16px;
+    display: block;
+}
+
+.gadgets-gadget-content {
+   height: auto !important;
+   padding-left: 10px !important;
+   padding-right: 10px !important;
+   padding-bottom: 10px !important;
+}
+
+.gadgets-log-entry {
+}
+
+#columns tr td {
+    border: 1px dashed #CCCCCC;
+    margin: 5px;
+}
+
+/*End Gadget Styles*/
+
+/*Begin Tab Styles*/
+
+#tabmenu {
+    color: #000;
+    border-bottom: 1px solid #666;
+    margin: 12px 0px 0px 0px;
+    padding: 0px;
+    z-index: 1;
+    padding-left: 10px
+}
+
+#tabmenu li {
+    display: inline;
+    overflow: hidden;
+    list-style-type: none;
+}
+
+#tabmenu a {
+    color: #fff;
+    background: #586b74;
+}
+
+#tabmenu a, a.active {
+    font-size: 13px;
+    border: 1px solid #666;
+    padding: 3px 10px 0px 10px;
+    margin: 0px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#tabmenu a.active {
+    background: #fff;
+    color: #586b74;
+    border-bottom: 1px solid #ffffff;
+}
+
+#tabmenu a:hover {
+    color: #fff;
+    cursor: pointer;
+}
+
+#tabmenu a:visited {
+}
+
+#tabmenu a.active:hover {
+    background: #F4F4F4;
+    color: #000000;
+}
+
+.gadgets-top-links {
+    list-style: none;
+    height: 40px;
+}
+
+.gadgets-top-links li {
+    float: left;
+}
+
+.gadgets-title-bar {
+    list-style: none;
+    height: 20px;
+    width: 100%;
+    margin-top: 2px;
+    *margin-top: -17px;
+}
+
+.gadgets-title-bar li {
+    float: right;
+    width: 19px;
+    margin-right: 3px;
+}
+
+.gadgets-title-bar td {
+    text-align: right;
+    width: 18px;
+    border: none !important;
+}
+
+.gadgets-title {
+    text-align: left !important;
+    width: auto !important;
+}
+
+/*End Tab Styles*/
+
+/* Begin Powered by Logo Style */
+
+.powered-by {
+    clear: left;
+    float: right;
+    width: 192px;
+    height: 25px;
+
+}
+
+#columns {
+    padding-top: 15px;
+}
+
+.section {
+    float: left;
+    width: 33%;
+    height: 100% !important;
+}
+
+.sectionTop {
+    width: auto;
+    *width: 100%;
+    margin-top: 10px;
+    *margin-top: -10px;
+}
+
+#page {
+    margin-top: 16px;
+    margin-left: 16px;
+    *margin-left: 0px;
+    width: auto;
+    *width: 100%;
+}
+
+.lineitem {
+    margin-bottom: 20px !important;
+    *margin-bottom: 5px !important;
+    cursor: move;
+}
+
+.ui-sortable-helper {
+    width: 26% !important;
+    *width: 26% !important;
+}
+
+.block-hover {
+    border: 1px dashed #CCCCCC;
+    height: 200px;
+}
+
+/* End Powered by Logo Style */
+
+#handlerBut{
+	float:right;
+	background-repeat:no-repeat;
+	background-position:0 0;
+	padding-left:20px;
+
+}

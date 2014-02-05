@@ -1,0 +1,99 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ax213="http://util.archive.data.cassandra.bam.carbon.wso2.org/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:tns="http://service.archive.data.cassandra.bam.carbon.wso2.org" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://service.archive.data.cassandra.bam.carbon.wso2.org">
+    <wsdl:documentation>CassandraArchivalService</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema xmlns:ax214="http://util.archive.data.cassandra.bam.carbon.wso2.org/xsd" xmlns:ns="http://org.apache.axis2/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://org.apache.axis2/xsd">
+            <xs:import namespace="http://util.archive.data.cassandra.bam.carbon.wso2.org/xsd"/>
+            <xs:element name="CassandraArchivalServiceException">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="CassandraArchivalServiceException" nillable="true" type="ns1:Exception"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:complexType name="Exception">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="Message" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="archiveCassandraData">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="archiveConfiguration" nillable="true" type="ax214:ArchiveConfiguration"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://util.archive.data.cassandra.bam.carbon.wso2.org/xsd">
+            <xs:complexType name="ArchiveConfiguration">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="connectionURL" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="cronExpression" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="endDate" nillable="true" type="xs:date"/>
+                    <xs:element minOccurs="0" name="noOfDays" type="xs:int"/>
+                    <xs:element minOccurs="0" name="password" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="schedulingOn" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="startDate" nillable="true" type="xs:date"/>
+                    <xs:element minOccurs="0" name="streamName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="userName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="version" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="archiveCassandraDataRequest">
+        <wsdl:part name="parameters" element="ns1:archiveCassandraData"/>
+    </wsdl:message>
+    <wsdl:message name="CassandraArchivalServiceException">
+        <wsdl:part name="parameters" element="ns1:CassandraArchivalServiceException"/>
+    </wsdl:message>
+    <wsdl:portType name="CassandraArchivalServicePortType">
+        <wsdl:operation name="archiveCassandraData">
+            <wsdl:input message="tns:archiveCassandraDataRequest" wsaw:Action="urn:archiveCassandraData"/>
+            <wsdl:fault message="tns:CassandraArchivalServiceException" name="CassandraArchivalServiceException" wsaw:Action="urn:archiveCassandraDataCassandraArchivalServiceException"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="CassandraArchivalServiceSoap11Binding" type="tns:CassandraArchivalServicePortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="archiveCassandraData">
+            <soap:operation soapAction="urn:archiveCassandraData" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="CassandraArchivalServiceException">
+                <soap:fault use="literal" name="CassandraArchivalServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="CassandraArchivalServiceSoap12Binding" type="tns:CassandraArchivalServicePortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="archiveCassandraData">
+            <soap12:operation soapAction="urn:archiveCassandraData" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="CassandraArchivalServiceException">
+                <soap12:fault use="literal" name="CassandraArchivalServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="CassandraArchivalServiceHttpBinding" type="tns:CassandraArchivalServicePortType">
+        <http:binding verb="POST"/>
+        <wsdl:operation name="archiveCassandraData">
+            <http:operation location="archiveCassandraData"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="CassandraArchivalService">
+        <wsdl:port name="CassandraArchivalServiceHttpsSoap11Endpoint" binding="tns:CassandraArchivalServiceSoap11Binding">
+            <soap:address location="https://10.224.54.236:9443/services/CassandraArchivalService.CassandraArchivalServiceHttpsSoap11Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="CassandraArchivalServiceHttpsSoap12Endpoint" binding="tns:CassandraArchivalServiceSoap12Binding">
+            <soap12:address location="https://10.224.54.236:9443/services/CassandraArchivalService.CassandraArchivalServiceHttpsSoap12Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="CassandraArchivalServiceHttpsEndpoint" binding="tns:CassandraArchivalServiceHttpBinding">
+            <http:address location="https://10.224.54.236:9443/services/CassandraArchivalService.CassandraArchivalServiceHttpsEndpoint/"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

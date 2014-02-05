@@ -1,0 +1,123 @@
+.tip-table {
+    border-collapse: collapse;
+    width: 464px;
+}
+
+.tip-table tr td.tip-empty {
+    width: 60px;
+}
+
+.tip-top {
+    width: 202px;
+    height: 85px;
+    z-index: 90;
+}
+
+.tip-content-lifter {
+    margin-top: -20px;
+    position: relative;
+    font-size: 11px;
+}
+
+.tip-content a.dashboard-subtitle {
+    line-height: 30px;
+}
+
+.tip-content {
+    background: transparent url(../images/tip-back.png) repeat-y left top;
+    padding: 10px !important;
+    width: 182px;
+    z-index: 100;
+}
+
+.tip-bottom {
+    background: transparent url(../images/tip-bottom.png) no-repeat left top;
+    height: 11px;
+    width: 202px;
+}
+
+a.tip-title, h3.tip-title {
+    color: #333333 !important;
+    font-size: 18px !important;
+    text-decoration: none;
+    margin-bottom: 0 !important;
+    margin-top: 0 !important;
+    display: block;
+}
+
+a.tip-title {
+    cursor: pointer;
+}
+
+a.tip-title:hover {
+    color: #930000 !important;
+}
+
+div#workArea h2.dashboard-title {
+    background-image: url(../images/dashboard-title-bg.gif);
+    background-position: left bottom;
+    background-repeat: repeat-x;
+    border-bottom: 0 none;
+    color: #000000;
+    font-size: 150%;
+    font-weight: bold;
+    line-height: 25px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+}
+
+.tip-table-div {
+    height: 10px;
+}
+
+.tip-table td.enterprice-info {
+    background-image: url(../images/enterprice-info.png);
+}
+
+.tip-table td.easyuser {
+    background-image: url(../images/easyuser.png);
+}
+
+.tip-table td.author-gadgets {
+    background-image: url(../images/author-gadgets.png);
+}
+
+.tip-table td.client-side-gadgets {
+    background-image: url(../images/client-side-gadgets.png);
+}
+
+.tip-table td.ent-gadget-repo {
+    background-image: url(../images/ent-gadget-repo.png);
+}
+
+.tip-table td.anonymous {
+    background-image: url(../images/anonymous.png);
+}
+
+.tip-table td.secure-sign-in {
+    background-image: url(../images/secure-sign-in.png);
+}
+
+.tip-table td.mgt-consle {
+    background-image: url(../images/mgt-consle.png);
+}
+div#middle div#loginContent {
+    padding:10px;
+}
+.page-login-box{
+    width:400px;
+}
+.button, .button:visited {
+background-color: #b8e2df;
+}
+.button:hover{
+	background-color: #111; color: #fff;
+}
+table#links{
+    border: solid 1px #2bafb9;
+    -moz-border-radius: 7px;
+    border-radius: 7px;
+    padding: 10px;
+
+    background-color:#f2f2f2;
+}

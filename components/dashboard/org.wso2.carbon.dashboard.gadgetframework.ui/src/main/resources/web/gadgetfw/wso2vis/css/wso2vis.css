@@ -1,0 +1,39 @@
+@media screen, print { 
+	ul.mktree  li { list-style: none; } 
+	ul.mktree {margin: 0px; margin-left: -10px !important; margin-top: 3px;}
+	ul.mktree, ul.mktree ul , ul.mktree li { margin-left:10px; padding:0px; white-space: nowrap}
+	ul.mktree  li           .bullet { padding-left: 15px;}
+	ul.mktree  li.liOpen    .bullet { cursor: pointer; background: url(../images/minus.gif)  center left no-repeat; }
+	ul.mktree  li.liClosed  .bullet { cursor: pointer; background: url(../images/plus.gif)   center left no-repeat; }
+	ul.mktree  li.liBullet  .bullet { cursor: default; background: url(../images/bullet.gif) center left no-repeat; }
+	ul.mktree  li.liOpen    ul { display: block; border-left:1px solid #f5f5f5; border-top:1px solid #f5f5f5;}
+	ul.mktree  li.liClosed  ul { display: none; }
+	ul.mktree  li { line-height: 16px } 
+}
+
+#recordframe {
+	font: 10px Arial; 
+	border:1px solid #ccc;
+	width:100%;
+    height: 33%;
+    text-decoration: none; 
+    padding: 0;
+}
+
+#treecontainer{
+    border:1px solid #ccc;
+    width:100%;
+    height: 77%;
+    overflow: auto;
+    margin-right:4px;
+}
+#treecontainer div, a{
+    color: #000000; 
+    font: 12px Arial; 
+    text-decoration: none; 
+    padding-left: 2px; 
+    padding-right: 2px;
+    cursor:pointer;
+}
+#treecontainer .au{background-color: #ffffff; color: #000000} 	/* A tag unselected*/
+#treecontainer .as{background-color: #0a246a; color: #ffffff }	/* A tag selected*/  

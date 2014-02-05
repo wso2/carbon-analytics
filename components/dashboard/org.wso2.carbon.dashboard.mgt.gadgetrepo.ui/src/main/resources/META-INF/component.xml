@@ -1,0 +1,69 @@
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<component xmlns="http://products.wso2.org/carbon">
+    <!-- sample menu configuration -->
+    <menus>
+        <menu>
+            <id>gadgetrepo_menu</id>
+            <i18n-key>dashboard.resources.menu</i18n-key>
+            <i18n-bundle>org.wso2.carbon.dashboard.mgt.gadgetrepo.ui.resource.i18n.Resources</i18n-bundle>
+            <parent-menu>manage_gs</parent-menu>
+            <link>../gadgetrepo/index.jsp</link>
+            <url-params>name=governance</url-params>
+            <region>region1</region>
+            <order>1</order>
+            <style-class>manage</style-class>
+            <icon>../gadgetrepo/images/gadgetRepo.gif</icon>
+            <require-permission>/permission/admin/manage</require-permission>
+        </menu>
+        <menu>
+            <id>portal_menu</id>
+            <i18n-key>dashboard.resources.menu.portal</i18n-key>
+            <i18n-bundle>org.wso2.carbon.dashboard.mgt.gadgetrepo.ui.resource.i18n.Resources</i18n-bundle>
+            <parent-menu>manage_gs</parent-menu>
+            <link>../dashboard/index.jsp</link>
+            <region>region1</region>
+            <order>1</order>
+            <style-class>manage</style-class>
+            <icon>../gadgetrepo/images/portalicon.gif</icon>
+            <require-permission>/permission/admin/login</require-permission>
+        </menu>
+    </menus>
+    <framework-configuration>
+        <bypass>
+            <authentication>
+                <link>../gadgetrepo/gadget-browser.jsp</link>
+                <link>../gadgetrepo/gadget-page.jsp</link>
+                <link>../gsusermgt/login.jsp</link>
+            </authentication>
+            <tiles>
+                <link>../gadgetrepo/gadget-browser.jsp</link>
+                <link>../gadgetrepo/gadget-page.jsp</link>
+                <link>../gsusermgt/login.jsp</link>
+            </tiles>
+        </bypass>
+    </framework-configuration>
+        <FileUploadConfig>
+        <Mapping>
+            <Actions>
+                <Action>gadgetupload</Action>
+            </Actions>
+            <Class>org.wso2.carbon.dashboard.mgt.gadgetrepo.ui.processors.GadgetUploadProcessor</Class>
+        </Mapping>
+    </FileUploadConfig>    
+</component>

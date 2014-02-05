@@ -1,0 +1,90 @@
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html>
+	<head>
+        <title>Protovis Clustered Bar Chart Example</title>
+        <script type="text/javascript" src="../wso2vis.js"></script>
+
+        <script language="javascript" type="text/javascript">
+
+            var dataProvider = new wso2vis.p.ProviderGET("http://localhost/wso2vis/examples/generator2.php");
+            var dataFilter = new wso2vis.f.BasicFilter(["services", "service"], ["@name"]);
+
+            var timer = new wso2vis.u.Timer(5000);
+
+            function globalTick() {
+                dataProvider.pullData();
+            }
+
+            function clusBarTooltip(data, index) {
+                return "Operation: " + data["operations"]["operation"][index]["@name"] + " - Requests: " + data["operations"]["operation"][index]["stats"]["requestCount"];
+            }
+
+            function clusBarClick(data, index) {
+                alert("Clicked Server: " + data["@name"] + ", Operation: " + data["operations"]["operation"][index]["@name"]);
+            }
+
+            window.onload = function () {
+
+                var clusBarChart = new wso2vis.s.chart.protovis.ClusteredBarChart("chart","Request count per Operation","");
+
+                clusBarChart.dataField(["services", "service"])
+                            .subDataField(["operations", "operation"])
+			                .subDataValue(["stats", "requestCount"])
+			                .dataLabel(["@name"])
+                            .subDataLabel(["@name"])
+                            .width(600)
+                            .height(400)
+                            .paddingTop(25)
+                            .paddingBottom(10)
+                            .paddingLeft(60)
+                            .paddingRight(80);
+
+                clusBarChart.onTooltip = clusBarTooltip;
+                clusBarChart.onClick = clusBarClick;
+                clusBarChart.load();                
+
+                dataProvider.addDataReceiver(dataFilter); // dataProvider -> dataFilter -> clusBarChart
+                dataFilter.addDataReceiver(clusBarChart);
+
+                dataProvider.initialize();
+
+                timer.tick = globalTick;
+                timer.startTimer();
+            }
+		</script>
+        <style>
+            div#qTip {
+                padding: 3px;
+                border: 1px solid #666;
+                border-right-width: 2px;
+                border-bottom-width: 2px;
+                display: none;
+                background: #999;
+                color: #FFF;
+                font: bold 10px Verdana, Arial, sans-serif;
+                text-align: left;
+                position: absolute;
+                z-index: 1000;
+            }
+        </style>
+	</head>
+	<body>
+    	<div id="chart"></div>
+	</body>
+</html>

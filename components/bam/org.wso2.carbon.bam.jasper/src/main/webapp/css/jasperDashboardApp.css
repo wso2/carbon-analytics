@@ -1,0 +1,459 @@
+.analizer_background {
+    /*background: transparent url( ../images/LetherBack.png ) repeat-x left top;*/
+}
+.analizerMainTable{
+    width:100%;
+}
+#analizer_header {
+    margin-bottom: 10px;
+}
+
+#analizer_nav {
+    width: auto;
+    margin-bottom: 10px;
+}
+
+#analizer_content {
+    margin-left: 2%;
+    margin-bottom: 10px;
+}
+
+#analizer_footer {
+    clear: both;
+    height: 50px;
+    background-color: #666;
+    margin-bottom: 10px;
+}
+
+/*content items */
+
+.analizer_toolbar {
+    background-image: -webkit-gradient( linear, left top, left bottom, from( #dee7f3 ), to( #ffffff ) ); /* mozilla - FF3.6+ */
+    background-image: -moz-linear-gradient( top, #dee7f3 0%, #ffffff 100% ); /* IE 5.5 - 7 */
+    filter: progid:DXImageTransform.Microsoft.gradient( gradientType = 0, startColorStr = #dee7f3, endColorStr = #ffffff ); /* IE8 */
+    -ms-filter: progid: DXImageTransform . Microsoft . gradient( gradientType = 0, startColorStr = #dee7f3, endColoStr = #ffffff );
+
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    border: solid 1px #42728b;
+
+    -moz-box-shadow: 0 0 3px #999;
+    -webkit-box-shadow: 0 0 3px #999;
+    box-shadow: 0 0 3px #999;
+    margin: 0px;
+    opacity: 0.8;
+    padding:5px 10px 5px 10px;
+}
+
+.analizer_node, #analizerTreeContainer a {
+    background-image: -webkit-gradient( linear, left top, left bottom, from( #ffffff ), to( #94bad5 ) ); /* mozilla - FF3.6+ */
+    background-image: -moz-linear-gradient( top, #ffffff 0%, #94bad5 100% ); /* IE 5.5 - 7 */
+    filter: progid:DXImageTransform.Microsoft.gradient( gradientType = 0, startColorStr = #ffffff, endColorStr = #94bad5 ); /* IE8 */
+    -ms-filter: progid:DXImageTransform.Microsoft.gradient( gradientType = 0, startColorStr = #ffffff, endColoStr = #94bad5 );
+
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    border: solid 1px #b5dff7;
+    padding: 2px 10px 2px 5px;
+    width: auto;
+    font-size: 12px;
+    text-shadow: 1px 1px 1px #fff;
+
+    -moz-box-shadow: 5px 5px 2px #888;
+    -webkit-box-shadow: 5px 5px 2px #888;
+    box-shadow: 5px 5px 2px #888;
+    margin: 10px;
+
+}
+
+.jstree-default.jstree-focused {
+    background-color: transparent !important;
+}
+#analizerTreeContainer a ins.get,div.get {background: transparent url( ../images/get.png ) no-repeat left center;}
+#analizerTreeContainer a ins.aggregate,div.aggregate {background: transparent url( ../images/aggregate.png ) no-repeat left center;}
+#analizerTreeContainer a ins.lookup,div.lookup {background: transparent url( ../images/lookup.png ) no-repeat left center;}
+#analizerTreeContainer a ins.put,div.put {background: transparent url( ../images/put.png ) no-repeat left center;}
+#analizerTreeContainer a ins.log,div.log {background: transparent url( ../images/log.png ) no-repeat left center;}
+#analizerTreeContainer a ins.orderBy,div.orderBy {background: transparent url( ../images/orderBy.png ) no-repeat left center;}
+#analizerTreeContainer a ins.detectFault,div.detectFault {background: transparent url( ../images/detectFault.png ) no-repeat left center;}
+#analizerTreeContainer a ins.index,div.index {background: transparent url( ../images/index.png ) no-repeat left center;}
+#analizerTreeContainer a ins.alert,div.alert {background: transparent url( ../images/alert.png ) no-repeat left center;}
+#analizerTreeContainer a ins.extract,div.extract {background: transparent url( ../images/extract.png ) no-repeat left center;}
+#analizerTreeContainer a ins.groupBy,div.groupBy {background: transparent url( ../images/groupBy.png ) no-repeat left center;}
+#analizerTreeContainer a ins.drop,div.drop {background: transparent url( ../images/drop.png ) no-repeat left center;}
+
+.jstree-draggable {
+    padding-left: 30px;
+    cursor: move;
+}
+
+.treeContainer {
+    background-color: #fff;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    border: dotted 1px #b5dff7;
+    margin-right: 10px;
+
+    -moz-box-shadow: 5px 5px 2px #888;
+    -webkit-box-shadow: 5px 5px 2px #888;
+    box-shadow: 5px 5px 2px #888;
+}
+
+#analizerTreeContainer li {
+    min-height: 22px;
+    line-height: 22px;
+}
+
+#analizerTreeContainer a ins {
+    height: 20px;
+    width: 20px;
+    background-position: -56px -17px;
+}
+
+div.xmlTreeAttributes {
+    font-size: 11px;
+    overflow:auto;
+}
+
+div.xmlTreeAttributes .mainLabel img {
+    margin-left:5px;
+}
+div.xmlTreeAttributes .mainLabel {
+    font-weight: bold;
+}
+div.xmlTreeAttributes .mainLabel1 {
+    color: #000000;
+    font-size: 18px;
+    float: left !important;
+    font-weight: bold;
+}
+
+/*
+div.xmlTreeAttributes .mainLabel2 {
+    font-size: 16px;
+    color: #666666;
+    font-weight: bold;
+}
+
+div.xmlTreeAttributes .mainLabel3 {
+    font-size: 15px;
+    color: #707a88;
+    font-weight: bold;
+}
+div.xmlTreeAttributes .mainLabel4 {
+    font-size: 13px;
+    color: #707a88;
+    font-weight: bold;
+}
+*/
+
+div.xmlTreeAttributes .addLinkList {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+div.xmlTreeAttributes .addLinkList li {
+    float: left;
+    padding: 5px 10px 5px 0px;
+}
+
+div.xmlTreeAttributes .shiftingLeft {
+    padding-left: 20px;
+}
+
+div.xmlTreeAttributes .attributeRow label {
+    display: block;
+    float: left;
+}
+div.xmlTreeAttributes .attributeRow input {
+    float: left;
+    margin-bottom:3px;
+}
+
+div.xmlTreeAttributes .attributeRow {
+    background-color: #fff;
+    padding: 5px;
+}
+.borderClass{
+    border:solid 1px #ccc;
+}
+/* Dialog box */
+
+#dialog-overlay {
+    width: 100%;
+    height: 100%;
+
+    filter: alpha( opacity = 50 );
+    -moz-opacity: 0.5;
+    -khtml-opacity: 0.5;
+    opacity: 0.5;
+    background: #000;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 3000;
+    display: none;
+}
+
+#dialog-box {
+
+    -webkit-box-shadow: 0px 0px 10px rgba( 0, 0, 0, 0.5 );
+    -moz-box-shadow: 0px 0px 10px rgba( 0, 0, 0, 0.5 );
+
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+
+    background: #333;
+
+    position: absolute;
+    z-index: 5000;
+
+    display: none;
+    opacity:0.9;
+    border-top: 20px solid #333333;
+}
+
+#dialog-box .dialog-content {
+    text-align: left;
+    margin-top: 7px;
+    color: #666;
+    font-family: arial;
+    font-size: 14px;
+    background-color:#eee;
+}
+#dialog-box input.button{
+    width:50px;
+}
+.dialogButtons{
+    padding:10px 0px 0px 10px;
+    border-top:solid 1px #ccc;
+    background-color:#333;
+}
+.dialogButtons a{
+    float:left;
+    margin-right:10px;
+}
+
+div.analizer_toolbar .button{
+    width:50px;
+    display:block;
+    margin-top:10px;
+    cursor:pointer;
+}
+a.button:hover {
+    background-color: #c33100;
+}
+.analizer_toolbar div.title{
+    font-size:12px;
+    font-weight:bold;
+    line-height:30px;
+}
+/*#tabs ul li{
+    *//* webkit *//*
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#cdd6e3), to(#ffffff));
+    *//* mozilla - FF3.6+ *//*
+    background-image: -moz-linear-gradient(top, #cdd6e3 0%, #ffffff 100%);
+    *//* IE 5.5 - 7 *//*
+    filter: progid:DXImageTransform.Microsoft.gradient(gradientType=0, startColor=0, endColorStr=#cdd6e3);
+    *//* IE8 *//*
+    -ms-filter: progid:DXImageTransform.Microsoft.gradient(gradientType=0, startColor=0, endColoStr=#cdd6e3);
+
+    padding: 2px 8px 3px;
+    color: #fff;
+    text-decoration: none;
+    line-height: 1;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+
+    border-bottom: none;
+    height:20px;
+    margin-right:5px;
+    border-top:solid 1px #b2ccdd;
+    border-left:solid 1px #b2ccdd;
+    border-right:solid 1px #b2ccdd;
+    float:left;
+}*/
+
+/*#tabs ul li.ui-tabs-selected{
+    background-image:none;
+    background-color:#fff;
+}*/
+.source{
+    width:99%;
+    height:400px;
+}
+.closeButton{
+    background:transparent url(../images/close.png) no-repeat right top;
+    width:22px;
+    height:22px;
+    cursor:pointer;
+    display:block;
+    position:absolute;
+    top:5px;
+    right:5px;
+    margin-top:-23px;
+}
+#root0{
+    background-image: -webkit-gradient( linear, left top, left bottom, from( #ffffff ), to( #000000 ) ) !important; /* mozilla - FF3.6+ */
+    background-image: -moz-linear-gradient( top, #ffffff 0%, #000000 100% ) !important; /* IE 5.5 - 7 */
+    filter: progid:DXImageTransform.Microsoft.gradient( gradientType = 0, startColorStr = #ffffff, endColorStr = #000000 ) !important; /* IE8 */
+    -ms-filter: progid:DXImageTransform.Microsoft.gradient( gradientType = 0, startColorStr = #ffffff, endColoStr = #000000 ) !important;
+
+    border-color:#000 !important;
+    color:#fff !important;
+    text-shadow:none !important;
+    padding:20px !important;
+}
+.xmlTreeAttributes input[type=text] {
+    min-width:350px;
+}
+.toolBar-header{
+     background-image: -webkit-gradient( linear, left top, left bottom, from( #555555 ), to( #000000 ) ); /* mozilla - FF3.6+ */
+    background-image: -moz-linear-gradient( top, #555555 0%, #000000 100% ); /* IE 5.5 - 7 */
+    filter: progid:DXImageTransform.Microsoft.gradient( gradientType = 0, startColorStr = '#555555', endColorStr = '#000000' ); /* IE8 */
+    -ms-filter: progid: DXImageTransform . Microsoft . gradient( gradientType = 0, startColorStr = '#555555', endColoStr = '#000000' );
+
+    background-color: #222;
+    color:#fff;
+    padding:5px;
+}
+.insertSourceButton{
+
+    background-image: -webkit-gradient( linear, left top, left bottom, from( #ffffff ), to( #94bad5 ) ); /* mozilla - FF3.6+ */
+    background-image: -moz-linear-gradient( top, #ffffff 0%, #94bad5 100% ); /* IE 5.5 - 7 */
+    filter: progid:DXImageTransform.Microsoft.gradient( gradientType = 0, startColorStr = '#ffffff', endColorStr = '#94bad5' ); /* IE8 */
+    -ms-filter: progid:DXImageTransform.Microsoft.gradient( gradientType = 0, startColorStr = '#ffffff', endColoStr = '#94bad5' );
+
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    border: solid 1px #b5dff7;
+    padding: 2px 10px 2px 5px;
+    width: auto;
+    font-size: 12px;
+    text-shadow: 1px 1px 1px #fff;
+
+    -moz-box-shadow: 5px 5px 2px #888;
+    -webkit-box-shadow: 5px 5px 2px #888;
+    box-shadow: 5px 5px 2px #888;
+    margin: 5px;
+}
+
+.customForms{
+    margin:10px;
+}
+.customForms span{
+    font-size: 18px;
+    font-weight: bold;
+}
+.customForms table{
+    width:100%;
+    margin:10px 5px 5px 0px;
+    background-color:#fff;
+}
+.customForms table tr:first-child{
+    width:30%;
+}
+.optionalElements{
+    padding:5px;
+    background-color:#fff;
+}
+.togglebleTitle {
+/*background:transparent url(../images/arrowDownUp.png) no-repeat left -20px;*/
+    cursor: pointer;
+}
+
+.sectionSeperator {
+    color: #000;
+    text-transform: capitalize;
+    font-size: 12px;
+    font-weight: bold;
+
+    background-image: -webkit-gradient( linear, left top, left bottom, from( #ffffff ), to( #dddddd ) ); /* mozilla - FF3.6+ */
+    background-image: -moz-linear-gradient( top, #ffffff 0%, #dddddd 100% ); /* IE 5.5 - 7 */
+    filter: progid:DXImageTransform.Microsoft.gradient( gradientType = 0, startColorStr = #ffffff, endColorStr = #dddddd ); /* IE8 */
+    -ms-filter: progid: DXImageTransform . Microsoft . gradient( gradientType = 0, startColorStr = #ffffff, endColoStr = #dddddd );
+
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    border: solid 1px #888888;
+    padding: 2px 10px 2px 5px;
+    width: auto;
+
+    -moz-box-shadow: 3px 3px 2px #ddd;
+    -webkit-box-shadow: 3px 3px 2px #ddd;
+    box-shadow: 3px 3px 2px #ddd;
+    margin-bottom: 10px;
+    clear: both;
+}
+
+.sectionSeperator img {
+    margin-left: 20px;
+}
+
+.contentHidden {
+/*background:transparent url(../images/arrowDownUp.png) no-repeat left 5px !important; */
+    color: #fff;
+    background-image: -webkit-gradient( linear, left top, left bottom, from( #555555 ), to( #dddddd ) ); /* mozilla - FF3.6+ */
+    background-image: -moz-linear-gradient( top, #888888 0%, #eeeeee 100% ); /* IE 5.5 - 7 */
+    filter: progid:DXImageTransform.Microsoft.gradient( gradientType = 0, startColorStr = #555555, endColorStr = #dddddd ); /* IE8 */
+    -ms-filter: progid: DXImageTransform . Microsoft . gradient( gradientType = 0, startColorStr = #555555, endColoStr = #dddddd );
+}
+#tabs ul{
+    font-size: 16px;
+}
+.leftPanelLink{
+    min-width: 100px;
+    display: block;
+    padding: 4px;
+    font-size: 0.8em;
+    text-decoration: none;
+    text-align: center;
+    margin: 4px 2px;
+}
+.leftPanelLink:hover{
+    background: #79c9ec url("../jquery.ui/css/start/images/ui-bg_glass_75_79c9ec_1x400.png") 50% 50% repeat-x; font-weight: normal; color: #026890;
+}
+#leftNav{
+    width:19%;
+    position: relative;
+    float: left;
+    height: 100%;
+    border: 1px solid #A6C9E2;
+    background: none repeat scroll 0 0 #F5F8FF;
+}
+#tabs{
+    width: 80%;
+    position: relative;
+    float: right;
+}
+#jasperWrapper{
+    position: relative;
+    width:100%;
+    overflow: hidden;
+}
+#header{
+    position: relative;
+    height: 32px;
+    padding: 20px;
+    margin-bottom: 4px;
+}
+#footer{
+    position: relative;
+    height: 16px;
+    text-align: right;
+    padding: 4px 10px;
+    margin: 4px 0;
+    font-size: 0.7em;
+}
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default{
+    border: none;
+}
+#tabs ul li a{
+    padding:4px 20px;
+    font-size:.8em;
+    cursor:pointer;
+}
+

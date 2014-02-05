@@ -1,0 +1,484 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://service.deployer.toolbox.bam.carbon.wso2.org" xmlns:ax231="http://deployer.toolbox.bam.carbon.wso2.org/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ax229="http://util.deployer.toolbox.bam.carbon.wso2.org/xsd" xmlns:ax227="http://exception.deployer.toolbox.bam.carbon.wso2.org/xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://service.deployer.toolbox.bam.carbon.wso2.org">
+    <wsdl:documentation>BAMToolboxDepolyerService</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://exception.deployer.toolbox.bam.carbon.wso2.org/xsd">
+            <xs:complexType name="BAMToolboxDeploymentException">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="message" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://deployer.toolbox.bam.carbon.wso2.org/xsd">
+            <xs:complexType name="BasicToolBox">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="TBoxFileName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="description" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="displayName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="location" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="sampleId" type="xs:int"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema xmlns:ax232="http://deployer.toolbox.bam.carbon.wso2.org/xsd" xmlns:ax228="http://exception.deployer.toolbox.bam.carbon.wso2.org/xsd" xmlns:ax230="http://util.deployer.toolbox.bam.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://service.deployer.toolbox.bam.carbon.wso2.org">
+            <xs:import namespace="http://exception.deployer.toolbox.bam.carbon.wso2.org/xsd"/>
+            <xs:import namespace="http://util.deployer.toolbox.bam.carbon.wso2.org/xsd"/>
+            <xs:import namespace="http://deployer.toolbox.bam.carbon.wso2.org/xsd"/>
+            <xs:element name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="BAMToolboxDeploymentException" nillable="true" type="ax228:BAMToolboxDeploymentException"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="uploadBAMToolBox">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="toolbox" nillable="true" type="xs:base64Binary"/>
+                        <xs:element minOccurs="0" name="toolboxName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="uploadBAMToolBoxResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="undeployToolBox">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="toolboxNames" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="undeployToolBoxResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getJaggeryDashboards">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getJaggeryDashboardsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax230:JaggeryDashboardDTO"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getDeployedToolBoxes">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="searchKey" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getDeployedToolBoxesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax230:ToolBoxStatusDTO"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getBasicToolBoxes">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getBasicToolBoxesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax232:BasicToolBox"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="downloadToolBox">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="toolboxName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="downloadToolBoxResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:base64Binary"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployToolBoxFromURL">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="url" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployBasicToolBox">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="sample_id" type="xs:int"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://util.deployer.toolbox.bam.carbon.wso2.org/xsd">
+            <xs:complexType name="JaggeryDashboardDTO">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="dashboardName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="jaggeryTabs" nillable="true" type="xs:anyType"/>
+                    <xs:element minOccurs="0" name="validDashboardConfig" type="xs:boolean"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ToolBoxStatusDTO">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="deployedTools" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="toBeDeployedTools" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="toBeUndeployedTools" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="deployBasicToolBoxRequest">
+        <wsdl:part name="parameters" element="ns:deployBasicToolBox"/>
+    </wsdl:message>
+    <wsdl:message name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException">
+        <wsdl:part name="parameters" element="ns:BAMToolboxDepolyerServiceBAMToolboxDeploymentException"/>
+    </wsdl:message>
+    <wsdl:message name="deployToolBoxFromURLRequest">
+        <wsdl:part name="parameters" element="ns:deployToolBoxFromURL"/>
+    </wsdl:message>
+    <wsdl:message name="downloadToolBoxRequest">
+        <wsdl:part name="parameters" element="ns:downloadToolBox"/>
+    </wsdl:message>
+    <wsdl:message name="downloadToolBoxResponse">
+        <wsdl:part name="parameters" element="ns:downloadToolBoxResponse"/>
+    </wsdl:message>
+    <wsdl:message name="uploadBAMToolBoxRequest">
+        <wsdl:part name="parameters" element="ns:uploadBAMToolBox"/>
+    </wsdl:message>
+    <wsdl:message name="uploadBAMToolBoxResponse">
+        <wsdl:part name="parameters" element="ns:uploadBAMToolBoxResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getBasicToolBoxesRequest">
+        <wsdl:part name="parameters" element="ns:getBasicToolBoxes"/>
+    </wsdl:message>
+    <wsdl:message name="getBasicToolBoxesResponse">
+        <wsdl:part name="parameters" element="ns:getBasicToolBoxesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getDeployedToolBoxesRequest">
+        <wsdl:part name="parameters" element="ns:getDeployedToolBoxes"/>
+    </wsdl:message>
+    <wsdl:message name="getDeployedToolBoxesResponse">
+        <wsdl:part name="parameters" element="ns:getDeployedToolBoxesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getJaggeryDashboardsRequest">
+        <wsdl:part name="parameters" element="ns:getJaggeryDashboards"/>
+    </wsdl:message>
+    <wsdl:message name="getJaggeryDashboardsResponse">
+        <wsdl:part name="parameters" element="ns:getJaggeryDashboardsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="undeployToolBoxRequest">
+        <wsdl:part name="parameters" element="ns:undeployToolBox"/>
+    </wsdl:message>
+    <wsdl:message name="undeployToolBoxResponse">
+        <wsdl:part name="parameters" element="ns:undeployToolBoxResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="BAMToolboxDepolyerServicePortType">
+        <wsdl:operation name="deployBasicToolBox">
+            <wsdl:input message="ns:deployBasicToolBoxRequest" wsaw:Action="urn:deployBasicToolBox"/>
+            <wsdl:fault message="ns:BAMToolboxDepolyerServiceBAMToolboxDeploymentException" name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException" wsaw:Action="urn:deployBasicToolBoxBAMToolboxDepolyerServiceBAMToolboxDeploymentException"/>
+        </wsdl:operation>
+        <wsdl:operation name="deployToolBoxFromURL">
+            <wsdl:input message="ns:deployToolBoxFromURLRequest" wsaw:Action="urn:deployToolBoxFromURL"/>
+            <wsdl:fault message="ns:BAMToolboxDepolyerServiceBAMToolboxDeploymentException" name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException" wsaw:Action="urn:deployToolBoxFromURLBAMToolboxDepolyerServiceBAMToolboxDeploymentException"/>
+        </wsdl:operation>
+        <wsdl:operation name="downloadToolBox">
+            <wsdl:input message="ns:downloadToolBoxRequest" wsaw:Action="urn:downloadToolBox"/>
+            <wsdl:output message="ns:downloadToolBoxResponse" wsaw:Action="urn:downloadToolBoxResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="uploadBAMToolBox">
+            <wsdl:input message="ns:uploadBAMToolBoxRequest" wsaw:Action="urn:uploadBAMToolBox"/>
+            <wsdl:output message="ns:uploadBAMToolBoxResponse" wsaw:Action="urn:uploadBAMToolBoxResponse"/>
+            <wsdl:fault message="ns:BAMToolboxDepolyerServiceBAMToolboxDeploymentException" name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException" wsaw:Action="urn:uploadBAMToolBoxBAMToolboxDepolyerServiceBAMToolboxDeploymentException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getBasicToolBoxes">
+            <wsdl:input message="ns:getBasicToolBoxesRequest" wsaw:Action="urn:getBasicToolBoxes"/>
+            <wsdl:output message="ns:getBasicToolBoxesResponse" wsaw:Action="urn:getBasicToolBoxesResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getDeployedToolBoxes">
+            <wsdl:input message="ns:getDeployedToolBoxesRequest" wsaw:Action="urn:getDeployedToolBoxes"/>
+            <wsdl:output message="ns:getDeployedToolBoxesResponse" wsaw:Action="urn:getDeployedToolBoxesResponse"/>
+            <wsdl:fault message="ns:BAMToolboxDepolyerServiceBAMToolboxDeploymentException" name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException" wsaw:Action="urn:getDeployedToolBoxesBAMToolboxDepolyerServiceBAMToolboxDeploymentException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getJaggeryDashboards">
+            <wsdl:input message="ns:getJaggeryDashboardsRequest" wsaw:Action="urn:getJaggeryDashboards"/>
+            <wsdl:output message="ns:getJaggeryDashboardsResponse" wsaw:Action="urn:getJaggeryDashboardsResponse"/>
+            <wsdl:fault message="ns:BAMToolboxDepolyerServiceBAMToolboxDeploymentException" name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException" wsaw:Action="urn:getJaggeryDashboardsBAMToolboxDepolyerServiceBAMToolboxDeploymentException"/>
+        </wsdl:operation>
+        <wsdl:operation name="undeployToolBox">
+            <wsdl:input message="ns:undeployToolBoxRequest" wsaw:Action="urn:undeployToolBox"/>
+            <wsdl:output message="ns:undeployToolBoxResponse" wsaw:Action="urn:undeployToolBoxResponse"/>
+            <wsdl:fault message="ns:BAMToolboxDepolyerServiceBAMToolboxDeploymentException" name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException" wsaw:Action="urn:undeployToolBoxBAMToolboxDepolyerServiceBAMToolboxDeploymentException"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="BAMToolboxDepolyerServiceSoap11Binding" type="ns:BAMToolboxDepolyerServicePortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="deployBasicToolBox">
+            <soap:operation soapAction="urn:deployBasicToolBox" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException">
+                <soap:fault use="literal" name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="uploadBAMToolBox">
+            <soap:operation soapAction="urn:uploadBAMToolBox" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException">
+                <soap:fault use="literal" name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="downloadToolBox">
+            <soap:operation soapAction="urn:downloadToolBox" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployToolBoxFromURL">
+            <soap:operation soapAction="urn:deployToolBoxFromURL" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException">
+                <soap:fault use="literal" name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getBasicToolBoxes">
+            <soap:operation soapAction="urn:getBasicToolBoxes" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getDeployedToolBoxes">
+            <soap:operation soapAction="urn:getDeployedToolBoxes" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException">
+                <soap:fault use="literal" name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getJaggeryDashboards">
+            <soap:operation soapAction="urn:getJaggeryDashboards" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException">
+                <soap:fault use="literal" name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="undeployToolBox">
+            <soap:operation soapAction="urn:undeployToolBox" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException">
+                <soap:fault use="literal" name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="BAMToolboxDepolyerServiceSoap12Binding" type="ns:BAMToolboxDepolyerServicePortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="deployBasicToolBox">
+            <soap12:operation soapAction="urn:deployBasicToolBox" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException">
+                <soap12:fault use="literal" name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="uploadBAMToolBox">
+            <soap12:operation soapAction="urn:uploadBAMToolBox" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException">
+                <soap12:fault use="literal" name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="downloadToolBox">
+            <soap12:operation soapAction="urn:downloadToolBox" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployToolBoxFromURL">
+            <soap12:operation soapAction="urn:deployToolBoxFromURL" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException">
+                <soap12:fault use="literal" name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getBasicToolBoxes">
+            <soap12:operation soapAction="urn:getBasicToolBoxes" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getDeployedToolBoxes">
+            <soap12:operation soapAction="urn:getDeployedToolBoxes" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException">
+                <soap12:fault use="literal" name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getJaggeryDashboards">
+            <soap12:operation soapAction="urn:getJaggeryDashboards" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException">
+                <soap12:fault use="literal" name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="undeployToolBox">
+            <soap12:operation soapAction="urn:undeployToolBox" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException">
+                <soap12:fault use="literal" name="BAMToolboxDepolyerServiceBAMToolboxDeploymentException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="BAMToolboxDepolyerServiceHttpBinding" type="ns:BAMToolboxDepolyerServicePortType">
+        <http:binding verb="POST"/>
+        <wsdl:operation name="deployBasicToolBox">
+            <http:operation location="deployBasicToolBox"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="uploadBAMToolBox">
+            <http:operation location="uploadBAMToolBox"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="downloadToolBox">
+            <http:operation location="downloadToolBox"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployToolBoxFromURL">
+            <http:operation location="deployToolBoxFromURL"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getBasicToolBoxes">
+            <http:operation location="getBasicToolBoxes"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getDeployedToolBoxes">
+            <http:operation location="getDeployedToolBoxes"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getJaggeryDashboards">
+            <http:operation location="getJaggeryDashboards"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployToolBox">
+            <http:operation location="undeployToolBox"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="BAMToolboxDepolyerService">
+        <wsdl:port name="BAMToolboxDepolyerServiceHttpsSoap11Endpoint" binding="ns:BAMToolboxDepolyerServiceSoap11Binding">
+            <soap:address location="https://10.224.111.254:9443/services/BAMToolboxDepolyerService.BAMToolboxDepolyerServiceHttpsSoap11Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="BAMToolboxDepolyerServiceHttpsSoap12Endpoint" binding="ns:BAMToolboxDepolyerServiceSoap12Binding">
+            <soap12:address location="https://10.224.111.254:9443/services/BAMToolboxDepolyerService.BAMToolboxDepolyerServiceHttpsSoap12Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="BAMToolboxDepolyerServiceHttpsEndpoint" binding="ns:BAMToolboxDepolyerServiceHttpBinding">
+            <http:address location="https://10.224.111.254:9443/services/BAMToolboxDepolyerService.BAMToolboxDepolyerServiceHttpsEndpoint/"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

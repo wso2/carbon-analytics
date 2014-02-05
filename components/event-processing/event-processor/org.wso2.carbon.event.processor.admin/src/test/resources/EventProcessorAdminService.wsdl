@@ -1,0 +1,714 @@
+
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ax2106="http://admin.processor.event.carbon.wso2.org/xsd" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://admin.processor.event.carbon.wso2.org" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://admin.processor.event.carbon.wso2.org">
+    <wsdl:documentation>EventProcessorAdminService</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema xmlns:ax2107="http://admin.processor.event.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://admin.processor.event.carbon.wso2.org">
+            <xs:import namespace="http://admin.processor.event.carbon.wso2.org/xsd"></xs:import>
+            <xs:element name="undeployInactiveExecutionPlanConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="undeployActiveExecutionPlanConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setTracingEnabled">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="executionPlanName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="isEnabled" type="xs:boolean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setStatisticsEnabled">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="executionPlanName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="isEnabled" type="xs:boolean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getStreamNames">
+                <xs:complexType>
+                    <xs:sequence></xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getStreamNamesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getStreamDefinitionAsString">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="streamId" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getStreamDefinitionAsStringResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getInactiveExecutionPlanConfigurationContent">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="path" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getInactiveExecutionPlanConfigurationContentResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllInactiveExecutionPlanConigurations">
+                <xs:complexType>
+                    <xs:sequence></xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllInactiveExecutionPlanConigurationsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2107:ExecutionPlanConfigurationFileDto"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllActiveExecutionPlanConfigurations">
+                <xs:complexType>
+                    <xs:sequence></xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllActiveExecutionPlanConfigurationsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2107:ExecutionPlanConfigurationDto"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getActiveExecutionPlanConfigurationContent">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="planName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getActiveExecutionPlanConfigurationContentResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getActiveExecutionPlanConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getActiveExecutionPlanConfigurationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2107:ExecutionPlanConfigurationDto"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="editInactiveExecutionPlanConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="configuration" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="path" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="editActiveExecutionPlanConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="configuration" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployExecutionPlanConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="configurationDto" nillable="true" type="ax2107:ExecutionPlanConfigurationDto"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://admin.processor.event.carbon.wso2.org/xsd">
+            <xs:complexType name="ExecutionPlanConfigurationFileDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="deploymentStatusMessage" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="path" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="status" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ExecutionPlanConfigurationDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="description" nillable="true" type="xs:string"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="exportedStreams" nillable="true" type="ax2106:StreamConfigurationDto"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="importedStreams" nillable="true" type="ax2106:StreamConfigurationDto"></xs:element>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="queryExpressions" nillable="true" type="xs:string"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="siddhiConfigurations" nillable="true" type="ax2106:SiddhiConfigurationDto"></xs:element>
+                    <xs:element minOccurs="0" name="statisticsEnabled" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="tracingEnabled" type="xs:boolean"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="StreamConfigurationDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="siddhiStreamName" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="streamId" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="SiddhiConfigurationDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="key" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="value" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="getStreamDefinitionAsStringRequest">
+        <wsdl:part name="parameters" element="ns:getStreamDefinitionAsString"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getStreamDefinitionAsStringResponse">
+        <wsdl:part name="parameters" element="ns:getStreamDefinitionAsStringResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deployExecutionPlanConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:deployExecutionPlanConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deployExecutionPlanConfigurationResponse"></wsdl:message>
+    <wsdl:message name="editActiveExecutionPlanConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:editActiveExecutionPlanConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="editActiveExecutionPlanConfigurationResponse"></wsdl:message>
+    <wsdl:message name="getActiveExecutionPlanConfigurationContentRequest">
+        <wsdl:part name="parameters" element="ns:getActiveExecutionPlanConfigurationContent"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getActiveExecutionPlanConfigurationContentResponse">
+        <wsdl:part name="parameters" element="ns:getActiveExecutionPlanConfigurationContentResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="setStatisticsEnabledRequest">
+        <wsdl:part name="parameters" element="ns:setStatisticsEnabled"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="setStatisticsEnabledResponse"></wsdl:message>
+    <wsdl:message name="editInactiveExecutionPlanConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:editInactiveExecutionPlanConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="editInactiveExecutionPlanConfigurationResponse"></wsdl:message>
+    <wsdl:message name="getActiveExecutionPlanConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:getActiveExecutionPlanConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getActiveExecutionPlanConfigurationResponse">
+        <wsdl:part name="parameters" element="ns:getActiveExecutionPlanConfigurationResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllActiveExecutionPlanConfigurationsRequest">
+        <wsdl:part name="parameters" element="ns:getAllActiveExecutionPlanConfigurations"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllActiveExecutionPlanConfigurationsResponse">
+        <wsdl:part name="parameters" element="ns:getAllActiveExecutionPlanConfigurationsResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="undeployActiveExecutionPlanConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:undeployActiveExecutionPlanConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="undeployActiveExecutionPlanConfigurationResponse"></wsdl:message>
+    <wsdl:message name="getAllInactiveExecutionPlanConigurationsRequest">
+        <wsdl:part name="parameters" element="ns:getAllInactiveExecutionPlanConigurations"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllInactiveExecutionPlanConigurationsResponse">
+        <wsdl:part name="parameters" element="ns:getAllInactiveExecutionPlanConigurationsResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="undeployInactiveExecutionPlanConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:undeployInactiveExecutionPlanConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="undeployInactiveExecutionPlanConfigurationResponse"></wsdl:message>
+    <wsdl:message name="getStreamNamesRequest">
+        <wsdl:part name="parameters" element="ns:getStreamNames"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getStreamNamesResponse">
+        <wsdl:part name="parameters" element="ns:getStreamNamesResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="setTracingEnabledRequest">
+        <wsdl:part name="parameters" element="ns:setTracingEnabled"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="setTracingEnabledResponse"></wsdl:message>
+    <wsdl:message name="getInactiveExecutionPlanConfigurationContentRequest">
+        <wsdl:part name="parameters" element="ns:getInactiveExecutionPlanConfigurationContent"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getInactiveExecutionPlanConfigurationContentResponse">
+        <wsdl:part name="parameters" element="ns:getInactiveExecutionPlanConfigurationContentResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="EventProcessorAdminServicePortType">
+        <wsdl:operation name="getStreamDefinitionAsString">
+            <wsdl:input message="ns:getStreamDefinitionAsStringRequest" wsaw:Action="urn:getStreamDefinitionAsString"></wsdl:input>
+            <wsdl:output message="ns:getStreamDefinitionAsStringResponse" wsaw:Action="urn:getStreamDefinitionAsStringResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployExecutionPlanConfiguration">
+            <wsdl:input message="ns:deployExecutionPlanConfigurationRequest" wsaw:Action="urn:deployExecutionPlanConfiguration"></wsdl:input>
+            <wsdl:output message="ns:deployExecutionPlanConfigurationResponse" wsaw:Action="urn:deployExecutionPlanConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editActiveExecutionPlanConfiguration">
+            <wsdl:input message="ns:editActiveExecutionPlanConfigurationRequest" wsaw:Action="urn:editActiveExecutionPlanConfiguration"></wsdl:input>
+            <wsdl:output message="ns:editActiveExecutionPlanConfigurationResponse" wsaw:Action="urn:editActiveExecutionPlanConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveExecutionPlanConfigurationContent">
+            <wsdl:input message="ns:getActiveExecutionPlanConfigurationContentRequest" wsaw:Action="urn:getActiveExecutionPlanConfigurationContent"></wsdl:input>
+            <wsdl:output message="ns:getActiveExecutionPlanConfigurationContentResponse" wsaw:Action="urn:getActiveExecutionPlanConfigurationContentResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setStatisticsEnabled">
+            <wsdl:input message="ns:setStatisticsEnabledRequest" wsaw:Action="urn:setStatisticsEnabled"></wsdl:input>
+            <wsdl:output message="ns:setStatisticsEnabledResponse" wsaw:Action="urn:setStatisticsEnabledResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editInactiveExecutionPlanConfiguration">
+            <wsdl:input message="ns:editInactiveExecutionPlanConfigurationRequest" wsaw:Action="urn:editInactiveExecutionPlanConfiguration"></wsdl:input>
+            <wsdl:output message="ns:editInactiveExecutionPlanConfigurationResponse" wsaw:Action="urn:editInactiveExecutionPlanConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveExecutionPlanConfiguration">
+            <wsdl:input message="ns:getActiveExecutionPlanConfigurationRequest" wsaw:Action="urn:getActiveExecutionPlanConfiguration"></wsdl:input>
+            <wsdl:output message="ns:getActiveExecutionPlanConfigurationResponse" wsaw:Action="urn:getActiveExecutionPlanConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllActiveExecutionPlanConfigurations">
+            <wsdl:input message="ns:getAllActiveExecutionPlanConfigurationsRequest" wsaw:Action="urn:getAllActiveExecutionPlanConfigurations"></wsdl:input>
+            <wsdl:output message="ns:getAllActiveExecutionPlanConfigurationsResponse" wsaw:Action="urn:getAllActiveExecutionPlanConfigurationsResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployActiveExecutionPlanConfiguration">
+            <wsdl:input message="ns:undeployActiveExecutionPlanConfigurationRequest" wsaw:Action="urn:undeployActiveExecutionPlanConfiguration"></wsdl:input>
+            <wsdl:output message="ns:undeployActiveExecutionPlanConfigurationResponse" wsaw:Action="urn:undeployActiveExecutionPlanConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllInactiveExecutionPlanConigurations">
+            <wsdl:input message="ns:getAllInactiveExecutionPlanConigurationsRequest" wsaw:Action="urn:getAllInactiveExecutionPlanConigurations"></wsdl:input>
+            <wsdl:output message="ns:getAllInactiveExecutionPlanConigurationsResponse" wsaw:Action="urn:getAllInactiveExecutionPlanConigurationsResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployInactiveExecutionPlanConfiguration">
+            <wsdl:input message="ns:undeployInactiveExecutionPlanConfigurationRequest" wsaw:Action="urn:undeployInactiveExecutionPlanConfiguration"></wsdl:input>
+            <wsdl:output message="ns:undeployInactiveExecutionPlanConfigurationResponse" wsaw:Action="urn:undeployInactiveExecutionPlanConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getStreamNames">
+            <wsdl:input message="ns:getStreamNamesRequest" wsaw:Action="urn:getStreamNames"></wsdl:input>
+            <wsdl:output message="ns:getStreamNamesResponse" wsaw:Action="urn:getStreamNamesResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setTracingEnabled">
+            <wsdl:input message="ns:setTracingEnabledRequest" wsaw:Action="urn:setTracingEnabled"></wsdl:input>
+            <wsdl:output message="ns:setTracingEnabledResponse" wsaw:Action="urn:setTracingEnabledResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getInactiveExecutionPlanConfigurationContent">
+            <wsdl:input message="ns:getInactiveExecutionPlanConfigurationContentRequest" wsaw:Action="urn:getInactiveExecutionPlanConfigurationContent"></wsdl:input>
+            <wsdl:output message="ns:getInactiveExecutionPlanConfigurationContentResponse" wsaw:Action="urn:getInactiveExecutionPlanConfigurationContentResponse"></wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="EventProcessorAdminServiceSoap11Binding" type="ns:EventProcessorAdminServicePortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"></soap:binding>
+        <wsdl:operation name="getStreamDefinitionAsString">
+            <soap:operation soapAction="urn:getStreamDefinitionAsString" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployExecutionPlanConfiguration">
+            <soap:operation soapAction="urn:deployExecutionPlanConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editActiveExecutionPlanConfiguration">
+            <soap:operation soapAction="urn:editActiveExecutionPlanConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveExecutionPlanConfigurationContent">
+            <soap:operation soapAction="urn:getActiveExecutionPlanConfigurationContent" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editInactiveExecutionPlanConfiguration">
+            <soap:operation soapAction="urn:editInactiveExecutionPlanConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setStatisticsEnabled">
+            <soap:operation soapAction="urn:setStatisticsEnabled" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveExecutionPlanConfiguration">
+            <soap:operation soapAction="urn:getActiveExecutionPlanConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployActiveExecutionPlanConfiguration">
+            <soap:operation soapAction="urn:undeployActiveExecutionPlanConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllActiveExecutionPlanConfigurations">
+            <soap:operation soapAction="urn:getAllActiveExecutionPlanConfigurations" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllInactiveExecutionPlanConigurations">
+            <soap:operation soapAction="urn:getAllInactiveExecutionPlanConigurations" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployInactiveExecutionPlanConfiguration">
+            <soap:operation soapAction="urn:undeployInactiveExecutionPlanConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getStreamNames">
+            <soap:operation soapAction="urn:getStreamNames" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setTracingEnabled">
+            <soap:operation soapAction="urn:setTracingEnabled" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getInactiveExecutionPlanConfigurationContent">
+            <soap:operation soapAction="urn:getInactiveExecutionPlanConfigurationContent" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="EventProcessorAdminServiceSoap12Binding" type="ns:EventProcessorAdminServicePortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"></soap12:binding>
+        <wsdl:operation name="getStreamDefinitionAsString">
+            <soap12:operation soapAction="urn:getStreamDefinitionAsString" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployExecutionPlanConfiguration">
+            <soap12:operation soapAction="urn:deployExecutionPlanConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editActiveExecutionPlanConfiguration">
+            <soap12:operation soapAction="urn:editActiveExecutionPlanConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveExecutionPlanConfigurationContent">
+            <soap12:operation soapAction="urn:getActiveExecutionPlanConfigurationContent" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editInactiveExecutionPlanConfiguration">
+            <soap12:operation soapAction="urn:editInactiveExecutionPlanConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setStatisticsEnabled">
+            <soap12:operation soapAction="urn:setStatisticsEnabled" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveExecutionPlanConfiguration">
+            <soap12:operation soapAction="urn:getActiveExecutionPlanConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployActiveExecutionPlanConfiguration">
+            <soap12:operation soapAction="urn:undeployActiveExecutionPlanConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllActiveExecutionPlanConfigurations">
+            <soap12:operation soapAction="urn:getAllActiveExecutionPlanConfigurations" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllInactiveExecutionPlanConigurations">
+            <soap12:operation soapAction="urn:getAllInactiveExecutionPlanConigurations" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployInactiveExecutionPlanConfiguration">
+            <soap12:operation soapAction="urn:undeployInactiveExecutionPlanConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getStreamNames">
+            <soap12:operation soapAction="urn:getStreamNames" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setTracingEnabled">
+            <soap12:operation soapAction="urn:setTracingEnabled" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getInactiveExecutionPlanConfigurationContent">
+            <soap12:operation soapAction="urn:getInactiveExecutionPlanConfigurationContent" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="EventProcessorAdminServiceHttpBinding" type="ns:EventProcessorAdminServicePortType">
+        <http:binding verb="POST"></http:binding>
+        <wsdl:operation name="getStreamDefinitionAsString">
+            <http:operation location="getStreamDefinitionAsString"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployExecutionPlanConfiguration">
+            <http:operation location="deployExecutionPlanConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editActiveExecutionPlanConfiguration">
+            <http:operation location="editActiveExecutionPlanConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveExecutionPlanConfigurationContent">
+            <http:operation location="getActiveExecutionPlanConfigurationContent"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editInactiveExecutionPlanConfiguration">
+            <http:operation location="editInactiveExecutionPlanConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setStatisticsEnabled">
+            <http:operation location="setStatisticsEnabled"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveExecutionPlanConfiguration">
+            <http:operation location="getActiveExecutionPlanConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployActiveExecutionPlanConfiguration">
+            <http:operation location="undeployActiveExecutionPlanConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllActiveExecutionPlanConfigurations">
+            <http:operation location="getAllActiveExecutionPlanConfigurations"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllInactiveExecutionPlanConigurations">
+            <http:operation location="getAllInactiveExecutionPlanConigurations"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployInactiveExecutionPlanConfiguration">
+            <http:operation location="undeployInactiveExecutionPlanConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getStreamNames">
+            <http:operation location="getStreamNames"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setTracingEnabled">
+            <http:operation location="setTracingEnabled"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getInactiveExecutionPlanConfigurationContent">
+            <http:operation location="getInactiveExecutionPlanConfigurationContent"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="EventProcessorAdminService">
+        <wsdl:port name="EventProcessorAdminServiceHttpsSoap11Endpoint" binding="ns:EventProcessorAdminServiceSoap11Binding">
+            <soap:address location="https://10.100.1.144:9443/services/EventProcessorAdminService.EventProcessorAdminServiceHttpsSoap11Endpoint/"></soap:address>
+        </wsdl:port>
+        <wsdl:port name="EventProcessorAdminServiceHttpsSoap12Endpoint" binding="ns:EventProcessorAdminServiceSoap12Binding">
+            <soap12:address location="https://10.100.1.144:9443/services/EventProcessorAdminService.EventProcessorAdminServiceHttpsSoap12Endpoint/"></soap12:address>
+        </wsdl:port>
+        <wsdl:port name="EventProcessorAdminServiceHttpsEndpoint" binding="ns:EventProcessorAdminServiceHttpBinding">
+            <http:address location="https://10.100.1.144:9443/services/EventProcessorAdminService.EventProcessorAdminServiceHttpsEndpoint/"></http:address>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

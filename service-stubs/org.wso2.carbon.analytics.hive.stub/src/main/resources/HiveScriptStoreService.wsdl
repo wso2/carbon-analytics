@@ -1,0 +1,355 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ax29="http://exception.hive.analytics.carbon.wso2.org/xsd" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:tns="http://web.hive.analytics.carbon.wso2.org" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://web.hive.analytics.carbon.wso2.org">
+    <wsdl:documentation>HiveScriptStoreService</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema xmlns:ns="http://org.apache.axis2/xsd" xmlns:ax210="http://exception.hive.analytics.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://org.apache.axis2/xsd">
+            <xs:import namespace="http://exception.hive.analytics.carbon.wso2.org/xsd" />
+            <xs:element name="HiveScriptStoreServiceHiveScriptStoreException">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="HiveScriptStoreException" nillable="true" type="ax29:HiveScriptStoreException" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="saveHiveScript">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="scriptContent" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="cron" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="retrieveHiveScript">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="retrieveHiveScriptResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isTaskExecuting">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isTaskExecutingResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getCronExpression">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getCronExpressionResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllScriptNames">
+                <xs:complexType>
+                    <xs:sequence />
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllScriptNamesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteScript">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://exception.hive.analytics.carbon.wso2.org/xsd">
+            <xs:complexType name="HiveScriptStoreException">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="exceptionMessage" nillable="true" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="retrieveHiveScriptRequest">
+        <wsdl:part name="parameters" element="ns1:retrieveHiveScript" />
+    </wsdl:message>
+    <wsdl:message name="retrieveHiveScriptResponse">
+        <wsdl:part name="parameters" element="ns1:retrieveHiveScriptResponse" />
+    </wsdl:message>
+    <wsdl:message name="HiveScriptStoreServiceHiveScriptStoreException">
+        <wsdl:part name="parameters" element="ns1:HiveScriptStoreServiceHiveScriptStoreException" />
+    </wsdl:message>
+    <wsdl:message name="getCronExpressionRequest">
+        <wsdl:part name="parameters" element="ns1:getCronExpression" />
+    </wsdl:message>
+    <wsdl:message name="getCronExpressionResponse">
+        <wsdl:part name="parameters" element="ns1:getCronExpressionResponse" />
+    </wsdl:message>
+    <wsdl:message name="getAllScriptNamesRequest">
+        <wsdl:part name="parameters" element="ns1:getAllScriptNames" />
+    </wsdl:message>
+    <wsdl:message name="getAllScriptNamesResponse">
+        <wsdl:part name="parameters" element="ns1:getAllScriptNamesResponse" />
+    </wsdl:message>
+    <wsdl:message name="isTaskExecutingRequest">
+        <wsdl:part name="parameters" element="ns1:isTaskExecuting" />
+    </wsdl:message>
+    <wsdl:message name="isTaskExecutingResponse">
+        <wsdl:part name="parameters" element="ns1:isTaskExecutingResponse" />
+    </wsdl:message>
+    <wsdl:message name="saveHiveScriptRequest">
+        <wsdl:part name="parameters" element="ns1:saveHiveScript" />
+    </wsdl:message>
+    <wsdl:message name="deleteScriptRequest">
+        <wsdl:part name="parameters" element="ns1:deleteScript" />
+    </wsdl:message>
+    <wsdl:portType name="HiveScriptStoreServicePortType">
+        <wsdl:operation name="retrieveHiveScript">
+            <wsdl:input message="tns:retrieveHiveScriptRequest" wsaw:Action="urn:retrieveHiveScript" />
+            <wsdl:output message="tns:retrieveHiveScriptResponse" wsaw:Action="urn:retrieveHiveScriptResponse" />
+            <wsdl:fault message="tns:HiveScriptStoreServiceHiveScriptStoreException" name="HiveScriptStoreServiceHiveScriptStoreException" wsaw:Action="urn:retrieveHiveScriptHiveScriptStoreServiceHiveScriptStoreException" />
+        </wsdl:operation>
+        <wsdl:operation name="getCronExpression">
+            <wsdl:input message="tns:getCronExpressionRequest" wsaw:Action="urn:getCronExpression" />
+            <wsdl:output message="tns:getCronExpressionResponse" wsaw:Action="urn:getCronExpressionResponse" />
+            <wsdl:fault message="tns:HiveScriptStoreServiceHiveScriptStoreException" name="HiveScriptStoreServiceHiveScriptStoreException" wsaw:Action="urn:getCronExpressionHiveScriptStoreServiceHiveScriptStoreException" />
+        </wsdl:operation>
+        <wsdl:operation name="getAllScriptNames">
+            <wsdl:input message="tns:getAllScriptNamesRequest" wsaw:Action="urn:getAllScriptNames" />
+            <wsdl:output message="tns:getAllScriptNamesResponse" wsaw:Action="urn:getAllScriptNamesResponse" />
+            <wsdl:fault message="tns:HiveScriptStoreServiceHiveScriptStoreException" name="HiveScriptStoreServiceHiveScriptStoreException" wsaw:Action="urn:getAllScriptNamesHiveScriptStoreServiceHiveScriptStoreException" />
+        </wsdl:operation>
+        <wsdl:operation name="isTaskExecuting">
+            <wsdl:input message="tns:isTaskExecutingRequest" wsaw:Action="urn:isTaskExecuting" />
+            <wsdl:output message="tns:isTaskExecutingResponse" wsaw:Action="urn:isTaskExecutingResponse" />
+            <wsdl:fault message="tns:HiveScriptStoreServiceHiveScriptStoreException" name="HiveScriptStoreServiceHiveScriptStoreException" wsaw:Action="urn:isTaskExecutingHiveScriptStoreServiceHiveScriptStoreException" />
+        </wsdl:operation>
+        <wsdl:operation name="saveHiveScript">
+            <wsdl:input message="tns:saveHiveScriptRequest" wsaw:Action="urn:saveHiveScript" />
+            <wsdl:fault message="tns:HiveScriptStoreServiceHiveScriptStoreException" name="HiveScriptStoreServiceHiveScriptStoreException" wsaw:Action="urn:saveHiveScriptHiveScriptStoreServiceHiveScriptStoreException" />
+        </wsdl:operation>
+        <wsdl:operation name="deleteScript">
+            <wsdl:input message="tns:deleteScriptRequest" wsaw:Action="urn:deleteScript" />
+            <wsdl:fault message="tns:HiveScriptStoreServiceHiveScriptStoreException" name="HiveScriptStoreServiceHiveScriptStoreException" wsaw:Action="urn:deleteScriptHiveScriptStoreServiceHiveScriptStoreException" />
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="HiveScriptStoreServiceSoap11Binding" type="tns:HiveScriptStoreServicePortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+        <wsdl:operation name="retrieveHiveScript">
+            <soap:operation soapAction="urn:retrieveHiveScript" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="HiveScriptStoreServiceHiveScriptStoreException">
+                <soap:fault use="literal" name="HiveScriptStoreServiceHiveScriptStoreException" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getCronExpression">
+            <soap:operation soapAction="urn:getCronExpression" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="HiveScriptStoreServiceHiveScriptStoreException">
+                <soap:fault use="literal" name="HiveScriptStoreServiceHiveScriptStoreException" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getAllScriptNames">
+            <soap:operation soapAction="urn:getAllScriptNames" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="HiveScriptStoreServiceHiveScriptStoreException">
+                <soap:fault use="literal" name="HiveScriptStoreServiceHiveScriptStoreException" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="isTaskExecuting">
+            <soap:operation soapAction="urn:isTaskExecuting" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="HiveScriptStoreServiceHiveScriptStoreException">
+                <soap:fault use="literal" name="HiveScriptStoreServiceHiveScriptStoreException" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="saveHiveScript">
+            <soap:operation soapAction="urn:saveHiveScript" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:fault name="HiveScriptStoreServiceHiveScriptStoreException">
+                <soap:fault use="literal" name="HiveScriptStoreServiceHiveScriptStoreException" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteScript">
+            <soap:operation soapAction="urn:deleteScript" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:fault name="HiveScriptStoreServiceHiveScriptStoreException">
+                <soap:fault use="literal" name="HiveScriptStoreServiceHiveScriptStoreException" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="HiveScriptStoreServiceSoap12Binding" type="tns:HiveScriptStoreServicePortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+        <wsdl:operation name="retrieveHiveScript">
+            <soap12:operation soapAction="urn:retrieveHiveScript" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="HiveScriptStoreServiceHiveScriptStoreException">
+                <soap12:fault use="literal" name="HiveScriptStoreServiceHiveScriptStoreException" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getCronExpression">
+            <soap12:operation soapAction="urn:getCronExpression" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="HiveScriptStoreServiceHiveScriptStoreException">
+                <soap12:fault use="literal" name="HiveScriptStoreServiceHiveScriptStoreException" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getAllScriptNames">
+            <soap12:operation soapAction="urn:getAllScriptNames" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="HiveScriptStoreServiceHiveScriptStoreException">
+                <soap12:fault use="literal" name="HiveScriptStoreServiceHiveScriptStoreException" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="isTaskExecuting">
+            <soap12:operation soapAction="urn:isTaskExecuting" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="HiveScriptStoreServiceHiveScriptStoreException">
+                <soap12:fault use="literal" name="HiveScriptStoreServiceHiveScriptStoreException" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="saveHiveScript">
+            <soap12:operation soapAction="urn:saveHiveScript" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:fault name="HiveScriptStoreServiceHiveScriptStoreException">
+                <soap12:fault use="literal" name="HiveScriptStoreServiceHiveScriptStoreException" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteScript">
+            <soap12:operation soapAction="urn:deleteScript" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:fault name="HiveScriptStoreServiceHiveScriptStoreException">
+                <soap12:fault use="literal" name="HiveScriptStoreServiceHiveScriptStoreException" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="HiveScriptStoreServiceHttpBinding" type="tns:HiveScriptStoreServicePortType">
+        <http:binding verb="POST" />
+        <wsdl:operation name="retrieveHiveScript">
+            <http:operation location="retrieveHiveScript" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getCronExpression">
+            <http:operation location="getCronExpression" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllScriptNames">
+            <http:operation location="getAllScriptNames" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isTaskExecuting">
+            <http:operation location="isTaskExecuting" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="saveHiveScript">
+            <http:operation location="saveHiveScript" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="deleteScript">
+            <http:operation location="deleteScript" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="HiveScriptStoreService">
+        <wsdl:port name="HiveScriptStoreServiceHttpsSoap11Endpoint" binding="tns:HiveScriptStoreServiceSoap11Binding">
+            <soap:address location="https://10.200.3.29:9445/services/HiveScriptStoreService.HiveScriptStoreServiceHttpsSoap11Endpoint/" />
+        </wsdl:port>
+        <wsdl:port name="HiveScriptStoreServiceHttpsSoap12Endpoint" binding="tns:HiveScriptStoreServiceSoap12Binding">
+            <soap12:address location="https://10.200.3.29:9445/services/HiveScriptStoreService.HiveScriptStoreServiceHttpsSoap12Endpoint/" />
+        </wsdl:port>
+        <wsdl:port name="HiveScriptStoreServiceHttpsEndpoint" binding="tns:HiveScriptStoreServiceHttpBinding">
+            <http:address location="https://10.200.3.29:9445/services/HiveScriptStoreService.HiveScriptStoreServiceHttpsEndpoint/" />
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Untitled Document</title>
+</head>
+
+<body>
+<script language="javascript" type="text/javascript">
+	function btnUp() {
+		moveWithin(true, "selectedList");
+	}
+	
+	function btnDown() {
+		moveWithin(false, "selectedList");
+	}
+	
+	function btnLeft() {
+		moveInbetween("originalList", "selectedList");
+	}
+	
+	function btnRight() {
+		moveInbetween("selectedList", "originalList");
+	}
+	
+	function btnApply() {
+	}
+	
+	function btnCancel() {
+	}
+	
+	function moveInbetween(listName, listName2) {
+	  var src = document.getElementById(listName);
+	  var dst = document.getElementById(listName2);
+	  var idx = src.selectedIndex;
+	  if (idx==-1) 
+		alert("You must first select the item to move.");
+	  else {
+		var oldVal = src[idx].value;
+		var oldText = src[idx].text;
+		src.remove(idx);		
+
+	  	var nxidx;
+		if (idx>=src.length-1) 
+			nxidx=src.length-1;		
+		else 
+			nxidx=idx;			
+		if (src.length > 0) { 
+			src.selectedIndex = nxidx;		
+		}
+		
+		var opNew = document.createElement('option');
+  		opNew.text = oldText;
+  		opNew.value = oldVal;		
+		try {
+			dst.add(opNew, null); // standards compliant; doesn't work in IE
+		}
+		catch(ex) {
+			dst.add(opNew); // IE only
+		}		
+		dst.selectedIndex = dst.length - 1;	
+	  }
+	}
+	
+	function moveWithin(bDir,sName) {
+	  var el = document.getElementById(sName);
+	  var idx = el.selectedIndex
+	  if (idx==-1) 
+		alert("You must first select the item to reorder.")
+	  else {
+		var nxidx = idx+( bDir? -1 : 1)
+		if (nxidx<0) nxidx=el.length-1
+		if (nxidx>=el.length) nxidx=0
+		var oldVal = el[idx].value
+		var oldText = el[idx].text
+		el[idx].value = el[nxidx].value
+		el[idx].text = el[nxidx].text
+		el[nxidx].value = oldVal
+		el[nxidx].text = oldText
+		el.selectedIndex = nxidx
+	  }
+	}
+</script>
+<form>
+  <table width="100%" border="0">
+    <tr>
+      <td width="13%" rowspan="4"><select name="originalList" id="originalList" size="10" style="width: 300px">
+      	<option value="1" selected>test item 1</option>
+        <option value="2">test item 2</option>
+        <option value="3">test item 3</option>
+        <option value="4">test item 4</option>
+        <option value="5">test item 5</option>
+        <option value="6">test item 6</option>
+      </select></td>
+      <td width="6%">&nbsp;</td>
+      <td width="14%" rowspan="4"><select name="selectedList" id="selectedList" size="10" style="width: 300px">
+      <option value="1">test item r1</option>
+        <option value="2">test item r2</option>
+        <option value="3">test item r3</option>
+        <option value="4">test item r4</option>
+        <option value="5">test item r5</option>
+        <option value="6">test item r6</option>
+      </select></td>
+      <td width="7%">&nbsp;</td>
+      <td width="60%" rowspan="4">&nbsp;</td>
+    </tr>
+    <tr>
+      <td><div align="center">
+        <input type="button" name="buttonLeft" id="buttonLeft" value="Add &gt;" style="width: 80px" onclick="btnLeft();"/>
+      </div></td>
+      <td><div align="center">
+          <input type="button" name="buttonUp" id="buttonUp" value="Move Up" style="width: 80px" onclick="btnUp();"/>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div align="center">
+        <input type="button" name="buttonRight" id="buttonRight" value="&lt; Remove" style="width: 80px" onclick="btnRight();"/>
+      </div></td>
+      <td><div align="center">
+          <input type="button" name="buttonDown" id="buttonDown" value="Move Down" style="width: 80px" onclick="btnDown();"/>
+      </div></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td colspan="5">
+        <input type="button" name="buttonApply" id="buttonApply" value="Apply" style="width: 80px"  onclick="btnApply()"/>
+        <input type="button" name="buttonCancel" id="buttonCancel" value="Cancel" style="width: 80px"  onclick="btnCancel()"/></td>
+    </tr>
+  </table>
+</form>
+</body>
+</html>

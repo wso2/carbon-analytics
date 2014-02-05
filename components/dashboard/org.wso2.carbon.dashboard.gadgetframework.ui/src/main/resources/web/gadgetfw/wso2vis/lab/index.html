@@ -1,0 +1,93 @@
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html>
+<head>
+<title>WSO2VIS Editor</title>
+<link type="text/css" href="../css/ui-lightness/jquery-ui-1.8rc3.custom.css" rel="stylesheet" />
+<link href="css/wso2vis_ide.css" type="text/css" rel="stylesheet"/>
+<script type="text/javascript" src="../wso2vis.js"></script>
+<script type="text/javascript" src="../3rdparty/jquery-ui-1.8.2.min.js"></script>
+<script type="text/javascript" src="js/wso2vis-ide.js"></script>
+<script src="editor/js/codemirror.js" type="text/javascript"></script>    
+<script type="text/javascript" src="js/ui-wrapper-element.js"></script>
+<script type="text/javascript" src="js/hidden-element.js"></script><script type="text/javascript" src="js/properties.js"></script>
+<script type="text/javascript" src="js/property-grid.js"></script>
+<script type="text/javascript" src="js/canvas.js"></script>
+<script type="text/javascript" src="js/main.js"></script>
+
+</head>
+<body>
+<div id="container">
+  <div id="menu"></div>
+  <div id="tabs">    
+    <ul>
+      <li><a href="#design-view">Design</a></li>
+      <li><a href="#code-view">Code</a></li>
+    </ul>
+    <div id="design-view">
+      <div id="toolbar">
+        <div id="piechart" class="draggable"> 
+        	<div class="toolbtn piechartbtn"></div>         
+        </div>
+        <div id="columnchart" class="draggable">
+        	<div class="toolbtn columnchartbtn"></div>
+        </div>
+        <div id="linechart" class="draggable">
+        	<div class="toolbtn linechartbtn"></div>
+        </div>
+        <div id="areachart" class="draggable">
+        	<div class="toolbtn areachartbtn"></div>
+        </div>
+        
+        
+        
+        <div id="dataprovider1" class="draggable">
+        	<div class="toolbtn dataprovider1btn"></div>
+        </div>        
+      </div>
+      <div id="toolbarend"></div>
+      <div id="droppable" class="ui-state-default-droppable">
+        <div id="canvaz"></div>
+      </div>
+      <div id="property-grid-top" class="hbox">
+        <div><h1>Properties</h1></div>
+	    <div><select id="canvasElementsDropdown" onChange="canvasElementsDropdownOnChange(this)"><option>piechart1</option><option>piechart2</option></select></div>
+      </div>
+      
+      <div id="property-grid" class="hbox">
+      </div>
+    </div>
+    <style type="text/css">
+		 .CodeMirror-line-numbers {
+			width: 2.2em;
+			color: #aaa;
+			background-color: #eee;
+			text-align: right;
+			padding: .4em;
+			margin: 0;
+			font-family: monospace;
+			font-size: 10pt;	
+		  }
+	</style>
+    <div id="code-view">    
+      <textarea id="codez" cols="228" rows="37">Generated Code</textarea>
+    </div>
+  </div>
+</div>
+</body>
+</html>

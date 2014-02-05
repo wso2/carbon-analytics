@@ -1,0 +1,85 @@
+.theme-box{
+    background:transparent url(../images/theme-box-back.png) repeat-y right top;
+    border:solid 1px #9b9b9b;
+    border-top:solid 3px #9b9b9b;
+    margin-bottom:40px;
+}
+.theme-box-content{
+    padding:5px 5px 5px 20px;
+}
+.active{
+    border:solid 1px #009900;
+    border-top:solid 3px #009900;
+}
+.theme-box-title{
+    font-size:15px;
+    position:absolute;
+    margin-top:-20px;
+    color:#494949;
+    background-color:#fff;
+    padding:5px;
+    font-weight:bold;
+}
+.theme-box-activeORnot{
+    width:15px;
+    cursor:pointer;
+    background-color:#4bc55a;
+    position:absolute;
+    margin-left:-10px;
+    
+
+    -moz-box-shadow: 5px 5px 5px #888;
+    -webkit-box-shadow: 5px 5px 5px #888;
+    box-shadow: 5px 5px 5px #888;
+
+	/* For IE 8 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#888888')";
+	/* For IE 5.5 - 7 */
+	filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#888888');
+
+    border-right: 1px solid #CCCCCC;
+    border-top: 1px solid #CCCCCC;
+    border-bottom: 1px solid #CCCCCC;
+
+    -moz-border-radius: 1px;
+    -moz-border-radius: 1px;
+    border-radius: 1px;
+    border-radius: 1px;
+
+    height:100px;
+    padding-top:50px;
+}
+.theme-box-activeORnot span{
+    color:#fff;
+    display:block;
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    white-space:nowrap;
+    display:block;
+    width:80px;
+    margin-left:-37px;
+    margin-top:20px;
+    padding-right:5px;
+    padding-left:5px;
+    font-size:16px;
+}
+
+.theme-box-comment-col{
+    background-color:#d3d3d3;
+    padding:5px 0px 5px 20px;
+    color:#333;
+}
+h3.default-theme-subtitle{
+    margin-bottom:40px;
+    display:block;
+    color: #666666;
+    font-size:15px;
+    height:40px;
+}
+table.theme-box-content td{
+    padding-left:10px !important;
+}
+table.theme-box-content td.left-cell{
+    width:10px;
+}

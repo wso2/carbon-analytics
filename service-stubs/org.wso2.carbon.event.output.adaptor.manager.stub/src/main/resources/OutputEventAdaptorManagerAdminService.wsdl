@@ -1,0 +1,767 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://internal.admin.manager.adaptor.output.event.carbon.wso2.org" xmlns:ax2108="http://internal.admin.manager.adaptor.output.event.carbon.wso2.org/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://internal.admin.manager.adaptor.output.event.carbon.wso2.org">
+    <wsdl:documentation>OutputEventAdaptorManagerAdminService</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema xmlns:ax2109="http://internal.admin.manager.adaptor.output.event.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://internal.admin.manager.adaptor.output.event.carbon.wso2.org">
+            <xs:import namespace="http://internal.admin.manager.adaptor.output.event.carbon.wso2.org/xsd"/>
+            <xs:element name="undeployInactiveOutputEventAdaptorConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="undeployActiveOutputEventAdaptorConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventAdaptorName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="testConnection">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventAdaptorName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="eventAdaptorType" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputAdaptorPropertyDtoOutputs" nillable="true" type="ax2109:OutputEventAdaptorPropertyDto"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setTracingEnabled">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventAdaptorName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="flag" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setStatisticsEnabled">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventAdaptorName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="flag" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getOutputEventAdaptorTypeNames">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getOutputEventAdaptorTypeNamesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getOutputEventAdaptorProperties">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventAdaptorName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getOutputEventAdaptorPropertiesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2109:OutputEventAdaptorPropertiesDto"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getInactiveOutputEventAdaptorConfigurationContent">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getInactiveOutputEventAdaptorConfigurationContentResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllInactiveOutputEventAdaptorConfiguration">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllInactiveOutputEventAdaptorConfigurationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2109:OutputEventAdaptorFileDto"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllActiveOutputEventAdaptorConfiguration">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllActiveOutputEventAdaptorConfigurationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2109:OutputEventAdaptorConfigurationInfoDto"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getActiveOutputEventAdaptorConfigurationContent">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventAdaptorName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getActiveOutputEventAdaptorConfigurationContentResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getActiveOutputEventAdaptorConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventAdaptorName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getActiveOutputEventAdaptorConfigurationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2109:OutputEventAdaptorPropertiesDto"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="editInactiveOutputEventAdaptorConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventAdaptorConfiguration" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="editActiveOutputEventAdaptorConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventAdaptorConfiguration" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="eventAdaptorName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployOutputEventAdaptorConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventAdaptorName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="eventAdaptorType" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputAdaptorPropertyDtoOutputs" nillable="true" type="ax2109:OutputEventAdaptorPropertyDto"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://internal.admin.manager.adaptor.output.event.carbon.wso2.org/xsd">
+            <xs:complexType name="OutputEventAdaptorPropertyDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="defaultValue" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="displayName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="hint" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="key" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="options" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="required" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="secured" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="value" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="OutputEventAdaptorPropertiesDto">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="outputEventAdaptorPropertyDtos" nillable="true" type="ax2108:OutputEventAdaptorPropertyDto"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="OutputEventAdaptorFileDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="eventAdaptorName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="OutputEventAdaptorConfigurationInfoDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="enableStats" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="enableTracing" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="eventAdaptorName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="eventAdaptorType" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="getInactiveOutputEventAdaptorConfigurationContentRequest">
+        <wsdl:part name="parameters" element="ns:getInactiveOutputEventAdaptorConfigurationContent"/>
+    </wsdl:message>
+    <wsdl:message name="getInactiveOutputEventAdaptorConfigurationContentResponse">
+        <wsdl:part name="parameters" element="ns:getInactiveOutputEventAdaptorConfigurationContentResponse"/>
+    </wsdl:message>
+    <wsdl:message name="testConnectionRequest">
+        <wsdl:part name="parameters" element="ns:testConnection"/>
+    </wsdl:message>
+    <wsdl:message name="testConnectionResponse"/>
+    <wsdl:message name="getActiveOutputEventAdaptorConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:getActiveOutputEventAdaptorConfiguration"/>
+    </wsdl:message>
+    <wsdl:message name="getActiveOutputEventAdaptorConfigurationResponse">
+        <wsdl:part name="parameters" element="ns:getActiveOutputEventAdaptorConfigurationResponse"/>
+    </wsdl:message>
+    <wsdl:message name="setStatisticsEnabledRequest">
+        <wsdl:part name="parameters" element="ns:setStatisticsEnabled"/>
+    </wsdl:message>
+    <wsdl:message name="setStatisticsEnabledResponse"/>
+    <wsdl:message name="deployOutputEventAdaptorConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:deployOutputEventAdaptorConfiguration"/>
+    </wsdl:message>
+    <wsdl:message name="deployOutputEventAdaptorConfigurationResponse"/>
+    <wsdl:message name="editActiveOutputEventAdaptorConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:editActiveOutputEventAdaptorConfiguration"/>
+    </wsdl:message>
+    <wsdl:message name="editActiveOutputEventAdaptorConfigurationResponse"/>
+    <wsdl:message name="getActiveOutputEventAdaptorConfigurationContentRequest">
+        <wsdl:part name="parameters" element="ns:getActiveOutputEventAdaptorConfigurationContent"/>
+    </wsdl:message>
+    <wsdl:message name="getActiveOutputEventAdaptorConfigurationContentResponse">
+        <wsdl:part name="parameters" element="ns:getActiveOutputEventAdaptorConfigurationContentResponse"/>
+    </wsdl:message>
+    <wsdl:message name="undeployInactiveOutputEventAdaptorConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:undeployInactiveOutputEventAdaptorConfiguration"/>
+    </wsdl:message>
+    <wsdl:message name="undeployInactiveOutputEventAdaptorConfigurationResponse"/>
+    <wsdl:message name="getOutputEventAdaptorTypeNamesRequest">
+        <wsdl:part name="parameters" element="ns:getOutputEventAdaptorTypeNames"/>
+    </wsdl:message>
+    <wsdl:message name="getOutputEventAdaptorTypeNamesResponse">
+        <wsdl:part name="parameters" element="ns:getOutputEventAdaptorTypeNamesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="setTracingEnabledRequest">
+        <wsdl:part name="parameters" element="ns:setTracingEnabled"/>
+    </wsdl:message>
+    <wsdl:message name="setTracingEnabledResponse"/>
+    <wsdl:message name="getAllInactiveOutputEventAdaptorConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:getAllInactiveOutputEventAdaptorConfiguration"/>
+    </wsdl:message>
+    <wsdl:message name="getAllInactiveOutputEventAdaptorConfigurationResponse">
+        <wsdl:part name="parameters" element="ns:getAllInactiveOutputEventAdaptorConfigurationResponse"/>
+    </wsdl:message>
+    <wsdl:message name="undeployActiveOutputEventAdaptorConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:undeployActiveOutputEventAdaptorConfiguration"/>
+    </wsdl:message>
+    <wsdl:message name="undeployActiveOutputEventAdaptorConfigurationResponse"/>
+    <wsdl:message name="getAllActiveOutputEventAdaptorConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:getAllActiveOutputEventAdaptorConfiguration"/>
+    </wsdl:message>
+    <wsdl:message name="getAllActiveOutputEventAdaptorConfigurationResponse">
+        <wsdl:part name="parameters" element="ns:getAllActiveOutputEventAdaptorConfigurationResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getOutputEventAdaptorPropertiesRequest">
+        <wsdl:part name="parameters" element="ns:getOutputEventAdaptorProperties"/>
+    </wsdl:message>
+    <wsdl:message name="getOutputEventAdaptorPropertiesResponse">
+        <wsdl:part name="parameters" element="ns:getOutputEventAdaptorPropertiesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="editInactiveOutputEventAdaptorConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:editInactiveOutputEventAdaptorConfiguration"/>
+    </wsdl:message>
+    <wsdl:message name="editInactiveOutputEventAdaptorConfigurationResponse"/>
+    <wsdl:portType name="OutputEventAdaptorManagerAdminServicePortType">
+        <wsdl:operation name="getInactiveOutputEventAdaptorConfigurationContent">
+            <wsdl:input message="ns:getInactiveOutputEventAdaptorConfigurationContentRequest" wsaw:Action="urn:getInactiveOutputEventAdaptorConfigurationContent"/>
+            <wsdl:output message="ns:getInactiveOutputEventAdaptorConfigurationContentResponse" wsaw:Action="urn:getInactiveOutputEventAdaptorConfigurationContentResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="testConnection">
+            <wsdl:input message="ns:testConnectionRequest" wsaw:Action="urn:testConnection"/>
+            <wsdl:output message="ns:testConnectionResponse" wsaw:Action="urn:testConnectionResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveOutputEventAdaptorConfiguration">
+            <wsdl:input message="ns:getActiveOutputEventAdaptorConfigurationRequest" wsaw:Action="urn:getActiveOutputEventAdaptorConfiguration"/>
+            <wsdl:output message="ns:getActiveOutputEventAdaptorConfigurationResponse" wsaw:Action="urn:getActiveOutputEventAdaptorConfigurationResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="setStatisticsEnabled">
+            <wsdl:input message="ns:setStatisticsEnabledRequest" wsaw:Action="urn:setStatisticsEnabled"/>
+            <wsdl:output message="ns:setStatisticsEnabledResponse" wsaw:Action="urn:setStatisticsEnabledResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="deployOutputEventAdaptorConfiguration">
+            <wsdl:input message="ns:deployOutputEventAdaptorConfigurationRequest" wsaw:Action="urn:deployOutputEventAdaptorConfiguration"/>
+            <wsdl:output message="ns:deployOutputEventAdaptorConfigurationResponse" wsaw:Action="urn:deployOutputEventAdaptorConfigurationResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="editActiveOutputEventAdaptorConfiguration">
+            <wsdl:input message="ns:editActiveOutputEventAdaptorConfigurationRequest" wsaw:Action="urn:editActiveOutputEventAdaptorConfiguration"/>
+            <wsdl:output message="ns:editActiveOutputEventAdaptorConfigurationResponse" wsaw:Action="urn:editActiveOutputEventAdaptorConfigurationResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveOutputEventAdaptorConfigurationContent">
+            <wsdl:input message="ns:getActiveOutputEventAdaptorConfigurationContentRequest" wsaw:Action="urn:getActiveOutputEventAdaptorConfigurationContent"/>
+            <wsdl:output message="ns:getActiveOutputEventAdaptorConfigurationContentResponse" wsaw:Action="urn:getActiveOutputEventAdaptorConfigurationContentResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="undeployInactiveOutputEventAdaptorConfiguration">
+            <wsdl:input message="ns:undeployInactiveOutputEventAdaptorConfigurationRequest" wsaw:Action="urn:undeployInactiveOutputEventAdaptorConfiguration"/>
+            <wsdl:output message="ns:undeployInactiveOutputEventAdaptorConfigurationResponse" wsaw:Action="urn:undeployInactiveOutputEventAdaptorConfigurationResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getOutputEventAdaptorTypeNames">
+            <wsdl:input message="ns:getOutputEventAdaptorTypeNamesRequest" wsaw:Action="urn:getOutputEventAdaptorTypeNames"/>
+            <wsdl:output message="ns:getOutputEventAdaptorTypeNamesResponse" wsaw:Action="urn:getOutputEventAdaptorTypeNamesResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="setTracingEnabled">
+            <wsdl:input message="ns:setTracingEnabledRequest" wsaw:Action="urn:setTracingEnabled"/>
+            <wsdl:output message="ns:setTracingEnabledResponse" wsaw:Action="urn:setTracingEnabledResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getAllInactiveOutputEventAdaptorConfiguration">
+            <wsdl:input message="ns:getAllInactiveOutputEventAdaptorConfigurationRequest" wsaw:Action="urn:getAllInactiveOutputEventAdaptorConfiguration"/>
+            <wsdl:output message="ns:getAllInactiveOutputEventAdaptorConfigurationResponse" wsaw:Action="urn:getAllInactiveOutputEventAdaptorConfigurationResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="undeployActiveOutputEventAdaptorConfiguration">
+            <wsdl:input message="ns:undeployActiveOutputEventAdaptorConfigurationRequest" wsaw:Action="urn:undeployActiveOutputEventAdaptorConfiguration"/>
+            <wsdl:output message="ns:undeployActiveOutputEventAdaptorConfigurationResponse" wsaw:Action="urn:undeployActiveOutputEventAdaptorConfigurationResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getAllActiveOutputEventAdaptorConfiguration">
+            <wsdl:input message="ns:getAllActiveOutputEventAdaptorConfigurationRequest" wsaw:Action="urn:getAllActiveOutputEventAdaptorConfiguration"/>
+            <wsdl:output message="ns:getAllActiveOutputEventAdaptorConfigurationResponse" wsaw:Action="urn:getAllActiveOutputEventAdaptorConfigurationResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getOutputEventAdaptorProperties">
+            <wsdl:input message="ns:getOutputEventAdaptorPropertiesRequest" wsaw:Action="urn:getOutputEventAdaptorProperties"/>
+            <wsdl:output message="ns:getOutputEventAdaptorPropertiesResponse" wsaw:Action="urn:getOutputEventAdaptorPropertiesResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="editInactiveOutputEventAdaptorConfiguration">
+            <wsdl:input message="ns:editInactiveOutputEventAdaptorConfigurationRequest" wsaw:Action="urn:editInactiveOutputEventAdaptorConfiguration"/>
+            <wsdl:output message="ns:editInactiveOutputEventAdaptorConfigurationResponse" wsaw:Action="urn:editInactiveOutputEventAdaptorConfigurationResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="OutputEventAdaptorManagerAdminServiceSoap11Binding" type="ns:OutputEventAdaptorManagerAdminServicePortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="getInactiveOutputEventAdaptorConfigurationContent">
+            <soap:operation soapAction="urn:getInactiveOutputEventAdaptorConfigurationContent" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="testConnection">
+            <soap:operation soapAction="urn:testConnection" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveOutputEventAdaptorConfiguration">
+            <soap:operation soapAction="urn:getActiveOutputEventAdaptorConfiguration" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setStatisticsEnabled">
+            <soap:operation soapAction="urn:setStatisticsEnabled" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployOutputEventAdaptorConfiguration">
+            <soap:operation soapAction="urn:deployOutputEventAdaptorConfiguration" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editActiveOutputEventAdaptorConfiguration">
+            <soap:operation soapAction="urn:editActiveOutputEventAdaptorConfiguration" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveOutputEventAdaptorConfigurationContent">
+            <soap:operation soapAction="urn:getActiveOutputEventAdaptorConfigurationContent" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getOutputEventAdaptorTypeNames">
+            <soap:operation soapAction="urn:getOutputEventAdaptorTypeNames" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployInactiveOutputEventAdaptorConfiguration">
+            <soap:operation soapAction="urn:undeployInactiveOutputEventAdaptorConfiguration" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllInactiveOutputEventAdaptorConfiguration">
+            <soap:operation soapAction="urn:getAllInactiveOutputEventAdaptorConfiguration" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setTracingEnabled">
+            <soap:operation soapAction="urn:setTracingEnabled" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployActiveOutputEventAdaptorConfiguration">
+            <soap:operation soapAction="urn:undeployActiveOutputEventAdaptorConfiguration" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getOutputEventAdaptorProperties">
+            <soap:operation soapAction="urn:getOutputEventAdaptorProperties" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllActiveOutputEventAdaptorConfiguration">
+            <soap:operation soapAction="urn:getAllActiveOutputEventAdaptorConfiguration" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editInactiveOutputEventAdaptorConfiguration">
+            <soap:operation soapAction="urn:editInactiveOutputEventAdaptorConfiguration" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="OutputEventAdaptorManagerAdminServiceSoap12Binding" type="ns:OutputEventAdaptorManagerAdminServicePortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="getInactiveOutputEventAdaptorConfigurationContent">
+            <soap12:operation soapAction="urn:getInactiveOutputEventAdaptorConfigurationContent" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="testConnection">
+            <soap12:operation soapAction="urn:testConnection" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveOutputEventAdaptorConfiguration">
+            <soap12:operation soapAction="urn:getActiveOutputEventAdaptorConfiguration" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setStatisticsEnabled">
+            <soap12:operation soapAction="urn:setStatisticsEnabled" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployOutputEventAdaptorConfiguration">
+            <soap12:operation soapAction="urn:deployOutputEventAdaptorConfiguration" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editActiveOutputEventAdaptorConfiguration">
+            <soap12:operation soapAction="urn:editActiveOutputEventAdaptorConfiguration" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveOutputEventAdaptorConfigurationContent">
+            <soap12:operation soapAction="urn:getActiveOutputEventAdaptorConfigurationContent" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getOutputEventAdaptorTypeNames">
+            <soap12:operation soapAction="urn:getOutputEventAdaptorTypeNames" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployInactiveOutputEventAdaptorConfiguration">
+            <soap12:operation soapAction="urn:undeployInactiveOutputEventAdaptorConfiguration" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllInactiveOutputEventAdaptorConfiguration">
+            <soap12:operation soapAction="urn:getAllInactiveOutputEventAdaptorConfiguration" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setTracingEnabled">
+            <soap12:operation soapAction="urn:setTracingEnabled" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployActiveOutputEventAdaptorConfiguration">
+            <soap12:operation soapAction="urn:undeployActiveOutputEventAdaptorConfiguration" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getOutputEventAdaptorProperties">
+            <soap12:operation soapAction="urn:getOutputEventAdaptorProperties" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllActiveOutputEventAdaptorConfiguration">
+            <soap12:operation soapAction="urn:getAllActiveOutputEventAdaptorConfiguration" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editInactiveOutputEventAdaptorConfiguration">
+            <soap12:operation soapAction="urn:editInactiveOutputEventAdaptorConfiguration" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="OutputEventAdaptorManagerAdminServiceHttpBinding" type="ns:OutputEventAdaptorManagerAdminServicePortType">
+        <http:binding verb="POST"/>
+        <wsdl:operation name="getInactiveOutputEventAdaptorConfigurationContent">
+            <http:operation location="getInactiveOutputEventAdaptorConfigurationContent"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="testConnection">
+            <http:operation location="testConnection"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveOutputEventAdaptorConfiguration">
+            <http:operation location="getActiveOutputEventAdaptorConfiguration"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setStatisticsEnabled">
+            <http:operation location="setStatisticsEnabled"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployOutputEventAdaptorConfiguration">
+            <http:operation location="deployOutputEventAdaptorConfiguration"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editActiveOutputEventAdaptorConfiguration">
+            <http:operation location="editActiveOutputEventAdaptorConfiguration"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveOutputEventAdaptorConfigurationContent">
+            <http:operation location="getActiveOutputEventAdaptorConfigurationContent"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getOutputEventAdaptorTypeNames">
+            <http:operation location="getOutputEventAdaptorTypeNames"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployInactiveOutputEventAdaptorConfiguration">
+            <http:operation location="undeployInactiveOutputEventAdaptorConfiguration"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllInactiveOutputEventAdaptorConfiguration">
+            <http:operation location="getAllInactiveOutputEventAdaptorConfiguration"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setTracingEnabled">
+            <http:operation location="setTracingEnabled"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployActiveOutputEventAdaptorConfiguration">
+            <http:operation location="undeployActiveOutputEventAdaptorConfiguration"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getOutputEventAdaptorProperties">
+            <http:operation location="getOutputEventAdaptorProperties"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllActiveOutputEventAdaptorConfiguration">
+            <http:operation location="getAllActiveOutputEventAdaptorConfiguration"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editInactiveOutputEventAdaptorConfiguration">
+            <http:operation location="editInactiveOutputEventAdaptorConfiguration"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="OutputEventAdaptorManagerAdminService">
+        <wsdl:port name="OutputEventAdaptorManagerAdminServiceHttpSoap11Endpoint" binding="ns:OutputEventAdaptorManagerAdminServiceSoap11Binding">
+            <soap:address location="http://10.100.0.44:9763/services/OutputEventAdaptorManagerAdminService.OutputEventAdaptorManagerAdminServiceHttpSoap11Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="OutputEventAdaptorManagerAdminServiceHttpsSoap11Endpoint" binding="ns:OutputEventAdaptorManagerAdminServiceSoap11Binding">
+            <soap:address location="https://10.100.0.44:9443/services/OutputEventAdaptorManagerAdminService.OutputEventAdaptorManagerAdminServiceHttpsSoap11Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="OutputEventAdaptorManagerAdminServiceHttpsSoap12Endpoint" binding="ns:OutputEventAdaptorManagerAdminServiceSoap12Binding">
+            <soap12:address location="https://10.100.0.44:9443/services/OutputEventAdaptorManagerAdminService.OutputEventAdaptorManagerAdminServiceHttpsSoap12Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="OutputEventAdaptorManagerAdminServiceHttpSoap12Endpoint" binding="ns:OutputEventAdaptorManagerAdminServiceSoap12Binding">
+            <soap12:address location="http://10.100.0.44:9763/services/OutputEventAdaptorManagerAdminService.OutputEventAdaptorManagerAdminServiceHttpSoap12Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="OutputEventAdaptorManagerAdminServiceHttpsEndpoint" binding="ns:OutputEventAdaptorManagerAdminServiceHttpBinding">
+            <http:address location="https://10.100.0.44:9443/services/OutputEventAdaptorManagerAdminService.OutputEventAdaptorManagerAdminServiceHttpsEndpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="OutputEventAdaptorManagerAdminServiceHttpEndpoint" binding="ns:OutputEventAdaptorManagerAdminServiceHttpBinding">
+            <http:address location="http://10.100.0.44:9763/services/OutputEventAdaptorManagerAdminService.OutputEventAdaptorManagerAdminServiceHttpEndpoint/"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

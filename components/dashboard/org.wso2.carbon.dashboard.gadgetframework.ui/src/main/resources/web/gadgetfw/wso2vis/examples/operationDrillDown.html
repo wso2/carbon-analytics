@@ -1,0 +1,135 @@
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html>
+	<head>
+        <title>Operation Level Drilldown</title>
+        <script type="text/javascript" src="../wso2vis-min.js"></script>
+
+        <script language="javascript" type="text/javascript">
+
+            var dataProvider = new wso2vis.p.ProviderGET("http://localhost/wso2vis/examples/generator.php");
+            var dataFilter = new wso2vis.f.BasicFilter(["level0", "level1"], ["@name"]);    
+            var endpointFilter = new wso2vis.f.BasicFilter(["level0", "level1"], ["@name"], ["endpoint 01"]);
+            var operationFilter = new wso2vis.f.BasicFilter(["level0", "level1", "0", "level2"], ["@name"], ["operation 01"]);
+
+            var operationLineChart;
+
+            var timer = new wso2vis.u.Timer(10000);
+
+            function globalTick() {
+                dataProvider.pullData();
+            }
+
+            function endpointsChartTooltip(data, index) {
+                return data["@name"] + " - " + data["stats"][index]["@name"] + ": " + data["stats"][index]["@count"];
+            }
+
+            function endpointsChartClick(data, index) {
+                operationLineChart.clear();
+                endpointFilter.filterArray([data["@name"]]);
+                dataProvider.pullData();
+            }
+
+            function operationsChartTooltip(data, index) {
+                return data["@name"] + " - " + data["stats"][index]["@name"] + ": " + data["stats"][index]["@count"];
+            }
+
+            function operationsChartClick(data, index) {
+                operationLineChart.clear();
+                operationFilter.filterArray([data["@name"]]);
+                dataProvider.pullData();
+            }
+
+            function operationLineChartTooltip(data) {
+                return data["@name"];
+            }
+
+            window.onload = function () {
+
+                var endpointsChart = new wso2vis.s.chart.protovis.ClusteredColumnChart("chart1","Endpoints","");
+                endpointsChart.dataField(["level0", "level1"])
+                            .subDataField(["stats"])
+			                .subDataValue(["@count"])
+			                .dataLabel(["@name"])
+                            .subDataLabel(["@name"])
+                            .width(310)
+                            .height(220);
+                endpointsChart.onTooltip = endpointsChartTooltip;
+                endpointsChart.onClick = endpointsChartClick;
+                endpointsChart.load();
+
+                var operationsChart = new wso2vis.s.chart.protovis.ClusteredColumnChart("chart2","Operations","");
+                operationsChart.dataField(["level0", "level1", "0", "level2"])
+                            .subDataField(["stats"])
+			                .subDataValue(["@count"])
+			                .dataLabel(["@name"])
+                            .subDataLabel(["@name"])
+                            .width(310)
+                            .height(220);
+                operationsChart.onTooltip = operationsChartTooltip;
+                operationsChart.onClick = operationsChartClick;
+                operationsChart.load();
+
+                operationLineChart = new wso2vis.s.chart.protovis.LineChart("chart3","Requests and Faults","");
+                operationLineChart.dataField(["level0", "level1", "0", "level2", "0", "stats"])
+	                .dataValue(["@count"])
+                    .dataLabel(["@name"])
+                    .width(310)
+                    .height(220)
+                    .band(10)
+                    .legend(true)
+                    .marks(true)
+                    .xSuffix("s");
+                operationLineChart.onTooltip = operationLineChartTooltip;
+                operationLineChart.load();
+                
+                dataProvider.addDataReceiver(dataFilter);
+                dataFilter.addDataReceiver(endpointsChart);
+                dataFilter.addDataReceiver(endpointFilter);
+                endpointFilter.addDataReceiver(operationsChart);
+                endpointFilter.addDataReceiver(operationFilter);
+                operationFilter.addDataReceiver(operationLineChart);
+
+                dataProvider.initialize();
+
+                timer.tick = globalTick;
+                timer.startTimer();
+            }
+		</script>
+        <style>
+            div#qTip {
+                padding: 3px;
+                border: 1px solid #666;
+                border-right-width: 2px;
+                border-bottom-width: 2px;
+                display: none;
+                background: #999;
+                color: #FFF;
+                font: bold 10px Verdana, Arial, sans-serif;
+                text-align: left;
+                position: absolute;
+                z-index: 1000;
+            }
+        </style>
+	</head>
+	<body>
+    	<div id="chart1"></div>
+        <div id="chart2"></div>
+        <div id="chart3"></div>
+	</body>
+</html>

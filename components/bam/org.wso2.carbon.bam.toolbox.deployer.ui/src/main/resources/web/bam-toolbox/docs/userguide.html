@@ -1,0 +1,154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"/>
+  <title>Toolbox Guide</title>
+  <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all"/>
+</head>
+
+<body>
+<h1>Toolbox</h1>
+
+<p>A toolbox is an installable archive, with a .tbox extension. A toolbox will contains necessary artifacts that models
+    a complete use case. A toolbox can contain the below artifacts </p>
+<ol>
+    <li>Stream definitions</li>
+    <li>Analytics</li>
+    <li>Dashboard components</li>
+</ol>
+
+<p>All three artifacts are not mandated, and they are optional. You can have all of three artifacts or either of them in
+    one toolbox. And only those artifcats will be deployed.</p>
+
+<p>Stream Definitions, are the definitions of the streams of data which you are going to send to WSO2 BAM and perform
+    the analytics.You can place any number of stream definitions under one toolbox and all of then will be deployed with
+    that toolbox. But Each stream definitions need to be in the separate file. You can find More details on how to
+    create the stream definition artifact on Creating a custom toolbox.</p>
+
+<p>Analytics, includes the hive scripts which you are going to deploy in WSO2 BAM. Similar to the stream definitions
+    artifact you can place any number of analytic scripts and ll of the will be deployed. You can provide the cron
+    expression if you want to schedule the analytic script for each script in a seperate properties file. You can find
+    More details on how to create the analytic scripts on Creating a custom toolbox.</p>
+
+<p>Dashboard components, contains the gadget xmls, jaggery files, etc. You can specify the number of tabs, title of
+    tabs, gadgets that should be shown in a tab, etc in a properties file, and the dashboard will be organised as
+    specified. You can find More details on how to create the dashboard components on Creating a custom toolbox.</p>
+
+<p>For example, to monitor service statistics of service hosting WSO2 servers the stream definitions, analyzers and
+    dashboard components needed will be available in the "Service Stats" toolbox. So, by installing the "Service Stats"
+    toolbox, all artifacts will be deployed to the necessary locations in the server. Then, when data from a "Service
+    Stats Data Agent" reaches BAM, after a few minutes you will see the Service Stats dashboard populated with service
+    statistics.</p>
+
+
+<ol>
+   <li><h2><i>Installing a Toolbox</i></h2></li>
+
+    <p>There are toolbox which are shipped by default with WSO2 BAM pack, and you can created your own toolboxes for
+        your requirement also.</p>
+
+    <ol>
+        <li><b><i>Installing Default Toolbox</i></b></li>
+        <ol>
+            <li>Start WSO2 BAM server</li>
+            <li>Go to management console and login</li>
+            <li>Go to Main -> BAM ToolBox -> Add</li>
+            <li>Select an option which are listed under 'Basic Toolbox'. Eg: Phone Retail Store Toolbox, HTTPD Logs
+                Analysis
+                Toolbox
+            </li>
+            <br/>
+            <img src="images/1.png"/>
+            <li>Click on Install Button</li>
+
+            <p>This will redirect to 'List' page of BAM toolboxes. There you can notice that the selected toolbox will
+                be in the status of 'installing'.</p>
+            <br/>
+            <img src="images/2.png"/>
+            <br/>
+
+            <p>Wait for approximately 1mintue and refresh the page, then you can notice the status of the toolbox status
+                has changed to 'Installed' state.</p>
+            <br/>
+            <img src="images/3.png"/>
+            <br/><br/>
+        </ol>
+
+        <li><b><i>Installing Custom Toolbox</i></b></li>
+        <p>You can install the toolboxes which is not listed in under the Basic Toolbox list by providing the system
+            file path or URL path pointing to your toolbox</p>
+        <ol>
+            <li>Start WSO2 BAM server</li>
+            <li>Go to management console and login</li>
+            <li>Go to Main -> BAM ToolBox -> Add</li>
+            <li>Select 'Toolbox From File System' if you have the toolbox in your system</li>
+            <br/>
+            <img src="images/4.png"/>
+            <br/>
+
+            <p>OR Select 'ToolBox From URL ' if you have the toolbox in hosted in a location.</p>
+            <br/>
+            <img src="images/5.png"/>
+            <br/>
+            <li>And provide the necessary toolbox file path OR URL path depending on your selection in step-4.</li>
+            <li>Click on Install Button.</li>
+            <p>This will redirect to 'List' page of BAM toolboxes. There you can notice that the selected toolbox will
+                be in the status of 'installing'.</p>
+            <br/>
+            <img src="images/6.png"/>
+
+            <p>Wait for approximately 1mintue and refresh the page, then you can notice the status of the toolbox status
+                has changed to 'Installed' state.</p>
+            <br/>
+            <img src="images/7.png"/>
+            <br/>
+            <br/>
+        </ol>
+
+    </ol>
+
+    <li><h2><i>Uninstalling Toolbox</i></h2></li>
+    <p>You can uninstall the toolbox which have been installed in WSO2 BAM instance. Uninstalling toolbox involves
+        removing your deployed artifacts from your system. Ie, If you have installed some analytic hive script via
+        toolbox, the have script will be removed from the when unistalling the toolbox.</p>
+    <ol>
+        <li>Start WSO2 BAM server</li>
+        <li>Go to management console and login</li>
+        <li>Go to Main -> BAM Toolbox - > List</li>
+        <li>Select the toolboxes which you are going to uninstall by selecting the relevant check boxes of toolbox</li>
+        <li>Click on 'Uninstall' icon</li>
+        <br/>
+        <img src="images/8.png"/>
+        <br/>
+        <li>Click 'yes' on the confirmation dialog box which asks for uninstalling the toolbox</li>
+        <br/>
+        <img src="images/9.png"/>
+        <p>There you can notice that the selected toolbox(s) will be in the status of 'uninstalling'.</p>
+        <br/>
+        <img src="images/10.png"/>
+        <p>Wait for approximately 1mintue and refresh the page, then you can notice the toolbox(s) have been removed from list of toolboxes.</p>
+        <br/>
+        <img src="images/11.png"/>
+        <br/>
+    </ol>
+</ol>
+</body>
+
+</html>

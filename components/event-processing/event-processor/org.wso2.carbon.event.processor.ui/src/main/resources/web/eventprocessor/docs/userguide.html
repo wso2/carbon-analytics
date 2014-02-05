@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html>
+<head><title>Execution Plan - User Guide</title>
+
+    <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all"/>
+</head>
+<body>
+<h1>Execution Plan</h1>
+
+<h2>Configuring Execution plan</h2>
+
+<p>You can configure execution plans through the management console as explained below or by
+   manually adding an XML file as explained in step 5.</p>
+<ol>
+    <li>
+        <a href="http://docs.wso2.org/display/CEP300/Running+the+Product">Start the CEP</a>, log in
+                                                                                           to its
+                                                                                           management
+                                                                                           console,
+                                                                                           select
+        <strong>Execution
+                Plans</strong>
+                                                                                           and click<strong>
+        Add </strong> <strong>Execution Plan</strong>.
+    </li>
+    <br/>
+    <li>Enter details in the form that appears and click the<strong> Add Execution Plan</strong>
+        button at the end of the form. For example,<br/>
+        <br/><img src="../images/event-details.png" alt="Event details"/>
+        <br/>The fields in the above configuration are described below:<br/> <br/>
+        <ul>
+            <li>Execution Plan Name : Can contain only alphanumeric characters and '_' character
+            </li>
+            <br/>
+            <li>Description : This is optional</li>
+            <br/>
+            <li>Snapshot time interval : Defines how often the state of the processing engine should
+                be persisted, which is used to restore after a system crash. The default value is 0,
+                which disables this feature. If snapshot is enabled, you must start the CEP with the
+                embedded Cassandra server enabled. To do this, specify <strong>-Ddisable.cassandra.server.startup=false </strong>
+                option at server startup.
+            </li>
+            <br/>
+            <li>Query expressions: See Siddhi Language Specification documentation on how to write
+                queries. When writing query expressions, you must import the required streams from
+                event builders. The <strong>As</strong> field maps the incoming stream to a stream
+                name suitable for the Siddhi processing engine. It can contain only alphanumeric
+                characters and '_' character.<br/> <br/>In the text field that follows imported
+                streams, you can enter any number of CEP statements, each ending with a semicolon.
+                For example,<br/>
+                <br/><img src="../images/query-expressions.png" alt="Query Expressions"/><br/>
+                The <strong>Exported streams</strong> section allows you to expose the output
+                streams from Siddhi to the event formatter with preferred stream IDs. For
+                example,<br/>
+                <br/><img src="../images/exported-streams.png" alt="Exported Streams"/><br/>
+                <br/>For the <strong>StreamId</strong>, provide a character string that starts with
+                an alphabetic because it is considered as a java variable in Siddhi. Stream Id is a
+                combination of stream name and version. E.g., <a>testStream:1.0.0</a>.
+            </li>
+            <br/>
+        </ul>
+    </li>
+    <li>After an execution plan is successfully created, you can change its configuration and
+        redeploy it. To do this, click the <strong>Edit</strong> link associated with it.
+    </li>
+    <br/>
+    <li>An XML based editor opens allowing you to edit the event builder configuration from the UI
+        itself, without having to edit the file in the file system. Do your modifications and click
+        <strong>Update</strong>.
+    </li>
+    <br/>
+    <li>
+        <p>Alternatively, you can specify an execution plan configuration using an XML file and save
+           it in <code>&lt;PRODUCT_HOME&gt;/repository/deployment/server/executionplans</code>
+           directory, which is the execution plan deployment directory. Since hot deployment is
+           enabled, you can simply add/remove files to deploy/undeploy from the server.<br/> <br/>Create
+           the XML file with the following XML based configurations. Execution plan implementation
+           must start with <code>&lt;executionplan&gt;</code> root element as in the example
+           below:<br/>
+            <br/><img src="../images/execution-plan-filesystem-edit.png"
+                      alt="Exported Streams"/><br/>
+        </p>
+    </li>
+    <br/>
+</ol>
+
+<p>For more details on creating execution plans, Please refer the official
+   documentation <a
+            href="http://docs.wso2.org/display/CEP300/Working+with+Execution+Plans">Here.</a>
+</p>
+
+</body>
+</html>
+

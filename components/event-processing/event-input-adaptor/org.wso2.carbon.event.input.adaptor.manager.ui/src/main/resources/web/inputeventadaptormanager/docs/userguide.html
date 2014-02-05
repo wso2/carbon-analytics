@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html>
+<head><title>Input Event Adaptors - User Guide</title>
+
+    <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all"/>
+</head>
+<body>
+<h1>Input Event Adaptors</h1>
+
+<h2>Configuring WSO2Event Input Event Adaptor</h2>
+
+<p>WSO2Event event adaptor handles WSO2 Common Events. It receives events over Thrift using TCP,
+   SSL, HTTP, HTTPS and also JSON events via HTTP and HTTPS. By default, the CEP comes with an
+   WSO2Event event adaptor, which is used to receive fired events</p>
+
+<p>
+    <strong>Note</strong>: You can use the WSO2Event event adaptor that comes with the CEP only to
+                         receive incoming events. But, CEP can send output events to any (including
+                         external) WSO2Event event adaptors.</p>
+
+<p>By default, Input WSO2Event event adaptor starts with CEP, and its default ports are as
+   follows:</p>
+
+<p>tcp port : 7611<br/>
+   ssl port : 7711<br/>
+   http port : 9763 <br/>
+   https port : 9443</p>
+
+<p>The steps below explain how to configure using the management console or using an XML file as
+   explained in step 5.
+</p>
+<ol>
+    <li>Log in to the CEP management console, select<strong>Input Event Adaptors</strong> menu and
+        then click <strong>Add Input Event Adaptor</strong>.
+    </li>
+    <br/>
+    <li>Enter details in the form that appears and click<strong> Add Event Adaptor</strong> button
+        at the end of the form. For example,<br/>
+        <img src="../images/create-event-adaptor.png" alt="Create Event Adaptor"/>
+        <br/>Following values are used in the configuration above:<br/>
+        <br/>
+        <ul>
+            <li>Event Adaptor Name : inputWSO2EventTransportAdaptor</li>
+            <li>Event Adaptor Type : wso2event</li>
+        </ul>
+    </li>
+    <br/>
+    <li>After a adapter is successfully added, you can change its configuration and redeploy it. To
+        do this, click the <strong>Edit</strong> link associated with it. You can also click the
+        other links associated with it to delete it or enable statistics and tracing.
+    </li>
+    <br/>
+    <li>An XML based editor opens allowing you to edit the event adaptor configuration from UI
+        itself, without having to edit the file in the file system. <span
+                style="font-size: 10.0pt;line-height: 13.0pt;">Do your modifications and click <strong>Update</strong>.</span>
+    </li>
+    <br/>
+    <li>Alternatively, you can specify an event adaptor configuration using an XML file and save it
+        in <code>
+            &lt;PRODUCT_HOME&gt;/repository/deployment/server/inputeventadaptors</code>
+        directory, which is the Input event adaptor deployment directory. Since hot deployment is
+        enabled, you can simply add/remove files to deploy/undeploy from the server.<br/>
+        <br/>Create the XML file with the following WSO2Event event adaptor configurations.
+        Input event adaptor implementation must start with <code>&lt;inputEventAdaptor&gt;</code>
+        root element.
+
+    <pre>&lt;inputEventAdaptor name="localEventReceiver" type="wso2event"
+                            xmlns="http://wso2.org/carbon/eventadaptormanager"&gt;&lt;/inputEventAdaptor&gt;</pre>
+
+    </li>
+    <br/>
+</ol>
+<h3>Configuring stream definition stores for the adaptor</h3>
+
+<p>Stream definition stores are used to store the stream definitions of the incoming event streams.
+   WSO2Event event adaptor supports three types of stream definition stores as follows:</p> <br/>
+<ul>
+    <li>Registry-based stream definition store</li>
+    <li>Cassandra-based stream definition store</li>
+    <li>In-memory stream definition store</li>
+</ul>
+<p>By default, CEP uses the registry-based stream definition store. To change the default stream
+   definition store, add the appropriate stream definition store implementation class to <code>&lt;PRODUCT_HOME&gt;/repository/conf/data-bridge/data-bridge-config.xml</code>
+   file as follows:</p><br/>
+<pre>&lt;dataBridgeConfiguration xmlns="http://wso2.org/carbon/databridge"&gt;
+    <!--<StreamDefinitionStore>org.wso2.carbon.databridge.streamdefn.registry.datastore.RegistryStreamDefinitionStore</StreamDefinitionStore>-->
+    &lt;StreamDefinitionStore&gt;
+        org.wso2.carbon.databridge.streamdefn.cassandra.datastore.CassandraStreamDefinitionStore
+    &lt;/StreamDefinitionStore&gt;
+    <!--<StreamDefinitionStore>org.wso2.carbon.databridge.core.definitionstore.InMemoryStreamDefinitionStore</StreamDefinitionStore>-->
+    ...
+&lt;/dataBridgeConfiguration&gt;  </pre>
+
+<p>
+    <strong>Info: </strong>: In registry-based stream definition store, the stream
+                           definitions are stored in
+    <code>/_system/governance/StreamDefinitions</code>.
+                           In Cassandra-based stream definition store, the stream definitions
+                           are stored in <code>META_KS</code> key space.</p>
+
+<p>For more details on configuring different types of event adaptors, Please refer the official
+   documentation <a href="http://docs.wso2.org/display/CEP300/Input+Event+Adaptors">Here.</a></p>
+
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html>
+	<head>
+        <title>Dropdown filter with Wedge Chart Example</title>
+        <script type="text/javascript" src="../wso2vis.js"></script>
+        <link rel="stylesheet" type="text/css" href="../css/wso2vis.css"></link>
+        <script type="text/javascript" src="../js/subscriber/form/dump.js"></script>
+        <script language="javascript" type="text/javascript">
+            var dataProvider = new wso2vis.p.ProviderGET("http://localhost/wso2vis/examples/generator3.php");
+            var dump = new wso2vis.s.form.Dump()
+                           .canvas("div1");
+
+            var timer = new wso2vis.u.Timer(5000);
+
+            function globalTick() {
+                dataProvider.pullData();
+            }
+
+            function wedgeTooltip(data) {
+                return data["@name"] +"<br/"+"> Requests: "+ data["stats"]["requestCount"];
+            }
+
+            window.onload = function () {
+                dataProvider.addDataReceiver(dump);
+
+                dataProvider.initialize();  // make sure all forms are filled with data
+                dump.load();                // now show the form to the user
+
+                timer.tick = globalTick;
+                timer.startTimer();                                
+            }
+		</script>
+	</head>
+	<body>
+    	<div id="chart"></div>    	
+    	<div id="treecontainer"><div id="div1"></div></div>
+    	<div id="recordframe">
+    	    <div id="div2"></div>
+    	    <div id="div3"></div>
+    	    <div id="div4"></div>
+    	</div>
+	</body>
+</html>

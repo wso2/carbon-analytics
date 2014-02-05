@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eventFormatter name="wso2eventformatter" xmlns:ef="http://wso2.org/carbon/eventformatter">
+    <ef:from stream="summarizedStatistics" version="1.0.0"/>
+    <ef:mapping type="wso2event">
+        <ef:metaData>
+            <ef:property>
+                <ef:from name="ipAdd"/>
+                <ef:to name="ipAddress" type="string"/>
+            </ef:property>
+        </ef:metaData>
+        <ef:correlationData/>
+        <ef:payloadData>
+            <ef:property>
+                <ef:from name="userID"/>
+                <ef:to name="user" type="string"/>
+            </ef:property>
+            <ef:property>
+                <ef:from name="searchTerms"/>
+                <ef:to name="keywords" type="string"/>
+            </ef:property>
+        </ef:payloadData>
+    </ef:mapping>
+    <ef:to eventAdaptorType="agent" eventAdaptorName="localAgentBroker">
+        <ef:property name="stream">analytics_Statistics</ef:property>
+        <ef:property name="version">1.3.0</ef:property>
+    </ef:to>
+</eventFormatter>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

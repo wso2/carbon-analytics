@@ -1,0 +1,86 @@
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html>
+	<head>
+        <title>Infovis Space Tree Example</title>
+        <script type="text/javascript" src="../wso2vis.js"></script>
+
+        <script language="javascript" type="text/javascript">
+
+            var dataProvider = new wso2vis.p.ProviderGETJSON("http://localhost/wso2vis/examples/generator5.php");
+//            var dataFilter = new wso2vis.f.BasicFilter(["services", "service"], ["@name"]);
+
+            var timer = new wso2vis.u.Timer(5000);
+
+            function pullData() {
+                dataProvider.pullData();
+            }
+	    var dataFilter = new wso2vis.f.form.Select()
+                             .canvas("filter")
+                             .dataField(["children"])
+                             .dataLabel(["name"])
+                             .defaultText("- Select Service -");
+
+
+          
+            window.onload = function () {
+		var treeDiv = document.getElementById("infovis");
+		var logDiv = document.getElementById("log");
+                var spaceTree = new wso2vis.s.chart.infovis.SpaceTree(logDiv,"infovis","Dependency Tree","Impact Analysis of resources");
+			spaceTree.dataField(["children"])
+				.dataLabel(["name"])
+				.width(300)
+				.height(300);
+
+                spaceTree.load();
+
+
+                //spaceTree.onTooltip = barTooltip;
+                //spaceTree.onClick = barClick;
+
+                dataProvider.addDataReceiver(dataFilter);
+                dataFilter.addDataReceiver(spaceTree);
+
+                dataProvider.initialize();
+		dataFilter.load();
+		
+            }
+		</script>
+        <style>
+            div#qTip {
+                padding: 3px;
+                border: 1px solid #666;
+                border-right-width: 2px;
+                border-bottom-width: 2px;
+                display: none;
+                background: #999;
+                color: #FFF;
+                font: bold 10px Verdana, Arial, sans-serif;
+                text-align: left;
+                position: absolute;
+                z-index: 1000;
+            }
+        </style>
+	</head>
+	<body>
+    	<div id="log"></div>
+    	<div id="filter" style="width:300px;"></div>
+	<input type='button' onclick='pullData()' value='Refresh' />
+    	<div id="infovis" style="height:300px;width:300px"></div>
+	</body>
+</html>

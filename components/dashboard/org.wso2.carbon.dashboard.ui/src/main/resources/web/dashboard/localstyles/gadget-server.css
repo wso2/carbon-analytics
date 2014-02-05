@@ -1,0 +1,633 @@
+html {
+    padding: 0px;
+    margin: 0px;
+    height: 100%;
+}
+
+body {
+    background-image: url(../images/bgLeftTop.jpg);
+    background-repeat: no-repeat;
+    background-position: left top;
+    background-color: #9DD4D1;
+    margin: 0px;
+    padding: 10px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+div#middle {
+   background-color: #FFFFFF !important;
+   width: 100%;
+}
+
+div#middle div#workArea {
+   background-color: #FFFFFF !important;
+   padding: 0px;
+   width: 100%;
+}
+
+a.icon-link {
+   background-image: url(../images/default-menu-icon.gif);
+   background-repeat: no-repeat;
+   background-position: left top;
+   font-size: 13px;
+   padding-left: 20px;
+   line-height: 17px;
+   height: 17px;
+   float: left;
+   position: relative;
+   margin-left: 10px;
+   margin-top: 5px;
+   margin-bottom: 3px;
+   white-space: nowrap;
+   cursor:pointer;
+}
+
+div#link-panel {
+   background-image: url(../images/logoBg.jpg);
+   background-repeat: repeat-x;
+   background-position: left top;
+   background-color: #FFFFFF;
+   height: 43px;
+   margin-bottom: 5px;
+   padding-top: 15px;
+   *padding-bottom: 10px;
+}
+
+div#link-panel div.left-logo {
+   background-image: url(../images/gs-header-logo.gif);
+   background-repeat: no-repeat;
+   background-position: left top;
+   float: left;
+   height: 32px;
+   margin-left: 15px;
+   width: 179px;
+}
+
+div#link-panel div.left-logo a.header-home {
+   display: block;
+}
+
+div#link-panel div.left-logo a.header-home img {
+   display: block;
+}
+
+div#link-panel div.right-links {
+   clear: both;
+   float: right;
+   height: 25px;
+   margin-right: 10px;
+   padding-top: 5px;
+   width: 400px;
+}
+
+div#link-panel ul {
+   float: right;
+   list-style-image: none;
+   list-style-position: outside;
+   list-style-type: none;
+   margin-top: 7px;
+   margin-right: 10px;
+   padding: 0;
+}
+
+div#link-panel ul li {
+   float: left;
+   margin: 0;
+   padding: 0 5px;
+   position: relative;
+}
+
+.gadgets-top-links {
+   background-image: url(../images/addGadgetsBg.jpg);
+   background-repeat: repeat-x;
+   background-position: left top;
+   border: 1px solid #C8E8E8;
+   height: 30px !important;
+   *height: 35px !important;
+   list-style-image: none;
+   list-style-position: outside;
+   list-style-type: none;
+   padding-top: 3px;
+}
+
+.gadgets-top-links li {
+   height: 27px;
+   float: left;
+   margin-left: 3px;
+   padding-right: 10px;
+
+    background-color: #ffffff;
+    border: solid 1px #00a094;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+.gadgets-top-links li a {
+    color:#13315f;
+}
+td.gadgets-top-links a {
+    color:#13315f;
+    font-weight:bold;
+    margin-top:0px;
+    padding-left:35px;
+}
+td.gadgets-top-links a:hover {
+    color: #006633;   
+}
+table.tablayout input{
+    margin:10px 0px 10px 0px;
+}
+#tabmenu {
+   background-image: url(../images/tabsBg.jpg);
+   background-repeat: no-repeat;
+   background-position: left top;
+   background-color: #9DD4D1;
+   border-bottom: 1px solid #666666;
+   color: #000000;
+   padding: 25px 0 0 10px !important;
+   margin: 0 !important;
+   z-index: 1;
+}
+
+table {
+   border: 0 none;
+   font-size: 12px;
+   margin: 0;
+   padding: 0;
+}
+
+#columns {
+   padding-left: 12px !important;
+   padding-top: 12px !important;
+}
+
+#columns tr td {
+   border: 0 !important;
+   margin: 0 !important;
+}
+
+.gadgets-gadget-chrome {
+   border: 1px solid #CCCCCC;
+   cursor: move;
+   margin: 10px !important;
+   height: auto !important;
+   width: auto !important;
+   *width: 100% !important;
+}
+
+.gadgets-gadget-content {
+   height: auto !important;
+   padding-left: 10px !important;
+   padding-right: 10px !important;
+   padding-bottom: 10px !important;
+}
+
+#page {
+   margin-top: 16px;
+   margin-left: 16px;
+   width: auto;
+   *width: 100%;
+}
+
+.section {
+   float: left;
+   width: 33%;
+   height: 100% !important;
+}
+
+.sectionTop {
+   width: auto;
+   *width: 100%;
+   margin-top: 10px;
+   *margin-top: -10px;
+}
+
+.lineitem {
+   margin-bottom: 20px !important;
+   cursor: move;
+}
+
+#tabmenu a.active {
+   background: #FFFFFF none repeat scroll 0;
+   border-bottom: 2px solid #FFFFFF !important;
+   color: #586B74;
+}
+
+#tabmenu a.active:hover {
+   background: #FFFFFF !important;
+   color: #F47B20 !important;
+}
+
+div#workArea table.styledLeft {
+   border-collapse: collapse;
+   margin-left: 7px;
+   margin-top: 7px;
+   margin-bottom: 7px;
+   width: 99%;
+}
+
+div.footer-content {
+   background-color: #B5B5B5;
+   height: 27px;
+   width: 100%;
+   border-top: 5px solid #9DD4D1;
+   *padding-bottom: 5px;
+}
+
+div.footer-content div.copyright {
+   color: #FFFFFF;
+   float: left;
+   margin-left: 10px;
+   padding-top: 6px;
+}
+
+div#workArea div.gadgetInfo {
+   padding: 35px;
+}
+
+.gadgetImage {
+   border: 1px solid #D7D7D7;
+   background-color: #FFFFFF;
+   padding: 3px;
+}
+
+.gadgetDescriptionArea {
+   padding-left: 12px;
+   padding-right: 12px;
+   background-image: url(../images/gadgetDescriptionBg.jpg);
+   background-repeat: repeat-x;
+   background-position: left top;
+   height: 150px;
+}
+
+div.gadgetInfo div.GadgetHeading {
+   margin-top: 7px;
+   font-weight: bold;
+    font-size:15px;
+    color:#00a79d;
+    border:none;
+}
+
+div.gadgetInfo div.GadgetDescription {
+   margin-top: 14px;
+   line-height: 19px;
+}
+
+div#workArea table.styledLeft tbody tr td {
+   padding-bottom: 4px;
+   padding-left: 8px !important;
+   padding-right: 4px !important;
+   padding-top: 4px;
+   vertical-align: middle !important;
+   line-height: 19px;
+}
+
+.tableEvenRow {
+   background-color: #F5F5F5 !important;
+}
+
+div#workArea div.formset {
+   padding-left: 35px;
+   padding-top: 5px;
+   padding-bottom: 10px;
+   width: 600px;
+}
+
+div#workArea div.formset form fieldset {
+   border: 1px solid #D7D7D7;
+   width: 550px;
+   margin: 0;
+   padding: 15px;
+}
+
+div#workArea div.formset form fieldset legend {
+   font-size: 12px;
+   color: #111111;
+}
+
+.form-item {
+   margin-bottom: 15px;
+   margin-top: 15px;
+}
+
+.form-item label {
+   display: block;
+}
+
+div#workArea div.pagination {
+   float: right;
+   margin-right: 10px;
+}
+
+a.pageLinks {
+   color: #111111;
+   text-decoration: underline;
+}
+
+a.pageLinks:hover {
+   color: #F47B20;
+   text-decoration: underline;
+}
+
+a.pageLinks:active {
+   color: #111111;
+   font-weight: bold;
+   text-decoration: none;
+}
+
+.gadgets-title-bar {
+   *margin-top: 5px !important;
+}
+
+div#workArea table.gadgetList {
+
+}
+div#workArea table.gadgetList td.gadgetLastColumn{
+
+}
+div#workArea table.gadgetList td{
+
+}
+div#workArea table.gadgetList td div{
+
+}
+.gadget-name{
+font-size:12px;
+}
+div#middle h2.trigger{
+background-color:#30b7b0;
+}
+div#middle h2.trigger a{
+color:#fff;
+}
+.rating-text{
+   float: left;
+   font-weight: normal;
+   font-size: 12px;
+   margin-right: 6px;
+}
+
+div#workArea table.gadgetComments {
+   border-collapse: collapse;
+   margin-bottom: 7px;
+   margin-left: 7px;
+   margin-top: 7px;
+   width: 99%;
+}
+
+div#workArea table.gadgetComments thead th {
+   background-image: url(../images/table-header.gif);
+   background-position: left bottom;
+   background-repeat: repeat-x;
+   border: 1px solid #CCCCCC;
+   font-weight: normal;
+   height: 22px;
+   line-height: 20px;
+   margin-bottom: 5px;
+   padding-left: 8px;
+}
+
+div#workArea table.gadgetComments tbody tr td {
+   border: 1px solid #CCCCCC;
+   line-height: 19px;
+   padding-bottom: 4px;
+   padding-left: 8px !important;
+   padding-right: 4px !important;
+   padding-top: 4px;
+   vertical-align: middle !important;
+}
+
+div#workArea table.gadgetComments tbody tr td div.delete {
+   float: right;
+}
+
+.block-hover{
+   border: 1px dashed #CCCCCC;
+   height: 200px;
+}
+
+div#newGadgetsPane {
+   background-image: url(../images/defaultGadgetsBg.jpg);
+   background-position: left top;
+   background-repeat: repeat-x;
+}
+
+div#newGadgetsPane table.defaultGadgets {
+   border-collapse: collapse;
+   margin-bottom: 7px;
+   margin-left: 10px;
+   margin-top: 7px;
+   width: 99%;
+}
+
+div#middle div#loginbox {
+   background-image: url(../images/infoCardBg.jpg);
+   background-position: left top;
+   background-repeat: repeat-x;
+   border: 1px solid #BCBEC0;
+   background-color: #F2F2F2;
+   margin: 35px;
+   padding: 20px;
+}
+
+div#middle div#mainLogin {
+   background-image: url(../images/infoCardBg.jpg);
+   background-position: left top;
+   background-repeat: repeat-x;
+   background-color: #F2F2F2;
+   margin-bottom: 20px;
+   padding: 20px;
+   *width: 100%;
+}
+div#mainLogin {
+    border: solid 1px #2bafb9;
+    -moz-border-radius: 7px;
+    border-radius: 7px;
+    padding: 10px;
+}
+div#mainLogin {
+   text-align: center;
+}
+
+div#mainLogin table {
+   margin: auto;
+   *margin: 0;
+}
+
+div#mainLogin table tr td {
+   padding: 3px;
+}
+
+.ui-sortable-helper {
+   width: 31% !important;
+   *width: 96% !important;
+}
+
+div#middle div#loginContent {
+   background-color: #FFFFFF;
+}
+
+div#loginContent div#left {
+   float: left;
+   margin-right: 36px;
+   width: 624px;
+}
+
+div#loginContent div#right {
+   float: left;
+   padding-bottom: 0;
+   width: 300px;
+   margin-top: 64px;
+   *margin-top: 59px;
+}
+
+div#left div.loginPageImage {
+   background-image: url(../images/loginPageImage.jpg);
+   background-position: center;
+   background-repeat: no-repeat;
+   height: 684px;
+   margin-left: 0;
+   width: 624px;
+}
+
+div.loginPageImage div#platformBlog {
+   float: left;
+   height: 130px;
+   padding-left: 10px;
+   padding-right: 10px;
+   padding-top: 10px;
+   margin-top: 100px;
+   width: 280px;
+}
+
+div.loginPageImage div#projectPage {
+   float: left;
+   height: 130px;
+   margin-left: 24px;
+   *margin-left: 64px;
+   padding-left: 10px;
+   padding-right: 10px;
+   padding-top: 10px;
+   margin-top: 100px;
+   text-align: right;
+   width: 280px;
+}
+
+div.loginPageImage div#wso2Carbon {
+   float: left;
+   height: 130px;
+   margin-top: 20px;
+   padding-left: 10px;
+   padding-right: 10px;
+   padding-top: 10px;
+   margin-top: 190px;
+   width: 280px;
+}
+
+div.loginPageImage div#developerPortal {
+   float: left;
+   height: 130px;
+   margin-left: 24px;
+   *margin-left: 64px;
+   margin-top: 20px;
+   padding-left: 10px;
+   padding-right: 10px;
+   padding-top: 10px;
+   margin-top: 190px;
+   text-align: right;
+   width: 280px;
+}
+
+div.loginPageImage h3 {
+   font-size: 14px !important;
+   margin-bottom: 8px;
+   margin-top: 0;
+}
+
+div.loginPageImage p {
+   font-size: 12px;
+   margin-bottom: 8px;
+   margin-top: 0;
+}
+
+div.loginPageImage span.readMore {
+   font-size: 11px;
+   margin-top: 0;
+}
+
+.gadgets-gadget-title-bar {
+   line-height: 18px !important;
+   *margin-top: 2px !important;
+}
+
+.gadgets-gadget-title {
+   float: none !important;
+}
+
+.gadgets-gadget-title-button {
+   margin-right: 2px;
+} 
+
+.img-style{
+    margin-right: 20px;
+}
+.button {
+   border-top: 1px solid #0b876c;
+   background: #30b7b0;
+  /* background: -webkit-gradient(linear, left top, left bottom, from(#179189), to(#30b7b0));
+   background: -moz-linear-gradient(top, #179189, #30b7b0);*/
+   padding: 3.5px 3px;
+   -webkit-border-radius: 5px;
+   -moz-border-radius: 5px;
+   border-radius: 5px;
+   -webkit-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   -moz-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   box-shadow: rgba(0,0,0,1) 0 1px 0;
+   text-shadow: rgba(0,0,0,.4) 0 1px 0;
+   color: #fff;
+   font-size: 11px;
+   font-family: Georgia, serif;
+   text-decoration: none;
+   vertical-align: middle;
+    cursor:pointer;
+}
+.button:hover {
+   border-top-color: #28597a;
+   background: #28597a;
+   color: #ccc;
+   }
+.button:active {
+   border-top-color: #1b435e;
+   background: #1b435e;
+}
+.paginator table{
+    margin:auto;    
+}
+.paginator{
+    height:30px;
+    text-align:center;
+    clear:both;
+}
+.paginator td strong{
+    display:block;
+    background-color: #fff;
+    border: solid 1px #e1e1e1;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+
+    -moz-box-shadow: 2px 2px 2px #888;
+    -webkit-box-shadow: 2px 2px 2px #888;
+    box-shadow: 2px 2px 2px #888;
+    text-align:center;
+    padding-left:7px;
+    margin-right:5px;
+}
+.gadget-image{
+    margin-top:5px;
+}
+.gadget-image img{
+    float:left;
+    margin:0px 10px 10px 0px;
+}

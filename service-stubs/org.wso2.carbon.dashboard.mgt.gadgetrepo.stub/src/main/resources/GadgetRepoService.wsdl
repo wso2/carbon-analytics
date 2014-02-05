@@ -1,0 +1,1631 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://org.wso2.wsf/tools" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:tns="http://gadgetrepo.mgt.dashboard.carbon.wso2.org" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ax2157="http://bean.common.dashboard.carbon.wso2.org/xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://gadgetrepo.mgt.dashboard.carbon.wso2.org">
+    <wsdl:documentation>GadgetRepoService</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema xmlns:ax2158="http://bean.common.dashboard.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://org.wso2.wsf/tools">
+            <xs:import namespace="http://bean.common.dashboard.carbon.wso2.org/xsd" />
+            <xs:element name="userHasGadget">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="gadgetPath" nillable="true" type="xs:string" />
+
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="userHasGadgetResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean" />
+                    </xs:sequence>
+                </xs:complexType>
+
+            </xs:element>
+            <xs:element name="modifyGadgetEntry">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="gadegtPath" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="gName" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="gUrl" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="gDesc" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="gScreen" nillable="true" type="xs:base64Binary" />
+
+                        <xs:element minOccurs="0" name="screenMediaType" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="gadgetContent" nillable="true" type="xs:base64Binary" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="modifyGadgetEntryResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean" />
+
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="modifyGadget">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="gadegtPath" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="gName" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="gUrl" nillable="true" type="xs:string" />
+
+                        <xs:element minOccurs="0" name="gDesc" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="gScreen" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="screenMediaType" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="modifyGadgetResponse">
+                <xs:complexType>
+                    <xs:sequence>
+
+                        <xs:element minOccurs="0" name="return" type="xs:boolean" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="makeUnsignedUserGadget">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="gadgetPath" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="isMakeDefault" type="xs:boolean" />
+
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="makeUnsignedUserGadgetResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean" />
+                    </xs:sequence>
+                </xs:complexType>
+
+            </xs:element>
+            <xs:element name="makeGadgetDefault">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="gadgetPath" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="isMakeDefault" type="xs:boolean" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="makeGadgetDefaultResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isSessionValid">
+                <xs:complexType>
+
+                    <xs:sequence />
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isSessionValidResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean" />
+                    </xs:sequence>
+                </xs:complexType>
+
+            </xs:element>
+            <xs:element name="isReadOnlyMode">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="userId" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isReadOnlyModeResponse">
+
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isExternalGadgetAdditionEnabled">
+                <xs:complexType>
+                    <xs:sequence />
+
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isExternalGadgetAdditionEnabledResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="isAdmin">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="userId" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isAdminResponse">
+                <xs:complexType>
+
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="incrementUserCount">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="gadgetPath" nillable="true" type="xs:string" />
+
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="incrementUserCountResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean" />
+                    </xs:sequence>
+                </xs:complexType>
+
+            </xs:element>
+            <xs:element name="getUserRating">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="gadgetPath" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="userId" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="getUserRatingResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getGadgetDataPag">
+                <xs:complexType>
+
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="upper" type="xs:int" />
+                        <xs:element minOccurs="0" name="lower" type="xs:int" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getGadgetDataPagResponse">
+                <xs:complexType>
+                    <xs:sequence>
+
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2157:Gadget" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getGadgetData">
+                <xs:complexType>
+                    <xs:sequence />
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="getGadgetDataResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2157:Gadget" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getGadgetByName">
+                <xs:complexType>
+
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getGadgetByNameResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2157:Gadget" />
+
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getGadget">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="gadgetPath" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+
+            </xs:element>
+            <xs:element name="getGadgetResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2157:Gadget" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getDefaultGadgetUrlSet">
+
+                <xs:complexType>
+                    <xs:sequence />
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getDefaultGadgetUrlSetResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string" />
+                    </xs:sequence>
+
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getCommentsCount">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="resPath" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="getCommentsCountResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:int" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getCommentSet">
+                <xs:complexType>
+
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="resPath" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="start" type="xs:int" />
+                        <xs:element minOccurs="0" name="size" type="xs:int" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getCommentSetResponse">
+                <xs:complexType>
+
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2157:Comment" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getCollectionSize">
+                <xs:complexType>
+                    <xs:sequence />
+                </xs:complexType>
+
+            </xs:element>
+            <xs:element name="getCollectionSizeResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:int" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteGadgetImage">
+
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="path" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteGadgetImageResponse">
+                <xs:complexType>
+                    <xs:sequence>
+
+                        <xs:element minOccurs="0" name="return" type="xs:boolean" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteGadget">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="gadgetPath" nillable="true" type="xs:string" />
+                    </xs:sequence>
+
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteGadgetResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="deleteComment">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="path" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteCommentResponse">
+                <xs:complexType>
+
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addRatingForGadget">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="gadgetPath" nillable="true" type="xs:string" />
+
+                        <xs:element minOccurs="0" name="rating" type="xs:int" />
+                        <xs:element minOccurs="0" name="tabId" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="gadgetGroup" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addRatingForGadgetResponse">
+                <xs:complexType>
+                    <xs:sequence>
+
+                        <xs:element minOccurs="0" name="return" type="xs:boolean" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addGadgetToRepo">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="gName" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="gUrl" nillable="true" type="xs:string" />
+
+                        <xs:element minOccurs="0" name="gDesc" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="gScreen" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="screenMediaType" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addGadgetToRepoResponse">
+                <xs:complexType>
+                    <xs:sequence>
+
+                        <xs:element minOccurs="0" name="return" type="xs:boolean" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addGadgetEntryToRepo">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="gName" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="gUrl" nillable="true" type="xs:string" />
+
+                        <xs:element minOccurs="0" name="gDesc" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="gScreen" nillable="true" type="xs:base64Binary" />
+                        <xs:element minOccurs="0" name="screenMediaType" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="gadgetContent" nillable="true" type="xs:base64Binary" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addGadgetEntryToRepoResponse">
+                <xs:complexType>
+
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addGadget">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="userId" nillable="true" type="xs:string" />
+
+                        <xs:element minOccurs="0" name="tabId" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="url" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="dashboardName" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="gadgetGroup" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="gadgetPath" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addGadgetResponse">
+
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addCommentForGadget">
+                <xs:complexType>
+                    <xs:sequence>
+
+                        <xs:element minOccurs="0" name="gadgetPath" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="comment" nillable="true" type="ax2157:Comment" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addCommentForGadgetResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean" />
+
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://bean.common.dashboard.carbon.wso2.org/xsd">
+            <xs:complexType name="Gadget">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="comments" nillable="true" type="ax2157:Comment" />
+                    <xs:element minOccurs="0" name="defaultGadget" nillable="true" type="xs:string" />
+
+                    <xs:element minOccurs="0" name="gadgetDesc" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="gadgetId" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="gadgetName" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="gadgetPath" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="gadgetPrefs" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="gadgetScreenBase64" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="gadgetUrl" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="rating" nillable="true" type="xs:float" />
+                    <xs:element minOccurs="0" name="thumbUrl" nillable="true" type="xs:string" />
+
+                    <xs:element minOccurs="0" name="unsignedUserGadget" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="userCount" nillable="true" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="Comment">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="authorUserName" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="commentPath" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="commentText" nillable="true" type="xs:string" />
+
+                    <xs:element minOccurs="0" name="createTime" nillable="true" type="xs:date" />
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="isAdminRequest">
+        <wsdl:part name="parameters" element="ns:isAdmin" />
+    </wsdl:message>
+    <wsdl:message name="isAdminResponse">
+
+        <wsdl:part name="parameters" element="ns:isAdminResponse" />
+    </wsdl:message>
+    <wsdl:message name="addRatingForGadgetRequest">
+        <wsdl:part name="parameters" element="ns:addRatingForGadget" />
+    </wsdl:message>
+    <wsdl:message name="addRatingForGadgetResponse">
+        <wsdl:part name="parameters" element="ns:addRatingForGadgetResponse" />
+    </wsdl:message>
+    <wsdl:message name="getCommentSetRequest">
+
+        <wsdl:part name="parameters" element="ns:getCommentSet" />
+    </wsdl:message>
+    <wsdl:message name="getCommentSetResponse">
+        <wsdl:part name="parameters" element="ns:getCommentSetResponse" />
+    </wsdl:message>
+    <wsdl:message name="isReadOnlyModeRequest">
+        <wsdl:part name="parameters" element="ns:isReadOnlyMode" />
+    </wsdl:message>
+    <wsdl:message name="isReadOnlyModeResponse">
+
+        <wsdl:part name="parameters" element="ns:isReadOnlyModeResponse" />
+    </wsdl:message>
+    <wsdl:message name="addGadgetToRepoRequest">
+        <wsdl:part name="parameters" element="ns:addGadgetToRepo" />
+    </wsdl:message>
+    <wsdl:message name="addGadgetToRepoResponse">
+        <wsdl:part name="parameters" element="ns:addGadgetToRepoResponse" />
+    </wsdl:message>
+    <wsdl:message name="getGadgetRequest">
+
+        <wsdl:part name="parameters" element="ns:getGadget" />
+    </wsdl:message>
+    <wsdl:message name="getGadgetResponse">
+        <wsdl:part name="parameters" element="ns:getGadgetResponse" />
+    </wsdl:message>
+    <wsdl:message name="deleteGadgetImageRequest">
+        <wsdl:part name="parameters" element="ns:deleteGadgetImage" />
+    </wsdl:message>
+    <wsdl:message name="deleteGadgetImageResponse">
+
+        <wsdl:part name="parameters" element="ns:deleteGadgetImageResponse" />
+    </wsdl:message>
+    <wsdl:message name="addCommentForGadgetRequest">
+        <wsdl:part name="parameters" element="ns:addCommentForGadget" />
+    </wsdl:message>
+    <wsdl:message name="addCommentForGadgetResponse">
+        <wsdl:part name="parameters" element="ns:addCommentForGadgetResponse" />
+    </wsdl:message>
+    <wsdl:message name="isExternalGadgetAdditionEnabledRequest">
+
+        <wsdl:part name="parameters" element="ns:isExternalGadgetAdditionEnabled" />
+    </wsdl:message>
+    <wsdl:message name="isExternalGadgetAdditionEnabledResponse">
+        <wsdl:part name="parameters" element="ns:isExternalGadgetAdditionEnabledResponse" />
+    </wsdl:message>
+    <wsdl:message name="getCommentsCountRequest">
+        <wsdl:part name="parameters" element="ns:getCommentsCount" />
+    </wsdl:message>
+    <wsdl:message name="getCommentsCountResponse">
+
+        <wsdl:part name="parameters" element="ns:getCommentsCountResponse" />
+    </wsdl:message>
+    <wsdl:message name="getDefaultGadgetUrlSetRequest">
+        <wsdl:part name="parameters" element="ns:getDefaultGadgetUrlSet" />
+    </wsdl:message>
+    <wsdl:message name="getDefaultGadgetUrlSetResponse">
+        <wsdl:part name="parameters" element="ns:getDefaultGadgetUrlSetResponse" />
+    </wsdl:message>
+    <wsdl:message name="makeGadgetDefaultRequest">
+
+        <wsdl:part name="parameters" element="ns:makeGadgetDefault" />
+    </wsdl:message>
+    <wsdl:message name="makeGadgetDefaultResponse">
+        <wsdl:part name="parameters" element="ns:makeGadgetDefaultResponse" />
+    </wsdl:message>
+    <wsdl:message name="addGadgetRequest">
+        <wsdl:part name="parameters" element="ns:addGadget" />
+    </wsdl:message>
+    <wsdl:message name="addGadgetResponse">
+
+        <wsdl:part name="parameters" element="ns:addGadgetResponse" />
+    </wsdl:message>
+    <wsdl:message name="getGadgetByNameRequest">
+        <wsdl:part name="parameters" element="ns:getGadgetByName" />
+    </wsdl:message>
+    <wsdl:message name="getGadgetByNameResponse">
+        <wsdl:part name="parameters" element="ns:getGadgetByNameResponse" />
+    </wsdl:message>
+    <wsdl:message name="modifyGadgetRequest">
+
+        <wsdl:part name="parameters" element="ns:modifyGadget" />
+    </wsdl:message>
+    <wsdl:message name="modifyGadgetResponse">
+        <wsdl:part name="parameters" element="ns:modifyGadgetResponse" />
+    </wsdl:message>
+    <wsdl:message name="userHasGadgetRequest">
+        <wsdl:part name="parameters" element="ns:userHasGadget" />
+    </wsdl:message>
+    <wsdl:message name="userHasGadgetResponse">
+
+        <wsdl:part name="parameters" element="ns:userHasGadgetResponse" />
+    </wsdl:message>
+    <wsdl:message name="getGadgetDataRequest">
+        <wsdl:part name="parameters" element="ns:getGadgetData" />
+    </wsdl:message>
+    <wsdl:message name="getGadgetDataResponse">
+        <wsdl:part name="parameters" element="ns:getGadgetDataResponse" />
+    </wsdl:message>
+    <wsdl:message name="isSessionValidRequest">
+
+        <wsdl:part name="parameters" element="ns:isSessionValid" />
+    </wsdl:message>
+    <wsdl:message name="isSessionValidResponse">
+        <wsdl:part name="parameters" element="ns:isSessionValidResponse" />
+    </wsdl:message>
+    <wsdl:message name="modifyGadgetEntryRequest">
+        <wsdl:part name="parameters" element="ns:modifyGadgetEntry" />
+    </wsdl:message>
+    <wsdl:message name="modifyGadgetEntryResponse">
+
+        <wsdl:part name="parameters" element="ns:modifyGadgetEntryResponse" />
+    </wsdl:message>
+    <wsdl:message name="deleteGadgetRequest">
+        <wsdl:part name="parameters" element="ns:deleteGadget" />
+    </wsdl:message>
+    <wsdl:message name="deleteGadgetResponse">
+        <wsdl:part name="parameters" element="ns:deleteGadgetResponse" />
+    </wsdl:message>
+    <wsdl:message name="getUserRatingRequest">
+
+        <wsdl:part name="parameters" element="ns:getUserRating" />
+    </wsdl:message>
+    <wsdl:message name="getUserRatingResponse">
+        <wsdl:part name="parameters" element="ns:getUserRatingResponse" />
+    </wsdl:message>
+    <wsdl:message name="getGadgetDataPagRequest">
+        <wsdl:part name="parameters" element="ns:getGadgetDataPag" />
+    </wsdl:message>
+    <wsdl:message name="getGadgetDataPagResponse">
+
+        <wsdl:part name="parameters" element="ns:getGadgetDataPagResponse" />
+    </wsdl:message>
+    <wsdl:message name="incrementUserCountRequest">
+        <wsdl:part name="parameters" element="ns:incrementUserCount" />
+    </wsdl:message>
+    <wsdl:message name="incrementUserCountResponse">
+        <wsdl:part name="parameters" element="ns:incrementUserCountResponse" />
+    </wsdl:message>
+    <wsdl:message name="getCollectionSizeRequest">
+
+        <wsdl:part name="parameters" element="ns:getCollectionSize" />
+    </wsdl:message>
+    <wsdl:message name="getCollectionSizeResponse">
+        <wsdl:part name="parameters" element="ns:getCollectionSizeResponse" />
+    </wsdl:message>
+    <wsdl:message name="addGadgetEntryToRepoRequest">
+        <wsdl:part name="parameters" element="ns:addGadgetEntryToRepo" />
+    </wsdl:message>
+    <wsdl:message name="addGadgetEntryToRepoResponse">
+
+        <wsdl:part name="parameters" element="ns:addGadgetEntryToRepoResponse" />
+    </wsdl:message>
+    <wsdl:message name="makeUnsignedUserGadgetRequest">
+        <wsdl:part name="parameters" element="ns:makeUnsignedUserGadget" />
+    </wsdl:message>
+    <wsdl:message name="makeUnsignedUserGadgetResponse">
+        <wsdl:part name="parameters" element="ns:makeUnsignedUserGadgetResponse" />
+    </wsdl:message>
+    <wsdl:message name="deleteCommentRequest">
+
+        <wsdl:part name="parameters" element="ns:deleteComment" />
+    </wsdl:message>
+    <wsdl:message name="deleteCommentResponse">
+        <wsdl:part name="parameters" element="ns:deleteCommentResponse" />
+    </wsdl:message>
+    <wsdl:portType name="GadgetRepoServicePortType">
+        <wsdl:operation name="isAdmin">
+            <wsdl:input message="tns:isAdminRequest" wsaw:Action="urn:isAdmin" />
+            <wsdl:output message="tns:isAdminResponse" wsaw:Action="urn:isAdminResponse" />
+
+        </wsdl:operation>
+        <wsdl:operation name="addRatingForGadget">
+            <wsdl:input message="tns:addRatingForGadgetRequest" wsaw:Action="urn:addRatingForGadget" />
+            <wsdl:output message="tns:addRatingForGadgetResponse" wsaw:Action="urn:addRatingForGadgetResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getCommentSet">
+            <wsdl:input message="tns:getCommentSetRequest" wsaw:Action="urn:getCommentSet" />
+            <wsdl:output message="tns:getCommentSetResponse" wsaw:Action="urn:getCommentSetResponse" />
+        </wsdl:operation>
+
+        <wsdl:operation name="isReadOnlyMode">
+            <wsdl:input message="tns:isReadOnlyModeRequest" wsaw:Action="urn:isReadOnlyMode" />
+            <wsdl:output message="tns:isReadOnlyModeResponse" wsaw:Action="urn:isReadOnlyModeResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="addGadgetToRepo">
+            <wsdl:input message="tns:addGadgetToRepoRequest" wsaw:Action="urn:addGadgetToRepo" />
+            <wsdl:output message="tns:addGadgetToRepoResponse" wsaw:Action="urn:addGadgetToRepoResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getGadget">
+
+            <wsdl:input message="tns:getGadgetRequest" wsaw:Action="urn:getGadget" />
+            <wsdl:output message="tns:getGadgetResponse" wsaw:Action="urn:getGadgetResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="deleteGadgetImage">
+            <wsdl:input message="tns:deleteGadgetImageRequest" wsaw:Action="urn:deleteGadgetImage" />
+            <wsdl:output message="tns:deleteGadgetImageResponse" wsaw:Action="urn:deleteGadgetImageResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="addCommentForGadget">
+            <wsdl:input message="tns:addCommentForGadgetRequest" wsaw:Action="urn:addCommentForGadget" />
+
+            <wsdl:output message="tns:addCommentForGadgetResponse" wsaw:Action="urn:addCommentForGadgetResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="isExternalGadgetAdditionEnabled">
+            <wsdl:input message="tns:isExternalGadgetAdditionEnabledRequest" wsaw:Action="urn:isExternalGadgetAdditionEnabled" />
+            <wsdl:output message="tns:isExternalGadgetAdditionEnabledResponse" wsaw:Action="urn:isExternalGadgetAdditionEnabledResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getCommentsCount">
+            <wsdl:input message="tns:getCommentsCountRequest" wsaw:Action="urn:getCommentsCount" />
+            <wsdl:output message="tns:getCommentsCountResponse" wsaw:Action="urn:getCommentsCountResponse" />
+
+        </wsdl:operation>
+        <wsdl:operation name="getDefaultGadgetUrlSet">
+            <wsdl:input message="tns:getDefaultGadgetUrlSetRequest" wsaw:Action="urn:getDefaultGadgetUrlSet" />
+            <wsdl:output message="tns:getDefaultGadgetUrlSetResponse" wsaw:Action="urn:getDefaultGadgetUrlSetResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="makeGadgetDefault">
+            <wsdl:input message="tns:makeGadgetDefaultRequest" wsaw:Action="urn:makeGadgetDefault" />
+            <wsdl:output message="tns:makeGadgetDefaultResponse" wsaw:Action="urn:makeGadgetDefaultResponse" />
+        </wsdl:operation>
+
+        <wsdl:operation name="addGadget">
+            <wsdl:input message="tns:addGadgetRequest" wsaw:Action="urn:addGadget" />
+            <wsdl:output message="tns:addGadgetResponse" wsaw:Action="urn:addGadgetResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getGadgetByName">
+            <wsdl:input message="tns:getGadgetByNameRequest" wsaw:Action="urn:getGadgetByName" />
+            <wsdl:output message="tns:getGadgetByNameResponse" wsaw:Action="urn:getGadgetByNameResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="modifyGadget">
+
+            <wsdl:input message="tns:modifyGadgetRequest" wsaw:Action="urn:modifyGadget" />
+            <wsdl:output message="tns:modifyGadgetResponse" wsaw:Action="urn:modifyGadgetResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="userHasGadget">
+            <wsdl:input message="tns:userHasGadgetRequest" wsaw:Action="urn:userHasGadget" />
+            <wsdl:output message="tns:userHasGadgetResponse" wsaw:Action="urn:userHasGadgetResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getGadgetData">
+            <wsdl:input message="tns:getGadgetDataRequest" wsaw:Action="urn:getGadgetData" />
+
+            <wsdl:output message="tns:getGadgetDataResponse" wsaw:Action="urn:getGadgetDataResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="isSessionValid">
+            <wsdl:input message="tns:isSessionValidRequest" wsaw:Action="urn:isSessionValid" />
+            <wsdl:output message="tns:isSessionValidResponse" wsaw:Action="urn:isSessionValidResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="modifyGadgetEntry">
+            <wsdl:input message="tns:modifyGadgetEntryRequest" wsaw:Action="urn:modifyGadgetEntry" />
+            <wsdl:output message="tns:modifyGadgetEntryResponse" wsaw:Action="urn:modifyGadgetEntryResponse" />
+
+        </wsdl:operation>
+        <wsdl:operation name="deleteGadget">
+            <wsdl:input message="tns:deleteGadgetRequest" wsaw:Action="urn:deleteGadget" />
+            <wsdl:output message="tns:deleteGadgetResponse" wsaw:Action="urn:deleteGadgetResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getUserRating">
+            <wsdl:input message="tns:getUserRatingRequest" wsaw:Action="urn:getUserRating" />
+            <wsdl:output message="tns:getUserRatingResponse" wsaw:Action="urn:getUserRatingResponse" />
+        </wsdl:operation>
+
+        <wsdl:operation name="getGadgetDataPag">
+            <wsdl:input message="tns:getGadgetDataPagRequest" wsaw:Action="urn:getGadgetDataPag" />
+            <wsdl:output message="tns:getGadgetDataPagResponse" wsaw:Action="urn:getGadgetDataPagResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="incrementUserCount">
+            <wsdl:input message="tns:incrementUserCountRequest" wsaw:Action="urn:incrementUserCount" />
+            <wsdl:output message="tns:incrementUserCountResponse" wsaw:Action="urn:incrementUserCountResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getCollectionSize">
+
+            <wsdl:input message="tns:getCollectionSizeRequest" wsaw:Action="urn:getCollectionSize" />
+            <wsdl:output message="tns:getCollectionSizeResponse" wsaw:Action="urn:getCollectionSizeResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="addGadgetEntryToRepo">
+            <wsdl:input message="tns:addGadgetEntryToRepoRequest" wsaw:Action="urn:addGadgetEntryToRepo" />
+            <wsdl:output message="tns:addGadgetEntryToRepoResponse" wsaw:Action="urn:addGadgetEntryToRepoResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="makeUnsignedUserGadget">
+            <wsdl:input message="tns:makeUnsignedUserGadgetRequest" wsaw:Action="urn:makeUnsignedUserGadget" />
+
+            <wsdl:output message="tns:makeUnsignedUserGadgetResponse" wsaw:Action="urn:makeUnsignedUserGadgetResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="deleteComment">
+            <wsdl:input message="tns:deleteCommentRequest" wsaw:Action="urn:deleteComment" />
+            <wsdl:output message="tns:deleteCommentResponse" wsaw:Action="urn:deleteCommentResponse" />
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="GadgetRepoServiceSoap11Binding" type="tns:GadgetRepoServicePortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+
+        <wsdl:operation name="isAdmin">
+            <soap:operation soapAction="urn:isAdmin" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="isReadOnlyMode">
+            <soap:operation soapAction="urn:isReadOnlyMode" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="getCommentSet">
+            <soap:operation soapAction="urn:getCommentSet" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="addRatingForGadget">
+            <soap:operation soapAction="urn:addRatingForGadget" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="getGadget">
+            <soap:operation soapAction="urn:getGadget" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="addGadgetToRepo">
+            <soap:operation soapAction="urn:addGadgetToRepo" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="deleteGadgetImage">
+            <soap:operation soapAction="urn:deleteGadgetImage" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="isExternalGadgetAdditionEnabled">
+            <soap:operation soapAction="urn:isExternalGadgetAdditionEnabled" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="addCommentForGadget">
+            <soap:operation soapAction="urn:addCommentForGadget" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="getDefaultGadgetUrlSet">
+            <soap:operation soapAction="urn:getDefaultGadgetUrlSet" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="getCommentsCount">
+            <soap:operation soapAction="urn:getCommentsCount" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="makeGadgetDefault">
+            <soap:operation soapAction="urn:makeGadgetDefault" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="addGadget">
+            <soap:operation soapAction="urn:addGadget" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="modifyGadget">
+            <soap:operation soapAction="urn:modifyGadget" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="getGadgetByName">
+            <soap:operation soapAction="urn:getGadgetByName" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="getGadgetData">
+            <soap:operation soapAction="urn:getGadgetData" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="userHasGadget">
+            <soap:operation soapAction="urn:userHasGadget" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="isSessionValid">
+            <soap:operation soapAction="urn:isSessionValid" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="deleteGadget">
+            <soap:operation soapAction="urn:deleteGadget" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="modifyGadgetEntry">
+            <soap:operation soapAction="urn:modifyGadgetEntry" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="getGadgetDataPag">
+            <soap:operation soapAction="urn:getGadgetDataPag" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="getUserRating">
+            <soap:operation soapAction="urn:getUserRating" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="incrementUserCount">
+            <soap:operation soapAction="urn:incrementUserCount" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="getCollectionSize">
+            <soap:operation soapAction="urn:getCollectionSize" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="makeUnsignedUserGadget">
+            <soap:operation soapAction="urn:makeUnsignedUserGadget" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="addGadgetEntryToRepo">
+            <soap:operation soapAction="urn:addGadgetEntryToRepo" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="deleteComment">
+            <soap:operation soapAction="urn:deleteComment" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+    </wsdl:binding>
+    <wsdl:binding name="GadgetRepoServiceSoap12Binding" type="tns:GadgetRepoServicePortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+        <wsdl:operation name="isAdmin">
+            <soap12:operation soapAction="urn:isAdmin" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isReadOnlyMode">
+            <soap12:operation soapAction="urn:isReadOnlyMode" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getCommentSet">
+            <soap12:operation soapAction="urn:getCommentSet" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addRatingForGadget">
+            <soap12:operation soapAction="urn:addRatingForGadget" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getGadget">
+            <soap12:operation soapAction="urn:getGadget" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addGadgetToRepo">
+            <soap12:operation soapAction="urn:addGadgetToRepo" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deleteGadgetImage">
+            <soap12:operation soapAction="urn:deleteGadgetImage" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isExternalGadgetAdditionEnabled">
+            <soap12:operation soapAction="urn:isExternalGadgetAdditionEnabled" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addCommentForGadget">
+            <soap12:operation soapAction="urn:addCommentForGadget" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getDefaultGadgetUrlSet">
+            <soap12:operation soapAction="urn:getDefaultGadgetUrlSet" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getCommentsCount">
+            <soap12:operation soapAction="urn:getCommentsCount" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="makeGadgetDefault">
+            <soap12:operation soapAction="urn:makeGadgetDefault" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addGadget">
+            <soap12:operation soapAction="urn:addGadget" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="modifyGadget">
+            <soap12:operation soapAction="urn:modifyGadget" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getGadgetByName">
+            <soap12:operation soapAction="urn:getGadgetByName" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getGadgetData">
+            <soap12:operation soapAction="urn:getGadgetData" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="userHasGadget">
+            <soap12:operation soapAction="urn:userHasGadget" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isSessionValid">
+            <soap12:operation soapAction="urn:isSessionValid" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deleteGadget">
+            <soap12:operation soapAction="urn:deleteGadget" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="modifyGadgetEntry">
+            <soap12:operation soapAction="urn:modifyGadgetEntry" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getGadgetDataPag">
+            <soap12:operation soapAction="urn:getGadgetDataPag" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getUserRating">
+            <soap12:operation soapAction="urn:getUserRating" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="incrementUserCount">
+            <soap12:operation soapAction="urn:incrementUserCount" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getCollectionSize">
+            <soap12:operation soapAction="urn:getCollectionSize" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="makeUnsignedUserGadget">
+            <soap12:operation soapAction="urn:makeUnsignedUserGadget" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addGadgetEntryToRepo">
+            <soap12:operation soapAction="urn:addGadgetEntryToRepo" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deleteComment">
+            <soap12:operation soapAction="urn:deleteComment" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="GadgetRepoServiceHttpBinding" type="tns:GadgetRepoServicePortType">
+        <http:binding verb="POST" />
+        <wsdl:operation name="isAdmin">
+            <http:operation location="isAdmin" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isReadOnlyMode">
+            <http:operation location="isReadOnlyMode" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getCommentSet">
+            <http:operation location="getCommentSet" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addRatingForGadget">
+            <http:operation location="addRatingForGadget" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getGadget">
+            <http:operation location="getGadget" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addGadgetToRepo">
+            <http:operation location="addGadgetToRepo" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deleteGadgetImage">
+            <http:operation location="deleteGadgetImage" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isExternalGadgetAdditionEnabled">
+            <http:operation location="isExternalGadgetAdditionEnabled" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addCommentForGadget">
+            <http:operation location="addCommentForGadget" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getDefaultGadgetUrlSet">
+            <http:operation location="getDefaultGadgetUrlSet" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getCommentsCount">
+            <http:operation location="getCommentsCount" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="makeGadgetDefault">
+            <http:operation location="makeGadgetDefault" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addGadget">
+            <http:operation location="addGadget" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="modifyGadget">
+            <http:operation location="modifyGadget" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getGadgetByName">
+            <http:operation location="getGadgetByName" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getGadgetData">
+            <http:operation location="getGadgetData" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="userHasGadget">
+            <http:operation location="userHasGadget" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isSessionValid">
+            <http:operation location="isSessionValid" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deleteGadget">
+            <http:operation location="deleteGadget" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="modifyGadgetEntry">
+            <http:operation location="modifyGadgetEntry" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getGadgetDataPag">
+            <http:operation location="getGadgetDataPag" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getUserRating">
+            <http:operation location="getUserRating" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="incrementUserCount">
+            <http:operation location="incrementUserCount" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getCollectionSize">
+            <http:operation location="getCollectionSize" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="makeUnsignedUserGadget">
+            <http:operation location="makeUnsignedUserGadget" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addGadgetEntryToRepo">
+            <http:operation location="addGadgetEntryToRepo" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deleteComment">
+            <http:operation location="deleteComment" />
+            <wsdl:input>
+
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="GadgetRepoService">
+        <wsdl:port name="GadgetRepoServiceHttpsSoap11Endpoint" binding="tns:GadgetRepoServiceSoap11Binding">
+
+            <soap:address location="https://10.100.0.20:8443/services/GadgetRepoService.GadgetRepoServiceHttpsSoap11Endpoint/" />
+        </wsdl:port>
+        <wsdl:port name="GadgetRepoServiceHttpSoap11Endpoint" binding="tns:GadgetRepoServiceSoap11Binding">
+            <soap:address location="http://10.100.0.20:8080/services/GadgetRepoService.GadgetRepoServiceHttpSoap11Endpoint/" />
+        </wsdl:port>
+        <wsdl:port name="GadgetRepoServiceHttpsSoap12Endpoint" binding="tns:GadgetRepoServiceSoap12Binding">
+            <soap12:address location="https://10.100.0.20:8443/services/GadgetRepoService.GadgetRepoServiceHttpsSoap12Endpoint/" />
+        </wsdl:port>
+        <wsdl:port name="GadgetRepoServiceHttpSoap12Endpoint" binding="tns:GadgetRepoServiceSoap12Binding">
+
+            <soap12:address location="http://10.100.0.20:8080/services/GadgetRepoService.GadgetRepoServiceHttpSoap12Endpoint/" />
+        </wsdl:port>
+        <wsdl:port name="GadgetRepoServiceHttpEndpoint" binding="tns:GadgetRepoServiceHttpBinding">
+            <http:address location="http://10.100.0.20:8080/services/GadgetRepoService.GadgetRepoServiceHttpEndpoint/" />
+        </wsdl:port>
+        <wsdl:port name="GadgetRepoServiceHttpsEndpoint" binding="tns:GadgetRepoServiceHttpBinding">
+            <http:address location="https://10.100.0.20:8443/services/GadgetRepoService.GadgetRepoServiceHttpsEndpoint/" />
+        </wsdl:port>
+    </wsdl:service>
+
+</wsdl:definitions>

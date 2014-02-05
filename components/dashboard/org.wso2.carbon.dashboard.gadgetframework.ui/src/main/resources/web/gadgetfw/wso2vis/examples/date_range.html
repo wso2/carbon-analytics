@@ -1,0 +1,46 @@
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html>
+    <head>
+    <!--<script type="text/javascript" src="../3rdparty/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../3rdparty/yui/build/animation/animation-min.js"></script>
+    <script type="text/javascript" src="../3rdparty/yui/build/calendar/calendar-min.js"></script>-->
+    
+    <script type="text/javascript" src="../wso2vis.js"></script>
+    <!--<script type="text/javascript" src="../js/wso2vis.js"></script>	
+	<script type="text/javascript" src="../js/control/Control.js"></script>
+	<script type="text/javascript" src="../js/control/DateRange.js"></script>-->
+    <link rel="stylesheet" type="text/css" href="../3rdparty/yui/build/calendar/assets/skins/sam/calendar.css"/>
+    <link type="text/css" rel="stylesheet" href="../css/DateRange.css"/>    
+    <link rel="stylesheet" type="text/css" href="../3rdparty/yui/build/fonts/fonts-min.css"/>
+    </head>
+    <body>
+        <div id="workArea">
+        </div>
+        
+        <script language="javascript" type="application/javascript">
+			var dr = new wso2vis.c.DateRange()
+						 .canvas("workArea")
+						 .showHours(true)   // default is true
+						 .showDays(true)    // default is true
+						 .showMonths(true); // default is true
+			dr.create();
+			dr.onApplyClicked = function(mode, date1, date2) { alert(mode + (new Date(date1)).toString() + (new Date(date2)).toString());};
+		</script>
+	</body>
+</html>    

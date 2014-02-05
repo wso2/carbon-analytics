@@ -1,0 +1,106 @@
+div#middle h2{
+    font-size:15px;
+    color:#00a79d;
+    border:none;
+    font-weight:bold;
+}
+.gadget-repo-table{
+    width:100%;
+}
+.gadget-ropo-cell-1{
+    border-left:solid 1px #c6e8e9;
+    border-top:solid 1px #c6e8e9;
+    border-right:solid 1px #c6e8e9;
+    padding:5px 5px 0px 15px;
+    -moz-border-radius-topleft:10px;
+    border-top-left-radius:10px;
+    -moz-border-radius-topright:10px;
+    border-top-right-radius:10px;
+    width:300px;
+}
+.gadget-ropo-cell-2{
+    border-bottom:solid 1px #c6e8e9;
+    padding:5px 5px 10px 10px;
+}
+.gadget-ropo-cell-2-inside{
+    width:450px;
+    float:right
+}
+.gadget-ropo-cell-3{
+    border-left:solid 1px #c6e8e9;
+    border-right:solid 1px #c6e8e9;
+    border-bottom:solid 1px #c6e8e9;
+    border-bottom-left-radius:10px;
+    -moz-border-radius-bottomleft:10px;
+    border-bottom-right-radius:10px;
+    -moz-border-radius-bottomright:10px;
+    padding:5px;
+}
+h3.gadget-subtitle{
+    line-height:30px;
+    color: #333333;
+    font-size: 14px !important;
+    font-weight:bold;
+    letter-spacing: 0.1em;
+    text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.6);
+    margin: 0;
+    font-family: "Lucida", "Lucida Grande", "Trebuchet MS", Tahoma, Verdana, sans-serif;
+}
+.gadgetList{
+    width:100%;
+}
+.gadgetList td{
+    padding:0px 7px 15px 0px;
+    width:33%;
+}
+.gadgetBox{
+     background-color: #fff;
+    border: solid 1px #30b7b0;
+    -moz-border-radius: 7px;
+    border-radius: 7px;
+
+    -moz-box-shadow: 5px 5px 5px #888;
+    -webkit-box-shadow: 5px 5px 5px #888;
+    box-shadow: 5px 5px 5px #888;
+    padding:22px 7px 7px 7px;
+    height:230px;
+}
+.users-strip{
+    background:transparent url(../images/user-strip.png) no-repeat left top;
+    width:140px;
+    height:20px;
+    color:#fff;
+    margin-top:-25px;
+    float:right;
+    padding-top:7px;
+    padding-left:27px;
+    *position:relative;
+}
+.user-strip-inside{
+    width:77px;
+    text-align:center;
+}
+.add-it-box{
+    float:right;
+}
+.delete-comment-text{
+    padding-bottom:5px;
+    margin-top:10px;
+}
+.delete-comment{
+    background-color:#fff;
+    padding:3px;
+    border:solid 1px #ccc;
+}
+.delete-comment a{
+    cursor:pointer;
+}
+.delete-comment img{
+    cursor:pointer;
+    padding-right:5px;
+    vertical-align:bottom;
+}
+.delete-comment-td{
+    padding-left:5px;
+    padding-bottom:5px;
+}

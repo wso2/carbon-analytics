@@ -1,0 +1,1141 @@
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<resource path="/system/dashboards" isCollection="true">
+	<mediaType />
+	<description />
+	<childs>
+		<resource path="/system/dashboards/bam" isCollection="true">
+			<mediaType />
+			<description />
+			<childs>
+				<resource path="/system/dashboards/bam/gadgets"
+					isCollection="true">
+					<mediaType />
+					<description />
+					<childs>
+						<resource path="/system/dashboards/bam/gadgets/10"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-average-response-time-for-server.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/10/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-10" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/11"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-maximum-response-time-for-server.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/11/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-11" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/12"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-minimum-response-time-for-server.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/12/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-12" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/13"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-request-count-for-server.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/13/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-13" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/14"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-response-count-for-server.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/14/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-14" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/15"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-fault-count-for-server.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/15/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-15" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/20"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-average-response-time-for-service.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/20/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-20" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/21"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-maximum-response-time-for-service.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/21/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-21" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/22"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-minimum-response-time-for-service.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/22/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-22" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/23"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-request-count-for-service.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/23/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-23" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/24"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-response-count-for-service.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/24/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-24" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/25"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-fault-count-for-service.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/25/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-25" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/40"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-in-average-response-time-for-endpoint.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/40/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-40" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/41"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-in-maximum-response-time-for-endpoint.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/41/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-41" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/42"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-in-minimum-response-time-for-endpoint.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/42/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-42" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/43"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-in-cumulative-count-for-endpoint.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/43/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-43" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/44"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-in-fault-count-for-endpoint.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/44/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-44" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/50"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-in-average-response-time-for-sequence.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/50/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-50" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/51"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-in-maximum-response-time-for-sequence.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/51/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-51" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/52"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-in-minimum-response-time-for-sequence.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/52/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-52" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/53"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-in-cumulative-count-for-sequence.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/53/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-53" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/54"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-in-fault-count-for-sequence.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/54/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-54" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/60"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-in-average-response-time-for-proxy.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/60/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-60" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/61"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-in-maximum-response-time-for-proxy.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/61/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-61" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/62"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-in-minimum-response-time-for-proxy.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/62/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-62" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/63"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-in-cumulative-count-for-proxy.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/63/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-63" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/64"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-in-fault-count-for-proxy.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/64/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-64" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/65"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/service-average-response-times-of-server.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/65/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-65" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/66"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/service-min-response-times-of-server.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/66/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-66" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/67"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/service-max-response-times-of-server.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/67/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-67" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/68"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/service-wedge-chart-of-server.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/68/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-68" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/69"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/service-req-res-fault-counts-of-server.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/69/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-69" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/70"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/latest-operations-for-activityid.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/70/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-70" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/71"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/mediation-endpoint-in-average-processing-times-of-server.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/71/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-71" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/72"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/mediation-proxy-service-in-average-processing-times-of-server.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/72/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-72" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/73"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/mediation-sequence-in-average-processing-times-of-server.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/73/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-73" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/74"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/mediation-wedge-chart-of-server.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/74/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-74" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/75"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/mediation-endpoint-req-fault-counts-of-server.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/75/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-75" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/76"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/mediation-proxy-service-req-fault-counts-of-server.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/76/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-76" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/77"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/mediation-sequence-req-fault-counts-of-server.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/77/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-77" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/78"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/wedge-chart-of-activity.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/78/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-78" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/79"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/service-funnel-chart-of-server.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/79/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-79" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/gadgets/80"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="gadgetUrl">
+									/registry/resource/system/gadgets/activity-service-operation-wedge-chart-of-activity.xml
+								</property>
+							</properties>
+							<childs>
+								<resource path="/system/dashboards/bam/gadgets/80/gadgetprefs"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="gadgetUserPrefs-80" />
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+            <resource path="/system/dashboards/bam/gadgets/81"
+							isCollection="true">
+              <mediaType />
+              <description />
+              <properties>
+                <property key="gadgetUrl">
+                  /registry/resource/system/gadgets/myGadget.xml
+                </property>
+              </properties>
+              <childs>
+                <resource path="/system/dashboards/bam/gadgets/81/gadgetprefs"
+									isCollection="true">
+                  <mediaType />
+                  <description />
+                  <properties>
+                    <property key="gadgetUserPrefs-81" />
+                  </properties>
+                  <childs />
+                </resource>
+              </childs>
+            </resource>            
+					</childs>
+				</resource>
+				<resource path="/system/dashboards/bam/nextGadgetId"
+					isCollection="true">
+					<mediaType />
+					<description />
+					<properties>
+						<property key="nextGadgetId">200</property>
+					</properties>
+					<childs />
+				</resource>
+				<resource path="/system/dashboards/bam/tabs"
+					isCollection="true">
+					<mediaType />
+					<description />
+					<properties>
+						<property key="nextTabId">200</property>
+						<property key="currentTabLayout">0,3,5,10,20,30,40</property>
+					</properties>
+					<childs>
+						<resource path="/system/dashboards/bam/tabs/0"
+							isCollection="true">
+              <mediaType />
+              <description />
+              <properties>
+                <property key="tabTitle">Server Data</property>
+              </properties>
+              <childs>
+                <resource
+									path="/system/dashboards/bam/tabs/0/currentGadgetLayout"
+									isCollection="true">
+                  <mediaType />
+                  <description />
+                  <properties>
+                    <property key="currentGadgetLayout">G1#81</property>
+                  </properties>
+                  <childs />
+                </resource>
+              </childs>
+            </resource>
+						<resource path="/system/dashboards/bam/tabs/3"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="tabTitle">Mediation Data</property>
+							</properties>
+							<childs>
+								<resource
+									path="/system/dashboards/bam/tabs/3/currentGadgetLayout"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="currentGadgetLayout">G1#74,G2#75,G3#76,G1#77,G2#71,G3#72,G1#73</property>
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/tabs/5"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="tabTitle">Server Level Service Data
+								</property>
+							</properties>
+							<childs>
+								<resource
+									path="/system/dashboards/bam/tabs/5/currentGadgetLayout"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="currentGadgetLayout">G1#10,G2#11,G3#12,G1#13,G2#14,G3#15</property>
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/tabs/1"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="tabTitle">Service Data</property>
+							</properties>
+							<childs>
+								<resource
+									path="/system/dashboards/bam/tabs/1/currentGadgetLayout"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="currentGadgetLayout">G1#20,G2#21,G3#22,G1#23,G2#24,G3#25</property>
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/tabs/10"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="tabTitle">Endpoint Data</property>
+							</properties>
+							<childs>
+								<resource
+									path="/system/dashboards/bam/tabs/10/currentGadgetLayout"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="currentGadgetLayout">G1#40,G2#41,G3#42,G1#43,G2#44</property>
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/tabs/20"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="tabTitle">Sequence Data</property>
+							</properties>
+							<childs>
+								<resource
+									path="/system/dashboards/bam/tabs/20/currentGadgetLayout"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="currentGadgetLayout">G1#50,G2#51,G3#52,G1#53,G2#54</property>
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/tabs/30"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="tabTitle">Proxy Data</property>
+							</properties>
+							<childs>
+								<resource
+									path="/system/dashboards/bam/tabs/30/currentGadgetLayout"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="currentGadgetLayout">G1#60,G2#61,G3#62,G1#63,G2#64</property>
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+						<resource path="/system/dashboards/bam/tabs/40"
+							isCollection="true">
+							<mediaType />
+							<description />
+							<properties>
+								<property key="tabTitle">Activity Data</property>
+							</properties>
+							<childs>
+								<resource
+									path="/system/dashboards/bam/tabs/40/currentGadgetLayout"
+									isCollection="true">
+									<mediaType />
+									<description />
+									<properties>
+										<property key="currentGadgetLayout">G1#80,G2#70</property>
+									</properties>
+									<childs />
+								</resource>
+							</childs>
+						</resource>
+					</childs>
+				</resource>
+			</childs>
+		</resource>
+	</childs>
+</resource>

@@ -1,0 +1,207 @@
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html>
+	<head>
+        <title>Single Data Provider</title>
+        <script type="text/javascript" src="../wso2vis.js"></script>
+        <link rel="stylesheet" type="text/css" media="screen" href="../css/ui-lightness/jquery-ui-1.8rc3.custom.css" />
+
+        <script language="javascript" type="text/javascript">
+
+            var dataProvider = new wso2vis.p.ProviderGET("generator2.php");
+            var dataFilter = new wso2vis.f.BasicFilter(["services", "service"], ["@name"]);
+
+            var timer = new wso2vis.u.Timer(5000);
+
+            function globalTick() {
+                dataProvider.pullData();
+            }
+
+            function lineTooltip(data) {
+                return data["@name"];
+            }
+
+            function lineOnClick(data) {
+                alert("clicked: " + data["@name"]);
+            }
+
+            function barTooltip(data) {
+                return data["@name"] + " - Requests: "+ data["stats"]["requestCount"];
+            }
+
+            function barClick(data) {
+                alert("Clicked: " + data["@name"]);
+            }
+
+            function wedgeTooltip(data) {
+                return data["@name"] + " - Requests: "+ data["stats"]["requestCount"];
+            }
+
+            function wedgeClick(data) {
+                alert("Clicked: " + data["@name"]);
+            }
+
+            function pieTooltip(data) {
+                return data["@name"] + " - Requests: "+ data["stats"]["requestCount"];
+            }
+
+            function funnelTooltip(data) {
+                var percent = ""; //data.first > 0 ? " (" + (data.value * 100/data.first).toFixed() + "%)" :"";
+                return data.label +"<br/"+"> Requests: "+ data.value + percent;
+            }
+
+            function clusBarTooltip(data, index) {
+                return "Operation: " + data["operations"]["operation"][index]["@name"] + " - Requests: " + data["operations"]["operation"][index]["stats"]["requestCount"];
+            }
+
+            function clusBarClick(data, index) {
+                alert("Clicked Server: " + data["@name"] + ", Operation: " + data["operations"]["operation"][index]["@name"]);
+            }
+
+            window.onload = function () {
+
+                var lineChart = new wso2vis.s.chart.protovis.LineChart("line","Request count per Service","");
+                lineChart.dataField(["services", "service"])
+	                     .dataValue(["stats", "requestCount"])
+                         .dataLabel(["@name"])
+                         .width(600)
+                         .height(280)
+                         .band(10)
+                         .legend(true)
+                         .marks(true)
+                         .xSuffix("s");
+                lineChart.onTooltip = lineTooltip;
+                lineChart.onClick = lineOnClick;
+                lineChart.load();
+
+                var barChart = new wso2vis.s.chart.protovis.BarChart("bar","Request count per Service","");
+                barChart.dataField(["services", "service"])
+			            .dataValue(["stats", "requestCount"])
+			            .dataLabel(["@name"])
+                        .width(400)
+                        .height(300)
+                        .legend(false)
+                        .marks(false);
+                barChart.onTooltip = barTooltip;
+                barChart.onClick = barClick;
+                barChart.load();
+
+                var clusBarChart = new wso2vis.s.chart.protovis.ClusteredBarChart("clusBar","Request count per Operation","");
+                clusBarChart.dataField(["services", "service"])
+                            .subDataField(["operations", "operation"])
+			                .subDataValue(["stats", "requestCount"])
+			                .dataLabel(["@name"])
+                            .subDataLabel(["@name"])
+                            .width(400)
+                            .height(300);
+                clusBarChart.onTooltip = clusBarTooltip;
+                clusBarChart.onClick = clusBarClick;
+                clusBarChart.load();
+
+                var wedgeChart = new wso2vis.s.chart.protovis.WedgeChart("wedge","Request count per Service","");
+                wedgeChart.dataField(["services", "service"])
+			            .dataValue(["stats", "requestCount"])
+			            .dataLabel(["@name"])
+                        .width(300)
+                        .height(300)
+                        .marks(false)
+                        .thickness(30);
+                wedgeChart.onTooltip = wedgeTooltip;
+                wedgeChart.onClick = wedgeClick;
+                wedgeChart.load();
+
+                var pieChart = new wso2vis.s.chart.protovis.PieChart("pie","Request count per Service","");
+                pieChart.dataField(["services", "service"])
+			            .dataValue(["stats", "requestCount"])
+			            .dataLabel(["@name"])
+                        .width(300)
+                        .height(300)
+                        .marks(true);
+                pieChart.onTooltip = pieTooltip;
+                pieChart.load();
+
+                var funnelChart = new wso2vis.s.chart.raphael.FunnelChart("funnel","Business Funnel Chart","");
+                wso2vis.initialize();
+                funnelChart.load(300, 300)
+                        .dataField(["services", "service"])
+		                .dataValue(["stats", "requestCount"])
+		                .dataLabel(["@name"])
+                        .tooltip(true)      //default: true
+                        .showPercent(true)  //default: true
+                        .showValue(true);   //default: true
+               funnelChart.onTooltip = funnelTooltip;
+
+                dataProvider.addDataReceiver(dataFilter);
+                dataFilter.addDataReceiver(lineChart);
+                dataFilter.addDataReceiver(barChart);
+                dataFilter.addDataReceiver(clusBarChart);
+                dataFilter.addDataReceiver(wedgeChart);
+                dataFilter.addDataReceiver(pieChart);
+                dataFilter.addDataReceiver(funnelChart);
+
+                dataProvider.initialize();
+
+                timer.tick = globalTick;
+                timer.startTimer();
+            }
+		</script>
+        <style>
+            body, p {
+	            font-family: "Arial", "Helvetica", "Verdana", "sans-serif";
+	            font-size: 13px;
+            }
+            div#qTip {
+                padding: 3px;
+                border: 1px solid #666;
+                border-right-width: 2px;
+                border-bottom-width: 2px;
+                display: none;
+                background: #999;
+                color: #FFF;
+                font: bold 10px Verdana, Arial, sans-serif;
+                text-align: left;
+                position: absolute;
+                z-index: 1000;
+            }
+            tr, td {
+                text-align: center;
+            }
+        </style>
+	</head>
+	<body>
+        <p class="ui-state-default ui-corner-all ui-helper-clearfix" style="padding:4px;">
+            <span class="ui-icon ui-icon-image" style="float:left; margin:-2px 5px 0 0;"></span>
+            Single Data Provider for Different Charts
+        </p>
+        <table cellspacing="10px" align="center">
+            <tr>
+                <td><p class="ui-widget-header ui-corner-all">Request count per Service</p><div class="ui-widget-content-ui-corner-all"><div id="bar"></div></div></td>
+                <td><p class="ui-widget-header ui-corner-all">Request count per Operation</p><div class="ui-widget-content-ui-corner-all"><div id="clusBar"></div></div></td>
+                <td><p class="ui-widget-header ui-corner-all">Request count per Service</p><div class="ui-widget-content-ui-corner-all"><div id="line"></div></div></td>
+            </tr>
+            <tr>
+                <td colspan="3"><img src="arrow1.png" /></td>
+            </tr>
+            <tr>
+                <td><p class="ui-widget-header ui-corner-all">Request count per Service</p><div class="ui-widget-content-ui-corner-all"><div id="wedge"></div></div></td>
+                <td><p class="ui-widget-header ui-corner-all">Request count per Service</p><div class="ui-widget-content-ui-corner-all"><div id="pie"></div></div></td>
+                <td><p class="ui-widget-header ui-corner-all">Request count per Service</p><div class="ui-widget-content-ui-corner-all"><div id="funnel"></div></div></td>
+            </tr>
+        </table>
+	</body>
+</html>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eventBuilder name="wso2eventbuilder" xmlns="http://wso2.org/carbon/eventbuilder">
+    <from eventAdaptorType="wso2eventadaptor" eventAdaptorName="wso2eventadaptor">
+        <property name="streamName">analytics_Statistics</property>
+        <property name="version">1.3.0</property>
+    </from>
+    <mapping type="wso2event">
+        <property>
+            <from name="ipAdd" type="metadata"/>
+            <to name="ipAddress" type="string"/>
+        </property>
+        <property>
+            <from name="userID" type="payload"/>
+            <to name="user" type="string"/>
+        </property>
+        <property>
+            <from name="searchTerms" type="payload"/>
+            <to name="keywords" type="string"/>
+        </property>
+    </mapping>
+    <to streamName="summarizedStatistics" version="1.0.0"/>
+</eventBuilder>

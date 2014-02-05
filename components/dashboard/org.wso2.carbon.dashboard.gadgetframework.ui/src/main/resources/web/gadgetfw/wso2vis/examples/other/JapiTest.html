@@ -1,0 +1,56 @@
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html> 
+    <head> 
+        <title> WSO2Vis </title>
+        <script type="text/javascript" src="../wso2visd.js"></script>        
+        <script type="text/javascript">
+            var index = 0;
+			var timer = new Timer(3000);
+			var dataProvider = new DataProvider("http://localhost/wso2vis/examples/generator2.php");
+			var dataFilter = new BasicDataFilter(["services", "service"], "@name", ["findDNSServers", "dnsService", "myDarnService"]);
+			var dataFilter2 = new BasicDataFilter(["services", "service"], "@name", ["findDNSServers", "dnsService", "myDarnService"]);		
+			var dataFilterDialog = new DataFilterDialog(dataFilter, "filter");
+			
+			dataProvider.addDataReceiver(dataFilter);
+			dataFilter.addDataReceiver(dataFilter2);			
+
+			timer.tick = globalTick;
+			dataFilter2.pushData = showData;
+			timer.startTimer();			
+			
+			function globalTick() {
+				dataProvider.pullData();
+			}
+			
+			function showData(data)	{
+				index  = index + 1;
+				document.getElementById("out").innerHTML = index +"<br/>"+ JSON.stringify(data);
+				
+				if (index == 100) 
+				{
+					timer.stopTimer();
+				}
+			}
+        </script>
+    </head>
+    <body>
+         <div id="filter"></div>
+         <div id="out"></div>
+    </body>
+</html>

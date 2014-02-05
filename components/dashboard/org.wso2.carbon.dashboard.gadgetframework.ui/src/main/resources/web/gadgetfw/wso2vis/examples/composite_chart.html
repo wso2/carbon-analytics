@@ -1,0 +1,112 @@
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html>
+	<head>
+        <title>Protovis Bar Chart Example</title>
+        <script type="text/javascript" src="../wso2vis.js"></script>
+
+        <script language="javascript" type="text/javascript">
+
+            var dataProvider = new wso2vis.p.ProviderGET("http://localhost/wso2vis/examples/generator2.php");
+            var dataFilter = new wso2vis.f.BasicFilter(["services", "service"], ["@name"]);
+
+            var timer = new wso2vis.u.Timer(5000);
+			var compChart = null;
+
+            function globalTick() {
+                dataProvider.pullData();
+            }
+
+            function compTooltip(data) {
+                return data["@name"] + " - Requests: "+ data["stats"]["requestCount"];
+            }
+
+            function compClick(data) {
+                alert("Clicked: " + data["@name"]);
+            }
+
+            window.onload = function () {
+
+                compChart = new wso2vis.s.chart.composite.CompositeChart1("chart","Request count per Service","");
+
+                compChart.dataField(["services", "service"])
+			            .dataValue(["stats", "requestCount"])
+			            .dataLabel(["@name"])
+                        .width(400)
+                        .height(300)
+                        .paddingTop(25)
+                        .paddingBottom(10)
+                        .paddingLeft(60)
+                        .paddingRight(80)
+                        //.legendX(barChart.height()/2)
+                        //.legendY(barChart.width() -  120)
+						.chartType(0)
+                        .legendText("Requests")
+						.marks(true);
+
+                compChart.onTooltip = compTooltip;
+                compChart.onClick = compClick;
+                compChart.load();
+
+                dataProvider.addDataReceiver(dataFilter);
+                dataFilter.addDataReceiver(compChart);
+
+                dataProvider.initialize();
+
+                timer.tick = globalTick;
+                timer.startTimer();
+				
+				$("#chartSelector").change(function () {
+					 if (compChart !== undefined) {
+						compChart.chartType($(this).val());
+						compChart.load();
+						dataProvider.initialize();
+					 }				 
+				});
+            }
+		</script>
+        <style>
+            div#qTip {
+                padding: 3px;
+                border: 1px solid #666;
+                border-right-width: 2px;
+                border-bottom-width: 2px;
+                display: none;
+                background: #999;
+                color: #FFF;
+                font: bold 10px Verdana, Arial, sans-serif;
+                text-align: left;
+                position: absolute;
+                z-index: 1000;
+            }
+        </style>
+	</head>
+	<body>
+    	<div id="chart"></div>
+        <div>&nbsp;</div>
+        <div id="selectBox">
+        	Chart Type: 
+        	<select id="chartSelector">
+            	<option value="0" selected>Bar Chart</option>
+            	<option value="1">Column Chart</option>
+            	<option value="2">Wedge Chart</option>
+            	<option value="3">Pie Chart</option>                                                
+            </select>
+        </div>
+	</body>
+</html>

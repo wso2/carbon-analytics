@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html>
+<head><title>Output Event Adaptors - User Guide</title>
+
+    <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all"/>
+</head>
+<body>
+<h1>Output Event Adaptors</h1>
+
+<h2>Configuring WSO2Event Output Event Adaptor</h2>
+
+
+<p>WSO2Event output event adaptor handles WSO2 common events and is used to publish events over
+   Thrift using TCP, SSL, HTTP, and HTTPS. You can send output events to any other WSO2Event server
+   from the CEP, using Thrift over TCP, SSL, HTTP, or HTTPS.</p>
+
+<p>The steps below explain how to configure using the management console or using an XML file in
+   step 5.</p>
+<ol>
+    <li>Log in to the CEP management console, select the <span style="color: rgb(0,0,0);"> <strong>Output
+                                                                                                   Event
+                                                                                                   Adaptors</strong> menu and then click <strong>Add
+                                                                                                                                                 Output
+                                                                                                                                                 Event
+                                                                                                                                                 Adaptor</strong>.</span> </span>
+    </li>
+    <br/>
+    <li>Enter details in the form that appears and click<strong> Add Event Adaptor</strong> button
+        at the end of the form. For example,<br/>
+        <img src="../images/AddOutputWSO2EventAdaptor.png" alt="Create Event Adaptor"/>
+        <br/>Following values are used in the configuration above:<br/>
+        <ul>
+            <li>Event Adaptor Name : outputWSO2EventAdaptor</li>
+            <li>Event Adaptor Type : wso2event</li>
+            <li>Receiver URL : <a>tcp://localhost:7611</a> (In this example, we assumes that the
+                Agent Server is started on port 7611)
+            </li>
+            <li>Authenticator URL : <a>ssl://localhost:7711</a>
+            </li>
+            <li>User Name/Password : admin/admin</li>
+        </ul>
+    </li>
+    <br/>
+    <li>After a adapter is successfully added, you can change its configuration and redeploy it. To
+        do this, click the <strong>Edit</strong> link associated with it. You can also click the
+        other links associated with it to delete it or enable statistics and tracing.
+    </li>
+    <br/>
+    <li>An XML based editor opens allowing you to edit the event adaptor configuration from UI
+        itself, without having to edit the file in the file system. <span>Do your modifications and <strong>Update</strong>.</span>
+    </li>
+    <br/>
+    <li>you can specify a event adaptor configuration using an XML file and save it in <code>&lt;PRODUCT_HOME&gt;/repository/deployment/server/outputeventadaptors </code>directory,
+        which is the output event adaptor deployment directory. Since hot deployment is enabled, you
+        can simply add/remove files to deploy/undeploy from the server.</span> </span>
+        <p>Create the XML file with the following WSO2Event event adaptor configurations. Output
+           event adaptor implementation must start with <code>&lt;outputEventAdaptor&gt;</code> root
+           element.</p> <br/>
+        <br/><pre>&lt;outputEventAdaptor name="outputWSO2EventAdaptor" statistics="disable"
+                                                             trace="disable" type="wso2event" xmlns="http://wso2.org/carbon/eventadaptormanager"&gt;
+                &lt;property name="username"&gt;admin&lt;/property&gt;
+                &lt;property name="receiverURL"&gt;tcp://localhost:7661&lt;/property&gt;
+                &lt;property name="password"&gt;admin&lt;/property>
+                &lt;property name="authenticatorURL"&gt;ssl://localhost:7761&lt;/property&gt;
+            &lt;/outputEventAdaptor&gt;</pre>
+        <br/>
+    </li>
+    <br/>
+</ol>
+
+<p>For more details on creating different types of event adaptors, Please refer the official
+   documentation <a href="http://docs.wso2.org/display/CEP300/Output+Event+Adaptors">Here.</a></p>
+
+</body>
+</html>

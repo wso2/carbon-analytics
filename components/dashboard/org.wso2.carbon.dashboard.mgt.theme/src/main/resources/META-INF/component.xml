@@ -1,0 +1,14 @@
+<component xmlns="http://products.wso2.org/carbon">
+    <ManagementPermissions>
+
+       <ManagementPermission>
+           <DisplayName>Gadget Server</DisplayName>
+           <ResourceId>/permission/admin/gadget-server</ResourceId>
+       </ManagementPermission>
+
+       <ManagementPermission>
+           <DisplayName>Theme Management</DisplayName>
+           <ResourceId>/permission/admin/gadget-server/theme-management</ResourceId>
+       </ManagementPermission>
+   </ManagementPermissions>
+    </component>

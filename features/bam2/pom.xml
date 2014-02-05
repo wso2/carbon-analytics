@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ ~ Copyright (c) 2009-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ Licensed under the Apache License, Version 2.0 (the "License");
+ ~ you may not use this file except in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~      http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing, software
+ ~ distributed under the License is distributed on an "AS IS" BASIS,
+ ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ~ See the License for the specific language governing permissions and
+ ~ limitations under the License.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <groupId>org.wso2.carbon</groupId>
+        <artifactId>carbon-features</artifactId>
+        <version>4.3.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>bam2-feature</artifactId>
+    <packaging>pom</packaging>
+    <name>WSO2 Carbon - bam2 Feature Aggregator Module</name>
+    <url>http://wso2.org</url>
+
+    <modules>
+        <!--module>org.wso2.carbon.bam.analyzer.feature</module>
+        <module>org.wso2.carbon.bam.analyzer.server.feature</module>
+        <module>org.wso2.carbon.bam.analyzer.ui.feature</module>
+        <module>org.wso2.carbon.bam.receiver.server.feature</module>
+        <module>org.wso2.carbon.bam.presentation.server.feature</module>
+        <module>org.wso2.carbon.bam.feature</module-->
+        <module>org.wso2.carbon.bam.dashboard.server.feature</module>
+        <module>org.wso2.carbon.bam.dashboard.ui.feature</module>
+        <module>org.wso2.carbon.bam.dashboard.feature</module>
+        <module>org.wso2.carbon.bam.messagestore.server.feature</module>
+        <module>org.wso2.carbon.bam.notification.task.server.feature</module>
+        <!--module>org.wso2.carbon.bam.clustermonitor.ui.feature</module-->
+        <module>org.wso2.carbon.bam.toolbox.deployer.feature</module>
+        <module>org.wso2.carbon.bam.toolbox.deployer.server.feature</module>
+        <module>org.wso2.carbon.bam.toolbox.deployer.ui.feature</module>
+		<module>org.wso2.carbon.bam.cassandra.data.archive.server.feature</module>
+		<module>org.wso2.carbon.bam.cassandra.data.archive.ui.feature</module>
+		<module>org.wso2.carbon.bam.cassandra.data.archive.feature</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.bam2.presentation</artifactId>
+                <version>${wso2carbon.version.bam2}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.bam2.utils</artifactId>
+                <version>${wso2carbon.version.bam2}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.bam2.analyzer</artifactId>
+                <version>${wso2carbon.version.bam2}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.bam2.analyzer.ui</artifactId>
+                <version>${wso2carbon.version.bam2}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.bam2.receiver</artifactId>
+                <version>${wso2carbon.version.bam2}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.bam2.service</artifactId>
+                <version>${wso2carbon.version.bam2}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.bam.analyzer.stub</artifactId>
+                <version>${wso2carbon.version.bam2}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.bam.toolbox.deployer</artifactId>
+                <version>${wso2carbon.version.bam2}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.bam.toolbox.deployer.ui</artifactId>
+                <version>${wso2carbon.version.bam2}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.bam.toolbox.deployer.stub</artifactId>
+                <version>${wso2carbon.version.bam2}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.bam.dashboard.ui</artifactId>
+                <version>${wso2carbon.version.bam2}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <properties>
+        <wso2carbon.version.bam2>${wso2carbon.version}</wso2carbon.version.bam2>
+    </properties>
+
+</project>
+

@@ -1,0 +1,21 @@
+@CHARSET "UTF-8";
+body {
+  padding-left: 5em;
+  font-family: Georgia, "Times New Roman",
+        Times, serif;
+  font-size: 20px;
+  color: white;
+  background-color: #808080 }
+
+h1{
+	color: #D6B327;
+}
+.button {
+  
+color:white;
+background-color:black;
+
+height:35px;
+width:100px;
+font: bold 15px arial,sans-serif;
+}

@@ -1,0 +1,89 @@
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html>
+	<head>
+        <script type="text/javascript" src="../3rdparty/protovis-r3.1.js"></script>
+        <script type="text/javascript" src="../3rdparty/json2.js"></script>
+        <script type="text/javascript" src="../js/wso2vis.js"></script>
+        <script type="text/javascript" src="../js/subscriber/DataSubscriber.js"></script>
+		<script type="text/javascript" src="../js/chart/Chart.js"></script>
+        <script type="text/javascript" src="../js/chart/ProtovisClusteredBarChart.js"></script>
+        <script type="text/javascript" src="../js/chart/ProtovisBarChart.js"></script>
+        <script type="text/javascript" src="../js/chart/ProtovisWedgeChart.js"></script>
+        <script type="text/javascript" src="../js/provider/DataProvider.js"></script>
+        <script type="text/javascript" src="../js/provider/DataProviderGET.js"></script>
+        <script type="text/javascript" src="../js/filter/DataFilter.js"></script>
+        <script type="text/javascript" src="../js/filter/BasicDataFilter.js"></script>
+        <script type="text/javascript" src="../js/util/Timer.js"></script>
+        <script type="text/javascript" src="../js/util/Utils.js"></script>
+        <script type="text/javascript" src="../js/dialog/Dialog.js"></script>
+        <script type="text/javascript" src="../js/dialog/DataFilterDialog.js"></script>
+        
+        <script language="javascript" type="text/javascript">
+            var dataProvider = new wso2vis.DataProviderGET("http://localhost/wso2vis/examples/generator2.php");
+            var dataFilter = new wso2vis.BasicDataFilter(["services", "service"], "@name", ["findDNSServers", "dnsService", "myDarnService"]);
+            var dataFilterDialog = new wso2vis.DataFilterDialog(dataFilter.getID(), "dial");
+            var index = 0;            
+            var timer = new wso2vis.Timer(5000);
+
+            function globalTick() {
+                dataProvider.pullData();
+                index++;
+                if (index == 1) {
+                    dataFilterDialog.load();
+                }
+            }
+
+            window.onload = function () {
+
+                //var clusterBarChart = new ProtovisClusteredBarChart("","");
+			    /*dataProvider.addDataReceiver(clusterBarChart);
+                clusterBarChart.dataField = ["services", "service"];
+			    clusterBarChart.dataLabel = ["@name"];
+			    clusterBarChart.subDataField = ["operations", "operation"];
+			    clusterBarChart.subDataValue = ["stats", "requestCount"];
+			    clusterBarChart.subDataLabel = ["@name"];
+                clusterBarChart.loadChart(200, 300);*/
+
+                //var barChart = new ProtovisBarChart("","");
+                /*dataProvider.addDataReceiver(barChart);
+                barChart.dataField = ["services", "service"];
+			    barChart.dataValue = ["stats", "requestCount"];			
+			    barChart.dataLabel = ["@name"];
+                barChart.loadChart(200, 300);*/
+
+                var pieChart = new wso2vis.ProtovisWedgeChart("Request Count Per Server","");
+                dataProvider.addDataReceiver(dataFilter);
+                dataFilter.addDataReceiver(pieChart);
+                pieChart.dataField = ["services", "service"];
+			    pieChart.dataValue = ["stats", "requestCount"];			
+			    pieChart.dataLabel = ["@name"];
+                pieChart.loadChart(300, 300);
+
+                dataProvider.initialize();
+
+                timer.tick = globalTick;
+                timer.startTimer();
+            }
+		</script>
+	</head>
+	<body>
+    	<div id="div1"></div>    	
+    	<div id="dial"></div>
+	</body>
+</html>

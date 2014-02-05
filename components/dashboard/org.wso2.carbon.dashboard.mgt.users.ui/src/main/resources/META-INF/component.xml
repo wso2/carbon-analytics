@@ -1,0 +1,131 @@
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<component xmlns="http://products.wso2.org/carbon">
+    <!-- sample menu configuration -->
+    <menus>
+        <menu>
+            <id>gadget_server_user_mgt_menu</id>
+            <i18n-key>dashboard.resources.menu</i18n-key>
+            <i18n-bundle>org.wso2.carbon.dashboard.mgt.users.ui.resource.i18n.Resources</i18n-bundle>
+            <parent-menu>manage_gs</parent-menu>
+            <link>../gsusermgt/index.jsp</link>
+            <region>region1</region>
+            <order>1</order>
+            <style-class>manage</style-class>
+            <icon>../gsusermgt/images/gadgetPermissions.gif</icon>
+            <require-permission>/permission/admin/manage</require-permission>
+        </menu>
+    </menus>
+    <contexts>
+        <context>
+            <context-id>default-context</context-id>
+            <context-name>portal</context-name>
+            <protocol>http</protocol>
+            <description>Gadget Server Default Context</description>
+        </context>
+    </contexts>
+    <framework-configuration>
+        <bypass>
+            <authentication>
+                <link>/ifr</link>
+                <link>/jsonservlet</link>
+                <link>../dashboard/index2.jsp</link>
+                <link>../dashboard/index.jsp</link>
+                <link>../dashboard/add-gadgets.jsp</link>
+                <link>../gadgetrepo/gadget-browser.jsp</link>
+                <link>../gsusermgt/login.jsp</link>
+                <link>../gsusermgt/register.jsp</link>
+                <link>../user-registration/index.jsp</link>
+                <link>../user-registration/user-registration.jsp</link>
+                <link>../user-registration/add_user.jsp</link>
+                <link>../user-registration/infocard_signup.jsp</link>
+                <link>../user-registration/infocard_accept.jsp</link>
+                <link>../dashboard/index-2.jsp</link>
+                <link>../relyingparty/index.jsp</link>
+                <link>../relyingparty/openid.jsp</link>
+                <link>../relyingparty/associate_openid.jsp</link>
+                <link>../relyingparty/openid_accept.jsp</link>
+                <link>../relyingparty/openid_sign_in.jsp</link>
+                <link>../relyingparty/add_openid.jsp</link>
+                <link>../relyingparty/infocard_signin.jsp</link>
+                <link>../relyingparty/infocard_accept.jsp</link>
+                <link>../relyingparty/openid_associate_infocard_signin.jsp</link>
+                <link>../relyingparty/openid_associate_infocard_associate.jsp</link>
+                <link>../gsusermgt/middle.jsp</link>
+                <link>../gsusermgt/middle.jsp</link>
+                <link>/social/rpc</link>
+                <link>/social/rest</link>
+                <link>../dashboard/authorize.jsp</link>
+            </authentication>
+            <tiles>
+                <link>/ifr</link>
+                <link>/jsonservlet</link>
+                <link>../dashboard/index2.jsp</link>
+                <link>../dashboard/index.jsp</link>
+                <link>../dashboard/add-gadgets.jsp</link>
+                <link>../gadgetrepo/gadget-browser.jsp</link>
+                <link>../gsusermgt/login.jsp</link>
+                <link>../gsusermgt/register.jsp</link>
+                <link>../user-registration/index.jsp</link>
+                <link>../user-registration/user-registration.jsp</link>
+                <link>../user-registration/add_user.jsp</link>
+                <link>../user-registration/infocard_signup.jsp</link>
+                <link>../user-registration/infocard_accept.jsp</link>
+                <link>../dashboard/index-2.jsp</link>
+                <link>../relyingparty/index.jsp</link>
+                <link>../relyingparty/openid.jsp</link>
+                <link>../relyingparty/associate_openid.jsp</link>
+                <link>../relyingparty/openid_accept.jsp</link>
+                <link>../relyingparty/openid_sign_in.jsp</link>
+                <link>../relyingparty/add_openid.jsp</link>
+                <link>../relyingparty/infocard_signin.jsp</link>
+                <link>../relyingparty/infocard_accept.jsp</link>
+                <link>../relyingparty/openid_associate_infocard_signin.jsp</link>
+                <link>../relyingparty/openid_associate_infocard_associate.jsp</link>
+                <link>../gsusermgt/middle.jsp</link>
+                <link>/social/rpc</link>
+                <link>/social/rest</link>
+                <link>../dashboard/authorize.jsp</link>
+                <link>../admin/jsp/session-validate.jsp</link>
+            </tiles>
+            <httpUrls>
+                <link>/ifr</link>
+                <link>/jsonservlet</link>
+                <link>../dashboard/index2.jsp</link>
+                <link>../dashboard/index.jsp</link>
+                <link>../dashboard/add-gadgets.jsp</link>
+                <link>../gadgetrepo/gadget-browser.jsp</link>
+                <link>../gadgetrepo/BrowserImage-ajaxprocessor.jsp</link>
+                <link>../gadgetrepo/items-ajaxprocessor.jsp</link>
+                <link>../gadgetrepo/gadget-page.jsp</link>
+                <link>../gadgetrepo/GadgetPage-ajaxprocessor.jsp</link>
+                <link>../gadgetrepo/GadgetRepo-ajaxprocessor.jsp</link>
+                <link>../gadgetrepo/GadgetBrowser-ajaxprocessor.jsp</link>
+                <link>../gadgetrepo/image-ajaxprocessor.jsp</link>
+                <link>../gadgetrepo/paginetor-ajaxprocessor.jsp</link>
+                <link>../dashboard/dashboardServiceClient-ajaxprocessor.jsp</link>
+                <link>/social/rpc</link>
+                <link>/social/rest</link>
+                <link>../dashboard/authorize.jsp</link>
+                <link>../admin/layout/template.jsp</link>
+                <link>../admin/jsp/session-validate.jsp</link>
+             </httpUrls>
+        </bypass>
+    </framework-configuration>
+
+</component>

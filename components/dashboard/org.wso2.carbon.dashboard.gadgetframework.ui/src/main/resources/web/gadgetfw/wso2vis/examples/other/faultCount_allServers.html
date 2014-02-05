@@ -1,0 +1,137 @@
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html>
+	<head>
+        <!--<script type="text/javascript" src="../3rdparty/protovis-r3.1.js"></script>
+        <script type="text/javascript" src="../3rdparty/json2.js"></script>
+        <script type="text/javascript" src="../3rdparty/qtip.js"></script>-->
+        <script type="text/javascript" src="wso2vis.js"></script>
+        <!--<script type="text/javascript" src="../js/subscriber/DataSubscriber.js"></script>
+		<script type="text/javascript" src="../js/chart/Chart.js"></script>
+        <script type="text/javascript" src="../js/chart/ProtovisStakedAreaChart.js"></script>
+        <script type="text/javascript" src="../js/provider/DataProvider.js"></script>
+        <script type="text/javascript" src="../js/provider/DataProviderGET.js"></script>
+        <script type="text/javascript" src="../js/filter/DataFilter.js"></script>
+        <script type="text/javascript" src="../js/filter/BasicDataFilter.js"></script>
+        <script type="text/javascript" src="../js/util/Timer.js"></script>
+        <script type="text/javascript" src="../js/util/Utils.js"></script>-->
+
+        <script language="javascript" type="text/javascript">
+            var dataProvider = new wso2vis.DataProviderGET("https://10.100.1.119:8443/bam/carbon/wso2vis/examples/allservers.php");
+            //var dataFilter = new wso2vis.BasicDataFilter(["services", "service"], "@name", ["findDNSServers", "dnsService", "myDarnService"]);
+            var timer = new wso2vis.Timer(1000);
+            var reqTooltip = false; //TODO FIX this !
+
+            var stakedAreaChart = new wso2vis.ProtovisStakedAreaChart("chart1","Requests/Faults for All Servers","");
+
+            function globalTick() {
+                dataProvider.pullData();
+            }
+
+            function faultsToolTip(data) {
+                reqTooltip = !reqTooltip;
+                return ( reqTooltip == true ? "Requests" : "Faults" );
+            }
+
+            window.onload = function () {
+
+			    dataProvider.addDataReceiver(stakedAreaChart);
+                //dataFilter.addDataReceiver(stakedAreaChart);
+                stakedAreaChart.dataField = ["level0", "level1"];
+			    stakedAreaChart.dataValue = ["@faults"];
+			    stakedAreaChart.dataLabel = ["@name"];
+                stakedAreaChart.loadChart(600, 300, 10);
+                stakedAreaChart.band = 10;
+                //stakedAreaChart.showTooltip = false; //disable fancy tooltip*/
+                stakedAreaChart.tooltip = faultsToolTip;
+
+                dataProvider.initialize();
+
+                timer.tick = globalTick;
+                timer.startTimer();
+            }
+
+            wso2vis.ProtovisStakedAreaChart.prototype.populateData = function (thisObject) {
+                var _dataField = thisObject.traverseToDataField(thisObject.rawData, thisObject.dataField);
+                var aggregatedData = []; //0 reqs, 1 faults
+                aggregatedData[0] = 0; aggregatedData[1] = 0; //init
+
+                for (var i=0; i<_dataField.length; i++) {
+
+                    aggregatedData[0] += parseInt(_dataField[i]["@requests"]);
+                    aggregatedData[1] += parseInt(_dataField[i]["@faults"]);
+                }
+
+                thisObject.formattedData = pv.range(2).map( genDataMap );
+
+                thisObject.x.domain(0, thisObject.band).range(0,thisObject.width);
+                var maxheight = calcMaxHeight();
+                thisObject.y.domain(0, maxheight).range(0,thisObject.height*0.9 - 35);
+                
+                function genDataMap(x) {
+
+                    //var valObj = parseInt(thisObject.traverseToDataField(_dataField[x], thisObject.dataValue));
+                    var valObj = parseInt(aggregatedData[x]);
+
+                    if (thisObject.dataHistory[x] === undefined){
+                        thisObject.dataHistory[x] = new Array();
+                    }
+                    thisObject.dataHistory[x].unshift(valObj);
+
+                    if(thisObject.dataHistory[x].length > thisObject.band+1){
+                        thisObject.dataHistory[x].pop();
+                    }
+                    return thisObject.dataHistory[x];
+                }
+
+                function calcMaxHeight() {
+                    
+                    var totHeights = [];
+
+                    for (var k=0; k<thisObject.dataHistory.length; k++) {
+
+                        totHeights.push(thisObject.dataHistory[k].max());
+                    }
+                    return totHeights.max();
+                }
+            };
+
+            wso2vis.ProtovisStakedAreaChart.prototype.getDataLable = function (i) {
+                return ( i==0 ? "Requests" : "Faults" );
+            };
+		</script>
+        <style>
+            div#qTip {
+                padding: 3px;
+                border: 1px solid #666;
+                border-right-width: 2px;
+                border-bottom-width: 2px;
+                display: none;
+                background: #999;
+                color: #FFF;
+                font: bold 10px Verdana, Arial, sans-serif;
+                text-align: left;
+                position: absolute;
+                z-index: 1000;
+            }
+        </style>
+	</head>
+	<body>
+    	<div id="chart1"></div>
+	</body>
+</html>

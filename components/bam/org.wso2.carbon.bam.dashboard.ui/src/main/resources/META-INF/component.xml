@@ -1,0 +1,26 @@
+<component xmlns="http://products.wso2.org/carbon">
+	<menus>
+        <menu>
+            <id>dashboard_menu_1</id>
+            <i18n-key>BAM Dashboards</i18n-key>
+            <i18n-bundle>org.wso2.carbon.bam.dashboard.ui.i18n.Resources</i18n-bundle>
+            <parent-menu>dashboard_main_menu</parent-menu>
+            <link>../bam-dashboard/bam-dashboard.jsp</link>
+            <region>region1</region>
+            <order>2</order>
+            <style-class>manage</style-class>
+            <icon>../bam-dashboard/images/dashboard.gif</icon>
+        </menu>
+        <menu>
+            <id>dashboard_menu_2</id>
+            <i18n-key>Activity Dashboard</i18n-key>
+            <i18n-bundle>org.wso2.carbon.bam.dashboard.ui.i18n.Resources</i18n-bundle>
+            <parent-menu>dashboard_main_menu</parent-menu>
+            <link>../bam-dashboard/activity-dashboard.jsp</link>
+            <region>region1</region>
+            <order>3</order>
+            <style-class>manage</style-class>
+            <icon>../bam-dashboard/images/portal.png</icon>
+        </menu>
+	</menus>
+</component>

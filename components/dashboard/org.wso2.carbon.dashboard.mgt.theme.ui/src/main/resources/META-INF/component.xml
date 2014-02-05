@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<component xmlns="http://products.wso2.org/carbon">
+    <menus>
+        <menu>
+            <id>gadget_server_theme_mgt_menu</id>
+            <i18n-key>dashboard.resources.theme.menu</i18n-key>
+            <i18n-bundle>org.wso2.carbon.dashboard.mgt.theme.ui.resource.i18n.Resources</i18n-bundle>
+            <parent-menu>manage_gs</parent-menu>
+            <link>../theme/index.jsp</link>
+            <region>region1</region>
+            <order>1</order>
+            <style-class>manage</style-class>
+            <icon>../theme/images/themeManagement.gif</icon>
+            <require-permission>/permission/admin/gadget-server/theme-management</require-permission>
+        </menu>
+    </menus>
+    <FileUploadConfig>
+        <Mapping>
+            <Actions>
+                <Action>themeupload</Action>
+            </Actions>
+            <Class>org.wso2.carbon.dashboard.mgt.theme.ui.processors.ThemeUploadProcessors</Class>
+        </Mapping>
+    </FileUploadConfig>
+    <servlets>
+        <servlet id="gadgetservlet">
+            <servlet-name>GadgetResourceServlet</servlet-name>
+            <url-pattern>/gs/resource</url-pattern>
+            <display-name>Resource Content Servlet</display-name>
+            <servlet-class>org.wso2.carbon.dashboard.mgt.theme.ui.servlets.GadgetResourceServlet</servlet-class>
+        </servlet>
+    </servlets>
+    <framework-configuration>
+        <bypass>
+            <authentication>
+                <link>/gs/resource/</link>
+            </authentication>
+            <tiles>
+                <link>/gs/resource/</link>
+            </tiles>
+            <httpUrls>
+                <link>/gs/resource/</link>
+             </httpUrls>
+        </bypass>
+    </framework-configuration>
+
+
+
+</component>
