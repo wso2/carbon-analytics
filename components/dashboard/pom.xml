@@ -20,8 +20,9 @@
 
     <parent>
         <groupId>org.wso2.carbon</groupId>
-        <artifactId>carbon-components</artifactId>
+        <artifactId>carbon-analytics</artifactId>
         <version>4.3.0-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -235,6 +236,9 @@
         <axis2.osgi.version.range.dashboard>${axis2.osgi.version.range}
         </axis2.osgi.version.range.dashboard>
         <axis2.version.dashboard>${axis2.version}</axis2.version.dashboard>
+        <shindig.platform.patch.version>1.1.0.wso2v7</shindig.platform.patch.version>
+        <orbit.version.commons.lang>2.6.0.wso2v1</orbit.version.commons.lang>
+        <orbit.version.json-simple>1.1.wso2v1</orbit.version.json-simple>
     </properties>
 
 </project>

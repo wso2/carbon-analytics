@@ -73,6 +73,7 @@
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.event.formatter.stub</artifactId>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
@@ -106,5 +107,8 @@
         <module>org.wso2.carbon.event.formatter.ui</module>
         <!--<module>org.wso2.carbon.event.formatter.test</module>-->
     </modules>
+    <properties>
+        <gson.version>1.7.1</gson.version>
+    </properties>
 
 </project>	

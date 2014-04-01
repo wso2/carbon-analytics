@@ -123,7 +123,7 @@
     <properties>
         <jsonpath.wso2.version>0.8.1.wso2v1</jsonpath.wso2.version>
         <junit4.version>4.11</junit4.version>
-        <!--<gson.version>1.7.1</gson.version>-->
+        <gson.version>1.7.1</gson.version>
         <service.stub.version>1.1.0-SNAPSHOT</service.stub.version>
     </properties>
 

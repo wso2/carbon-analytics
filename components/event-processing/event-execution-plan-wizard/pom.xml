@@ -37,6 +37,7 @@
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.event.processor.stub</artifactId>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
@@ -73,7 +74,7 @@
     </modules>
 
     <properties>
-        <!--<gson.version>1.7.1</gson.version>-->
+        <gson.version>1.7.1</gson.version>
     </properties>
 
 </project>	

@@ -73,7 +73,7 @@
     </dependencyManagement>
 
     <properties>
-        <wso2carbon.version.event-tracer>${wso2carbon.version}</wso2carbon.version.event-tracer>
+        <wso2carbon.version.event-tracer>${carbon.platform.package.export.version}</wso2carbon.version.event-tracer>
         <commons-lang.wso2.version.event-tracer>${commons-lang.wso2.version}</commons-lang.wso2.version.event-tracer>
     </properties>
 
