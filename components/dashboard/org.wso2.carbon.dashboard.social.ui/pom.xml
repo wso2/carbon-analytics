@@ -65,7 +65,6 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.dashboard.ui</artifactId>
-            <version>${carbon.platform.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
@@ -75,7 +74,6 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.dashboard.social</artifactId>
-            <version>${carbon.platform.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.batik.wso2</groupId>
@@ -115,8 +113,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <properties>
-    </properties>
 
 </project>

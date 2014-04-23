@@ -39,32 +39,26 @@
 	<dependency>
 	    <groupId>org.wso2.carbon</groupId>
 	    <artifactId>org.wso2.carbon.registry.social.api</artifactId>
-		<version>${carbon.platform.version}</version>
 	</dependency>
 	<dependency>
 	    <groupId>org.wso2.carbon</groupId>
 	    <artifactId>org.wso2.carbon.registry.social.impl</artifactId>
-		<version>${carbon.platform.version}</version>
 	</dependency>
 	<dependency>
 	    <groupId>org.wso2.carbon</groupId>
 	    <artifactId>org.wso2.carbon.dashboard.social.ui</artifactId>
-		<version>${carbon.platform.version}</version>
 	</dependency>
 	<dependency>
 	    <groupId>org.wso2.carbon</groupId>
 	    <artifactId>org.wso2.carbon.dashboard.social.common</artifactId>
-		<version>${carbon.platform.version}</version>
 	</dependency>
 		<dependency>
 	    <groupId>org.wso2.carbon</groupId>
 	    <artifactId>org.wso2.carbon.dashboard.social.stub</artifactId>
-		<version>${carbon.platform.version}</version>
 	</dependency>
 	<dependency>
             <groupId>org.apache.batik.wso2</groupId>
             <artifactId>batik</artifactId>
-            <version>1.7.0.wso2v1</version>
         </dependency>
     </dependencies>
 
@@ -73,7 +67,7 @@
             <plugin>
                 <groupId>org.wso2.maven</groupId>
                 <artifactId>carbon-p2-plugin</artifactId>
-                <version>${p2.plugin.version}</version>
+                <version>${carbon.p2.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>p2-feature-generation</id>

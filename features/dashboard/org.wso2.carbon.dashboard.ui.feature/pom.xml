@@ -38,7 +38,6 @@
         <dependency>
             <groupId>org.apache.shindig.wso2</groupId>
             <artifactId>shindig</artifactId>
-            <version>${shindig.platform.patch.version}</version>
         </dependency>
     <!--dependency>
             <groupId>org.wso2.carbon</groupId>
@@ -48,17 +47,14 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.dashboard.common</artifactId>
-            <version>4.3.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.dashboard.ui</artifactId>
-            <version>4.3.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.dashboard.stub</artifactId>
-            <version>${carbon.platform.version}</version>
         </dependency>
         <dependency>
             <groupId>joda-time.wso2</groupId>
@@ -90,7 +86,7 @@
             <plugin>
                 <groupId>org.wso2.maven</groupId>
                 <artifactId>carbon-p2-plugin</artifactId>
-                <version>${p2.plugin.version}</version>
+                <version>${carbon.p2.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>p2-feature-generation</id>
@@ -123,7 +119,7 @@
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>
-                                    org.wso2.carbon.registry.core.ui:${registry.core.feature.version}
+                                    org.wso2.carbon.registry.core.ui
                                 </importFeatureDef>
                             </importFeatures>
                         </configuration>
@@ -132,9 +128,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <properties>
-        <shindig.platform.patch.version>1.1.0.wso2v7</shindig.platform.patch.version>
-    </properties>
 
 </project>

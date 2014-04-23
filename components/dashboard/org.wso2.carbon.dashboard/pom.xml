@@ -35,17 +35,14 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.utils</artifactId>
-            <version>4.3.0-SNAPSHOT</version>
         </dependency>
 		<dependency>
             <groupId>org.apache.shindig.wso2</groupId>
             <artifactId>shindig</artifactId>
-            <version>${shindig.platform.patch.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.dashboard.common</artifactId>
-            <version>${carbon.platform.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
@@ -88,10 +85,10 @@
                         <Export-Package>
                             !org.wso2.carbon.dashboard.internal,
                             !org.wso2.carbon.dashboard.common.*,
-                            org.wso2.carbon.dashboard.*; version=1.0.0			    
+                            org.wso2.carbon.dashboard.*; version=1.0.0
                         </Export-Package>
                         <Import-Package>
-                            org.apache.axis2.*; version="${axis2.osgi.version.range.dashboard}",
+                            org.apache.axis2.*; version="${axis2.osgi.version.range}",
                             javax.servlet.http;version="${imp.pkg.version.javax.servlet}",
                             org.wso2.carbon.dashboard.common.*,
 			    org.json.*,
@@ -104,9 +101,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <properties>
-        <shindig.platform.patch.version>1.1.0.wso2v7</shindig.platform.patch.version>
-    </properties>
 
 </project>

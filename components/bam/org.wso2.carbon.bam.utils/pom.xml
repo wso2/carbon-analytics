@@ -20,27 +20,22 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.cassandra.server</artifactId>
-            <version>${wso2carbon.version.bam2}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.cassandra.dataaccess</artifactId>
-            <version>${wso2carbon.version.bam2}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.core.common</artifactId>
-            <version>${wso2carbon.version.bam2}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.utils</artifactId>
-            <version>${wso2carbon.version.bam2}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.registry.core</artifactId>
-            <version>${wso2carbon.version.bam2}</version>
         </dependency>
     </dependencies>
 

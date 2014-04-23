@@ -33,9 +33,9 @@
     <url>http://wso2.org</url>
 
     <modules>
-        <module>org.wso2.carbon.dashboard.feature</module>
         <module>org.wso2.carbon.dashboard.server.feature</module>
         <module>org.wso2.carbon.dashboard.ui.feature</module>
+        <module>org.wso2.carbon.dashboard.feature</module>
         <module>org.wso2.carbon.dashboard.mgt.gadgetrepo.feature</module>
         <module>org.wso2.carbon.dashboard.mgt.gadgetrepo.server.feature</module>
         <module>org.wso2.carbon.dashboard.mgt.gadgetrepo.ui.feature</module>
@@ -49,208 +49,165 @@
         <module>org.wso2.carbon.dashboard.mgt.theme.server.feature</module>
         <module>org.wso2.carbon.dashboard.mgt.theme.feature</module>
         <module>org.wso2.carbon.dashboard.themepopulator.server.feature</module>
-	<module>org.wso2.carbon.dashboard.social.ui.feature</module>
-	<module>org.wso2.carbon.dashboard.social.server.feature</module>
-	<module>org.wso2.carbon.dashboard.social.feature</module>
-	<module>org.wso2.carbon.dashboard.mgt.oauth.server.feature</module>
-	<module>org.wso2.carbon.dashboard.mgt.oauth.ui.feature</module>
-	<module>org.wso2.carbon.dashboard.mgt.oauth.feature</module>
+        <module>org.wso2.carbon.dashboard.social.ui.feature</module>
+        <module>org.wso2.carbon.dashboard.social.server.feature</module>
+        <module>org.wso2.carbon.dashboard.social.feature</module>
+        <module>org.wso2.carbon.dashboard.mgt.oauth.server.feature</module>
+        <module>org.wso2.carbon.dashboard.mgt.oauth.ui.feature</module>
+        <module>org.wso2.carbon.dashboard.mgt.oauth.feature</module>
     </modules>
 
-    <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.dashboard.mgt.oauth</artifactId>
-                <version>${wso2carbon.version.dashboard}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.dashboard.mgt.oauth.ui</artifactId>
-                <version>${wso2carbon.version.dashboard}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.dashboard.mgt.theme.common</artifactId>
-                <version>${wso2carbon.version.dashboard}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.dashboard.themepopulator</artifactId>
-                <version>${wso2carbon.version.dashboard}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.dashboard.mgt.theme.ui</artifactId>
-                <version>${wso2carbon.version.dashboard}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.dashboard.mgt.theme</artifactId>
-                <version>${wso2carbon.version.dashboard}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.dashboard.common</artifactId>
-                <version>${wso2carbon.version.dashboard}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.dashboard</artifactId>
-                <version>${wso2carbon.version.dashboard}</version>
             </dependency>
             
             <dependency>
             	<groupId>org.json.wso2</groupId>
             	<artifactId>json</artifactId>
-            	<version>1.0.0.wso2v1</version>
             </dependency>
 
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.dashboard.ui</artifactId>
-                <version>${wso2carbon.version.dashboard}</version>
             </dependency>
 
 
             <dependency>
                 <groupId>org.apache.shindig.wso2</groupId>
                 <artifactId>shindig</artifactId>
-                <version>${shindig.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>joda-time.wso2</groupId>
                 <artifactId>joda-time</artifactId>
-                <version>${joda-time.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>jdom.wso2</groupId>
                 <artifactId>jdom</artifactId>
-                <version>${jdom.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.google.common.wso2</groupId>
                 <artifactId>google-collect</artifactId>
-                <version>${google.collect.osgi.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>rhino.wso2</groupId>
                 <artifactId>js</artifactId>
-                <version>${rhino.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.dashboard.mgt.gadgetrepo.common</artifactId>
-                <version>${wso2carbon.version.dashboard}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.dashboard.mgt.gadgetrepo</artifactId>
-                <version>${wso2carbon.version.dashboard}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.dashboard.mgt.gadgetrepo.ui</artifactId>
-                <version>${wso2carbon.version.dashboard}</version>
             </dependency>
             
 
 
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.dashboard.mgt.users.common</artifactId>
-                <version>${wso2carbon.version.dashboard}</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>org.wso2.carbon</groupId>-->
+                <!--<artifactId>org.wso2.carbon.dashboard.mgt.users.common</artifactId>-->
+            <!--</dependency>-->
 
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.dashboard.mgt.users</artifactId>
-                <version>${wso2carbon.version.dashboard}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.dashboard.mgt.users.ui</artifactId>
-                <version>${wso2carbon.version.dashboard}</version>
             </dependency>
 
 
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.dashboard.gadgetrepopopulator</artifactId>
-                <version>${wso2carbon.version.dashboard}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.dashboard.dashboardpopulator</artifactId>
-                <version>${wso2carbon.version.dashboard}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.dashboard.gadgetframework.ui</artifactId>
-                <version>${wso2carbon.version.dashboard}</version>
             </dependency>
             
             <dependency>
                 <groupId>com.google.guice.wso2</groupId>
                 <artifactId>guice2</artifactId>
-                <version>${guice.version}</version>
-	    </dependency>
-	    <dependency>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.dashboard.mgt.oauth.stub</artifactId>
-                <version>${wso2carbon.version.dashboard}</version>
             </dependency>
                         
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.dashboard.mgt.users.stub</artifactId>
-                <version>${wso2carbon.version.dashboard}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.dashboard.mgt.gadgetrepo.stub</artifactId>
-                <version>${wso2carbon.version.dashboard}</version>
             </dependency>
                         
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.dashboard.stub</artifactId>
-                <version>${wso2carbon.version.dashboard}</version>
             </dependency>
             <dependency>
-		<groupId>org.wso2.carbon</groupId>
-		<artifactId>org.wso2.carbon.dashboard.mgt.theme.stub</artifactId>
-		<version>${wso2carbon.version.dashboard}</version>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.dashboard.mgt.theme.stub</artifactId>
             </dependency>
             <dependency>
             	<groupId>org.wso2.carbon</groupId>
             	<artifactId>org.wso2.carbon.registry.resource.stub</artifactId>
-            	<version>${wso2carbon.version.dashboard}</version>
         </dependency>
         </dependencies>
-    </dependencyManagement>
 
-    <properties>
-        <wso2carbon.version.dashboard>${wso2carbon.version}</wso2carbon.version.dashboard>
-        <shindig.version>1.1.0.wso2v6</shindig.version>
-        <joda-time.version>1.6.0.wso2v1</joda-time.version>
-        <jdom.version>1.0.0.wso2v1</jdom.version>
-        <rhino.version>1.7.0.R4.wso2v1</rhino.version>
-        <google.collect.osgi.version>1.0.0.wso2v2</google.collect.osgi.version>
-	<p2.plugin.version>${carbon.p2.plugin.version}</p2.plugin.version>
-	<guice.version>2.0.0.wso2v2</guice.version>
-    </properties>
 
 </project>
 

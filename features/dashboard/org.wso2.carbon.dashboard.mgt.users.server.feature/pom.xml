@@ -39,12 +39,10 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.dashboard.common</artifactId>
-            <version>4.3.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.dashboard.mgt.users</artifactId>
-            <version>4.3.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
@@ -53,7 +51,7 @@
             <plugin>
                 <groupId>org.wso2.maven</groupId>
                 <artifactId>carbon-p2-plugin</artifactId>
-                <version>${p2.plugin.version}</version>
+                <version>${carbon.p2.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>p2-feature-generation</id>

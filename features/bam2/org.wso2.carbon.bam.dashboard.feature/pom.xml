@@ -23,13 +23,11 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.bam.dashboard.server.feature</artifactId>
-            <version>${project.version}</version>
             <type>zip</type>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.bam.dashboard.ui.feature</artifactId>
-            <version>${project.version}</version>
             <type>zip</type>
         </dependency>
     </dependencies>
@@ -51,12 +49,12 @@
                             <id>org.wso2.carbon.bam.dashboard</id>
                             <propertiesFile>../feature.properties</propertiesFile>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core</importFeatureDef>
                             </importFeatures>
                             <includedFeatures>
-                                <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.bam.dashboard.server.feature:${project.version}
+                                <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.bam.dashboard.server.feature
                                 </includedFeatureDef>
-                                <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.bam.dashboard.ui.feature:${project.version}
+                                <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.bam.dashboard.ui.feature
                                 </includedFeatureDef>
                             </includedFeatures>
                         </configuration>

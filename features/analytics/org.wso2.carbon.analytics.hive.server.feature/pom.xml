@@ -38,7 +38,6 @@
         <dependency>
             <groupId>org.apache.hive.wso2</groupId>
             <artifactId>hive</artifactId>
-            <version>${hive.orbit.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.hive</groupId>
@@ -77,138 +76,96 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.hive.data.source.access</artifactId>
-            <version>${carbon.platform.version}</version>
         </dependency>
         <dependency>
             <groupId>antlr.wso2</groupId>
             <artifactId>antlr</artifactId>
-            <version>${antlr.orbit.version}</version>
         </dependency>
         <dependency>
             <groupId>org.antlr.wso2</groupId>
             <artifactId>antlr-runtime</artifactId>
-            <version>${antlr.orbit.version}</version>
         </dependency>
         <dependency>
             <groupId>asm.wso2</groupId>
             <artifactId>asm</artifactId>
-            <version>${asm.orbit.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-cli.wso2</groupId>
             <artifactId>commons-cli</artifactId>
-            <version>${commons.cli.orbit.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-codec.wso2</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>${commons.codec.orbit.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-collections.wso2</groupId>
             <artifactId>commons-collections</artifactId>
-            <version>${commons.collections.orbit.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-configuration.wso2</groupId>
             <artifactId>commons-configuration</artifactId>
-            <version>${commons.configuration.orbit.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-dbcp.wso2</groupId>
             <artifactId>commons-dbcp</artifactId>
-            <version>${commons.dbcp.orbit.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-lang.wso2</groupId>
             <artifactId>commons-lang</artifactId>
-            <version>${commons.lang.orbit.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-pool.wso2</groupId>
             <artifactId>commons-pool</artifactId>
-            <version>${commons.pool.orbit.version}</version>
         </dependency>
         <dependency>
             <groupId>org.datanucleus.wso2</groupId>
             <artifactId>datanucleus-api-jdo</artifactId>
-            <version>3.1.4.wso2v1</version>
         </dependency>
         <dependency>
             <groupId>org.datanucleus.wso2</groupId>
             <artifactId>datanucleus-core</artifactId>
-            <version>3.1.5.wso2v1</version>
-        </dependency>
+         </dependency>
         <dependency>
             <groupId>org.datanucleus.wso2</groupId>
             <artifactId>datanucleus-rdbms</artifactId>
-            <version>3.1.5.wso2v1</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava.wso2</groupId>
             <artifactId>guava</artifactId>
-            <version>${google.guava.wso2.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.hadoop.wso2</groupId>
             <artifactId>hadoop-core</artifactId>
-            <version>${hadoop.orbit.version}</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.javaewah.wso2</groupId>
             <artifactId>JavaEWAH</artifactId>
-            <version>${javaewah.orbit.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.jdo.wso2</groupId>
             <artifactId>jdo-api</artifactId>
-            <version>${jdo.orbit.version}</version>
         </dependency>
         <dependency>
             <groupId>org.json.wso2</groupId>
             <artifactId>json</artifactId>
-            <version>${json.orbit.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.thrift.wso2</groupId>
             <artifactId>libfb303</artifactId>
-            <version>${libfb303.orbit.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cassandra.wso2</groupId>
             <artifactId>apache-cassandra</artifactId>
-            <version>1.2.10.wso2v1</version>
         </dependency>
     </dependencies>
-
-    <properties>
-        <hive.orbit.version>0.8.1.wso2v8</hive.orbit.version>
-        <antlr.orbit.version>3.2.0.wso2v1</antlr.orbit.version>
-        <asm.orbit.version>3.1.wso2v1</asm.orbit.version>
-        <commons.cli.orbit.version>1.2.0.wso2v1</commons.cli.orbit.version>
-        <commons.codec.orbit.version>1.4.0.wso2v1</commons.codec.orbit.version>
-        <commons.collections.orbit.version>3.2.0.wso2v1</commons.collections.orbit.version>
-        <commons.configuration.orbit.version>1.6.0.wso2v1</commons.configuration.orbit.version>
-        <commons.dbcp.orbit.version>1.4.0.wso2v1</commons.dbcp.orbit.version>
-        <commons.lang.orbit.version>2.6.0.wso2v1</commons.lang.orbit.version>
-        <commons.pool.orbit.version>1.5.6.wso2v1</commons.pool.orbit.version>
-        <hadoop.orbit.version>0.20.203.1.wso2v6</hadoop.orbit.version>
-        <javaewah.orbit.version>0.3.2.wso2v1</javaewah.orbit.version>
-        <jdo.orbit.version>3.0.0.wso2v1</jdo.orbit.version>
-        <json.orbit.version>2.0.0.wso2v1</json.orbit.version>
-        <libfb303.orbit.version>0.7.0.wso2v1</libfb303.orbit.version>
-        <slf4j.version>1.6.1</slf4j.version>
-    </properties>
 
     <build>
         <plugins>

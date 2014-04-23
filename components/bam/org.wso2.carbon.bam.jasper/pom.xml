@@ -20,7 +20,6 @@
         <dependency>
             <groupId>net.sf.jasperreports</groupId>
             <artifactId>jasperreports</artifactId>
-            <version>4.6.0</version>
         </dependency>
         <!--        <dependency>
             <groupId>jasperreports.wso2</groupId>
@@ -31,7 +30,6 @@
         <dependency>
             <groupId>org.eclipse.equinox</groupId>
             <artifactId>javax.servlet</artifactId>
-            <version>${version.javax.servlet}</version>
             <scope>provided</scope>
             <!-- <version>${jasperreports.wso2.bam.version}</version>-->
         </dependency>
@@ -44,13 +42,11 @@
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.bam.toolbox.deployer</artifactId>
             <scope>provided</scope>
-            <version>${wso2carbon.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.ndatasource.core</artifactId>
             <scope>provided</scope>
-            <version>${wso2carbon.version}</version>
         </dependency>
     </dependencies>
 

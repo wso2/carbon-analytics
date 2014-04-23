@@ -19,7 +19,6 @@
         <dependency>
             <groupId>org.apache.hive.wso2</groupId>
             <artifactId>hive</artifactId>
-            <version>${hive.orbit.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.hive</groupId>
@@ -53,7 +52,7 @@
                     <groupId>org.apache.hive</groupId>
                     <artifactId>hive-jdbc</artifactId>
                 </exclusion>
-		<exclusion>
+		       <exclusion>
                     <groupId>org.wso2.carbon</groupId>
                     <artifactId>hive-jdbc-handler</artifactId>
                 </exclusion>
@@ -62,7 +61,6 @@
         <dependency>
             <groupId>org.apache.hadoop.wso2</groupId>
             <artifactId>hadoop-core</artifactId>
-	    <version>0.20.203.1.wso2v6</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
@@ -75,67 +73,34 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.ntask.core</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.ntask.solutions</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.datasource</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.ndatasource.core</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.ndatasource.rdbms</artifactId>
-            <version>${project.version}</version>
         </dependency>
-        <!--dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.rssmanager.core</artifactId>
-            <version>4.3.0-SNAPSHOT</version>
-        </dependency-->
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.core</artifactId>
-            <version>${carbon.platform.version}</version>
         </dependency>
-         <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.utils</artifactId>
-            <version>${carbon.platform.version}</version>
-        </dependency>
-         <!--dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.rssmanager.stub</artifactId>
-            <version>4.3.0-SNAPSHOT</version>
-        </dependency-->
          <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.authenticator.stub</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.ndatasource.core</artifactId>
-            <version>4.3.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.cassandra.dataaccess</artifactId>
-            <version>${project.version}</version>
         </dependency>
-
          <dependency>
             <groupId>org.hectorclient</groupId>
             <artifactId>hector-core</artifactId>
-            <version>1.1-0</version>
         </dependency>
     </dependencies>
 
@@ -194,9 +159,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
 </project>

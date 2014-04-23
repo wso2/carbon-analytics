@@ -39,22 +39,18 @@
 	<dependency>
 	    <groupId>org.wso2.carbon</groupId>
 	    <artifactId>org.wso2.carbon.registry.social.api</artifactId>
-		<version>${carbon.platform.version}</version>
 	</dependency>
 	<dependency>
 	    <groupId>org.wso2.carbon</groupId>
 	    <artifactId>org.wso2.carbon.registry.social.impl</artifactId>
-		<version>${carbon.platform.version}</version>
 	</dependency>
 	<dependency>
 	    <groupId>org.wso2.carbon</groupId>
 	    <artifactId>org.wso2.carbon.dashboard.social</artifactId>
-		<version>${carbon.platform.version}</version>
 	</dependency>
 	<dependency>
 	    <groupId>org.wso2.carbon</groupId>
 	    <artifactId>org.wso2.carbon.dashboard.social.common</artifactId>
-		<version>${carbon.platform.version}</version>
 	</dependency>
     </dependencies>
 
@@ -63,7 +59,7 @@
             <plugin>
                 <groupId>org.wso2.maven</groupId>
                 <artifactId>carbon-p2-plugin</artifactId>
-                <version>${p2.plugin.version}</version>
+                <version>${carbon.p2.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>p2-feature-generation</id>
@@ -87,7 +83,7 @@
 				<bundleDef>org.wso2.carbon:org.wso2.carbon.dashboard.social.common</bundleDef>
                             </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.registry.core.server:${registry.core.feature.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.registry.core.server</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>

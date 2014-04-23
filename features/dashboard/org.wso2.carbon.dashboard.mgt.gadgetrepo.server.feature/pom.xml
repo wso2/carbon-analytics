@@ -35,29 +35,25 @@
     <description>This feature contains the core bundles required for Gadget Repo Back-end</description>
     
     <dependencies>
-	<dependency>
-	    <groupId>org.wso2.carbon</groupId>
-	    <artifactId>org.wso2.carbon.dashboard.mgt.gadgetrepo.common</artifactId>
-	</dependency>
-    <dependency>
-         <groupId>org.wso2.carbon</groupId>
-         <artifactId>org.wso2.carbon.dashboard.mgt.gadgetrepo</artifactId>
-         <version>4.3.0-SNAPSHOT</version>
-    </dependency>
-	<dependency>
-	    <groupId>org.wso2.carbon</groupId>
-	    <artifactId>org.wso2.carbon.dashboard.common</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
-	</dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.dashboard.mgt.gadgetrepo.common</artifactId>
+        </dependency>
+        <dependency>
+             <groupId>org.wso2.carbon</groupId>
+             <artifactId>org.wso2.carbon.dashboard.mgt.gadgetrepo</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.dashboard.common</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.registry.social.api</artifactId>
-            <version>${carbon.platform.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.registry.social.impl</artifactId>
-            <version>${carbon.platform.version}</version>
         </dependency>
     </dependencies>
     
@@ -66,7 +62,7 @@
             <plugin>
                 <groupId>org.wso2.maven</groupId>
                 <artifactId>carbon-p2-plugin</artifactId>
-                <version>${p2.plugin.version}</version>
+                <version>${carbon.p2.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>p2-feature-generation</id>

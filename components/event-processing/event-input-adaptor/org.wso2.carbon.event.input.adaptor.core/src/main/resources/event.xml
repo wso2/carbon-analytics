@@ -1,8 +1,0 @@
-<agent:StockQuart xmlns:agent="http://wso2.org/carbon/agent/event">
-    <agent:ipAdd>127.0.0.1</agent:ipAdd>
-    <agent:symbol>IBM</agent:symbol>
-    <agent:price>126.8</agent:price>
-    <agent:volume>1200</agent:volume>
-    <agent:max>126.8</agent:max>
-    <agent:min>126.8</agent:min>
-</agent:StockQuart>

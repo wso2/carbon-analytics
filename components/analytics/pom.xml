@@ -38,44 +38,19 @@
         <module>org.wso2.carbon.hive.data.source.access</module>
     </modules>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.apache.hive.wso2</groupId>
-                <artifactId>hive</artifactId>
-                <version>${hive.orbit.version}</version>
-            </dependency>
-            <!--        <dependency>
-                <groupId>org.apache.hive.wso2</groupId>
-                <artifactId>hive-exec</artifactId>
-                <version>0.8.1-wso2v1</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.hive.wso2</groupId>
-                <artifactId>hive-service</artifactId>
-                <version>0.8.1-wso2v1</version>
-            </dependency>-->
-            <dependency>
-                <groupId>org.apache.hadoop.wso2</groupId>
-                <artifactId>hadoop-core</artifactId>
-                <version>${hadoop.orbit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.utils</artifactId>
-                <version>${wso2carbon.version}</version>
-            </dependency>
-            <!--<dependency>
-                <groupId>libthrift.wso2</groupId>
-                <artifactId>libthrift</artifactId>
-                <version>0.7.wso2v1</version>
-            </dependency>-->
-        </dependencies>
-    </dependencyManagement>
-
-    <properties>
-        <hive.orbit.version>0.8.1.wso2v8</hive.orbit.version>
-        <hadoop.orbit.version>0.20.203.1.wso2v6</hadoop.orbit.version>
-    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.hive.wso2</groupId>
+            <artifactId>hive</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop.wso2</groupId>
+            <artifactId>hadoop-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.utils</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

@@ -36,9 +36,9 @@
         <!--module>org.wso2.carbon.bam.analyzer.feature</module>
         <module>org.wso2.carbon.bam.analyzer.server.feature</module>
         <module>org.wso2.carbon.bam.analyzer.ui.feature</module>
-        <module>org.wso2.carbon.bam.receiver.server.feature</module>
-        <module>org.wso2.carbon.bam.presentation.server.feature</module>
-        <module>org.wso2.carbon.bam.feature</module-->
+        <module>org.wso2.carbon.bam.receiver.server.feature</module-->
+        <!--<module>org.wso2.carbon.bam.presentation.server.feature</module>-->
+        <!--<module>org.wso2.carbon.bam.feature</module>-->
         <module>org.wso2.carbon.bam.dashboard.server.feature</module>
         <module>org.wso2.carbon.bam.dashboard.ui.feature</module>
         <module>org.wso2.carbon.bam.dashboard.feature</module>
@@ -53,69 +53,52 @@
 		<module>org.wso2.carbon.bam.cassandra.data.archive.feature</module>
     </modules>
 
-    <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.bam2.presentation</artifactId>
-                <version>${wso2carbon.version.bam2}</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>org.wso2.carbon</groupId>-->
+                <!--<artifactId>org.wso2.carbon.bam2.presentation</artifactId>-->
+            <!--</dependency>-->
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.bam2.utils</artifactId>
-                <version>${wso2carbon.version.bam2}</version>
             </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.bam2.analyzer</artifactId>
-                <version>${wso2carbon.version.bam2}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.bam2.analyzer.ui</artifactId>
-                <version>${wso2carbon.version.bam2}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.bam2.receiver</artifactId>
-                <version>${wso2carbon.version.bam2}</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>org.wso2.carbon</groupId>-->
+                <!--<artifactId>org.wso2.carbon.bam2.analyzer</artifactId>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>org.wso2.carbon</groupId>-->
+                <!--<artifactId>org.wso2.carbon.bam2.analyzer.ui</artifactId>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>org.wso2.carbon</groupId>-->
+                <!--<artifactId>org.wso2.carbon.bam2.receiver</artifactId>-->
+            <!--</dependency>-->
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.bam2.service</artifactId>
-                <version>${wso2carbon.version.bam2}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.bam.analyzer.stub</artifactId>
-                <version>${wso2carbon.version.bam2}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.bam.toolbox.deployer</artifactId>
-                <version>${wso2carbon.version.bam2}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.bam.toolbox.deployer.ui</artifactId>
-                <version>${wso2carbon.version.bam2}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.bam.toolbox.deployer.stub</artifactId>
-                <version>${wso2carbon.version.bam2}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.bam.dashboard.ui</artifactId>
-                <version>${wso2carbon.version.bam2}</version>
             </dependency>
         </dependencies>
-    </dependencyManagement>
-
-    <properties>
-        <wso2carbon.version.bam2>${wso2carbon.version}</wso2carbon.version.bam2>
-    </properties>
 
 </project>
 
