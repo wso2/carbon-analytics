@@ -27,12 +27,13 @@ public class IntInserter implements TypeInserter {
 
     @Override
     public Mutator addDataToBatchInsertion(Object data, String streamColumnFamily,
-                                           String columnName, String rowKey, Mutator<String> mutator) {
+                                           String columnName, String rowKey,
+                                           Mutator<String> mutator) {
         Integer intVal = ((data) instanceof Double) ? ((Double) data).intValue()
-                : (Integer) data;
+                                                    : (Integer) data;
         if (intVal != null) {
             mutator.addInsertion(rowKey, streamColumnFamily,
-                    HFactory.createColumn(columnName, intVal, stringSerializer, integerSerializer));
+                                 HFactory.createColumn(columnName, intVal, stringSerializer, integerSerializer));
         }
         return mutator;
 

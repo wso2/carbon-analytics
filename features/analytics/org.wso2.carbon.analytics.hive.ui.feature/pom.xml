@@ -69,9 +69,9 @@
                                 </properties>
                             </adviceFile>
                             <bundles>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.analytics.hive.ui:4.3.0-SNAPSHOT
+                                <bundleDef>org.wso2.carbon:org.wso2.carbon.analytics.hive.ui
                                 </bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.analytics.hive.stub:4.3.0-SNAPSHOT</bundleDef>
+                                <bundleDef>org.wso2.carbon:org.wso2.carbon.analytics.hive.stub</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.ui:${wso2carbon.version}</importFeatureDef>

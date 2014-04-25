@@ -1,6 +1,13 @@
 package org.wso2.carbon.databridge.persistence.cassandra.Utils;
 
-import me.prettyprint.cassandra.serializers.*;
+import me.prettyprint.cassandra.serializers.BooleanSerializer;
+import me.prettyprint.cassandra.serializers.DoubleSerializer;
+import me.prettyprint.cassandra.serializers.FloatSerializer;
+import me.prettyprint.cassandra.serializers.IntegerSerializer;
+import me.prettyprint.cassandra.serializers.LongSerializer;
+import me.prettyprint.cassandra.serializers.StringSerializer;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.AttributeType;
 import org.wso2.carbon.databridge.persistence.cassandra.datastore.CassandraConnector;
@@ -26,6 +33,8 @@ import java.util.Calendar;
  * limitations under the License.
  */
 public class CassandraSDSUtils {
+    static Log log = LogFactory.getLog(CassandraSDSUtils.class);
+
     public static String convertStreamNameToCFName(String streamName) {
         if (streamName == null) {
             return null;
@@ -33,8 +42,8 @@ public class CassandraSDSUtils {
         int keySpaceLength = StreamDefinitionUtils.getKeySpaceName().length();
         if ((streamName.length() + keySpaceLength) > 48) {
             throw new RuntimeException("The stream name you provided is too long. This has caused the" +
-                    " generated key (\"" + streamName + "\") to go " +
-                    "beyond the allowed characters. of " + (48 - keySpaceLength));
+                                       " generated key (\"" + streamName + "\") to go " +
+                                       "beyond the allowed characters. of " + (48 - keySpaceLength));
         }
         return streamName.replace(":", "_").replace(".", "_");
     }
@@ -54,7 +63,8 @@ public class CassandraSDSUtils {
     private final static FloatSerializer floatSerializer = FloatSerializer.get();
     private final static DoubleSerializer doubleSerializer = DoubleSerializer.get();
 
-    public static Object getOriginalValueFromColumnValue(ByteBuffer byteBuffer, AttributeType attributeType)
+    public static Object getOriginalValueFromColumnValue(ByteBuffer byteBuffer,
+                                                         AttributeType attributeType)
             throws IOException {
         switch (attributeType) {
             case BOOL: {
@@ -108,12 +118,46 @@ public class CassandraSDSUtils {
 
     //Todo: name of column family should have less than 48 chars. handle it properly
     public static String getCustomIndexCFName(String primaryCFName, String indexColumnName) {
-        return String.valueOf(Math.abs((primaryCFName + (indexColumnName.indexOf("_") > 0 ?
-                indexColumnName.substring(indexColumnName.indexOf("_") + 1) :indexColumnName)).hashCode()));
+        String indexCFName = String.valueOf(Math.abs((primaryCFName + (indexColumnName.indexOf("_") > 0 ?
+                                                                       indexColumnName.substring(indexColumnName.indexOf("_") + 1) : indexColumnName)).hashCode()));
+
+        log.debug("Index CF Name for " + indexColumnName + "(" + primaryCFName + ") -->" + indexCFName);
+        return indexCFName;
     }
 
     //Todo: name of column family should have less than 48 chars. handle it properly
-    public static String getCustomIndexCFNameForInsert(String primaryCFName, String indexColumnName) {
+    public static String getCustomIndexCFNameForInsert(String primaryCFName,
+                                                       String indexColumnName) {
         return String.valueOf(Math.abs((primaryCFName + indexColumnName).hashCode()));
+    }
+
+    public static Object getParsedArbitraryFieldValue(String val, AttributeType attributeType) {
+        try {
+            switch (attributeType) {
+                case BOOL: {
+                    return Boolean.parseBoolean(val);
+                }
+                case FLOAT: {
+                    return Float.parseFloat(val);
+                }
+                case DOUBLE: {
+                    return Double.parseDouble(val);
+                }
+                case INT: {
+                    return Integer.parseInt(val);
+                }
+                case LONG: {
+                    return Long.parseLong(val);
+                }
+                case STRING: {
+                    return val;
+                }
+
+            }
+        } catch (NumberFormatException e) {
+            log.debug("Error while parsing attribute field value from String ", e);
+            return null;
+        }
+        return null;
     }
 }

@@ -25,11 +25,12 @@ public class StringInserter implements TypeInserter {
 
     @Override
     public Mutator addDataToBatchInsertion(Object data, String streamColumnFamily,
-                                           String columnName, String rowKey, Mutator<String> mutator) {
+                                           String columnName, String rowKey,
+                                           Mutator<String> mutator) {
         String strVal = (String) data;
         if (strVal != null) {
             mutator.addInsertion(rowKey, streamColumnFamily,
-                    HFactory.createColumn(columnName, strVal, stringSerializer, stringSerializer));
+                                 HFactory.createColumn(columnName, strVal, stringSerializer, stringSerializer));
         }
         return mutator;
     }

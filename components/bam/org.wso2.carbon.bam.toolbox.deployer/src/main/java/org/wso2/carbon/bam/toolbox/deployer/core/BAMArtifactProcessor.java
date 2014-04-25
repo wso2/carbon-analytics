@@ -222,7 +222,7 @@ public class BAMArtifactProcessor {
             if (null != streamDefnVarString && !streamDefnVarString.trim().equals("")) {
                 streamDefnVarString = streamDefnVarString.trim();
                 String[] streamDefnVars = streamDefnVarString.split(",");
-                if (streamDefnVars == null || streamDefnVars.length == 0) {
+                if (streamDefnVars.length == 0) {
                     throw new BAMToolboxDeploymentException("Invalid toolbox artifact. No scripts found in analyzers.properties");
                 } else {
                     for (String aStreamVarName : streamDefnVars) {
@@ -233,8 +233,6 @@ public class BAMArtifactProcessor {
                                 log.error("No stream definition file name specified for stream reference name: " + aStreamVarName);
                                 toolBoxDTO.removeStreamDefn(streamFileName);
                             } else {
-                                String streamUsername = props.getProperty(BAMToolBoxDeployerConstants.STREAM_DEFN_PREFIX + "."
-                                        + aStreamVarName.trim() + "." + BAMToolBoxDeployerConstants.STREAM_DEFN_USERNAME_SUFFIX);
                                 String streamSecIndexes = props.getProperty(BAMToolBoxDeployerConstants.STREAM_DEFN_PREFIX + "."
                                         + aStreamVarName.trim() + "." + BAMToolBoxDeployerConstants.STREAM_DEFN_SECONDARY_INDEXES);
                                 String streamCustIndexes = props.getProperty(BAMToolBoxDeployerConstants.STREAM_DEFN_PREFIX + "."
@@ -245,25 +243,15 @@ public class BAMArtifactProcessor {
                                         + aStreamVarName.trim() + "." +BAMToolBoxDeployerConstants.STREAM_DEFN_INCREMETAL_INDEX);
                                 String arbitraryIndexes= props.getProperty(BAMToolBoxDeployerConstants.STREAM_DEFN_PREFIX + "."
                                         + aStreamVarName.trim() + "." + BAMToolBoxDeployerConstants.STREAM_DEFN_ARBITRARY_INDEXES);
-                                if(null != incremntalIndexStr) incremntalIndexStr = incremntalIndexStr.toLowerCase();
-                                boolean isEnableIncremental = Boolean.parseBoolean(incremntalIndexStr);
-                                if (null != streamUsername && !streamUsername.trim().equals("")) {
-                                    String streamPassword = props.getProperty(BAMToolBoxDeployerConstants.STREAM_DEFN_PREFIX + "."
-                                            + aStreamVarName.trim() + "." + BAMToolBoxDeployerConstants.STREAM_DEFN_PASSWORD_SUFFIX);
-                                    if (null != streamPassword && !streamPassword.isEmpty()) {
-                                        toolBoxDTO.setPropertiesForStreamDefn(streamFileName, streamUsername, streamPassword,
-                                                streamSecIndexes, streamCustIndexes, fixedSearchProperties, isEnableIncremental,
-                                                arbitraryIndexes);
-                                    } else {
-                                        log.warn("No password specified for stream definition: "
-                                                + streamFileName + ".Stream defn " + streamFileName + " won't be deployed");
-                                        toolBoxDTO.removeStreamDefn(streamFileName);
-                                    }
-                                } else {
-                                    log.warn("No username specified for stream definition: "
-                                            + streamFileName + ".Stream defn " + streamFileName + " won't be deployed");
-                                    toolBoxDTO.removeStreamDefn(streamFileName);
+                                if (null != incremntalIndexStr) {
+                                    incremntalIndexStr = incremntalIndexStr.toLowerCase();
                                 }
+                                boolean isEnableIncremental = Boolean.parseBoolean(incremntalIndexStr);
+
+                                toolBoxDTO.setPropertiesForStreamDefn(streamFileName, streamSecIndexes,
+                                                                      streamCustIndexes, fixedSearchProperties, isEnableIncremental,
+                                                                      arbitraryIndexes);
+
                             }
                         }
                     }

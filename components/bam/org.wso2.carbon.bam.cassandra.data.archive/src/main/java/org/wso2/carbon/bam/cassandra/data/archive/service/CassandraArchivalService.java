@@ -20,50 +20,44 @@ package org.wso2.carbon.bam.cassandra.data.archive.service;
 import me.prettyprint.cassandra.service.CassandraHostConfigurator;
 import me.prettyprint.cassandra.service.ThriftCluster;
 import me.prettyprint.hector.api.Cluster;
-import me.prettyprint.hector.api.Keyspace;
-import me.prettyprint.hector.api.beans.HColumn;
-import me.prettyprint.hector.api.factory.HFactory;
-import me.prettyprint.hector.api.query.ColumnQuery;
-import me.prettyprint.hector.api.query.QueryResult;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.CronExpression;
+import org.wso2.carbon.analytics.hive.exception.HiveExecutionException;
 import org.wso2.carbon.analytics.hive.service.HiveExecutorService;
 import org.wso2.carbon.analytics.hive.web.HiveScriptStoreService;
 import org.wso2.carbon.bam.cassandra.data.archive.exception.CassandraArchiveException;
 import org.wso2.carbon.bam.cassandra.data.archive.exception.InvalidCronExpressionException;
 import org.wso2.carbon.bam.cassandra.data.archive.util.ArchiveConfiguration;
+import org.wso2.carbon.bam.cassandra.data.archive.util.ArchiveThreadExecutor;
 import org.wso2.carbon.bam.cassandra.data.archive.util.CassandraArchiveUtil;
 import org.wso2.carbon.bam.cassandra.data.archive.util.GenerateHiveScript;
 import org.wso2.carbon.cassandra.dataaccess.ClusterInformation;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
-import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
-import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
-import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
+import org.wso2.carbon.event.stream.manager.core.EventStreamService;
+import org.wso2.carbon.event.stream.manager.core.exception.EventStreamConfigurationException;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 
 public class CassandraArchivalService {
 
     private static final Log log = LogFactory.getLog(CassandraArchivalService.class);
 
-    public static final String BAM_META_KEYSPACE = "META_KS";
-    public static final String BAM_META_STREAM_DEF_CF = "STREAM_DEFINITION";
-    private static final String STREAM_DEF = "STREAM_DEFINITION";
-
     Cluster cluster;
 
     public void archiveCassandraData(ArchiveConfiguration archiveConfiguration) throws Exception {
 
         if ((archiveConfiguration != null)) {
-            if ( !archiveConfiguration.isSchedulingOn() || CronExpression.isValidExpression(
+            if (!archiveConfiguration.isSchedulingOn() || CronExpression.isValidExpression(
                     archiveConfiguration.getCronExpression())) {
 
                 if (archiveConfiguration.getConnectionURL() == null) {
                     ClusterInformation clusterInformation = new ClusterInformation(archiveConfiguration.getUserName(),
-                                                                                   archiveConfiguration.getPassword());
+                            archiveConfiguration.getPassword());
                     cluster = CassandraArchiveUtil.getDataAccessService().getCluster(clusterInformation);
                 } else {
                     String connectionUrl = archiveConfiguration.getConnectionURL();
@@ -77,7 +71,7 @@ public class CassandraArchivalService {
 
                 try {
 
-                    StreamDefinition streamDefinition = getStreamDefinition(cluster, archiveConfiguration);
+                    StreamDefinition streamDefinition = getStreamDefinition(archiveConfiguration);
 
                     if (streamDefinition != null) {
                         GenerateHiveScript generateHiveScript = new GenerateHiveScript(cluster, archiveConfiguration);
@@ -88,25 +82,39 @@ public class CassandraArchivalService {
                         hiveQuery = hiveQuery + generateHiveScript.generateMappingForWritingToTmpCF(streamDefinition) + "\n";
                         hiveQuery = hiveQuery + generateHiveScript.hiveQueryForWritingDataToTmpCF(streamDefinition, archiveConfiguration) + "\n";
                         hiveQuery = hiveQuery + generateHiveScript.mapReduceJobAsHiveQuery();
+
                         if (archiveConfiguration.isSchedulingOn()) {
                             HiveScriptStoreService hiveScriptStoreService = CassandraArchiveUtil.getHiveScriptStoreService();
                             String scriptName = streamDefinition.getName() + streamDefinition.getVersion() + "_archiveScript";
                             hiveScriptStoreService.saveHiveScript(scriptName, hiveQuery, archiveConfiguration.getCronExpression());
                         } else {
-                            HiveExecutorService hiveExecutorService = CassandraArchiveUtil.getHiveExecutorService();
                             if (log.isDebugEnabled()) {
                                 log.debug(hiveQuery);
                             }
-                            hiveExecutorService.execute(null, hiveQuery);
+
+                            final String finalHiveQuery = hiveQuery;
+
+                            ExecutorService executor = ArchiveThreadExecutor.getExecutorServiceInstance();
+                            executor.submit(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        HiveExecutorService hiveExecutorService = CassandraArchiveUtil.getHiveExecutorService();
+                                        hiveExecutorService.execute(null, finalHiveQuery);
+                                    } catch (HiveExecutionException e) {
+                                        log.error("Failed to execute hive query : " + e.getMessage(), e);
+                                    }
+                                }
+                            });
                         }
-                    }else {
+                    } else {
                         String message = "Unable to find stream definition " + archiveConfiguration.getStreamName() +
                                 " with version " + archiveConfiguration.getVersion();
                         log.error(message);
                         throw new CassandraArchiveException(message);
                     }
 
-                } catch (StreamDefinitionStoreException e) {
+                } catch (EventStreamConfigurationException e) {
                     log.error("Failed to get stream definition from Cassandra", e);
                     throw new CassandraArchiveException("Failed to get stream definition");
                 }
@@ -114,34 +122,21 @@ public class CassandraArchivalService {
                 log.error("Invalid cron expression: " + archiveConfiguration.getCronExpression());
                 throw new InvalidCronExpressionException("Invalid cron expression: " + archiveConfiguration.getCronExpression());
             }
-        }else {
+        } else {
             log.error("UI doesn't pass the configuration to backend");
             throw new CassandraArchiveException("UI doesn't pass the configuration to backend");
         }
     }
 
 
-    private StreamDefinition getStreamDefinition(Cluster cluster, ArchiveConfiguration archiveConfiguration)
-            throws StreamDefinitionStoreException {
-        StreamDefinition streamDef = null;
-        Keyspace keyspace =
-                HFactory.createKeyspace(BAM_META_KEYSPACE, cluster);
-        ColumnQuery<String, String, String> columnQuery =
-                HFactory.createStringColumnQuery(keyspace);
-        columnQuery.setColumnFamily(BAM_META_STREAM_DEF_CF)
-                .setKey(getStreamKey(archiveConfiguration)).setName(STREAM_DEF);
-        QueryResult<HColumn<String, String>> result = columnQuery.execute();
-        HColumn<String, String> hColumn = result.get();
-        try {
-            if (hColumn != null) {
-                streamDef = EventDefinitionConverterUtils.convertFromJson(hColumn.getValue());
-            }
-        } catch (MalformedStreamDefinitionException e) {
-            throw new StreamDefinitionStoreException(
-                    "Retrieved definition from Cassandra store is malformed. Retrieved "
-                            +
-                            "value : " + hColumn.getValue());
-        }
+    private StreamDefinition getStreamDefinition(ArchiveConfiguration archiveConfiguration) throws EventStreamConfigurationException {
+
+        EventStreamService eventStreamService = CassandraArchiveUtil.getEventStreamService();
+        String streamName = archiveConfiguration.getStreamName();
+        String version = archiveConfiguration.getVersion();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        StreamDefinition streamDef = eventStreamService.getStreamDefinition(streamName, version, tenantId);
+
         return streamDef;
     }
 

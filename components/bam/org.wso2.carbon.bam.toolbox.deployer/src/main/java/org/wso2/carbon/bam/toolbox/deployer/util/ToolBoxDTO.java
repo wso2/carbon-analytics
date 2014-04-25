@@ -211,21 +211,19 @@ public class ToolBoxDTO {
         return names;
     }
 
-    public void setPropertiesForStreamDefn(String streamDefnName, String username, String password,
-                                           String secIndexes, String custIndexes, String fixedSearchProperties,
+    public void setPropertiesForStreamDefn(String streamDefnName, String secIndexes,
+                                           String custIndexes, String fixedSearchProperties,
                                            boolean isIncrementalIndex, String arbitraryIndexes)
             throws BAMToolboxDeploymentException, BAMComponentNotFoundException {
         boolean found = false;
         if (null != streamDefnName && !streamDefnName.isEmpty()) {
             for (StreamDefnDTO aStreamDefn : dataStreamDefs) {
                 if (aStreamDefn.getFileName().equalsIgnoreCase(streamDefnName)) {
-                    aStreamDefn.setUsername(username);
-                    aStreamDefn.setPassword(password);
                     aStreamDefn.setIndexes(secIndexes == null ? "" : secIndexes,
-                            custIndexes == null ? "" : custIndexes,
-                            fixedSearchProperties == null ? "" : fixedSearchProperties,
-                            isIncrementalIndex,
-                            arbitraryIndexes == null ? "" : arbitraryIndexes);
+                                           custIndexes == null ? "" : custIndexes,
+                                           fixedSearchProperties == null ? "" : fixedSearchProperties,
+                                           isIncrementalIndex,
+                                           arbitraryIndexes == null ? "" : arbitraryIndexes);
                     found = true;
                     break;
                 }

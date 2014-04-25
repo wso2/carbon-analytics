@@ -26,15 +26,18 @@ import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TServerTransport;
 import org.apache.thrift.transport.TTransportFactory;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.analytics.hive.Utils;
 import org.wso2.carbon.analytics.hive.HiveConstants;
 import org.wso2.carbon.analytics.hive.ServiceHolder;
+import org.wso2.carbon.analytics.hive.Utils;
+import org.wso2.carbon.analytics.hive.cassandra.CassandraStreamDefnConfigReader;
 import org.wso2.carbon.analytics.hive.exception.AnalyzerConfigException;
 import org.wso2.carbon.analytics.hive.extension.util.AnalyzerFactory;
 import org.wso2.carbon.analytics.hive.impl.HiveExecutorServiceImpl;
 import org.wso2.carbon.analytics.hive.service.HiveExecutorService;
+import org.wso2.carbon.analytics.hive.task.ScriptTaskJob;
 import org.wso2.carbon.analytics.hive.web.HiveScriptStoreService;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.cassandra.dataaccess.DataAccessService;
@@ -50,7 +53,6 @@ import org.wso2.carbon.utils.ServerConstants;
 import java.io.File;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
@@ -61,7 +63,7 @@ import java.util.concurrent.Executors;
  * interface="org.wso2.carbon.utils.ConfigurationContextService" cardinality="0..1" policy="dynamic"
  * bind="setConfigurationContextService" unbind="unsetConfigurationContextService"
  * @scr.reference name="ntask.component" interface="org.wso2.carbon.ntask.core.service.TaskService"
- * cardinality="1..1" policy="dynamic" bind="setTaskService" unbind="unsetTaskService"
+ * cardinality="0..1" policy="dynamic" bind="setTaskService" unbind="unsetTaskService"
  * @scr.reference name="user.realmservice.default" interface="org.wso2.carbon.user.core.service.RealmService"
  * cardinality="1..1" policy="dynamic" bind="setRealmService" unbind="unsetRealmService"
  * @scr.reference name="dataaccess.service" interface="org.wso2.carbon.cassandra.dataaccess.DataAccessService"
@@ -74,7 +76,7 @@ public class HiveServiceComponent {
 
     private static final String ENABLE_HIVE_SERVER_SYS_PROP = "enable.hive.thrift.server";
 
-	private static final Log log = LogFactory.getLog(HiveServiceComponent.class);
+    private static final Log log = LogFactory.getLog(HiveServiceComponent.class);
 
     private static final String CARBON_HOME_ENV = "CARBON_HOME";
 
@@ -93,6 +95,13 @@ public class HiveServiceComponent {
 			if (log.isDebugEnabled()) {
 				log.debug("Starting 'HiveServiceComponent'");
 			}
+
+            if (Utils.isAnalyticsDisabled()) {
+                log.info("Analytics component is disabled.");
+                return;
+            }
+
+            CassandraStreamDefnConfigReader.readConfigFile();
 
 			// Set CARBON_HOME if not already set for the use of Hive in order
 			// to load hive configurations.
@@ -136,6 +145,9 @@ public class HiveServiceComponent {
 			if (enableHiveServerProp != null && Boolean.parseBoolean(enableHiveServerProp)) {
 				Executors.newSingleThreadExecutor().submit(new HiveRunnable());
 			}
+            BundleContext bundleContext = ctx.getBundleContext();
+            bundleContext.registerService(ScriptTaskJob.class.getName(),
+                    new ScriptTaskJob(), null);
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
 		}

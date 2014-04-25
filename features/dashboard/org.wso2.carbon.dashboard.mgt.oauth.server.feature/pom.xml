@@ -74,7 +74,7 @@
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.dashboard.mgt.oauth</bundleDef>
                             </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.registry.core.server:${registry.core.feature.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.registry.core.server</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>

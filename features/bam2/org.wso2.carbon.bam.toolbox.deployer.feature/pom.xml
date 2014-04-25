@@ -49,12 +49,12 @@
                             <id>org.wso2.carbon.bam.toolbox.deployer</id>
                             <propertiesFile>../feature.properties</propertiesFile>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core:${project.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core</importFeatureDef>
                             </importFeatures>
                             <includedFeatures>
-                                <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.bam.toolbox.deployer.server.feature:${project.version}
+                                <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.bam.toolbox.deployer.server.feature
                                 </includedFeatureDef>
-                                <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.bam.toolbox.deployer.ui.feature:4.3.0-SNAPSHOT
+                                <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.bam.toolbox.deployer.ui.feature
                                 </includedFeatureDef>
                             </includedFeatures>
                         </configuration>

@@ -21,6 +21,8 @@ import org.wso2.carbon.analytics.hive.HiveConstants;
 import org.wso2.carbon.analytics.hive.ServiceHolder;
 import org.wso2.carbon.analytics.hive.exception.HiveScriptStoreException;
 import org.wso2.carbon.analytics.hive.persistence.HiveScriptPersistenceManager;
+import org.wso2.carbon.analytics.hive.task.ScriptTaskJob;
+import org.wso2.carbon.analytics.hive.task.ScriptTaskProcessor;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.TaskInfo;
@@ -44,12 +46,29 @@ public class HiveScriptStoreService {
         }
     }
 
+    public String isHiveScriptEditable(String scriptName) throws HiveScriptStoreException {
+        scriptName = validateScriptName(scriptName);
+        if (null != scriptName) {
+            HiveScriptPersistenceManager manager = HiveScriptPersistenceManager.getInstance();
+            return manager.isHiveScriptEditable(scriptName);
+        } else {
+            log.error("Script name is empty. Please provide a valid script name!");
+            throw new HiveScriptStoreException("Script name is empty. Please provide a valid" +
+                    " script name!");
+        }
+    }
+
     public void saveHiveScript(String scriptName, String scriptContent, String cron)
+            throws HiveScriptStoreException {
+        this.saveHiveScriptWithEditability(scriptName, scriptContent, cron, "true");
+    }
+
+    public void saveHiveScriptWithEditability(String scriptName, String scriptContent, String cron, String editability)
             throws HiveScriptStoreException {
         scriptName = validateScriptName(scriptName);
         if (null != scriptName) {
             HiveScriptPersistenceManager manager = HiveScriptPersistenceManager.getInstance();
-            manager.saveScript(scriptName, scriptContent);
+            manager.saveScriptWithEditability(scriptName, scriptContent, editability);
         } else {
             log.error("Script name is empty. Please provide a valid script name!");
             throw new HiveScriptStoreException("Script name is empty. Please provide a valid" +
@@ -57,47 +76,18 @@ public class HiveScriptStoreService {
         }
 
         if (cron != null && !cron.equals("")) {
-            deleteTask(scriptName);
             TaskInfo.TriggerInfo triggerInfo = new TaskInfo.TriggerInfo();
-            //triggerInfo.setRepeatCount(sequence.getCount());
-            //triggerInfo.setIntervalMillis(sequence.getInterval());
             triggerInfo.setDisallowConcurrentExecution(true);
             triggerInfo.setCronExpression(cron);
-
-
             Map<String, String> properties = new HashMap<String, String>();
             properties.put(HiveConstants.HIVE_SCRIPT_NAME, scriptName);
             properties.put(HiveConstants.TASK_TENANT_ID_KEY,
-                           String.valueOf(CarbonContext.getThreadLocalCarbonContext().getTenantId()));
-
-            TaskInfo info = new TaskInfo(scriptName, HiveConstants.HIVE_DEFAULT_TASK_CLASS,
-                                         properties, triggerInfo);
-/*            info.setName(scriptName);
-            info.setTriggerInfo(triggerInfo);
-            info.setTaskClass(HiveConstants.HIVE_DEFAULT_TASK_CLASS);
-
-            info.setParameters(properties);*/
-
+                    String.valueOf(CarbonContext.getThreadLocalCarbonContext().getTenantId()));
             int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
-            try {
-                ServiceHolder.getTaskManager().registerTask(info);
-                ServiceHolder.getTaskManager().scheduleTask(info.getName());
-            } catch (TaskException e) {
-                log.error("Error while scheduling script : " + info.getName() + " for tenant : " +
-                        tenantId + "..", e);
-                throw new HiveScriptStoreException("Error while scheduling script : " +
-                        info.getName() + " for tenant : " + tenantId +
-                        "..", e);
-            }
-
-            if (log.isDebugEnabled()) {
-                log.debug("Registered script execution task : " + info.getName() +
-                        " for tenant : " + tenantId);
-            }
+            ScriptTaskProcessor.getInstance().addTask(new ScriptTaskJob(scriptName, triggerInfo, properties, tenantId));
         } else {
             deleteTask(scriptName);
         }
-
     }
 
     public String getCronExpression(String scriptName) throws HiveScriptStoreException {

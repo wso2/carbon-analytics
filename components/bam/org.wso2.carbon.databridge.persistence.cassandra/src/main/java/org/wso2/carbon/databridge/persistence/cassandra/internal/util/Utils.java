@@ -11,7 +11,11 @@ import org.wso2.carbon.utils.CarbonUtils;
 import javax.xml.namespace.QName;
 import java.io.File;
 import java.io.InputStream;
-import java.net.*;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Enumeration;
 
 /**
@@ -100,30 +104,30 @@ public class Utils {
         }
 
         globalConsistencyLevelPolicy = new StreamDefnConsistencyLevelPolicy(readConsistencyLevel, writeConsistencyLevel);
-        
+
         OMElement strategyEl = documentElement.getFirstChildWithName(new QName(STRATEGY_CLASS_ELEMENT));
         if (strategyEl != null) {
             strategyClass = strategyEl.getText();
         }
 
-         OMElement nodeIdElement = documentElement.getFirstChildWithName(new QName(NODE_ID_ELEMENT));
-        if (nodeIdElement != null){
+        OMElement nodeIdElement = documentElement.getFirstChildWithName(new QName(NODE_ID_ELEMENT));
+        if (nodeIdElement != null) {
             nodeId = Integer.parseInt(nodeIdElement.getText());
-        }else {
+        } else {
             nodeId = DataReceiverConstants.DEFAULT_RECEIVER_NODE_ID;
         }
 
         OMElement keySpaceElement = documentElement.getFirstChildWithName(new QName(KEY_SPACE_NAME_ELEMENT));
-        if (nodeIdElement != null){
+        if (nodeIdElement != null) {
             keySpaceName = keySpaceElement.getText();
-        }else {
+        } else {
             keySpaceName = DataReceiverConstants.DEFAULT_KEY_SPACE_NAME;
         }
 
-       OMElement indexKeySpaceElement = documentElement.getFirstChildWithName(new QName(INDEX_KEY_SPACE_NAME_ELEMENT));
-        if (nodeIdElement != null){
+        OMElement indexKeySpaceElement = documentElement.getFirstChildWithName(new QName(INDEX_KEY_SPACE_NAME_ELEMENT));
+        if (nodeIdElement != null) {
             indexKeySpaceName = indexKeySpaceElement.getText();
-        }else {
+        } else {
             indexKeySpaceName = DataReceiverConstants.DEFAULT_INDEX_KEYSPACE_NAME;
         }
     }
@@ -149,7 +153,7 @@ public class Utils {
         return writeConsistencyLevel;
     }
 
-    public static int getNodeId(){
+    public static int getNodeId() {
         return nodeId;
     }
 

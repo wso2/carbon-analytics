@@ -73,6 +73,8 @@
 
                     <% if (null != scriptNames) {
                         for (String aName : scriptNames) {
+                            if ("true".equals(client.getScriptEditability(aName)))
+                            {
                     %>
                     <tr>
                         <td><label>
@@ -81,12 +83,12 @@
                         </td>
                         <td>
                             <a class="icon-link" style="background: url('../hive-explorer/images/edit.gif') no-repeat;"
-                               href="../hive-explorer/hiveexplorer.jsp?mode=edit&scriptName=<%=aName%>">Edit</a>
+                               href="../hive-explorer/hiveexplorer.jsp?mode=edit&editability=true&scriptName=<%=aName%>">Edit</a>
                             <a class="icon-link" href="../hive-explorer/execute.jsp?scriptName=<%=aName%>"
                                style="background: url('../hive-explorer/images/execute.gif') no-repeat;">
                                 Execute</a>
                             <a class="icon-link" style="background: url('images/tasks-icon.gif') no-repeat;"
-                                      href="../hive-explorer/scheduleAndSave.jsp?scriptName=<%=aName%>">Schedule
+                                      href="../hive-explorer/scheduleAndSave.jsp?editability=true&scriptName=<%=aName%>">Schedule
                                 Script
                             </a>
                             <a onclick="deleteRow('<%=aName%>','Do you want to delete')"
@@ -95,6 +97,30 @@
 
                     </tr>
                     <%
+                            } else {
+                    %>
+                    <tr>
+                        <td><label>
+                            <%=aName%>
+                        </label>
+                        </td>
+                        <td>
+                            <a class="icon-link" style="background: url('../hive-explorer/images/edit.gif') no-repeat;"
+                               href="../hive-explorer/hiveexplorer.jsp?mode=edit&editability=false&scriptName=<%=aName%>">Copy as a New Script</a>
+                            <a class="icon-link" href="../hive-explorer/execute.jsp?scriptName=<%=aName%>"
+                               style="background: url('../hive-explorer/images/execute.gif') no-repeat;">
+                                Execute</a>
+                            <a class="icon-link" style="background: url('images/tasks-icon.gif') no-repeat;"
+                               href="../hive-explorer/scheduleAndSave.jsp?editability=false&scriptName=<%=aName%>">Schedule
+                                Script
+                            </a>
+                            <a onclick="deleteRow('<%=aName%>','Do you want to delete')"
+                               class="delete-icon-link" href="#">Delete</a>
+                        </td>
+
+                    </tr>
+                    <%
+                            }
                         }
                     } else { %>
                     <tr>
@@ -114,7 +140,7 @@
                 </tr>
                 <tr>
                     <td><a class="icon-link" style="background-image:url(images/add.gif);"
-                           href="hiveexplorer.jsp"><fmt:message
+                           href="hiveexplorer.jsp?editability=true"><fmt:message
                             key="script.add.main"/></a></td>
                 </tr>
                 </tbody>

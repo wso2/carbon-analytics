@@ -60,9 +60,9 @@
                                 </properties>
                             </adviceFile>
                             <bundles>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.messagestore:4.3.0-SNAPSHOT</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.cassandra.dataaccess:4.3.0-SNAPSHOT</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.datasource.utils:4.3.0-SNAPSHOT</bundleDef>
+                                <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.messagestore</bundleDef>
+                                <bundleDef>org.wso2.carbon:org.wso2.carbon.cassandra.dataaccess</bundleDef>
+                                <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.datasource.utils</bundleDef>
                                 <bundleDef>org.hectorclient.wso2:hector-core</bundleDef>
                             </bundles>
 

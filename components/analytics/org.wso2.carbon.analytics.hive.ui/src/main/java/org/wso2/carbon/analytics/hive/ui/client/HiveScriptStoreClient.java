@@ -47,12 +47,20 @@ public class HiveScriptStoreClient {
        stub.saveHiveScript(scriptName, script, cron);
     }
 
+    public void saveScriptWithEditability(String scriptName, String script, String cron, String editable) throws HiveScriptStoreServiceHiveScriptStoreException, RemoteException {
+        stub.saveHiveScriptWithEditability(scriptName, script, cron, editable);
+    }
+
     public String[] getAllScriptNames() throws HiveScriptStoreServiceHiveScriptStoreException, RemoteException {
         return stub.getAllScriptNames();
     }
 
     public String getScript(String scriptName) throws HiveScriptStoreServiceHiveScriptStoreException, RemoteException {
           return stub.retrieveHiveScript(scriptName);
+    }
+
+    public String getScriptEditability(String scriptName) throws HiveScriptStoreServiceHiveScriptStoreException, RemoteException {
+        return stub.isHiveScriptEditable(scriptName);
     }
 
     public void deleteScript(String scriptName) throws HiveScriptStoreServiceHiveScriptStoreException, RemoteException {

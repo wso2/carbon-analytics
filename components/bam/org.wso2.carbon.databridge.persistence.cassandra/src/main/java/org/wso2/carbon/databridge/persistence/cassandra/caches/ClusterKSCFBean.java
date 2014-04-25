@@ -42,14 +42,24 @@ public class ClusterKSCFBean {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         ClusterKSCFBean that = (ClusterKSCFBean) o;
 
-        if (!cluster.equals(that.cluster)) return false;
-        if (!columnFamilyName.equals(that.columnFamilyName)) return false;
-        if (!keyspaceName.equals(that.keyspaceName)) return false;
+        if (!cluster.equals(that.cluster)) {
+            return false;
+        }
+        if (!columnFamilyName.equals(that.columnFamilyName)) {
+            return false;
+        }
+        if (!keyspaceName.equals(that.keyspaceName)) {
+            return false;
+        }
 
         return true;
     }

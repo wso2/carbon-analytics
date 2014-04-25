@@ -381,6 +381,11 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.cassandra.mgt</artifactId>
+                <version>${carbon.platform.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.cassandra.dataaccess</artifactId>
                 <version>${carbon.platform.version}</version>
             </dependency>
@@ -454,6 +459,11 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.databridge.streamdefn.registry</artifactId>
+                <version>${carbon.platform.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.bam.cassandra.data.archive.stub</artifactId>
                 <version>${carbon.platform.version}</version>
             </dependency>
@@ -465,6 +475,11 @@
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.bam.toolbox.deployer.stub</artifactId>
+                <version>${carbon.platform.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.databridge.datasink.cassandra</artifactId>
                 <version>${carbon.platform.version}</version>
             </dependency>
             <dependency>
@@ -1133,7 +1148,7 @@
         <junit.version>4.9</junit.version>
         <xmlschema.version>1.4.3</xmlschema.version>
         <version.javax.servlet>3.0.0.v201112011016</version.javax.servlet>
-        <event.processor.version>1.0.0</event.processor.version>
+        <event.processor.version>1.0.1</event.processor.version>
         <cxf.version>2.5.1</cxf.version>
         <slf4j.orbit.version>1.5.10.wso2v1</slf4j.orbit.version>
         <slf4j.version>1.6.1</slf4j.version>

@@ -35,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.bam.datasource.utils.DataSourceUtils;
 import org.wso2.carbon.bam.notification.task.internal.NotificationDispatchComponent;
 import org.wso2.carbon.base.MultitenantConstants;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.agent.thrift.Agent;
 import org.wso2.carbon.databridge.agent.thrift.DataPublisher;
 import org.wso2.carbon.databridge.agent.thrift.conf.AgentConfiguration;
@@ -193,8 +194,8 @@ public class NotificationDispatchTask extends AbstractTask {
         StreamDefinition streamDef = streamDefs.get(streamId);
         if (streamDef == null) {
             EventStreamService esService = NotificationDispatchComponent.getEventStreamService();
-            streamDef = esService.getStreamDefinitionFromStore(streamId,
-                    MultitenantConstants.SUPER_TENANT_ID);
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            streamDef = esService.getStreamDefinition(streamId,tenantId);
             if (streamDef != null) {
                 streamDefs.put(streamId, streamDef);
             }

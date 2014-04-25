@@ -35,7 +35,7 @@ public class StreamDefnConsistencyLevelPolicy implements ConsistencyLevelPolicy 
 
         if (op.equals(OperationType.META_WRITE) || op.equals(OperationType.WRITE)) {
             return writeConsistency;
-        } else if (op.equals(OperationType.META_READ) || op.equals(OperationType.READ))  {
+        } else if (op.equals(OperationType.META_READ) || op.equals(OperationType.READ)) {
             return readConsistency;
         }
         return HConsistencyLevel.QUORUM;
@@ -45,7 +45,7 @@ public class StreamDefnConsistencyLevelPolicy implements ConsistencyLevelPolicy 
     public HConsistencyLevel get(OperationType op, String cfName) {
         if (op.equals(OperationType.META_WRITE) || op.equals(OperationType.WRITE)) {
             return writeConsistency;
-        } else if (op.equals(OperationType.META_READ) || op.equals(OperationType.READ))  {
+        } else if (op.equals(OperationType.META_READ) || op.equals(OperationType.READ)) {
             return readConsistency;
         }
         return HConsistencyLevel.QUORUM;

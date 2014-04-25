@@ -25,6 +25,8 @@ public class Utils {
     
     public static final int CARBON_DEFAULT_PORT_OFFSET = 0;
 
+    private static final String DISABLE_ANALYTICS = "disable.analytics";
+
     public static int getPortOffset() {
         String portOffset = ServerConfiguration.getInstance().getFirstProperty(
                 CARBON_CONFIG_PORT_OFFSET_NODE);
@@ -37,4 +39,8 @@ public class Utils {
         }
     }
 
+    public static boolean isAnalyticsDisabled() {
+        String disableAnalytics = System.getProperty(Utils.DISABLE_ANALYTICS);
+        return (disableAnalytics != null && Boolean.parseBoolean(disableAnalytics));
+    }
 }

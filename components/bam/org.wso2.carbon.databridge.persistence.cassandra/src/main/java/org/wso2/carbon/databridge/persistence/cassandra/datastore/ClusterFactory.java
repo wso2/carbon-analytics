@@ -36,14 +36,13 @@ public class ClusterFactory {
     private static Log log = LogFactory.getLog(ClusterFactory.class);
 
 
-
     private ClusterFactory() {
 
     }
 
     private static void init() {
         if (clusterLoadingCache != null) {
-                return;
+            return;
         }
         synchronized (ClusterFactory.class) {
             if (clusterLoadingCache != null) {
@@ -69,8 +68,9 @@ public class ClusterFactory {
 //                                    HFactory.createCluster(configuration.getClusterName(), cassandraHostConfigurator,
 //                                            creds);
                             ClusterInformation clusterInformation = new ClusterInformation(credentials.getUsername(),
-                                    credentials.getPassword());
+                                                                                           credentials.getPassword());
                             Cluster cluster = ServiceHolder.getDataAccessService().getCluster(clusterInformation);
+
                             initCassandraKeySpaces(cluster);
                             return cluster;
                         }
@@ -78,20 +78,16 @@ public class ClusterFactory {
         }
     }
 
-    public static void initCassandraKeySpaces(Cluster cluster) throws StreamDefinitionStoreException {
+    public static void initCassandraKeySpaces(Cluster cluster)
+            throws StreamDefinitionStoreException {
         log.info("Initializing cluster");
         CassandraConnector connector = ServiceHolder.getCassandraConnector();
-        connector.createKeySpaceIfNotExisting(cluster, CassandraConnector.BAM_META_KEYSPACE);
 
         connector.createKeySpaceIfNotExisting(cluster, StreamDefinitionUtils.getKeySpaceName());
         connector.createKeySpaceIfNotExisting(cluster, StreamDefinitionUtils.getIndexKeySpaceName());
 
-        connector.createColumnFamily(cluster, CassandraConnector.BAM_META_KEYSPACE,
-                CassandraConnector.BAM_META_STREAM_DEF_CF, null);
         connector.createColumnFamily(cluster, StreamDefinitionUtils.getIndexKeySpaceName(),
-                CassandraConnector.INDEX_DEF_CF, null);
-        connector.createColumnFamily(cluster, StreamDefinitionUtils.getIndexKeySpaceName(),
-                CassandraConnector.GLOBAL_ACTIVITY_MONITORING_INDEX_CF, null);
+                                     CassandraConnector.GLOBAL_ACTIVITY_MONITORING_INDEX_CF, null);
     }
 
     public static Cluster getCluster(Credentials credentials) {

@@ -27,6 +27,8 @@ public class HiveConstants {
     public static final String HIVE_USERNAME_KEY = "username";
     public static final String HIVE_PASSWORD_KEY = "password";
     public static final String HIVE_SCRIPT_NAME = "scriptName";
+    public static final String HIVE_SCRIPT_EDITABILITY = "editable";
+    public static final String HIVE_SCRIPT_DEFAULT_EDITABILITY = "true";
     public static final String SCRIPT_TRIGGER_CRON = "cron";
     public static final String DEFAULT_TRIGGER_CRON = "1 * * * * ? *";
 

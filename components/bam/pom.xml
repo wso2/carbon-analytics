@@ -41,6 +41,9 @@
         <module>org.wso2.carbon.bam.utils</module>
         <!--<module>org.wso2.carbon.bam.gadgetgenwizard</module>-->
         <!--<module>org.wso2.carbon.bam.gadgetgenwizard.ui</module>-->
+        <module>org.wso2.carbon.databridge.persistence.cassandra</module>
+        <module>org.wso2.carbon.databridge.streamdefn.registry</module>
+        <module>org.wso2.carbon.databridge.datasink.cassandra</module>
         <module>org.wso2.carbon.bam.toolbox.deployer</module>
         <module>org.wso2.carbon.bam.toolbox.deployer.ui</module>
         <module>org.wso2.carbon.bam.jasper</module>
@@ -52,7 +55,6 @@
         <module>org.wso2.carbon.bam.messagestore</module>
         <module>org.wso2.carbon.bam.datasource.utils</module>
         <module>org.wso2.carbon.bam.notification.task</module>
-        <module>org.wso2.carbon.databridge.persistence.cassandra</module>
     </modules>
 
 

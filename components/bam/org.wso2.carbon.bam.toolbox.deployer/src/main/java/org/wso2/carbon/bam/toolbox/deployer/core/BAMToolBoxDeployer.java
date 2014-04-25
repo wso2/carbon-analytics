@@ -4,7 +4,6 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.deployment.AbstractDeployer;
 import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.deployment.repository.util.DeploymentFileData;
-import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -15,7 +14,6 @@ import org.wso2.carbon.bam.toolbox.deployer.ServiceHolder;
 import org.wso2.carbon.bam.toolbox.deployer.config.ToolBoxConfigurationManager;
 import org.wso2.carbon.bam.toolbox.deployer.deploy.BAMArtifactDeployerManager;
 import org.wso2.carbon.bam.toolbox.deployer.exception.BAMToolboxDeploymentException;
-import org.wso2.carbon.bam.toolbox.deployer.internal.ServerStartUpInspector;
 import org.wso2.carbon.bam.toolbox.deployer.util.ToolBoxDTO;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -72,29 +70,6 @@ public class BAMToolBoxDeployer extends AbstractDeployer {
         this.configurationContext = configurationContext;
         createHotDeployementFolderIfNotExists();
         CarbonContext.getThreadLocalCarbonContext().getTenantId();
-
-        if (!ServerStartUpInspector.isServerStarted()) {
-            if (getTenantId() == MultitenantConstants.SUPER_TENANT_ID) {
-                pausedDeployments = this;
-
-            }
-        } else {
-            doInitialUnDeployments();
-        }
-    }
-
-    public void doInitialUnDeployments() {
-        try {
-            ArrayList<String> allTools = ToolBoxConfigurationManager.getInstance().getAllToolBoxNames(getTenantId());
-            ArrayList<String> availArtifacts = getAllBAMArtifacts();
-            for (String aTool : allTools) {
-                if (!availArtifacts.contains(aTool)) {
-                    removeAllArtifacts(aTool);
-                }
-            }
-        } catch (BAMToolboxDeploymentException e) {
-            log.error("Error in initializing the tasks of BAM Tool Box deployement", e);
-        }
     }
 
     @Override
@@ -114,32 +89,32 @@ public class BAMToolBoxDeployer extends AbstractDeployer {
      * @throws DeploymentException
      */
     public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {
-        if (ServerStartUpInspector.isServerStarted()) {
             String path = deploymentFileData.getAbsolutePath();
             File toolBox = new File(path);
             String destDir = toolBox.getParent();
             ToolBoxConfigurationManager manager = ToolBoxConfigurationManager.getInstance();
             try {
                 ArrayList<String> allTools = manager.getAllToolBoxNames(getTenantId());
-                if (!allTools.contains(toolBox.getName().replaceAll("." + BAMToolBoxDeployerConstants.BAM_ARTIFACT_EXT, ""))) {
-                    log.info("Deploying file:" + path);
-                    BAMArtifactProcessor processor = BAMArtifactProcessor.getInstance();
-                    String barDir = processor.extractBAMArtifact(path, destDir + "/temp");
+                log.info("Deploying file:" + path);
+                BAMArtifactProcessor processor = BAMArtifactProcessor.getInstance();
+//                String barDir = processor.extractBAMArtifact(path, destDir + "/temp");
 
-                    ToolBoxDTO aTool = processor.getToolBoxDTO(barDir);
-                    aTool.setHotDeploymentRootDir(this.configurationContext.getAxisConfiguration().getRepository().getPath());
+                //Caution!: temporary fix for BAM-1516
+                String tmpDir = System.getProperty("java.io.tmpdir") + File.separator + "tbox";
+                log.info("Extracting toolbox to directory: " + tmpDir);
+                String barDir = processor.extractBAMArtifact(path, tmpDir);
 
-                    int tenantId = getTenantId();
-                    BAMArtifactDeployerManager.getInstance().deploy(aTool, tenantId, getTenantAdminName(tenantId));
+                ToolBoxDTO aTool = processor.getToolBoxDTO(barDir);
+                aTool.setHotDeploymentRootDir(this.configurationContext.getAxisConfiguration().getRepository().getPath());
+                int tenantId = getTenantId();
+                BAMArtifactDeployerManager.getInstance().deploy(aTool, tenantId, getTenantAdminName(tenantId));
+                manager.addNewToolBoxConfiguration(aTool, getTenantId());
+                createDataSource(aTool);
 
-                    manager.addNewToolBoxConfiguration(aTool, getTenantId());
-
-                    createDataSource(aTool);
-
-                    String repoPath = this.configurationContext.getAxisConfiguration().getRepository().getPath();
-                    removeTempFiles(new File(repoPath + File.separator + this.directory + "/temp"));
-                    log.info("Deployed successfully file: " + path);
-                }
+                String repoPath = this.configurationContext.getAxisConfiguration().getRepository().getPath();
+//                removeTempFiles(new File(repoPath + File.separator + this.directory + "/temp"));
+                removeTempFiles(new File(tmpDir));
+                log.info("Deployed successfully file: " + path);
             } catch (BAMToolboxDeploymentException e) {
                 log.error("Error while deploying bam  artifact :" + deploymentFileData.getAbsolutePath(), e);
                 throw new BAMToolboxDeploymentException("Error while deploying bam  artifact :" + deploymentFileData.getAbsolutePath(), e);
@@ -156,9 +131,6 @@ public class BAMToolBoxDeployer extends AbstractDeployer {
                 log.error("Error while deploying bam  artifact :" + deploymentFileData.getAbsolutePath(), e);
                 throw new BAMToolboxDeploymentException("Error while deploying bam  artifact :" + deploymentFileData.getAbsolutePath(), e);
             }
-        } else {
-            this.pausedDeploymentFileDatas.add(deploymentFileData);
-        }
     }
 
     private int getTenantId() {
@@ -240,10 +212,10 @@ public class BAMToolBoxDeployer extends AbstractDeployer {
         int tenantId = getTenantId();
         ToolBoxConfigurationManager manager = ToolBoxConfigurationManager.getInstance();
         ToolBoxDTO toolBoxDTO = manager.getToolBox(aToolName, getTenantId());
-
-        BAMArtifactDeployerManager.getInstance().undeploy(toolBoxDTO, getTenantAdminName(tenantId),
-                tenantId);
-        manager.deleteToolBoxConfiguration(aToolName, getTenantId());
+        if(toolBoxDTO != null) {
+            BAMArtifactDeployerManager.getInstance().undeploy(toolBoxDTO, getTenantAdminName(tenantId), tenantId);
+            manager.deleteToolBoxConfiguration(aToolName, getTenantId());
+        }
     }
 
 

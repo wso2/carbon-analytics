@@ -48,6 +48,7 @@ public class SaveScriptProcessor extends HttpServlet {
 
 
         String scriptName = request.getParameter("scriptName");
+        String editability = request.getParameter("editability");
         String scriptContent = request.getParameter("queries");
         String cron = request.getParameter("cronExp");
         if(null==cron) cron ="";
@@ -59,7 +60,7 @@ public class SaveScriptProcessor extends HttpServlet {
                 if (null == scriptContent) {
                     scriptContent = client.getScript(scriptName);
                 }
-                client.saveScript(scriptName, scriptContent, cron);
+                client.saveScriptWithEditability(scriptName, scriptContent, cron, editability);
                 out.println("Successfully updated the Hive script " + scriptName);
             } catch (AxisFault axisFault) {
                 out.println("Error while updating the script");

@@ -25,7 +25,6 @@ import org.wso2.carbon.bam.toolbox.deployer.BAMToolBoxDeployerConstants;
 import org.wso2.carbon.bam.toolbox.deployer.BasicToolBox;
 import org.wso2.carbon.bam.toolbox.deployer.ServiceHolder;
 import org.wso2.carbon.base.api.ServerConfigurationService;
-import org.wso2.carbon.core.ServerStartupHandler;
 import org.wso2.carbon.ndatasource.core.DataSourceService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.user.core.UserRealm;
@@ -54,7 +53,7 @@ import java.util.Properties;
  * unbind="unsetRegistryService"
  * @scr.reference name="config.context.service"
  * interface="org.wso2.carbon.utils.ConfigurationContextService"
- * cardinality="1..1"
+ * cardinality="0..1"
  * policy="dynamic"
  * bind="setConfigurationContextService"
  * unbind="unsetConfigurationContextService"
@@ -84,8 +83,8 @@ public class BAMToolBoxDeployerComponent {
     protected void activate(ComponentContext context) {
         loadAvailableToolBoxes();
         BundleContext bundleContext = context.getBundleContext();
-        bundleContext.registerService(ServerStartupHandler.class.getName(),
-                new ServerStartUpInspector(), null);
+        bundleContext.registerService(DeployerInit.class.getName(),
+                new DeployerInit(), null);
         log.info("Successfully Started BAM Toolbox Deployer");
     }
 

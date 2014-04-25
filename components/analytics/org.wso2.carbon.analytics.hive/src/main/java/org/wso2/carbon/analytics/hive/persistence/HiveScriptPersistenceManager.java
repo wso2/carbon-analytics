@@ -15,7 +15,6 @@
  */
 package org.wso2.carbon.analytics.hive.persistence;
 
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.hive.HiveConstants;
@@ -90,6 +89,26 @@ public class HiveScriptPersistenceManager {
         }
     }
 
+    public String isHiveScriptEditable(String scriptName) throws HiveScriptStoreException {
+        UserRegistry registry;
+        int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+        Resource resource;
+        try {
+            registry = ServiceHolder.getRegistryService().
+                    getConfigSystemRegistry(tenantId);
+        } catch (RegistryException e) {
+            throw new HiveScriptStoreException("Failed to get registry", e);
+        }
+        String scriptPath = HiveConstants.HIVE_SCRIPT_BASE_PATH + scriptName + HiveConstants.HIVE_SCRIPT_EXT;
+        try {
+            resource = registry.get(scriptPath);
+            return resource.getProperty(HiveConstants.HIVE_SCRIPT_EDITABILITY);
+        } catch (RegistryException e) {
+            log.error("Error while retrieving the script - " + scriptName + " from registry", e);
+            throw new HiveScriptStoreException("Error while retrieving the script - " + scriptName + " from registry", e);
+        }
+    }
+
     public void saveScript(String scriptName, String scriptContent)
             throws HiveScriptStoreException {
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
@@ -118,6 +137,42 @@ public class HiveScriptPersistenceManager {
             throw new HiveScriptStoreException("Unable to store tenant information for the script" +
                                                " : " + scriptName + ". May not be rescheduled at" +
                                                " startup due to this..", e);
+        }
+    }
+
+    public void saveScriptWithEditability(String scriptName, String scriptContent, String editability)
+            throws HiveScriptStoreException {
+        int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+        UserRegistry configSystemRegistry;
+        try {
+            configSystemRegistry = ServiceHolder.getRegistryService().
+                    getConfigSystemRegistry(tenantId);
+            Resource resource = configSystemRegistry.newResource();
+            resource.setContent(scriptContent);
+            resource.setProperty(HiveConstants.HIVE_SCRIPT_NAME, scriptName);
+            resource.setProperty(HiveConstants.SCRIPT_TRIGGER_CRON,
+                    HiveConstants.DEFAULT_TRIGGER_CRON);
+            if (editability != null && !"".equals(editability)) {
+                resource.setProperty(HiveConstants.HIVE_SCRIPT_EDITABILITY, editability);
+            } else {
+                resource.setProperty(HiveConstants.HIVE_SCRIPT_EDITABILITY, HiveConstants.HIVE_SCRIPT_DEFAULT_EDITABILITY);
+            }
+            resource.setMediaType("text/plain");
+            configSystemRegistry.put(HiveConstants.HIVE_SCRIPT_BASE_PATH + scriptName +
+                    HiveConstants.HIVE_SCRIPT_EXT, resource);
+
+        } catch (RegistryException e) {
+            throw new HiveScriptStoreException("Failed to get registry", e);
+        }
+
+        try {
+            updateTenantTracker(tenantId);
+        } catch (RegistryException e) {
+            log.error("Unable to store tenant information for the script : " + scriptName +
+                    ". May not be rescheduled at startup due to this..", e);
+            throw new HiveScriptStoreException("Unable to store tenant information for the script" +
+                    " : " + scriptName + ". May not be rescheduled at" +
+                    " startup due to this..", e);
         }
     }
 
@@ -179,8 +234,6 @@ public class HiveScriptPersistenceManager {
     }
 
     private void updateTenantTracker(int tenantId) throws RegistryException {
-        ConfigurationContext superTenantContext = ServiceHolder.getConfigurationContextService().
-                getServerConfigContext();
         UserRegistry superTenantRegistry = ServiceHolder.getRegistryService().
                 getConfigSystemRegistry(PrivilegedCarbonContext.
                         //getCurrentContext(superTenantContext).getTenantId());

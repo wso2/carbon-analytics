@@ -2,13 +2,12 @@ package org.wso2.carbon.hive.data.source.access.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.HiveContext;
 import org.apache.hadoop.mapred.lib.db.DBConfiguration;
 import org.w3c.dom.Element;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.ndatasource.common.DataSourceException;
 import org.wso2.carbon.ndatasource.core.CarbonDataSource;
+import org.wso2.carbon.ndatasource.core.DataSourceManager;
 import org.wso2.carbon.ndatasource.core.DataSourceService;
 import org.wso2.carbon.ndatasource.core.utils.DataSourceUtils;
 import org.wso2.carbon.ndatasource.rdbms.RDBMSConfiguration;
@@ -42,6 +41,7 @@ public class DataSourceAccessUtil {
             PrivilegedCarbonContext.startTenantFlow();
             PrivilegedCarbonContext.getCurrentContext().setTenantId(tenantId, true);
 
+            DataSourceManager.getInstance().initTenant(tenantId);
             CarbonDataSource cds = carbonDataSourceService.getDataSource(dataSourceName);
             if (cds == null) {
             	throw new RuntimeException("The data source: " + dataSourceName + 

@@ -101,17 +101,9 @@ public class BAMToolBoxUploaderService extends AbstractAdmin {
         ArrayList<String> toolsInConf = configurationManager.getAllToolBoxNames(tenantId);
         if (null == type || "".equals(type) || type.equals("1")) {
             toolBoxStatusDTO.setDeployedTools(getDeployedTools(toolsInDir, toolsInConf, searchKey));
-            toolBoxStatusDTO.setToBeDeployedTools(getToBeDeployedTools(toolsInDir, toolsInConf, searchKey));
-            toolBoxStatusDTO.setToBeUndeployedTools(getToBeUnDeployedTools(toolsInDir, toolsInConf, searchKey));
-
         } else if (type.equalsIgnoreCase("2")) {
             toolBoxStatusDTO.setDeployedTools(getDeployedTools(toolsInDir, toolsInConf, searchKey));
-        } else if (type.equalsIgnoreCase("3")) {
-            toolBoxStatusDTO.setToBeDeployedTools(getToBeDeployedTools(toolsInDir, toolsInConf, searchKey));
-        } else {
-            toolBoxStatusDTO.setToBeUndeployedTools(getToBeUnDeployedTools(toolsInDir, toolsInConf, searchKey));
         }
-
         return toolBoxStatusDTO;
     }
 
@@ -123,7 +115,9 @@ public class BAMToolBoxUploaderService extends AbstractAdmin {
         ArrayList<String> toolsInConf = configurationManager.getAllToolBoxNames(tenantId);
         for (String toolbox : toolsInConf) {
             ToolBoxDTO toolBoxDTO = configurationManager.getToolBox(toolbox, tenantId);
-            jaggeryDashboardDTOs.addAll(toolBoxDTO.getJaggeryDashboards());
+            if(toolBoxDTO != null) {
+                jaggeryDashboardDTOs.addAll(toolBoxDTO.getJaggeryDashboards());
+            }
         }
         return jaggeryDashboardDTOs;
     }
@@ -142,54 +136,6 @@ public class BAMToolBoxUploaderService extends AbstractAdmin {
             }
         }
         return deployedTools.toArray(new String[deployedTools.size()]);
-    }
-
-    private String[] getToBeDeployedTools(String[] toolsInDir, ArrayList<String> toolsInConf, String searchKey) {
-        ArrayList<String> toBedeployedTools = new ArrayList<String>();
-        if (null != toolsInDir) {
-            for (String tool : toolsInDir) {
-                if (tool.endsWith(".tbox")) {
-                    tool = tool.replaceAll(".tbox", "");
-                }
-                if ((searchKey.equals("") || searchKey.equals("*") || tool.equalsIgnoreCase(searchKey)) && !toolsInConf.contains(tool)) {
-                    toBedeployedTools.add(tool);
-                }
-            }
-        }
-        return toBedeployedTools.toArray(new String[toBedeployedTools.size()]);
-    }
-
-    private String[] getToBeUnDeployedTools(String[] toolsInDir, ArrayList<String> toolsInConf, String searchKey) {
-
-        ArrayList<String> toBeUndeployedTools = new ArrayList<String>();
-        if (null != toolsInConf) {
-            for (String tool : toolsInConf) {
-                String toolName = tool;
-                tool += ".tbox";
-                if (null != toolsInDir) {
-                    boolean exists = false;
-                    for (String toolDir : toolsInDir) {
-                        if (toolDir.equalsIgnoreCase(tool)) {
-                            exists = true;
-                            break;
-                        }
-                    }
-                    if ((searchKey.equals("") || searchKey.equals("*") || tool.equalsIgnoreCase(searchKey)) && !exists) {
-                        toBeUndeployedTools.add(toolName);
-                    }
-                } else {
-                    if (searchKey.equals("") || searchKey.equals("*")) {
-                        toBeUndeployedTools.addAll(toolsInConf);
-                        break;
-                    } else {
-                        if (tool.equalsIgnoreCase(searchKey)) {
-                            toBeUndeployedTools.add(tool);
-                        }
-                    }
-                }
-            }
-        }
-        return toBeUndeployedTools.toArray(new String[toBeUndeployedTools.size()]);
     }
 
     public boolean undeployToolBox(String[] toolboxNames) throws BAMToolboxDeploymentException {

@@ -1,0 +1,3 @@
+instructions.configure = \
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.analytics.server_${feature.version}/conf/hive-rss-config.xml,target:${installFolder}/../../conf/advanced/hive-rss-config.xml,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.analytics.server_${feature.version}/conf/analyzer-config.xml,target:${installFolder}/../../conf/advanced/analyzer-config.xml,overwrite:true);\

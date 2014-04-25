@@ -36,6 +36,7 @@
 
 <%
     String scriptName = request.getParameter("scriptName");
+    String editability = request.getParameter("editability");
     String serverURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);
     ConfigurationContext configContext =
             (ConfigurationContext) config.getServletContext().getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
@@ -46,6 +47,7 @@
 <script type="text/javascript">
     var cronExpSelected = '';
     var scriptName = '<%=scriptName%>';
+    var editability = '<%=editability%>';
 
     function saveCron() {
         if (document.getElementById('selectUI').checked) {
@@ -208,7 +210,7 @@
     function sendRequestToSaveScript(cron) {
         new Ajax.Request('../hive-explorer/SaveScriptProcessor', {
                     method: 'post',
-                    parameters: {scriptName:scriptName,
+                    parameters: {scriptName:scriptName, editability:editability,
                         cronExp:cron},
                     onSuccess: function(transport) {
                         var result = transport.responseText;

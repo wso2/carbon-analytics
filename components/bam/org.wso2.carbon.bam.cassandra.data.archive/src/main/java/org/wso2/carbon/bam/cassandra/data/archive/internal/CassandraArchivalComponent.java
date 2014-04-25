@@ -21,9 +21,14 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.hive.service.HiveExecutorService;
 import org.wso2.carbon.analytics.hive.web.HiveScriptStoreService;
+import org.wso2.carbon.bam.cassandra.data.archive.util.ArchiveThreadExecutor;
 import org.wso2.carbon.bam.cassandra.data.archive.util.CassandraArchiveUtil;
 import org.wso2.carbon.cassandra.dataaccess.DataAccessService;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
+import org.wso2.carbon.event.stream.manager.core.EventStreamService;
+
+import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 
 /**
@@ -35,7 +40,9 @@ import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
  * @scr.reference name="bam.hive.store.service" interface="org.wso2.carbon.analytics.hive.web.HiveScriptStoreService"
  * cardinality="1..1" policy="dynamic" bind="setHiveScriptStoreService" unbind="unsetHiveScriptStoreService"
  * @scr.reference name="bam.data.bridge.core" interface="org.wso2.carbon.databridge.core.DataBridgeReceiverService"
- * cardinality="1..1" policy="dynamic" bind="setDataBridgeReceiverService"  unbind="unsetDataBridgeReceiverService
+ * cardinality="1..1" policy="dynamic" bind="setDataBridgeReceiverService"  unbind="unsetDataBridgeReceiverService"
+ * @scr.reference name="event.stream.manager.core" interface="org.wso2.carbon.event.stream.manager.core.EventStreamService"
+ * cardinality="1..1" policy="dynamic" bind="setEventStreamService"  unbind="unsetEventStreamService"
  * */
 public class CassandraArchivalComponent {
 
@@ -49,6 +56,19 @@ public class CassandraArchivalComponent {
     }
 
     protected void deactivate(ComponentContext componentContext) {
+
+        ExecutorService executor = ArchiveThreadExecutor.getExecutorServiceInstance();
+        if (executor != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Trying to shutdown archive thread executor.");
+            }
+            if ((!executor.isTerminated()) && (!executor.isShutdown())) {
+                List<Runnable> pendingTasks = executor.shutdownNow();
+                if ((pendingTasks != null) && (!pendingTasks.isEmpty())) {
+                    log.warn("These schedule tasks are aborted : \n " + pendingTasks.toString());
+                }
+            }
+        }
         if (log.isDebugEnabled()) {
             log.debug("Stopped the Cassandra archival component");
         }
@@ -84,5 +104,13 @@ public class CassandraArchivalComponent {
 
     protected void unsetDataBridgeReceiverService(DataBridgeReceiverService dataBridgeReceiverService) {
         CassandraArchiveUtil.setDataBridgeReceiverService(null);
+    }
+
+    protected void setEventStreamService(EventStreamService eventStreamService) {
+        CassandraArchiveUtil.setEventStreamService(eventStreamService) ;
+    }
+
+    protected void unsetEventStreamService(EventStreamService eventStreamService) {
+        CassandraArchiveUtil.setEventStreamService(null);
     }
 }

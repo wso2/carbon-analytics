@@ -59,7 +59,8 @@ public class CFCache {
         return CFCache.get(new ClusterKSCFBean(cluster, keyspaceName, columnFamilyName));
     }
 
-    public static void putCF(Cluster cluster, String keyspaceName, String columnFamilyName, boolean present) {
+    public static void putCF(Cluster cluster, String keyspaceName, String columnFamilyName,
+                             boolean present) {
         init();
         CFCache.put(new ClusterKSCFBean(cluster, keyspaceName, columnFamilyName), present);
     }

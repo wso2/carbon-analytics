@@ -27,11 +27,12 @@ public class FloatInserter implements TypeInserter {
 
     @Override
     public Mutator addDataToBatchInsertion(Object data, String streamColumnFamily,
-                                           String columnName, String rowKey, Mutator<String> mutator) {
+                                           String columnName, String rowKey,
+                                           Mutator<String> mutator) {
         Float floatVal = ((data) instanceof Double) ? ((Double) data).floatValue() : (Float) data;
         if (floatVal != null) {
             mutator.addInsertion(rowKey, streamColumnFamily,
-                    HFactory.createColumn(columnName, floatVal, stringSerializer, floatSerializer));
+                                 HFactory.createColumn(columnName, floatVal, stringSerializer, floatSerializer));
         }
         return mutator;
     }

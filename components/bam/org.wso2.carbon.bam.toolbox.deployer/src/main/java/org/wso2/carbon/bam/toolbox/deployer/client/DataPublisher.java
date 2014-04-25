@@ -4,8 +4,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.bam.toolbox.deployer.ServiceHolder;
 import org.wso2.carbon.bam.toolbox.deployer.exception.BAMToolboxDeploymentException;
-import org.wso2.carbon.databridge.commons.exception.*;
-import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
+import org.wso2.carbon.databridge.commons.Attribute;
+import org.wso2.carbon.databridge.commons.AttributeType;
+import org.wso2.carbon.databridge.commons.IndexDefinition;
+import org.wso2.carbon.databridge.commons.StreamDefinition;
+import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
+import org.wso2.carbon.databridge.datasink.cassandra.utils.RegistryAccess;
+import org.wso2.carbon.event.stream.manager.core.EventStreamService;
 
 /**
  * Copyright (c) 2009, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -24,14 +29,14 @@ import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
  */
 public class DataPublisher {
     private static DataPublisher instance;
-    private static DataBridgeReceiverService receiverService;
+    private static EventStreamService eventStreamService;
 
     private static Log log = LogFactory.getLog(DataPublisher.class);
 
     private DataPublisher() {
-        receiverService = ServiceHolder.getDataBridgeReceiverService();
-        if (null == receiverService) {
-            log.warn("Databridge reciever service is not available...");
+        eventStreamService = ServiceHolder.getEventStreamService();
+        if (null == eventStreamService) {
+            log.warn("Event Stream service is not available...");
         }
     }
 
@@ -42,42 +47,28 @@ public class DataPublisher {
         return instance;
     }
 
-    public void createEventDefn(String defn, String username, String password)
+    public void createEventDefn(String defn, String indexDefn, int tenantId)
             throws BAMToolboxDeploymentException {
         try {
-            String session = receiverService.login(username, password);
-            try {
-                receiverService.defineStream(session, defn);
-            } catch (DifferentStreamDefinitionAlreadyDefinedException e1) {
-                log.warn(e1.getMessage());
-            } catch (MalformedStreamDefinitionException e1) {
-                log.error(e1);
-                throw new BAMToolboxDeploymentException(e1.getMessage(), e1);
-            } catch (SessionTimeoutException e1) {
-                log.error(e1);
+
+            StreamDefinition streamDefinition = EventDefinitionConverterUtils.convertFromJson(defn);
+            eventStreamService.addEventStreamDefinition(streamDefinition, tenantId);
+
+            if ((indexDefn != null) && (!indexDefn.isEmpty())) {
+                IndexDefinition indexDefinition = new IndexDefinition();
+                indexDefinition.setIndexData(indexDefn, streamDefinition);
+                // Adding Timestamp as default index.
+                if (indexDefinition.getCustomIndexData() != null) {
+                    indexDefinition.getCustomIndexData().add(new Attribute("Timestamp", AttributeType.LONG));
+                }
+
+                RegistryAccess.saveIndexDefinition(streamDefinition, indexDefinition, ServiceHolder.getRegistryService().
+                        getGovernanceSystemRegistry(tenantId));
             }
+
         } catch (Exception e) {
-            log.warn("Logout in DataReceiver is not successful...");
+            log.error("Error while creating event stream :" + e.getMessage());
+            throw new BAMToolboxDeploymentException(e.getMessage(), e);
         }
     }
-
-    public void createEventDefn(String defn, String username, String password, String indexDefn)
-            throws BAMToolboxDeploymentException {
-        try {
-            String session = receiverService.login(username, password);
-            try {
-                receiverService.defineStream(session, defn, indexDefn);
-            } catch (DifferentStreamDefinitionAlreadyDefinedException e1) {
-                log.warn(e1.getMessage());
-            } catch (MalformedStreamDefinitionException e1) {
-                log.error(e1);
-                throw new BAMToolboxDeploymentException(e1.getMessage(), e1);
-            } catch (SessionTimeoutException e1) {
-                log.error(e1);
-            }
-        } catch (Exception e) {
-            log.warn("Logout in DataReceiver is not successful...");
-        }
-    }
-
 }

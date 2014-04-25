@@ -40,6 +40,7 @@
         session.setAttribute("scriptContent" + scriptName, scriptContent);
     }
     String mode = request.getParameter("mode");
+    String editability = request.getParameter("editability");
     String cron = request.getParameter("cron");
     String saveWithCron = request.getParameter("saveWithCron");
     if (null == saveWithCron) saveWithCron = "";
@@ -76,10 +77,14 @@
                             if (message.indexOf("Success") != -1) {
                                 cronExpSelected = array[2];
                                 CARBON.showInfoDialog(array[0], function() {
-                                    location.href = '../hive-explorer/hiveexplorer.jsp?cron=' + cronExpSelected + '&scriptName=' + '<%=scriptName%>' + '&mode=' + '<%=mode%>'
+                                    location.href = '../hive-explorer/hiveexplorer.jsp?cron=' + cronExpSelected
+                                            + '&editability=' + '<%=editability%>' + '&scriptName='
+                                            + '<%=scriptName%>' + '&mode=' + '<%=mode%>'
                                             + '&saveWithCron=' + '<%=saveWithCron%>';
                                 }, function() {
-                                    location.href = '../hive-explorer/hiveexplorer.jsp?cron=' + cronExpSelected + '&scriptName=' + '<%=scriptName%>' + '&mode=' + '<%=mode%>'
+                                    location.href = '../hive-explorer/hiveexplorer.jsp?cron=' + cronExpSelected
+                                            + '&editability=' + '<%=editability%>' + '&scriptName='
+                                            + '<%=scriptName%>' + '&mode=' + '<%=mode%>'
                                             + '&saveWithCron=' + '<%=saveWithCron%>';
                                 });
 
@@ -106,10 +111,14 @@
                                 var array = message.split('#');
                                 cronExpSelected = array[2];
                                 CARBON.showInfoDialog(array[0], function() {
-                                    location.href = '../hive-explorer/hiveexplorer.jsp?cron=' + cronExpSelected + '&scriptName=' + '<%=scriptName%>' + '&mode=' + '<%=mode%>'
+                                    location.href = '../hive-explorer/hiveexplorer.jsp?cron=' + cronExpSelected
+                                            + '&editability=' + '<%=editability%>' + '&scriptName=' + '<%=scriptName%>'
+                                            + '&mode=' + '<%=mode%>'
                                             + '&saveWithCron=' + '<%=saveWithCron%>';
                                 }, function() {
-                                    location.href = '../hive-explorer/hiveexplorer.jsp?cron=' + cronExpSelected + '&scriptName=' + '<%=scriptName%>' + '&mode=' + '<%=mode%>'
+                                    location.href = '../hive-explorer/hiveexplorer.jsp?cron=' + cronExpSelected
+                                            + '&editability=' + '<%=editability%>' + '&scriptName=' + '<%=scriptName%>'
+                                            + '&mode=' + '<%=mode%>'
                                             + '&saveWithCron=' + '<%=saveWithCron%>';
                                 });
 
@@ -126,7 +135,8 @@
                         });
             }
         } else if (document.getElementById('noSchedule').checked) {
-            location.href = '../hive-explorer/hiveexplorer.jsp?cron=' + '&scriptName=' + '<%=scriptName%>' + '&mode=' + '<%=mode%>'
+            location.href = '../hive-explorer/hiveexplorer.jsp?cron=' + '&scriptName=' + '<%=scriptName%>'
+                    + '&editability=' + '<%=editability%>' + '&mode=' + '<%=mode%>'
         } else {
             //when interval -count option is selected..
         }
@@ -221,7 +231,7 @@
 
     function cancelCron() {
         location.href = '../hive-explorer/hiveexplorer.jsp?scriptName=' + '<%=scriptName%>' + '&mode=' + '<%=mode%>'
-                + '&saveWithCron="false"&schedulingCanceled=true';
+                + '&editability=' + '<%=editability%>' + '&saveWithCron="false"&schedulingCanceled=true';
     }
 
 

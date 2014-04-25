@@ -52,11 +52,11 @@
                                 </properties>
                             </adviceFile>
                             <bundles>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.toolbox.deployer.ui:${project.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.toolbox.deployer.ui</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.toolbox.deployer.stub</bundleDef>
                             </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core.ui:${carbon.platform.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core.ui</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>

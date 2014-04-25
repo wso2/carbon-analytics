@@ -84,7 +84,7 @@
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.dashboard.mgt.gadgetrepo.stub</bundleDef>
                             </bundles>
                             <importFeatures>
-				                <importFeatureDef>org.wso2.carbon.registry.core.ui:${registry.core.feature.version}</importFeatureDef>
+				                <importFeatureDef>org.wso2.carbon.registry.core.ui</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>

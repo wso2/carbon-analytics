@@ -65,7 +65,7 @@
                             <id>org.wso2.carbon.dashboard.mgt.theme</id>
                             <propertiesFile>../../../etc/feature.properties</propertiesFile>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.registry.core:${registry.core.feature.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.registry.core</importFeatureDef>
                             </importFeatures>
                             <includedFeatures>
                                 <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.dashboard.mgt.theme.server.feature</includedFeatureDef>

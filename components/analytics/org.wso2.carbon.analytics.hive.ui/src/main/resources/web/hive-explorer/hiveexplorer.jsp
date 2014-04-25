@@ -49,7 +49,10 @@
     String scriptContent = "";
     String cron = "";
     String mode = request.getParameter("mode");
-
+    String editability = "true";
+    if(request.getParameter("editability") != null && !"".equals(request.getParameter("editability"))){
+        editability = request.getParameter("editability");
+    }
     String isSchedulingCanceled = "false";
     if("true".equals(request.getParameter("schedulingCanceled"))){
         isSchedulingCanceled  = "true";
@@ -246,6 +249,7 @@
 <script type="text/javascript">
     var cron = '<%=cron%>';
     var scriptName = '<%=scriptName%>';
+    var editability = '<%=editability%>';
     var saveWithoutPrompt = '<%=isSchedulingCanceled%>';
     var allQueries = '';
     function executeQuery() {
@@ -290,24 +294,22 @@
         return text.replace(/^\s+|\s+$/g, "");
     }
 
-    function saveScript() {
+    function saveScriptAfterChecking() {
         allQueries = editAreaLoader.getValue("allcommands");
         scriptName = document.getElementById('scriptName').value;
         allQueries = trim(allQueries);
         if (allQueries != "") {
             if (scriptName != "") {
-                if (cron != "" || saveWithoutPrompt == "true") {
-                    checkExistingNameAndSaveScript();
-                }
-                else {
-                    document.getElementById('saveWithCron').value = 'true';
-                    CARBON.showConfirmationDialog("Do you want to schedule the script?", function() {
-                        scheduleTask();
-                    }, function() {
-                        checkExistingNameAndSaveScript();
-                    }, function() {
-
-                    });
+                if("false" != '<%=editability%>') {
+                    saveScript();
+                } else {
+                    if(scriptName != '<%=scriptName%>') {
+                        editability = "true";
+                        saveScript();
+                    } else {
+                        var message = "Please enter a different script name to save";
+                        CARBON.showErrorDialog(message);
+                    }
                 }
 
             } else {
@@ -321,6 +323,22 @@
         }
     }
 
+    function saveScript() {
+        if (cron != "" || saveWithoutPrompt == "true") {
+            checkExistingNameAndSaveScript();
+        }
+        else {
+            document.getElementById('saveWithCron').value = 'true';
+            CARBON.showConfirmationDialog("Do you want to schedule the script?", function() {
+                scheduleTask();
+            }, function() {
+                checkExistingNameAndSaveScript();
+            }, function() {
+
+            });
+        }
+    }
+
     function cancelScript() {
         location.href = "../hive-explorer/listscripts.jsp";
     }
@@ -328,13 +346,14 @@
     function scheduleTask() {
         var allQueries = editAreaLoader.getValue("allcommands");
         document.getElementById('scriptContent').value = allQueries;
-        document.getElementById('commandForm').action = "../hive-explorer/scheduletask.jsp?mode=" + '<%=mode%>' + '&cron=' + '<%=cron%>';
+        document.getElementById('commandForm').action = "../hive-explorer/scheduletask.jsp?mode=" + '<%=mode%>'
+                + '&cron=' + '<%=cron%>' + '&editability=' + '<%=editability%>';
         document.getElementById('commandForm').submit();
     }
 
     function checkExistingNameAndSaveScript() {
         var mode = '<%=mode%>';
-        if (mode != 'edit') {
+        if (mode != 'edit' || (mode == 'edit' && 'false' == '<%=editability%>')) {
             new Ajax.Request('../hive-explorer/ScriptNameChecker', {
                         method: 'post',
                         parameters: {scriptName:scriptName},
@@ -359,7 +378,7 @@
     function sendRequestToSaveScript() {
         new Ajax.Request('../hive-explorer/SaveScriptProcessor', {
                     method: 'post',
-                    parameters: {queries:allQueries, scriptName:scriptName,
+                    parameters: {queries:allQueries, scriptName:scriptName, editability:editability,
                         cronExp:cron},
                     onSuccess: function(transport) {
                         var result = transport.responseText;
@@ -459,6 +478,27 @@
                     </td>
                 </tr>
                 <%
+                } else if (scriptNameExists && "false".equals(editability)) {
+                %>
+                <tr>
+                    <td>
+                        <table class="normal-nopadding">
+                            <tbody>
+                            <tr>
+                                <td class="leftCol-small">
+                                    <fmt:message key="script.name.save.as"/> <span
+                                        class="required">*</span>
+                                </td>
+                                <td>
+                                    <input type="text" id="scriptName" name="scriptName" size="60"
+                                           value=""/>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <%
                 } else { %>
                 <input type="hidden" value="<%=scriptName%>" name="scriptName" id="scriptName">
                 <% }
@@ -500,7 +540,7 @@
                                 <td>
                                     <input class="button" type="button" onclick="executeQuery()"
                                            value="<fmt:message key="execute"/>" />
-                                    <input class="button" type="button" onclick="saveScript()"
+                                    <input class="button" type="button" onclick="saveScriptAfterChecking()"
                                            value="<fmt:message key="save"/>"/>
                                     <input type="button" value="<fmt:message key="cancel"/>" onclick="cancelScript()"
                                            class="button"/>
@@ -569,7 +609,7 @@
 %>
 
 <script type="text/javascript">
-    saveScript();
+    saveScriptAfterChecking();
 </script>
 <%
     }

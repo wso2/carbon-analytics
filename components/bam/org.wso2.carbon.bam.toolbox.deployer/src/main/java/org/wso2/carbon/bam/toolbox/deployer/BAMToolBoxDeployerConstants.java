@@ -85,8 +85,6 @@ public class BAMToolBoxDeployerConstants {
     public static final String STREAM_DEFN_PREFIX = "streams.definitions";
     public static final String STREAM_DEFN_FILE_NAME_SUFFIX = "filename";
     public static final String STREAM_DEFN_DESCRIPTION_SUFFIX = "description";
-    public static final String STREAM_DEFN_USERNAME_SUFFIX = "username";
-    public static final String STREAM_DEFN_PASSWORD_SUFFIX = "password";
     public static final String STREAM_DEFN_SECONDARY_INDEXES = "secondaryindexes";
     public static final String STREAM_DEFN_CUSTOM_INDEXES    = "customindexes";
     public static final String STREAM_DEFN_FIXED_SEARCH_PROPERTIES = "fixedsearchproperties";

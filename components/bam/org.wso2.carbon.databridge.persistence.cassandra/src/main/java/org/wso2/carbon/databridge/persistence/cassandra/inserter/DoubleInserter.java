@@ -27,11 +27,12 @@ public class DoubleInserter implements TypeInserter {
 
     @Override
     public Mutator addDataToBatchInsertion(Object data, String streamColumnFamily,
-                                           String columnName, String rowKey, Mutator<String> mutator) {
+                                           String columnName, String rowKey,
+                                           Mutator<String> mutator) {
         Double doubleVal = (Double) data;
         if (doubleVal != null) {
             mutator.addInsertion(rowKey, streamColumnFamily,
-                    HFactory.createColumn(columnName, doubleVal, stringSerializer, doubleSerializer));
+                                 HFactory.createColumn(columnName, doubleVal, stringSerializer, doubleSerializer));
         }
         return mutator;
     }

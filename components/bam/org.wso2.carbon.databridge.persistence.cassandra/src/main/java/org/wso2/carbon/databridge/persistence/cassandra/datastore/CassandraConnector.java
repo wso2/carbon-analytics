@@ -16,9 +16,6 @@
 
 package org.wso2.carbon.databridge.persistence.cassandra.datastore;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import me.prettyprint.cassandra.model.BasicColumnDefinition;
 import me.prettyprint.cassandra.model.BasicColumnFamilyDefinition;
 import me.prettyprint.cassandra.serializers.*;
@@ -31,24 +28,20 @@ import me.prettyprint.hector.api.ddl.*;
 import me.prettyprint.hector.api.exceptions.HectorException;
 import me.prettyprint.hector.api.factory.HFactory;
 import me.prettyprint.hector.api.mutation.Mutator;
-import me.prettyprint.hector.api.query.ColumnQuery;
 import me.prettyprint.hector.api.query.QueryResult;
 import me.prettyprint.hector.api.query.RangeSlicesQuery;
-import me.prettyprint.hector.api.query.SliceQuery;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.*;
-import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
-import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 import org.wso2.carbon.databridge.persistence.cassandra.Utils.AttributeValue;
 import org.wso2.carbon.databridge.persistence.cassandra.Utils.CassandraSDSUtils;
 import org.wso2.carbon.databridge.persistence.cassandra.Utils.StreamDefinitionUtils;
 import org.wso2.carbon.databridge.persistence.cassandra.caches.CFCache;
-import org.wso2.carbon.databridge.persistence.cassandra.exception.NullValueException;
 import org.wso2.carbon.databridge.persistence.cassandra.inserter.*;
 import org.wso2.carbon.databridge.persistence.cassandra.internal.util.AppendUtils;
 import org.wso2.carbon.databridge.persistence.cassandra.internal.util.ServiceHolder;
@@ -63,7 +56,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -83,7 +75,7 @@ public class CassandraConnector {
     private static final String STREAM_ID_KEY = "StreamId";
     public static final String BAM_META_STREAM_DEF_CF = "STREAM_DEFINITION";
 
-    public static final String BAM_META_KEYSPACE = "META_KS";
+//    public static final String BAM_META_KEYSPACE = "META_KS";
 
 
     public static final String BAM_EVENT_DATA_KEYSPACE = "EVENT_KS";
@@ -94,10 +86,10 @@ public class CassandraConnector {
 
     private static final String STREAM_DEF = "STREAM_DEFINITION";
 
-    private final static StringSerializer stringSerializer  = StringSerializer.get();
-    private final static LongSerializer longSerializer      = LongSerializer.get();
-    private final static BooleanSerializer booleanSerializer= BooleanSerializer.get();
-    private final static DoubleSerializer doubleSerializer  = DoubleSerializer.get();
+    private final static StringSerializer stringSerializer = StringSerializer.get();
+    private final static LongSerializer longSerializer = LongSerializer.get();
+    private final static BooleanSerializer booleanSerializer = BooleanSerializer.get();
+    private final static DoubleSerializer doubleSerializer = DoubleSerializer.get();
     private final static DynamicCompositeSerializer dynamicCompositeSerializer = DynamicCompositeSerializer.get();
 
     private AtomicInteger rowkeyCounter = new AtomicInteger();
@@ -128,21 +120,24 @@ public class CassandraConnector {
     public static final String EVENT_INDEX_ROWS_KEY = "INDEX_ROW";
 
     //Indexing Related
-    public static final String INDEX_DEF_CF         = "INDEX_DEFINITION";
-    public static final String SEC_INDEX_COLUMN_SUFFIX  = "_index";
+    public static final String SEC_INDEX_COLUMN_SUFFIX = "_index";
     private static final String SECONDARY_INDEX_DEF = "SECONDARY_INDEXES";
-    private static final String CUSTOM_INDEX_DEF    = "CUSTOM_INDEXES";
+    private static final String CUSTOM_INDEX_DEF = "CUSTOM_INDEXES";
     private static final String INCREMENTAL_INDEX = "INCREMENTAL_INDEX";
-    private static final String FIXED_SEARCH_DEF    = "FIXED_SEARCH_PROPERTIES";
-    private static final String CUSTOM_INDEX_ROWS_KEY    = "INDEX_ROW";
+    private static final String FIXED_SEARCH_DEF = "FIXED_SEARCH_PROPERTIES";
+    private static final String CUSTOM_INDEX_ROWS_KEY = "INDEX_ROW";
     private static final String CUSTOM_INDEX_VALUE_ROW_KEY = "INDEX_VALUE_ROW";
+    private static final String ARBITRARY_INDEX_DEF = "ARBITRARY_INDEXES";
 
     //Global Activity ID Index
-    private static final String BAM_ACTIVITY_ID     = "activity_id";
+    private static final String BAM_ACTIVITY_ID = "activity_id";
     public static final String GLOBAL_ACTIVITY_MONITORING_INDEX_CF = "global_index_activity_monitoring";
 
     private ConcurrentHashMap<String, Long> indexCFLastAddedTimeStampCache =
             new ConcurrentHashMap<String, Long>();
+
+    private ConcurrentHashMap<String, String> streamInitializationCache =
+            new ConcurrentHashMap<String, String>();
 
     static {
         attributeComparatorMap.put(AttributeType.STRING, ComparatorType.UTF8TYPE.getClassName());
@@ -226,6 +221,7 @@ public class CassandraConnector {
                 return cfdef;
             }
         }
+
         ColumnFamilyDefinition columnFamilyDefinition = new BasicColumnFamilyDefinition();
         columnFamilyDefinition.setKeyspaceName(keyspaceName);
         columnFamilyDefinition.setName(columnFamilyName);
@@ -248,40 +244,31 @@ public class CassandraConnector {
                     DataType.correlation, columnFamilyDefinition);
         }
 
-        cluster.addColumnFamily(new ThriftCfDef(columnFamilyDefinition), true);
-
-        // give some time to propogate changes
-        keyspaceDef =
-                cluster.describeKeyspace(keyspace.getKeyspaceName());
-        int retryCount = 0;
-        while (retryCount < 100) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                // ignore
-            }
-
-            for (ColumnFamilyDefinition cfdef : keyspaceDef.getCfDefs()) {
-                if (cfdef.getName().equals(columnFamilyName)) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Column Family " + columnFamilyName + " already exists.");
-                    }
-                    CFCache.putCF(cluster, keyspaceName, columnFamilyName, true);
-                    return cfdef;
+        try {
+            cluster.addColumnFamily(new ThriftCfDef(columnFamilyDefinition), true);
+        } catch (me.prettyprint.hector.api.exceptions.HInvalidRequestException e) {
+            // checking for inevitable, harmless exception in clustered environments (sorry)
+            if (e.getMessage().contains("Cannot add already existing column family")) {
+                if (log.isDebugEnabled()) {
+                    log.debug(e.getMessage());
                 }
+            } else {
+                throw e;
             }
-            retryCount++;
         }
 
-        throw new RuntimeException("The column family " + columnFamilyName + " was  not created");
+        CFCache.putCF(cluster, keyspaceName, columnFamilyName, true);
+
+        return columnFamilyDefinition;
     }
 
-    public void createSecondaryIndexes(Cluster cluster, ColumnFamilyDefinition cfDef, StreamDefinition streamDefinition) {
+    public void createSecondaryIndexes(Cluster cluster, ColumnFamilyDefinition cfDef,
+                                       StreamDefinition streamDefinition) {
         List<Attribute> secondaryIndexList = streamDefinition.getIndexDefinition().getSecondaryIndexData();
 
         BasicColumnFamilyDefinition columnFamilyDefinition = new BasicColumnFamilyDefinition(cfDef);
 
-        for(Attribute attribute : secondaryIndexList) {
+        for (Attribute attribute : secondaryIndexList) {
             BasicColumnDefinition columnDefinition = new BasicColumnDefinition();
             columnDefinition.setName(StringSerializer.get().toByteBuffer(attribute.getName()));
             columnDefinition.setIndexName(CassandraSDSUtils.getSecondaryIndexColumnName(attribute.getName()));
@@ -300,16 +287,32 @@ public class CassandraConnector {
     }
 
     public void createCustomIndexes(Cluster cluster, ColumnFamilyDefinition cfDef,
-                                    StreamDefinition streamDefinition, String primaryColumnFamilyName) {
+                                    StreamDefinition streamDefinition,
+                                    String primaryColumnFamilyName) {
         List<Attribute> customIndexList = streamDefinition.getIndexDefinition().getCustomIndexData();
 
-        for(Attribute attribute : customIndexList) {
+        for (Attribute attribute : customIndexList) {
             ColumnFamilyDefinition indexCfDef = createCustomIndexColumnFamily(cluster, StreamDefinitionUtils.getIndexKeySpaceName(),
                     CassandraSDSUtils.getCustomIndexCFName(primaryColumnFamilyName, attribute.getName()), attribute.getType());
         }
 
     }
 
+    public void createArbitraryCustomIndexes(Cluster cluster, ColumnFamilyDefinition cfDef,
+                                             StreamDefinition streamDefinition,
+                                             String primaryColumnFamilyName) {
+        List<Attribute> arbitraryIndexList = streamDefinition.getIndexDefinition().getArbitraryIndexData();
+
+        for (Attribute attribute : arbitraryIndexList) {
+            ColumnFamilyDefinition indexCfDef = createCustomIndexColumnFamily(cluster, StreamDefinitionUtils.getIndexKeySpaceName(),
+                    CassandraSDSUtils.getCustomIndexCFName(primaryColumnFamilyName, attribute.getName()), attribute.getType());
+        }
+
+    }
+
+    public void invalidateStreamCache(String streamId) {
+        streamInitializationCache.put(streamId, Boolean.FALSE.toString());
+    }
 
     private ColumnFamilyDefinition createIndexColumnFamily(Cluster cluster, String keyspaceName,
                                                            String columnFamilyName) {
@@ -339,36 +342,26 @@ public class CassandraConnector {
 
 //        addMetaColumnDefinitionsToColumnFamily(columnFamilyDefinition);
 
-
-        cluster.addColumnFamily(new ThriftCfDef(columnFamilyDefinition), true);
-
-        // give some time to propogate changes
-        keyspaceDef =
-                cluster.describeKeyspace(keyspace.getKeyspaceName());
-        int retryCount = 0;
-        while (retryCount < 100) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                // ignore
-            }
-
-            for (ColumnFamilyDefinition cfdef : keyspaceDef.getCfDefs()) {
-                if (cfdef.getName().equals(columnFamilyName)) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Column Family " + columnFamilyName + " already exists.");
-                    }
-                    CFCache.putCF(cluster, keyspaceName, columnFamilyName, true);
-                    return cfdef;
+        try {
+            cluster.addColumnFamily(new ThriftCfDef(columnFamilyDefinition), true);
+        } catch (me.prettyprint.hector.api.exceptions.HInvalidRequestException e) {
+            // checking for inevitable, harmless exception in clustered environments (sorry)
+            if (e.getMessage().contains("Cannot add already existing column family")) {
+                if (log.isDebugEnabled()) {
+                    log.debug(e.getMessage());
                 }
+            } else {
+                throw e;
             }
-            retryCount++;
         }
 
-        throw new RuntimeException("The column family " + columnFamilyName + " was  not created");
+        CFCache.putCF(cluster, keyspaceName, columnFamilyName, true);
+
+        return columnFamilyDefinition;
     }
 
-    private ColumnFamilyDefinition createGlobalActivityIndexColumnFamily(Cluster cluster, String keyspaceName,
+    private ColumnFamilyDefinition createGlobalActivityIndexColumnFamily(Cluster cluster,
+                                                                         String keyspaceName,
                                                                          String columnFamilyName) {
         Keyspace keyspace = getKeyspace(keyspaceName, cluster);
         KeyspaceDefinition keyspaceDef =
@@ -394,36 +387,28 @@ public class CassandraConnector {
         compressionOptions.put("chunk_length_kb", "128");
         columnFamilyDefinition.setCompressionOptions(compressionOptions);
 
-        cluster.addColumnFamily(new ThriftCfDef(columnFamilyDefinition), true);
-
-        // give some time to propogate changes
-        keyspaceDef =
-                cluster.describeKeyspace(keyspace.getKeyspaceName());
-        int retryCount = 0;
-        while (retryCount < 100) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                // ignore
-            }
-
-            for (ColumnFamilyDefinition cfdef : keyspaceDef.getCfDefs()) {
-                if (cfdef.getName().equals(columnFamilyName)) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Column Family " + columnFamilyName + " already exists.");
-                    }
-                    CFCache.putCF(cluster, keyspaceName, columnFamilyName, true);
-                    return cfdef;
+        try {
+            cluster.addColumnFamily(new ThriftCfDef(columnFamilyDefinition), true);
+        } catch (me.prettyprint.hector.api.exceptions.HInvalidRequestException e) {
+            // checking for inevitable, harmless exception in clustered environments (sorry)
+            if (e.getMessage().contains("Cannot add already existing column family")) {
+                if (log.isDebugEnabled()) {
+                    log.debug(e.getMessage());
                 }
+            } else {
+                throw e;
             }
-            retryCount++;
         }
 
-        throw new RuntimeException("The column family " + columnFamilyName + " was  not created");
+        CFCache.putCF(cluster, keyspaceName, columnFamilyName, true);
+
+        return columnFamilyDefinition;
     }
 
-    private ColumnFamilyDefinition createCustomIndexColumnFamily(Cluster cluster, String keyspaceName,
-                                                                 String columnFamilyName, AttributeType attributeType) {
+    private ColumnFamilyDefinition createCustomIndexColumnFamily(Cluster cluster,
+                                                                 String keyspaceName,
+                                                                 String columnFamilyName,
+                                                                 AttributeType attributeType) {
         Keyspace keyspace = getKeyspace(keyspaceName, cluster);
         KeyspaceDefinition keyspaceDef =
                 cluster.describeKeyspace(keyspace.getKeyspaceName());
@@ -451,66 +436,39 @@ public class CassandraConnector {
 
         try {
             cluster.addColumnFamily(new ThriftCfDef(columnFamilyDefinition), true);
-        } catch (Exception e) {
-            log.warn("Custom Index creation is not successful for -> " + columnFamilyName +
-                    "-" + attributeType.name() + ":" + e);
-        }
-
-        // give some time to propogate changes
-        keyspaceDef =
-                cluster.describeKeyspace(keyspace.getKeyspaceName());
-        int retryCount = 0;
-        while (retryCount < 100) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                // ignore
-            }
-
-            for (ColumnFamilyDefinition cfdef : keyspaceDef.getCfDefs()) {
-                if (cfdef.getName().equals(columnFamilyName)) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Column Family " + columnFamilyName + " already exists.");
-                    }
-                    CFCache.putCF(cluster, keyspaceName, columnFamilyName, true);
-                    return cfdef;
+        } catch (me.prettyprint.hector.api.exceptions.HInvalidRequestException e) {
+            // checking for inevitable, harmless exception in clustered environments (sorry)
+            if (e.getMessage().contains("Cannot add already existing column family")) {
+                if (log.isDebugEnabled()) {
+                    log.debug(e.getMessage());
                 }
+            } else {
+                throw e;
             }
-            retryCount++;
         }
 
-        throw new RuntimeException("The column family " + columnFamilyName + " was  not created");
+        CFCache.putCF(cluster, keyspaceName, columnFamilyName, true);
+
+        return columnFamilyDefinition;
     }
 
-
     public boolean createKeySpaceIfNotExisting(Cluster cluster, String keySpaceName) {
-
         KeyspaceDefinition keySpaceDef = cluster.describeKeyspace(keySpaceName);
-
         if (keySpaceDef == null) {
-            cluster.addKeyspace(HFactory.createKeyspaceDefinition(
-                    keySpaceName, StreamDefinitionUtils.getStrategyClass(), StreamDefinitionUtils.getReplicationFactor(), null));
-
-            keySpaceDef = cluster.describeKeyspace(keySpaceName);
-            //Sometimes it takes some time to make keySpaceDef!=null
-            int retryCount = 0;
-            while (keySpaceDef == null && retryCount < 100) {
-                try {
-                    Thread.sleep(100);
-                    keySpaceDef = cluster.describeKeyspace(keySpaceName);
-                    if (keySpaceDef != null) {
-                        break;
-                    }
-                } catch (InterruptedException e) {
-                    break;
+            synchronized (this) {
+                keySpaceDef = cluster.describeKeyspace(keySpaceName);
+                if (keySpaceDef == null) {
+                    cluster.addKeyspace(HFactory.createKeyspaceDefinition(
+                            keySpaceName, StreamDefinitionUtils.getStrategyClass(),
+                            StreamDefinitionUtils.getReplicationFactor(), null), true);
+                    return true;
+                } else {
+                    return false;
                 }
             }
-            return true;
         } else {
             return false;
         }
-
-
     }
 
     public List<String> insertEventList(Credentials credentials, Cluster cluster,
@@ -524,33 +482,43 @@ public class CassandraConnector {
         List<String> rowKeyList = new ArrayList<String>();
         startTimeMeasurement(IS_PERFORMANCE_MEASURED);
 
-        Map<String, Attribute> metaIndex     = null;
-        Map<String, Attribute> payloadIndex  = null;
+        Map<String, Attribute> metaIndex = null;
+        Map<String, Attribute> payloadIndex = null;
         Map<String, Attribute> correlationIndex = null;
-        Map<String, Attribute> generalIndex  = null;
-        Map<String, Attribute> fixedIndexProperties  = null;
+        Map<String, Attribute> generalIndex = null;
+        Map<String, Attribute> fixedIndexProperties = null;
         Map<String, AttributeValue> fixedIndexPropertyValueMap = null;
+        Map<String, Attribute> arbitraryIndex = null;
         boolean isIncrementalIndex = false;
-        boolean isTimeStampIndex   = false;
+        boolean isTimeStampIndex = false;
 
         for (Event event : eventList) {
 
             String rowKey;
-            streamDef = getStreamDefinitionFromStore(credentials, event.getStreamId());
+            streamDef = getStreamDefinitionFromStore(event.getStreamId());
 
-            if(streamDef == null) {
+            if (!Boolean.parseBoolean(streamInitializationCache.get(event.getStreamId()))) {
+                synchronized (this) {
+                    if (!Boolean.parseBoolean(streamInitializationCache.get(event.getStreamId()))) {
+                        createColumnFamilyForStream(cluster, streamDef);
+                    }
+                }
+            }
+
+            if (streamDef == null) {
                 return null;
             }
 
-            if(streamDef.getIndexDefinition() != null) {
+            if (streamDef.getIndexDefinition() != null) {
                 IndexDefinition indexDefinition = streamDef.getIndexDefinition();
-                metaIndex   = indexDefinition.getMetaCustomIndex();
-                payloadIndex= indexDefinition.getPayloadCustomIndex();
+                metaIndex = indexDefinition.getMetaCustomIndex();
+                payloadIndex = indexDefinition.getPayloadCustomIndex();
                 correlationIndex = indexDefinition.getCorrelationCustomIndex();
-                generalIndex= indexDefinition.getGeneralCustomIndex();
-                fixedIndexProperties  = indexDefinition.getFixedPropertiesMap();
+                generalIndex = indexDefinition.getGeneralCustomIndex();
+                fixedIndexProperties = indexDefinition.getFixedPropertiesMap();
                 isIncrementalIndex = indexDefinition.isIncrementalIndex();
-                isTimeStampIndex   = streamDef.getIndexDefinition().isIndexTimestamp();
+                isTimeStampIndex = streamDef.getIndexDefinition().isIndexTimestamp();
+                arbitraryIndex = indexDefinition.getArbitraryIndex();
                 fixedIndexPropertyValueMap = new LinkedHashMap<String, AttributeValue>();
             }
 
@@ -610,19 +578,25 @@ public class CassandraConnector {
 
             mutator.addInsertion(rowKey, streamColumnFamily,
                     HFactory.createColumn(STREAM_TIMESTAMP_KEY, timestamp, stringSerializer,
-                            longSerializer));
+                            longSerializer)
+            );
 
             if (event.getArbitraryDataMap() != null) {
-                this.insertVariableFields(streamColumnFamily, rowKey, mutator, event.getArbitraryDataMap());
+                if (arbitraryIndex == null) {
+                    this.insertVariableFields(streamColumnFamily, rowKey, mutator, event.getArbitraryDataMap());
+                } else {
+                    this.insertVariableFieldsWithIndexing(streamColumnFamily, rowKey, mutator, event.getArbitraryDataMap(),
+                            eventIndexMutator, arbitraryIndex, timestamp, fixedIndexPropertyValueMap);
+                }
             }
 
             //todo : come up with a better solution for this
-            if(fixedIndexProperties != null && !fixedIndexProperties.isEmpty()) {
+            if (fixedIndexProperties != null && !fixedIndexProperties.isEmpty()) {
                 fillIndexPropValueMap(fixedIndexPropertyValueMap,
                         event.getMetaData(), event.getCorrelationData(), event.getPayloadData(), streamDef);
             }
 
-            if(isTimeStampIndex) {
+            if (isTimeStampIndex) {
                 addIndexColumn(generalIndex.get(STREAM_TIMESTAMP_KEY), timestamp, streamColumnFamily, rowKey, timestamp,
                         fixedIndexPropertyValueMap, eventIndexMutator);
 
@@ -664,10 +638,10 @@ public class CassandraConnector {
                 }
             }
 
-           if (isIncrementalIndex){
-               addTimeStampIndex(rowKey, CassandraSDSUtils
-                       .getIndexColumnFamilyName(streamColumnFamily), eventIndexMutator);
-           }
+            if (isIncrementalIndex) {
+                addTimeStampIndex(rowKey, CassandraSDSUtils
+                        .getIndexColumnFamilyName(streamColumnFamily), eventIndexMutator);
+            }
 
             rowKeyList.add(rowKey);
 
@@ -688,18 +662,18 @@ public class CassandraConnector {
                                       Object[] payloadData,
                                       StreamDefinition streamDefinition) {
         List<Attribute> streamDefnAttrList = null;
-        IndexDefinition indexDefinition    = streamDefinition.getIndexDefinition();
+        IndexDefinition indexDefinition = streamDefinition.getIndexDefinition();
         Map<String, AttributeValue> tempValueMap = new HashMap<String, AttributeValue>();
 
         Set<String> metaFix = indexDefinition.getMetaFixProps();
         Set<String> correlationFix = indexDefinition.getCorrelationFixProps();
-        Set<String> payloadFix     = indexDefinition.getPayloadFixProps();
+        Set<String> payloadFix = indexDefinition.getPayloadFixProps();
 
-        if(metaFix != null) {
-            for(String property : metaFix) {
+        if (metaFix != null) {
+            for (String property : metaFix) {
                 streamDefnAttrList = streamDefinition.getMetaData();
                 for (int i = 0; i < streamDefnAttrList.size(); i++) {
-                    Attribute attribute  = streamDefnAttrList.get(i);
+                    Attribute attribute = streamDefnAttrList.get(i);
                     String attributeName = attribute.getName();
                     if (property.equals(attributeName)) {
                         tempValueMap.put(attributeName, new AttributeValue(metaData[i], attribute));
@@ -709,11 +683,11 @@ public class CassandraConnector {
             }
         }
 
-        if(correlationFix != null) {
-            for(String property : correlationFix) {
+        if (correlationFix != null) {
+            for (String property : correlationFix) {
                 streamDefnAttrList = streamDefinition.getCorrelationData();
                 for (int i = 0; i < streamDefnAttrList.size(); i++) {
-                    Attribute attribute  = streamDefnAttrList.get(i);
+                    Attribute attribute = streamDefnAttrList.get(i);
                     String attributeName = attribute.getName();
                     if (property.equals(attributeName)) {
                         tempValueMap.put(attributeName, new AttributeValue(correlationData[i], attribute));
@@ -723,11 +697,11 @@ public class CassandraConnector {
             }
         }
 
-        if(payloadFix != null) {
-            for(String property : payloadFix) {
+        if (payloadFix != null) {
+            for (String property : payloadFix) {
                 streamDefnAttrList = streamDefinition.getPayloadData();
                 for (int i = 0; i < streamDefnAttrList.size(); i++) {
-                    Attribute attribute  = streamDefnAttrList.get(i);
+                    Attribute attribute = streamDefnAttrList.get(i);
                     String attributeName = attribute.getName();
                     if (property.equals(attributeName)) {
                         tempValueMap.put(attributeName, new AttributeValue(payloadData[i], attribute));
@@ -738,12 +712,12 @@ public class CassandraConnector {
         }
 
         //Only version can be in general FIX properties
-        if(indexDefinition.getGeneralFixProps() != null) {
+        if (indexDefinition.getGeneralFixProps() != null) {
             tempValueMap.put(STREAM_VERSION_KEY,
                     new AttributeValue(streamDefinition.getVersion(), new Attribute(STREAM_VERSION_KEY, AttributeType.STRING)));
         }
 
-        for(String key : indexDefinition.getFixedPropertiesMap().keySet()) {
+        for (String key : indexDefinition.getFixedPropertiesMap().keySet()) {
             fixedPropertyValues.put(key, tempValueMap.get(key));
         }
     }
@@ -759,7 +733,8 @@ public class CassandraConnector {
                 HFactory.createStringColumn(colName, primaryCFRowKey));
     }
 
-    private void addTimeStampIndex(String eventRowKey, String indexCfName, Mutator<String> mutator) {
+    private void addTimeStampIndex(String eventRowKey, String indexCfName,
+                                   Mutator<String> mutator) {
         long timestamp;
         String keyStr;
 
@@ -781,7 +756,8 @@ public class CassandraConnector {
 
         mutator.addInsertion(String.valueOf(indexCfRowKey), indexCfName,
                 HFactory.createColumn(columnKey, eventRowKey,
-                        longSerializer, stringSerializer));
+                        longSerializer, stringSerializer)
+        );
 
         Long lastTimeStamp = indexCFLastAddedTimeStampCache.get(indexCfName);
 
@@ -933,54 +909,6 @@ public class CassandraConnector {
 
     }
 
-    /**
-     * Store event stream definition to Cassandra data store
-     *
-     * @param cluster Cluster of the tenant
-     */
-    public void saveStreamDefinitionToStore(Cluster cluster,
-                                            StreamDefinition streamDefinition)
-            throws StreamDefinitionStoreException {
-
-        String CFName = CassandraSDSUtils.convertStreamNameToCFName(streamDefinition.getName());
-
-
-        try {
-            //todo move this to defineStream
-            if (!CFCache.getCF(cluster, StreamDefinitionUtils.getKeySpaceName(), CFName)) {
-                createColumnFamily(cluster, StreamDefinitionUtils.getKeySpaceName(), CFName, streamDefinition);
-            }
-
-
-            Keyspace keyspace = getKeyspace(BAM_META_KEYSPACE, cluster);
-            Mutator<String> mutator = HFactory.createMutator(keyspace, stringSerializer);
-            mutator.addInsertion(streamDefinition.getStreamId(), BAM_META_STREAM_DEF_CF,
-                    HFactory.createStringColumn(STREAM_DEF, EventDefinitionConverterUtils
-                            .convertToJson(streamDefinition)
-                    ));
-
-            mutator.execute();
-
-            log.info("Saving Stream Definition : " + streamDefinition.getStreamId());
-
-            if (log.isDebugEnabled()) {
-                String logMsg = "saveStreamDefinition executed. \n";
-
-                Credentials credentials = getCredentials(cluster);
-                StreamDefinition streamDefinitionFromStore =
-                        getStreamDefinitionFromStore(credentials, streamDefinition.getStreamId());
-                logMsg += " stream definition saved : " + streamDefinitionFromStore.toString() +
-                        " \n";
-
-                log.debug(logMsg);
-            }
-
-        } catch (ExecutionException e) {
-            throw new StreamDefinitionStoreException("Error getting column family : " + CFName, e);
-        }
-
-
-    }
 
     public static Credentials getCredentials(Cluster cluster) {
         Map<String, String> credentials = cluster.getCredentials();
@@ -997,55 +925,6 @@ public class CassandraConnector {
         return creds;
     }
 
-    public boolean deleteStreamDefinitionFromStore(Cluster cluster, String streamId)
-            throws StreamDefinitionStoreException {
-
-        // delete entry from stream definitions
-        Keyspace keyspace = getKeyspace(BAM_META_KEYSPACE, cluster);
-        Mutator<String> mutator = HFactory.createMutator(keyspace, stringSerializer);
-        mutator.delete(streamId, BAM_META_STREAM_DEF_CF, STREAM_DEF, stringSerializer);
-
-        //Doesn't matter whether the exception throws from this block
-        try {
-            deleteIndexDefinitionFromStore(cluster, streamId);
-        } catch (StreamDefinitionStoreException e) {
-        }
-
-        return true;
-    }
-
-    public boolean deleteStreamDefinitionFromCassandra(Cluster cluster, String streamId)
-            throws StreamDefinitionStoreException {
-
-        Credentials credentials = getCredentials(cluster);
-        // clear data
-        deleteDataFromStreamDefinition(credentials, cluster, streamId);
-
-        // delete entry from stream definitions
-        Keyspace keyspace = getKeyspace(BAM_META_KEYSPACE, cluster);
-        Mutator<String> mutator = HFactory.createMutator(keyspace, stringSerializer);
-        mutator.delete(streamId, BAM_META_STREAM_DEF_CF, STREAM_DEF, stringSerializer);
-
-        //Doesn't matter whether the exception throws from this block
-        try {
-            deleteIndexDefinitionFromStore(cluster, streamId);
-        } catch (StreamDefinitionStoreException e) {
-        }
-
-        return true;
-    }
-
-    public boolean deleteIndexDefinitionFromStore(Cluster cluster, String streamId)
-            throws StreamDefinitionStoreException {
-        // delete entry from index definitions
-        Keyspace keyspace = getKeyspace(StreamDefinitionUtils.getIndexKeySpaceName(), cluster);
-        Mutator<String> mutator = HFactory.createMutator(keyspace, stringSerializer);
-        mutator.delete(streamId, INDEX_DEF_CF, SECONDARY_INDEX_DEF, stringSerializer);
-        mutator.delete(streamId, INDEX_DEF_CF, CUSTOM_INDEX_DEF, stringSerializer);
-
-        return true;
-
-    }
 
     private void deleteDataFromStreamDefinition(Credentials credentials, Cluster cluster,
                                                 String streamId) {
@@ -1136,122 +1015,78 @@ public class CassandraConnector {
      * @throws StreamDefinitionStoreException Thrown if the stream definitions are malformed
      */
 
-    public StreamDefinition getStreamDefinitionFromStore(Credentials credentials, String streamId) {
+    public StreamDefinition getStreamDefinitionFromStore(String streamId) {
         try {
-            return StreamDefnCache.getStreamDefinition(credentials, streamId);
-        } catch (ExecutionException e) {
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            return ServiceHolder.getStreamDefinitionStoreService().getStreamDefinition(streamId, tenantId);
+        } catch (StreamDefinitionStoreException e) {
+            log.error("Error while retrieving the stream definition from stream definition store when storing " +
+                    "the event in cassandra. " + e.getMessage(), e);
             return null;
         }
     }
 
-    /**
-     * Invalidate Stream Definition stored in stream definition column family under key domainName-streamIdKey
-     *
-     * @param credentials
-     * @param streamId
-     */
-    public void invalidateDefinitionFromStore(Credentials credentials, String streamId) {
-        try {
-            StreamDefnCache.invalidateStreamDefinition(credentials, streamId);
-        } catch (Exception e) {
-            return;
-        }
-    }
 
-    public StreamDefinition getStreamDefinitionFromCassandra(
-            Cluster cluster, String streamId) throws StreamDefinitionStoreException {
-        StreamDefinition streamDefinition = null;
-        Keyspace keyspace =
-                getKeyspace(BAM_META_KEYSPACE, cluster);
-        ColumnQuery<String, String, String> columnQuery =
-                HFactory.createStringColumnQuery(keyspace);
-        columnQuery.setColumnFamily(BAM_META_STREAM_DEF_CF)
-                .setKey(streamId).setName(STREAM_DEF);
-        QueryResult<HColumn<String, String>> result = columnQuery.execute();
-        HColumn<String, String> hColumn = result.get();
-        try {
-            if (hColumn != null) {
-                streamDefinition = EventDefinitionConverterUtils.convertFromJson(hColumn.getValue());
-            }
-        } catch (MalformedStreamDefinitionException e) {
-            throw new StreamDefinitionStoreException(
-                    "Retrieved definition from Cassandra store is malformed. Retrieved "
-                            + "value : " + hColumn.getValue());
-        }
+//    public String getIndexDefinitionFromCassandra(Cluster cluster, String streamName)
+//            throws StreamDefinitionStoreException {
+//        StringBuilder indexSB = new StringBuilder();
+//        String secIndex = "";
+//        String custIndex = "";
+//        String fixedIndex = "";
+//        boolean incrementalIndex = false;
+//        String arbitraryIndex = "";
+//
+//        Keyspace keyspace = getKeyspace(StreamDefinitionUtils.getIndexKeySpaceName(), cluster);
+//        SliceQuery<String, String, String> sliceQuery =
+//                HFactory.createSliceQuery(keyspace, stringSerializer, stringSerializer,
+//                                          stringSerializer);
+//        sliceQuery.setColumnFamily(INDEX_DEF_CF).setKey(streamName);
+//        sliceQuery.setRange(null, null, false, 5);
+//
+//        QueryResult<ColumnSlice<String, String>> result = sliceQuery.execute();
+//
+//        for (HColumn<String, String> column : result.get().getColumns()) {
+//            if (column.getName().equals(SECONDARY_INDEX_DEF)) {
+//                secIndex = column.getValue();
+//            } else if (column.getName().equals(CUSTOM_INDEX_DEF)) {
+//                custIndex = column.getValue();
+//            } else if (column.getName().equals(FIXED_SEARCH_DEF)) {
+//                fixedIndex = column.getValue();
+//            } else if (column.getName().equals(INCREMENTAL_INDEX)) {
+//                incrementalIndex = true;
+//            } else if (column.getName().equals(ARBITRARY_INDEX_DEF)) {
+//                arbitraryIndex = column.getValue();
+//            }
+//        }
+//
+//        if (secIndex.isEmpty() && custIndex.isEmpty() && !fixedIndex.isEmpty()
+//            && !incrementalIndex && !arbitraryIndex.isEmpty()) {
+//            return null;
+//        }
+//
+//        return indexSB.append(secIndex).append("|").append(custIndex).append("|").append(fixedIndex).
+//                append("|").append(incrementalIndex).append("|").append(arbitraryIndex).toString();
+//    }
 
-        if(streamDefinition != null) {
-            //no worries even if exception throws.
-            try {
-                String indexDefnString = getIndexDefinitionFromCassandra(cluster, streamDefinition.getName());
-                if (indexDefnString != null) {
-                    streamDefinition.createIndexDefinitionFromStore((indexDefnString));
-                }
-                return streamDefinition;
-            } catch (Exception e) {
-                return streamDefinition;
-            }
-        }
-
-        return null;
-    }
-
-    public String getIndexDefinitionFromCassandra(Cluster cluster, String streamName)
-            throws StreamDefinitionStoreException {
-        StringBuilder indexSB = new StringBuilder();
-        String secIndex  = "";
-        String custIndex = "";
-        String fixedIndex= "";
-        boolean incrementalIndex = false;
-
-        Keyspace keyspace = getKeyspace(StreamDefinitionUtils.getIndexKeySpaceName(), cluster);
-        SliceQuery<String, String, String> sliceQuery =
-                HFactory.createSliceQuery(keyspace, stringSerializer, stringSerializer,
-                        stringSerializer);
-        sliceQuery.setColumnFamily(INDEX_DEF_CF).setKey(streamName);
-        sliceQuery.setRange(null, null, false, 4);
-
-        QueryResult<ColumnSlice<String,String>> result = sliceQuery.execute();
-
-        for (HColumn<String, String> column : result.get().getColumns()) {
-            if(column.getName().equals(SECONDARY_INDEX_DEF)) {
-                secIndex = column.getValue();
-            } else if(column.getName().equals(CUSTOM_INDEX_DEF)) {
-                custIndex= column.getValue();
-            } else if(column.getName().equals(FIXED_SEARCH_DEF)) {
-                fixedIndex= column.getValue();
-            } else if(column.getName().equals(INCREMENTAL_INDEX)){
-                 incrementalIndex = true;
-            }
-        }
-
-        if(secIndex.isEmpty() && custIndex.isEmpty() && !incrementalIndex) {
-            return null;
-        }
-
-        return indexSB.append(secIndex).append("|").append(custIndex).append("|").append(fixedIndex).
-                append("|").append(incrementalIndex).toString();
-    }
-
-    public void definedStream(Cluster cluster,
-                              StreamDefinition streamDefinition) {
+    public void createColumnFamilyForStream(Cluster cluster,
+                                            StreamDefinition streamDefinition) {
         String CFName = CassandraSDSUtils.convertStreamNameToCFName(streamDefinition.getName());
 
         ColumnFamilyDefinition cfDef = null;
         ColumnFamilyDefinition indexCfDef = null;
         String secondaryIndexDefn = null;
-        String customIndexDefn    = null;
-        String fixedSearchDefn    = null;
-        String incrementalIndex = null;
+        String customIndexDefn = null;
+        String arbitraryIndexDefn = null;
+        boolean isIncremental = false;
         try {
-            cfDef = getColumnFamily(cluster, StreamDefinitionUtils.getKeySpaceName(), CFName);
-            indexCfDef = getColumnFamily(cluster, StreamDefinitionUtils.getIndexKeySpaceName(),
-                    CassandraSDSUtils.getIndexColumnFamilyName(CFName));
 
+            cfDef = getColumnFamily(cluster, StreamDefinitionUtils.getKeySpaceName(), CFName);
+//            indexCfDef = getColumnFamily(cluster, StreamDefinitionUtils.getIndexKeySpaceName(),
+//                                         CassandraSDSUtils.getIndexColumnFamilyName(CFName));
             if (!CFCache.getCF(cluster, StreamDefinitionUtils.getKeySpaceName(), CFName)) {
                 if (cfDef == null) {
                     cfDef = createColumnFamily(cluster, StreamDefinitionUtils.getKeySpaceName(), CFName,
                             streamDefinition);
-                    return;
                 } else {
                     CFCache.putCF(cluster, StreamDefinitionUtils.getKeySpaceName(), CFName, true);
                 }
@@ -1260,51 +1095,35 @@ public class CassandraConnector {
             //Creating Indexes if exists in stream definition.
             //Todo - double check, need to create indexes for existing column families
             if (streamDefinition.getIndexDefinition() != null) {
-                Keyspace indexKeyspace      = getKeyspace(StreamDefinitionUtils.getIndexKeySpaceName(), cluster);
-                Mutator<String> indexMutator= HFactory.createMutator(indexKeyspace, stringSerializer);
+                Keyspace indexKeyspace = getKeyspace(StreamDefinitionUtils.getIndexKeySpaceName(), cluster);
+                Mutator<String> indexMutator = HFactory.createMutator(indexKeyspace, stringSerializer);
                 secondaryIndexDefn = streamDefinition.getIndexDefinition().getSecondaryIndexDefn();
-                customIndexDefn    = streamDefinition.getIndexDefinition().getCustomIndexDefn();
-                fixedSearchDefn    = streamDefinition.getIndexDefinition().getFixedSearchDefn();
-                incrementalIndex   = String.valueOf(streamDefinition.getIndexDefinition().isIncrementalIndex());
+                customIndexDefn = streamDefinition.getIndexDefinition().getCustomIndexDefn();
+                arbitraryIndexDefn = streamDefinition.getIndexDefinition().getArbitraryIndexDefn();
+                isIncremental = streamDefinition.getIndexDefinition().isIncrementalIndex();
 
                 if (secondaryIndexDefn != null) {
                     createSecondaryIndexes(cluster, cfDef, streamDefinition);
-                    indexMutator.addInsertion(streamDefinition.getName(), INDEX_DEF_CF,
-                            HFactory.createStringColumn(SECONDARY_INDEX_DEF, secondaryIndexDefn
-                            ));
-
                 }
                 if (customIndexDefn != null) {
                     createCustomIndexes(cluster, cfDef, streamDefinition, CFName);
-                    indexMutator.addInsertion(streamDefinition.getName(), INDEX_DEF_CF,
-                            HFactory.createStringColumn(CUSTOM_INDEX_DEF, customIndexDefn
-                            ));
                 }
 
-                if(fixedSearchDefn != null) {
-                    indexMutator.addInsertion(streamDefinition.getName(), INDEX_DEF_CF,
-                            HFactory.createStringColumn(FIXED_SEARCH_DEF, fixedSearchDefn
-                            ));
-
-                }if (Boolean.parseBoolean(incrementalIndex)){
-                    indexMutator.addInsertion(streamDefinition.getName(), INDEX_DEF_CF,
-                            HFactory.createStringColumn(INCREMENTAL_INDEX, incrementalIndex
-                            ));
+                if (arbitraryIndexDefn != null) {
+                    createArbitraryCustomIndexes(cluster, cfDef, streamDefinition, CFName);
                 }
 
-                indexMutator.execute();
-                invalidateDefinitionFromStore(getCredentials(cluster), streamDefinition.getStreamId());
-
-                //Initializing the IndexCF
-                if (!CFCache.getCF(cluster, StreamDefinitionUtils.getIndexKeySpaceName(),
-                        CassandraSDSUtils.getIndexColumnFamilyName(CFName))) {
-                    if (indexCfDef == null) {
-                        indexCfDef = createIndexColumnFamily(cluster, StreamDefinitionUtils.getIndexKeySpaceName(),
-                                CassandraSDSUtils.getIndexColumnFamilyName(CFName));
-                        return;
-                    } else {
-                        CFCache.putCF(cluster, StreamDefinitionUtils.getIndexKeySpaceName(),
-                                CassandraSDSUtils.getIndexColumnFamilyName(CFName), true);
+                if (isIncremental) {
+                    //Initializing the IndexCF
+                    if (!CFCache.getCF(cluster, StreamDefinitionUtils.getIndexKeySpaceName(),
+                            CassandraSDSUtils.getIndexColumnFamilyName(CFName))) {
+                        if (indexCfDef == null) {
+                            indexCfDef = createIndexColumnFamily(cluster, StreamDefinitionUtils.getIndexKeySpaceName(),
+                                    CassandraSDSUtils.getIndexColumnFamilyName(CFName));
+                        } else {
+                            CFCache.putCF(cluster, StreamDefinitionUtils.getIndexKeySpaceName(),
+                                    CassandraSDSUtils.getIndexColumnFamilyName(CFName), true);
+                        }
                     }
                 }
             }
@@ -1327,208 +1146,13 @@ public class CassandraConnector {
             if (originalColumnDefinitionSize != newColumnDefinitionSize) {
                 cluster.updateColumnFamily(cfDef, true);
             }
-
+            streamInitializationCache.put(streamDefinition.getStreamId(), Boolean.TRUE.toString());
         } catch (ExecutionException e) {
             log.error("Error while getting column family definition from cache at defined stream."
                     , e);
         }
-
-
     }
 
-    public void removeStream(Credentials credentials, Cluster cluster,
-                             StreamDefinition streamDefinition) {
-
-        // clear data
-        deleteDataFromStreamDefinition(credentials, cluster, streamDefinition.getStreamId());
-
-        // invalidate cache
-        StreamDefnCache.invalidateStreamDefinition(credentials, streamDefinition.getStreamId());
-    }
-
-    private static class StreamDefnCache {
-
-        private volatile static LoadingCache<StreamIdClusterBean, StreamDefinition> streamDefnCache = null;
-
-        private static void init() {
-            if (streamDefnCache != null) {
-                return;
-            }
-            synchronized (StreamDefnCache.class) {
-                if (streamDefnCache != null) {
-                    return;
-                }
-                streamDefnCache = CacheBuilder.newBuilder()
-                        .maximumSize(1000)
-                        .expireAfterAccess(30, TimeUnit.MINUTES)
-                        .build(new CacheLoader<StreamIdClusterBean, StreamDefinition>() {
-                            @Override
-                            public StreamDefinition load(StreamIdClusterBean streamIdClusterBean)
-                                    throws Exception {
-
-                                String sessionId = ServiceHolder.getDataBridgeReceiverService().
-                                        login(streamIdClusterBean.getUserName(),
-                                                streamIdClusterBean.getPassword());
-
-                                StreamDefinition streamDefinition =
-                                        ServiceHolder.getDataBridgeReceiverService().
-                                                getStreamDefinition(
-                                                        sessionId, DataBridgeCommonsUtils.getStreamNameFromStreamId(
-                                                        streamIdClusterBean.getStreamId()),
-                                                        DataBridgeCommonsUtils.getStreamVersionFromStreamId(
-                                                                streamIdClusterBean.getStreamId()));
-
-                                if (streamDefinition != null) {
-                                    return streamDefinition;
-                                }
-
-                                throw new NullValueException("No value found");
-                            }
-                        }
-                        );
-            }
-
-        }
-
-        public static StreamDefinition getStreamDefinition(Credentials credentials, String streamId)
-                throws ExecutionException {
-            init();
-            return streamDefnCache.get(new StreamIdClusterBean(credentials, streamId));
-        }
-
-        public static void invalidateStreamDefinition(Credentials credentials, String streamId) {
-            streamDefnCache.invalidate(new StreamIdClusterBean(credentials, streamId));
-        }
-
-
-        private static class StreamIdClusterBean {
-            private String tenantDomain;
-            private String streamId;
-            private Credentials credentials;
-
-            private StreamIdClusterBean(Credentials credentials, String streamId) {
-                this.credentials = credentials;
-                this.tenantDomain = credentials.getDomainName();
-                this.streamId = streamId;
-            }
-
-            public String getUserName() {
-                return credentials.getUsername();
-            }
-
-            public String getPassword() {
-                return credentials.getPassword();
-            }
-
-            public String getStreamId() {
-                return streamId;
-            }
-
-            @Override
-            public boolean equals(Object o) {
-                if (this == o) {
-                    return true;
-                }
-                if (o == null || getClass() != o.getClass()) {
-                    return false;
-                }
-
-                StreamIdClusterBean that = (StreamIdClusterBean) o;
-
-                return tenantDomain.equals(that.tenantDomain) && streamId.equals(that.streamId);
-
-            }
-
-            @Override
-            public int hashCode() {
-                int result = tenantDomain.hashCode();
-                result = 31 * result + streamId.hashCode();
-                return result;
-            }
-
-        }
-    }
-
-    /**
-     * Retrun all stream definitions stored under one domain
-     *
-     * @param cluster Tenant cluster
-     * @return All stream definitions related to given tenant domain
-     * @throws StreamDefinitionStoreException If the stream definitions are malformed
-     */
-    public Collection<StreamDefinition> getAllStreamDefinitionFromStore(Cluster cluster)
-            throws StreamDefinitionStoreException {
-
-        List<StreamDefinition> streamDefinitions = new ArrayList<StreamDefinition>();
-
-        Keyspace keyspace = getKeyspace(BAM_META_KEYSPACE, cluster);
-        int row_count = 100;
-        // get all stream ids
-        RangeSlicesQuery<String, String, String> query =
-                HFactory.createRangeSlicesQuery(keyspace, stringSerializer, stringSerializer, stringSerializer);
-        query.setColumnFamily(BAM_META_STREAM_DEF_CF);
-        String last_key = "";
-        query.setColumnNames(STREAM_DEF);
-        query.setRowCount(row_count);
-
-
-        String logMsg = null;
-        if (log.isDebugEnabled()) {
-            logMsg = "getAllStreamDefinitions called : \n";
-        }
-        int count = 0;
-        while (true) {
-            query.setKeys(last_key, "");
-            QueryResult<OrderedRows<String, String, String>> result = query.execute();
-
-            int iter = 0;
-            for (Row<String, String, String> row : result.get()) {
-                iter++;
-                if (row == null) {
-                    continue;
-                }
-
-                if (!last_key.equals("") && iter == 1) {
-                    //since last iteration-last row, and this iteration first ro returns same row.
-                    continue;
-                }
-                count++;
-
-                last_key = row.getKey();
-
-                if (null != row.getColumnSlice().getColumnByName(STREAM_DEF)) {
-                    String streamDefinitionString = row.getColumnSlice().getColumnByName(STREAM_DEF).getValue();
-
-                    try {
-                        StreamDefinition streamDefinition = EventDefinitionConverterUtils.convertFromJson(streamDefinitionString);
-                        streamDefinitions.add(streamDefinition);
-
-                        try {
-                            String indexDefnString = getIndexDefinitionFromCassandra(cluster, streamDefinition.getName());
-                            if (indexDefnString != null) {
-                                streamDefinition.createIndexDefinitionFromStore((indexDefnString));
-                            }
-                        } catch (Exception ignored) {
-                        }
-                    } catch (MalformedStreamDefinitionException e) {
-                        log.error("Malformed StreamDefinition " + streamDefinitionString);
-                    }
-                }
-
-            }
-
-            if (result.get().getCount() < row_count) {
-                break;
-            }
-        }
-
-        if (log.isDebugEnabled()) {
-            log.debug(logMsg);
-            log.info("Stream Id returned from cassandra: " + count);
-        }
-
-        return streamDefinitions;
-    }
 
     // Default access methods shared witloadh unit tests
 
@@ -1538,7 +1162,35 @@ public class CassandraConnector {
         for (Map.Entry<String, String> stringStringEntry : customKeyValuePairs.entrySet()) {
             mutator.addInsertion(rowKey, streamColumnFamily,
                     HFactory.createStringColumn(stringStringEntry.getKey(),
-                            stringStringEntry.getValue()));
+                            stringStringEntry.getValue())
+            );
+        }
+    }
+
+    void insertVariableFieldsWithIndexing(String streamColumnFamily, String rowKey,
+                                          Mutator<String> mutator,
+                                          Map<String, String> customKeyValuePairs,
+                                          Mutator<String> indexMutator,
+                                          Map<String, Attribute> indexProps,
+                                          long timestamp,
+                                          Map<String, AttributeValue> fixedIndexPropertyValueMap) {
+        for (Map.Entry<String, String> stringStringEntry : customKeyValuePairs.entrySet()) {
+            mutator.addInsertion(rowKey, streamColumnFamily,
+                    HFactory.createStringColumn(stringStringEntry.getKey(),
+                            stringStringEntry.getValue())
+            );
+            if (indexProps.containsKey(stringStringEntry.getKey())) {
+                Attribute attribute = indexProps.get(stringStringEntry.getKey());
+                Object value = CassandraSDSUtils.getParsedArbitraryFieldValue(stringStringEntry.getValue(), attribute.getType());
+                if (value != null) {
+                    addIndexColumn(attribute, value, streamColumnFamily, rowKey, timestamp,
+                            fixedIndexPropertyValueMap, indexMutator);
+                } else {
+                    log.debug("Parsing error. Cannot index the arbitrary field" + stringStringEntry.getKey());
+                }
+            } else {
+                log.debug("Cannot Find Index for arbitrary field : " + stringStringEntry.getKey());
+            }
         }
     }
 
@@ -1569,7 +1221,7 @@ public class CassandraConnector {
 
             typeInserter.addDataToBatchInsertion(data[i], streamColumnFamily, columnName, rowKey, mutator);
 
-            if(attribute.getName().equals(BAM_ACTIVITY_ID)) {
+            if (attribute.getName().equals(BAM_ACTIVITY_ID)) {
                 addActivityCorrelationIndex(String.valueOf(data[i]), rowKey, streamColumnFamily,
                         indexMutator, timestamp);
             }
@@ -1592,7 +1244,7 @@ public class CassandraConnector {
 
             typeInserter.addDataToBatchInsertion(data[i], streamColumnFamily, columnName, rowKey, mutator);
 
-            if(indexProps.containsKey(attribute.getName())) {
+            if (indexProps.containsKey(attribute.getName())) {
                 addIndexColumn(attribute, data[i], streamColumnFamily, rowKey, timestamp,
                         fixedIndexPropertyValueMap, indexMutator);
             }
@@ -1600,7 +1252,8 @@ public class CassandraConnector {
         return mutator;
     }
 
-    Mutator prepareCorrelationDataForInsertionWithIndexing(Object[] data, List<Attribute> streamDefnAttrList,
+    Mutator prepareCorrelationDataForInsertionWithIndexing(Object[] data,
+                                                           List<Attribute> streamDefnAttrList,
                                                            DataType dataType,
                                                            String rowKey, String streamColumnFamily,
                                                            Mutator<String> mutator,
@@ -1615,12 +1268,12 @@ public class CassandraConnector {
 
             typeInserter.addDataToBatchInsertion(data[i], streamColumnFamily, columnName, rowKey, mutator);
 
-            if(indexProps.containsKey(attribute.getName())) {
+            if (indexProps.containsKey(attribute.getName())) {
                 addIndexColumn(attribute, data[i], streamColumnFamily, rowKey, timestamp,
                         fixedIndexPropertyValueMap, indexMutator);
             }
 
-            if(attribute.getName().equals(BAM_ACTIVITY_ID)) {
+            if (attribute.getName().equals(BAM_ACTIVITY_ID)) {
                 addActivityCorrelationIndex(String.valueOf(data[i]), rowKey, streamColumnFamily,
                         indexMutator, timestamp);
             }
@@ -1635,71 +1288,75 @@ public class CassandraConnector {
         DynamicComposite colKey1 = new DynamicComposite();
         DynamicComposite colKey2 = new DynamicComposite();
 
-        Object finalValueObj  = null;
+        Object finalValueObj = null;
         Serializer serializer = null;
         boolean isMapModified = false;
 
-        if(!fixedIndexPropertyValueMap.containsKey(attribute.getName())) {
-            fixedIndexPropertyValueMap.put(attribute.getName(),
-                    new AttributeValue(data, attribute));
-            isMapModified = true;
-        }
+        try {
+            if (!fixedIndexPropertyValueMap.containsKey(attribute.getName())) {
+                fixedIndexPropertyValueMap.put(attribute.getName(),
+                        new AttributeValue(data, attribute));
+                isMapModified = true;
+            }
 
-        for (String key : fixedIndexPropertyValueMap.keySet()) {
-            AttributeType attributeType = fixedIndexPropertyValueMap.get(key).getAttribute().getType();
-            Object attributeValue       = fixedIndexPropertyValueMap.get(key).getValue();
-            switch (attributeType) {
-                case BOOL: {
-                    finalValueObj = (Boolean) attributeValue;
-                    serializer    = booleanSerializer;
-                    break;
+            for (String key : fixedIndexPropertyValueMap.keySet()) {
+                AttributeType attributeType = fixedIndexPropertyValueMap.get(key).getAttribute().getType();
+                Object attributeValue = fixedIndexPropertyValueMap.get(key).getValue();
+                switch (attributeType) {
+                    case BOOL: {
+                        finalValueObj = (Boolean) attributeValue;
+                        serializer = booleanSerializer;
+                        break;
+                    }
+                    case INT: {          //Integers aslo inserting as longs until hector fixes on dynamic composite is done
+                        finalValueObj = ((attributeValue) instanceof Double) ? ((Double) attributeValue).longValue()
+                                : (Integer) attributeValue;
+                        serializer = longSerializer;
+                        break;
+                    }
+                    case DOUBLE: {
+                        finalValueObj = (Double) attributeValue;
+                        serializer = doubleSerializer;
+                        break;
+                    }
+                    case FLOAT: {        //Floats aslo inserting as doubles until hector fixes on dynamic composite is done
+                        finalValueObj = ((attributeValue) instanceof Double) ? ((Double) attributeValue).doubleValue() : (Float) attributeValue;
+                        serializer = doubleSerializer;
+                        break;
+                    }
+                    case LONG: {
+                        finalValueObj = ((attributeValue) instanceof Double) ? ((Double) attributeValue).longValue() : (Long) attributeValue;
+                        serializer = longSerializer;
+                        break;
+                    }
+                    case STRING: {
+                        finalValueObj = (String) attributeValue;
+                        serializer = stringSerializer;
+                        break;
+                    }
                 }
-                case INT: {          //Integers aslo inserting as longs until hector fixes on dynamic composite is done
-                    finalValueObj = ((attributeValue) instanceof Double) ? ((Double) attributeValue).longValue()
-                            : (Integer) attributeValue;
-                    serializer    = longSerializer;
-                    break;
-                }
-                case DOUBLE: {
-                    finalValueObj = (Double) attributeValue;
-                    serializer    = doubleSerializer;
-                    break;
-                }
-                case FLOAT: {        //Floats aslo inserting as doubles until hector fixes on dynamic composite is done
-                    finalValueObj = ((attributeValue) instanceof Double) ? ((Double) attributeValue).doubleValue() : (Float) attributeValue;
-                    serializer    = doubleSerializer;
-                    break;
-                }
-                case LONG: {
-                    finalValueObj = ((attributeValue) instanceof Double) ? ((Double) attributeValue).longValue() : (Long) attributeValue;
-                    serializer    = longSerializer;
-                    break;
-                }
-                case STRING: {
-                    finalValueObj = (String) attributeValue;
-                    serializer    = stringSerializer;
-                    break;
+                if (finalValueObj != null) {
+                    colKey1.addComponent(finalValueObj, serializer);
                 }
             }
-            if (finalValueObj != null) {
-                colKey1.addComponent(finalValueObj, serializer);
+            colKey2.addComponent(finalValueObj, serializer);
+
+            if (isMapModified) {
+                fixedIndexPropertyValueMap.remove(attribute.getName());
             }
-        }
-        colKey2.addComponent(finalValueObj, serializer);
 
-        if(isMapModified) {
-            fixedIndexPropertyValueMap.remove(attribute.getName());
+            colKey1.addComponent(timeStamp, longSerializer);
+            colKey1.addComponent(rowKey, stringSerializer);
+            String indexColName = CassandraSDSUtils.getCustomIndexCFNameForInsert(streamColumnFamily, attribute.getName());
+            mutator.addInsertion(CUSTOM_INDEX_ROWS_KEY,
+                    indexColName,
+                    HFactory.createColumn(colKey1, rowKey, dynamicCompositeSerializer, stringSerializer));
+            mutator.addInsertion(CUSTOM_INDEX_VALUE_ROW_KEY,
+                    indexColName,
+                    HFactory.createColumn(colKey2, "", dynamicCompositeSerializer, stringSerializer));
+        } catch (Exception e) {
+            log.debug("Error while adding index column ", e);
         }
-
-        colKey1.addComponent(timeStamp, longSerializer);
-        colKey1.addComponent(rowKey, stringSerializer);
-        String indexColName = CassandraSDSUtils.getCustomIndexCFNameForInsert(streamColumnFamily, attribute.getName());
-        mutator.addInsertion(CUSTOM_INDEX_ROWS_KEY,
-                indexColName,
-                HFactory.createColumn(colKey1, rowKey, dynamicCompositeSerializer, stringSerializer));
-        mutator.addInsertion(CUSTOM_INDEX_VALUE_ROW_KEY,
-                indexColName,
-                HFactory.createColumn(colKey2, "", dynamicCompositeSerializer, stringSerializer));
         return mutator;
     }
 
@@ -1718,7 +1375,8 @@ public class CassandraConnector {
         return HFactory.createMutator(keyspace, stringSerializer);
     }
 
-    private Mutator<String> getMutator(Cluster cluster, String keySpaceName) throws StreamDefinitionStoreException {
+    private Mutator<String> getMutator(Cluster cluster, String keySpaceName)
+            throws StreamDefinitionStoreException {
         Keyspace keyspace = getKeyspace(keySpaceName, cluster);
         return HFactory.createMutator(keyspace, stringSerializer);
     }
@@ -1726,7 +1384,6 @@ public class CassandraConnector {
     static Keyspace getKeyspace(String keyspace, Cluster cluster) {
         return HFactory.createKeyspace(keyspace, cluster, StreamDefinitionUtils.getGlobalConsistencyLevelPolicy());
     }
-
 
 }
 

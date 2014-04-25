@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveContext;
 import org.wso2.carbon.analytics.hive.HiveConstants;
+import org.wso2.carbon.analytics.hive.cassandra.CassandraConfigurationAnalyzer;
 import org.wso2.carbon.analytics.hive.dto.QueryResult;
 import org.wso2.carbon.analytics.hive.dto.QueryResultRow;
 import org.wso2.carbon.analytics.hive.dto.ScriptResult;
@@ -254,6 +255,10 @@ public class HiveExecutorServiceImpl implements HiveExecutorService {
                     startDateTime = new Date();
                 }
 
+                CassandraConfigurationAnalyzer cassandraConfigurationAnalyzer =
+                        new CassandraConfigurationAnalyzer();
+                cassandraConfigurationAnalyzer.execute();
+
                 for (String cmdLine : cmdLines) {
 
                     String trimmedCmdLine = cmdLine.trim();
@@ -410,6 +415,9 @@ public class HiveExecutorServiceImpl implements HiveExecutorService {
                 incrAnalyzer.cleanUp();
             }
         }
+
+
+
 
         private void executeAnalyzer(String trimmedCmdLine) throws AnalyzerConfigException {
             String name;

@@ -2,6 +2,7 @@ package org.wso2.carbon.databridge.persistence.cassandra.internal.util;
 
 import org.wso2.carbon.cassandra.dataaccess.DataAccessService;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
+import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
 import org.wso2.carbon.databridge.persistence.cassandra.datastore.CassandraConnector;
 import org.wso2.carbon.identity.authentication.AuthenticationService;
 import org.wso2.carbon.registry.core.service.RegistryService;
@@ -35,6 +36,15 @@ public class ServiceHolder {
 
     private static DataBridgeReceiverService dataBridgeReceiverService;
 
+    private static AbstractStreamDefinitionStore streamDefinitionStoreService;
+
+    public static AbstractStreamDefinitionStore getStreamDefinitionStoreService() {
+        return streamDefinitionStoreService;
+    }
+
+    public static void setStreamDefinitionStoreService(AbstractStreamDefinitionStore streamDefinitionStoreService) {
+        ServiceHolder.streamDefinitionStoreService = streamDefinitionStoreService;
+    }
 
     public static CassandraConnector getCassandraConnector() {
         return cassandraConnector;
@@ -80,7 +90,8 @@ public class ServiceHolder {
         return configurationContextService;
     }
 
-    public static void setConfigurationContextService(ConfigurationContextService configurationContextService) {
+    public static void setConfigurationContextService(
+            ConfigurationContextService configurationContextService) {
         ServiceHolder.configurationContextService = configurationContextService;
     }
 
@@ -88,7 +99,8 @@ public class ServiceHolder {
         return dataBridgeReceiverService;
     }
 
-    public static void setDataBridgeReceiverService(DataBridgeReceiverService dataBridgeReceiverService) {
+    public static void setDataBridgeReceiverService(
+            DataBridgeReceiverService dataBridgeReceiverService) {
         ServiceHolder.dataBridgeReceiverService = dataBridgeReceiverService;
     }
 

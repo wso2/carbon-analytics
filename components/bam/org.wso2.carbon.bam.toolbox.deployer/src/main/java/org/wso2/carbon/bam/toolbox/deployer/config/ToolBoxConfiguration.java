@@ -214,6 +214,10 @@ public class ToolBoxConfiguration {
         return this.config.toString();
     }
 
+    public boolean configExists() {
+        return (config != null);
+    }
+
     public ArrayList<String> getScriptNames() throws BAMToolboxDeploymentException {
         if (null != config) {
             ArrayList<String> scripts = new ArrayList<String>();

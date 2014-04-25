@@ -27,11 +27,12 @@ public class LongInserter implements TypeInserter {
 
     @Override
     public Mutator addDataToBatchInsertion(Object data, String streamColumnFamily,
-                                           String columnName, String rowKey, Mutator<String> mutator) {
+                                           String columnName, String rowKey,
+                                           Mutator<String> mutator) {
         Long longVal = ((data) instanceof Double) ? ((Double) data).longValue() : (Long) data;
         if (longVal != null) {
             mutator.addInsertion(rowKey, streamColumnFamily,
-                    HFactory.createColumn(columnName, longVal, stringSerializer, longSerializer));
+                                 HFactory.createColumn(columnName, longVal, stringSerializer, longSerializer));
         }
         return mutator;
     }

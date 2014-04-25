@@ -71,7 +71,7 @@ public class BAMArtifactDeployerManager {
             String scriptName = scriptFile.getName();
             scriptName = scriptName.split("\\.")[0];
             String content = getContent(scriptFile);
-            scriptName = scriptName + "_" + getRandomArtifactId();
+            //scriptName = scriptName + "_" + getRandomArtifactId();
             scriptNameWithId.add(scriptName);
             try {
                 HiveScriptStoreClient scriptStoreClient = HiveScriptStoreClient.getInstance();
@@ -98,13 +98,22 @@ public class BAMArtifactDeployerManager {
         try {
             DashboardClient dashboardClient = DashboardClient.getInstance();
             for (DashBoardTabDTO tabDTO : toolBoxDTO.getDashboardTabs()) {
+                int gadgetCount = 0;
                 if (tabDTO.getGadgets().size() > 0) {
                     int tabID = dashboardClient.addTab(username, tabDTO.getTabName());
                     tabDTO.setTabId(tabID);
                     for (String aGadget : tabDTO.getGadgets()) {
-                        ServiceHolder.getGadgetRepoService().addGadgetEntryToRepo(aGadget.replaceAll(".xml", ""), "conf:/repository/gadget-server/gadgets/" + aGadget, "", null, null, null);
-                        dashboardClient.addNewGadget(username, String.valueOf(tabID),
-                                "/registry/resource/_system/config/repository/gadget-server/gadgets/" + aGadget);
+                        boolean gadgetNotExists = ServiceHolder.getGadgetRepoService().addGadgetEntryToRepo(
+                                aGadget.replaceAll(".xml", ""), "conf:/repository/gadget-server/gadgets/" + aGadget, "", null, null, null);
+                        if(gadgetNotExists) {
+                            dashboardClient.addNewGadget(username, String.valueOf(tabID),
+                                    "/registry/resource/_system/config/repository/gadget-server/gadgets/" + aGadget);
+                            gadgetCount++;
+                        }
+                    }
+                    //remove above created tab since it doesn't has gadgets
+                    if(gadgetCount == 0) {
+                        dashboardClient.removeTab(username, tabID);
                     }
                 }
             }
@@ -141,7 +150,7 @@ public class BAMArtifactDeployerManager {
     private void undeployJasperTab(JasperTabDTO tabDTO, int tenantId)
             throws BAMToolboxDeploymentException {
         try {
-            Registry registry = ServiceHolder.getRegistry(tenantId);
+            Registry registry = ServiceHolder.getRegistryService().getConfigSystemRegistry(tenantId);
 
             String jrxmlPath = jasperPath + RegistryConstants.PATH_SEPARATOR +
                     tabDTO.getJrxmlFileName();
@@ -158,7 +167,7 @@ public class BAMArtifactDeployerManager {
             throws BAMToolboxDeploymentException {
         if (canDeployDataStreamDefn()) {
             if (null != toolBoxDTO.getStreamDefnParentDirectory()) {
-                deployStreamDefn(toolBoxDTO);
+                deployStreamDefn(toolBoxDTO, tenantId);
             }
         }
 
@@ -186,7 +195,7 @@ public class BAMArtifactDeployerManager {
     }
 
     private boolean canDeployDataStreamDefn() {
-        if (null == ServiceHolder.getDataBridgeReceiverService()) {
+        if (null == ServiceHolder.getEventStreamService()) {
             if (log.isDebugEnabled())
                 log.debug("No DataReceiverService Found! Skipping deploying DataStream Definitions..");
             return false;
@@ -194,13 +203,13 @@ public class BAMArtifactDeployerManager {
     }
 
 
-    private void deployStreamDefn(ToolBoxDTO toolBoxDTO)
+    private void deployStreamDefn(ToolBoxDTO toolBoxDTO, int tenantId)
             throws BAMToolboxDeploymentException {
         DataPublisher client = DataPublisher.getInstance();
         for (StreamDefnDTO defn : toolBoxDTO.getDataStreamDefs()) {
             String defnPath = toolBoxDTO.getStreamDefnParentDirectory() + File.separator + defn.getFileName();
             String streamDefn = getStreamDefinition(defnPath);
-            client.createEventDefn(streamDefn, defn.getUsername(), defn.getPassword(), defn.getIndexes());
+            client.createEventDefn(streamDefn, defn.getIndexes(), tenantId);
         }
     }
 
@@ -299,7 +308,7 @@ public class BAMArtifactDeployerManager {
             // Storing the root path for future reference
             String rootPath = rootDirectory.getAbsolutePath();
 
-            Registry registry = ServiceHolder.getRegistry(tenantId);
+            Registry registry = ServiceHolder.getRegistryService().getConfigSystemRegistry(tenantId);
 
             // Creating the default gadget collection resource
 
@@ -329,7 +338,7 @@ public class BAMArtifactDeployerManager {
             // Storing the root path for future reference
             String rootPath = rootDirectory.getAbsolutePath();
 
-            Registry registry = ServiceHolder.getRegistry(tenantId);
+            Registry registry = ServiceHolder.getRegistryService().getConfigSystemRegistry(tenantId);
 
             // Creating the default gadget collection resource
 
@@ -393,7 +402,7 @@ public class BAMArtifactDeployerManager {
     private static void addToRegistry(String rootPath, File file, String registryPath, int tenantId)
             throws BAMToolboxDeploymentException {
         try {
-            Registry registry = ServiceHolder.getRegistry(tenantId);
+            Registry registry = ServiceHolder.getRegistryService().getConfigSystemRegistry(tenantId);
 
             // This path is used to store the file resource under registry
             String fileRegistryPath =
@@ -411,9 +420,9 @@ public class BAMArtifactDeployerManager {
             }
             fileResource.setContentStream(new FileInputStream(file));
             registry.put(fileRegistryPath, fileResource);
-
-            //adding anon role to the gadget
-            AuthorizationManager authorizationManager = ((UserRegistry) ServiceHolder.getRegistry(tenantId)).getUserRealm().getAuthorizationManager();
+             //adding anon role to the gadget
+            AuthorizationManager authorizationManager = ((UserRegistry) ServiceHolder.getRegistryService().getConfigSystemRegistry(tenantId)).
+                    getUserRealm().getAuthorizationManager();
             authorizationManager.authorizeRole(CarbonConstants.REGISTRY_ANONNYMOUS_ROLE_NAME,
                     RegistryConstants.CONFIG_REGISTRY_BASE_PATH + fileRegistryPath, ActionConstants.GET);
             Registry reg = ServiceHolder.getGovernanceSystemRegistry(tenantId);

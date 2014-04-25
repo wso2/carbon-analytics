@@ -1,5 +1,7 @@
 package org.wso2.carbon.bam.toolbox.deployer.util;
 
+import org.wso2.carbon.databridge.commons.IndexDefinitionConstants;
+
 /**
  * Copyright (c) 2009, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  * <p/>
@@ -48,9 +50,25 @@ public class StreamDefnDTO {
     public void setIndexes(String secondaryIndexes, String customIndexes,
                            String fixedSearchProperties, boolean incrementalIndex,
                            String arbitraryIndexes) {
-        if(!(secondaryIndexes.equals("") && customIndexes.equals("") && fixedSearchProperties.equals("") && !incrementalIndex))
-            this.indexes = secondaryIndexes + "|" + customIndexes + "|" +
-                    fixedSearchProperties + "|" + incrementalIndex + "|" + arbitraryIndexes;
+        indexes = "";
+        if (arbitraryIndexes != null)
+            indexes += "[" + IndexDefinitionConstants.ARBITRARY_INDEX + ":=" +
+                    arbitraryIndexes + "]" + ",\n";
+        if (customIndexes != null)
+            indexes += "[" + IndexDefinitionConstants.CUSTOM_INDEX + ":=" +
+                    customIndexes + "]" + ",\n";
+        if (fixedSearchProperties != null)
+            indexes += "[" + IndexDefinitionConstants.FIXED_INDEX + ":=" +
+                    fixedSearchProperties + "]" + ",\n";
+        if (incrementalIndex)
+            indexes += "[" + IndexDefinitionConstants.INCREMENTAL_INDEX + ":=" +
+                    incrementalIndex + "]" + ",\n";
+        if (secondaryIndexes != null)
+            indexes += "[" + IndexDefinitionConstants.SECONDARY_INDEX + ":=" +
+                    secondaryIndexes + "]" + ",\n";
+        if (!indexes.isEmpty()) {
+            indexes = indexes.substring(0, indexes.length() - 2);
+        }
     }
 
     public String getIndexes() {

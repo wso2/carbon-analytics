@@ -55,7 +55,7 @@ public class ToolBoxConfigurationManager {
     public void addNewToolBoxConfiguration(ToolBoxDTO toolboxDTO, int tenantId) throws BAMToolboxDeploymentException {
         ToolBoxConfiguration configuration = createToolBoxConf(toolboxDTO);
         try {
-            Registry registry = ServiceHolder.getRegistry(tenantId);
+            Registry registry = ServiceHolder.getRegistryService().getConfigSystemRegistry(tenantId);
             saveNewConfiguration(registry, configuration.toString(),
                     toolboxDTO.getName());
         } catch (RegistryException e) {
@@ -67,21 +67,25 @@ public class ToolBoxConfigurationManager {
 
     public ToolBoxDTO getToolBox(String aToolName, int tenantId) throws BAMToolboxDeploymentException {
         ToolBoxConfiguration configuration = getToolBoxConfiguration(aToolName, tenantId);
-        ToolBoxDTO aToolBox = new ToolBoxDTO(aToolName);
-        aToolBox.setScriptNames(configuration.getScriptNames());
-        aToolBox.setDashboardTabs(configuration.getDashboardTabs());
-        aToolBox.setJaggeryDashboards(configuration.getJaggeryDashboards());
-        aToolBox.setJasperTabs(configuration.getJasperTabs());
-        aToolBox.setDataSource(configuration.getDataSource());
-        aToolBox.setDataSourceConfiguration(configuration.getDataSourceConfiguration());
-        return aToolBox;
+        if(configuration.configExists()) {
+            ToolBoxDTO aToolBox = new ToolBoxDTO(aToolName);
+            aToolBox.setScriptNames(configuration.getScriptNames());
+            aToolBox.setDashboardTabs(configuration.getDashboardTabs());
+            aToolBox.setJaggeryDashboards(configuration.getJaggeryDashboards());
+            aToolBox.setJasperTabs(configuration.getJasperTabs());
+            aToolBox.setDataSource(configuration.getDataSource());
+            aToolBox.setDataSourceConfiguration(configuration.getDataSourceConfiguration());
+            return aToolBox;
+        } else {
+            return null;
+        }
     }
 
     public void deleteToolBoxConfiguration(String toolBoxName, int tenantId) throws BAMToolboxDeploymentException {
       String path = BAMToolBoxDeployerConstants.BAM_BASE_PATH + BAMToolBoxDeployerConstants.TOOL_BOX_CONF +
                     BAMToolBoxDeployerConstants.FILE_SEPERATOR +toolBoxName;
         try {
-            Registry registry = ServiceHolder.getRegistry(tenantId);
+            Registry registry = ServiceHolder.getRegistryService().getConfigSystemRegistry(tenantId);
             registry.delete(path);
         } catch (RegistryException e) {
             log.error("Error while loading the registry for tenant:"+tenantId
@@ -95,7 +99,7 @@ public class ToolBoxConfigurationManager {
     public ArrayList<String> getAllToolBoxNames(int tenantId) throws BAMToolboxDeploymentException {
         try {
             ArrayList<String> toolNames = new ArrayList<String>();
-            Registry registry = ServiceHolder.getRegistry(tenantId);
+            Registry registry = ServiceHolder.getRegistryService().getConfigSystemRegistry(tenantId);
             String path = BAMToolBoxDeployerConstants.BAM_BASE_PATH + BAMToolBoxDeployerConstants.TOOL_BOX_CONF;
             if(registry.resourceExists(path)){
                 if(registry.get(path) instanceof Collection){
@@ -149,7 +153,7 @@ public class ToolBoxConfigurationManager {
 
     private ToolBoxConfiguration getToolBoxConfiguration(String toolBoxName, int tenantId) throws BAMToolboxDeploymentException {
            try {
-            Registry registry = ServiceHolder.getRegistry(tenantId);
+               Registry registry = ServiceHolder.getRegistryService().getConfigSystemRegistry(tenantId);
             String path = BAMToolBoxDeployerConstants.BAM_BASE_PATH + BAMToolBoxDeployerConstants.TOOL_BOX_CONF
                     + BAMToolBoxDeployerConstants.FILE_SEPERATOR + toolBoxName;
             if(registry.resourceExists(path)){
@@ -181,6 +185,9 @@ public class ToolBoxConfigurationManager {
             resource.setContent(configContent);
             String path = BAMToolBoxDeployerConstants.BAM_BASE_PATH + BAMToolBoxDeployerConstants.TOOL_BOX_CONF +
                     BAMToolBoxDeployerConstants.FILE_SEPERATOR +toolboxName;
+            if(registry.resourceExists(path)) {
+                registry.delete(path);
+            }
             registry.put(path, resource);
         } catch (RegistryException e) {
             log.error("Error while saving the configuration file " +

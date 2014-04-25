@@ -351,9 +351,6 @@
                             <fmt:message key="bam.toolboxes"/></span>
             </th>
             <th><span style="float: left; position: relative; margin-top: 2px;">
-                            <fmt:message key="tools.status"/></span>
-            </th>
-            <th><span style="float: left; position: relative; margin-top: 2px;">
                             <fmt:message key="operation"/></span>
             </th>
         </tr>
@@ -375,8 +372,6 @@
             <td><label>
                 <%=aName%>
             </label>
-            </td>
-            <td><fmt:message key="bam.tool.status.deployed"></fmt:message>
             </td>
             <td>
                 <nobr>
@@ -408,8 +403,6 @@
                 <%=aName%>
             </label>
             </td>
-            <td><fmt:message key="bam.tool.status.tobedeployed"></fmt:message>
-            </td>
             <td>
             </td>
 
@@ -434,8 +427,6 @@
             <td><label>
                 <%=aName%>
             </label>
-            </td>
-            <td><fmt:message key="bam.tool.status.tobeundeployed"></fmt:message>
             </td>
             <td>
             </td>

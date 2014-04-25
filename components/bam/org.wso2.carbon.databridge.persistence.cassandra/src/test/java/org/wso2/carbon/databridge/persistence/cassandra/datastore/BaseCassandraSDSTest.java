@@ -15,6 +15,7 @@ import org.cassandraunit.AbstractCassandraUnit4TestCase;
 import org.cassandraunit.dataset.DataSet;
 import org.cassandraunit.utils.EmbeddedCassandraServerHelper;
 import org.junit.BeforeClass;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
@@ -128,8 +129,9 @@ public class BaseCassandraSDSTest extends AbstractCassandraUnit4TestCase {
     protected String insertEvent(Cluster cluster, Event eventData, int eventCounter)
             throws MalformedStreamDefinitionException, StreamDefinitionStoreException {
 
-        StreamDefinition streamDef = cassandraConnector.getStreamDefinitionFromCassandra(
-                cluster, eventData.getStreamId());
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        StreamDefinition streamDef = ServiceHolder.getStreamDefinitionStoreService().
+                getStreamDefinition(eventData.getStreamId(),tenantId);
         String streamColumnFamily = CassandraSDSUtils.convertStreamNameToCFName(
                 DataBridgeCommonsUtils.getStreamNameFromStreamId(eventData.getStreamId()));
 
@@ -150,40 +152,41 @@ public class BaseCassandraSDSTest extends AbstractCassandraUnit4TestCase {
         }
 
         String rowKey = CassandraSDSUtils.createRowKey(timestamp, localAddress, port,
-                                                       eventCounter);
+                eventCounter);
 
         String streamDefDescription = streamDef.getDescription();
         String streamDefNickName = streamDef.getNickName();
 
         mutator.addInsertion(rowKey, streamColumnFamily,
-                             HFactory.createStringColumn(STREAM_ID_KEY, streamDef.getStreamId()));
+                HFactory.createStringColumn(STREAM_ID_KEY, streamDef.getStreamId()));
         mutator.addInsertion(rowKey, streamColumnFamily,
-                             HFactory.createStringColumn(STREAM_NAME_KEY, streamDef.getName()));
+                HFactory.createStringColumn(STREAM_NAME_KEY, streamDef.getName()));
         mutator.addInsertion(rowKey, streamColumnFamily,
-                             HFactory.createStringColumn(STREAM_VERSION_KEY, streamDef.getVersion()));
+                HFactory.createStringColumn(STREAM_VERSION_KEY, streamDef.getVersion()));
 
         if (streamDefDescription != null) {
             mutator.addInsertion(rowKey, streamColumnFamily,
-                                 HFactory.createStringColumn(STREAM_DESCRIPTION_KEY, streamDefDescription));
+                    HFactory.createStringColumn(STREAM_DESCRIPTION_KEY, streamDefDescription));
         }
         if (streamDefNickName != null) {
             mutator.addInsertion(rowKey, streamColumnFamily,
-                                 HFactory.createStringColumn(STREAM_NICK_NAME_KEY, streamDefNickName));
+                    HFactory.createStringColumn(STREAM_NICK_NAME_KEY, streamDefNickName));
         }
 
         mutator.addInsertion(rowKey, streamColumnFamily,
-                             HFactory.createColumn(STREAM_TIMESTAMP_KEY, timestamp, stringSerializer,
-                                                   longSerializer));
+                HFactory.createColumn(STREAM_TIMESTAMP_KEY, timestamp, stringSerializer,
+                        longSerializer)
+        );
 
         if (eventData.getArbitraryDataMap() != null) {
             cassandraConnector.insertVariableFields(streamColumnFamily, rowKey, mutator,
-                                                    eventData.getArbitraryDataMap());
+                    eventData.getArbitraryDataMap());
         }
 
         if (streamDef.getMetaData() != null) {
             cassandraConnector.prepareDataForInsertion(
                     eventData.getMetaData(), streamDef.getMetaData(), DataType.meta, rowKey,
-                                    streamColumnFamily, mutator);
+                    streamColumnFamily, mutator);
 
         }
         //Iterate for correlation  data
@@ -196,8 +199,8 @@ public class BaseCassandraSDSTest extends AbstractCassandraUnit4TestCase {
         //Iterate for payload data
         if (eventData.getPayloadData() != null) {
             cassandraConnector.prepareDataForInsertion(eventData.getPayloadData(),
-                                                       streamDef.getPayloadData(), DataType.payload,
-                                                       rowKey, streamColumnFamily, mutator);
+                    streamDef.getPayloadData(), DataType.payload,
+                    rowKey, streamColumnFamily, mutator);
         }
 
         cassandraConnector.commit(mutator);
@@ -213,8 +216,8 @@ public class BaseCassandraSDSTest extends AbstractCassandraUnit4TestCase {
 
         StreamDefinition streamDefinition = null;
         try {
-            streamDefinition = cassandraConnector.
-                    getStreamDefinitionFromCassandra(cluster, streamId);
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            streamDefinition = ServiceHolder.getStreamDefinitionStoreService().getStreamDefinition(streamId, tenantId);
         } catch (StreamDefinitionStoreException e) {
             log.error("Error while fetching stream definition from Cassandra..");
         }
@@ -234,7 +237,7 @@ public class BaseCassandraSDSTest extends AbstractCassandraUnit4TestCase {
 
         SliceQuery<String, String, ByteBuffer> sliceQuery =
                 HFactory.createSliceQuery(cassandraConnector.getKeyspace(BAM_EVENT_DATA_KEYSPACE, cluster), stringSerializer, stringSerializer,
-                                          byteBufferSerializer);
+                        byteBufferSerializer);
         String cfName = CassandraSDSUtils.convertStreamNameToCFName(
                 DataBridgeCommonsUtils.getStreamNameFromStreamId(streamId));
         sliceQuery.setKey(rowKey).setRange("", "", true, Integer.MAX_VALUE).setColumnFamily(
@@ -270,7 +273,7 @@ public class BaseCassandraSDSTest extends AbstractCassandraUnit4TestCase {
                 for (Attribute payloadDefinition : correlationDefinitions) {
                     correlationData.add(correlationData
                             .add(cassandraConnector.
-                            getValueForDataTypeList(columnSlice, payloadDefinition, DataType.correlation)));
+                                    getValueForDataTypeList(columnSlice, payloadDefinition, DataType.correlation)));
                 }
             }
         } catch (IOException e) {

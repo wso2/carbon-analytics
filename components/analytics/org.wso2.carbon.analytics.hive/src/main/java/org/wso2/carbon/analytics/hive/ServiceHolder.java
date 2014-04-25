@@ -17,6 +17,7 @@ package org.wso2.carbon.analytics.hive;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.analytics.hive.task.ScriptTaskProcessor;
 import org.wso2.carbon.analytics.hive.service.HiveExecutorService;
 import org.wso2.carbon.analytics.hive.web.HiveScriptStoreService;
 import org.wso2.carbon.base.ServerConfiguration;
@@ -41,6 +42,7 @@ public class ServiceHolder {
     private static RealmService realmService;
     private static DataSourceService dataSourceService;
     private static DataAccessService cassandraDataAccessService;
+    private static boolean disableAnalytics;
 
     private ServiceHolder(){
 
@@ -105,7 +107,15 @@ public class ServiceHolder {
         ServiceHolder.taskService = taskService;
         if (null != taskService) {
             try {
+                // If analytics disabled then we are not join to task scheduling.
+                if (Utils.isAnalyticsDisabled()) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Hive_Task type is not registering due to disable.analytics property.");
+                    }
+                    return;
+                }
                 taskService.registerTaskType(HiveConstants.HIVE_TASK);
+                ScriptTaskProcessor.getInstance().processPendingTasks();
             } catch (TaskException e) {
                 log.error("Error while initializing TaskManager. Script scheduling may not" +
                         " work properly..", e);

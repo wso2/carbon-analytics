@@ -51,6 +51,15 @@ import org.wso2.carbon.bam.toolbox.deployer.exception.BAMComponentNotFoundExcept
              log.error("Error while saving the hive script", e);
         }
     }
+    
+    public String[] getAllHiveScriptNames() {
+        try {
+            return service.getAllScriptNames();
+        } catch (HiveScriptStoreException e) {
+            log.error("Error while getting all the hive script names", e);
+            return new String[0];
+        }
+    }
 
     public void deleteScript(String scriptName){
         try {

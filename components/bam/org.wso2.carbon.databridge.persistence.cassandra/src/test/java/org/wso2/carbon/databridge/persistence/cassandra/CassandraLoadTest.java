@@ -26,6 +26,7 @@ public class CassandraLoadTest extends BaseCassandraSDSTest {
 
 
     private final Map<String, Event> insertedEvents = new HashMap<String, Event>();
+
     @Test
     public void loadTest() {
 //        // save stream defn 1

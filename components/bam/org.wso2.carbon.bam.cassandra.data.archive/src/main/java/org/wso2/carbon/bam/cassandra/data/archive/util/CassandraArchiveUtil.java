@@ -21,6 +21,7 @@ import org.wso2.carbon.analytics.hive.service.HiveExecutorService;
 import org.wso2.carbon.analytics.hive.web.HiveScriptStoreService;
 import org.wso2.carbon.cassandra.dataaccess.DataAccessService;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
+import org.wso2.carbon.event.stream.manager.core.EventStreamService;
 
 
 public class CassandraArchiveUtil {
@@ -32,6 +33,7 @@ public class CassandraArchiveUtil {
     public static final String CASSANDRA_PASSWORD = "cassandra_password";
 
     private static DataAccessService dataAccessService;
+    private static EventStreamService eventStreamService;
     private static HiveExecutorService hiveExecutor;
     private static HiveScriptStoreService hiveScriptStoreService;
     private static DataBridgeReceiverService dataBridgeService;
@@ -79,5 +81,13 @@ public class CassandraArchiveUtil {
 
     public static DataBridgeReceiverService getDataBridgeReceiverService (){
         return dataBridgeService;
+    }
+
+    public static EventStreamService getEventStreamService() {
+        return eventStreamService;
+    }
+
+    public static void setEventStreamService(EventStreamService eventStreamService) {
+        CassandraArchiveUtil.eventStreamService = eventStreamService;
     }
 }

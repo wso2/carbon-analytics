@@ -25,7 +25,12 @@ import org.wso2.carbon.utils.ServerConstants;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  * CassandraConnector helper Class
@@ -36,6 +41,7 @@ public class CassandraConnectorHelper {
 
     /**
      * Read event-stream-definition-auth.xml and return credentials.
+     *
      * @return
      */
 
@@ -60,7 +66,7 @@ public class CassandraConnectorHelper {
             log.error(DataReceiverConstants.CASSANDRA_STREAM_DEF_AUTH_CONF + "cannot be found in the path : " + path, e);
         } catch (XMLStreamException e) {
             log.error("Invalid XML for " + DataReceiverConstants.CASSANDRA_STREAM_DEF_AUTH_CONF + " located in " +
-                    "the path : " + path, e);
+                      "the path : " + path, e);
         } finally {
             try {
                 if (inputStream != null) {

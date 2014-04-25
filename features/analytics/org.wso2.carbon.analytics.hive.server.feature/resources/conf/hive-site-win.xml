@@ -1129,6 +1129,35 @@
     <value>${CARBON_HOME}/repository/components/plugins/hive_0.8.1.wso2v8.jar</value>
   </property>
 
+ <!--Incremental intermediate table configs -->
+   <property>
+    <name>hive.incremental.index.cassandra.keyspace</name>
+    <value>EVENT_INDEX_KS</value>
+  </property>
+
+   <property>
+    <name>hive.incremental.processing.intermediate.results.cassandra.keyspace</name>
+    <value>HIVE_INCREMENTAL_KS</value>
+   </property>
+
+   <property>
+    <name>hive.incremental.processing.intermediate.results.cassandra.hosts</name>
+    <value>localhost:9160</value>
+  </property>
+
+   <property>
+    <name>hive.incremental.processing.intermediate.results.cassandra.userName</name>
+    <value>admin</value>
+  </property>
+
+   <property>
+    <name>hive.incremental.processing.intermediate.results.cassandra.password</name>
+    <value>admin</value>
+  </property>
+
+
+ <!--End of Incremental intermediate table configs -->
+
   <property>
     <name>hadoop.embedded.local.mode</name>
     <value>true</value>
@@ -1156,7 +1185,7 @@
 
   <property>
     <name>hive.aux.jars.path</name>
-    <value>file:///${CARBON_HOME}/repository/components/plugins/apache-cassandra_1.1.3.wso2v5.jar,file:///${CARBON_HOME}/repository/components/plugins/guava_12.0.0.wso2v1.jar,file:///${CARBON_HOME}/repository/components/plugins/json_2.0.0.wso2v1.jar,file:///${CARBON_HOME}/repository/components/plugins/commons-dbcp_1.4.0.wso2v1.jar,file:///${CARBON_HOME}/repository/components/plugins/commons-pool_1.5.6.wso2v1.jar</value>
+    <value>file:///${CARBON_HOME}/repository/components/plugins/apache-cassandra_1.2.13.wso2v1.jar,file:///${CARBON_HOME}/repository/components/plugins/guava_12.0.0.wso2v1.jar,file:///${CARBON_HOME}/repository/components/plugins/json_2.0.0.wso2v1.jar,file:///${CARBON_HOME}/repository/components/plugins/commons-dbcp_1.4.0.wso2v1.jar,file:///${CARBON_HOME}/repository/components/plugins/commons-pool_1.5.6.wso2v1.jar</value>
   </property>
 
   <!-- Comment out below properties in order to point to a local pesudo distributed mode Hadoop installation running with default parameters provided in

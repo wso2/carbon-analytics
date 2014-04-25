@@ -26,8 +26,8 @@ public class ConfigFileTest {
     @Test
     public void readConfigFileValues() {
         StreamDefinitionUtils.readConfigFile();
-        assertEquals( 1, StreamDefinitionUtils.getReplicationFactor());
-        assertEquals( "QUORUM", StreamDefinitionUtils.getReadConsistencyLevel());
+        assertEquals(1, StreamDefinitionUtils.getReplicationFactor());
+        assertEquals("QUORUM", StreamDefinitionUtils.getReadConsistencyLevel());
         assertEquals("QUORUM", StreamDefinitionUtils.getWriteConsistencyLevel());
         assertEquals("org.apache.cassandra.locator.SimpleStrategy", StreamDefinitionUtils.getStrategyClass());
         assertNotNull(StreamDefinitionUtils.getGlobalConsistencyLevelPolicy());

@@ -49,12 +49,12 @@
                             <id>org.wso2.carbon.bam.cassandra.data.archive</id>
                             <propertiesFile>../../../etc/feature.properties</propertiesFile>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core:${carbon.platform.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core</importFeatureDef>
                             </importFeatures>
                             <includedFeatures>
-                                <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.bam.cassandra.data.archive.server.feature:4.3.0-SNAPSHOT
+                                <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.bam.cassandra.data.archive.server.feature
                                 </includedFeatureDef>
-                                <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.bam.cassandra.data.archive.ui.feature:${carbon.platform.version}
+                                <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.bam.cassandra.data.archive.ui.feature
                                 </includedFeatureDef>
                             </includedFeatures>
                         </configuration>

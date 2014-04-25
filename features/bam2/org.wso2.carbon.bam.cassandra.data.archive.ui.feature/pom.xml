@@ -51,11 +51,11 @@
                                 </properties>
                             </adviceFile>
                             <bundles>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.cassandra.data.archive.ui:${carbon.platform.version}</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.cassandra.data.archive.stub:${carbon.platform.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.cassandra.data.archive.ui</bundleDef>
+                                <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.cassandra.data.archive.stub</bundleDef>
                             </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core.ui:${carbon.platform.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core.ui</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>

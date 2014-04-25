@@ -28,11 +28,12 @@ public class BoolInserter implements TypeInserter {
 
     @Override
     public Mutator addDataToBatchInsertion(Object data, String streamColumnFamily,
-                                           String columnName, String rowKey, Mutator<String> mutator) {
+                                           String columnName, String rowKey,
+                                           Mutator<String> mutator) {
         Boolean boolVal = (Boolean) data;
         if (boolVal != null) {
             mutator.addInsertion(rowKey, streamColumnFamily,
-                    HFactory.createColumn(columnName, boolVal, stringSerializer, booleanSerializer));
+                                 HFactory.createColumn(columnName, boolVal, stringSerializer, booleanSerializer));
         }
         return mutator;
     }

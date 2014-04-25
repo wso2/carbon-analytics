@@ -2,7 +2,12 @@ package org.wso2.carbon.databridge.persistence.cassandra.internal.util;
 
 import org.apache.commons.io.IOUtils;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Copyright (c) WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -45,5 +50,6 @@ public final class AppendUtils {
         return new BufferedOutputStream(new FileOutputStream(f, true));
     }
 
-    private AppendUtils() {}
+    private AppendUtils() {
+    }
 }

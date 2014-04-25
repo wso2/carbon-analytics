@@ -22,5 +22,16 @@
             <style-class>manage</style-class>
             <icon>../bam-dashboard/images/portal.png</icon>
         </menu>
+        <menu>
+            <id>dashboard_menu_3</id>
+            <i18n-key>Message Console</i18n-key>
+            <i18n-bundle>org.wso2.carbon.bam.dashboard.ui.i18n.Resources</i18n-bundle>
+            <parent-menu>dashboard_main_menu</parent-menu>
+            <link>../bam-dashboard/message-console.jsp</link>
+            <region>region1</region>
+            <order>4</order>
+            <style-class>manage</style-class>
+            <icon>../bam-dashboard/images/console.png</icon>
+        </menu>
 	</menus>
 </component>

@@ -21,16 +21,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.bam.toolbox.deployer.ServiceHolder;
-import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
+import org.wso2.carbon.event.stream.manager.core.EventStreamService;
 
 /**
  * @scr.component name="org.wso2.carbon.bam.toolbox.databridge.service.component" immediate="true"
- * @scr.reference name="databridge.reciever"
- * interface="org.wso2.carbon.databridge.core.DataBridgeReceiverService"
- * cardinality="1..1"
- * policy="dynamic"
- * bind="setDataBridgeReceiverService"
- * unbind="unsetDataBridgeReceiverService"
+ * @scr.reference name="event.stream"
+ * interface="org.wso2.carbon.event.stream.manager.core.EventStreamService" cardinality="1..1"
+ * policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
  */
 
 public class DataBridgeRecieverServiceComponent {
@@ -40,13 +37,11 @@ public class DataBridgeRecieverServiceComponent {
         log.info("Successfully setted data bridge reciever service");
     }
 
-    protected void setDataBridgeReceiverService(DataBridgeReceiverService dataBridgeReceiverService) {
-        ServiceHolder.setDataBridgeReceiverService(dataBridgeReceiverService);
+    protected void setEventStreamService(EventStreamService eventStreamService) {
+        ServiceHolder.setEventStreamService(eventStreamService);
     }
 
-    protected void unsetDataBridgeReceiverService(DataBridgeReceiverService dataBridgeReceiverService) {
-        ServiceHolder.setDataBridgeReceiverService(null);
+    protected void unsetEventStreamService(EventStreamService eventStreamService) {
+        ServiceHolder.setEventStreamService(null);
     }
-
-
 }

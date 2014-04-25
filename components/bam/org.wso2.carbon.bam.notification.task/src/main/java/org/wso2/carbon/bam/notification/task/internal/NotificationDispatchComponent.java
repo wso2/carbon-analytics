@@ -46,6 +46,8 @@ public class NotificationDispatchComponent {
 
     private static final String DISABLE_NOTIFICATION_TASK = "disable.notification.task";
 
+    private static final String DISABLE_RECEIVER = "disable.receiver";
+
     private static TaskService taskService;
     
     private static EventStreamService eventStreamService;
@@ -57,6 +59,14 @@ public class NotificationDispatchComponent {
             if (System.getProperty(DISABLE_NOTIFICATION_TASK) != null) {
                 return;
             }
+
+            String disableReceiver = System.getProperty(DISABLE_RECEIVER);
+            if (disableReceiver != null && Boolean.parseBoolean(disableReceiver)) {
+                log.info("NotificationDispatchComponent disabled.");
+                return;
+            }
+
+
             getTaskService().registerTaskType(NotificationDispatchTask.TASK_TYPE);
             if (log.isDebugEnabled()) {
                 log.debug("Notification dispatch bundle is activated ");

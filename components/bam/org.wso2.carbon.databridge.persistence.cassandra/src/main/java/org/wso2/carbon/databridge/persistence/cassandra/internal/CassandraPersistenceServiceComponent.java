@@ -23,6 +23,7 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.cassandra.dataaccess.DataAccessService;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
+import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
 import org.wso2.carbon.databridge.persistence.cassandra.Utils.StreamDefinitionUtils;
 import org.wso2.carbon.databridge.persistence.cassandra.datastore.CassandraConnector;
 import org.wso2.carbon.databridge.persistence.cassandra.internal.util.ServiceHolder;
@@ -49,7 +50,9 @@ import org.wso2.carbon.utils.ConfigurationContextService;
  * @scr.reference name="databridge.core"
  * interface="org.wso2.carbon.databridge.core.DataBridgeReceiverService"
  * cardinality="1..1" policy="dynamic" bind="setDataBridgeReceiverService"  unbind="unsetDataBridgeReceiverService"
- *
+ * @scr.reference name="registry.streamdefn.comp"
+ * interface="org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore"
+ * cardinality="1..1" policy="dynamic" bind="setStreamDefinitionStoreService" unbind="unsetStreamDefinitionStoreService"
  */
 public class CassandraPersistenceServiceComponent {
     private static Log log = LogFactory.getLog(CassandraPersistenceServiceComponent.class);
@@ -92,7 +95,7 @@ public class CassandraPersistenceServiceComponent {
     }
 
     protected void setRegistryService(RegistryService registryService) throws
-            RegistryException {
+                                                                       RegistryException {
         ServiceHolder.setRegistryService(registryService);
     }
 
@@ -116,12 +119,22 @@ public class CassandraPersistenceServiceComponent {
         ServiceHolder.setConfigurationContextService(null);
     }
 
-    protected void setDataBridgeReceiverService(DataBridgeReceiverService dataBridgeReceiverService) {
+    protected void setDataBridgeReceiverService(
+            DataBridgeReceiverService dataBridgeReceiverService) {
         ServiceHolder.setDataBridgeReceiverService(dataBridgeReceiverService);
     }
 
-    protected void unsetDataBridgeReceiverService(DataBridgeReceiverService dataBridgeReceiverService) {
+    protected void unsetDataBridgeReceiverService(
+            DataBridgeReceiverService dataBridgeReceiverService) {
         ServiceHolder.setDataBridgeReceiverService(null);
+    }
+
+    protected void setStreamDefinitionStoreService(AbstractStreamDefinitionStore abstractStreamDefinitionStore){
+      ServiceHolder.setStreamDefinitionStoreService(abstractStreamDefinitionStore);
+    }
+
+     protected void unsetStreamDefinitionStoreService(AbstractStreamDefinitionStore abstractStreamDefinitionStore){
+      ServiceHolder.setStreamDefinitionStoreService(null);
     }
 
 

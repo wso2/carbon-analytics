@@ -19,5 +19,6 @@ import me.prettyprint.hector.api.mutation.Mutator;
  */
 public interface TypeInserter {
     public Mutator addDataToBatchInsertion(Object data, String streamColumnFamily,
-                                           String columnName, String rowKey, Mutator<String> mutator);
+                                           String columnName, String rowKey,
+                                           Mutator<String> mutator);
 }

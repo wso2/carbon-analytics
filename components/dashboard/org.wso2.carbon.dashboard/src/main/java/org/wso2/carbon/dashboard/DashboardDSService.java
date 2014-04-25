@@ -1058,7 +1058,13 @@ public class DashboardDSService extends AbstractAdmin {
             registry.put(dashboardTabPath, userTabResource);
 
             // Then remove all the Gadgets belonging to this tab
-            JSONObject currentLayout = new JSONObject(getGadgetLayout(userId, tabId, dashboardName));
+            JSONObject currentLayout = null;
+            String gadgetLayout = getGadgetLayout(userId, tabId, dashboardName);
+            if(gadgetLayout.equalsIgnoreCase("NA")) {
+                currentLayout = new JSONObject("{ layout : []}");
+            } else {
+                currentLayout = new JSONObject(gadgetLayout);
+            }
             JSONArray layoutElements = currentLayout.getJSONArray("layout");
 
             ArrayList gadgetIdStore = new ArrayList();

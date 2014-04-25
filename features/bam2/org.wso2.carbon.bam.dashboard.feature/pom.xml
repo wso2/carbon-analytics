@@ -64,8 +64,4 @@
         </plugins>
     </build>
 
-    <properties>
-        <carbon.kernel.version>4.3.0-SNAPSHOT</carbon.kernel.version>
-    </properties>
-
 </project>
