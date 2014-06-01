@@ -1,0 +1,822 @@
+
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ax221="http://profiles.agent.jmx.bam.carbon.wso2.org/xsd" xmlns:ns="http://agent.jmx.bam.carbon.wso2.org" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:ax223="http://io.java/xsd" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ax219="http://exceptions.agent.jmx.bam.carbon.wso2.org/xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://agent.jmx.bam.carbon.wso2.org">
+    <wsdl:documentation>JmxAgent</wsdl:documentation>
+    <wsdl:types>
+    <xs:schema xmlns:ax220="http://exceptions.agent.jmx.bam.carbon.wso2.org/xsd" xmlns:ax222="http://profiles.agent.jmx.bam.carbon.wso2.org/xsd" xmlns:ax224="http://io.java/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://agent.jmx.bam.carbon.wso2.org">
+        <xs:import namespace="http://exceptions.agent.jmx.bam.carbon.wso2.org/xsd"></xs:import>
+        <xs:import namespace="http://profiles.agent.jmx.bam.carbon.wso2.org/xsd"></xs:import>
+        <xs:import namespace="http://io.java/xsd"></xs:import>
+        <xs:element name="JmxAgentProfileDoesNotExistException">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="ProfileDoesNotExistException" nillable="true" type="ax220:ProfileDoesNotExistException"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="JmxAgentJmxProfileException">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="JmxProfileException" nillable="true" type="ax220:JmxProfileException"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="updateProfile">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="profile" nillable="true" type="ax221:Profile"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="updateProfileResponse">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="return" type="xs:boolean"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="testDataPublisherAvailability">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="connectionType" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="url" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="port" type="xs:int"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="testDataPublisherAvailabilityResponse">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="return" type="xs:boolean"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="stopMonitoringProfile">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="profileName" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="startMonitoringProfile">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="profileName" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="getProfile">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="profileName" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="getProfileResponse">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="return" nillable="true" type="ax221:Profile"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="JmxAgentIOException">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="IOException" nillable="true" type="ax223:IOException"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="getMBeans">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="url" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="userName" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="password" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="getMBeansResponse">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ns:ArrayOfString"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:complexType name="ArrayOfString">
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" minOccurs="0" name="array" nillable="true" type="xs:string"></xs:element>
+            </xs:sequence>
+        </xs:complexType>
+        <xs:element name="JmxAgentMalformedObjectNameException">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="MalformedObjectNameException" nillable="true" type="xs:anyType"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="JmxAgentIntrospectionException">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="IntrospectionException" nillable="true" type="xs:anyType"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="JmxAgentInstanceNotFoundException">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="InstanceNotFoundException" nillable="true" type="xs:anyType"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="JmxAgentReflectionException">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="ReflectionException" nillable="true" type="xs:anyType"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="getMBeanAttributeInfo">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="mBean" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="url" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="userName" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="password" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="getMBeanAttributeInfoResponse">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ns:ArrayOfString"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="getAllProfiles">
+            <xs:complexType>
+                <xs:sequence></xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="getAllProfilesResponse">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax221:Profile"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="deleteProfile">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="profileName" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="deleteProfileResponse">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="return" type="xs:boolean"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="addToolboxProfile">
+            <xs:complexType>
+                <xs:sequence></xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="addToolboxProfileResponse">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="return" type="xs:boolean"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="JmxAgentProfileAlreadyExistsException">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="ProfileAlreadyExistsException" nillable="true" type="ax220:ProfileAlreadyExistsException"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="addProfile">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="profile" nillable="true" type="ax221:Profile"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="addProfileResponse">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="return" type="xs:boolean"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+    </xs:schema>
+    <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://profiles.agent.jmx.bam.carbon.wso2.org/xsd">
+        <xs:complexType name="Profile">
+            <xs:sequence>
+                <xs:element minOccurs="0" name="active" type="xs:boolean"></xs:element>
+                <xs:element minOccurs="0" name="cronExpression" nillable="true" type="xs:string"></xs:element>
+                <xs:element minOccurs="0" name="dpPassword" nillable="true" type="xs:string"></xs:element>
+                <xs:element minOccurs="0" name="dpReceiverAddress" nillable="true" type="xs:string"></xs:element>
+                <xs:element minOccurs="0" name="dpReceiverConnectionType" nillable="true" type="xs:string"></xs:element>
+                <xs:element minOccurs="0" name="dpSecureAddress" nillable="true" type="xs:string"></xs:element>
+                <xs:element minOccurs="0" name="dpSecureUrlConnectionType" nillable="true" type="xs:string"></xs:element>
+                <xs:element minOccurs="0" name="dpUserName" nillable="true" type="xs:string"></xs:element>
+                <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
+                <xs:element minOccurs="0" name="pass" nillable="true" type="xs:string"></xs:element>
+                <xs:element maxOccurs="unbounded" minOccurs="0" name="selectedMBeans" nillable="true" type="ax221:MBean"></xs:element>
+                <xs:element minOccurs="0" name="url" nillable="true" type="xs:string"></xs:element>
+                <xs:element minOccurs="0" name="userName" nillable="true" type="xs:string"></xs:element>
+                <xs:element minOccurs="0" name="version" type="xs:int"></xs:element>
+            </xs:sequence>
+        </xs:complexType>
+        <xs:complexType name="MBean">
+            <xs:sequence>
+                <xs:element minOccurs="0" name="MBeanName" nillable="true" type="xs:string"></xs:element>
+                <xs:element maxOccurs="unbounded" minOccurs="0" name="attributes" nillable="true" type="ax221:MBeanAttribute"></xs:element>
+            </xs:sequence>
+        </xs:complexType>
+        <xs:complexType name="MBeanAttribute">
+            <xs:sequence>
+                <xs:element minOccurs="0" name="aliasName" nillable="true" type="xs:string"></xs:element>
+                <xs:element minOccurs="0" name="attributeName" nillable="true" type="xs:string"></xs:element>
+                <xs:element maxOccurs="unbounded" minOccurs="0" name="properties" nillable="true" type="ax221:MBeanAttributeProperty"></xs:element>
+            </xs:sequence>
+        </xs:complexType>
+        <xs:complexType name="MBeanAttributeProperty">
+            <xs:sequence>
+                <xs:element minOccurs="0" name="aliasName" nillable="true" type="xs:string"></xs:element>
+                <xs:element minOccurs="0" name="propertyName" nillable="true" type="xs:string"></xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:schema>
+    <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://exceptions.agent.jmx.bam.carbon.wso2.org/xsd">
+        <xs:complexType name="ProfileDoesNotExistException">
+            <xs:sequence>
+                <xs:element minOccurs="0" name="message" nillable="true" type="xs:string"></xs:element>
+            </xs:sequence>
+        </xs:complexType>
+        <xs:complexType name="JmxProfileException">
+            <xs:sequence>
+                <xs:element minOccurs="0" name="message" nillable="true" type="xs:string"></xs:element>
+            </xs:sequence>
+        </xs:complexType>
+        <xs:complexType name="ProfileAlreadyExistsException">
+            <xs:sequence>
+                <xs:element minOccurs="0" name="message" nillable="true" type="xs:string"></xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:schema>
+    <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://io.java/xsd">
+        <xs:complexType name="IOException">
+            <xs:sequence></xs:sequence>
+        </xs:complexType>
+    </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="startMonitoringProfileRequest">
+        <wsdl:part name="parameters" element="ns:startMonitoringProfile"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="JmxAgentProfileDoesNotExistException">
+        <wsdl:part name="parameters" element="ns:JmxAgentProfileDoesNotExistException"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="updateProfileRequest">
+        <wsdl:part name="parameters" element="ns:updateProfile"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="updateProfileResponse">
+        <wsdl:part name="parameters" element="ns:updateProfileResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="JmxAgentJmxProfileException">
+        <wsdl:part name="parameters" element="ns:JmxAgentJmxProfileException"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getMBeansRequest">
+        <wsdl:part name="parameters" element="ns:getMBeans"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getMBeansResponse">
+        <wsdl:part name="parameters" element="ns:getMBeansResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="JmxAgentIOException">
+        <wsdl:part name="parameters" element="ns:JmxAgentIOException"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deleteProfileRequest">
+        <wsdl:part name="parameters" element="ns:deleteProfile"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deleteProfileResponse">
+        <wsdl:part name="parameters" element="ns:deleteProfileResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="addProfileRequest">
+        <wsdl:part name="parameters" element="ns:addProfile"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="addProfileResponse">
+        <wsdl:part name="parameters" element="ns:addProfileResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="JmxAgentProfileAlreadyExistsException">
+        <wsdl:part name="parameters" element="ns:JmxAgentProfileAlreadyExistsException"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="stopMonitoringProfileRequest">
+        <wsdl:part name="parameters" element="ns:stopMonitoringProfile"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="testDataPublisherAvailabilityRequest">
+        <wsdl:part name="parameters" element="ns:testDataPublisherAvailability"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="testDataPublisherAvailabilityResponse">
+        <wsdl:part name="parameters" element="ns:testDataPublisherAvailabilityResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllProfilesRequest">
+        <wsdl:part name="parameters" element="ns:getAllProfiles"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllProfilesResponse">
+        <wsdl:part name="parameters" element="ns:getAllProfilesResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getProfileRequest">
+        <wsdl:part name="parameters" element="ns:getProfile"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getProfileResponse">
+        <wsdl:part name="parameters" element="ns:getProfileResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getMBeanAttributeInfoRequest">
+        <wsdl:part name="parameters" element="ns:getMBeanAttributeInfo"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getMBeanAttributeInfoResponse">
+        <wsdl:part name="parameters" element="ns:getMBeanAttributeInfoResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="JmxAgentMalformedObjectNameException">
+        <wsdl:part name="parameters" element="ns:JmxAgentMalformedObjectNameException"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="JmxAgentIntrospectionException">
+        <wsdl:part name="parameters" element="ns:JmxAgentIntrospectionException"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="JmxAgentInstanceNotFoundException">
+        <wsdl:part name="parameters" element="ns:JmxAgentInstanceNotFoundException"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="JmxAgentReflectionException">
+        <wsdl:part name="parameters" element="ns:JmxAgentReflectionException"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="addToolboxProfileRequest">
+        <wsdl:part name="parameters" element="ns:addToolboxProfile"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="addToolboxProfileResponse">
+        <wsdl:part name="parameters" element="ns:addToolboxProfileResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="JmxAgentPortType">
+        <wsdl:operation name="startMonitoringProfile">
+            <wsdl:input message="ns:startMonitoringProfileRequest" wsaw:Action="urn:startMonitoringProfile"></wsdl:input>
+            <wsdl:fault message="ns:JmxAgentProfileDoesNotExistException" name="JmxAgentProfileDoesNotExistException" wsaw:Action="urn:startMonitoringProfileJmxAgentProfileDoesNotExistException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updateProfile">
+            <wsdl:input message="ns:updateProfileRequest" wsaw:Action="urn:updateProfile"></wsdl:input>
+            <wsdl:output message="ns:updateProfileResponse" wsaw:Action="urn:updateProfileResponse"></wsdl:output>
+            <wsdl:fault message="ns:JmxAgentProfileDoesNotExistException" name="JmxAgentProfileDoesNotExistException" wsaw:Action="urn:updateProfileJmxAgentProfileDoesNotExistException"></wsdl:fault>
+            <wsdl:fault message="ns:JmxAgentJmxProfileException" name="JmxAgentJmxProfileException" wsaw:Action="urn:updateProfileJmxAgentJmxProfileException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getMBeans">
+            <wsdl:input message="ns:getMBeansRequest" wsaw:Action="urn:getMBeans"></wsdl:input>
+            <wsdl:output message="ns:getMBeansResponse" wsaw:Action="urn:getMBeansResponse"></wsdl:output>
+            <wsdl:fault message="ns:JmxAgentIOException" name="JmxAgentIOException" wsaw:Action="urn:getMBeansJmxAgentIOException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteProfile">
+            <wsdl:input message="ns:deleteProfileRequest" wsaw:Action="urn:deleteProfile"></wsdl:input>
+            <wsdl:output message="ns:deleteProfileResponse" wsaw:Action="urn:deleteProfileResponse"></wsdl:output>
+            <wsdl:fault message="ns:JmxAgentProfileDoesNotExistException" name="JmxAgentProfileDoesNotExistException" wsaw:Action="urn:deleteProfileJmxAgentProfileDoesNotExistException"></wsdl:fault>
+            <wsdl:fault message="ns:JmxAgentJmxProfileException" name="JmxAgentJmxProfileException" wsaw:Action="urn:deleteProfileJmxAgentJmxProfileException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addProfile">
+            <wsdl:input message="ns:addProfileRequest" wsaw:Action="urn:addProfile"></wsdl:input>
+            <wsdl:output message="ns:addProfileResponse" wsaw:Action="urn:addProfileResponse"></wsdl:output>
+            <wsdl:fault message="ns:JmxAgentProfileAlreadyExistsException" name="JmxAgentProfileAlreadyExistsException" wsaw:Action="urn:addProfileJmxAgentProfileAlreadyExistsException"></wsdl:fault>
+            <wsdl:fault message="ns:JmxAgentJmxProfileException" name="JmxAgentJmxProfileException" wsaw:Action="urn:addProfileJmxAgentJmxProfileException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="stopMonitoringProfile">
+            <wsdl:input message="ns:stopMonitoringProfileRequest" wsaw:Action="urn:stopMonitoringProfile"></wsdl:input>
+            <wsdl:fault message="ns:JmxAgentProfileDoesNotExistException" name="JmxAgentProfileDoesNotExistException" wsaw:Action="urn:stopMonitoringProfileJmxAgentProfileDoesNotExistException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="testDataPublisherAvailability">
+            <wsdl:input message="ns:testDataPublisherAvailabilityRequest" wsaw:Action="urn:testDataPublisherAvailability"></wsdl:input>
+            <wsdl:output message="ns:testDataPublisherAvailabilityResponse" wsaw:Action="urn:testDataPublisherAvailabilityResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllProfiles">
+            <wsdl:input message="ns:getAllProfilesRequest" wsaw:Action="urn:getAllProfiles"></wsdl:input>
+            <wsdl:output message="ns:getAllProfilesResponse" wsaw:Action="urn:getAllProfilesResponse"></wsdl:output>
+            <wsdl:fault message="ns:JmxAgentJmxProfileException" name="JmxAgentJmxProfileException" wsaw:Action="urn:getAllProfilesJmxAgentJmxProfileException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getProfile">
+            <wsdl:input message="ns:getProfileRequest" wsaw:Action="urn:getProfile"></wsdl:input>
+            <wsdl:output message="ns:getProfileResponse" wsaw:Action="urn:getProfileResponse"></wsdl:output>
+            <wsdl:fault message="ns:JmxAgentProfileDoesNotExistException" name="JmxAgentProfileDoesNotExistException" wsaw:Action="urn:getProfileJmxAgentProfileDoesNotExistException"></wsdl:fault>
+            <wsdl:fault message="ns:JmxAgentJmxProfileException" name="JmxAgentJmxProfileException" wsaw:Action="urn:getProfileJmxAgentJmxProfileException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getMBeanAttributeInfo">
+            <wsdl:input message="ns:getMBeanAttributeInfoRequest" wsaw:Action="urn:getMBeanAttributeInfo"></wsdl:input>
+            <wsdl:output message="ns:getMBeanAttributeInfoResponse" wsaw:Action="urn:getMBeanAttributeInfoResponse"></wsdl:output>
+            <wsdl:fault message="ns:JmxAgentMalformedObjectNameException" name="JmxAgentMalformedObjectNameException" wsaw:Action="urn:getMBeanAttributeInfoJmxAgentMalformedObjectNameException"></wsdl:fault>
+            <wsdl:fault message="ns:JmxAgentIntrospectionException" name="JmxAgentIntrospectionException" wsaw:Action="urn:getMBeanAttributeInfoJmxAgentIntrospectionException"></wsdl:fault>
+            <wsdl:fault message="ns:JmxAgentInstanceNotFoundException" name="JmxAgentInstanceNotFoundException" wsaw:Action="urn:getMBeanAttributeInfoJmxAgentInstanceNotFoundException"></wsdl:fault>
+            <wsdl:fault message="ns:JmxAgentIOException" name="JmxAgentIOException" wsaw:Action="urn:getMBeanAttributeInfoJmxAgentIOException"></wsdl:fault>
+            <wsdl:fault message="ns:JmxAgentReflectionException" name="JmxAgentReflectionException" wsaw:Action="urn:getMBeanAttributeInfoJmxAgentReflectionException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addToolboxProfile">
+            <wsdl:input message="ns:addToolboxProfileRequest" wsaw:Action="urn:addToolboxProfile"></wsdl:input>
+            <wsdl:output message="ns:addToolboxProfileResponse" wsaw:Action="urn:addToolboxProfileResponse"></wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="JmxAgentSoap11Binding" type="ns:JmxAgentPortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"></soap:binding>
+        <wsdl:operation name="startMonitoringProfile">
+            <soap:operation soapAction="urn:startMonitoringProfile" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:fault name="JmxAgentProfileDoesNotExistException">
+                <soap:fault use="literal" name="JmxAgentProfileDoesNotExistException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updateProfile">
+            <soap:operation soapAction="urn:updateProfile" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+            <wsdl:fault name="JmxAgentProfileDoesNotExistException">
+                <soap:fault use="literal" name="JmxAgentProfileDoesNotExistException"></soap:fault>
+            </wsdl:fault>
+            <wsdl:fault name="JmxAgentJmxProfileException">
+                <soap:fault use="literal" name="JmxAgentJmxProfileException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getMBeans">
+            <soap:operation soapAction="urn:getMBeans" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+            <wsdl:fault name="JmxAgentIOException">
+                <soap:fault use="literal" name="JmxAgentIOException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteProfile">
+            <soap:operation soapAction="urn:deleteProfile" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+            <wsdl:fault name="JmxAgentProfileDoesNotExistException">
+                <soap:fault use="literal" name="JmxAgentProfileDoesNotExistException"></soap:fault>
+            </wsdl:fault>
+            <wsdl:fault name="JmxAgentJmxProfileException">
+                <soap:fault use="literal" name="JmxAgentJmxProfileException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addProfile">
+            <soap:operation soapAction="urn:addProfile" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+            <wsdl:fault name="JmxAgentProfileAlreadyExistsException">
+                <soap:fault use="literal" name="JmxAgentProfileAlreadyExistsException"></soap:fault>
+            </wsdl:fault>
+            <wsdl:fault name="JmxAgentJmxProfileException">
+                <soap:fault use="literal" name="JmxAgentJmxProfileException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="stopMonitoringProfile">
+            <soap:operation soapAction="urn:stopMonitoringProfile" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:fault name="JmxAgentProfileDoesNotExistException">
+                <soap:fault use="literal" name="JmxAgentProfileDoesNotExistException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="testDataPublisherAvailability">
+            <soap:operation soapAction="urn:testDataPublisherAvailability" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllProfiles">
+            <soap:operation soapAction="urn:getAllProfiles" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+            <wsdl:fault name="JmxAgentJmxProfileException">
+                <soap:fault use="literal" name="JmxAgentJmxProfileException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getProfile">
+            <soap:operation soapAction="urn:getProfile" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+            <wsdl:fault name="JmxAgentProfileDoesNotExistException">
+                <soap:fault use="literal" name="JmxAgentProfileDoesNotExistException"></soap:fault>
+            </wsdl:fault>
+            <wsdl:fault name="JmxAgentJmxProfileException">
+                <soap:fault use="literal" name="JmxAgentJmxProfileException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getMBeanAttributeInfo">
+            <soap:operation soapAction="urn:getMBeanAttributeInfo" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+            <wsdl:fault name="JmxAgentReflectionException">
+                <soap:fault use="literal" name="JmxAgentReflectionException"></soap:fault>
+            </wsdl:fault>
+            <wsdl:fault name="JmxAgentInstanceNotFoundException">
+                <soap:fault use="literal" name="JmxAgentInstanceNotFoundException"></soap:fault>
+            </wsdl:fault>
+            <wsdl:fault name="JmxAgentMalformedObjectNameException">
+                <soap:fault use="literal" name="JmxAgentMalformedObjectNameException"></soap:fault>
+            </wsdl:fault>
+            <wsdl:fault name="JmxAgentIOException">
+                <soap:fault use="literal" name="JmxAgentIOException"></soap:fault>
+            </wsdl:fault>
+            <wsdl:fault name="JmxAgentIntrospectionException">
+                <soap:fault use="literal" name="JmxAgentIntrospectionException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addToolboxProfile">
+            <soap:operation soapAction="urn:addToolboxProfile" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="JmxAgentSoap12Binding" type="ns:JmxAgentPortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"></soap12:binding>
+        <wsdl:operation name="startMonitoringProfile">
+            <soap12:operation soapAction="urn:startMonitoringProfile" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:fault name="JmxAgentProfileDoesNotExistException">
+                <soap12:fault use="literal" name="JmxAgentProfileDoesNotExistException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updateProfile">
+            <soap12:operation soapAction="urn:updateProfile" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+            <wsdl:fault name="JmxAgentProfileDoesNotExistException">
+                <soap12:fault use="literal" name="JmxAgentProfileDoesNotExistException"></soap12:fault>
+            </wsdl:fault>
+            <wsdl:fault name="JmxAgentJmxProfileException">
+                <soap12:fault use="literal" name="JmxAgentJmxProfileException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getMBeans">
+            <soap12:operation soapAction="urn:getMBeans" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+            <wsdl:fault name="JmxAgentIOException">
+                <soap12:fault use="literal" name="JmxAgentIOException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteProfile">
+            <soap12:operation soapAction="urn:deleteProfile" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+            <wsdl:fault name="JmxAgentProfileDoesNotExistException">
+                <soap12:fault use="literal" name="JmxAgentProfileDoesNotExistException"></soap12:fault>
+            </wsdl:fault>
+            <wsdl:fault name="JmxAgentJmxProfileException">
+                <soap12:fault use="literal" name="JmxAgentJmxProfileException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addProfile">
+            <soap12:operation soapAction="urn:addProfile" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+            <wsdl:fault name="JmxAgentProfileAlreadyExistsException">
+                <soap12:fault use="literal" name="JmxAgentProfileAlreadyExistsException"></soap12:fault>
+            </wsdl:fault>
+            <wsdl:fault name="JmxAgentJmxProfileException">
+                <soap12:fault use="literal" name="JmxAgentJmxProfileException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="stopMonitoringProfile">
+            <soap12:operation soapAction="urn:stopMonitoringProfile" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:fault name="JmxAgentProfileDoesNotExistException">
+                <soap12:fault use="literal" name="JmxAgentProfileDoesNotExistException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="testDataPublisherAvailability">
+            <soap12:operation soapAction="urn:testDataPublisherAvailability" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllProfiles">
+            <soap12:operation soapAction="urn:getAllProfiles" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+            <wsdl:fault name="JmxAgentJmxProfileException">
+                <soap12:fault use="literal" name="JmxAgentJmxProfileException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getProfile">
+            <soap12:operation soapAction="urn:getProfile" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+            <wsdl:fault name="JmxAgentProfileDoesNotExistException">
+                <soap12:fault use="literal" name="JmxAgentProfileDoesNotExistException"></soap12:fault>
+            </wsdl:fault>
+            <wsdl:fault name="JmxAgentJmxProfileException">
+                <soap12:fault use="literal" name="JmxAgentJmxProfileException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getMBeanAttributeInfo">
+            <soap12:operation soapAction="urn:getMBeanAttributeInfo" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+            <wsdl:fault name="JmxAgentReflectionException">
+                <soap12:fault use="literal" name="JmxAgentReflectionException"></soap12:fault>
+            </wsdl:fault>
+            <wsdl:fault name="JmxAgentInstanceNotFoundException">
+                <soap12:fault use="literal" name="JmxAgentInstanceNotFoundException"></soap12:fault>
+            </wsdl:fault>
+            <wsdl:fault name="JmxAgentMalformedObjectNameException">
+                <soap12:fault use="literal" name="JmxAgentMalformedObjectNameException"></soap12:fault>
+            </wsdl:fault>
+            <wsdl:fault name="JmxAgentIOException">
+                <soap12:fault use="literal" name="JmxAgentIOException"></soap12:fault>
+            </wsdl:fault>
+            <wsdl:fault name="JmxAgentIntrospectionException">
+                <soap12:fault use="literal" name="JmxAgentIntrospectionException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addToolboxProfile">
+            <soap12:operation soapAction="urn:addToolboxProfile" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="JmxAgentHttpBinding" type="ns:JmxAgentPortType">
+        <http:binding verb="POST"></http:binding>
+        <wsdl:operation name="startMonitoringProfile">
+            <http:operation location="startMonitoringProfile"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="updateProfile">
+            <http:operation location="updateProfile"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getMBeans">
+            <http:operation location="getMBeans"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deleteProfile">
+            <http:operation location="deleteProfile"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addProfile">
+            <http:operation location="addProfile"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="stopMonitoringProfile">
+            <http:operation location="stopMonitoringProfile"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="testDataPublisherAvailability">
+            <http:operation location="testDataPublisherAvailability"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllProfiles">
+            <http:operation location="getAllProfiles"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getProfile">
+            <http:operation location="getProfile"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getMBeanAttributeInfo">
+            <http:operation location="getMBeanAttributeInfo"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addToolboxProfile">
+            <http:operation location="addToolboxProfile"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="JmxAgent">
+        <wsdl:port name="JmxAgentHttpsSoap11Endpoint" binding="ns:JmxAgentSoap11Binding">
+            <soap:address location="https://10.100.0.46:9443/services/JmxAgent.JmxAgentHttpsSoap11Endpoint/"></soap:address>
+        </wsdl:port>
+        <wsdl:port name="JmxAgentHttpsSoap12Endpoint" binding="ns:JmxAgentSoap12Binding">
+            <soap12:address location="https://10.100.0.46:9443/services/JmxAgent.JmxAgentHttpsSoap12Endpoint/"></soap12:address>
+        </wsdl:port>
+        <wsdl:port name="JmxAgentHttpsEndpoint" binding="ns:JmxAgentHttpBinding">
+            <http:address location="https://10.100.0.46:9443/services/JmxAgent.JmxAgentHttpsEndpoint/"></http:address>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

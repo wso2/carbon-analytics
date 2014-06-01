@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://wso2.org/carbon/databridge/agent/thrift" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="thriftAgentConfiguration" type="thr:thriftAgentConfigurationType" xmlns:thr="http://wso2.org/carbon/databridge/agent/thrift"/>
+    <xs:complexType name="thriftAgentConfigurationType">
+        <xs:all>
+            <xs:element type="xs:string" name="bufferedEventsSize"/>
+            <xs:element type="xs:string" name="poolSize"/>
+            <xs:element type="xs:string" name="maxPoolSize"/>
+            <xs:element type="xs:string" name="maxTransportPoolSize"/>
+            <xs:element type="xs:string" name="maxIdleConnections"/>
+            <xs:element type="xs:string" name="evictionTimePeriod"/>
+            <xs:element type="xs:string" name="minIdleTimeInPool"/>
+            <xs:element type="xs:string" name="secureMaxTransportPoolSize"/>
+            <xs:element type="xs:string" name="secureMaxIdleConnections"/>
+            <xs:element type="xs:string" name="secureEvictionTimePeriod"/>
+            <xs:element type="xs:string" name="secureMinIdleTimeInPool"/>
+            <xs:element type="xs:string" name="maxMessageBundleSize"/>
+            <xs:element type="xs:string" name="asyncDataPublisherBufferedEventSize"/>
+            <xs:element type="xs:string" name="loadBalancingReconnectionInterval"/>
+            <!--<xs:element type="xs:string" name="trustStore"/>-->
+            <!--<xs:element type="xs:string" name="trustStorePassword"/>-->
+        </xs:all>
+    </xs:complexType>
+</xs:schema>

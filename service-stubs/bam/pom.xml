@@ -36,6 +36,7 @@
         <module>org.wso2.carbon.bam.core.stub</module>
         <module>org.wso2.carbon.bam.presentation.stub</module>
         <module>org.wso2.carbon.bam.toolbox.deployer.stub</module>
+        <module>org.wso2.carbon.bam.jmx.agent.stub</module>
     </modules>
 
     <dependencies>
