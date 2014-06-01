@@ -1316,8 +1316,8 @@
         <slf4j.orbit.version>1.5.10.wso2v1</slf4j.orbit.version>
         <slf4j.version>1.6.1</slf4j.version>
         <log4j.version>1.2.14</log4j.version>
-        <!--<libthrift.version>0.5.wso2v1</libthrift.version>-->
-        <libthrift.version>0.7.wso2v1</libthrift.version>
+        <libthrift.version>0.5.wso2v1</libthrift.version>
+        <!--<libthrift.version>0.7.wso2v1</libthrift.version>-->
         <libfb303.orbit.version>0.7.0.wso2v1</libfb303.orbit.version>
         <shindig.version>1.1.0.wso2v7</shindig.version>
         <joda-time.version>1.6.0.wso2v1</joda-time.version>
