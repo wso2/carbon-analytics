@@ -82,7 +82,7 @@
                             org.wso2.carbon.dashboard.mgt.gadgetrepo.*; version=1.0.0,
                         </Export-Package>
                         <Import-Package>
-                            org.apache.axis2.*; version="${axis2.osgi.version.range.dashboard}",
+                            org.apache.axis2.*; version="${axis2.osgi.version.range}",
                             javax.servlet.http;version="${imp.pkg.version.javax.servlet}",
                             org.wso2.carbon.dashboard.mgt.gadgetrepo.common.*,
                             org.wso2.carbon.dashboard.common.*,

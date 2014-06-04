@@ -10,17 +10,29 @@
     
     <modules>
         <module>service-stubs/analytics</module>
-        <module>service-stubs/bam</module>
+        <module>service-stubs/bam-toolbox</module>
         <module>service-stubs/dashboard</module>
+        <module>service-stubs/bam-gadgetgen</module>
+        <module>service-stubs/bam-data-agents</module>
+        <module>service-stubs/bam-archival</module>
         <module>components/analytics</module>
         <module>components/bam</module>
+        <module>components/bam-archival</module>
+        <module>components/bam-notification</module>
+        <module>components/bam-toolbox</module>
+        <module>components/bam-databridge-cassandra</module>
+        <module>components/bam-gadgetgen</module>
         <module>components/dashboard</module>
-        <module>components/data-agents</module>
-        <module>components/data-bridge</module>
+        <module>components/bam-data-agents</module>
         <module>features/analytics</module>
-        <module>features/bam2</module>
+        <module>features/bam</module>
+        <module>features/bam-archival</module>
+        <module>features/bam-notification</module>
+        <module>features/bam-toolbox</module>
+        <module>features/bam-databridge-cassandra</module>
+        <module>features/bam-gadgetgen</module>
         <module>features/dashboard</module>
-        <module>features/data-agents</module>
+        <module>features/bam-data-agents</module>
 
     </modules>
     
@@ -496,11 +508,11 @@
                 <artifactId>org.wso2.carbon.bam.toolbox.deployer.ui</artifactId>
                 <version>${carbon.platform.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.bam.analyzer.stub</artifactId>
-                <version>${carbon.platform.version}</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>org.wso2.carbon</groupId>-->
+                <!--<artifactId>org.wso2.carbon.bam.analyzer.stub</artifactId>-->
+                <!--<version>${carbon.platform.version}</version>-->
+            <!--</dependency>-->
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.bam.notification.task</artifactId>
@@ -531,11 +543,11 @@
                 <artifactId>org.wso2.carbon.bam2.core</artifactId>
                 <version>${carbon.platform.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.bam.core.stub</artifactId>
-                <version>${carbon.platform.version}</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>org.wso2.carbon</groupId>-->
+                <!--<artifactId>org.wso2.carbon.bam.core.stub</artifactId>-->
+                <!--<version>${carbon.platform.version}</version>-->
+            <!--</dependency>-->
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.bam2.core.ui</artifactId>
@@ -576,11 +588,11 @@
                 <artifactId>org.wso2.carbon.bam2.clustermonitor.ui</artifactId>
                 <version>${carbon.platform.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.bam.presentation.stub</artifactId>
-                <version>${carbon.platform.version}</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>org.wso2.carbon</groupId>-->
+                <!--<artifactId>org.wso2.carbon.bam.presentation.stub</artifactId>-->
+                <!--<version>${carbon.platform.version}</version>-->
+            <!--</dependency>-->
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.bam.cassandra.data.archive.server.feature</artifactId>
@@ -1051,6 +1063,33 @@
                 <version>${wso2carbon.version}</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.bam.gadgetgenwizard.stub</artifactId>
+                <version>${wso2carbon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.gadgetgenwizard.server.feature</artifactId>
+                <version>${wso2carbon.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.gadgetgenwizard.ui.feature</artifactId>
+                <version>${wso2carbon.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.bam.gadgetgenwizard</artifactId>
+                <version>${wso2carbon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.bam.gadgetgenwizard.ui</artifactId>
+                <version>${wso2carbon.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1396,6 +1435,9 @@
 
         <!-- Javax-->
         <javax.servelet.version>3.0.1</javax.servelet.version>
+
+        <!-- Jaggery-->
+        <jaggery.feature.version>0.9.0.ALPHA4.wso2v1</jaggery.feature.version>
     </properties>
 
     <repositories>

@@ -94,6 +94,7 @@
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Export-Package>
                             org.wso2.carbon.dashboard.mgt.gadgetrepo.stub.*; version=4.0.0,
+                            javax.activation.*;version=1.1.0,
                         </Export-Package>
                         <Carbon-Component>UIBundle</Carbon-Component>
                     </instructions>
