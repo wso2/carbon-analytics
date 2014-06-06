@@ -94,7 +94,7 @@
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.server:${carbon.platform.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.bam.messagestore.server:4.3.0-SNAPSHOT</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.bam.messagestore.server:${wso2carbon.version}</importFeatureDef>
                             </importFeatures>
                             <includedFeatures>
                                  <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.analytics.hive.server.feature:${carbon.platform.version}

@@ -28,7 +28,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.carbon</groupId>
-    <artifactId>bam2</artifactId>
+    <artifactId>bam</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Business Activity Monitoring Aggregator Module</name>
     <description>
@@ -37,24 +37,15 @@
     <url>http://wso2.org</url>
 
     <modules>
-        <module>org.wso2.carbon.bam.service</module>
-        <module>org.wso2.carbon.bam.utils</module>
+        <!--<module>org.wso2.carbon.bam.service</module>-->
+        <!--<module>org.wso2.carbon.bam.utils</module>-->
         <!--<module>org.wso2.carbon.bam.gadgetgenwizard</module>-->
         <!--<module>org.wso2.carbon.bam.gadgetgenwizard.ui</module>-->
-        <module>org.wso2.carbon.databridge.persistence.cassandra</module>
-        <module>org.wso2.carbon.databridge.streamdefn.registry</module>
-        <module>org.wso2.carbon.databridge.datasink.cassandra</module>
-        <module>org.wso2.carbon.bam.toolbox.deployer</module>
-        <module>org.wso2.carbon.bam.toolbox.deployer.ui</module>
-        <module>org.wso2.carbon.bam.jasper</module>
+        <!--<module>org.wso2.carbon.databridge.streamdefn.registry</module>-->
+        <!--<module>org.wso2.carbon.bam.jasper</module>-->
         <module>org.wso2.carbon.bam.dashboard</module>
         <module>org.wso2.carbon.bam.dashboard.ui</module>
-        <module>org.wso2.carbon.bam.restapi</module>
-        <module>org.wso2.carbon.bam.cassandra.data.archive</module>
-        <module>org.wso2.carbon.bam.cassandra.data.archive.ui</module>
-        <module>org.wso2.carbon.bam.messagestore</module>
-        <module>org.wso2.carbon.bam.datasource.utils</module>
-        <module>org.wso2.carbon.bam.notification.task</module>
+        <!--<module>org.wso2.carbon.bam.restapi</module>-->
     </modules>
 
 
