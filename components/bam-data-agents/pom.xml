@@ -42,6 +42,10 @@
         <module>org.wso2.carbon.bam.jmx.agent</module>
         <module>org.wso2.carbon.bam.jmx.agent.ui</module>
 
+        <module>org.wso2.carbon.bam.message.tracer.filter</module>
+        <module>org.wso2.carbon.bam.message.tracer.handler</module>
+        <module>org.wso2.carbon.bam.message.tracer.handler.ui</module>
+
         <!--<module>org.wso2.carbon.bam.webapp.stat.publisher/4.2.0</module>-->
         <!--<module>org.wso2.carbon.bam.webapp.stat.publisher.ui/4.2.0</module>-->
     </modules>
