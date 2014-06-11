@@ -1,0 +1,11 @@
+<StreamDefinition>
+    <NodeId>1</NodeId>
+
+    <keySpaceName>EVENT_KS</keySpaceName>
+    <eventIndexKeySpaceName>EVENT_INDEX_KS</eventIndexKeySpaceName>
+
+    <ReplicationFactor>1</ReplicationFactor>
+    <ReadConsistencyLevel>QUORUM</ReadConsistencyLevel>
+    <WriteConsistencyLevel>QUORUM</WriteConsistencyLevel>
+    <StrategyClass>org.apache.cassandra.locator.SimpleStrategy</StrategyClass>
+</StreamDefinition>

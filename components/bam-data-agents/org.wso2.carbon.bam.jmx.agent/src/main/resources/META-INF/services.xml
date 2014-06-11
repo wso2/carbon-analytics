@@ -1,0 +1,13 @@
+<serviceGroup>
+    <service name="JmxAgent" scope="transportsession">
+        <transports>
+            <transport>https</transport>
+        </transports>
+        <parameter name="ServiceClass">org.wso2.carbon.bam.jmx.agent.JmxAgentWebInterface
+        </parameter>
+    </service>
+
+    <parameter name="adminService" locked="true">true</parameter>
+    <parameter name="hiddenService" locked="true">true</parameter>
+    <parameter name="AuthorizationAction" locked="true">/permission/admin/protected</parameter>
+</serviceGroup>

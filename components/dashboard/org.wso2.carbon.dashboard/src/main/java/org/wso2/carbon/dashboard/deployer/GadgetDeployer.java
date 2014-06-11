@@ -27,6 +27,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.CarbonException;
+import org.wso2.carbon.application.deployer.AppDeployerConstants;
 import org.wso2.carbon.application.deployer.AppDeployerUtils;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.context.CarbonContext;
@@ -277,7 +278,11 @@ public class GadgetDeployer extends AbstractDeployer {
     public String extractGarArchive(String garPath) throws CarbonException {
         garPath = AppDeployerUtils.formatPath(garPath);
         String fileName = garPath.substring(garPath.lastIndexOf('/') + 1);
-        String destinationDir = AppDeployerUtils.APP_UNZIP_DIR + File.separator + System.currentTimeMillis() +
+
+        String javaTempDir = System.getProperty("axis2.work.dir");
+        String appUnzipDir = javaTempDir.endsWith(File.separator) ? javaTempDir + AppDeployerConstants.CARBON_APPS :
+                javaTempDir + File.separator + AppDeployerConstants.CARBON_APPS;
+        String destinationDir = appUnzipDir + File.separator + System.currentTimeMillis() +
                 fileName + File.separator;
         AppDeployerUtils.createDir(destinationDir);
 
