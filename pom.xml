@@ -24,6 +24,7 @@
         <module>components/bam-gadgetgen</module>
         <module>components/dashboard</module>
         <module>components/bam-data-agents</module>
+ 	<module>components/ganalytics</module>
         <module>features/analytics</module>
         <module>features/bam</module>
         <module>features/bam-archival</module>
