@@ -37,7 +37,7 @@
         <!--<module>service</module>-->
         <!--<module>webapps</module>-->
 
-        <!--<module>mediation</module>-->
+        <module>message-tracer-handler</module>
         <module>jmx</module>
 
     </modules>

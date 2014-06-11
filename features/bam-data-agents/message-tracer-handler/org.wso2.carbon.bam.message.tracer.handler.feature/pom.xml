@@ -22,14 +22,14 @@
     <parent>
         <groupId>org.wso2.carbon</groupId>
         <artifactId>bam-message-tracer-handler-feature</artifactId>
-        <version>4.2.0</version>
-	<relativePath>../../pom.xml</relativePath>
+        <version>4.3.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.bam.message.tracer.handler.feature</artifactId>
     <packaging>pom</packaging>
-    <version>4.2.2</version>
+    <version>4.3.0-SNAPSHOT</version>
     <name>WSO2 Carbon - BAM Message Tracer Handler Aggregate Feature</name>
     <url>http://wso2.org</url>
 
@@ -37,13 +37,11 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.bam.message.tracer.handler.server.feature</artifactId>
-            <version>4.2.2</version>
             <type>zip</type>
 	    </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.bam.message.tracer.handler.ui.feature</artifactId>
-            <version>4.2.1</version>
             <type>zip</type>
 	    </dependency>
     </dependencies>
@@ -68,8 +66,8 @@
                                 <importFeatureDef>org.wso2.carbon.core:${carbon.platform.version}</importFeatureDef>
                             </importFeatures>
                             <includedFeatures>
-                                <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.bam.message.tracer.handler.server.feature:4.2.2</includedFeatureDef>
-                                <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.bam.message.tracer.handler.ui.feature:4.2.1</includedFeatureDef>
+                                <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.bam.message.tracer.handler.server.feature:${wso2carbon.version}</includedFeatureDef>
+                                <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.bam.message.tracer.handler.ui.feature:${wso2carbon.version}</includedFeatureDef>
                             </includedFeatures>
                         </configuration>
                     </execution>

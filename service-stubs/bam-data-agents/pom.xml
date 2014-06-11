@@ -32,21 +32,8 @@
 	
     <modules>
         <module>org.wso2.carbon.bam.jmx.agent.stub</module>
+        <module>org.wso2.carbon.bam.message.tracer.handler.stub</module>
     </modules>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.axis2.wso2</groupId>
-            <artifactId>axis2</artifactId>
-        </dependency>
-        <dependency>
-           <groupId>org.apache.axis2.wso2</groupId>
-           <artifactId>axis2-client</artifactId>
-       </dependency>
-        <dependency>
-            <groupId>org.apache.ws.commons.axiom.wso2</groupId>
-            <artifactId>axiom</artifactId>
-        </dependency>
-    </dependencies>
 
 </project>

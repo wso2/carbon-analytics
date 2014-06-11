@@ -22,7 +22,8 @@
     <parent>
         <groupId>org.wso2.carbon</groupId>
         <artifactId>bam-data-agents-features</artifactId>
-        <version>4.2.0</version>
+        <version>4.3.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -32,29 +33,10 @@
     <url>http://wso2.org</url>
 
     <modules>
-        <module>org.wso2.carbon.bam.message.tracer.handler.server.feature/4.2.0</module>
-        <module>org.wso2.carbon.bam.message.tracer.handler.ui.feature/4.2.0</module>
-	<module>org.wso2.carbon.bam.message.tracer.handler.feature/4.2.0</module>
+        <module>org.wso2.carbon.bam.message.tracer.handler.server.feature</module>
+        <module>org.wso2.carbon.bam.message.tracer.handler.ui.feature</module>
+        <module>org.wso2.carbon.bam.message.tracer.handler.feature</module>
     </modules>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.bam.message.tracer.handler</artifactId>
-                <version>4.2.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.bam.message.tracer.handler.ui</artifactId>
-                <version>4.2.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.bam.message.tracer.handler.stub</artifactId>
-                <version>4.2.0</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 </project>
 
