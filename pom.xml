@@ -1373,7 +1373,7 @@
         <junit.version>4.9</junit.version>
         <xmlschema.version>1.4.3</xmlschema.version>
         <version.javax.servlet>3.0.0.v201112011016</version.javax.servlet>
-        <event.processor.version>1.0.1</event.processor.version>
+        <event.processor.version>2.0.0-SNAPSHOT</event.processor.version>
         <cxf.version>2.5.1</cxf.version>
         <cxf.wso2.version>2.6.1.wso2v2</cxf.wso2.version>
         <slf4j.orbit.version>1.5.10.wso2v1</slf4j.orbit.version>
