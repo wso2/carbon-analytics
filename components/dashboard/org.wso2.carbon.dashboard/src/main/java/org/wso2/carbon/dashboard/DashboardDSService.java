@@ -1883,7 +1883,7 @@ public class DashboardDSService extends AbstractAdmin {
                     // Following property used to ensure first time population (running only ones)
                     serverNameResource.setProperty(tabResourcePath, tabResourcePath);
 
-                    String tenantDomain = PrivilegedCarbonContext.getCurrentContext().getTenantDomain();
+                    String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
 
                     // So gadget resources not populated for this tab
                     // Need to populate resources related to this tab
@@ -2018,7 +2018,7 @@ public class DashboardDSService extends AbstractAdmin {
     private void setAnonymousReadPermission(String fileRegistryPath)
             throws org.wso2.carbon.user.api.UserStoreException {
         AuthorizationManager accessControlAdmin =
-                CarbonContext.getCurrentContext().getUserRealm().getAuthorizationManager();
+                CarbonContext.getThreadLocalCarbonContext().getUserRealm().getAuthorizationManager();
 
         if (!accessControlAdmin.isRoleAuthorized(CarbonConstants.REGISTRY_ANONNYMOUS_ROLE_NAME,
                 RegistryConstants.CONFIG_REGISTRY_BASE_PATH +
@@ -2030,20 +2030,20 @@ public class DashboardDSService extends AbstractAdmin {
     }
 
 //    protected Registry getConfigSystemRegistry() {
-//        return (Registry) PrivilegedCarbonContext.getCurrentContext().
+//        return (Registry) PrivilegedCarbonContext.getThreadLocalCarbonContext().
 //                getRegistry(RegistryType.SYSTEM_CONFIGURATION);
 //    }
 //
 //
     protected Registry getConfigUserRegistry() {
-        return (Registry) PrivilegedCarbonContext.getCurrentContext().
+        return (Registry) PrivilegedCarbonContext.getThreadLocalCarbonContext().
                 getRegistry(RegistryType.USER_CONFIGURATION);
     }
 
 
     protected Registry getConfigSystemRegistry() {
         try {
-            return DashboardContext.getRegistry(PrivilegedCarbonContext.getCurrentContext().getTenantId());
+            return DashboardContext.getRegistry(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
         } catch (RegistryException e) {
             log.error(e.getMessage(), e);
             return null;

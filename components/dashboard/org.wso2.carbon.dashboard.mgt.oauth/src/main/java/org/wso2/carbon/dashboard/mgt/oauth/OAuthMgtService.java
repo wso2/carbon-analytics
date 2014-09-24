@@ -121,7 +121,7 @@ public class OAuthMgtService extends AbstractAdmin {
                 reg.put(DashboardConstants.OAUTH_KEY_STORE + "/" + entry.getService(), res);
             }
 
-            int tenantId = PrivilegedCarbonContext.getCurrentContext().getTenantId();
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             RegistryBasedOAuthStore store = (RegistryBasedOAuthStore) OAuthUtils.
                     getOauthStoreProvider().getStore(tenantId);
             try {

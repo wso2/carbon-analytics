@@ -159,7 +159,7 @@ public class GSOAuthModule extends AbstractModule {
         private void loadConsumers() {
             try {
 //                String oauthConfigString = ResourceLoader.getContent(OAUTH_CONFIG);
-                Integer tId = PrivilegedCarbonContext.getCurrentContext().getTenantId();
+                Integer tId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
                 Registry reg = OAuthUtils.getRegistry(tId);
                 store.initFromConfigString(reg, (Collection) reg.get(DashboardConstants.OAUTH_KEY_STORE));
             } catch (Throwable t) {
@@ -177,7 +177,7 @@ public class GSOAuthModule extends AbstractModule {
         public OAuthStore getStore() {
             Integer tId = null;
             try {
-                tId = PrivilegedCarbonContext.getCurrentContext().getTenantId();
+                tId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
                 return mtStore.get(tId);
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
@@ -198,7 +198,7 @@ public class GSOAuthModule extends AbstractModule {
             RegistryBasedOAuthStore newStore = new RegistryBasedOAuthStore();
             Integer tId = null;
             try {
-                tId = PrivilegedCarbonContext.getCurrentContext().getTenantId();
+                tId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
                 mtStore.put(tId, newStore);
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
