@@ -546,6 +546,8 @@ public class HiveExecutorServiceImpl implements HiveExecutorService {
                 }
                 formattedScript += temp + " ";
             }
+            //Removing Javadoc-style block comments from script (if present)
+            formattedScript = formattedScript.replaceAll("/\\*(.|[\r\n])*?\\*/"," ");
             return formattedScript;
         }
 

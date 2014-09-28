@@ -39,13 +39,13 @@ public class DataSourceAccessUtil {
         try {
 
             PrivilegedCarbonContext.startTenantFlow();
-            PrivilegedCarbonContext.getCurrentContext().setTenantId(tenantId, true);
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId, true);
 
             DataSourceManager.getInstance().initTenant(tenantId);
             CarbonDataSource cds = carbonDataSourceService.getDataSource(dataSourceName);
             if (cds == null) {
             	throw new RuntimeException("The data source: " + dataSourceName + 
-            			" does not exist for tenant: " + PrivilegedCarbonContext.getCurrentContext().getTenantDomain());
+            			" does not exist for tenant: " + PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain());
             }
             Element element = (Element) cds.getDSMInfo().getDefinition().getDsXMLConfiguration();
             RDBMSConfiguration rdbmsConfiguration = RDBMSDataSourceReader.loadConfig(
