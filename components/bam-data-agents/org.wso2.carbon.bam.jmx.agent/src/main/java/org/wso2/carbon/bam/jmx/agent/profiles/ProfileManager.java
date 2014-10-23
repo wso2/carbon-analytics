@@ -60,8 +60,8 @@ public class ProfileManager extends RegistryAbstractAdmin {
 
         //get the tenant's registry
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
-        tenantRegistryLoader.loadTenantRegistry(tenantId);
         try {
+            tenantRegistryLoader.loadTenantRegistry(tenantId);
             registry = registryService.getGovernanceSystemRegistry(tenantId);
         } catch (RegistryException e) {
             log.error("Error obtaining the registry " + e.getMessage(), e);
