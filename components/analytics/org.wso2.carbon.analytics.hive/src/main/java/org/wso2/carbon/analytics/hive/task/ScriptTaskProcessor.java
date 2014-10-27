@@ -69,7 +69,7 @@ public class ScriptTaskProcessor {
         TaskInfo info = new TaskInfo(taskData.getName(), HiveConstants.HIVE_DEFAULT_TASK_CLASS , taskData.getProperties(), taskData.getTriggerInfo());
         try {
             PrivilegedCarbonContext.startTenantFlow();
-            PrivilegedCarbonContext.getCurrentContext().setTenantId(tenantId, true);
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId, true);
             ServiceHolder.getTaskManager().registerTask(info);
             ServiceHolder.getTaskManager().rescheduleTask(info.getName());
             if (log.isDebugEnabled()) {

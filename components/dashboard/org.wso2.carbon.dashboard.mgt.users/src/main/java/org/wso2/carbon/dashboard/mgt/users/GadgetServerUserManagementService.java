@@ -43,7 +43,7 @@ public class GadgetServerUserManagementService extends AbstractAdmin {
     }
 
     private int getTenantId() {
-        return PrivilegedCarbonContext.getCurrentContext().getTenantId();
+        return PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
     }
 
     /**
@@ -116,7 +116,7 @@ public class GadgetServerUserManagementService extends AbstractAdmin {
         Boolean response = false;
 
         try {
-            int tenantId = PrivilegedCarbonContext.getCurrentContext().getTenantId();
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             Registry registry = GadgetServerUserManagementContext.getRegistry(tenantId);
 
             Resource regAdminDataResource;
@@ -152,7 +152,7 @@ public class GadgetServerUserManagementService extends AbstractAdmin {
         Boolean response = false;
 
         try {
-            int tenantId = PrivilegedCarbonContext.getCurrentContext().getTenantId();
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             Registry registry = GadgetServerUserManagementContext.getRegistry(tenantId);
 
             Resource regAdminDataResource;

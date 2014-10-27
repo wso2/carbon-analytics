@@ -46,7 +46,7 @@ public class GadgetZipUploadHandler extends Handler {
 
     public void put(RequestContext requestContext) throws RegistryException {
 
-        int tenantId = PrivilegedCarbonContext.getCurrentContext().getTenantId();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         Registry sysRegistry = GadgetRepoContext.getRegistryService().getConfigSystemRegistry(tenantId);
 
         // adding the stream from the resource to the zip input

@@ -1646,7 +1646,7 @@ public class GadgetRepoService extends AbstractAdmin {
     protected Registry getConfigSystemRegistry() {
         try {
             return  GadgetRepoContext.getRegistryService()
-                    .getConfigSystemRegistry(CarbonContext.getCurrentContext().getTenantId());
+                    .getConfigSystemRegistry(CarbonContext.getThreadLocalCarbonContext().getTenantId());
         } catch (RegistryException e) {
             log.error(e.getMessage(), e);
             return null;

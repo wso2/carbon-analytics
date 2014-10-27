@@ -338,13 +338,13 @@ public class GadgetDeployer extends AbstractDeployer {
         UserRegistry registry = null;
         try {
             // registry = (UserRegistry) DashboardContext.getRegistry(tenantId);
-            // int tID = PrivilegedCarbonContext.getCurrentContext().getTenantId();
+            // int tID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             registry = (UserRegistry) DashboardContext.getRegistry(tenantId);
 
         } catch (Exception e) {
             // During startup, we can't get a registry instance from declarative services.
             // But the deployer gets called. Using instance stored in CarbonContext in that case.            
-            registry = (UserRegistry) CarbonContext.getCurrentContext().getRegistry(
+            registry = (UserRegistry) CarbonContext.getThreadLocalCarbonContext().getRegistry(
                     RegistryType.SYSTEM_CONFIGURATION);
         }
         return registry;
