@@ -22,6 +22,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceException;
 import org.wso2.carbon.analytics.datasource.core.Record.Column;
@@ -60,87 +61,6 @@ public class GenericUtils {
             parent = "/";
         }
         return parent;
-    }
-    
-    public static byte[] encodeColumnObject(Object obj) throws AnalyticsDataSourceException {
-        ByteBuffer byteBuffer;
-        if (obj instanceof String) {
-            try {
-                byte[] strData = ((String) obj).getBytes(DEFAULT_CHARSET);
-                byteBuffer = ByteBuffer.allocate(strData.length + 1);
-                byteBuffer.put(DATA_TYPE_STRING);
-                byteBuffer.put(strData);
-            } catch (UnsupportedEncodingException e) {
-                throw new AnalyticsDataSourceException("Error in decoding String: " + e.getMessage(), e);
-            }
-        } else if (obj instanceof Integer) {
-            byteBuffer = ByteBuffer.allocate(Integer.SIZE / 8 + 1);
-            byteBuffer.put(DATA_TYPE_INTEGER);
-            byteBuffer.putInt((Integer) obj);
-        } else if (obj instanceof Long) {
-            byteBuffer = ByteBuffer.allocate(Long.SIZE / 8 + 1);
-            byteBuffer.put(DATA_TYPE_LONG);
-            byteBuffer.putLong((Long) obj);
-        } else if (obj instanceof Double) {
-            byteBuffer = ByteBuffer.allocate(Double.SIZE / 8 + 1);
-            byteBuffer.put(DATA_TYPE_DOUBLE);
-            byteBuffer.putDouble((Double) obj);
-        } else if (obj instanceof Float) {
-            byteBuffer = ByteBuffer.allocate(Float.SIZE / 8 + 1);
-            byteBuffer.put(DATA_TYPE_FLOAT);
-            byteBuffer.putFloat((Float) obj);
-        } else if (obj instanceof Boolean) {
-            byteBuffer = ByteBuffer.allocate(2);
-            byteBuffer.put(DATA_TYPE_BOOLEAN);
-            boolean boolValue = (Boolean) obj;
-            if (boolValue) {
-                byteBuffer.put((byte) BOOLEAN_TRUE);
-            } else {
-                byteBuffer.put((byte) BOOLEAN_FALSE);
-            }
-        } else if (obj == null) {
-            byteBuffer = ByteBuffer.allocate(1);
-            byteBuffer.put(DATA_TYPE_NULL);
-        } else {
-            throw new AnalyticsDataSourceException("Unsupported object type to be encoded: " + obj.getClass());
-        }
-        return byteBuffer.array();
-    }
-    
-    public static Object decodeColumnObject(byte[] data) throws AnalyticsDataSourceException {
-        ByteBuffer byteBuffer = ByteBuffer.wrap(data);
-        byte type = byteBuffer.get();
-        switch (type) {
-        case DATA_TYPE_STRING:
-            byte[] strData = new byte[data.length - 1];
-            byteBuffer.get(strData);
-            try {
-                return new String(strData, DEFAULT_CHARSET);
-            } catch (UnsupportedEncodingException e) {
-                throw new AnalyticsDataSourceException("Error in decoding string data to object: " + e.getMessage(), e);
-            }
-        case DATA_TYPE_INTEGER:
-            return byteBuffer.getInt();
-        case DATA_TYPE_LONG:
-            return byteBuffer.getLong();
-        case DATA_TYPE_DOUBLE:
-            return byteBuffer.getDouble();
-        case DATA_TYPE_FLOAT:
-            return byteBuffer.getFloat();
-        case DATA_TYPE_BOOLEAN:
-            byte boolValue = byteBuffer.get();
-            if (boolValue == BOOLEAN_TRUE) {
-                return true;
-            } else if (boolValue == BOOLEAN_FALSE) {
-                return false;
-            } else {
-                throw new AnalyticsDataSourceException("Invalid boolean data while decoding: " + boolValue);
-            }
-        case DATA_TYPE_NULL:
-            return null;
-        default:
-            throw new AnalyticsDataSourceException("Invalid object data type while decoding: " + type);
-        }
     }
     
     private static int calculateRecordValuesBufferSize(List<Column> values) throws AnalyticsDataSourceException {
@@ -225,7 +145,8 @@ public class GenericUtils {
         return buffer.array();
     }
     
-    public static List<Column> decodeRecordValues(byte[] data) throws AnalyticsDataSourceException {
+    public static List<Column> decodeRecordValues(byte[] data, 
+            Set<String> columns) throws AnalyticsDataSourceException {
         List<Column> result = new ArrayList<Column>();
         ByteBuffer buffer = ByteBuffer.wrap(data);
         int type, size;
@@ -275,7 +196,9 @@ public class GenericUtils {
                 default:
                     throw new AnalyticsDataSourceException("Unknown encoded data source type : " + type);
                 }
-                result.add(column);
+                if (columns == null || columns.contains(colName)) {
+                    result.add(column);
+                }
             } catch (Exception e) {
                 throw new AnalyticsDataSourceException("Error in decoding record values: " + e.getMessage());
             }

@@ -21,14 +21,15 @@ package org.wso2.carbon.analytics.datasource.rdbms;
 import java.io.ByteArrayInputStream;
 import java.sql.Blob;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -105,53 +106,52 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     	}
     }
     
-    public static void main(String[] args) throws Exception {
-        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/bam3", "root", "root");
-        conn.setAutoCommit(false);
-        String sqlx = "INSERT INTO AN_TABLE_RECORD (record_id, table_name, timestamp) VALUES (?,?,?)";
-        //String sql = "INSERT INTO AN_TABLE_RECORD_COLUMN4 (record_id, record_column_name, record_column_data) VALUES (?,?,?)";
-        String sql = "INSERT INTO AN_TABLE_RECORD_COLUMN3 (record_id, record_column_name, record_column_data_long) VALUES (?,?,?)";
-        String strData = "FOIJFWOIJFOWIFWOIFJW OIFG OIJ FEOFIJE OFIJEOFIJEOFIJOIJOI OIEJF EOIFJ EOFIEOIFJEOIF OIJOIJF EOIJOIJFOEI JWOGIJEWG";
-        byte[] data = strData.getBytes();
-        long start = System.currentTimeMillis();
-        final int n = 5, batch = 1000;
-        for (int j = 0; j < n; j++) {
-//            PreparedStatement stmt = conn.prepareStatement(sqlx);
-//            List<String> ids = new ArrayList<String>();
-//            for (int i = 0; i < batch; i++) {
-//                String recordId = "" + Math.random();
-//                ids.add(recordId);
-//                stmt.setString(1, recordId);
-//                stmt.setString(2, "T1");
-//                stmt.setLong(3, 905425);
+//    public static void main(String[] args) throws Exception {
+//        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/bam3", "root", "root");
+//        conn.setAutoCommit(false);
+//        String sqlx = "INSERT INTO AN_TABLE_RECORD (record_id, table_name, timestamp) VALUES (?,?,?)";
+//        //String sql = "INSERT INTO AN_TABLE_RECORD_COLUMN4 (record_id, record_column_name, record_column_data) VALUES (?,?,?)";
+//        String sql = "INSERT INTO AN_TABLE_RECORD_COLUMN3 (record_id, record_column_name, record_column_data_long) VALUES (?,?,?)";
+//        String strData = "FOIJFWOIJFOWIFWOIFJW OIFG OIJ FEOFIJE OFIJEOFIJEOFIJOIJOI OIEJF EOIFJ EOFIEOIFJEOIF OIJOIJF EOIJOIJFOEI JWOGIJEWG";
+//        byte[] data = strData.getBytes();
+//        long start = System.currentTimeMillis();
+//        final int n = 5, batch = 1000;
+//        for (int j = 0; j < n; j++) {
+////            PreparedStatement stmt = conn.prepareStatement(sqlx);
+////            List<String> ids = new ArrayList<String>();
+////            for (int i = 0; i < batch; i++) {
+////                String recordId = "" + Math.random();
+////                ids.add(recordId);
+////                stmt.setString(1, recordId);
+////                stmt.setString(2, "T1");
+////                stmt.setLong(3, 905425);
+////                stmt.addBatch();
+////            }
+////            stmt.executeBatch();
+////            stmt.close();
+//            PreparedStatement stmt = conn.prepareStatement(sql);
+//            for (int i = 0; i < batch * 10; i++) {
+//                //stmt.setString(1, ids.get(i / 10));
+//                stmt.setString(1, "1");
+//                stmt.setString(2, "" + Math.random());
+//                //stmt.setBlob(3, new ByteArrayInputStream(data));
+//                stmt.setLong(3, 3435);
 //                stmt.addBatch();
 //            }
 //            stmt.executeBatch();
 //            stmt.close();
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            for (int i = 0; i < batch * 10; i++) {
-                //stmt.setString(1, ids.get(i / 10));
-                stmt.setString(1, "1");
-                stmt.setString(2, "" + Math.random());
-                //stmt.setBlob(3, new ByteArrayInputStream(data));
-                stmt.setLong(3, 3435);
-                stmt.addBatch();
-            }
-            stmt.executeBatch();
-            stmt.close();
-            conn.commit();
-            conn.rollback();
-        }
-        long end = System.currentTimeMillis();
-        System.out.println("Time: " + (end - start));
-        System.out.println("TPS: " + (n * batch) / (double) (end - start) * 1000.0);
-        conn.close();
-    }
+//            conn.commit();
+//            conn.rollback();
+//        }
+//        long end = System.currentTimeMillis();
+//        System.out.println("Time: " + (end - start));
+//        System.out.println("TPS: " + (n * batch) / (double) (end - start) * 1000.0);
+//        conn.close();
+//    }
     
     private String[] getInitSQLQueries() {
     	String[] queries = new String[3];
-    	queries[0] = "CREATE TABLE AN_TABLE_RECORD (record_id VARCHAR(50), table_name VARCHAR(256), timestamp BIGINT, PRIMARY KEY(record_id))";
-    	queries[1] = "CREATE TABLE AN_TABLE_RECORD_COLUMN (record_id VARCHAR(50), record_column_name VARCHAR(50), record_column_data BLOB, PRIMARY KEY (record_id, record_column_name), FOREIGN KEY (record_id) REFERENCES AN_TABLE_RECORD (record_id) ON DELETE CASCADE)";
+    	queries[0] = "CREATE TABLE AN_TABLE_RECORD (record_id VARCHAR(50), table_name VARCHAR(256), timestamp BIGINT, data BLOB, PRIMARY KEY(record_id))";
     	queries[2] = "CREATE INDEX AN_TABLE_RECORD_TABLE_NAME ON AN_TABLE_RECORD(table_name)";
     	queries[3] = "CREATE INDEX AN_TABLE_RECORD_TIMESTAMP ON AN_TABLE_RECORD(timestamp)";
     	return queries;
@@ -182,62 +182,29 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     @Override
     public void put(List<Record> records) throws AnalyticsDataSourceException {
         Connection conn = null;
-        try {
-            conn = this.getConnection(false);
-            this.addRecordEntries(conn, records);
-            this.addRecordEntryColumns(conn, records);
-            conn.commit();
-        } catch (SQLException e) {
-            RDBMSUtils.rollbackConnection(conn);
-            throw new AnalyticsDataSourceException("Error in adding records: " + e.getMessage(), e);
-        } finally {
-            RDBMSUtils.cleanupConnection(null, null, conn);
-        }
-    }
-    
-    private String getRecordInsertSQL() {
-    	return "INSERT INTO AN_TABLE_RECORD (record_id, table_name, timestamp) VALUES (?, ?, ?)";
-    }
-    
-    private String getRecordColumnInsertSQL() {
-    	return "INSERT INTO AN_TABLE_RECORD_COLUMN (record_id, record_column_name, record_column_data) VALUES (?, ?, ?)";
-    }
-    
-    private void addRecordEntries(Connection conn, List<Record> records) throws SQLException {
         PreparedStatement stmt = null;
         try {
+            conn = this.getConnection(false);
             stmt = conn.prepareStatement(this.getRecordInsertSQL());
             for (Record record : records) {
                 stmt.setString(1, record.getId());
                 stmt.setString(2, record.getTableName());
                 stmt.setLong(3, record.getTimestamp());
+                stmt.setBlob(4, new ByteArrayInputStream(GenericUtils.encodeRecordValues(record.getValues())));
                 stmt.addBatch();
             }
             stmt.executeBatch();
+            conn.commit();
+        } catch (SQLException e) {
+            RDBMSUtils.rollbackConnection(conn);
+            throw new AnalyticsDataSourceException("Error in adding records: " + e.getMessage(), e);
         } finally {
-            RDBMSUtils.cleanupConnection(null, stmt, null);
+            RDBMSUtils.cleanupConnection(null, stmt, conn);
         }
     }
     
-    private void addRecordEntryColumns(Connection conn, 
-            List<Record> records) throws AnalyticsDataSourceException, SQLException {
-        PreparedStatement stmt = null;
-        try {
-            stmt = conn.prepareStatement(this.getRecordColumnInsertSQL());
-            for (Record record : records) {
-                for (Column column : record.getValues()) {
-                    stmt.setString(1, record.getId());
-                    stmt.setString(2, column.getName());
-                    stmt.setBlob(3, new ByteArrayInputStream(GenericUtils.encodeColumnObject(column.getValue())));
-                    stmt.addBatch();
-                }
-            }
-            stmt.executeBatch();
-        } finally {
-            if (stmt != null) {
-                stmt.close();
-            }
-        }
+    private String getRecordInsertSQL() {
+    	return "INSERT INTO AN_TABLE_RECORD (record_id, table_name, timestamp, data) VALUES (?, ?, ?, ?)";
     }
 
     @Override
@@ -245,9 +212,11 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             long timeFrom, long timeTo, int recordsFrom, 
             int recordsCount) throws AnalyticsDataSourceException {
         Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
         try {
             conn = this.getConnection(false);
-            PreparedStatement stmt = conn.prepareStatement(this.getRecordRetrievalSQL());
+            stmt = conn.prepareStatement(this.getRecordRetrievalSQL());
             if (timeFrom == -1) {
                 timeFrom = Long.MIN_VALUE;
             }
@@ -265,65 +234,35 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             stmt.setLong(3, timeTo);
             stmt.setInt(4, recordsFrom);
             stmt.setInt(5, recordsCount);
-            ResultSet rs = stmt.executeQuery();
-            List<Record> result = this.processRecordResultSet(tableName, stmt, rs, columns, conn);
+            rs = stmt.executeQuery();
+            List<Record> result = this.processRecordResultSet(tableName, rs, columns);
             conn.commit();
             return result;
         } catch (SQLException e) {
             RDBMSUtils.rollbackConnection(conn);
             throw new AnalyticsDataSourceException("Error in retrieving records: " + e.getMessage(), e);
         } finally {
-            RDBMSUtils.cleanupConnection(null, null, conn);
+            RDBMSUtils.cleanupConnection(rs, stmt, conn);
         }
     }
     
-    private List<Record> processRecordResultSet(String tableName, Statement stmt, ResultSet rs, 
-            List<String> columns, Connection conn) throws SQLException, AnalyticsDataSourceException {
+    private List<Record> processRecordResultSet(String tableName, ResultSet rs, 
+            List<String> columns) throws SQLException, AnalyticsDataSourceException {
         List<Record> result = new ArrayList<Record>();
-        String columnValuesSQL = this.generateGetRecordColumnsSQL(columns == null ? 0 : columns.size());
-        List<Object[]> records = new ArrayList<Object[]>();
-        while (rs.next()) {
-            records.add(new Object[] { rs.getString(1), rs.getLong(2)});
+        Record record;
+        Blob blob;
+        List<Column> values;
+        Set<String> colSet = null;
+        if (columns != null && columns.size() > 0) {
+            colSet = new HashSet<String>(columns);
         }
-        rs.close();
-        stmt.close();
-        String id;
-        long timestamp;
-        for (Object[] record : records) {
-            id = (String) record[0];
-            timestamp = (Long) record[1];
-            result.add(new Record(id, tableName, this.getRecordValues(columnValuesSQL, id, columns, conn), timestamp));
+        while (rs.next()) {
+            blob = rs.getBlob(3);
+            values = GenericUtils.decodeRecordValues(blob.getBytes(1, (int) blob.length()), colSet);
+            record = new Record(rs.getString(1), tableName, values, rs.getLong(2));
+            result.add(record);
         }
         return result;
-    }
-    
-    private List<Column> getRecordValues(String sql, String id, List<String> columns, 
-            Connection conn) throws SQLException, AnalyticsDataSourceException {
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        try {
-            stmt = conn.prepareStatement(sql);
-            stmt.setString(1, id);
-            if (columns != null) {
-                for (int i = 0; i < columns.size(); i++) {
-                    stmt.setString(i + 2, columns.get(i));
-                }
-            }
-            rs = stmt.executeQuery();
-            List<Column> result = new ArrayList<Record.Column>();
-            String colName;
-            Blob blob;
-            Object value;
-            while (rs.next()) {
-                colName = rs.getString(1);
-                blob = rs.getBlob(2);
-                value = GenericUtils.decodeColumnObject(blob.getBytes(1, (int) blob.length()));
-                result.add(new Column(colName, value));
-            }
-            return result;
-        } finally {
-            RDBMSUtils.cleanupConnection(rs, stmt, null);
-        }
     }
             
     @Override
@@ -331,22 +270,24 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             List<String> ids) throws AnalyticsDataSourceException {
         String recordGetSQL = this.generateGetRecordRetrievalWithIdsSQL(ids.size());
         Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
         try {
             conn = this.getConnection(false);
-            PreparedStatement stmt = conn.prepareStatement(recordGetSQL);
+            stmt = conn.prepareStatement(recordGetSQL);
             stmt.setString(1, tableName);
             for (int i = 0; i < ids.size(); i++) {
                 stmt.setString(i + 2, ids.get(i));
             }
-            ResultSet rs = stmt.executeQuery();
-            List<Record> result = this.processRecordResultSet(tableName, stmt, rs, columns, conn);
+            rs = stmt.executeQuery();
+            List<Record> result = this.processRecordResultSet(tableName, rs, columns);
             conn.commit();
             return result;
         } catch (SQLException e) {
             RDBMSUtils.rollbackConnection(conn);
             throw new AnalyticsDataSourceException("Error in retrieving records: " + e.getMessage(), e);
         } finally {
-            RDBMSUtils.cleanupConnection(null, null, conn);
+            RDBMSUtils.cleanupConnection(rs, stmt, conn);
         }
     }
 
@@ -400,11 +341,11 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     }
     
     private String getRecordRetrievalSQL() {
-        return "SELECT record_id, timestamp FROM AN_TABLE_RECORD WHERE table_name = ? AND timestamp >= ? AND timestamp < ? LIMIT ?,?";
+        return "SELECT record_id, timestamp, data FROM AN_TABLE_RECORD WHERE table_name = ? AND timestamp >= ? AND timestamp < ? LIMIT ?,?";
     }
     
     private String generateGetRecordRetrievalWithIdsSQL(int recordCount) {
-        String sql = "SELECT record_id, timestamp FROM AN_TABLE_RECORD WHERE table_name = ? AND record_id IN (:record_ids)";
+        String sql = "SELECT record_id, timestamp, data FROM AN_TABLE_RECORD WHERE table_name = ? AND record_id IN (:record_ids)";
         return sql.replaceAll(":record_ids", this.getDynamicSQLParams(recordCount));
     }
     
@@ -423,16 +364,6 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             }
         }
         return builder.toString();
-    }
-    
-    private String generateGetRecordColumnsSQL(int columnCount) {
-        String sqlWithColumns = "SELECT record_column_name, record_column_data FROM AN_TABLE_RECORD_COLUMN WHERE record_id = ? AND record_column_name IN (:columns)";
-        String sqlWithoutColumns = "SELECT record_column_name, record_column_data FROM AN_TABLE_RECORD_COLUMN WHERE record_id = ?";
-        if (columnCount == 0) {
-            return sqlWithoutColumns;
-        } else {
-            return sqlWithColumns.replaceAll(":columns", this.getDynamicSQLParams(columnCount));
-        }
     }
     
     private String getDeleteRecordsSQL() {
