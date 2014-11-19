@@ -34,10 +34,8 @@
 
     <modules>
         <module>org.wso2.carbon.analytics.datasource.core</module>
-        <module>org.wso2.carbon.analytics.datasource.rdbms.common</module>
-        <module>org.wso2.carbon.analytics.datasource.test</module>
-        <module>org.wso2.carbon.analytics.datasource.rdbms.h2</module>
-        <module>org.wso2.carbon.analytics.datasource.rdbms.mysql</module>
+        <module>org.wso2.carbon.analytics.datasource.rdbms</module>
+        <module>org.wso2.carbon.analytics.dataservice</module>
     </modules>
 
 

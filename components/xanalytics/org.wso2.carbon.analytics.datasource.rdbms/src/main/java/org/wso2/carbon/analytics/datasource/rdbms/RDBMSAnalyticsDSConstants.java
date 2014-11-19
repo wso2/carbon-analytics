@@ -16,21 +16,23 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.core;
+package org.wso2.carbon.analytics.datasource.rdbms;
+
+import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSource;
 
 /**
- * This class represents analytics data source related exceptions.
+ * Constants related to RDBMS based {@link AnalyticsDataSource}s.
  */
-public class AnalyticsDataSourceException extends Exception {
+public class RDBMSAnalyticsDSConstants {
 
-    private static final long serialVersionUID = 6750673867599631611L;
+    public static final String DATASOURCE = "datasource";
     
-    public AnalyticsDataSourceException(String msg) {
-        super(msg);
-    }
+    public static final String FS_PATH_TABLE = "AN_FS_PATH";
+        
+    public static final String FS_DATA_TABLE = "AN_FS_DATA";
     
-    public AnalyticsDataSourceException(String msg, Throwable cause) {
-        super(msg, cause);
-    }
-
+    public static final int FS_DATA_CHUNK_SIZE = 1024;
+    
+    public static final byte[] FS_EMPTY_DATA_CHUNK = new byte[FS_DATA_CHUNK_SIZE];
+        
 }

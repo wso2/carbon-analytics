@@ -21,6 +21,9 @@ package org.wso2.carbon.analytics.datasource.core;
 import java.util.List;
 import java.util.Map;
 
+import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
+import org.wso2.carbon.analytics.datasource.core.lock.LockProvider;
+
 /**
  * This interface represents the common data store implementations used in analytics. 
  */
@@ -31,32 +34,14 @@ public interface AnalyticsDataSource {
      * @param properites The properties associated with this analytics data source 
      * @throws AnalyticsDataSourceException
      */
-    void init(Map<String, Object> properites) throws AnalyticsDataSourceException;
+    void init(Map<String, String> properites) throws AnalyticsDataSourceException;
     
     /**
-     * Adds a table with the given details.
-     * @param tableName The name of the target table
-     * @param columns The columns consisting in the table
-     * the key is the name of the column and the value the data type,
-     * @see DataType
-     * @throws AnalyticsDataSourceException
-     */
-    void addTable(String tableName, Map<String, DataType> columns) throws AnalyticsDataSourceException;
-    
-    /**
-     * Drops a given table, and deletes the indices associated with it.
+     * Deletes all the records in a given table, and deletes the indices associated with it.
      * @param tableName The name of the table to be dropped
      * @throws AnalyticsDataSourceException
      */
-    void dropTable(String tableName) throws AnalyticsDataSourceException;
-    
-    /**
-     * Checks whether the given table already exists.
-     * @param tableName The name of the table to check for existence
-     * @return true if the table already exists
-     * @throws AnalyticsDataSourceException
-     */
-    boolean tableExists(String tableName) throws AnalyticsDataSourceException;
+    void purgeTable(String tableName) throws AnalyticsDataSourceException;
     
     /**
      * Adds a new record to the table. If the record id is mentioned, 
@@ -114,5 +99,15 @@ public interface AnalyticsDataSource {
      * @throws AnalyticsDataSourceException
      */
     FileSystem getFileSystem() throws AnalyticsDataSourceException;
+    
+    /**
+     * Returns a lock provider for this analytics data source. This can be returned null, and the users
+     * of this analytics data source should use a default lock provider, which should usually be an in-memory
+     * based implementation or a distributed memory based one for clusters. Only if there is a more efficient
+     * implementation of a lock provider is available that is bound to this data source, it should be returned. 
+     * @return Natively data source specific {@link LockProvider}
+     * @throws AnalyticsLockException
+     */
+    LockProvider getLockProvider() throws AnalyticsLockException;
 
 }

@@ -19,18 +19,18 @@
 package org.wso2.carbon.analytics.datasource.core;
 
 /**
- * This class represents analytics data source related exceptions.
+ * Exception class for lock provider based functionalities. 
  */
-public class AnalyticsDataSourceException extends Exception {
+public class AnalyticsLockException extends AnalyticsDataSourceException {
 
-    private static final long serialVersionUID = 6750673867599631611L;
-    
-    public AnalyticsDataSourceException(String msg) {
-        super(msg);
-    }
-    
-    public AnalyticsDataSourceException(String msg, Throwable cause) {
-        super(msg, cause);
-    }
+	private static final long serialVersionUID = -8955233645920639102L;
+
+	public AnalyticsLockException(String msg) {
+		super(msg);
+	}
+	
+	public AnalyticsLockException(String msg, Throwable cause) {
+	    super(msg, cause);
+	}
 
 }

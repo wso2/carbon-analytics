@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suite name="MySQL Analytics Data Source Test Suite" parallel="methods" thread-count="1">
+   <parameter name="url"  value="jdbc:mysql://localhost/bam3"/>
+   <parameter name="username"  value="root"/>
+   <parameter name="password"  value="root"/>
+   <test name="Analytics Test">
+     <classes>     
+       <!-- class name="org.wso2.carbon.analytics.datasource.core.MySQLMyISAMAnalyticsDataSourceTest" /-->
+       <class name="org.wso2.carbon.analytics.datasource.core.MySQLInnoDBAnalyticsDataSourceTest" />
+     </classes>
+   </test>
+</suite>

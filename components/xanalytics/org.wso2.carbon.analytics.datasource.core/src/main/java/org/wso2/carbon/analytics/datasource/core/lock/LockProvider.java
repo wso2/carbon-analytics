@@ -16,21 +16,17 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.core;
+package org.wso2.carbon.analytics.datasource.core.lock;
+
+import org.wso2.carbon.analytics.datasource.core.AnalyticsLockException;
 
 /**
- * This class represents analytics data source related exceptions.
+ * This interface represents a lock provider, that can be used to instantiate 
  */
-public class AnalyticsDataSourceException extends Exception {
+public interface LockProvider {
 
-    private static final long serialVersionUID = 6750673867599631611L;
+    Lock getLock(String name) throws AnalyticsLockException;
     
-    public AnalyticsDataSourceException(String msg) {
-        super(msg);
-    }
+    void clearLock(String name) throws AnalyticsLockException;
     
-    public AnalyticsDataSourceException(String msg, Throwable cause) {
-        super(msg, cause);
-    }
-
 }

@@ -32,51 +32,24 @@ public class Record {
     
     private List<Column> values;
     
-    private List<Column> permenantValues;
-    
-    private List<Column> arbitraryValues;
-    
     private long timestamp;
-    
-    private long identity;
-    
+        
     private String id;
     
     private int hashCode = -1;
     
-    public Record(String tableName, List<Column> permenantValues, long timestamp) {
-        this(null, tableName, permenantValues, timestamp);
+    public Record(String tableName, List<Column> values, long timestamp) {
+        this(null, tableName, values, timestamp);
     }
     
-    public Record(String tableName, List<Column> permenantValues, List<Column> arbitraryValues, long timestamp) {
-        this(null, tableName, permenantValues, arbitraryValues, timestamp);
-    }
-    
-    public Record(String id, String tableName, List<Column> permenantValues, long timestamp) {
+    public Record(String id, String tableName, List<Column> values, long timestamp) {
         this.id = id;
         if (this.id == null) {
             this.id = this.generateID();
         }
         this.tableName = tableName;
-        this.permenantValues = permenantValues;
-        this.values = this.permenantValues;
+        this.values = values;
         this.timestamp = timestamp;
-        this.identity = this.generateRecordIdentity();
-    }
-    
-    public Record(String id, String tableName, List<Column> permenantValues, List<Column> arbitraryValues, long timestamp) {
-        this.id = id;
-        if (this.id == null) {
-            this.id = this.generateID();
-        }
-        this.tableName = tableName;
-        this.permenantValues = permenantValues;
-        this.arbitraryValues = arbitraryValues;
-        this.values = new ArrayList<Record.Column>(permenantValues.size() + arbitraryValues.size());
-        this.values.addAll(permenantValues);
-        this.values.addAll(arbitraryValues);
-        this.timestamp = timestamp;
-        this.identity = this.generateRecordIdentity();
     }
     
     public String getId() {
@@ -98,34 +71,8 @@ public class Record {
         return values;
     }
     
-    public List<Column> getPermenantValues() {
-        return permenantValues;
-    }
-    
-    public List<Column> getArbitraryValues() {
-        return arbitraryValues;
-    }
-    
     public long getTimestamp() {
         return timestamp;
-    }
-    
-    public long getIdentity() {
-        return identity;
-    }
-    
-    /**
-     * Generates a hash value for the target location this record represents,
-     * basically to identify the table and the fields and their order. 
-     */
-    private long generateRecordIdentity() {
-        long identity = this.getTableName().hashCode();
-        int x = 1;
-        for (Column entry : this.getValues()) {
-            identity += entry.getName().hashCode() >> x;
-            x++;
-        }
-        return identity;
     }
     
     /**
@@ -140,7 +87,7 @@ public class Record {
             return false;
         }
         Record rhs = (Record) obj;
-        if (!this.getTableName().toUpperCase().equals(rhs.getTableName().toUpperCase())) {
+        if (!this.getTableName().equals(rhs.getTableName())) {
             return false;
         }
         if (!this.getId().equals(rhs.getId())) {
@@ -202,7 +149,7 @@ public class Record {
             }
             Column rhs = (Column) obj;
             /* The column name match is case insensitive */
-            if (this.getName().toUpperCase().equalsIgnoreCase(rhs.getName().toUpperCase())) {
+            if (this.getName().equals(rhs.getName())) {
                 Object val1 = this.getValue();
                 Object val2 = rhs.getValue();
                 if (val1 == null && val2 == null) {
@@ -219,7 +166,7 @@ public class Record {
         
         @Override
         public int hashCode() {
-            return this.getName().toUpperCase().hashCode() + 
+            return this.getName().hashCode() + 
                     (this.getValue() != null ? this.getValue().hashCode() * 2 : 0);
         }
                 
