@@ -351,7 +351,7 @@ public class AnalyticsDataSourceTest {
         this.cleanupT1();
         long hash1 = 0;
         List<Record> records;
-        int n = 10, batch = 1000;
+        int n = 50, batch = 1000;
         long start = System.currentTimeMillis();
         for (int i = 0; i < n; i++) {
             records = this.generateRecords("T1", i, batch, -1, -1);

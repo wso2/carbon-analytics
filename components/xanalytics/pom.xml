@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>analytics</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon X-Analytics Aggregator Module</name>
+    <name>WSO2 Carbon - Analytics Aggregator Module</name>
     <url>http://wso2.org</url>
 
     <modules>

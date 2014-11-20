@@ -29,6 +29,7 @@ import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Parameters;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceException;
+import org.wso2.carbon.analytics.datasource.rdbms.QueryConfiguration;
 import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsDataSource;
 
 /**
@@ -37,11 +38,11 @@ import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsDataSource;
 public class MySQLMyISAMAnalyticsDataSourceTest extends AnalyticsDataSourceTest {
 
     @BeforeSuite
-    @Parameters({"url", "username", "password"})
+    @Parameters({"mysql.url", "mysql.username", "mysql.password"})
     public void setup(String url, String username, 
             String password) throws NamingException, AnalyticsDataSourceException {
         this.initDS(url, username, password);
-        RDBMSAnalyticsDataSource ads = new RDBMSAnalyticsDataSource();
+        RDBMSAnalyticsDataSource ads = new RDBMSAnalyticsDataSource(this.generateQueryConfiguration());
         Map<String, String> props = new HashMap<String, String>();
         props.put("datasource", "DS");
         ads.init(props);
@@ -56,6 +57,22 @@ public class MySQLMyISAMAnalyticsDataSourceTest extends AnalyticsDataSourceTest 
         pps.setPassword(password);
         DataSource dsx = new DataSource(pps);
         new InitialContext().bind("DS", dsx);
+    }
+    
+    private QueryConfiguration generateQueryConfiguration() {
+        QueryConfiguration conf = new QueryConfiguration();
+        String[] initQueries = new String[3];
+        initQueries[0] = "CREATE TABLE AN_TABLE_RECORD (record_id VARCHAR(50), table_name VARCHAR(256), timestamp BIGINT, data BLOB, PRIMARY KEY(record_id)) ENGINE='MyISAM'";
+        initQueries[1] = "CREATE INDEX AN_TABLE_RECORD_TABLE_NAME ON AN_TABLE_RECORD(table_name) ENGINE='MyISAM'";
+        initQueries[2] = "CREATE INDEX AN_TABLE_RECORD_TIMESTAMP ON AN_TABLE_RECORD(timestamp) ENGINE='MyISAM'";
+        conf.setInitQueries(initQueries);
+        conf.setSystemTablesCheckQuery("DESCRIBE AN_TABLE_RECORD");
+        conf.setRecordInsertQuery("INSERT INTO AN_TABLE_RECORD (record_id, table_name, timestamp, data) VALUES (?, ?, ?, ?)");
+        conf.setRecordRetrievalQuery("SELECT record_id, timestamp, data FROM AN_TABLE_RECORD WHERE table_name = ? AND timestamp >= ? AND timestamp < ? LIMIT ?,?");
+        conf.setRecordRetrievalWithIdsQuery("SELECT record_id, timestamp, data FROM AN_TABLE_RECORD WHERE table_name = ? AND record_id IN (:record_ids)");
+        conf.setRecordDeletionWithIdsQuery("DELETE FROM AN_TABLE_RECORD WHERE table_name = ? AND record_id IN (:record_ids)");
+        conf.setRecordDeletionQuery("DELETE FROM AN_TABLE_RECORD WHERE table_name = ? AND timestamp >= ? AND timestamp < ?");
+        return conf;
     }
     
 }

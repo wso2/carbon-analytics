@@ -28,17 +28,16 @@ import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Parameters;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceException;
 import org.wso2.carbon.analytics.datasource.rdbms.QueryConfiguration;
 import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsDataSource;
 
 /**
- * MySQL implementation of analytics data source tests.
+ * H2 implementation of analytics data source tests.
  */
-public class MySQLInnoDBAnalyticsDataSourceTest extends AnalyticsDataSourceTest {
+public class H2AnalyticsDataSourceTest extends AnalyticsDataSourceTest {
 
     @BeforeSuite
-    @Parameters({"mysql.url", "mysql.username", "mysql.password"})
+    @Parameters({"url", "username", "password"})
     public void setup(String url, String username, 
             String password) throws NamingException, AnalyticsDataSourceException {
         this.initDS(url, username, password);

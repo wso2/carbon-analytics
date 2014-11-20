@@ -54,11 +54,21 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     
     private Map<String, String> properties;
     
+    private QueryConfiguration queryConfiguration;
+    
+    public RDBMSAnalyticsDataSource() {
+        this(null);
+    }
+    
+    public RDBMSAnalyticsDataSource(QueryConfiguration queryConfiguration) {
+        this.queryConfiguration = queryConfiguration;
+    }
+    
     @Override
-    public void init(Map<String, String> properites)
+    public void init(Map<String, String> properties)
             throws AnalyticsDataSourceException {
-        this.properties = properites;
-        String dsName = properites.get(RDBMSAnalyticsDSConstants.DATASOURCE);
+        this.properties = properties;
+        String dsName = properties.get(RDBMSAnalyticsDSConstants.DATASOURCE);
         if (dsName == null) {
             throw new AnalyticsDataSourceException("The property '" + 
                     RDBMSAnalyticsDSConstants.DATASOURCE + "' is required");
@@ -71,6 +81,10 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
         }
         /* create the system tables */
         this.checkAndCreateSystemTables();
+    }
+    
+    public QueryConfiguration getQueryConfiguration() {
+        return queryConfiguration;
     }
 
     private void checkAndCreateSystemTables() throws AnalyticsDataSourceException {
@@ -106,59 +120,12 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     	}
     }
     
-//    public static void main(String[] args) throws Exception {
-//        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/bam3", "root", "root");
-//        conn.setAutoCommit(false);
-//        String sqlx = "INSERT INTO AN_TABLE_RECORD (record_id, table_name, timestamp) VALUES (?,?,?)";
-//        //String sql = "INSERT INTO AN_TABLE_RECORD_COLUMN4 (record_id, record_column_name, record_column_data) VALUES (?,?,?)";
-//        String sql = "INSERT INTO AN_TABLE_RECORD_COLUMN3 (record_id, record_column_name, record_column_data_long) VALUES (?,?,?)";
-//        String strData = "FOIJFWOIJFOWIFWOIFJW OIFG OIJ FEOFIJE OFIJEOFIJEOFIJOIJOI OIEJF EOIFJ EOFIEOIFJEOIF OIJOIJF EOIJOIJFOEI JWOGIJEWG";
-//        byte[] data = strData.getBytes();
-//        long start = System.currentTimeMillis();
-//        final int n = 5, batch = 1000;
-//        for (int j = 0; j < n; j++) {
-////            PreparedStatement stmt = conn.prepareStatement(sqlx);
-////            List<String> ids = new ArrayList<String>();
-////            for (int i = 0; i < batch; i++) {
-////                String recordId = "" + Math.random();
-////                ids.add(recordId);
-////                stmt.setString(1, recordId);
-////                stmt.setString(2, "T1");
-////                stmt.setLong(3, 905425);
-////                stmt.addBatch();
-////            }
-////            stmt.executeBatch();
-////            stmt.close();
-//            PreparedStatement stmt = conn.prepareStatement(sql);
-//            for (int i = 0; i < batch * 10; i++) {
-//                //stmt.setString(1, ids.get(i / 10));
-//                stmt.setString(1, "1");
-//                stmt.setString(2, "" + Math.random());
-//                //stmt.setBlob(3, new ByteArrayInputStream(data));
-//                stmt.setLong(3, 3435);
-//                stmt.addBatch();
-//            }
-//            stmt.executeBatch();
-//            stmt.close();
-//            conn.commit();
-//            conn.rollback();
-//        }
-//        long end = System.currentTimeMillis();
-//        System.out.println("Time: " + (end - start));
-//        System.out.println("TPS: " + (n * batch) / (double) (end - start) * 1000.0);
-//        conn.close();
-//    }
-    
     private String[] getInitSQLQueries() {
-    	String[] queries = new String[3];
-    	queries[0] = "CREATE TABLE AN_TABLE_RECORD (record_id VARCHAR(50), table_name VARCHAR(256), timestamp BIGINT, data BLOB, PRIMARY KEY(record_id))";
-    	queries[2] = "CREATE INDEX AN_TABLE_RECORD_TABLE_NAME ON AN_TABLE_RECORD(table_name)";
-    	queries[3] = "CREATE INDEX AN_TABLE_RECORD_TIMESTAMP ON AN_TABLE_RECORD(timestamp)";
-    	return queries;
+    	return this.getQueryConfiguration().getInitQueries();
     }
     
     private String getSystemTableCheckQuery() {
-    	return "DESCRIBE AN_TABLE_RECORD";
+    	return this.getQueryConfiguration().getSystemTablesCheckQuery();
     }
     
     public Map<String, String> getProperties() {
@@ -204,7 +171,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     }
     
     private String getRecordInsertSQL() {
-    	return "INSERT INTO AN_TABLE_RECORD (record_id, table_name, timestamp, data) VALUES (?, ?, ?, ?)";
+    	return this.getQueryConfiguration().getRecordInsertQuery();
     }
 
     @Override
@@ -216,7 +183,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
         ResultSet rs = null;
         try {
             conn = this.getConnection(false);
-            stmt = conn.prepareStatement(this.getRecordRetrievalSQL());
+            stmt = conn.prepareStatement(this.getRecordRetrievalQuery());
             if (timeFrom == -1) {
                 timeFrom = Long.MIN_VALUE;
             }
@@ -268,7 +235,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     @Override
     public List<Record> getRecords(String tableName, List<String> columns,
             List<String> ids) throws AnalyticsDataSourceException {
-        String recordGetSQL = this.generateGetRecordRetrievalWithIdsSQL(ids.size());
+        String recordGetSQL = this.generateGetRecordRetrievalWithIdQuery(ids.size());
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -294,7 +261,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     @Override
     public void delete(String tableName, long timeFrom, long timeTo)
             throws AnalyticsDataSourceException {
-        String sql = this.getDeleteRecordsSQL();
+        String sql = this.getRecordDeletionQuery();
         Connection conn = null;
         PreparedStatement stmt = null;
         try {
@@ -322,7 +289,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
         if (ids.size() == 0) {
             return;
         }
-        String sql = this.generateDeleteRecordsWithIdsSQL(ids.size());
+        String sql = this.generateRecordDeletionRecordsWithIdsQuery(ids.size());
         Connection conn = null;
         PreparedStatement stmt = null;
         try {
@@ -340,17 +307,17 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
         }
     }
     
-    private String getRecordRetrievalSQL() {
-        return "SELECT record_id, timestamp, data FROM AN_TABLE_RECORD WHERE table_name = ? AND timestamp >= ? AND timestamp < ? LIMIT ?,?";
+    private String getRecordRetrievalQuery() {
+        return this.getQueryConfiguration().getRecordRetrievalQuery();
     }
     
-    private String generateGetRecordRetrievalWithIdsSQL(int recordCount) {
-        String sql = "SELECT record_id, timestamp, data FROM AN_TABLE_RECORD WHERE table_name = ? AND record_id IN (:record_ids)";
+    private String generateGetRecordRetrievalWithIdQuery(int recordCount) {
+        String sql = this.getQueryConfiguration().getRecordRetrievalWithIdsQuery();
         return sql.replaceAll(":record_ids", this.getDynamicSQLParams(recordCount));
     }
     
-    private String generateDeleteRecordsWithIdsSQL(int recordCount) {
-        String sql = "DELETE FROM AN_TABLE_RECORD WHERE table_name = ? AND record_id IN (:record_ids)";
+    private String generateRecordDeletionRecordsWithIdsQuery(int recordCount) {
+        String sql = this.getQueryConfiguration().getRecordDeletionWithIdsQuery();
         return sql.replaceAll(":record_ids", this.getDynamicSQLParams(recordCount));
     }
     
@@ -366,8 +333,8 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
         return builder.toString();
     }
     
-    private String getDeleteRecordsSQL() {
-        return "DELETE FROM AN_TABLE_RECORD WHERE table_name = ? AND timestamp >= ? AND timestamp < ?";
+    private String getRecordDeletionQuery() {
+        return this.getQueryConfiguration().getRecordDeletionQuery();
     }
 
     @Override
