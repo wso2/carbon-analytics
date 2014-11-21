@@ -34,10 +34,10 @@ import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsDataSource;
 /**
  * H2 implementation of analytics data source tests.
  */
-public class H2AnalyticsDataSourceTest extends AnalyticsDataSourceTest {
+public class H2FileDBAnalyticsDataSourceTest extends AnalyticsDataSourceTest {
 
     @BeforeSuite
-    @Parameters({"url", "username", "password"})
+    @Parameters({"h2.url", "h2.username", "h2.password"})
     public void setup(String url, String username, 
             String password) throws NamingException, AnalyticsDataSourceException {
         this.initDS(url, username, password);
@@ -45,12 +45,12 @@ public class H2AnalyticsDataSourceTest extends AnalyticsDataSourceTest {
         Map<String, String> props = new HashMap<String, String>();
         props.put("datasource", "DS");
         ads.init(props);
-        this.init("MySQLInnoDBAnalyticsDataSource", ads);
+        this.init("H2FileDBAnalyticsDataSource", ads);
     }
     
     private void initDS(String url, String username, String password) throws NamingException {
         PoolProperties pps = new PoolProperties();
-        pps.setDriverClassName("com.mysql.jdbc.Driver");
+        pps.setDriverClassName("org.h2.Driver");
         pps.setUrl(url);
         pps.setUsername(username);
         pps.setPassword(password);
@@ -61,11 +61,11 @@ public class H2AnalyticsDataSourceTest extends AnalyticsDataSourceTest {
     private QueryConfiguration generateQueryConfiguration() {
         QueryConfiguration conf = new QueryConfiguration();
         String[] initQueries = new String[3];
-        initQueries[0] = "CREATE TABLE AN_TABLE_RECORD (record_id VARCHAR(50), table_name VARCHAR(256), timestamp BIGINT, data BLOB, PRIMARY KEY(record_id)) ENGINE='InnoDB'";
-        initQueries[1] = "CREATE INDEX AN_TABLE_RECORD_TABLE_NAME ON AN_TABLE_RECORD(table_name) ENGINE='InnoDB'";
-        initQueries[2] = "CREATE INDEX AN_TABLE_RECORD_TIMESTAMP ON AN_TABLE_RECORD(timestamp) ENGINE='InnoDB'";
+        initQueries[0] = "CREATE TABLE AN_TABLE_RECORD (record_id VARCHAR(50), table_name VARCHAR(256), timestamp BIGINT, data BLOB, PRIMARY KEY(record_id))";
+        initQueries[1] = "CREATE INDEX AN_TABLE_RECORD_TABLE_NAME ON AN_TABLE_RECORD(table_name)";
+        initQueries[2] = "CREATE INDEX AN_TABLE_RECORD_TIMESTAMP ON AN_TABLE_RECORD(timestamp)";
         conf.setInitQueries(initQueries);
-        conf.setSystemTablesCheckQuery("DESCRIBE AN_TABLE_RECORD");
+        conf.setSystemTablesCheckQuery("SELECT record_id FROM AN_TABLE_RECORD WHERE record_id = '0'");
         conf.setRecordInsertQuery("INSERT INTO AN_TABLE_RECORD (record_id, table_name, timestamp, data) VALUES (?, ?, ?, ?)");
         conf.setRecordRetrievalQuery("SELECT record_id, timestamp, data FROM AN_TABLE_RECORD WHERE table_name = ? AND timestamp >= ? AND timestamp < ? LIMIT ?,?");
         conf.setRecordRetrievalWithIdsQuery("SELECT record_id, timestamp, data FROM AN_TABLE_RECORD WHERE table_name = ? AND record_id IN (:record_ids)");

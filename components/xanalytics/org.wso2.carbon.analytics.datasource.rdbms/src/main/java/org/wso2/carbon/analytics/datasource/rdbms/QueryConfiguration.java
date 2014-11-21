@@ -36,6 +36,16 @@ public class QueryConfiguration {
     private String recordRetrievalWithIdsQuery;
     
     private String recordDeletionWithIdsQuery;
+    
+    private boolean paginationFirstZeroIndexed;
+    
+    private boolean paginationFirstInclusive;
+    
+    private boolean paginationSecondLength;
+    
+    private boolean paginationSecondZeroIndexed;
+    
+    private boolean paginationSecondInclusive;
 
     public String[] getInitQueries() {
         return initQueries;
@@ -91,6 +101,46 @@ public class QueryConfiguration {
 
     public void setRecordDeletionWithIdsQuery(String recordDeletionWithIdsQuery) {
         this.recordDeletionWithIdsQuery = recordDeletionWithIdsQuery;
-    }    
+    }
+    
+    public boolean isPaginationFirstZeroIndexed() {
+        return paginationFirstZeroIndexed;
+    }
+    
+    public void setPaginationFirstZeroIndexed(boolean paginationFirstZeroIndexed) {
+        this.paginationFirstZeroIndexed = paginationFirstZeroIndexed;
+    }
+    
+    public boolean isPaginationFirstInclusive() {
+        return paginationFirstInclusive;
+    }
+    
+    public void setPaginationFirstInclusive(boolean paginationFirstInclusive) {
+        this.paginationFirstInclusive = paginationFirstInclusive;
+    }
+    
+    public boolean isPaginationSecondLength() {
+        return paginationSecondLength;
+    }
+    
+    public void setPaginationSecondLength(boolean paginationSecondLength) {
+        this.paginationSecondLength = paginationSecondLength;
+    }
+    
+    public boolean isPaginationSecondZeroIndexed() {
+        return paginationSecondZeroIndexed;
+    }
+    
+    public void setPaginationSecondZeroIndexed(boolean paginationSecondZeroIndexed) {
+        this.paginationSecondZeroIndexed = paginationSecondZeroIndexed;
+    }
+
+    public boolean isPaginationSecondInclusive() {
+        return paginationSecondInclusive;
+    }
+    
+    public void setPaginationSecondInclusive(boolean paginationSecondInclusive) {
+        this.paginationSecondInclusive = paginationSecondInclusive;
+    }
     
 }
