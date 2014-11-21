@@ -27,7 +27,6 @@ import javax.naming.NamingException;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.Parameters;
 import org.wso2.carbon.analytics.datasource.rdbms.QueryConfiguration;
 import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsDataSource;
 
