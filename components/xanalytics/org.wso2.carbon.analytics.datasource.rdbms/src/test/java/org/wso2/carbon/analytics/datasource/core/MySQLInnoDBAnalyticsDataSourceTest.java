@@ -72,6 +72,9 @@ public class MySQLInnoDBAnalyticsDataSourceTest extends AnalyticsDataSourceTest 
         conf.setRecordRetrievalWithIdsQuery("SELECT record_id, timestamp, data FROM AN_TABLE_RECORD WHERE table_name = ? AND record_id IN (:record_ids)");
         conf.setRecordDeletionWithIdsQuery("DELETE FROM AN_TABLE_RECORD WHERE table_name = ? AND record_id IN (:record_ids)");
         conf.setRecordDeletionQuery("DELETE FROM AN_TABLE_RECORD WHERE table_name = ? AND timestamp >= ? AND timestamp < ?");
+        conf.setPaginationFirstZeroIndexed(true);
+        conf.setPaginationFirstInclusive(true);
+        conf.setPaginationSecondLength(true);
         return conf;
     }
     

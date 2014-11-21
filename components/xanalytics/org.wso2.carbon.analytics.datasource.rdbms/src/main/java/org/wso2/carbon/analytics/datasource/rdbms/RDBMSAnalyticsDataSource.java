@@ -199,8 +199,8 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             stmt.setString(1, tableName);
             stmt.setLong(2, timeFrom);
             stmt.setLong(3, timeTo);
-            stmt.setInt(4, recordsFrom);
-            stmt.setInt(5, recordsCount);
+            stmt.setInt(4, this.adjustRecordsFromForProvider(recordsFrom));
+            stmt.setInt(5, this.adjustRecordsCountForProvider(recordsFrom, recordsCount));
             rs = stmt.executeQuery();
             List<Record> result = this.processRecordResultSet(tableName, rs, columns);
             conn.commit();
@@ -211,6 +211,28 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
         } finally {
             RDBMSUtils.cleanupConnection(rs, stmt, conn);
         }
+    }
+    
+    private int adjustRecordsFromForProvider(int recordsFrom) {
+        if (!this.getQueryConfiguration().isPaginationFirstZeroIndexed()) {
+            recordsFrom++;
+        }
+        if (!this.getQueryConfiguration().isPaginationFirstInclusive()) {
+            recordsFrom++;
+        }
+        return recordsFrom;
+    }
+    
+    private int adjustRecordsCountForProvider(int recordsFrom, int recordsCount) {
+        if (!this.getQueryConfiguration().isPaginationSecondLength() && recordsCount != Integer.MAX_VALUE) {
+            if (!this.getQueryConfiguration().isPaginationSecondZeroIndexed()) {
+                recordsCount++;
+            }
+            if (!this.getQueryConfiguration().isPaginationSecondInclusive()) {
+                recordsCount++;
+            }
+        }
+        return recordsCount;
     }
     
     private List<Record> processRecordResultSet(String tableName, ResultSet rs, 
