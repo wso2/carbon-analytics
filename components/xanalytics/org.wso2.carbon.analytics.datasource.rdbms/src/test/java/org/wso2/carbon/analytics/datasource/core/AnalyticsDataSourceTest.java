@@ -33,13 +33,16 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceException;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.Record.Column;
 import org.wso2.carbon.analytics.datasource.core.RecordGroup;
+import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
 
 /**
  * This class contains tests related to analytics data sources.
  */
 public class AnalyticsDataSourceTest {
 
-    protected AnalyticsDataSource analyticsDS;
+    private AnalyticsDataSource analyticsDS;
+    
+    private FileSystem fileSystem;
     
     private String implementationName;
     
@@ -52,6 +55,7 @@ public class AnalyticsDataSourceTest {
         this.analyticsDS = analyticsDS;
         this.analyticsDS.purgeTable("MyTable1");
         this.analyticsDS.purgeTable("T1");
+        this.fileSystem = this.analyticsDS.getFileSystem();
     }
     
     public String getImplementationName() {
@@ -377,6 +381,16 @@ public class AnalyticsDataSourceTest {
         System.out.println("* Read Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
         System.out.println("************** END PERF TEST [" + this.getImplementationName() + "] **************\n");
         this.cleanupT1();
+    }
+    
+    @Test
+    public void testFSDirectoryOperations() throws AnalyticsDataSourceException {
+        this.fileSystem.delete("/d1/d2/d3");
+        this.fileSystem.mkdir("/d1/d2/d3");
+        Assert.assertTrue(this.fileSystem.exists("/d1/d2/d3"));
+        Assert.assertFalse(this.fileSystem.exists("/d1/d2/d4"));
+        this.fileSystem.delete("/d1/d2/d3");
+        Assert.assertFalse(this.fileSystem.exists("/d1/d2/d3"));
     }
     
 }

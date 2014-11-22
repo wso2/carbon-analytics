@@ -46,6 +46,24 @@ public class QueryConfiguration {
     private boolean paginationSecondZeroIndexed;
     
     private boolean paginationSecondInclusive;
+    
+    private String fsPathRetrievalQuery;
+    
+    private String fsListFilesQuery;
+    
+    private String fsInsertPathQuery;
+    
+    private String fsFileLengthRetrievalQuery;
+    
+    private String fsSetFileLengthQuery;
+    
+    private String fsReadDataChunkQuery;
+    
+    private String fsWriteDataChunkQuery;
+    
+    private String fsDeletePathQuery;
+    
+    private int fsDataChunkSize;
 
     public String[] getInitQueries() {
         return initQueries;
@@ -141,6 +159,78 @@ public class QueryConfiguration {
     
     public void setPaginationSecondInclusive(boolean paginationSecondInclusive) {
         this.paginationSecondInclusive = paginationSecondInclusive;
+    }
+    
+    public String getFsPathRetrievalQuery() {
+        return fsPathRetrievalQuery;
+    }
+    
+    public void setFsPathRetrievalQuery(String fsPathRetrievalQuery) {
+        this.fsPathRetrievalQuery = fsPathRetrievalQuery;
+    }
+    
+    public String getFsListFilesQuery() {
+        return fsListFilesQuery;
+    }
+    
+    public void setFsListFilesQuery(String fsListFilesQuery) {
+        this.fsListFilesQuery = fsListFilesQuery;
+    }
+    
+    public String getFsInsertPathQuery() {
+        return fsInsertPathQuery;
+    }
+    
+    public void setFsInsertPathQuery(String fsInsertPathQuery) {
+        this.fsInsertPathQuery = fsInsertPathQuery;
+    }
+    
+    public String getFsFileLengthRetrievalQuery() {
+        return fsFileLengthRetrievalQuery;
+    }
+    
+    public void setFsFileLengthRetrievalQuery(String fsFileLengthRetrievalQuery) {
+        this.fsFileLengthRetrievalQuery = fsFileLengthRetrievalQuery;
+    }
+    
+    public String getFsSetFileLengthQuery() {
+        return fsSetFileLengthQuery;
+    }
+    
+    public void setFsSetFileLengthQuery(String fsSetFileLengthQuery) {
+        this.fsSetFileLengthQuery = fsSetFileLengthQuery;
+    }
+   
+    public String getFsReadDataChunkQuery() {
+        return fsReadDataChunkQuery;
+    }
+    
+    public void setFsReadDataChunkQuery(String fsReadDataChunkQuery) {
+        this.fsReadDataChunkQuery = fsReadDataChunkQuery;
+    }
+    
+    public String getFsWriteDataChunkQuery() {
+        return fsWriteDataChunkQuery;
+    }
+
+    public void setFsWriteDataChunkQuery(String fsWriteDataChunkQuery) {
+        this.fsWriteDataChunkQuery = fsWriteDataChunkQuery;
+    }
+    
+    public String getFsDeletePathQuery() {
+        return fsDeletePathQuery;
+    }
+    
+    public void setFsDeletePathQuery(String fsDeletePathQuery) {
+        this.fsDeletePathQuery = fsDeletePathQuery;
+    }
+
+    public int getFsDataChunkSize() {
+        return fsDataChunkSize;
+    }
+
+    public void setFsDataChunkSize(int fsDataChunkSize) {
+        this.fsDataChunkSize = fsDataChunkSize;
     }
     
 }

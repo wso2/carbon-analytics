@@ -366,7 +366,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
 
     @Override
     public FileSystem getFileSystem() throws AnalyticsDataSourceException {
-        return null;
+        return new RDBMSFileSystem(this.getQueryConfiguration(), this.getDataSource());
     }
 
     @Override

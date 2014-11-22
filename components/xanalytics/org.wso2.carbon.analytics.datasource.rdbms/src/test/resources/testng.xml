@@ -3,13 +3,10 @@
    <parameter name="mysql.url"  value="jdbc:mysql://localhost/bam3"/>
    <parameter name="mysql.username"  value="root"/>
    <parameter name="mysql.password"  value="root"/>
-   <parameter name="h2.url"  value="jdbc:h2:~/bam3_test"/>
-   <parameter name="h2.username"  value="wso2carbon"/>
-   <parameter name="h2.password"  value="wso2carbon"/>
    <test name="Analytics Test">
      <classes>     
-       <class name="org.wso2.carbon.analytics.datasource.core.MySQLMyISAMAnalyticsDataSourceTest"/>
        <class name="org.wso2.carbon.analytics.datasource.core.MySQLInnoDBAnalyticsDataSourceTest"/>
+       <class name="org.wso2.carbon.analytics.datasource.core.MySQLMyISAMAnalyticsDataSourceTest"/>
        <class name="org.wso2.carbon.analytics.datasource.core.H2FileDBAnalyticsDataSourceTest"/>
        <class name="org.wso2.carbon.analytics.datasource.core.H2MemDBAnalyticsDataSourceTest"/>
      </classes>
