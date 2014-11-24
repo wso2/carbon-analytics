@@ -249,6 +249,7 @@ public class RDBMSFileSystem implements FileSystem {
     public long length(String path) throws AnalyticsDataSourceException {
         Connection conn = null;
         try {
+            conn = this.getConnection();
             return this.lengthImpl(conn, path);
         } catch (SQLException e) {
             throw new AnalyticsDataSourceException("Error in file length: " + e.getMessage(), e);
@@ -260,7 +261,6 @@ public class RDBMSFileSystem implements FileSystem {
     protected long lengthImpl(Connection conn, String path) throws SQLException {
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        conn = this.getConnection();
         stmt = conn.prepareStatement(this.getFileLengthQuery());
         stmt.setString(1, path);
         rs = stmt.executeQuery();
@@ -347,6 +347,7 @@ public class RDBMSFileSystem implements FileSystem {
             stmt.executeBatch();
             conn.commit();
         } catch (SQLException e) {
+            e.printStackTrace();
             RDBMSUtils.rollbackConnection(conn);
             /* this is maybe because we are updating some data already in the file with a seek operation,
              * and the given write chunk query is not an insert or update, so lets insert sequentially
@@ -366,6 +367,7 @@ public class RDBMSFileSystem implements FileSystem {
     private void writeChunksSequentially(Connection conn, String path, 
         List<DataChunk> chunks) throws AnalyticsDataSourceException {
         PreparedStatement stmt = null;
+        String query;
         for (DataChunk chunk : chunks) {
             try {
                 stmt = conn.prepareStatement(this.getQueryConfiguration().getFsWriteDataChunkQuery());
@@ -374,7 +376,12 @@ public class RDBMSFileSystem implements FileSystem {
             } catch (SQLException e) {
                 /* maybe the chunk is already there, lets try the update */
                 try {
-                    stmt = conn.prepareStatement(this.getQueryConfiguration().getFsUpdateDataChunkQuery());
+                    query = this.getQueryConfiguration().getFsUpdateDataChunkQuery();
+                    if (query == null) {
+                        throw new AnalyticsDataSourceException("A required property 'FsUpdateDataChunkQuery' "
+                                + "for the current analytics data source is not specified");
+                    }
+                    stmt = conn.prepareStatement(query);
                     this.populateStatementWithDataChunkUpdate(stmt, path, chunk);
                     stmt.execute();
                 } catch (SQLException e1) {

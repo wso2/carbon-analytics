@@ -136,6 +136,9 @@ public abstract class ChunkedStream {
         public void markModified(int position, int length) {
             this.modificationEvents.put(position, MODIFICATION_BEGIN);
             this.modificationEvents.put(position + length, MODIFICATION_END);
+            if (this.calculateMissingDataSections().size() == 0) {
+                this.setWhole(true);
+            }
         }
         
         public List<int[]> calculateMissingDataSections() {

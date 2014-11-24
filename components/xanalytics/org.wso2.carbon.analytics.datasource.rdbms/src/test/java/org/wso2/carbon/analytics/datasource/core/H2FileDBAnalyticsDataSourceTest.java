@@ -39,13 +39,19 @@ public class H2FileDBAnalyticsDataSourceTest extends AnalyticsDataSourceTest {
 
     @BeforeSuite
     public void setup() throws NamingException, AnalyticsDataSourceException, IOException {
-        String tmpDir = System.getProperty("java.io.tmpdir");
-        this.initDS("jdbc:h2:" + tmpDir + File.separator + "bam_test_db", "wso2carbon", "wso2carbon");
+        String dbPath = System.getProperty("java.io.tmpdir") + File.separator + "bam_test_db";
+        this.deleteFile(dbPath + ".mv.db");
+        this.deleteFile(dbPath + ".trace.db");
+        this.initDS("jdbc:h2:" + dbPath, "wso2carbon", "wso2carbon");
         RDBMSAnalyticsDataSource ads = new RDBMSAnalyticsDataSource(this.generateQueryConfiguration());
         Map<String, String> props = new HashMap<String, String>();
         props.put("datasource", "DS");
         ads.init(props);
         this.init("H2FileDBAnalyticsDataSource", ads);
+    }
+    
+    private void deleteFile(String path) {
+        new File(path).delete();
     }
     
     private void initDS(String url, String username, String password) throws NamingException {
@@ -85,6 +91,7 @@ public class H2FileDBAnalyticsDataSourceTest extends AnalyticsDataSourceTest {
         conf.setFsSetFileLengthQuery("UPDATE AN_FS_PATH SET length = ? WHERE path = ?");
         conf.setFsReadDataChunkQuery("SELECT data FROM AN_FS_DATA WHERE path = ? AND sequence = ?");
         conf.setFsWriteDataChunkQuery("INSERT INTO AN_FS_DATA (path,sequence,data) VALUES (?,?,?)");
+        conf.setFsUpdateDataChunkQuery("UPDATE AN_FS_DATA SET data = ? WHERE path = ? AND sequence = ?");
         conf.setFsDeletePathQuery("DELETE FROM AN_FS_PATH WHERE path = ?");
         conf.setFsDataChunkSize(1024);
         return conf;

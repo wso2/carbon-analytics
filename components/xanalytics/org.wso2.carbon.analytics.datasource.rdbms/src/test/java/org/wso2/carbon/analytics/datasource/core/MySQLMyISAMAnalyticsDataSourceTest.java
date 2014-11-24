@@ -85,7 +85,7 @@ public class MySQLMyISAMAnalyticsDataSourceTest extends AnalyticsDataSourceTest 
         initQueries[1] = "CREATE INDEX AN_TABLE_RECORD_TABLE_NAME ON AN_TABLE_RECORD(table_name)";
         initQueries[2] = "CREATE INDEX AN_TABLE_RECORD_TIMESTAMP ON AN_TABLE_RECORD(timestamp)"; 
         initQueries[3] = "CREATE TABLE AN_FS_PATH (path VARCHAR(256), is_directory BOOLEAN, length BIGINT, parent_path VARCHAR(256), PRIMARY KEY(path), FOREIGN KEY (parent_path) REFERENCES AN_FS_PATH(path) ON DELETE CASCADE) ENGINE='InnoDB'";
-        initQueries[4] = "CREATE TABLE AN_FS_DATA (path VARCHAR(256), sequence BIGINT, data VARBINARY(1024), PRIMARY KEY (path,sequence), FOREIGN KEY (path) REFERENCES AN_FS_PATH(path) ON DELETE CASCADE) ENGINE='InnoDB'";
+        initQueries[4] = "CREATE TABLE AN_FS_DATA (path VARCHAR(256), sequence BIGINT, data BLOB, PRIMARY KEY (path,sequence), FOREIGN KEY (path) REFERENCES AN_FS_PATH(path) ON DELETE CASCADE) ENGINE='InnoDB'";
         initQueries[5] = "CREATE INDEX index_parent_id ON AN_FS_PATH(parent_path)";
         conf.setInitQueries(initQueries);
         conf.setSystemTablesCheckQuery("SELECT record_id FROM AN_TABLE_RECORD WHERE record_id = '0'");

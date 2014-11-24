@@ -355,7 +355,7 @@ public class AnalyticsDataSourceTest {
     
     @Test
     public void testDataRecordAddReadPerformance() throws AnalyticsDataSourceException {
-        System.out.println("\n************** START PERF TEST [" + this.getImplementationName() + "] **************");
+        System.out.println("\n************** START RECORD PERF TEST [" + this.getImplementationName() + "] **************");
         this.cleanupT1();
         long hash1 = 0;
         List<Record> records;
@@ -383,7 +383,7 @@ public class AnalyticsDataSourceTest {
         Assert.assertEquals(hash1, hash2);
         System.out.println("* Read Time: " + (end - start) + " ms.");
         System.out.println("* Read Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
-        System.out.println("************** END PERF TEST [" + this.getImplementationName() + "] **************\n");
+        System.out.println("************** END RECORD PERF TEST [" + this.getImplementationName() + "] **************\n");
         this.cleanupT1();
     }
     
@@ -536,6 +536,38 @@ public class AnalyticsDataSourceTest {
         System.arraycopy(data2, 0, data, 1024 * 5 + 20, data2.length);
         Assert.assertTrue(this.checkDataEquals(data, dataIn));
         this.fileSystem.delete("/d1/d2/fy");
+    }
+    
+    @Test
+    public void testFSPerfTest() throws AnalyticsDataSourceException {
+        System.out.println("\n************** START FS PERF TEST [" + this.getImplementationName() + "] **************");
+        this.fileSystem.delete("/mydir/perf");
+        byte[] data = this.generateData(2048);
+        DataOutput out;
+        long start = System.currentTimeMillis();
+        int count = 5000;
+        for (int i = 0; i < count; i++) {
+            out = this.fileSystem.createOutput("/mydir/perf/file" + i);
+            out.write(data, 0, data.length);
+            out.close();
+        }
+        System.out.println();
+        long end = System.currentTimeMillis();
+        System.out.println("* " + count + " 2K files written in: " + (end - start) + " ms. " + (count / (double) (end - start) * 1000.0) + " FPS.");
+        DataInput in;
+        byte[] dataIn = new byte[data.length];
+        int len;
+        start = System.currentTimeMillis();
+        for (int i = 0; i < count; i++) {
+            in = this.fileSystem.createInput("/mydir/perf/file" + i);
+            len = in.read(dataIn, 0, dataIn.length);
+            in.close();
+            Assert.assertEquals(len, dataIn.length);
+        }
+        end = System.currentTimeMillis();
+        System.out.println("* " + count + " 2K files read in: " + (end - start) + " ms. " + (count / (double) (end - start) * 1000.0) + " FPS.");
+        this.fileSystem.delete("/mydir/perf");
+        System.out.println("\n************** END FS PERF TEST [" + this.getImplementationName() + "] **************");
     }
     
 }

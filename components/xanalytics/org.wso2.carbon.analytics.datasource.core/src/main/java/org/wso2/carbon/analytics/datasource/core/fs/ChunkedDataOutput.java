@@ -33,7 +33,7 @@ import org.wso2.carbon.analytics.datasource.core.fs.FileSystem.DataOutput;
  */
 public class ChunkedDataOutput implements DataOutput {
 
-    private static final int DEFAULT_DATA_CHUNK_FLUSH_THRESHOLD = 100;
+    private static final int DEFAULT_DATA_CHUNK_FLUSH_THRESHOLD = 200;
     
     private ChunkedStream stream;
         
