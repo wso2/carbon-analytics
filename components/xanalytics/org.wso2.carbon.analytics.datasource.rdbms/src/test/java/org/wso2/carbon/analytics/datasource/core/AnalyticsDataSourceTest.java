@@ -18,6 +18,8 @@
  */
 package org.wso2.carbon.analytics.datasource.core;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -34,6 +36,8 @@ import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.Record.Column;
 import org.wso2.carbon.analytics.datasource.core.RecordGroup;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
+import org.wso2.carbon.analytics.datasource.core.fs.FileSystem.DataInput;
+import org.wso2.carbon.analytics.datasource.core.fs.FileSystem.DataOutput;
 
 /**
  * This class contains tests related to analytics data sources.
@@ -387,10 +391,151 @@ public class AnalyticsDataSourceTest {
     public void testFSDirectoryOperations() throws AnalyticsDataSourceException {
         this.fileSystem.delete("/d1/d2/d3");
         this.fileSystem.mkdir("/d1/d2/d3");
+        this.fileSystem.mkdir("/d1/d2/d5");
         Assert.assertTrue(this.fileSystem.exists("/d1/d2/d3"));
+        Assert.assertTrue(this.fileSystem.exists("/d1/d2/d5"));
         Assert.assertFalse(this.fileSystem.exists("/d1/d2/d4"));
         this.fileSystem.delete("/d1/d2/d3");
+        this.fileSystem.delete("/d1/d2/d5");
         Assert.assertFalse(this.fileSystem.exists("/d1/d2/d3"));
+        Assert.assertFalse(this.fileSystem.exists("/d1/d2/d5"));
+    }
+    
+    private byte[] generateData(int size) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        for (int i = 0; i < size; i++) {
+            out.write((int) (Math.random() * 127));
+        }
+        try {
+            out.close();
+        } catch (IOException ignore) {
+            /* never happens */
+        }
+        return out.toByteArray();
+    }
+    
+    private boolean checkDataEquals(byte[] lhs, byte[] rhs) {
+        for (int i = 0; i < lhs.length; i++) {
+            if (lhs[i] != rhs[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    @Test
+    public void testFSFileIOOperations() throws AnalyticsDataSourceException {
+        this.fileSystem.delete("/d1/d2/d3");
+        DataOutput out = this.fileSystem.createOutput("/d1/d2/d3/f1");
+        byte[] data = this.generateData(1024 * 1024 + 7);
+        long start = System.currentTimeMillis();
+        out.write(data, 0, data.length);
+        out.flush();
+        out.close();
+        long end = System.currentTimeMillis();
+        System.out.println("File data (1 MB) written in: " + (end - start) + " ms.");
+        Assert.assertEquals(this.fileSystem.length("/d1/d2/d3/f1"), data.length);
+        DataInput in = this.fileSystem.createInput("/d1/d2/d3/f1");
+        byte[] dataIn = new byte[data.length];
+        start = System.currentTimeMillis();
+        int len = in.read(dataIn, 0, dataIn.length);
+        in.close();
+        end = System.currentTimeMillis();
+        System.out.println("File data (1 MB) read in: " + (end - start) + " ms.");
+        Assert.assertEquals(len, data.length);
+        Assert.assertTrue(this.checkDataEquals(data, dataIn));
+        this.fileSystem.delete("/d1/d2/d3/f1");
+        Assert.assertFalse(this.fileSystem.exists("/d1/d2/d3/f1"));
+        this.fileSystem.delete("/d1/d2/d3");
+        Assert.assertFalse(this.fileSystem.exists("/d1/d2/d3"));
+    }
+    
+    @Test
+    public void testFSFileCopy() throws AnalyticsDataSourceException {
+        this.fileSystem.delete("/d1/fx");
+        this.fileSystem.delete("/d2/fx");
+        byte[] data = this.generateData(1024 * 510);
+        DataOutput out = this.fileSystem.createOutput("/d1/fx");
+        out.write(data, 0, data.length);
+        out.close();
+        this.fileSystem.copy("/d1/fx", "/d2/fx");
+        Assert.assertTrue(this.fileSystem.exists("/d2/fx"));
+        Assert.assertEquals(this.fileSystem.length("/d2/fx"), data.length);
+        DataInput in = this.fileSystem.createInput("/d2/fx");
+        byte[] dataIn = new byte[data.length];
+        in.read(dataIn, 0, dataIn.length);
+        in.close();
+        Assert.assertTrue(this.checkDataEquals(data, dataIn));
+        this.fileSystem.delete("/d1/fx");
+        this.fileSystem.delete("/d2/fx");
+    }
+    
+    @Test
+    public void testFSReadSeekPosition() throws AnalyticsDataSourceException {
+        this.fileSystem.delete("/d1/fx");
+        byte[] data = this.generateData(1024 * 45);
+        byte[] dataSubset = new byte[5];
+        dataSubset[0] = data[34021];
+        dataSubset[1] = data[34022];
+        dataSubset[2] = data[34023];
+        dataSubset[3] = data[34024];
+        dataSubset[4] = data[34025];
+        DataOutput out = this.fileSystem.createOutput("/d1/fx");
+        out.write(data, 0, data.length);
+        out.close();
+        DataInput in = this.fileSystem.createInput("/d1/fx");
+        in.seek(34021);
+        byte[] dataSubsetIn = new byte[5];
+        in.read(dataSubsetIn, 0, dataSubsetIn.length);
+        Assert.assertTrue(this.checkDataEquals(dataSubset, dataSubsetIn));
+        Assert.assertEquals(in.getPosition(), 34026);
+        this.fileSystem.delete("/d1/fx");
+    }
+    
+    @Test
+    public void testFSSetLengthRead() throws AnalyticsDataSourceException {
+        this.fileSystem.delete("/d_1/d_2/file1");
+        byte[] data = this.generateData(100);
+        DataOutput out = this.fileSystem.createOutput("/d_1/d_2/file1");
+        out.write(data, 0, data.length);
+        out.flush();
+        Assert.assertEquals(this.fileSystem.length("/d_1/d_2/file1"), data.length);
+        out.setLength(2000);
+        Assert.assertEquals(this.fileSystem.length("/d_1/d_2/file1"), 2000);
+        out.close();
+        byte[] dataIn = new byte[3000];
+        DataInput in = this.fileSystem.createInput("/d_1/d_2/file1");
+        int len = in.read(dataIn, 0, dataIn.length);
+        in.close();
+        Assert.assertEquals(len, 2000);
+        out = this.fileSystem.createOutput("/d_1/d_2/file1");
+        out.setLength(10);
+        out.close();
+        Assert.assertEquals(this.fileSystem.length("/d_1/d_2/file1"), 10);
+        in = this.fileSystem.createInput("/d_1/d_2/file1");
+        len = in.read(dataIn, 0, dataIn.length);
+        in.close();
+        Assert.assertEquals(len, 10);
+        this.fileSystem.delete("/d_1/d_2/file1");
+    }
+    
+    @Test
+    public void testFSWriteSeekPositionLength() throws AnalyticsDataSourceException {
+        this.fileSystem.delete("/d1/d2/fy");
+        byte[] data = this.generateData(1024 * 12 + 24);
+        byte[] data2 = this.generateData(1024 * 3 + 10);
+        DataOutput out = this.fileSystem.createOutput("/d1/d2/fy");
+        out.write(data, 0, data.length);
+        out.flush();
+        out.seek(1024 * 5 + 20);
+        out.write(data2, 0, data2.length);
+        out.close();
+        DataInput in = this.fileSystem.createInput("/d1/d2/fy");
+        byte[] dataIn = new byte[data.length];
+        in.read(dataIn, 0, dataIn.length);
+        System.arraycopy(data2, 0, data, 1024 * 5 + 20, data2.length);
+        Assert.assertTrue(this.checkDataEquals(data, dataIn));
+        this.fileSystem.delete("/d1/d2/fy");
     }
     
 }

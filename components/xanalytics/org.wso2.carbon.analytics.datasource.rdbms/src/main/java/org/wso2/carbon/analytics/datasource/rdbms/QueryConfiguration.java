@@ -61,6 +61,8 @@ public class QueryConfiguration {
     
     private String fsWriteDataChunkQuery;
     
+    private String fsUpdateDataChunkQuery;
+    
     private String fsDeletePathQuery;
     
     private int fsDataChunkSize;
@@ -231,6 +233,14 @@ public class QueryConfiguration {
 
     public void setFsDataChunkSize(int fsDataChunkSize) {
         this.fsDataChunkSize = fsDataChunkSize;
+    }
+    
+    public String getFsUpdateDataChunkQuery() {
+        return fsUpdateDataChunkQuery;
+    }
+    
+    public void setFsUpdateDataChunkQuery(String fsUpdateDataChunkQuery) {
+        this.fsUpdateDataChunkQuery = fsUpdateDataChunkQuery;
     }
     
 }

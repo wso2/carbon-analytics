@@ -62,7 +62,7 @@ public class H2MemDBAnalyticsDataSourceTest extends AnalyticsDataSourceTest {
         initQueries[1] = "CREATE INDEX AN_TABLE_RECORD_TABLE_NAME ON AN_TABLE_RECORD(table_name)";
         initQueries[2] = "CREATE INDEX AN_TABLE_RECORD_TIMESTAMP ON AN_TABLE_RECORD(timestamp)"; 
         initQueries[3] = "CREATE TABLE AN_FS_PATH (path VARCHAR(256), is_directory BOOLEAN, length BIGINT, parent_path VARCHAR(256), PRIMARY KEY(path), FOREIGN KEY (parent_path) REFERENCES AN_FS_PATH(path) ON DELETE CASCADE)";
-        initQueries[4] = "CREATE TABLE AN_FS_DATA (path VARCHAR(256), sequence BIGINT, data VARBINARY(1024), PRIMARY KEY (path,sequence), FOREIGN KEY (path) REFERENCES AN_FS_PATH(path) ON DELETE CASCADE)";
+        initQueries[4] = "CREATE TABLE AN_FS_DATA (path VARCHAR(256), sequence BIGINT, data BLOB, PRIMARY KEY (path,sequence), FOREIGN KEY (path) REFERENCES AN_FS_PATH(path) ON DELETE CASCADE)";
         initQueries[5] = "CREATE INDEX index_parent_id ON AN_FS_PATH(parent_path)";
         conf.setInitQueries(initQueries);
         conf.setSystemTablesCheckQuery("SELECT record_id FROM AN_TABLE_RECORD WHERE record_id = '0'");
@@ -80,8 +80,9 @@ public class H2MemDBAnalyticsDataSourceTest extends AnalyticsDataSourceTest {
         conf.setFsFileLengthRetrievalQuery("SELECT length FROM AN_FS_PATH WHERE path = ?");
         conf.setFsFileLengthRetrievalQuery("SELECT length FROM AN_FS_PATH WHERE path = ?");
         conf.setFsSetFileLengthQuery("UPDATE AN_FS_PATH SET length = ? WHERE path = ?");
-        conf.setFsReadDataChunkQuery("SELECT data FROM AN_FS_PATH WHERE path = ? AND sequence = ?");
-        conf.setFsWriteDataChunkQuery("INSERT INTO AN_FS_DATA (path,sequence,data) VALUES (?,?,?) ON DUPLICATE KEY UPDATE path=VALUES(path), sequence=VALUES(sequence), data=VALUES(data)");
+        conf.setFsReadDataChunkQuery("SELECT data FROM AN_FS_DATA WHERE path = ? AND sequence = ?");
+        conf.setFsWriteDataChunkQuery("INSERT INTO AN_FS_DATA (path,sequence,data) VALUES (?,?,?)");
+        conf.setFsUpdateDataChunkQuery("UPDATE AN_FS_DATA SET data = ? WHERE path = ? AND sequence = ?");
         conf.setFsDeletePathQuery("DELETE FROM AN_FS_PATH WHERE path = ?");
         conf.setFsDataChunkSize(1024);
         return conf;

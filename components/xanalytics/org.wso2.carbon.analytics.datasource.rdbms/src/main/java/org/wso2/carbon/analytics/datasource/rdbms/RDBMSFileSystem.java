@@ -31,6 +31,8 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceException;
 import org.wso2.carbon.analytics.datasource.core.fs.ChunkedDataInput;
 import org.wso2.carbon.analytics.datasource.core.fs.ChunkedDataOutput;
@@ -50,6 +52,8 @@ public class RDBMSFileSystem implements FileSystem {
     private QueryConfiguration queryConfiguration;
     
     private DataSource dataSource;
+    
+    private static final Log log = LogFactory.getLog(RDBMSFileSystem.class);
     
     public RDBMSFileSystem(QueryConfiguration queryConfiguration, 
             DataSource dataSource) throws AnalyticsDataSourceException {
@@ -326,11 +330,11 @@ public class RDBMSFileSystem implements FileSystem {
         }
     }
     
-    protected String getReadDataChunkQuery() {
+    private String getReadDataChunkQuery() {
         return this.getQueryConfiguration().getFsReadDataChunkQuery();
     }
     
-    protected void writeChunks(String path, List<DataChunk> chunks) throws AnalyticsDataSourceException {
+    private void writeChunks(String path, List<DataChunk> chunks) throws AnalyticsDataSourceException {
         Connection conn = null;
         PreparedStatement stmt = null;
         try {
@@ -344,20 +348,65 @@ public class RDBMSFileSystem implements FileSystem {
             conn.commit();
         } catch (SQLException e) {
             RDBMSUtils.rollbackConnection(conn);
-            throw new AnalyticsDataSourceException("Error in writing file data chunks: " + e.getMessage(), e);
+            /* this is maybe because we are updating some data already in the file with a seek operation,
+             * and the given write chunk query is not an insert or update, so lets insert sequentially
+             * and check, if an error comes, a separate update statement will be executed and checked */
+            if (log.isDebugEnabled()) {
+                log.debug("Chunk batch write failed: " + e.getMessage() + 
+                        ", falling back to sequential insert/update..");
+            }
+            RDBMSUtils.cleanupConnection(null, stmt, null);
+            stmt = null;
+            this.writeChunksSequentially(conn, path, chunks);
         } finally {
             RDBMSUtils.cleanupConnection(null, stmt, conn);
         }
     }
     
-    protected void populateStatementWithDataChunk(PreparedStatement stmt, String path, 
+    private void writeChunksSequentially(Connection conn, String path, 
+        List<DataChunk> chunks) throws AnalyticsDataSourceException {
+        PreparedStatement stmt = null;
+        for (DataChunk chunk : chunks) {
+            try {
+                stmt = conn.prepareStatement(this.getQueryConfiguration().getFsWriteDataChunkQuery());
+                this.populateStatementWithDataChunk(stmt, path, chunk);
+                stmt.execute();
+            } catch (SQLException e) {
+                /* maybe the chunk is already there, lets try the update */
+                try {
+                    stmt = conn.prepareStatement(this.getQueryConfiguration().getFsUpdateDataChunkQuery());
+                    this.populateStatementWithDataChunkUpdate(stmt, path, chunk);
+                    stmt.execute();
+                } catch (SQLException e1) {
+                    throw new AnalyticsDataSourceException("Error in updating data chunk: " + e1.getMessage(), e1);
+                }
+            } finally {
+                if (stmt != null) {
+                    try {
+                        stmt.close();
+                    } catch (SQLException e) {
+                        log.error("Error closing statement: " + e.getMessage(), e);
+                    }
+                }
+            }
+        }
+    }
+    
+    private void populateStatementWithDataChunk(PreparedStatement stmt, String path, 
             DataChunk chunk) throws SQLException {
         stmt.setString(1, path);
         stmt.setLong(2, chunk.getChunkNumber());
         stmt.setBinaryStream(3, new ByteArrayInputStream(chunk.getData()));
     }
+    
+    private void populateStatementWithDataChunkUpdate(PreparedStatement stmt, String path, 
+            DataChunk chunk) throws SQLException {
+        stmt.setBinaryStream(1, new ByteArrayInputStream(chunk.getData()));
+        stmt.setString(2, path);
+        stmt.setLong(3, chunk.getChunkNumber());
+    }
 
-    protected String getWriteDataChunkQuery() {
+    private String getWriteDataChunkQuery() {
         return this.getQueryConfiguration().getFsWriteDataChunkQuery();
     }
     

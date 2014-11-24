@@ -18,6 +18,8 @@
  */
 package org.wso2.carbon.analytics.datasource.core;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +42,7 @@ public class MySQLInnoDBAnalyticsDataSourceTest extends AnalyticsDataSourceTest 
     @BeforeSuite
     @Parameters({"mysql.url", "mysql.username", "mysql.password"})
     public void setup(String url, String username, 
-            String password) throws NamingException, AnalyticsDataSourceException {
+            String password) throws NamingException, AnalyticsDataSourceException, SQLException {
         this.initDS(url, username, password);
         RDBMSAnalyticsDataSource ads = new RDBMSAnalyticsDataSource(this.generateQueryConfiguration());
         Map<String, String> props = new HashMap<String, String>();
@@ -49,7 +51,7 @@ public class MySQLInnoDBAnalyticsDataSourceTest extends AnalyticsDataSourceTest 
         this.init("MySQLInnoDBAnalyticsDataSource", ads);
     }
     
-    private void initDS(String url, String username, String password) throws NamingException {
+    private void initDS(String url, String username, String password) throws NamingException, SQLException {
         PoolProperties pps = new PoolProperties();
         pps.setDriverClassName("com.mysql.jdbc.Driver");
         pps.setUrl(url);
@@ -57,6 +59,23 @@ public class MySQLInnoDBAnalyticsDataSourceTest extends AnalyticsDataSourceTest 
         pps.setPassword(password);
         DataSource dsx = new DataSource(pps);
         new InitialContext().bind("DS", dsx);
+        this.dropSystemTables(dsx);
+    }
+    
+    private void dropSystemTables(javax.sql.DataSource ds) throws SQLException {
+        Connection conn = null;
+        try {
+            conn = ds.getConnection();
+            conn.prepareStatement("DROP TABLE IF EXISTS AN_FS_DATA").executeUpdate();
+            conn.prepareStatement("DROP TABLE IF EXISTS AN_FS_PATH").executeUpdate();
+            conn.prepareStatement("DROP TABLE IF EXISTS AN_TABLE_RECORD").executeUpdate();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ignore) { } 
+            }
+        }
     }
     
     private QueryConfiguration generateQueryConfiguration() {
@@ -84,7 +103,7 @@ public class MySQLInnoDBAnalyticsDataSourceTest extends AnalyticsDataSourceTest 
         conf.setFsFileLengthRetrievalQuery("SELECT length FROM AN_FS_PATH WHERE path = ?");
         conf.setFsFileLengthRetrievalQuery("SELECT length FROM AN_FS_PATH WHERE path = ?");
         conf.setFsSetFileLengthQuery("UPDATE AN_FS_PATH SET length = ? WHERE path = ?");
-        conf.setFsReadDataChunkQuery("SELECT data FROM AN_FS_PATH WHERE path = ? AND sequence = ?");
+        conf.setFsReadDataChunkQuery("SELECT data FROM AN_FS_DATA WHERE path = ? AND sequence = ?");
         conf.setFsWriteDataChunkQuery("INSERT INTO AN_FS_DATA (path,sequence,data) VALUES (?,?,?) ON DUPLICATE KEY UPDATE path=VALUES(path), sequence=VALUES(sequence), data=VALUES(data)");
         conf.setFsDeletePathQuery("DELETE FROM AN_FS_PATH WHERE path = ?");
         conf.setFsDataChunkSize(1024);

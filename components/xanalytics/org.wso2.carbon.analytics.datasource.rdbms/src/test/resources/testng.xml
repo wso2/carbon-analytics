@@ -5,9 +5,9 @@
    <parameter name="mysql.password"  value="root"/>
    <test name="Analytics Test">
      <classes>     
-       <class name="org.wso2.carbon.analytics.datasource.core.MySQLInnoDBAnalyticsDataSourceTest"/>
+       <!--class name="org.wso2.carbon.analytics.datasource.core.MySQLInnoDBAnalyticsDataSourceTest"/>
        <class name="org.wso2.carbon.analytics.datasource.core.MySQLMyISAMAnalyticsDataSourceTest"/>
-       <class name="org.wso2.carbon.analytics.datasource.core.H2FileDBAnalyticsDataSourceTest"/>
+       <class name="org.wso2.carbon.analytics.datasource.core.H2FileDBAnalyticsDataSourceTest"/-->
        <class name="org.wso2.carbon.analytics.datasource.core.H2MemDBAnalyticsDataSourceTest"/>
      </classes>
    </test>

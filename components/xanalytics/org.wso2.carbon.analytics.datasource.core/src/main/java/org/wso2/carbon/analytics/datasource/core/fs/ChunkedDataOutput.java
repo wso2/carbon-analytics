@@ -82,7 +82,7 @@ public class ChunkedDataOutput implements DataOutput {
             remaining = this.getStream().getChunkSize() - chunkPosition;
             if (remaining > len) {                
                 remaining = len;
-            } 
+            }
             System.arraycopy(data, offset, chunk.getData(), chunkPosition, remaining);
             if (!chunk.isWhole()) {
                 /* if the chunk is not whole, that means, the original source data is not filled in yet,
@@ -93,6 +93,9 @@ public class ChunkedDataOutput implements DataOutput {
             this.position += remaining;
             offset += remaining;
             len -= remaining;
+            if (this.length < this.position) {
+                this.length = this.position;
+            }
             if (this.dataChunks.size() >= this.flushChunkThreshold) {
                 this.flush();
             }
@@ -101,8 +104,7 @@ public class ChunkedDataOutput implements DataOutput {
 
     @Override
     public void seek(long pos) throws AnalyticsDataSourceException {
-        long chunkNumber = this.getStream().getChunkNumber(pos);
-        this.dataChunks.put(chunkNumber, this.getStream().readChunk(chunkNumber));
+        this.position = pos;
     }
 
     @Override
@@ -112,14 +114,13 @@ public class ChunkedDataOutput implements DataOutput {
 
     @Override
     public void setLength(long length) throws AnalyticsDataSourceException {
-        this.getStream().setLength(length);
+        this.length = length;
+        this.getStream().setLength(this.length);
     }
 
     @Override
     public void flush() throws AnalyticsDataSourceException {
-        if (this.position > this.length) {
-            this.setLength(this.position);
-        }
+        this.setLength(this.length);
         List<DataChunk> dataChunks = new ArrayList<ChunkedStream.DataChunk>(this.dataChunks.values());
         for (DataChunk dataChunk : dataChunks) {
             if (!dataChunk.isWhole()) {
@@ -127,6 +128,7 @@ public class ChunkedDataOutput implements DataOutput {
             }
         }
         this.getStream().writeChunks(dataChunks);
+        this.dataChunks.clear();
     }
     
     private void makeWhole(DataChunk dataChunk) throws AnalyticsDataSourceException {
