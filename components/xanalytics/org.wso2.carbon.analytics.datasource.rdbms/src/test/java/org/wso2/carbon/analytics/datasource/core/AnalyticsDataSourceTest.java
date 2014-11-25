@@ -425,7 +425,7 @@ public class AnalyticsDataSourceTest {
     
     @Test
     public void testFSFileIOOperations() throws AnalyticsDataSourceException {
-        this.fileSystem.delete("/d1/d2/d3");
+        this.fileSystem.delete("/d1");
         DataOutput out = this.fileSystem.createOutput("/d1/d2/d3/f1");
         byte[] data = this.generateData(1024 * 1024 + 7);
         long start = System.currentTimeMillis();
@@ -448,11 +448,12 @@ public class AnalyticsDataSourceTest {
         Assert.assertFalse(this.fileSystem.exists("/d1/d2/d3/f1"));
         this.fileSystem.delete("/d1/d2/d3");
         Assert.assertFalse(this.fileSystem.exists("/d1/d2/d3"));
+        this.fileSystem.delete("/d1");
     }
     
     @Test
     public void testFSFileIOOperations2() throws AnalyticsDataSourceException, IOException {
-        this.fileSystem.delete("/d1/d2/d3");
+        this.fileSystem.delete("/d1");
         DataOutput out = this.fileSystem.createOutput("/d1/d2/d3");
         byte[] data = this.generateData(1350);
         for (int i = 0; i < 100; i++) {
@@ -486,14 +487,14 @@ public class AnalyticsDataSourceTest {
         in.close();
         Assert.assertTrue(this.checkDataEquals(data, byteOut.toByteArray()));
         
-        this.fileSystem.delete("/d1/d2/d3");
+        this.fileSystem.delete("/d1");
         Assert.assertFalse(this.fileSystem.exists("/d1/d2/d3"));
     }
     
     @Test
     public void testFSFileCopy() throws AnalyticsDataSourceException {
-        this.fileSystem.delete("/d1/fx");
-        this.fileSystem.delete("/d2/fx");
+        this.fileSystem.delete("/d1");
+        this.fileSystem.delete("/d2");
         byte[] data = this.generateData(1025);
         DataOutput out = this.fileSystem.createOutput("/d1/fx");
         out.write(data, 0, data.length);
@@ -511,13 +512,13 @@ public class AnalyticsDataSourceTest {
         in.read(dataIn, 0, dataIn.length);
         in.close();
         Assert.assertTrue(this.checkDataEquals(data, dataIn));
-        this.fileSystem.delete("/d1/fx");
-        this.fileSystem.delete("/d2/fx");
+        this.fileSystem.delete("/d1");
+        this.fileSystem.delete("/d2");
     }
     
     @Test
     public void testFSReadSeekPosition() throws AnalyticsDataSourceException {
-        this.fileSystem.delete("/d1/fx");
+        this.fileSystem.delete("/d1");
         byte[] data = this.generateData(1024 * 45);
         byte[] dataSubset = new byte[5];
         dataSubset[0] = data[34021];
@@ -534,12 +535,12 @@ public class AnalyticsDataSourceTest {
         in.read(dataSubsetIn, 0, dataSubsetIn.length);
         Assert.assertTrue(this.checkDataEquals(dataSubset, dataSubsetIn));
         Assert.assertEquals(in.getPosition(), 34026);
-        this.fileSystem.delete("/d1/fx");
+        this.fileSystem.delete("/d1");
     }
     
     @Test
     public void testFSSetLengthRead() throws AnalyticsDataSourceException {
-        this.fileSystem.delete("/d_1/d_2/file1");
+        this.fileSystem.delete("/d_1");
         byte[] data = this.generateData(100);
         DataOutput out = this.fileSystem.createOutput("/d_1/d_2/file1");
         out.write(data, 0, data.length);
@@ -561,12 +562,12 @@ public class AnalyticsDataSourceTest {
         len = in.read(dataIn, 0, dataIn.length);
         in.close();
         Assert.assertEquals(len, 10);
-        this.fileSystem.delete("/d_1/d_2/file1");
+        this.fileSystem.delete("/d_1");
     }
     
     @Test
     public void testFSWriteSeekPositionLength() throws AnalyticsDataSourceException {
-        this.fileSystem.delete("/d1/d2/fy");
+        this.fileSystem.delete("/d1");
         byte[] data = this.generateData(1024 * 12 + 24);
         byte[] data2 = this.generateData(1024 * 3 + 10);
         DataOutput out = this.fileSystem.createOutput("/d1/d2/fy");
@@ -580,13 +581,13 @@ public class AnalyticsDataSourceTest {
         in.read(dataIn, 0, dataIn.length);
         System.arraycopy(data2, 0, data, 1024 * 5 + 20, data2.length);
         Assert.assertTrue(this.checkDataEquals(data, dataIn));
-        this.fileSystem.delete("/d1/d2/fy");
+        this.fileSystem.delete("/d1");
     }
     
     @Test
     public void testFSPerfTest() throws AnalyticsDataSourceException {
         System.out.println("\n************** START FS PERF TEST [" + this.getImplementationName() + "] **************");
-        this.fileSystem.delete("/mydir/perf");
+        this.fileSystem.delete("/mydir");
         byte[] data = this.generateData(2048);
         DataOutput out;
         long start = System.currentTimeMillis();
@@ -611,7 +612,7 @@ public class AnalyticsDataSourceTest {
         }
         end = System.currentTimeMillis();
         System.out.println("* " + count + " 2K files read in: " + (end - start) + " ms. " + (count / (double) (end - start) * 1000.0) + " FPS.");
-        this.fileSystem.delete("/mydir/perf");
+        this.fileSystem.delete("/mydir");
         System.out.println("\n************** END FS PERF TEST [" + this.getImplementationName() + "] **************");
     }
     
