@@ -18,9 +18,20 @@
  */
 package org.wso2.carbon.analytics.dataservice;
 
+import java.util.List;
+
 /**
  * This interface represents the analytics data service operations.
  */
 public interface AnalyticsDataService {
 
+    void insertEvents(List<AnalyticsEvent> eventList) throws AnalyticsDataServiceException;
+    
+    List<AnalyticsEvent> getEvents(String streamId, List<String> meta, List<String> correlation, 
+            List<String> payload, long timeFrom,
+            long timeTo, int recordsFrom, int recordsCount) throws AnalyticsDataServiceException;
+    
+    List<AnalyticsEvent> getEvents(String streamId, List<String> meta, List<String> correlation, 
+            List<String> payload, List<String> ids) throws AnalyticsDataServiceException;
+    
 }

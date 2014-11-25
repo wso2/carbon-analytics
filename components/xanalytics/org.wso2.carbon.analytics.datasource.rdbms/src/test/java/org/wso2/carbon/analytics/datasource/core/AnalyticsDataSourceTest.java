@@ -590,7 +590,7 @@ public class AnalyticsDataSourceTest {
         byte[] data = this.generateData(2048);
         DataOutput out;
         long start = System.currentTimeMillis();
-        int count = 100;
+        int count = 1000;
         for (int i = 0; i < count; i++) {
             out = this.fileSystem.createOutput("/mydir/perf/file" + i);
             out.write(data, 0, data.length);
