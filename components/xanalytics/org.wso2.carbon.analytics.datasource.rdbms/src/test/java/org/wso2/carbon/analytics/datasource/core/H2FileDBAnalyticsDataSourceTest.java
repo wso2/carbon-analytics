@@ -93,7 +93,7 @@ public class H2FileDBAnalyticsDataSourceTest extends AnalyticsDataSourceTest {
         conf.setFsWriteDataChunkQuery("INSERT INTO AN_FS_DATA (path,sequence,data) VALUES (?,?,?)");
         conf.setFsUpdateDataChunkQuery("UPDATE AN_FS_DATA SET data = ? WHERE path = ? AND sequence = ?");
         conf.setFsDeletePathQuery("DELETE FROM AN_FS_PATH WHERE path = ?");
-        conf.setFsDataChunkSize(1024);
+        conf.setFsDataChunkSize(10240);
         return conf;
     }
     

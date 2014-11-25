@@ -101,7 +101,7 @@ public abstract class ChunkedStream {
         
         private boolean whole;
         
-        private SortedMap<Integer, Integer> modificationEvents = new TreeMap<Integer, Integer>();
+        private SortedMap<Integer, List<Integer>> modificationEvents = new TreeMap<Integer, List<Integer>>();
         
         public DataChunk(long chunkNumber, byte[] data) {
             this(chunkNumber, data, true);
@@ -134,8 +134,18 @@ public abstract class ChunkedStream {
         }
         
         public void markModified(int position, int length) {
-            this.modificationEvents.put(position, MODIFICATION_BEGIN);
-            this.modificationEvents.put(position + length, MODIFICATION_END);
+            List<Integer> events = this.modificationEvents.get(position);
+            if (events == null) {
+                events = new ArrayList<Integer>();
+                this.modificationEvents.put(position, events);
+            }
+            events.add(MODIFICATION_BEGIN);
+            events = this.modificationEvents.get(position + length);
+            if (events == null) {
+                events = new ArrayList<Integer>();
+                this.modificationEvents.put(position + length, events);
+            }
+            events.add(MODIFICATION_END);
             if (this.calculateMissingDataSections().size() == 0) {
                 this.setWhole(true);
             }
@@ -145,18 +155,20 @@ public abstract class ChunkedStream {
             List<int[]> result = new ArrayList<int[]>();
             int beginCount = 0;
             int lastEmptyLocation = 0;
-            for (Map.Entry<Integer, Integer> entry : this.modificationEvents.entrySet()) {
-                if (entry.getValue() == MODIFICATION_BEGIN) {
-                    if (beginCount == 0) {
-                        if (entry.getKey() > lastEmptyLocation) {
-                            result.add(new int[] { lastEmptyLocation, entry.getKey() });
+            for (Map.Entry<Integer, List<Integer>> entry : this.modificationEvents.entrySet()) {
+                for (int mode : entry.getValue()) {
+                    if (mode == MODIFICATION_BEGIN) {
+                        if (beginCount == 0) {
+                            if (entry.getKey() > lastEmptyLocation) {
+                                result.add(new int[] { lastEmptyLocation, entry.getKey() });
+                            }
                         }
-                    }
-                    beginCount++;
-                } else if (entry.getValue() == MODIFICATION_END) {
-                    beginCount--;
-                    if (beginCount == 0) {
-                        lastEmptyLocation = entry.getKey();
+                        beginCount++;
+                    } else if (mode == MODIFICATION_END) {
+                        beginCount--;
+                        if (beginCount == 0) {
+                            lastEmptyLocation = entry.getKey();
+                        }
                     }
                 }
             }

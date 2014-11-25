@@ -78,6 +78,24 @@ public class MySQLInnoDBAnalyticsDataSourceTest extends AnalyticsDataSourceTest 
         }
     }
     
+//    public static void main(String[] args) throws Exception {
+//        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/bam3", "root", "root");
+//        PreparedStatement stmt;
+//        long t1 = System.currentTimeMillis();
+//        for (int i = 0; i < 1000; i++) {
+//            //stmt = conn.prepareStatement("UPDATE ABC SET length = 5400 WHERE path = '/mydir'");
+//            stmt = conn.prepareStatement("INSERT INTO ABC (path,length,ppath) VALUES (?,?,?)");
+//            stmt.setString(1, "/mydir/" + i);
+//            stmt.setLong(2, 40500);
+//            stmt.setString(3, "/");
+//            stmt.executeUpdate();
+//            stmt.close();
+//        }
+//        long t2 = System.currentTimeMillis();
+//        conn.close();
+//        System.out.println("Time: " + (t2 - t1));
+//    }
+    
     private QueryConfiguration generateQueryConfiguration() {
         QueryConfiguration conf = new QueryConfiguration();
         String[] initQueries = new String[6];
@@ -106,7 +124,7 @@ public class MySQLInnoDBAnalyticsDataSourceTest extends AnalyticsDataSourceTest 
         conf.setFsReadDataChunkQuery("SELECT data FROM AN_FS_DATA WHERE path = ? AND sequence = ?");
         conf.setFsWriteDataChunkQuery("INSERT INTO AN_FS_DATA (path,sequence,data) VALUES (?,?,?) ON DUPLICATE KEY UPDATE path=VALUES(path), sequence=VALUES(sequence), data=VALUES(data)");
         conf.setFsDeletePathQuery("DELETE FROM AN_FS_PATH WHERE path = ?");
-        conf.setFsDataChunkSize(10240);
+        conf.setFsDataChunkSize(1024);
         return conf;
     }
     

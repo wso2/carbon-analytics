@@ -451,13 +451,58 @@ public class AnalyticsDataSourceTest {
     }
     
     @Test
+    public void testFSFileIOOperations2() throws AnalyticsDataSourceException, IOException {
+        this.fileSystem.delete("/d1/d2/d3");
+        DataOutput out = this.fileSystem.createOutput("/d1/d2/d3");
+        byte[] data = this.generateData(1350);
+        for (int i = 0; i < 100; i++) {
+            out.write(data, 0, data.length);
+        }
+        out.close();
+        DataInput in = this.fileSystem.createInput("/d1/d2/d3");
+        byte[] buff = new byte[500];
+        int j;
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        while ((j = in.read(buff, 0, buff.length)) > 0) {
+            byteOut.write(buff, 0, j);
+        }
+        byteOut.close();
+        in.close();
+        Assert.assertTrue(this.checkDataEquals(data, byteOut.toByteArray()));
+        /* overwriting earlier data again, with different buffer values */
+        out = this.fileSystem.createOutput("/d1/d2/d3");
+        data = this.generateData(135);
+        for (int i = 0; i < 1000; i++) {
+            out.write(data, 0, data.length);
+        }
+        out.close();
+        in = this.fileSystem.createInput("/d1/d2/d3");
+        buff = new byte[1000];
+        byteOut = new ByteArrayOutputStream();
+        while ((j = in.read(buff, 0, buff.length)) > 0) {
+            byteOut.write(buff, 0, j);
+        }
+        byteOut.close();
+        in.close();
+        Assert.assertTrue(this.checkDataEquals(data, byteOut.toByteArray()));
+        
+        this.fileSystem.delete("/d1/d2/d3");
+        Assert.assertFalse(this.fileSystem.exists("/d1/d2/d3"));
+    }
+    
+    @Test
     public void testFSFileCopy() throws AnalyticsDataSourceException {
         this.fileSystem.delete("/d1/fx");
         this.fileSystem.delete("/d2/fx");
-        byte[] data = this.generateData(1024 * 510);
+        byte[] data = this.generateData(1025);
         DataOutput out = this.fileSystem.createOutput("/d1/fx");
         out.write(data, 0, data.length);
         out.close();
+        DataInput inx = this.fileSystem.createInput("/d1/fx");
+        byte[] d = new byte[data.length];
+        inx.read(d, 0, d.length);
+        inx.close();
+        Assert.assertTrue(this.checkDataEquals(data, d));
         this.fileSystem.copy("/d1/fx", "/d2/fx");
         Assert.assertTrue(this.fileSystem.exists("/d2/fx"));
         Assert.assertEquals(this.fileSystem.length("/d2/fx"), data.length);
@@ -545,7 +590,7 @@ public class AnalyticsDataSourceTest {
         byte[] data = this.generateData(2048);
         DataOutput out;
         long start = System.currentTimeMillis();
-        int count = 5000;
+        int count = 100;
         for (int i = 0; i < count; i++) {
             out = this.fileSystem.createOutput("/mydir/perf/file" + i);
             out.write(data, 0, data.length);

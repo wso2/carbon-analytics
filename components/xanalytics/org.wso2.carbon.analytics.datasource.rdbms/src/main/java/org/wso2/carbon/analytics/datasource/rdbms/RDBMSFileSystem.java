@@ -84,9 +84,6 @@ public class RDBMSFileSystem implements FileSystem {
     public void copy(String srcPath, String destPath) throws AnalyticsDataSourceException {
         try {
             DataInput input = this.createInput(srcPath);
-            if (!this.exists(destPath)) {
-                this.createFile(destPath);
-            }
             DataOutput output = this.createOutput(destPath);
             byte[] buff = new byte[1024];
             int i;
@@ -347,7 +344,6 @@ public class RDBMSFileSystem implements FileSystem {
             stmt.executeBatch();
             conn.commit();
         } catch (SQLException e) {
-            e.printStackTrace();
             RDBMSUtils.rollbackConnection(conn);
             /* this is maybe because we are updating some data already in the file with a seek operation,
              * and the given write chunk query is not an insert or update, so lets insert sequentially
