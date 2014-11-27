@@ -37,11 +37,29 @@ public interface AnalyticsDataSource {
     void init(Map<String, String> properites) throws AnalyticsDataSourceException;
     
     /**
-     * Deletes all the records in a given table, and deletes the indices associated with it.
+     * Creates a table, where the columns are not defined here, but can contain any arbitrary number
+     * of columns when data is added.
+     * @param tableCategory The category of the table
+     * @param tableName The name of the table to be created
+     * @throws AnalyticsDataSourceException
+     */
+    void createTable(String tableCategory, String tableName) throws AnalyticsDataSourceException;
+    
+    /**
+     * Deletes the table with the given category and name.
+     * @param tableCategory The category of the table
      * @param tableName The name of the table to be dropped
      * @throws AnalyticsDataSourceException
      */
-    void purgeTable(String tableName) throws AnalyticsDataSourceException;
+    void deleteTable(String tableCategory, String tableName) throws AnalyticsDataSourceException;
+    
+    /**
+     * Lists all the current tables with the given category.
+     * @param tableCategory The category of the tables
+     * @return The list of table names
+     * @throws AnalyticsDataSourceException
+     */
+    List<String> listTables(String tableCategory) throws AnalyticsDataSourceException;
     
     /**
      * Adds a new record to the table. If the record id is mentioned, 
@@ -53,6 +71,7 @@ public interface AnalyticsDataSource {
     
     /**
      * Retrieves data from a table.
+     * @param tableCategory The category of the table
      * @param tableName The name of the table to search on
      * @param columns The list of columns to required in results, null if all needs to be returned
      * @param timeFrom The starting time to get records from, inclusive, -1 for beginning of time
@@ -62,36 +81,40 @@ public interface AnalyticsDataSource {
      * @return An array of {@link RecordGroup} objects, which contains individual data sets in their local location
      * @throws AnalyticsDataSourceException
      */
-    RecordGroup[] get(String tableName, List<String> columns, long timeFrom, 
+    RecordGroup[] get(String tableCategory, String tableName, List<String> columns, long timeFrom, 
             long timeTo, int recordsFrom, int recordsCount) throws AnalyticsDataSourceException;
     
     /**
+     * 
      * Retrieves data from a table with given ids.
+     * @param tableCategory The category of the table 
      * @param tableName The name of the table to search on
      * @param columns The list of columns to required in results, null if all needs to be returned
      * @param ids The list of ids of the records to be read
      * @return An array of {@link RecordGroup} objects, which contains individual data sets in their local location
      * @throws AnalyticsDataSourceException
      */
-    RecordGroup[] get(String tableName, List<String> columns, 
+    RecordGroup[] get(String tableCategory, String tableName, List<String> columns, 
             List<String> ids) throws AnalyticsDataSourceException;
 
     /**
      * Deletes a set of records in the table.
+     * @param tableCategory The category of the table 
      * @param tableName The name of the table to search on 
      * @param timeFrom The starting time to get records from for deletion
      * @param timeTo The ending time to get records to for deletion
      * @throws AnalyticsDataSourceException
      */
-    void delete(String tableName, long timeFrom, long timeTo) throws AnalyticsDataSourceException;
+    void delete(String tableCategory, String tableName, long timeFrom, long timeTo) throws AnalyticsDataSourceException;
     
     /**
      * Delete data in a table with given ids.
+     * @param tableCategory The category of the table 
      * @param tableName The name of the table to search on 
      * @param ids The list of ids of the records to be deleted
      * @throws AnalyticsDataSourceException
      */
-    void delete(String tableName, List<String> ids) throws AnalyticsDataSourceException;
+    void delete(String tableCategory, String tableName, List<String> ids) throws AnalyticsDataSourceException;
     
     /**
      * Creates and returns a {@link FileSystem} object to do file related operations.

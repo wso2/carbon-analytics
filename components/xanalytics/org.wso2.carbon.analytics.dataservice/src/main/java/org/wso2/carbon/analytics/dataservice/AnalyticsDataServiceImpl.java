@@ -18,9 +18,32 @@
  */
 package org.wso2.carbon.analytics.dataservice;
 
+import java.util.List;
+
 /**
  * The implementation of {@link AnalyticsDataService}.
  */
 public class AnalyticsDataServiceImpl implements AnalyticsDataService {
+
+    @Override
+    public void insertEvents(List<AnalyticsEvent> eventList) throws AnalyticsDataServiceException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public List<AnalyticsEvent> getEvents(String streamId, List<String> meta, List<String> correlation,
+            List<String> payload, long timeFrom, long timeTo, int recordsFrom, int recordsCount)
+            throws AnalyticsDataServiceException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<AnalyticsEvent> getEvents(String streamId, List<String> meta, List<String> correlation,
+            List<String> payload, List<String> ids) throws AnalyticsDataServiceException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 }

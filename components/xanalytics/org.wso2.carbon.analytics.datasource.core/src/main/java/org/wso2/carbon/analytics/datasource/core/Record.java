@@ -28,6 +28,8 @@ import java.util.List;
  */
 public class Record {
 
+    private String tableCategory;
+    
     private String tableName;
     
     private List<Column> values;
@@ -38,15 +40,16 @@ public class Record {
     
     private int hashCode = -1;
     
-    public Record(String tableName, List<Column> values, long timestamp) {
-        this(null, tableName, values, timestamp);
+    public Record(String tableCategory, String tableName, List<Column> values, long timestamp) {
+        this(null, tableCategory, tableName, values, timestamp);
     }
     
-    public Record(String id, String tableName, List<Column> values, long timestamp) {
+    public Record(String id, String tableCategory, String tableName, List<Column> values, long timestamp) {
         this.id = id;
         if (this.id == null) {
             this.id = this.generateID();
         }
+        this.tableCategory = tableCategory;
         this.tableName = tableName;
         this.values = values;
         this.timestamp = timestamp;
@@ -61,6 +64,10 @@ public class Record {
         builder.append(System.currentTimeMillis());
         builder.append(Math.random());
         return builder.toString();
+    }
+    
+    public String getTableCategory() {
+        return tableCategory;
     }
     
     public String getTableName() {
@@ -87,6 +94,9 @@ public class Record {
             return false;
         }
         Record rhs = (Record) obj;
+        if (!this.getTableCategory().equals(rhs.getTableCategory())) {
+            return false;
+        }
         if (!this.getTableName().equals(rhs.getTableName())) {
             return false;
         }
@@ -102,10 +112,11 @@ public class Record {
     @Override
     public int hashCode() {
         if (this.hashCode == -1) {
-            this.hashCode = this.getTableName().toUpperCase().hashCode();
-            this.hashCode += this.getId().hashCode() >> 2;
-            this.hashCode += String.valueOf(this.getTimestamp()).hashCode() >> 4;
-            this.hashCode += new HashSet<Column>(this.getNotNullValues()).hashCode() >> 8;
+            this.hashCode = this.getTableCategory().hashCode();
+            this.hashCode += this.getTableName().hashCode() >> 2;
+            this.hashCode += this.getId().hashCode() >> 4;
+            this.hashCode += String.valueOf(this.getTimestamp()).hashCode() >> 8;
+            this.hashCode += new HashSet<Column>(this.getNotNullValues()).hashCode() >> 16;
         }
         return this.hashCode;
     }

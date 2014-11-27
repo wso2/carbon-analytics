@@ -37,6 +37,8 @@ public class QueryConfiguration {
     
     private String recordDeletionWithIdsQuery;
     
+    private String tableListQuery;
+    
     private boolean paginationFirstZeroIndexed;
     
     private boolean paginationFirstInclusive;
@@ -123,6 +125,14 @@ public class QueryConfiguration {
         this.recordDeletionWithIdsQuery = recordDeletionWithIdsQuery;
     }
     
+    public String getTableListQuery() {
+        return tableListQuery;
+    }
+    
+    public void setTableListQuery(String tableListQuery) {
+        this.tableListQuery = tableListQuery;
+    }
+
     public boolean isPaginationFirstZeroIndexed() {
         return paginationFirstZeroIndexed;
     }
