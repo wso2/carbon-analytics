@@ -27,6 +27,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -171,13 +172,47 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
         return conn;
     }
     
+    private String calculateRecordIdentity(Record record) {
+        return this.generateTargetTableName(record.getTableCategory(), record.getTableName());
+    }
+    
     @Override
     public void put(List<Record> records) throws AnalyticsDataSourceException {
+        if (records.size() == 0) {
+            return;
+        }
         Connection conn = null;
-        PreparedStatement stmt = null;
         try {
             conn = this.getConnection(false);
-            stmt = conn.prepareStatement(this.getRecordInsertSQL());
+            Map<String, List<Record>> recordBatches = new HashMap<String, List<Record>>();
+            List<Record> recordBatch;
+            for (Record record : records) {
+                recordBatch = recordBatches.get(this.calculateRecordIdentity(record));
+                if (recordBatch == null) {
+                    recordBatch = new ArrayList<Record>();
+                    recordBatches.put(this.calculateRecordIdentity(record), recordBatch);
+                }
+                recordBatch.add(record);
+            }
+            for (List<Record> batch : recordBatches.values()) {
+                this.addRecordsSimilar(conn, batch);
+            }
+            conn.commit();
+        } catch (SQLException e) {
+            RDBMSUtils.rollbackConnection(conn);
+            throw new AnalyticsDataSourceException("Error in adding records: " + e.getMessage(), e);
+        } finally {
+            RDBMSUtils.cleanupConnection(null, null, conn);
+        }
+    }
+    
+    private void addRecordsSimilar(Connection conn, 
+            List<Record> records) throws SQLException, AnalyticsDataSourceException {
+        Record firstRecord = records.get(0);
+        String query = this.getRecordInsertSQL(firstRecord.getTableCategory(), firstRecord.getTableName());
+        PreparedStatement stmt = null;
+        try {
+            stmt = conn.prepareStatement(query);
             for (Record record : records) {
                 stmt.setString(1, record.getId());
                 stmt.setLong(4, record.getTimestamp());
@@ -185,17 +220,14 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
                 stmt.addBatch();
             }
             stmt.executeBatch();
-            conn.commit();
-        } catch (SQLException e) {
-            RDBMSUtils.rollbackConnection(conn);
-            throw new AnalyticsDataSourceException("Error in adding records: " + e.getMessage(), e);
         } finally {
-            RDBMSUtils.cleanupConnection(null, stmt, conn);
+            RDBMSUtils.cleanupConnection(null, stmt, null);
         }
     }
     
-    private String getRecordInsertSQL() {
-    	return this.getQueryConfiguration().getRecordInsertQuery();
+    private String getRecordInsertSQL(long tableCategoryId, String tableName) {
+    	String query = this.getQueryConfiguration().getRecordInsertQuery();
+    	return translateQueryWithTableInfo(query, tableCategoryId, tableName);
     }
 
     @Override
@@ -415,7 +447,9 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             conn.commit();
         } catch (SQLException e) {
             RDBMSUtils.rollbackConnection(conn);
-            throw new AnalyticsDataSourceException("Error in deleting table: " + e.getMessage(), e);
+            if (this.tableExists(tableCategoryId, tableName)) {
+                throw new AnalyticsDataSourceException("Error in deleting table: " + e.getMessage(), e);
+            }
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
