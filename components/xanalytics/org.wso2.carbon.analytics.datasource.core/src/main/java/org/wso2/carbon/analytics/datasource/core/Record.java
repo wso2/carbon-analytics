@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class Record {
 
-    private String tableCategory;
+    private long tableCategoryId;
     
     private String tableName;
     
@@ -40,16 +40,16 @@ public class Record {
     
     private int hashCode = -1;
     
-    public Record(String tableCategory, String tableName, List<Column> values, long timestamp) {
-        this(null, tableCategory, tableName, values, timestamp);
+    public Record(long tableCategoryId, String tableName, List<Column> values, long timestamp) {
+        this(null, tableCategoryId, tableName, values, timestamp);
     }
     
-    public Record(String id, String tableCategory, String tableName, List<Column> values, long timestamp) {
+    public Record(String id, long tableCategoryId, String tableName, List<Column> values, long timestamp) {
         this.id = id;
         if (this.id == null) {
             this.id = this.generateID();
         }
-        this.tableCategory = tableCategory;
+        this.tableCategoryId = tableCategoryId;
         this.tableName = tableName;
         this.values = values;
         this.timestamp = timestamp;
@@ -66,8 +66,8 @@ public class Record {
         return builder.toString();
     }
     
-    public String getTableCategory() {
-        return tableCategory;
+    public long getTableCategory() {
+        return tableCategoryId;
     }
     
     public String getTableName() {
@@ -94,7 +94,7 @@ public class Record {
             return false;
         }
         Record rhs = (Record) obj;
-        if (!this.getTableCategory().equals(rhs.getTableCategory())) {
+        if (this.getTableCategory() != rhs.getTableCategory()) {
             return false;
         }
         if (!this.getTableName().equals(rhs.getTableName())) {
@@ -112,7 +112,7 @@ public class Record {
     @Override
     public int hashCode() {
         if (this.hashCode == -1) {
-            this.hashCode = this.getTableCategory().hashCode();
+            this.hashCode = ((Long) this.getTableCategory()).hashCode();
             this.hashCode += this.getTableName().hashCode() >> 2;
             this.hashCode += this.getId().hashCode() >> 4;
             this.hashCode += String.valueOf(this.getTimestamp()).hashCode() >> 8;

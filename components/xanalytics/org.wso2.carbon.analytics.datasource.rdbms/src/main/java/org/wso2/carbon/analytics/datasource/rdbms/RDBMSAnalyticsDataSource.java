@@ -21,6 +21,7 @@ package org.wso2.carbon.analytics.datasource.rdbms;
 import java.io.ByteArrayInputStream;
 import java.sql.Blob;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -50,9 +51,11 @@ import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
  */
 public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
 
-    private static final String TABLE_REPRESENTATIVE_ID = "__1d45406f-9735-49c0-a714-fc1e60375671__";
-    
-    private static final String NON_TABLE_REPRESENTATIVE_ID = "__eac3d187-6ba6-46f8-bd7a-9a74fe0a5fc7__";
+    private static final String ANALYTICS_USER_TABLE_PREFIX = "ANX";
+
+    private static final String RECORD_IDS_PLACEHOLDER = "{{RECORD_IDS}}";
+
+    private static final String TABLE_NAME_PLACEHOLDER = "{{TABLE_NAME}}";
 
     private DataSource dataSource;
     
@@ -97,7 +100,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             conn = this.getConnection(false);
             Statement stmt;
             if (!this.checkSystemTables(conn)) {
-            	for (String query : this.getInitSQLQueries()) {
+            	for (String query : this.getFsTableInitSQLQueries()) {
             		stmt = conn.createStatement();
             		stmt.executeUpdate(query);
             		stmt.close();
@@ -124,12 +127,30 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     	}
     }
     
-    private String[] getInitSQLQueries() {
-    	return this.getQueryConfiguration().getInitQueries();
+    private String[] getFsTableInitSQLQueries() {
+    	return this.getQueryConfiguration().getFsTableInitQueries();
     }
     
     private String getSystemTableCheckQuery() {
-    	return this.getQueryConfiguration().getSystemTablesCheckQuery();
+    	return this.getQueryConfiguration().getFsTablesCheckQuery();
+    }
+    
+    private String[] getRecordTableInitQueries(long tableCategoryId, String tableName) {
+        String[] queries = this.getQueryConfiguration().getRecordTableInitQueries();
+        String[] result = new String[queries.length];
+        for (int i = 0; i < queries.length; i++) {
+            result[i] = this.translateQueryWithTableInfo(queries[i], tableCategoryId, tableName);
+        }
+        return result;
+    }
+    
+    private String[] getRecordTableDeleteQueries(long tableCategoryId, String tableName) {
+        String[] queries = this.getQueryConfiguration().getRecordTableDeleteQueries();
+        String[] result = new String[queries.length];
+        for (int i = 0; i < queries.length; i++) {
+            result[i] = this.translateQueryWithTableInfo(queries[i], tableCategoryId, tableName);
+        }
+        return result;
     }
     
     public Map<String, String> getProperties() {
@@ -159,8 +180,6 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             stmt = conn.prepareStatement(this.getRecordInsertSQL());
             for (Record record : records) {
                 stmt.setString(1, record.getId());
-                stmt.setString(2, record.getTableCategory());
-                stmt.setString(3, record.getTableName());
                 stmt.setLong(4, record.getTimestamp());
                 stmt.setBlob(5, new ByteArrayInputStream(GenericUtils.encodeRecordValues(record.getValues())));
                 stmt.addBatch();
@@ -180,7 +199,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     }
 
     @Override
-    public List<Record> getRecords(String tableCategory, String tableName, List<String> columns,
+    public List<Record> getRecords(long tableCategoryId, String tableName, List<String> columns,
             long timeFrom, long timeTo, int recordsFrom, 
             int recordsCount) throws AnalyticsDataSourceException {
         Connection conn = null;
@@ -188,7 +207,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
         ResultSet rs = null;
         try {
             conn = this.getConnection(false);
-            stmt = conn.prepareStatement(this.getRecordRetrievalQuery());
+            stmt = conn.prepareStatement(this.getRecordRetrievalQuery(tableCategoryId, tableName));
             if (timeFrom == -1) {
                 timeFrom = Long.MIN_VALUE;
             }
@@ -201,15 +220,12 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             if (recordsCount == -1) {
                 recordsCount = Integer.MAX_VALUE;
             }
-            stmt.setString(1, tableCategory);
-            stmt.setString(2, tableName);
             stmt.setLong(3, timeFrom);
             stmt.setLong(4, timeTo);
-            stmt.setString(5, TABLE_REPRESENTATIVE_ID);
             stmt.setInt(6, this.adjustRecordsFromForProvider(recordsFrom));
             stmt.setInt(7, this.adjustRecordsCountForProvider(recordsFrom, recordsCount));            
             rs = stmt.executeQuery();
-            List<Record> result = this.processRecordResultSet(tableCategory, tableName, rs, columns);
+            List<Record> result = this.processRecordResultSet(tableCategoryId, tableName, rs, columns);
             conn.commit();
             return result;
         } catch (SQLException e) {
@@ -242,7 +258,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
         return recordsCount;
     }
     
-    private List<Record> processRecordResultSet(String tableCategory, String tableName, ResultSet rs, 
+    private List<Record> processRecordResultSet(long tableCategoryId, String tableName, ResultSet rs, 
             List<String> columns) throws SQLException, AnalyticsDataSourceException {
         List<Record> result = new ArrayList<Record>();
         Record record;
@@ -255,30 +271,27 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
         while (rs.next()) {
             blob = rs.getBlob(3);
             values = GenericUtils.decodeRecordValues(blob.getBytes(1, (int) blob.length()), colSet);
-            record = new Record(rs.getString(1), tableCategory, tableName, values, rs.getLong(2));
+            record = new Record(rs.getString(1), tableCategoryId, tableName, values, rs.getLong(2));
             result.add(record);            
         }
         return result;
     }
-            
+
     @Override
-    public List<Record> getRecords(String tableCategory, String tableName, List<String> columns,
+    public List<Record> getRecords(long tableCategoryId, String tableName, List<String> columns,
             List<String> ids) throws AnalyticsDataSourceException {
-        String recordGetSQL = this.generateGetRecordRetrievalWithIdQuery(ids.size());
+        String recordGetSQL = this.generateGetRecordRetrievalWithIdQuery(tableCategoryId, tableName, ids.size());
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             conn = this.getConnection(false);
             stmt = conn.prepareStatement(recordGetSQL);
-            stmt.setString(1, tableCategory);
-            stmt.setString(2, tableName);
-            stmt.setString(3, TABLE_REPRESENTATIVE_ID);
             for (int i = 0; i < ids.size(); i++) {
                 stmt.setString(i + 4, ids.get(i));
             }
             rs = stmt.executeQuery();
-            List<Record> result = this.processRecordResultSet(tableCategory, tableName, rs, columns);
+            List<Record> result = this.processRecordResultSet(tableCategoryId, tableName, rs, columns);
             conn.commit();
             return result;
         } catch (SQLException e) {
@@ -288,25 +301,15 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             RDBMSUtils.cleanupConnection(rs, stmt, conn);
         }
     }
-
-    @Override
-    public void delete(String tableCatelog, String tableName, long timeFrom, long timeTo)
-            throws AnalyticsDataSourceException {
-        this.delete(tableCatelog, tableName, timeFrom, timeTo, false);
-    }
     
-    public void delete(String tableCategory, String tableName, long timeFrom, long timeTo, boolean dropTable)
+    @Override
+    public void delete(long tableCategoryId, String tableName, long timeFrom, long timeTo)
             throws AnalyticsDataSourceException {
         String sql = this.getRecordDeletionQuery();
         Connection conn = null;
         PreparedStatement stmt = null;
         try {
             conn = this.getConnection(false);
-            if (!dropTable) {
-                /* there is a chance we will delete all the records, so lets put in the
-                 * table representation record if its already not there */
-                this.createTable(conn, tableCategory, tableName);
-            }
             stmt = conn.prepareStatement(sql);
             if (timeFrom == -1) {
                 timeFrom = Long.MIN_VALUE;
@@ -314,15 +317,8 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             if (timeTo == -1) {
                 timeTo = Long.MAX_VALUE;
             }
-            stmt.setString(1, tableCategory);
-            stmt.setString(2, tableName);
             stmt.setLong(3, timeFrom);
             stmt.setLong(4, timeTo);
-            if (dropTable) {
-                stmt.setString(5, NON_TABLE_REPRESENTATIVE_ID);
-            } else {
-                stmt.setString(5, TABLE_REPRESENTATIVE_ID);
-            }
             stmt.executeUpdate();
             conn.commit();
         } catch (SQLException e) {
@@ -334,19 +330,16 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     }
         
     @Override
-    public void delete(String tableCatelog, String tableName, List<String> ids) throws AnalyticsDataSourceException {
+    public void delete(long tableCatelogId, String tableName, List<String> ids) throws AnalyticsDataSourceException {
         if (ids.size() == 0) {
             return;
         }
-        String sql = this.generateRecordDeletionRecordsWithIdsQuery(ids.size());
+        String sql = this.generateRecordDeletionRecordsWithIdsQuery(tableCatelogId, tableName, ids.size());
         Connection conn = null;
         PreparedStatement stmt = null;
         try {
             conn = this.getConnection();
             stmt = conn.prepareStatement(sql);
-            stmt.setString(1, tableCatelog);
-            stmt.setString(2, tableName);
-            stmt.setString(3, TABLE_REPRESENTATIVE_ID);
             for (int i = 0; i < ids.size(); i++) {
                 stmt.setString(i + 4, ids.get(i));
             }
@@ -358,22 +351,39 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
         }
     }
     
-    private String getRecordRetrievalQuery() {
-        return this.getQueryConfiguration().getRecordRetrievalQuery();
+    private String generateTablePrefix(long tableCategoryId) {
+        return RDBMSAnalyticsDataSource.ANALYTICS_USER_TABLE_PREFIX + "_" + tableCategoryId + "_";
     }
     
-    private String generateGetRecordRetrievalWithIdQuery(int recordCount) {
-        String sql = this.getQueryConfiguration().getRecordRetrievalWithIdsQuery();
-        return sql.replaceAll(":record_ids", this.getDynamicSQLParams(recordCount));
+    private String generateTargetTableName(long tableCategoryId, String tableName) {
+        return this.generateTablePrefix(tableCategoryId) + tableName;
     }
     
-    private String getTableListQuery() {
-        return this.getQueryConfiguration().getTableListQuery();
+    private String translateQueryWithTableInfo(String query, long tableCategoryId, String tableName) {
+        return query.replace(TABLE_NAME_PLACEHOLDER, this.generateTargetTableName(tableCategoryId, tableName));
     }
     
-    private String generateRecordDeletionRecordsWithIdsQuery(int recordCount) {
-        String sql = this.getQueryConfiguration().getRecordDeletionWithIdsQuery();
-        return sql.replaceAll(":record_ids", this.getDynamicSQLParams(recordCount));
+    private String translateQueryWithRecordIdsInfo(String query, int recordCount) {
+        return query.replace(RECORD_IDS_PLACEHOLDER, this.getDynamicSQLParams(recordCount));
+    }
+    
+    private String getRecordRetrievalQuery(long tableCategoryId, String tableName) {
+        String query = this.getQueryConfiguration().getRecordRetrievalQuery();
+        return this.translateQueryWithTableInfo(query, tableCategoryId, tableName);
+    }
+    
+    private String generateGetRecordRetrievalWithIdQuery(long tableCategoryId, String tableName, int recordCount) {
+        String query = this.getQueryConfiguration().getRecordRetrievalWithIdsQuery();
+        query = this.translateQueryWithTableInfo(query, tableCategoryId, tableName);
+        query = this.translateQueryWithRecordIdsInfo(query, recordCount);
+        return query;
+    }
+    
+    private String generateRecordDeletionRecordsWithIdsQuery(long tableCategoryId, String tableName, int recordCount) {
+        String query = this.getQueryConfiguration().getRecordDeletionWithIdsQuery();
+        query = this.translateQueryWithTableInfo(query, tableCategoryId, tableName);
+        query = this.translateQueryWithRecordIdsInfo(query, recordCount);
+        return query;
     }
     
     private String getDynamicSQLParams(int count) {
@@ -393,8 +403,22 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     }
 
     @Override
-    public void deleteTable(String tableCategory, String tableName) throws AnalyticsDataSourceException {
-        this.delete(tableCategory, tableName, -1, -1, true);
+    public void deleteTable(long tableCategoryId, String tableName) throws AnalyticsDataSourceException {
+        Connection conn = null;
+        try {
+            conn = this.getConnection(false);
+            String[] tableInitQueries = this.getRecordTableDeleteQueries(tableCategoryId, tableName);
+            for (String query : tableInitQueries) {
+                query = this.translateQueryWithTableInfo(query, tableCategoryId, tableName);
+                this.executeUpdate(conn, query);
+            }
+            conn.commit();
+        } catch (SQLException e) {
+            RDBMSUtils.rollbackConnection(conn);
+            throw new AnalyticsDataSourceException("Error in deleting table: " + e.getMessage(), e);
+        } finally {
+            RDBMSUtils.cleanupConnection(null, null, conn);
+        }
     }
 
     @Override
@@ -408,11 +432,14 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     }
     
     @Override
-    public void createTable(String tableCategory, String tableName) throws AnalyticsDataSourceException {
+    public void createTable(long tableCategoryId, String tableName) throws AnalyticsDataSourceException {
         Connection conn = null;
         try {
             conn = this.getConnection(false);
-            this.createTable(conn, tableCategory, tableName);
+            String[] tableInitQueries = this.getRecordTableInitQueries(tableCategoryId, tableName);
+            for (String query : tableInitQueries) {
+                this.executeUpdate(conn, query);
+            }
             conn.commit();
         } catch (SQLException e) {
             RDBMSUtils.rollbackConnection(conn);
@@ -421,62 +448,74 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
     }
-
-    public void createTable(Connection conn, String tableCategory, String tableName) throws SQLException, AnalyticsDataSourceException {
-        PreparedStatement stmt = null;
+    
+    private void executeUpdate(Connection conn, String query) throws SQLException {
+        Statement stmt = null;
         try {
-            if (this.isTableRepresentativeRecordAvailable(conn, tableCategory, tableName)) {
-                return;
-            }
-            stmt = conn.prepareStatement(this.getRecordInsertSQL());
-            stmt.setString(1, TABLE_REPRESENTATIVE_ID);
-            stmt.setString(2, tableCategory);
-            stmt.setString(3, tableName);
-            stmt.setLong(4, 0);
-            stmt.setBlob(5, new ByteArrayInputStream(GenericUtils.encodeRecordValues(new ArrayList<Record.Column>())));
-            stmt.executeUpdate();
+            stmt = conn.createStatement();
+            stmt.executeUpdate(query);
         } finally {
             RDBMSUtils.cleanupConnection(null, stmt, null);
         }
     }
     
-    private boolean isTableRepresentativeRecordAvailable(Connection conn, String tableCategory, 
-            String tableName) throws SQLException {
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        try {
-            stmt = conn.prepareStatement(this.generateGetRecordRetrievalWithIdQuery(1));
-            stmt.setString(1, tableCategory);
-            stmt.setString(2, tableName);
-            stmt.setString(3, NON_TABLE_REPRESENTATIVE_ID);
-            stmt.setString(4, TABLE_REPRESENTATIVE_ID);
-            rs = stmt.executeQuery();
-            return rs.next();
-        } finally {
-            RDBMSUtils.cleanupConnection(rs, stmt, null);
-        }
-    }
-
     @Override
-    public List<String> listTables(String tableCategory) throws AnalyticsDataSourceException {
-        String recordGetSQL = this.getTableListQuery();
-        List<String> result = new ArrayList<String>();
+    public boolean tableExists(long tableCategoryId, String tableName) throws AnalyticsDataSourceException {
+        tableName = this.normalizeTableName(tableName);
         Connection conn = null;
-        PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             conn = this.getConnection();
-            stmt = conn.prepareStatement(recordGetSQL);
-            stmt.setString(1, tableCategory);
-            rs = stmt.executeQuery();
+            DatabaseMetaData dbm = conn.getMetaData();
+            String prefix = this.generateTablePrefix(tableCategoryId);
+            String srcTable;
+            rs = dbm.getTables(null, null, "%", null);
             while (rs.next()) {
-                result.add(rs.getString(1));
+                srcTable = rs.getString("TABLE_NAME");
+                if (srcTable.startsWith(ANALYTICS_USER_TABLE_PREFIX)) {
+                    srcTable = srcTable.substring(prefix.length());
+                    srcTable = this.normalizeTableName(srcTable);
+                }
+                if (tableName.equals(srcTable)) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (SQLException e) {
+            throw new AnalyticsDataSourceException("Error in checking table existence: " + e.getMessage(), e);
+        } finally {
+            RDBMSUtils.cleanupConnection(rs, null, conn);
+        }
+    }
+
+    private String normalizeTableName(String tableName) {
+        return tableName.toUpperCase();
+    }
+    
+    @Override
+    public List<String> listTables(long tableCategoryId) throws AnalyticsDataSourceException {
+        List<String> result = new ArrayList<String>();
+        Connection conn = null;
+        ResultSet rs = null;
+        String tableName;
+        String prefix = this.generateTablePrefix(tableCategoryId);
+        try {
+            conn = this.getConnection();
+            DatabaseMetaData dbm = conn.getMetaData();
+            rs = dbm.getTables(null, null, "%", null);
+            while (rs.next()) {
+                tableName = rs.getString("TABLE_NAME");
+                if (tableName.startsWith(ANALYTICS_USER_TABLE_PREFIX)) {
+                    tableName = tableName.substring(prefix.length());
+                    tableName = this.normalizeTableName(tableName);
+                    result.add(tableName);
+                }
             }
             return result;
         } catch (SQLException e) {
-            throw new AnalyticsDataSourceException("Error in retrieving records: " + e.getMessage(), e);
+            throw new AnalyticsDataSourceException("Error in listing tables: " + e.getMessage(), e);
         } finally {
-            RDBMSUtils.cleanupConnection(rs, stmt, conn);
+            RDBMSUtils.cleanupConnection(rs, null, conn);
         }
     }
 

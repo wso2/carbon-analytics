@@ -25,14 +25,14 @@ import java.util.List;
  */
 public abstract class DirectAnalyticsDataSource implements AnalyticsDataSource {
     
-    public RecordGroup[] get(String tableCategory, String tableName, List<String> columns, long timeFrom, long timeTo, int recordsFrom, 
+    public RecordGroup[] get(long tableCategoryId, String tableName, List<String> columns, long timeFrom, long timeTo, int recordsFrom, 
             int recordsCount) throws AnalyticsDataSourceException {
-        List<Record> records = this.getRecords(tableCategory, tableName, columns, timeFrom, timeTo, recordsFrom, recordsCount);
+        List<Record> records = this.getRecords(tableCategoryId, tableName, columns, timeFrom, timeTo, recordsFrom, recordsCount);
         return new DirectRecordGroup[] { new DirectRecordGroup(records) };
     }
     
-    public RecordGroup[] get(String tableCategory, String tableName, List<String> columns, List<String> ids) throws AnalyticsDataSourceException {
-        List<Record> records = this.getRecords(tableCategory, tableName, columns, ids);
+    public RecordGroup[] get(long tableCategoryId, String tableName, List<String> columns, List<String> ids) throws AnalyticsDataSourceException {
+        List<Record> records = this.getRecords(tableCategoryId, tableName, columns, ids);
         if (records.size() > 0) {
             return new DirectRecordGroup[] { new DirectRecordGroup(records) };
         } else {
@@ -40,10 +40,10 @@ public abstract class DirectAnalyticsDataSource implements AnalyticsDataSource {
         }
     }
     
-    public abstract List<Record> getRecords(String tableCategory, String tableName, List<String> columns, long timeFrom, long timeTo, 
+    public abstract List<Record> getRecords(long tableCategoryId, String tableName, List<String> columns, long timeFrom, long timeTo, 
             int recordsFrom, int recordsCount) throws AnalyticsDataSourceException;
     
-    public abstract List<Record> getRecords(String tableCategory, String tableName, List<String> columns, List<String> ids) throws AnalyticsDataSourceException;
+    public abstract List<Record> getRecords(long tableCategoryId, String tableName, List<String> columns, List<String> ids) throws AnalyticsDataSourceException;
     
     /**
      * {@link RecordGroup} implementation for direct analytics data source.

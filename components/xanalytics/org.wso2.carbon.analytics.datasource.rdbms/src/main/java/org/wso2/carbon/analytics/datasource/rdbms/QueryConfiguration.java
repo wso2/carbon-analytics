@@ -23,9 +23,13 @@ package org.wso2.carbon.analytics.datasource.rdbms;
  */
 public class QueryConfiguration {
 
-    private String[] initQueries;
+    private String[] recordTableInitQueries;
     
-    private String systemTablesCheckQuery;
+    private String[] recordTableDeleteQueries;
+    
+    private String[] fsTableInitQueries;
+    
+    private String fsTablesCheckQuery;
     
     private String recordInsertQuery;
     
@@ -36,9 +40,7 @@ public class QueryConfiguration {
     private String recordRetrievalWithIdsQuery;
     
     private String recordDeletionWithIdsQuery;
-    
-    private String tableListQuery;
-    
+        
     private boolean paginationFirstZeroIndexed;
     
     private boolean paginationFirstInclusive;
@@ -69,20 +71,36 @@ public class QueryConfiguration {
     
     private int fsDataChunkSize;
 
-    public String[] getInitQueries() {
-        return initQueries;
+    public String[] getRecordTableInitQueries() {
+        return recordTableInitQueries;
     }
   
-    public void setInitQueries(String[] initQueries) {
-        this.initQueries = initQueries;
+    public void setRecordTableInitQueries(String[] recordTableInitQueries) {
+        this.recordTableInitQueries = recordTableInitQueries;
     }
     
-    public String getSystemTablesCheckQuery() {
-        return systemTablesCheckQuery;
+    public String[] getRecordTableDeleteQueries() {
+        return recordTableDeleteQueries;
+    }
+  
+    public void setRecordTableDeleteQueries(String[] recordTableDeleteQueries) {
+        this.recordTableDeleteQueries = recordTableDeleteQueries;
     }
     
-    public void setSystemTablesCheckQuery(String systemTablesCheckQuery) {
-        this.systemTablesCheckQuery = systemTablesCheckQuery;
+    public String[] getFsTableInitQueries() {
+        return fsTableInitQueries;
+    }
+  
+    public void setFsTableInitQueries(String[] fsTableInitQueries) {
+        this.fsTableInitQueries = fsTableInitQueries;
+    }
+    
+    public String getFsTablesCheckQuery() {
+        return fsTablesCheckQuery;
+    }
+    
+    public void setFsTablesCheckQuery(String fsTablesCheckQuery) {
+        this.fsTablesCheckQuery = fsTablesCheckQuery;
     }
     
     public String getRecordInsertQuery() {
@@ -123,14 +141,6 @@ public class QueryConfiguration {
 
     public void setRecordDeletionWithIdsQuery(String recordDeletionWithIdsQuery) {
         this.recordDeletionWithIdsQuery = recordDeletionWithIdsQuery;
-    }
-    
-    public String getTableListQuery() {
-        return tableListQuery;
-    }
-    
-    public void setTableListQuery(String tableListQuery) {
-        this.tableListQuery = tableListQuery;
     }
 
     public boolean isPaginationFirstZeroIndexed() {
