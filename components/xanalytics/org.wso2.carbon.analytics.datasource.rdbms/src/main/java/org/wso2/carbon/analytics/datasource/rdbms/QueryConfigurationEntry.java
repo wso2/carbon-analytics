@@ -18,11 +18,19 @@
  */
 package org.wso2.carbon.analytics.datasource.rdbms;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * This class represents the query configuration required to initialize a {@link RDBMSAnalyticsDataSource}.
  */
+@XmlRootElement (name = "database")
 public class QueryConfigurationEntry {
 
+    private String databaseName;
+    
     private String[] recordTableInitQueries;
     
     private String[] recordTableDeleteQueries;
@@ -73,6 +81,17 @@ public class QueryConfigurationEntry {
     
     private int fsDataChunkSize;
 
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
+    }
+    
+    @XmlAttribute (name = "name")
+    public String getDatabaseName() {
+        return databaseName;
+    }
+    
+    @XmlElementWrapper (name = "recordTableInitQueries")
+    @XmlElement (name = "query")
     public String[] getRecordTableInitQueries() {
         return recordTableInitQueries;
     }
@@ -81,6 +100,8 @@ public class QueryConfigurationEntry {
         this.recordTableInitQueries = recordTableInitQueries;
     }
     
+    @XmlElementWrapper (name = "recordTableDeleteQueries")
+    @XmlElement (name = "query")
     public String[] getRecordTableDeleteQueries() {
         return recordTableDeleteQueries;
     }
@@ -89,6 +110,8 @@ public class QueryConfigurationEntry {
         this.recordTableDeleteQueries = recordTableDeleteQueries;
     }
     
+    @XmlElementWrapper (name = "fsTableInitQueries")
+    @XmlElement (name = "query")
     public String[] getFsTableInitQueries() {
         return fsTableInitQueries;
     }

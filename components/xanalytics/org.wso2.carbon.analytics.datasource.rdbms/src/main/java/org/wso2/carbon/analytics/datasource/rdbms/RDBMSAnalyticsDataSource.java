@@ -19,6 +19,7 @@
 package org.wso2.carbon.analytics.datasource.rdbms;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -36,6 +37,9 @@ import java.util.Set;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,11 +53,16 @@ import org.wso2.carbon.analytics.datasource.core.Record.Column;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
 import org.wso2.carbon.analytics.datasource.core.lock.LockProvider;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.utils.CarbonUtils;
 
 /**
  * Abstract RDBMS database backed implementation of {@link AnalyticsDataSource}.
  */
 public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
+
+    private static final String RDBMS_QUERY_CONFIG_FILE = "rdbms-query-config.xml";
+
+    private static final String ANALYTICS_CONF_DIR = "analytics";
 
     private static final Log log = LogFactory.getLog(RDBMSAnalyticsDataSource.class);
     
@@ -69,7 +78,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     
     private QueryConfigurationEntry queryConfigurationEntry;
     
-    public RDBMSAnalyticsDataSource() {
+    public RDBMSAnalyticsDataSource() throws AnalyticsDataSourceException {
     }
     
     public RDBMSAnalyticsDataSource(QueryConfigurationEntry queryConfigurationEntry) {
@@ -92,7 +101,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
                     e.getMessage(), e);
         }
         if (this.queryConfigurationEntry == null) {
-            this.queryConfigurationEntry = this.lookupQueryConfigurationFromFile();
+            this.queryConfigurationEntry = lookupCurrentQueryConfigurationEntry();
         }
         /* create the system tables */
         this.checkAndCreateSystemTables();
@@ -111,12 +120,36 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
         }
     }
     
-    private QueryConfigurationEntry lookupQueryConfigurationFromFile() throws AnalyticsDataSourceException {
+    private QueryConfiguration loadQueryConfiguration() throws AnalyticsDataSourceException {
+        try {
+            File confFile = new File(CarbonUtils.getCarbonConfigDirPath() + 
+                    File.separator + ANALYTICS_CONF_DIR + File.separator + RDBMS_QUERY_CONFIG_FILE);
+            if (!confFile.exists()) {
+                throw new AnalyticsDataSourceException("Cannot initalize RDBMS analytics data source, "
+                        + "the query configuration file cannot be found at: " + confFile.getPath());
+            }
+            JAXBContext ctx = JAXBContext.newInstance(QueryConfiguration.class);
+            Unmarshaller unmarshaller = ctx.createUnmarshaller();
+            return (QueryConfiguration) unmarshaller.unmarshal(confFile);
+        } catch (JAXBException e) {
+            throw new AnalyticsDataSourceException(
+                    "Error in processing RDBMS query configuration: " + e.getMessage(), e);
+        }
+    }
+    
+    private QueryConfigurationEntry lookupCurrentQueryConfigurationEntry() throws AnalyticsDataSourceException {
         String dbType = this.lookupDatabaseType();
         if (log.isDebugEnabled()) {
-            log.debug("Analytics Data Source Looked Up Database Type: " + dbType);
+            log.debug("Loaded RDBMS Analytics Database Type: " + dbType);
         }
-        return null;
+        QueryConfiguration qcon = this.loadQueryConfiguration();
+        for (QueryConfigurationEntry entry : qcon.getDatabases()) {
+            if (entry.getDatabaseName().equalsIgnoreCase(dbType)) {
+                return entry;
+            }
+        }
+        throw new AnalyticsDataSourceException("Cannot find a database section in the RDBMS "
+                + "query configuration for the database: " + dbType);
     }
     
     public QueryConfigurationEntry getQueryConfiguration() {
