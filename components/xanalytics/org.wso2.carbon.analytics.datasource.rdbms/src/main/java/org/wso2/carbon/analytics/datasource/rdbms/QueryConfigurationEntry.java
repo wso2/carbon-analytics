@@ -21,7 +21,7 @@ package org.wso2.carbon.analytics.datasource.rdbms;
 /**
  * This class represents the query configuration required to initialize a {@link RDBMSAnalyticsDataSource}.
  */
-public class QueryConfiguration {
+public class QueryConfigurationEntry {
 
     private String[] recordTableInitQueries;
     

@@ -49,21 +49,21 @@ public class RDBMSFileSystem implements FileSystem {
     
     private final byte[] FS_EMPTY_DATA_CHUNK;
     
-    private QueryConfiguration queryConfiguration;
+    private QueryConfigurationEntry queryConfigurationEntry;
     
     private DataSource dataSource;
     
     private static final Log log = LogFactory.getLog(RDBMSFileSystem.class);
     
-    public RDBMSFileSystem(QueryConfiguration queryConfiguration, 
+    public RDBMSFileSystem(QueryConfigurationEntry queryConfigurationEntry, 
             DataSource dataSource) throws AnalyticsDataSourceException {
-        this.queryConfiguration = queryConfiguration;
+        this.queryConfigurationEntry = queryConfigurationEntry;
         this.dataSource = dataSource;
         this.FS_EMPTY_DATA_CHUNK = new byte[this.getQueryConfiguration().getFsDataChunkSize()];
     }
     
-    public QueryConfiguration getQueryConfiguration() {
-        return queryConfiguration;
+    public QueryConfigurationEntry getQueryConfiguration() {
+        return queryConfigurationEntry;
     }
     
     public DataSource getDataSource() {

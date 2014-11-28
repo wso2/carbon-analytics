@@ -31,7 +31,7 @@ import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Parameters;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceException;
-import org.wso2.carbon.analytics.datasource.rdbms.QueryConfiguration;
+import org.wso2.carbon.analytics.datasource.rdbms.QueryConfigurationEntry;
 import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsDataSource;
 
 /**
@@ -96,8 +96,8 @@ public class MySQLInnoDBAnalyticsDataSourceTest extends AnalyticsDataSourceTest 
 //        System.out.println("Time: " + (t2 - t1));
 //    }
     
-    private QueryConfiguration generateQueryConfiguration() {
-        QueryConfiguration conf = new QueryConfiguration();
+    private QueryConfigurationEntry generateQueryConfiguration() {
+        QueryConfigurationEntry conf = new QueryConfigurationEntry();
         String[] recordTableInitQueries = new String[2];
         recordTableInitQueries[0] = "CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data BLOB, PRIMARY KEY(record_id))";
         recordTableInitQueries[1] = "CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON AN_TABLE_RECORD(timestamp)";        

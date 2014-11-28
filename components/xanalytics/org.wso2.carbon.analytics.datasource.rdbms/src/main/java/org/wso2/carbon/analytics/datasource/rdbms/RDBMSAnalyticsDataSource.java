@@ -37,6 +37,8 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSource;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsLockException;
@@ -53,6 +55,8 @@ import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
  */
 public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
 
+    private static final Log log = LogFactory.getLog(RDBMSAnalyticsDataSource.class);
+    
     private static final String ANALYTICS_USER_TABLE_PREFIX = "ANX";
 
     private static final String RECORD_IDS_PLACEHOLDER = "{{RECORD_IDS}}";
@@ -63,14 +67,13 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     
     private Map<String, String> properties;
     
-    private QueryConfiguration queryConfiguration;
+    private QueryConfigurationEntry queryConfigurationEntry;
     
     public RDBMSAnalyticsDataSource() {
-        this(null);
     }
     
-    public RDBMSAnalyticsDataSource(QueryConfiguration queryConfiguration) {
-        this.queryConfiguration = queryConfiguration;
+    public RDBMSAnalyticsDataSource(QueryConfigurationEntry queryConfigurationEntry) {
+        this.queryConfigurationEntry = queryConfigurationEntry;
     }
     
     @Override
@@ -88,12 +91,36 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             throw new AnalyticsDataSourceException("Error in looking up data source: " + 
                     e.getMessage(), e);
         }
+        if (this.queryConfigurationEntry == null) {
+            this.queryConfigurationEntry = this.lookupQueryConfigurationFromFile();
+        }
         /* create the system tables */
         this.checkAndCreateSystemTables();
     }
     
-    public QueryConfiguration getQueryConfiguration() {
-        return queryConfiguration;
+    private String lookupDatabaseType() throws AnalyticsDataSourceException {
+        Connection conn = null;
+        try {
+            conn = this.getConnection();
+            DatabaseMetaData dmd = conn.getMetaData();
+            return dmd.getDatabaseProductName();
+        } catch (SQLException e) {
+            throw new AnalyticsDataSourceException("Error in looking up database type: " + e.getMessage(), e);
+        } finally {
+            RDBMSUtils.cleanupConnection(null, null, conn);
+        }
+    }
+    
+    private QueryConfigurationEntry lookupQueryConfigurationFromFile() throws AnalyticsDataSourceException {
+        String dbType = this.lookupDatabaseType();
+        if (log.isDebugEnabled()) {
+            log.debug("Analytics Data Source Looked Up Database Type: " + dbType);
+        }
+        return null;
+    }
+    
+    public QueryConfigurationEntry getQueryConfiguration() {
+        return queryConfigurationEntry;
     }
 
     private void checkAndCreateSystemTables() throws AnalyticsDataSourceException {
