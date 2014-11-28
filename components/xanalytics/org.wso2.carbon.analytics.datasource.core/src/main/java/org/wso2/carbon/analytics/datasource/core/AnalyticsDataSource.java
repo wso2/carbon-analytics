@@ -37,8 +37,8 @@ public interface AnalyticsDataSource {
     void init(Map<String, String> properties) throws AnalyticsDataSourceException;
     
     /**
-     * Creates a table, where the columns are not defined here, but can contain any arbitrary number
-     * of columns when data is added.
+     * Creates a table, if not already there, where the columns are not defined here, but can contain any arbitrary number
+     * of columns when data is added. The table names are not case sensitive.
      * @param tableCategoryId The category of the table
      * @param tableName The name of the table to be created
      * @throws AnalyticsDataSourceException
@@ -55,7 +55,8 @@ public interface AnalyticsDataSource {
     boolean tableExists(long tableCategoryId, String tableName) throws AnalyticsDataSourceException;
     
     /**
-     * Deletes the table with the given category and name.
+     * Deletes the table with the given category and name if a table exists already.
+     * This will not throw an error if the table is not there.
      * @param tableCategoryId The category of the table
      * @param tableName The name of the table to be dropped
      * @throws AnalyticsDataSourceException
@@ -69,14 +70,26 @@ public interface AnalyticsDataSource {
      * @throws AnalyticsDataSourceException
      */
     List<String> listTables(long tableCategoryId) throws AnalyticsDataSourceException;
+
+    /**
+     * Returns the number of records in the table with the given category and name.
+     * @param tableCategoryId The category of the table
+     * @param tableName The name of the table to get the count from
+     * @return The record count
+     * @throws AnalyticsDataSourceException
+     * @throws AnalyticsTableNotAvailableException
+     */
+    long getRecordCount(long tableCategoryId, String tableName) 
+            throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException;
     
     /**
      * Adds a new record to the table. If the record id is mentioned, 
      * it will be used to do an insert/update, or else, an insert will be done with a generated id.
      * @param records The list of records to be inserted
      * @throws AnalyticsDataSourceException
+     * @throws AnalyticsTableNotAvailableException
      */
-    void put(List<Record> records) throws AnalyticsDataSourceException;
+    void put(List<Record> records) throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException;
     
     /**
      * Retrieves data from a table.
@@ -89,9 +102,11 @@ public interface AnalyticsDataSource {
      * @param recordsCount The paginated records count to be read, -1 for infinity
      * @return An array of {@link RecordGroup} objects, which contains individual data sets in their local location
      * @throws AnalyticsDataSourceException
+     * @throws AnalyticsTableNotAvailableException
      */
     RecordGroup[] get(long tableCategoryId, String tableName, List<String> columns, long timeFrom, 
-            long timeTo, int recordsFrom, int recordsCount) throws AnalyticsDataSourceException;
+            long timeTo, int recordsFrom, int recordsCount) 
+            throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException;
     
     /**
      * 
@@ -102,9 +117,10 @@ public interface AnalyticsDataSource {
      * @param ids The list of ids of the records to be read
      * @return An array of {@link RecordGroup} objects, which contains individual data sets in their local location
      * @throws AnalyticsDataSourceException
+     * @throws AnalyticsTableNotAvailableException
      */
     RecordGroup[] get(long tableCategoryId, String tableName, List<String> columns, 
-            List<String> ids) throws AnalyticsDataSourceException;
+            List<String> ids) throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException;
 
     /**
      * Deletes a set of records in the table.
@@ -113,8 +129,10 @@ public interface AnalyticsDataSource {
      * @param timeFrom The starting time to get records from for deletion
      * @param timeTo The ending time to get records to for deletion
      * @throws AnalyticsDataSourceException
+     * @throws AnalyticsTableNotAvailableException
      */
-    void delete(long tableCategoryId, String tableName, long timeFrom, long timeTo) throws AnalyticsDataSourceException;
+    void delete(long tableCategoryId, String tableName, long timeFrom, long timeTo) 
+            throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException;
     
     /**
      * Delete data in a table with given ids.
@@ -122,8 +140,10 @@ public interface AnalyticsDataSource {
      * @param tableName The name of the table to search on 
      * @param ids The list of ids of the records to be deleted
      * @throws AnalyticsDataSourceException
+     * @throws AnalyticsTableNotAvailableException
      */
-    void delete(long tableCategoryId, String tableName, List<String> ids) throws AnalyticsDataSourceException;
+    void delete(long tableCategoryId, String tableName, List<String> ids) 
+            throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException;
     
     /**
      * Creates and returns a {@link FileSystem} object to do file related operations.

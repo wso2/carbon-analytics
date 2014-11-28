@@ -57,7 +57,7 @@ public class AnalyticsDataSourceTest {
     public void init(String implementationName, AnalyticsDataSource analyticsDS) throws AnalyticsDataSourceException {
         this.implementationName = implementationName;
         this.analyticsDS = analyticsDS;
-        this.analyticsDS.deleteTable(7, "MYTABLE1");
+        this.analyticsDS.deleteTable(7, "mytable1");
         this.analyticsDS.deleteTable(7, "T1");
         this.fileSystem = this.analyticsDS.getFileSystem();
     }
@@ -118,8 +118,8 @@ public class AnalyticsDataSourceTest {
     }
     
     private void cleanupT1() throws AnalyticsDataSourceException {
-        this.analyticsDS.delete(7, "T1", -1, -1);
-        Assert.assertEquals(this.recordGroupsToSet(this.analyticsDS.get(7, "T1", null, -1, -1, 0, -1)).size(), 0);
+        this.analyticsDS.deleteTable(7, "T1");
+        Assert.assertFalse(this.analyticsDS.tableExists(7, "T1"));
     }
     
     @Test
@@ -132,6 +132,9 @@ public class AnalyticsDataSourceTest {
         Assert.assertEquals(tables.size(), 1);
         Assert.assertTrue(new HashSet<String>(tables).contains("TABLE1"));
         Assert.assertTrue(this.analyticsDS.tableExists(250035, "table1"));
+        Assert.assertTrue(this.analyticsDS.tableExists(250035, "TABLE1"));
+        /* this should not throw an exception */
+        this.analyticsDS.createTable(250035, "Table1");
         Record record = this.createRecord(250035, "TABLE2", "S1", "10.0.0.1", 1, "LOG");
         List<Record> records = new ArrayList<Record>();
         records.add(record);
@@ -142,13 +145,14 @@ public class AnalyticsDataSourceTest {
         Assert.assertEquals(this.analyticsDS.listTables(8830).size(), 0);
     }
     
-    //@Test
+    @Test
     public void testDataRecordAddRetrieve() throws AnalyticsDataSourceException {
         this.cleanupT1();
         String serverName = "ESB1";
         String ip = "10.0.0.1";
         int tenant = 44;
         String log = "Boom!";
+        this.analyticsDS.createTable(7, "T1");
         Record record = this.createRecord(7, "T1", serverName, ip, tenant, log);
         List<Record> records = new ArrayList<Record>();
         records.add(record);
@@ -170,9 +174,10 @@ public class AnalyticsDataSourceTest {
         this.cleanupT1();
     }
     
-    //@Test
+    @Test
     public void testMultipleDataRecordAddRetieve() throws AnalyticsDataSourceException {
         this.cleanupT1();
+        this.analyticsDS.createTable(7, "T1");
         List<Record> records = this.generateRecords(7, "T1", 1, 100, -1, -1);
         this.analyticsDS.put(records);
         Set<Record> recordsIn = this.recordGroupsToSet(this.analyticsDS.get(7, "T1", null, -1, -1, 0, -1));
@@ -195,9 +200,23 @@ public class AnalyticsDataSourceTest {
         this.cleanupT1();
     }
     
-    //@Test
+    @Test
+    public void testDataRecordCount() throws AnalyticsDataSourceException {
+        this.cleanupT1();
+        this.analyticsDS.createTable(7, "T1");
+        int count = (int) (200 * Math.random()) + 1;
+        List<Record> records = this.generateRecords(7, "T1", 1, count, -1, -1);
+        this.analyticsDS.put(records);
+        Assert.assertEquals(this.analyticsDS.getRecordCount(7, "T1"), count);
+        this.analyticsDS.delete(7, "T1", -1, -1);
+        Assert.assertEquals(this.analyticsDS.getRecordCount(7, "T1"), 0);
+        this.cleanupT1();
+    }
+    
+    @Test
     public void testMultipleDataRecordAddRetieveWithTimestampRange1() throws AnalyticsDataSourceException {
         this.cleanupT1();
+        this.analyticsDS.createTable(7, "T1");
         long time = System.currentTimeMillis();
         int timeOffset = 10;
         List<Record> records = this.generateRecords(7, "T1", 1, 100, time, timeOffset);
@@ -218,9 +237,10 @@ public class AnalyticsDataSourceTest {
         this.cleanupT1();
     }
     
-    //@Test
+    @Test
     public void testMultipleDataRecordAddRetieveWithTimestampRange2() throws AnalyticsDataSourceException {
         this.cleanupT1();
+        this.analyticsDS.createTable(7, "T1");
         long time = System.currentTimeMillis();
         int timeOffset = 10;
         List<Record> records = this.generateRecords(7, "T1", 1, 100, time, timeOffset);
@@ -232,9 +252,10 @@ public class AnalyticsDataSourceTest {
         this.cleanupT1();
     }
     
-    //@Test
+    @Test
     public void testMultipleDataRecordAddRetieveWithTimestampRange3() throws AnalyticsDataSourceException {
         this.cleanupT1();
+        this.analyticsDS.createTable(7, "T1");
         long time = System.currentTimeMillis();
         int timeOffset = 10;
         List<Record> records = this.generateRecords(7, "T1", 1, 100, time, timeOffset);
@@ -246,9 +267,10 @@ public class AnalyticsDataSourceTest {
         this.cleanupT1();
     }
     
-    //@Test
+    @Test
     public void testMultipleDataRecordAddRetieveWithPagination1() throws AnalyticsDataSourceException {
         this.cleanupT1();
+        this.analyticsDS.createTable(7, "T1");
         long time = System.currentTimeMillis();
         int timeOffset = 10;
         List<Record> records = this.generateRecords(7, "T1", 2, 200, time, timeOffset);
@@ -277,9 +299,10 @@ public class AnalyticsDataSourceTest {
         this.cleanupT1();
     }
     
-    //@Test
+    @Test
     public void testMultipleDataRecordAddRetieveWithPagination2() throws AnalyticsDataSourceException {
         this.cleanupT1();
+        this.analyticsDS.createTable(7, "T1");
         long time = System.currentTimeMillis();
         int timeOffset = 10;
         List<Record> records = this.generateRecords(7, "T1", 2, 200, time, timeOffset);
@@ -322,9 +345,10 @@ public class AnalyticsDataSourceTest {
         this.cleanupT1();
     }
     
-    // @Test
+    @Test
     public void testDataRecordDeleteWithIds() throws AnalyticsDataSourceException {
         this.cleanupT1();
+        this.analyticsDS.createTable(7, "T1");
         List<Record> records = this.generateRecords(7, "T1", 2, 10, -1, -1);
         this.analyticsDS.put(records);
         Assert.assertEquals(this.recordGroupsToSet(this.analyticsDS.get(7, "T1", null, -1, -1, 0, -1)).size(), 10);
@@ -344,9 +368,10 @@ public class AnalyticsDataSourceTest {
         this.cleanupT1();
     }
     
-    //@Test
+    @Test
     public void testDataRecordDeleteWithTimestamps() throws AnalyticsDataSourceException {
         this.cleanupT1();
+        this.analyticsDS.createTable(7, "T1");
         long time = System.currentTimeMillis();
         int timeOffset = 10;
         List<Record> records = this.generateRecords(7, "T1", 1, 100, time, timeOffset);
@@ -373,10 +398,11 @@ public class AnalyticsDataSourceTest {
         this.cleanupT1();
     }
     
-    //@Test
+    @Test
     public void testDataRecordAddReadPerformance() throws AnalyticsDataSourceException {
         System.out.println("\n************** START RECORD PERF TEST [" + this.getImplementationName() + "] **************");
         this.cleanupT1();
+        this.analyticsDS.createTable(7, "T1");
         long hash1 = 0;
         List<Record> records;
         int n = 50, batch = 1000;

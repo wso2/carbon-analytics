@@ -82,9 +82,10 @@ public class H2FileDBAnalyticsDataSourceTest extends AnalyticsDataSourceTest {
         conf.setFsTablesCheckQuery("SELECT record_id FROM AN_FS_PATH WHERE path = '/'");
         conf.setRecordInsertQuery("INSERT INTO {{TABLE_NAME}} (record_id, timestamp, data) VALUES (?, ?, ?)");
         conf.setRecordRetrievalQuery("SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE timestamp >= ? AND timestamp < ? LIMIT ?,?");
-        conf.setRecordRetrievalWithIdsQuery("SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE AND record_id IN ({{RECORD_IDS}})");
+        conf.setRecordRetrievalWithIdsQuery("SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})");
         conf.setRecordDeletionWithIdsQuery("DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})");
-        conf.setRecordDeletionQuery("DELETE FROM {{TABLE_NAME}} WHERE timestamp >= ? AND timestamp < ? AND record_id != ?");
+        conf.setRecordDeletionQuery("DELETE FROM {{TABLE_NAME}} WHERE timestamp >= ? AND timestamp < ?");
+        conf.setRecordCountQuery("SELECT COUNT(*) FROM {{TABLE_NAME}}");
         conf.setPaginationFirstZeroIndexed(true);
         conf.setPaginationFirstInclusive(true);
         conf.setPaginationSecondLength(true);

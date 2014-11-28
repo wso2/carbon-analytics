@@ -27,6 +27,8 @@ public class QueryConfiguration {
     
     private String[] recordTableDeleteQueries;
     
+    private String recordCountQuery;
+    
     private String[] fsTableInitQueries;
     
     private String fsTablesCheckQuery;
@@ -261,6 +263,14 @@ public class QueryConfiguration {
     
     public void setFsUpdateDataChunkQuery(String fsUpdateDataChunkQuery) {
         this.fsUpdateDataChunkQuery = fsUpdateDataChunkQuery;
+    }
+    
+    public String getRecordCountQuery() {
+        return recordCountQuery;
+    }
+    
+    public void setRecordCountQuery(String recordCountQuery) {
+        this.recordCountQuery = recordCountQuery;
     }
     
 }
