@@ -20,30 +20,93 @@ package org.wso2.carbon.analytics.dataservice;
 
 import java.util.List;
 
+import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSource;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsTableNotAvailableException;
+import org.wso2.carbon.analytics.datasource.core.Record;
+import org.wso2.carbon.analytics.datasource.core.RecordGroup;
+
 /**
  * The implementation of {@link AnalyticsDataService}.
  */
 public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
+    private AnalyticsDataSource analyticsDataSource;
+    
+    public AnalyticsDataServiceImpl(AnalyticsDataSource analyticsDataSource) {
+        this.analyticsDataSource = analyticsDataSource;
+    }
+    
+    public AnalyticsDataSource getAnalyticsDataSource() {
+        return analyticsDataSource;
+    }
+    
     @Override
-    public void insertEvents(List<AnalyticsEvent> eventList) throws AnalyticsDataServiceException {
-        // TODO Auto-generated method stub
+    public void createTable(int tenantId, String tableName) throws AnalyticsDataSourceException {
+        this.getAnalyticsDataSource().createTable(tenantId, tableName);
+    }
+
+    @Override
+    public boolean tableExists(int tenantId, String tableName) throws AnalyticsDataSourceException {
+        return this.getAnalyticsDataSource().tableExists(tenantId, tableName);
+    }
+
+    @Override
+    public void deleteTable(int tenantId, String tableName) throws AnalyticsDataSourceException {
+        this.getAnalyticsDataSource().deleteTable(tenantId, tableName);
+    }
+
+    @Override
+    public List<String> listTables(int tenantId) throws AnalyticsDataSourceException {
+        return this.getAnalyticsDataSource().listTables(tenantId);
+    }
+
+    @Override
+    public long getRecordCount(int tenantId, String tableName) throws AnalyticsDataSourceException,
+            AnalyticsTableNotAvailableException {
+        return this.getAnalyticsDataSource().getRecordCount(tenantId, tableName);
+    }
+
+    @Override
+    public void put(List<Record> records) throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException {
+        this.getAnalyticsDataSource().put(records);
+    }
+
+    @Override
+    public RecordGroup[] get(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo,
+            int recordsFrom, int recordsCount) throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException {
+        return this.getAnalyticsDataSource().get(tenantId, tableName, columns, timeFrom, timeTo, recordsFrom, recordsCount);
+    }
+
+    @Override
+    public RecordGroup[] get(int tenantId, String tableName, List<String> columns, List<String> ids)
+            throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException {
+        return this.getAnalyticsDataSource().get(tenantId, tableName, columns, ids);
+    }
+
+    @Override
+    public void delete(int tenantId, String tableName, long timeFrom, long timeTo) throws AnalyticsDataSourceException,
+            AnalyticsTableNotAvailableException {
+        this.getAnalyticsDataSource().delete(tenantId, tableName, timeFrom, timeTo);
+    }
+
+    @Override
+    public void delete(int tenantId, String tableName, List<String> ids) throws AnalyticsDataSourceException,
+            AnalyticsTableNotAvailableException {
+        this.getAnalyticsDataSource().delete(tenantId, tableName, ids);
+    }
+
+    @Override
+    public void addIndex(int tenantId, String tableName, String column) {
         
     }
 
     @Override
-    public List<AnalyticsEvent> getEvents(String streamId, List<String> meta, List<String> correlation,
-            List<String> payload, long timeFrom, long timeTo, int recordsFrom, int recordsCount)
+    public List<String> search(int tenantId, String tableName, String language, String query)
             throws AnalyticsDataServiceException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
-    public List<AnalyticsEvent> getEvents(String streamId, List<String> meta, List<String> correlation,
-            List<String> payload, List<String> ids) throws AnalyticsDataServiceException {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
 }

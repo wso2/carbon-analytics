@@ -18,16 +18,19 @@
  */
 package org.wso2.carbon.analytics.datasource.core;
 
-import java.util.List;
 import java.util.Map;
 
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
 import org.wso2.carbon.analytics.datasource.core.lock.LockProvider;
 
 /**
- * This interface represents the common data store implementations used in analytics. 
+ * This interface represents the common data store implementations used in analytics. The tenant concept
+ * is put here as a design vs performance compromise, where if we not to introduce the tenant specifics here,
+ * then, we have to re-implement similar functionality in the upper layer to support tenancy, e.g. in 
+ * Analytcs Data Service, new set of classes have to be created which are mostly similar to the ones here to
+ * bring in the concept of tenants.
  */
-public interface AnalyticsDataSource {
+public interface AnalyticsDataSource extends AnalyticsRecordStore {
     
     /**
      * This method initializes the AnalyticsDataSource implementation, and is called once before any other method.
@@ -35,115 +38,6 @@ public interface AnalyticsDataSource {
      * @throws AnalyticsDataSourceException
      */
     void init(Map<String, String> properties) throws AnalyticsDataSourceException;
-    
-    /**
-     * Creates a table, if not already there, where the columns are not defined here, but can contain any arbitrary number
-     * of columns when data is added. The table names are not case sensitive.
-     * @param tableCategoryId The category of the table
-     * @param tableName The name of the table to be created
-     * @throws AnalyticsDataSourceException
-     */
-    void createTable(long tableCategoryId, String tableName) throws AnalyticsDataSourceException;
-    
-    /**
-     * Checks if the specified table with the given category and name exists.
-     * @param tableCategoryId The table category
-     * @param tableName The table name
-     * @return true if the table exists, false otherwise
-     * @throws AnalyticsDataSourceException
-     */
-    boolean tableExists(long tableCategoryId, String tableName) throws AnalyticsDataSourceException;
-    
-    /**
-     * Deletes the table with the given category and name if a table exists already.
-     * This will not throw an error if the table is not there.
-     * @param tableCategoryId The category of the table
-     * @param tableName The name of the table to be dropped
-     * @throws AnalyticsDataSourceException
-     */
-    void deleteTable(long tableCategoryId, String tableName) throws AnalyticsDataSourceException;
-    
-    /**
-     * Lists all the current tables with the given category.
-     * @param tableCategoryId The category of the tables
-     * @return The list of table names
-     * @throws AnalyticsDataSourceException
-     */
-    List<String> listTables(long tableCategoryId) throws AnalyticsDataSourceException;
-
-    /**
-     * Returns the number of records in the table with the given category and name.
-     * @param tableCategoryId The category of the table
-     * @param tableName The name of the table to get the count from
-     * @return The record count
-     * @throws AnalyticsDataSourceException
-     * @throws AnalyticsTableNotAvailableException
-     */
-    long getRecordCount(long tableCategoryId, String tableName) 
-            throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException;
-    
-    /**
-     * Adds a new record to the table. If the record id is mentioned, 
-     * it will be used to do an insert/update, or else, an insert will be done with a generated id.
-     * @param records The list of records to be inserted
-     * @throws AnalyticsDataSourceException
-     * @throws AnalyticsTableNotAvailableException
-     */
-    void put(List<Record> records) throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException;
-    
-    /**
-     * Retrieves data from a table.
-     * @param tableCategoryId The category of the table
-     * @param tableName The name of the table to search on
-     * @param columns The list of columns to required in results, null if all needs to be returned
-     * @param timeFrom The starting time to get records from, inclusive, -1 for beginning of time
-     * @param timeTo The ending time to get records to, non-inclusive, -1 for infinity
-     * @param recordsFrom The paginated index from value, zero based, inclusive
-     * @param recordsCount The paginated records count to be read, -1 for infinity
-     * @return An array of {@link RecordGroup} objects, which contains individual data sets in their local location
-     * @throws AnalyticsDataSourceException
-     * @throws AnalyticsTableNotAvailableException
-     */
-    RecordGroup[] get(long tableCategoryId, String tableName, List<String> columns, long timeFrom, 
-            long timeTo, int recordsFrom, int recordsCount) 
-            throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException;
-    
-    /**
-     * 
-     * Retrieves data from a table with given ids.
-     * @param tableCategoryId The category of the table 
-     * @param tableName The name of the table to search on
-     * @param columns The list of columns to required in results, null if all needs to be returned
-     * @param ids The list of ids of the records to be read
-     * @return An array of {@link RecordGroup} objects, which contains individual data sets in their local location
-     * @throws AnalyticsDataSourceException
-     * @throws AnalyticsTableNotAvailableException
-     */
-    RecordGroup[] get(long tableCategoryId, String tableName, List<String> columns, 
-            List<String> ids) throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException;
-
-    /**
-     * Deletes a set of records in the table.
-     * @param tableCategoryId The category of the table 
-     * @param tableName The name of the table to search on 
-     * @param timeFrom The starting time to get records from for deletion
-     * @param timeTo The ending time to get records to for deletion
-     * @throws AnalyticsDataSourceException
-     * @throws AnalyticsTableNotAvailableException
-     */
-    void delete(long tableCategoryId, String tableName, long timeFrom, long timeTo) 
-            throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException;
-    
-    /**
-     * Delete data in a table with given ids.
-     * @param tableCategoryId The category of the table 
-     * @param tableName The name of the table to search on 
-     * @param ids The list of ids of the records to be deleted
-     * @throws AnalyticsDataSourceException
-     * @throws AnalyticsTableNotAvailableException
-     */
-    void delete(long tableCategoryId, String tableName, List<String> ids) 
-            throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException;
     
     /**
      * Creates and returns a {@link FileSystem} object to do file related operations.

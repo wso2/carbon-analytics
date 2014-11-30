@@ -20,18 +20,15 @@ package org.wso2.carbon.analytics.dataservice;
 
 import java.util.List;
 
+import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStore;
+
 /**
  * This interface represents the analytics data service operations.
  */
-public interface AnalyticsDataService {
+public interface AnalyticsDataService extends AnalyticsRecordStore {
 
-    void insertEvents(List<AnalyticsEvent> eventList) throws AnalyticsDataServiceException;
+    void addIndex(int tenantId, String tableName, String column);
     
-    List<AnalyticsEvent> getEvents(String streamId, List<String> meta, List<String> correlation, 
-            List<String> payload, long timeFrom,
-            long timeTo, int recordsFrom, int recordsCount) throws AnalyticsDataServiceException;
-    
-    List<AnalyticsEvent> getEvents(String streamId, List<String> meta, List<String> correlation, 
-            List<String> payload, List<String> ids) throws AnalyticsDataServiceException;
+    List<String> search(int tenantId, String tableName, String language, String query) throws AnalyticsDataServiceException;
     
 }

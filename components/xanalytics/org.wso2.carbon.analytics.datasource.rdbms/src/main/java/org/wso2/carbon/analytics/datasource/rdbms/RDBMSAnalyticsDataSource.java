@@ -49,7 +49,6 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsLockException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.DirectAnalyticsDataSource;
 import org.wso2.carbon.analytics.datasource.core.Record;
-import org.wso2.carbon.analytics.datasource.core.Record.Column;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
 import org.wso2.carbon.analytics.datasource.core.lock.LockProvider;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
@@ -234,7 +233,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     }
     
     private String calculateRecordIdentity(Record record) {
-        return this.generateTargetTableName(record.getTableCategory(), record.getTableName());
+        return this.generateTargetTableName(record.getTenantId(), record.getTableName());
     }
     
     @Override
@@ -277,9 +276,9 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             List<Record> records) throws SQLException, 
             AnalyticsDataSourceException, AnalyticsTableNotAvailableException {
         Record firstRecord = records.get(0);
-        long tableCategoryId = firstRecord.getTableCategory();
+        int tenantId = firstRecord.getTenantId();
         String tableName = firstRecord.getTableName();
-        String query = this.getRecordInsertSQL(tableCategoryId, tableName);
+        String query = this.getRecordInsertSQL(tenantId, tableName);
         PreparedStatement stmt = null;
         try {
             stmt = conn.prepareStatement(query);
@@ -291,8 +290,8 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             }
             stmt.executeBatch();
         } catch (SQLException e) {
-            if (!this.tableExists(tableCategoryId, tableName)) {
-                throw new AnalyticsTableNotAvailableException(tableCategoryId, tableName);
+            if (!this.tableExists(tenantId, tableName)) {
+                throw new AnalyticsTableNotAvailableException(tenantId, tableName);
             } else {
                 throw e;
             }
@@ -307,7 +306,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     }
 
     @Override
-    public List<Record> getRecords(long tableCategoryId, String tableName, List<String> columns,
+    public List<Record> getRecords(int tenantId, String tableName, List<String> columns,
             long timeFrom, long timeTo, int recordsFrom, 
             int recordsCount) throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException {
         Connection conn = null;
@@ -315,7 +314,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
         ResultSet rs = null;
         try {
             conn = this.getConnection();
-            stmt = conn.prepareStatement(this.getRecordRetrievalQuery(tableCategoryId, tableName));
+            stmt = conn.prepareStatement(this.getRecordRetrievalQuery(tenantId, tableName));
             if (timeFrom == -1) {
                 timeFrom = Long.MIN_VALUE;
             }
@@ -333,11 +332,11 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             stmt.setInt(3, this.adjustRecordsFromForProvider(recordsFrom));
             stmt.setInt(4, this.adjustRecordsCountForProvider(recordsFrom, recordsCount));            
             rs = stmt.executeQuery();
-            List<Record> result = this.processRecordResultSet(tableCategoryId, tableName, rs, columns);
+            List<Record> result = this.processRecordResultSet(tenantId, tableName, rs, columns);
             return result;
         } catch (SQLException e) {
-            if (!this.tableExists(tableCategoryId, tableName)) {
-                throw new AnalyticsTableNotAvailableException(tableCategoryId, tableName);
+            if (!this.tableExists(tenantId, tableName)) {
+                throw new AnalyticsTableNotAvailableException(tenantId, tableName);
             } else {
                 throw new AnalyticsDataSourceException("Error in retrieving records: " + e.getMessage(), e);
             }
@@ -368,12 +367,12 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
         return recordsCount;
     }
     
-    private List<Record> processRecordResultSet(long tableCategoryId, String tableName, ResultSet rs, 
+    private List<Record> processRecordResultSet(int tenantId, String tableName, ResultSet rs, 
             List<String> columns) throws SQLException, AnalyticsDataSourceException {
         List<Record> result = new ArrayList<Record>();
         Record record;
         Blob blob;
-        List<Column> values;
+        Map<String, Object> values;
         Set<String> colSet = null;
         if (columns != null && columns.size() > 0) {
             colSet = new HashSet<String>(columns);
@@ -381,16 +380,16 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
         while (rs.next()) {
             blob = rs.getBlob(3);
             values = GenericUtils.decodeRecordValues(blob.getBytes(1, (int) blob.length()), colSet);
-            record = new Record(rs.getString(1), tableCategoryId, tableName, values, rs.getLong(2));
+            record = new Record(rs.getString(1), tenantId, tableName, values, rs.getLong(2));
             result.add(record);            
         }
         return result;
     }
 
     @Override
-    public List<Record> getRecords(long tableCategoryId, String tableName, List<String> columns,
+    public List<Record> getRecords(int tenantId, String tableName, List<String> columns,
             List<String> ids) throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException {
-        String recordGetSQL = this.generateGetRecordRetrievalWithIdQuery(tableCategoryId, tableName, ids.size());
+        String recordGetSQL = this.generateGetRecordRetrievalWithIdQuery(tenantId, tableName, ids.size());
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -401,11 +400,11 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
                 stmt.setString(i + 1, ids.get(i));
             }
             rs = stmt.executeQuery();
-            List<Record> result = this.processRecordResultSet(tableCategoryId, tableName, rs, columns);
+            List<Record> result = this.processRecordResultSet(tenantId, tableName, rs, columns);
             return result;
         } catch (SQLException e) {
-            if (!this.tableExists(tableCategoryId, tableName)) {
-                throw new AnalyticsTableNotAvailableException(tableCategoryId, tableName);
+            if (!this.tableExists(tenantId, tableName)) {
+                throw new AnalyticsTableNotAvailableException(tenantId, tableName);
             } else {
                 throw new AnalyticsDataSourceException("Error in retrieving records: " + e.getMessage(), e);
             }
@@ -415,9 +414,9 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     }
     
     @Override
-    public void delete(long tableCategoryId, String tableName, long timeFrom, long timeTo)
+    public void delete(int tenantId, String tableName, long timeFrom, long timeTo)
             throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException {
-        String sql = this.getRecordDeletionQuery(tableCategoryId, tableName);
+        String sql = this.getRecordDeletionQuery(tenantId, tableName);
         Connection conn = null;
         PreparedStatement stmt = null;
         try {
@@ -433,8 +432,8 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             stmt.setLong(2, timeTo);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            if (!this.tableExists(tableCategoryId, tableName)) {
-                throw new AnalyticsTableNotAvailableException(tableCategoryId, tableName);
+            if (!this.tableExists(tenantId, tableName)) {
+                throw new AnalyticsTableNotAvailableException(tenantId, tableName);
             } else {
                 throw new AnalyticsDataSourceException("Error in deleting records: " + e.getMessage(), e);
             }
@@ -444,12 +443,12 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     }
         
     @Override
-    public void delete(long tableCategoryId, String tableName, 
+    public void delete(int tenantId, String tableName, 
             List<String> ids) throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException {
         if (ids.size() == 0) {
             return;
         }
-        String sql = this.generateRecordDeletionRecordsWithIdsQuery(tableCategoryId, tableName, ids.size());
+        String sql = this.generateRecordDeletionRecordsWithIdsQuery(tenantId, tableName, ids.size());
         Connection conn = null;
         PreparedStatement stmt = null;
         try {
@@ -460,8 +459,8 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             }
             stmt.executeUpdate();
         } catch (SQLException e) {
-            if (!this.tableExists(tableCategoryId, tableName)) {
-                throw new AnalyticsTableNotAvailableException(tableCategoryId, tableName);
+            if (!this.tableExists(tenantId, tableName)) {
+                throw new AnalyticsTableNotAvailableException(tenantId, tableName);
             } else {
                 throw new AnalyticsDataSourceException("Error in deleting records: " + e.getMessage(), e);
             }
@@ -523,19 +522,19 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     }
 
     @Override
-    public void deleteTable(long tableCategoryId, String tableName) throws AnalyticsDataSourceException {
+    public void deleteTable(int tenantId, String tableName) throws AnalyticsDataSourceException {
         Connection conn = null;
         try {
             conn = this.getConnection(false);
-            String[] tableInitQueries = this.getRecordTableDeleteQueries(tableCategoryId, tableName);
+            String[] tableInitQueries = this.getRecordTableDeleteQueries(tenantId, tableName);
             for (String query : tableInitQueries) {
-                query = this.translateQueryWithTableInfo(query, tableCategoryId, tableName);
+                query = this.translateQueryWithTableInfo(query, tenantId, tableName);
                 this.executeUpdate(conn, query);
             }
             conn.commit();
         } catch (SQLException e) {
             RDBMSUtils.rollbackConnection(conn);
-            if (this.tableExists(tableCategoryId, tableName)) {
+            if (this.tableExists(tenantId, tableName)) {
                 throw new AnalyticsDataSourceException("Error in deleting table: " + e.getMessage(), e);
             }
         } finally {
@@ -554,18 +553,18 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     }
     
     @Override
-    public void createTable(long tableCategoryId, String tableName) throws AnalyticsDataSourceException {
+    public void createTable(int tenantId, String tableName) throws AnalyticsDataSourceException {
         Connection conn = null;
         try {
             conn = this.getConnection(false);
-            String[] tableInitQueries = this.getRecordTableInitQueries(tableCategoryId, tableName);
+            String[] tableInitQueries = this.getRecordTableInitQueries(tenantId, tableName);
             for (String query : tableInitQueries) {
                 this.executeUpdate(conn, query);
             }
             conn.commit();
         } catch (SQLException e) {
             RDBMSUtils.rollbackConnection(conn);
-            if (!this.tableExists(tableCategoryId, tableName)) {
+            if (!this.tableExists(tenantId, tableName)) {
                 throw new AnalyticsDataSourceException("Error in creating table: " + e.getMessage(), e);
             }
         } finally {
@@ -584,14 +583,14 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     }
     
     @Override
-    public boolean tableExists(long tableCategoryId, String tableName) throws AnalyticsDataSourceException {
+    public boolean tableExists(int tenantId, String tableName) throws AnalyticsDataSourceException {
         tableName = this.normalizeTableName(tableName);
         Connection conn = null;
         ResultSet rs = null;
         try {
             conn = this.getConnection();
             DatabaseMetaData dbm = conn.getMetaData();
-            String prefix = this.normalizeTableName(this.generateTablePrefix(tableCategoryId));
+            String prefix = this.normalizeTableName(this.generateTablePrefix(tenantId));
             String srcTable;
             rs = dbm.getTables(null, null, "%", null);
             while (rs.next()) {
@@ -617,12 +616,12 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     }
     
     @Override
-    public List<String> listTables(long tableCategoryId) throws AnalyticsDataSourceException {
+    public List<String> listTables(int tenantId) throws AnalyticsDataSourceException {
         List<String> result = new ArrayList<String>();
         Connection conn = null;
         ResultSet rs = null;
         String tableName;
-        String prefix = this.normalizeTableName(this.generateTablePrefix(tableCategoryId));
+        String prefix = this.normalizeTableName(this.generateTablePrefix(tenantId));
         try {
             conn = this.getConnection();
             DatabaseMetaData dbm = conn.getMetaData();
@@ -653,9 +652,9 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     }
     
     @Override
-    public long getRecordCount(long tableCategoryId, 
-            String tableName) throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException {
-        String recordCountQuery = this.getRecordCountQuery(tableCategoryId, tableName);
+    public long getRecordCount(int tenantId, String tableName) 
+            throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException {
+        String recordCountQuery = this.getRecordCountQuery(tenantId, tableName);
         Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
@@ -667,11 +666,11 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
                 return rs.getLong(1);
             } else {
                 throw new AnalyticsDataSourceException("Record count not available for " + 
-                        printableTableName(tableCategoryId, tableName));
+                        printableTableName(tenantId, tableName));
             }
         } catch (SQLException e) {
-            if (!this.tableExists(tableCategoryId, tableName)) {
-                throw new AnalyticsTableNotAvailableException(tableCategoryId, tableName);
+            if (!this.tableExists(tenantId, tableName)) {
+                throw new AnalyticsTableNotAvailableException(tenantId, tableName);
             }
             throw new AnalyticsDataSourceException("Error in retrieving record count: " + e.getMessage(), e);
         } finally {

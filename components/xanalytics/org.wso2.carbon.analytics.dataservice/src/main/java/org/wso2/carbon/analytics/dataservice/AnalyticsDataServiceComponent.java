@@ -25,12 +25,14 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSource;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceException;
 
 import com.hazelcast.core.HazelcastInstance;
 
 /**
  * This class represents the analytics data service declarative services component.
- * @scr.component name="tasks.component" immediate="true"
+ * @scr.component name="analytics.component" immediate="true"
  * @scr.reference name="listener.manager.service" interface="org.apache.axis2.engine.ListenerManager"
  * cardinality="1..1" policy="dynamic"  bind="setListenerManager" unbind="unsetListenerManager"
  */
@@ -43,10 +45,20 @@ public class AnalyticsDataServiceComponent {
             log.debug("Starting AnalyticsDataServiceComponent#activate");
         }
         BundleContext bundleContext = ctx.getBundleContext();
-        bundleContext.registerService(AnalyticsDataService.class, new AnalyticsDataServiceImpl(), null);
-        if (log.isDebugEnabled()) {
-            log.debug("Finished AnalyticsDataServiceComponent#activate");
+        try {
+            AnalyticsDataSource ads = this.loadAnalyticsDataSource();
+            bundleContext.registerService(AnalyticsDataService.class, new AnalyticsDataServiceImpl(ads), null);
+            if (log.isDebugEnabled()) {
+                log.debug("Finished AnalyticsDataServiceComponent#activate");
+            }
+        } catch(AnalyticsDataSourceException e) {
+            log.error("Error in registering analytics data source: " + e.getMessage(), e);
         }
+        
+    }
+    
+    private AnalyticsDataSource loadAnalyticsDataSource() throws AnalyticsDataSourceException {
+        return null;
     }
     
     public static HazelcastInstance getHazelcastInstance() {
@@ -60,7 +72,7 @@ public class AnalyticsDataServiceComponent {
     
     protected void setListenerManager(ListenerManager lm) {
         /* we don't really need this, the listener manager service is acquired
-         * to make sure, as a workaround, that the task component is initialized 
+         * to make sure, as a workaround, that the analytics component is initialized 
          * after the axis2 clustering agent is initialized */
     }
     

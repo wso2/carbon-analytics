@@ -20,12 +20,11 @@ package org.wso2.carbon.analytics.datasource.core.util;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceException;
-import org.wso2.carbon.analytics.datasource.core.Record.Column;
 
 /**
  * Generic utility methods for analytics data source implementations.
@@ -63,13 +62,13 @@ public class GenericUtils {
         return parent;
     }
     
-    private static int calculateRecordValuesBufferSize(List<Column> values) throws AnalyticsDataSourceException {
+    private static int calculateRecordValuesBufferSize(Map<String, Object> values) throws AnalyticsDataSourceException {
         int count = 0;
         String name;
         Object value;
-        for (Column column : values) {
-            name = column.getName();
-            value = column.getValue();
+        for (Map.Entry<String, Object> entry : values.entrySet()) {
+            name = entry.getKey();
+            value = entry.getValue();
             /* column name length value + data type (including null) */
             count += Integer.SIZE / 8 + 1;
             /* column name */
@@ -96,15 +95,15 @@ public class GenericUtils {
         return count;
     }
     
-    public static byte[] encodeRecordValues(List<Column> values) throws AnalyticsDataSourceException {
+    public static byte[] encodeRecordValues(Map<String, Object> values) throws AnalyticsDataSourceException {
         ByteBuffer buffer = ByteBuffer.allocate(calculateRecordValuesBufferSize(values));
         String name, strVal;
         boolean boolVal;
         Object value;
-        for (Column column : values) {
+        for (Map.Entry<String, Object> entry : values.entrySet()) {
             try {
-                name = column.getName();
-                value = column.getValue();
+                name = entry.getKey();
+                value = entry.getValue();
                 buffer.putInt(name.length());
                 buffer.put(name.getBytes(DEFAULT_CHARSET));
                 if (value instanceof String) {
@@ -145,15 +144,15 @@ public class GenericUtils {
         return buffer.array();
     }
     
-    public static List<Column> decodeRecordValues(byte[] data, 
+    public static Map<String, Object> decodeRecordValues(byte[] data, 
             Set<String> columns) throws AnalyticsDataSourceException {
-        List<Column> result = new ArrayList<Column>();
+        Map<String, Object> result = new HashMap<String, Object>();
         ByteBuffer buffer = ByteBuffer.wrap(data);
         int type, size;
         String colName;
+        Object value;
         byte[] buff;
         byte boolVal;
-        Column column;
         while (buffer.remaining() > 0) {
             try {
                 size = buffer.getInt();
@@ -166,38 +165,38 @@ public class GenericUtils {
                     size = buffer.getInt();
                     buff = new byte[size];
                     buffer.get(buff, 0, size);
-                    column = new Column(colName, new String(buff, DEFAULT_CHARSET));
+                    value = new String(buff, DEFAULT_CHARSET);
                     break;
                 case DATA_TYPE_LONG:
-                    column = new Column(colName, buffer.getLong());
+                    value = buffer.getLong();
                     break;
                 case DATA_TYPE_DOUBLE:
-                    column = new Column(colName, buffer.getDouble());
+                    value = buffer.getDouble();
                     break;
                 case DATA_TYPE_BOOLEAN:
                     boolVal = buffer.get();
                     if (boolVal == BOOLEAN_TRUE) {
-                        column = new Column(colName, true);
+                        value = true;
                     } else if (boolVal == BOOLEAN_FALSE) {
-                        column = new Column(colName, false);
+                        value = false;
                     } else {
                         throw new AnalyticsDataSourceException("Invalid encoded boolean value: " + boolVal);
                     }
                     break;
                 case DATA_TYPE_INTEGER:
-                    column = new Column(colName, buffer.getInt());
+                    value = buffer.getInt();
                     break;
                 case DATA_TYPE_FLOAT:
-                    column = new Column(colName, buffer.getFloat());
+                    value = buffer.getFloat();
                     break;
                 case DATA_TYPE_NULL:
-                    column = new Column(colName, null);
+                    value = null;
                     break;
                 default:
                     throw new AnalyticsDataSourceException("Unknown encoded data source type : " + type);
                 }
                 if (columns == null || columns.contains(colName)) {
-                    result.add(column);
+                    result.put(colName, value);
                 }
             } catch (Exception e) {
                 throw new AnalyticsDataSourceException("Error in decoding record values: " + e.getMessage());

@@ -18,9 +18,9 @@
  */
 package org.wso2.carbon.analytics.datasource.core;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * This class represents a data record in {@link AnalyticsDataSource}. A record's equality is measured
@@ -28,11 +28,11 @@ import java.util.List;
  */
 public class Record {
 
-    private long tableCategoryId;
+    private int tenantId;
     
     private String tableName;
     
-    private List<Column> values;
+    private Map<String, Object> values;
     
     private long timestamp;
         
@@ -40,16 +40,16 @@ public class Record {
     
     private int hashCode = -1;
     
-    public Record(long tableCategoryId, String tableName, List<Column> values, long timestamp) {
-        this(null, tableCategoryId, tableName, values, timestamp);
+    public Record(int tenantId, String tableName, Map<String, Object> values, long timestamp) {
+        this(null, tenantId, tableName, values, timestamp);
     }
     
-    public Record(String id, long tableCategoryId, String tableName, List<Column> values, long timestamp) {
+    public Record(String id, int tenantId, String tableName, Map<String, Object> values, long timestamp) {
         this.id = id;
         if (this.id == null) {
             this.id = this.generateID();
         }
-        this.tableCategoryId = tableCategoryId;
+        this.tenantId = tenantId;
         this.tableName = tableName;
         this.values = values;
         this.timestamp = timestamp;
@@ -66,16 +66,20 @@ public class Record {
         return builder.toString();
     }
     
-    public long getTableCategory() {
-        return tableCategoryId;
+    public int getTenantId() {
+        return tenantId;
     }
     
     public String getTableName() {
         return tableName;
     }
     
-    public List<Column> getValues() {
+    public Map<String, Object> getValues() {
         return values;
+    }
+    
+    public Object getValue(String name) {
+        return this.values.get(name);
     }
     
     public long getTimestamp() {
@@ -94,7 +98,7 @@ public class Record {
             return false;
         }
         Record rhs = (Record) obj;
-        if (this.getTableCategory() != rhs.getTableCategory()) {
+        if (this.getTenantId() != rhs.getTenantId()) {
             return false;
         }
         if (!this.getTableName().equals(rhs.getTableName())) {
@@ -106,81 +110,30 @@ public class Record {
         if (this.getTimestamp() != rhs.getTimestamp()) {
             return false;
         }
-        return new HashSet<Column>(this.getNotNullValues()).equals(new HashSet<Column>(rhs.getNotNullValues()));
+        return this.getNotNullValues().equals(rhs.getNotNullValues());
     }
     
     @Override
     public int hashCode() {
         if (this.hashCode == -1) {
-            this.hashCode = ((Long) this.getTableCategory()).hashCode();
+            this.hashCode = ((Integer) this.getTenantId()).hashCode();
             this.hashCode += this.getTableName().hashCode() >> 2;
             this.hashCode += this.getId().hashCode() >> 4;
             this.hashCode += String.valueOf(this.getTimestamp()).hashCode() >> 8;
-            this.hashCode += new HashSet<Column>(this.getNotNullValues()).hashCode() >> 16;
+            this.hashCode += this.getNotNullValues().hashCode() >> 16;
         }
         return this.hashCode;
     }
 
-    public List<Column> getNotNullValues() {
-        List<Column> result = new ArrayList<Record.Column>();
-        for (Column col : this.getValues()) {
-            if (col.getValue() != null) {
-                result.add(col);
+    public Map<String, Object> getNotNullValues() {
+        Map<String, Object> result = new HashMap<String, Object>(this.getValues());
+        Iterator<Map.Entry<String, Object>> itr = result.entrySet().iterator();
+        while (itr.hasNext()) {
+            if (itr.next().getValue() == null) {
+                itr.remove();
             }
         }
         return result;
-    }
-    
-    /**
-     * Represents a record column.
-     */
-    public static class Column {
-        
-        private String name;
-                
-        private Object value;
-        
-        public Column(String name, Object value) {
-            this.name = name;
-            this.value = value;
-        }
-        
-        public String getName() {
-            return name;
-        }
-        
-        public Object getValue() {
-            return value;
-        }
-        
-        @Override
-        public boolean equals(Object obj) {
-            if (!(obj instanceof Column)) {
-                return false;
-            }
-            Column rhs = (Column) obj;
-            /* The column name match is case insensitive */
-            if (this.getName().equals(rhs.getName())) {
-                Object val1 = this.getValue();
-                Object val2 = rhs.getValue();
-                if (val1 == null && val2 == null) {
-                    return true;
-                }
-                if (val1 == null || val2 == null) {
-                    return false;
-                }
-                return val1.equals(val2);
-            } else {
-                return false;
-            }
-        }
-        
-        @Override
-        public int hashCode() {
-            return this.getName().hashCode() + 
-                    (this.getValue() != null ? this.getValue().hashCode() * 2 : 0);
-        }
-                
     }
     
 }

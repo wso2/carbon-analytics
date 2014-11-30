@@ -21,8 +21,10 @@ package org.wso2.carbon.analytics.datasource.core;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.naming.Context;
@@ -33,7 +35,6 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSource;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceException;
 import org.wso2.carbon.analytics.datasource.core.Record;
-import org.wso2.carbon.analytics.datasource.core.Record.Column;
 import org.wso2.carbon.analytics.datasource.core.RecordGroup;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem.DataInput;
@@ -66,38 +67,38 @@ public class AnalyticsDataSourceTest {
         return implementationName;
     }
 
-    private Record createRecord(long tableCategoryId, String tableName, String serverName, String ip, int tenant, String log) {
-        List<Column> values = new ArrayList<Record.Column>();
-        values.add(new Column("server_name", serverName));
-        values.add(new Column("ip", ip));
-        values.add(new Column("tenant", tenant));
-        values.add(new Column("log", log));
-        values.add(new Column("sequence", null));
-        values.add(new Column("summary2", null));
-        return new Record(tableCategoryId, tableName, values, System.currentTimeMillis());
+    private Record createRecord(int tenantId, String tableName, String serverName, String ip, int tenant, String log) {
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put("server_name", serverName);
+        values.put("ip", ip);
+        values.put("tenant", tenant);
+        values.put("log", log);
+        values.put("sequence", null);
+        values.put("summary2", null);
+        return new Record(tenantId, tableName, values, System.currentTimeMillis());
     }
     
-    private List<Record> generateRecords(long tableCategoryId, String tableName, int i, int c, long time, int timeOffset) {
+    private List<Record> generateRecords(int tenantId, String tableName, int i, int c, long time, int timeOffset) {
         List<Record> result = new ArrayList<Record>();
-        List<Column> values;
+        Map<String, Object> values;
         long timeTmp;
         for (int j = 0; j < c; j++) {
-            values = new ArrayList<Record.Column>();
-            values.add(new Column("server_name", "ESB-" + i));
-            values.add(new Column("ip", "192.168.0." + (i % 256)));
-            values.add(new Column("tenant", i));
-            values.add(new Column("spam_index", i + 0.3454452));
-            values.add(new Column("important", i % 2 == 0 ? true : false));
-            values.add(new Column("sequence", i + 104050000L));
-            values.add(new Column("summary", "Joey asks, how you doing?"));
-            values.add(new Column("log", "Exception in Sequence[" + i + "," + j + "]"));
+            values = new HashMap<String, Object>();
+            values.put("server_name", "ESB-" + i);
+            values.put("ip", "192.168.0." + (i % 256));
+            values.put("tenant", i);
+            values.put("spam_index", i + 0.3454452);
+            values.put("important", i % 2 == 0 ? true : false);
+            values.put("sequence", i + 104050000L);
+            values.put("summary", "Joey asks, how you doing?");
+            values.put("log", "Exception in Sequence[" + i + "," + j + "]");
             if (time != -1) {
                 timeTmp = time;
                 time += timeOffset;
             } else {
                 timeTmp = System.currentTimeMillis();
             }
-            result.add(new Record(tableCategoryId, tableName, values, timeTmp));
+            result.add(new Record(tenantId, tableName, values, timeTmp));
         }
         return result;
     }
@@ -168,8 +169,7 @@ public class AnalyticsDataSourceTest {
         Assert.assertEquals(record.getId(), recordIn.getId());
         Assert.assertEquals(record.getTableName(), recordIn.getTableName());
         Assert.assertEquals(record.getTimestamp(), recordIn.getTimestamp());
-        Assert.assertEquals(new HashSet<Column>(record.getNotNullValues()), 
-                new HashSet<Column>(recordIn.getNotNullValues()));
+        Assert.assertEquals(record.getNotNullValues(), recordIn.getNotNullValues());
         Assert.assertEquals(record, recordIn);
         this.cleanupT1();
     }
@@ -332,12 +332,12 @@ public class AnalyticsDataSourceTest {
         Assert.assertEquals(r1.getValues().size(), 2);
         Assert.assertEquals(r2.getValues().size(), 2);
         StringBuilder columnNames = new StringBuilder();
-        for (Column col : r1.getValues()) {
-            columnNames.append(col.getName());
+        for (String col : r1.getValues().keySet()) {
+            columnNames.append(col);
         }
         StringBuilder values = new StringBuilder();
-        for (Column col : r2.getValues()) {
-            values.append(col.getValue());
+        for (Object val : r2.getValues().values()) {
+            values.append(val.toString());
         }
         Assert.assertTrue(columnNames.toString().contains("tenant"));
         Assert.assertTrue(columnNames.toString().contains("ip"));
