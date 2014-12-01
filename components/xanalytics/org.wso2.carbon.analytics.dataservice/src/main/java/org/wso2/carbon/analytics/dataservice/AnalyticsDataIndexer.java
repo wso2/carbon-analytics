@@ -28,6 +28,11 @@ import java.util.Set;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.DoubleField;
+import org.apache.lucene.document.FloatField;
+import org.apache.lucene.document.IntField;
+import org.apache.lucene.document.LongField;
+import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.index.IndexWriter;
@@ -68,21 +73,38 @@ public class AnalyticsDataIndexer {
         }
     }
     
-    private void addToIndex(Record record, Set<String> indices) throws AnalyticsIndexException {
+    private void addToIndex(Record record, Set<String> columns) throws AnalyticsIndexException {
         String tableId = this.generateTableId(record.getTenantId(), record.getTableName());
         IndexWriter indexWriter = this.lookupIndexWriter(tableId);
         try {
-            this.addDoc(indexWriter, "XXXXXXXXX F XXXXX", "POKFPEOFKPO POK P$O KP$OK $PORG$GR$G$G$JPO poPOJP POJP");
+            indexWriter.addDocument(this.generateIndexDoc(record, columns));
         } catch (IOException e) {
             throw new AnalyticsIndexException("Error in updating index: " + e.getMessage(), e);
         }
     }
     
-    private void addDoc(IndexWriter writer, String id, String name) throws IOException {
+    private Document generateIndexDoc(Record record, Set<String> columns) throws IOException, AnalyticsIndexException {
         Document doc = new Document();
-        doc.add(new TextField("id", id, Store.NO));
-        doc.add(new TextField("name", name, Store.NO));
-        writer.addDocument(doc);
+        Object obj;
+        for (String column : columns) {
+            obj = record.getValue(column);
+            if (obj instanceof String) {
+                doc.add(new TextField(column, (String) obj, Store.NO));
+            } else if (obj instanceof Integer) {
+                doc.add(new IntField(column, (Integer) obj, Store.NO));
+            } else if (obj instanceof Double) {
+                doc.add(new DoubleField(column, (Double) obj, Store.NO));
+            } else if (obj instanceof Boolean) {
+                doc.add(new StringField(column, ((Boolean) obj).toString(), Store.NO));
+            } else if (obj instanceof Long) {
+                doc.add(new LongField(column, (Long) obj, Store.NO));
+            } else if (obj instanceof Float) {
+                doc.add(new FloatField(column, (Float) obj, Store.NO));
+            } else {
+                throw new AnalyticsIndexException("Unsupported data type for indexing: " + obj.getClass());
+            }
+        }
+        return doc;
     }
     
     public void setIndices(int tenantId, String tableName, Set<String> columns) throws AnalyticsIndexException {
@@ -104,7 +126,7 @@ public class AnalyticsDataIndexer {
     
     private IndexWriter createIndexWriter(String tableId) throws AnalyticsIndexException {
         try {
-            Directory index = new NIOFSDirectory(new File("/home/laf/Desktop/index"));
+            Directory index = new NIOFSDirectory(new File("/home/laf/Desktop/index/" + tableId));
             StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_45);
             IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_45, analyzer);
             return new IndexWriter(index, config);
