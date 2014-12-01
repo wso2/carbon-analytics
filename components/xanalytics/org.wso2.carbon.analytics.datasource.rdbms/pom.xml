@@ -24,7 +24,7 @@
 			<groupId>org.wso2.carbon</groupId>
 			<artifactId>org.wso2.carbon.analytics.dataservice</artifactId>
 			<version>${project.version}</version>
-            <scope>test</scope>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>

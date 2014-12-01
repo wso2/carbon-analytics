@@ -136,4 +136,9 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         this.getIndexer().clearIndices(tenantId, tableName);
     }
 
+    @Override
+    public void destroy() throws AnalyticsException {
+        this.indexer.close();
+    }
+
 }

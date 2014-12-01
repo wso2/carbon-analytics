@@ -21,6 +21,7 @@ package org.wso2.carbon.analytics.dataservice;
 import java.util.List;
 import java.util.Set;
 
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStore;
 
 /**
@@ -67,5 +68,10 @@ public interface AnalyticsDataService extends AnalyticsRecordStore {
      */
     List<String> search(int tenantId, String tableName, String language, 
             String query) throws AnalyticsIndexException;
+    
+    /**
+     * Destroys and frees any resources taken up by the analytics data service implementation.
+     */
+    void destroy() throws AnalyticsException;
     
 }

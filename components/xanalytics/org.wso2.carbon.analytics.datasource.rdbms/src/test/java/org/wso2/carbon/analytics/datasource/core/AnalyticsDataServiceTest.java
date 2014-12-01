@@ -26,6 +26,7 @@ import java.util.Set;
 import javax.naming.NamingException;
 
 import org.testng.Assert;
+import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
@@ -43,6 +44,11 @@ public class AnalyticsDataServiceTest {
     public void setup() throws NamingException, AnalyticsException, IOException {
         AnalyticsDataSource ads = H2FileDBAnalyticsDataSourceTest.cleanupAndCreateDS();
         this.service = new AnalyticsDataServiceImpl(ads);
+    }
+    
+    @AfterSuite
+    public void done() throws NamingException, AnalyticsException, IOException {
+        this.service.destroy();
     }
     
     @Test
@@ -71,7 +77,7 @@ public class AnalyticsDataServiceTest {
     }
     
     @Test
-    public void testDataRecordAddReadPerformance() throws AnalyticsException {
+    public void testDataRecordAddReadPerformanceNonIndex() throws AnalyticsException {
         this.cleanupTable(50, "TableX");
         System.out.println("\n************** START ANALYTICS DS (WITHOUT INDEXING, H2-FILE) PERF TEST **************");
         int n = 55, batch = 1000;
@@ -102,6 +108,48 @@ public class AnalyticsDataServiceTest {
         System.out.println("* Read Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
         this.cleanupTable(50, "TableX");
         System.out.println("\n************** END ANALYTICS DS (WITHOUT INDEXING, H2-FILE) PERF TEST **************");
+    }
+    
+    @Test
+    public void testDataRecordAddReadPerformanceIndex() throws AnalyticsException {
+        this.cleanupTable(50, "TableX");
+        System.out.println("\n************** START ANALYTICS DS (WITH INDEXING, H2-FILE) PERF TEST **************");
+        int n = 55, batch = 1000;
+        List<Record> records;
+        Set<String> columns = new HashSet<String>();
+        columns.add("tenant");
+        columns.add("ip");
+        columns.add("log");
+        
+        /* warm-up */
+        this.service.createTable(50, "TableX");
+        this.service.setIndices(50, "TableX", columns);
+        for (int i = 0; i < 10; i++) {
+            records = AnalyticsDataSourceTest.generateRecords(50, "TableX", i, batch, -1, -1);
+            this.service.put(records);
+        }
+        this.service.clearIndices(50, "TableX");
+        this.cleanupTable(50, "TableX");
+        
+        this.service.createTable(50, "TableX");
+        this.service.setIndices(50, "TableX", columns);
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < n; i++) {
+            records = AnalyticsDataSourceTest.generateRecords(50, "TableX", i, batch, -1, -1);
+            this.service.put(records);
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("* Records: " + (n * batch));
+        System.out.println("* Write Time: " + (end - start) + " ms.");
+        System.out.println("* Write Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
+        Set<Record> recordsIn = AnalyticsDataSourceTest.recordGroupsToSet(this.service.get(50, "TableX", null, -1, -1, 0, -1));
+        Assert.assertEquals(recordsIn.size(), (n * batch));
+        end = System.currentTimeMillis();
+        System.out.println("* Read Time: " + (end - start) + " ms.");
+        System.out.println("* Read Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
+        this.service.clearIndices(50, "TableX");
+        this.cleanupTable(50, "TableX");
+        System.out.println("\n************** END ANALYTICS DS (WITH INDEXING, H2-FILE) PERF TEST **************");
     }
         
 }
