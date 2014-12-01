@@ -47,7 +47,7 @@ public class AnalyticsDataServiceComponent {
         BundleContext bundleContext = ctx.getBundleContext();
         try {
             AnalyticsDataSource ads = this.loadAnalyticsDataSource();
-            bundleContext.registerService(AnalyticsDataService.class, new AnalyticsDataServiceImpl(ads), null);
+            //bundleContext.registerService(AnalyticsDataService.class, new AnalyticsDataServiceImpl(ads), null);
             if (log.isDebugEnabled()) {
                 log.debug("Finished AnalyticsDataServiceComponent#activate");
             }

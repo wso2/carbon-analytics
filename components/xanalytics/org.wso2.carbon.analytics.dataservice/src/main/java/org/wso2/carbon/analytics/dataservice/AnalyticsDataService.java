@@ -27,8 +27,33 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStore;
  */
 public interface AnalyticsDataService extends AnalyticsRecordStore {
 
+    /**
+     * Adds an index to the given table's column under the given tenant. The indices must be
+     * saved in a persistent storage under analytics data service, to be able to lookup the 
+     * indices later, i.e. these indexes should be in-effect after a server restart.
+     * @param tenantId The tenant id
+     * @param tableName The table name
+     * @param column The column to add the index to
+     */
     void addIndex(int tenantId, String tableName, String column);
     
+    /**
+     * Returns the declared indices for a given table under the given tenant.
+     * @param tenantId The tenant id
+     * @param tableName The table name
+     * @return
+     */
+    List<String> getIndices(int tenantId, String tableName);
+    
+    /**
+     * Searches the data with a given search query.
+     * @param tenantId The tenant id
+     * @param tableName The table name
+     * @param language The language used to give the search query
+     * @param query The search query
+     * @return A list of record ids of matched records
+     * @throws AnalyticsDataServiceException
+     */
     List<String> search(int tenantId, String tableName, String language, String query) throws AnalyticsDataServiceException;
     
 }
