@@ -9,6 +9,7 @@
        <class name="org.wso2.carbon.analytics.datasource.core.MySQLMyISAMAnalyticsDataSourceTest"/-->
        <class name="org.wso2.carbon.analytics.datasource.core.H2FileDBAnalyticsDataSourceTest"/>
        <class name="org.wso2.carbon.analytics.datasource.core.H2MemDBAnalyticsDataSourceTest"/>
+       <class name="org.wso2.carbon.analytics.datasource.core.AnalyticsDataServiceTest"/>
      </classes>
    </test>
 </suite>
