@@ -19,6 +19,7 @@
 package org.wso2.carbon.analytics.dataservice;
 
 import java.util.List;
+import java.util.Set;
 
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStore;
 
@@ -28,22 +29,32 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStore;
 public interface AnalyticsDataService extends AnalyticsRecordStore {
 
     /**
-     * Adds an index to the given table's column under the given tenant. The indices must be
+     * Sets the indices for a given table under the given tenant. The indices must be
      * saved in a persistent storage under analytics data service, to be able to lookup the 
-     * indices later, i.e. these indexes should be in-effect after a server restart.
+     * indices later, i.e. these indices should be in-effect after a server restart.
      * @param tenantId The tenant id
      * @param tableName The table name
-     * @param column The column to add the index to
+     * @param columns The set of columns to create indices for
+     * @throws AnalyticsIndexException
      */
-    void addIndex(int tenantId, String tableName, String column);
+    void setIndices(int tenantId, String tableName, Set<String> columns) throws AnalyticsIndexException;
     
     /**
      * Returns the declared indices for a given table under the given tenant.
      * @param tenantId The tenant id
      * @param tableName The table name
-     * @return
+     * @return List of indices of the table
+     * @throws AnalyticsIndexException
      */
-    List<String> getIndices(int tenantId, String tableName);
+    Set<String> getIndices(int tenantId, String tableName) throws AnalyticsIndexException;
+    
+    /**
+     * Clears all the indices for the given table.
+     * @param tenantId The tenant id
+     * @param tableName The table name
+     * @throws AnalyticsIndexException
+     */
+    void clearIndices(int tenantId, String tableName) throws AnalyticsIndexException;
     
     /**
      * Searches the data with a given search query.
@@ -52,8 +63,9 @@ public interface AnalyticsDataService extends AnalyticsRecordStore {
      * @param language The language used to give the search query
      * @param query The search query
      * @return A list of record ids of matched records
-     * @throws AnalyticsDataServiceException
+     * @throws AnalyticsIndexException
      */
-    List<String> search(int tenantId, String tableName, String language, String query) throws AnalyticsDataServiceException;
+    List<String> search(int tenantId, String tableName, String language, 
+            String query) throws AnalyticsIndexException;
     
 }

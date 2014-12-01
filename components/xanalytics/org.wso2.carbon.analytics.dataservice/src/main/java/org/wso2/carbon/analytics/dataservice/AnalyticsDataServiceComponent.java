@@ -25,7 +25,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 
 import com.hazelcast.core.HazelcastInstance;
 
@@ -50,12 +50,12 @@ public class AnalyticsDataServiceComponent {
             if (log.isDebugEnabled()) {
                 log.debug("Finished AnalyticsDataServiceComponent#activate");
             }
-        } catch(AnalyticsDataSourceException e) {
+        } catch(AnalyticsException e) {
             log.error("Error in registering analytics data service: " + e.getMessage(), e);
         }        
     }
     
-    private AnalyticsDataServiceConfiguration loadAnalyticsDataServiceConfig() throws AnalyticsDataSourceException {
+    private AnalyticsDataServiceConfiguration loadAnalyticsDataServiceConfig() throws AnalyticsException {
         return null;
     }
     

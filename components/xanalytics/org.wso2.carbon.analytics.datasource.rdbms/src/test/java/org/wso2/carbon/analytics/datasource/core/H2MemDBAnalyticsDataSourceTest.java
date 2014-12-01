@@ -36,7 +36,7 @@ import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsDataSource;
 public class H2MemDBAnalyticsDataSourceTest extends AnalyticsDataSourceTest {
 
     @BeforeSuite
-    public void setup() throws NamingException, AnalyticsDataSourceException {
+    public void setup() throws NamingException, AnalyticsException {
         this.initDS("jdbc:h2:mem:bam_test_db", "wso2carbon", "wso2carbon");
         RDBMSAnalyticsDataSource ads = new RDBMSAnalyticsDataSource(this.generateQueryConfiguration());
         Map<String, String> props = new HashMap<String, String>();

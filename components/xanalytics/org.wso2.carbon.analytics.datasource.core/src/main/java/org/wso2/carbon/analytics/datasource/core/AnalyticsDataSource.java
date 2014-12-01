@@ -35,16 +35,16 @@ public interface AnalyticsDataSource extends AnalyticsRecordStore {
     /**
      * This method initializes the AnalyticsDataSource implementation, and is called once before any other method.
      * @param properties The properties associated with this analytics data source 
-     * @throws AnalyticsDataSourceException
+     * @throws AnalyticsException
      */
-    void init(Map<String, String> properties) throws AnalyticsDataSourceException;
+    void init(Map<String, String> properties) throws AnalyticsException;
     
     /**
      * Creates and returns a {@link FileSystem} object to do file related operations.
      * @return The {@link FileSystem} object
-     * @throws AnalyticsDataSourceException
+     * @throws AnalyticsException
      */
-    FileSystem getFileSystem() throws AnalyticsDataSourceException;
+    FileSystem getFileSystem() throws AnalyticsException;
     
     /**
      * Returns a lock provider for this analytics data source. This can be returned null, and the users

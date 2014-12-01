@@ -44,7 +44,7 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSource;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsLockException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.DirectAnalyticsDataSource;
@@ -77,7 +77,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     
     private QueryConfigurationEntry queryConfigurationEntry;
     
-    public RDBMSAnalyticsDataSource() throws AnalyticsDataSourceException {
+    public RDBMSAnalyticsDataSource() throws AnalyticsException {
     }
     
     public RDBMSAnalyticsDataSource(QueryConfigurationEntry queryConfigurationEntry) {
@@ -86,17 +86,17 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     
     @Override
     public void init(Map<String, String> properties)
-            throws AnalyticsDataSourceException {
+            throws AnalyticsException {
         this.properties = properties;
         String dsName = properties.get(RDBMSAnalyticsDSConstants.DATASOURCE);
         if (dsName == null) {
-            throw new AnalyticsDataSourceException("The property '" + 
+            throw new AnalyticsException("The property '" + 
                     RDBMSAnalyticsDSConstants.DATASOURCE + "' is required");
         }
         try {
             this.dataSource = (DataSource) InitialContext.doLookup(dsName);
         } catch (NamingException e) {
-            throw new AnalyticsDataSourceException("Error in looking up data source: " + 
+            throw new AnalyticsException("Error in looking up data source: " + 
                     e.getMessage(), e);
         }
         if (this.queryConfigurationEntry == null) {
@@ -106,37 +106,37 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
         this.checkAndCreateSystemTables();
     }
     
-    private String lookupDatabaseType() throws AnalyticsDataSourceException {
+    private String lookupDatabaseType() throws AnalyticsException {
         Connection conn = null;
         try {
             conn = this.getConnection();
             DatabaseMetaData dmd = conn.getMetaData();
             return dmd.getDatabaseProductName();
         } catch (SQLException e) {
-            throw new AnalyticsDataSourceException("Error in looking up database type: " + e.getMessage(), e);
+            throw new AnalyticsException("Error in looking up database type: " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
     }
     
-    private QueryConfiguration loadQueryConfiguration() throws AnalyticsDataSourceException {
+    private QueryConfiguration loadQueryConfiguration() throws AnalyticsException {
         try {
             File confFile = new File(CarbonUtils.getCarbonConfigDirPath() + 
                     File.separator + ANALYTICS_CONF_DIR + File.separator + RDBMS_QUERY_CONFIG_FILE);
             if (!confFile.exists()) {
-                throw new AnalyticsDataSourceException("Cannot initalize RDBMS analytics data source, "
+                throw new AnalyticsException("Cannot initalize RDBMS analytics data source, "
                         + "the query configuration file cannot be found at: " + confFile.getPath());
             }
             JAXBContext ctx = JAXBContext.newInstance(QueryConfiguration.class);
             Unmarshaller unmarshaller = ctx.createUnmarshaller();
             return (QueryConfiguration) unmarshaller.unmarshal(confFile);
         } catch (JAXBException e) {
-            throw new AnalyticsDataSourceException(
+            throw new AnalyticsException(
                     "Error in processing RDBMS query configuration: " + e.getMessage(), e);
         }
     }
     
-    private QueryConfigurationEntry lookupCurrentQueryConfigurationEntry() throws AnalyticsDataSourceException {
+    private QueryConfigurationEntry lookupCurrentQueryConfigurationEntry() throws AnalyticsException {
         String dbType = this.lookupDatabaseType();
         if (log.isDebugEnabled()) {
             log.debug("Loaded RDBMS Analytics Database Type: " + dbType);
@@ -147,7 +147,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
                 return entry;
             }
         }
-        throw new AnalyticsDataSourceException("Cannot find a database section in the RDBMS "
+        throw new AnalyticsException("Cannot find a database section in the RDBMS "
                 + "query configuration for the database: " + dbType);
     }
     
@@ -155,7 +155,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
         return queryConfigurationEntry;
     }
 
-    private void checkAndCreateSystemTables() throws AnalyticsDataSourceException {
+    private void checkAndCreateSystemTables() throws AnalyticsException {
         Connection conn = null;
         try {
             conn = this.getConnection(false);
@@ -170,7 +170,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             conn.commit();
         } catch (SQLException e) {
         	RDBMSUtils.rollbackConnection(conn);
-            throw new AnalyticsDataSourceException("Error in creating system tables: " + e.getMessage(), e);
+            throw new AnalyticsException("Error in creating system tables: " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
@@ -237,7 +237,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     }
     
     @Override
-    public void put(List<Record> records) throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException {
+    public void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
         /* if the records have identities (unique table category and name) as the following
          * "ABABABCCAACBDABCABCDBAC", the job of this method is to make it like the following,
          * {"AAAAAAAA", "BBBBBBB", "CCCCCC", "DD" } and add these with separate batch inserts */
@@ -263,8 +263,8 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             conn.commit();
         } catch (SQLException e) {
             RDBMSUtils.rollbackConnection(conn);
-            throw new AnalyticsDataSourceException("Error in adding records: " + e.getMessage(), e);
-        } catch (AnalyticsDataSourceException e) {
+            throw new AnalyticsException("Error in adding records: " + e.getMessage(), e);
+        } catch (AnalyticsException e) {
             RDBMSUtils.rollbackConnection(conn);
             throw e;
         } finally {
@@ -274,7 +274,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     
     private void addRecordsSimilar(Connection conn, 
             List<Record> records) throws SQLException, 
-            AnalyticsDataSourceException, AnalyticsTableNotAvailableException {
+            AnalyticsException, AnalyticsTableNotAvailableException {
         Record firstRecord = records.get(0);
         int tenantId = firstRecord.getTenantId();
         String tableName = firstRecord.getTableName();
@@ -308,7 +308,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     @Override
     public List<Record> getRecords(int tenantId, String tableName, List<String> columns,
             long timeFrom, long timeTo, int recordsFrom, 
-            int recordsCount) throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException {
+            int recordsCount) throws AnalyticsException, AnalyticsTableNotAvailableException {
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -338,7 +338,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             if (!this.tableExists(tenantId, tableName)) {
                 throw new AnalyticsTableNotAvailableException(tenantId, tableName);
             } else {
-                throw new AnalyticsDataSourceException("Error in retrieving records: " + e.getMessage(), e);
+                throw new AnalyticsException("Error in retrieving records: " + e.getMessage(), e);
             }
         } finally {
             RDBMSUtils.cleanupConnection(rs, stmt, conn);
@@ -368,7 +368,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     }
     
     private List<Record> processRecordResultSet(int tenantId, String tableName, ResultSet rs, 
-            List<String> columns) throws SQLException, AnalyticsDataSourceException {
+            List<String> columns) throws SQLException, AnalyticsException {
         List<Record> result = new ArrayList<Record>();
         Record record;
         Blob blob;
@@ -388,7 +388,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
 
     @Override
     public List<Record> getRecords(int tenantId, String tableName, List<String> columns,
-            List<String> ids) throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException {
+            List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
         String recordGetSQL = this.generateGetRecordRetrievalWithIdQuery(tenantId, tableName, ids.size());
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -406,7 +406,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             if (!this.tableExists(tenantId, tableName)) {
                 throw new AnalyticsTableNotAvailableException(tenantId, tableName);
             } else {
-                throw new AnalyticsDataSourceException("Error in retrieving records: " + e.getMessage(), e);
+                throw new AnalyticsException("Error in retrieving records: " + e.getMessage(), e);
             }
         } finally {
             RDBMSUtils.cleanupConnection(rs, stmt, conn);
@@ -415,7 +415,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     
     @Override
     public void delete(int tenantId, String tableName, long timeFrom, long timeTo)
-            throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException {
+            throws AnalyticsException, AnalyticsTableNotAvailableException {
         String sql = this.getRecordDeletionQuery(tenantId, tableName);
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -435,7 +435,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             if (!this.tableExists(tenantId, tableName)) {
                 throw new AnalyticsTableNotAvailableException(tenantId, tableName);
             } else {
-                throw new AnalyticsDataSourceException("Error in deleting records: " + e.getMessage(), e);
+                throw new AnalyticsException("Error in deleting records: " + e.getMessage(), e);
             }
         } finally {
             RDBMSUtils.cleanupConnection(null, stmt, conn);
@@ -444,7 +444,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
         
     @Override
     public void delete(int tenantId, String tableName, 
-            List<String> ids) throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException {
+            List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
         if (ids.size() == 0) {
             return;
         }
@@ -462,7 +462,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             if (!this.tableExists(tenantId, tableName)) {
                 throw new AnalyticsTableNotAvailableException(tenantId, tableName);
             } else {
-                throw new AnalyticsDataSourceException("Error in deleting records: " + e.getMessage(), e);
+                throw new AnalyticsException("Error in deleting records: " + e.getMessage(), e);
             }
         } finally {
             RDBMSUtils.cleanupConnection(null, stmt, conn);
@@ -522,7 +522,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     }
 
     @Override
-    public void deleteTable(int tenantId, String tableName) throws AnalyticsDataSourceException {
+    public void deleteTable(int tenantId, String tableName) throws AnalyticsException {
         Connection conn = null;
         try {
             conn = this.getConnection(false);
@@ -535,7 +535,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
         } catch (SQLException e) {
             RDBMSUtils.rollbackConnection(conn);
             if (this.tableExists(tenantId, tableName)) {
-                throw new AnalyticsDataSourceException("Error in deleting table: " + e.getMessage(), e);
+                throw new AnalyticsException("Error in deleting table: " + e.getMessage(), e);
             }
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
@@ -543,7 +543,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     }
 
     @Override
-    public FileSystem getFileSystem() throws AnalyticsDataSourceException {
+    public FileSystem getFileSystem() throws AnalyticsException {
         return new RDBMSFileSystem(this.getQueryConfiguration(), this.getDataSource());
     }
 
@@ -553,7 +553,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     }
     
     @Override
-    public void createTable(int tenantId, String tableName) throws AnalyticsDataSourceException {
+    public void createTable(int tenantId, String tableName) throws AnalyticsException {
         Connection conn = null;
         try {
             conn = this.getConnection(false);
@@ -565,7 +565,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
         } catch (SQLException e) {
             RDBMSUtils.rollbackConnection(conn);
             if (!this.tableExists(tenantId, tableName)) {
-                throw new AnalyticsDataSourceException("Error in creating table: " + e.getMessage(), e);
+                throw new AnalyticsException("Error in creating table: " + e.getMessage(), e);
             }
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
@@ -583,7 +583,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     }
     
     @Override
-    public boolean tableExists(int tenantId, String tableName) throws AnalyticsDataSourceException {
+    public boolean tableExists(int tenantId, String tableName) throws AnalyticsException {
         tableName = this.normalizeTableName(tableName);
         Connection conn = null;
         ResultSet rs = null;
@@ -605,7 +605,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             }
             return false;
         } catch (SQLException e) {
-            throw new AnalyticsDataSourceException("Error in checking table existence: " + e.getMessage(), e);
+            throw new AnalyticsException("Error in checking table existence: " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(rs, null, conn);
         }
@@ -616,7 +616,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     }
     
     @Override
-    public List<String> listTables(int tenantId) throws AnalyticsDataSourceException {
+    public List<String> listTables(int tenantId) throws AnalyticsException {
         List<String> result = new ArrayList<String>();
         Connection conn = null;
         ResultSet rs = null;
@@ -636,7 +636,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             }
             return result;
         } catch (SQLException e) {
-            throw new AnalyticsDataSourceException("Error in listing tables: " + e.getMessage(), e);
+            throw new AnalyticsException("Error in listing tables: " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(rs, null, conn);
         }
@@ -653,7 +653,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     
     @Override
     public long getRecordCount(int tenantId, String tableName) 
-            throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException {
+            throws AnalyticsException, AnalyticsTableNotAvailableException {
         String recordCountQuery = this.getRecordCountQuery(tenantId, tableName);
         Connection conn = null;
         Statement stmt = null;
@@ -665,14 +665,14 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
             if (rs.next()) {
                 return rs.getLong(1);
             } else {
-                throw new AnalyticsDataSourceException("Record count not available for " + 
+                throw new AnalyticsException("Record count not available for " + 
                         printableTableName(tenantId, tableName));
             }
         } catch (SQLException e) {
             if (!this.tableExists(tenantId, tableName)) {
                 throw new AnalyticsTableNotAvailableException(tenantId, tableName);
             }
-            throw new AnalyticsDataSourceException("Error in retrieving record count: " + e.getMessage(), e);
+            throw new AnalyticsException("Error in retrieving record count: " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(rs, stmt, conn);
         }

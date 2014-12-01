@@ -33,7 +33,7 @@ import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSource;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.RecordGroup;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
@@ -55,7 +55,7 @@ public class AnalyticsDataSourceTest {
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, InMemoryICFactory.class.getName());
     }
     
-    public void init(String implementationName, AnalyticsDataSource analyticsDS) throws AnalyticsDataSourceException {
+    public void init(String implementationName, AnalyticsDataSource analyticsDS) throws AnalyticsException {
         this.implementationName = implementationName;
         this.analyticsDS = analyticsDS;
         this.analyticsDS.deleteTable(7, "mytable1");
@@ -103,7 +103,7 @@ public class AnalyticsDataSourceTest {
         return result;
     }
     
-    private Set<Record> recordGroupsToSet(RecordGroup[] rgs) throws AnalyticsDataSourceException {
+    private Set<Record> recordGroupsToSet(RecordGroup[] rgs) throws AnalyticsException {
         Set<Record> result = new HashSet<Record>();
         for (RecordGroup rg : rgs) {
             result.addAll(rg.getRecords());
@@ -113,18 +113,18 @@ public class AnalyticsDataSourceTest {
     
     @AfterTest
     @Test
-    public void cleanup() throws AnalyticsDataSourceException {
+    public void cleanup() throws AnalyticsException {
         this.analyticsDS.deleteTable(7, "MYTABLE1");
         this.analyticsDS.deleteTable(7, "T1");
     }
     
-    private void cleanupT1() throws AnalyticsDataSourceException {
+    private void cleanupT1() throws AnalyticsException {
         this.analyticsDS.deleteTable(7, "T1");
         Assert.assertFalse(this.analyticsDS.tableExists(7, "T1"));
     }
     
     @Test
-    public void testTableCreateDeleteList() throws AnalyticsDataSourceException {
+    public void testTableCreateDeleteList() throws AnalyticsException {
         this.analyticsDS.deleteTable(250035, "TABLE1");
         this.analyticsDS.deleteTable(250035, "TABLE2");
         this.analyticsDS.deleteTable(8830, "TABLEX");        
@@ -147,7 +147,7 @@ public class AnalyticsDataSourceTest {
     }
     
     @Test
-    public void testDataRecordAddRetrieve() throws AnalyticsDataSourceException {
+    public void testDataRecordAddRetrieve() throws AnalyticsException {
         this.cleanupT1();
         String serverName = "ESB1";
         String ip = "10.0.0.1";
@@ -175,7 +175,7 @@ public class AnalyticsDataSourceTest {
     }
     
     @Test
-    public void testMultipleDataRecordAddRetieve() throws AnalyticsDataSourceException {
+    public void testMultipleDataRecordAddRetieve() throws AnalyticsException {
         this.cleanupT1();
         this.analyticsDS.createTable(7, "T1");
         List<Record> records = this.generateRecords(7, "T1", 1, 100, -1, -1);
@@ -201,7 +201,7 @@ public class AnalyticsDataSourceTest {
     }
     
     @Test
-    public void testDataRecordCount() throws AnalyticsDataSourceException {
+    public void testDataRecordCount() throws AnalyticsException {
         this.cleanupT1();
         this.analyticsDS.createTable(7, "T1");
         int count = (int) (200 * Math.random()) + 1;
@@ -214,7 +214,7 @@ public class AnalyticsDataSourceTest {
     }
     
     @Test
-    public void testMultipleDataRecordAddRetieveWithTimestampRange1() throws AnalyticsDataSourceException {
+    public void testMultipleDataRecordAddRetieveWithTimestampRange1() throws AnalyticsException {
         this.cleanupT1();
         this.analyticsDS.createTable(7, "T1");
         long time = System.currentTimeMillis();
@@ -238,7 +238,7 @@ public class AnalyticsDataSourceTest {
     }
     
     @Test
-    public void testMultipleDataRecordAddRetieveWithTimestampRange2() throws AnalyticsDataSourceException {
+    public void testMultipleDataRecordAddRetieveWithTimestampRange2() throws AnalyticsException {
         this.cleanupT1();
         this.analyticsDS.createTable(7, "T1");
         long time = System.currentTimeMillis();
@@ -253,7 +253,7 @@ public class AnalyticsDataSourceTest {
     }
     
     @Test
-    public void testMultipleDataRecordAddRetieveWithTimestampRange3() throws AnalyticsDataSourceException {
+    public void testMultipleDataRecordAddRetieveWithTimestampRange3() throws AnalyticsException {
         this.cleanupT1();
         this.analyticsDS.createTable(7, "T1");
         long time = System.currentTimeMillis();
@@ -268,7 +268,7 @@ public class AnalyticsDataSourceTest {
     }
     
     @Test
-    public void testMultipleDataRecordAddRetieveWithPagination1() throws AnalyticsDataSourceException {
+    public void testMultipleDataRecordAddRetieveWithPagination1() throws AnalyticsException {
         this.cleanupT1();
         this.analyticsDS.createTable(7, "T1");
         long time = System.currentTimeMillis();
@@ -300,7 +300,7 @@ public class AnalyticsDataSourceTest {
     }
     
     @Test
-    public void testMultipleDataRecordAddRetieveWithPagination2() throws AnalyticsDataSourceException {
+    public void testMultipleDataRecordAddRetieveWithPagination2() throws AnalyticsException {
         this.cleanupT1();
         this.analyticsDS.createTable(7, "T1");
         long time = System.currentTimeMillis();
@@ -346,7 +346,7 @@ public class AnalyticsDataSourceTest {
     }
     
     @Test
-    public void testDataRecordDeleteWithIds() throws AnalyticsDataSourceException {
+    public void testDataRecordDeleteWithIds() throws AnalyticsException {
         this.cleanupT1();
         this.analyticsDS.createTable(7, "T1");
         List<Record> records = this.generateRecords(7, "T1", 2, 10, -1, -1);
@@ -369,7 +369,7 @@ public class AnalyticsDataSourceTest {
     }
     
     @Test
-    public void testDataRecordDeleteWithTimestamps() throws AnalyticsDataSourceException {
+    public void testDataRecordDeleteWithTimestamps() throws AnalyticsException {
         this.cleanupT1();
         this.analyticsDS.createTable(7, "T1");
         long time = System.currentTimeMillis();
@@ -399,7 +399,7 @@ public class AnalyticsDataSourceTest {
     }
     
     @Test
-    public void testDataRecordAddReadPerformance() throws AnalyticsDataSourceException {
+    public void testDataRecordAddReadPerformance() throws AnalyticsException {
         System.out.println("\n************** START RECORD PERF TEST [" + this.getImplementationName() + "] **************");
         this.cleanupT1();
         this.analyticsDS.createTable(7, "T1");
@@ -434,7 +434,7 @@ public class AnalyticsDataSourceTest {
     }
     
     @Test
-    public void testFSDirectoryOperations() throws AnalyticsDataSourceException {
+    public void testFSDirectoryOperations() throws AnalyticsException {
         this.fileSystem.delete("/d1/d2/d3");
         this.fileSystem.mkdir("/d1/d2/d3");
         this.fileSystem.mkdir("/d1/d2/d5");
@@ -470,7 +470,7 @@ public class AnalyticsDataSourceTest {
     }
     
     @Test
-    public void testFSFileIOOperations() throws AnalyticsDataSourceException {
+    public void testFSFileIOOperations() throws AnalyticsException {
         this.fileSystem.delete("/d1");
         DataOutput out = this.fileSystem.createOutput("/d1/d2/d3/f1");
         byte[] data = this.generateData(1024 * 1024 + 7);
@@ -498,7 +498,7 @@ public class AnalyticsDataSourceTest {
     }
     
     @Test
-    public void testFSFileIOOperations2() throws AnalyticsDataSourceException, IOException {
+    public void testFSFileIOOperations2() throws AnalyticsException, IOException {
         this.fileSystem.delete("/d1");
         DataOutput out = this.fileSystem.createOutput("/d1/d2/d3");
         byte[] data = this.generateData(1350);
@@ -538,7 +538,7 @@ public class AnalyticsDataSourceTest {
     }
     
     @Test
-    public void testFSFileCopy() throws AnalyticsDataSourceException {
+    public void testFSFileCopy() throws AnalyticsException {
         this.fileSystem.delete("/d1");
         this.fileSystem.delete("/d2");
         byte[] data = this.generateData(1025);
@@ -563,7 +563,7 @@ public class AnalyticsDataSourceTest {
     }
     
     @Test
-    public void testFSReadSeekPosition() throws AnalyticsDataSourceException {
+    public void testFSReadSeekPosition() throws AnalyticsException {
         this.fileSystem.delete("/d1");
         byte[] data = this.generateData(1024 * 45);
         byte[] dataSubset = new byte[5];
@@ -585,7 +585,7 @@ public class AnalyticsDataSourceTest {
     }
     
     @Test
-    public void testFSSetLengthRead() throws AnalyticsDataSourceException {
+    public void testFSSetLengthRead() throws AnalyticsException {
         this.fileSystem.delete("/d_1");
         byte[] data = this.generateData(100);
         DataOutput out = this.fileSystem.createOutput("/d_1/d_2/file1");
@@ -612,7 +612,7 @@ public class AnalyticsDataSourceTest {
     }
     
     @Test
-    public void testFSWriteSeekPositionLength() throws AnalyticsDataSourceException {
+    public void testFSWriteSeekPositionLength() throws AnalyticsException {
         this.fileSystem.delete("/d1");
         byte[] data = this.generateData(1024 * 12 + 24);
         byte[] data2 = this.generateData(1024 * 3 + 10);
@@ -631,7 +631,7 @@ public class AnalyticsDataSourceTest {
     }
     
     @Test
-    public void testFSPerfTest() throws AnalyticsDataSourceException {
+    public void testFSPerfTest() throws AnalyticsException {
         System.out.println("\n************** START FS PERF TEST [" + this.getImplementationName() + "] **************");
         this.fileSystem.delete("/mydir");
         byte[] data = this.generateData(2048);

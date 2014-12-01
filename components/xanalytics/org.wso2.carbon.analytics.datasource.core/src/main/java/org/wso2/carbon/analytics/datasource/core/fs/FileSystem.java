@@ -20,7 +20,7 @@ package org.wso2.carbon.analytics.datasource.core.fs;
 
 import java.util.List;
 
-import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 
 /**
  * Represents a virtual file system data operations.
@@ -31,70 +31,70 @@ public interface FileSystem {
      * Checks if the file already exists.
      * @param path The location of the file
      * @return true if exists, false otherwise
-     * @throws AnalyticsDataSourceException
+     * @throws AnalyticsException
      */
-    boolean exists(String path) throws AnalyticsDataSourceException;
+    boolean exists(String path) throws AnalyticsException;
 
     /**
      * Lists the files in the directory.
      * @param path The path of the directory
      * @return The list of file name in the directory
-     * @throws AnalyticsDataSourceException
+     * @throws AnalyticsException
      */
-    List<String> list(String path) throws AnalyticsDataSourceException;
+    List<String> list(String path) throws AnalyticsException;
 
     /**
      * Deletes the file at the given path.
      * @param path The path of the file to be deleted
-     * @throws AnalyticsDataSourceException
+     * @throws AnalyticsException
      */
-    void delete(String path) throws AnalyticsDataSourceException;
+    void delete(String path) throws AnalyticsException;
 
     /**
      * Copies a file from a source to the target.
      * @param sourcePath The source file path
      * @param destPath The destination file path
-     * @throws AnalyticsDataSourceException
+     * @throws AnalyticsException
      */
-    void copy(String sourcePath, String destPath) throws AnalyticsDataSourceException;
+    void copy(String sourcePath, String destPath) throws AnalyticsException;
     
     /**
      * Makes a new directory.
      * @param path The path of the directory to be created
-     * @throws AnalyticsDataSourceException
+     * @throws AnalyticsException
      */
-    void mkdir(String path) throws AnalyticsDataSourceException;
+    void mkdir(String path) throws AnalyticsException;
     
     /**
      * Creates an object to do read related operations.
      * @param path The path of the file
      * @return The {@link DataInput} object
-     * @throws AnalyticsDataSourceException
+     * @throws AnalyticsException
      */
-    DataInput createInput(String path) throws AnalyticsDataSourceException;
+    DataInput createInput(String path) throws AnalyticsException;
     
     /**
      * Creates an object to do write related operations.
      * @param path The path of the file
      * @return The {@link DataOutput} object
-     * @throws AnalyticsDataSourceException
+     * @throws AnalyticsException
      */
-    DataOutput createOutput(String path) throws AnalyticsDataSourceException;
+    DataOutput createOutput(String path) throws AnalyticsException;
     
     /**
      * Flushes out any changes cached in the system for the given path.
      * @param path The path where the changes needs to be flushed out
-     * @throws AnalyticsDataSourceException
+     * @throws AnalyticsException
      */
-    void sync(String path) throws AnalyticsDataSourceException;
+    void sync(String path) throws AnalyticsException;
     
     /**
      * Returns the length of the given file.
      * @param path The path of the file
      * @return The size of the file in bytes
-     * @throws AnalyticsDataSourceException
+     * @throws AnalyticsException
      */
-    long length(String path) throws AnalyticsDataSourceException;
+    long length(String path) throws AnalyticsException;
     
     /**
      * Represents file data stream reading operations.
@@ -107,29 +107,29 @@ public interface FileSystem {
          * @param offset The offset of the buffer the data will be written to, 0 indexed
          * @param len The size of the data to be read in bytes
          * @return The actual number of bytes that was read
-         * @throws AnalyticsDataSourceException
+         * @throws AnalyticsException
          */
-        int read(byte[] buff, int offset, int len) throws AnalyticsDataSourceException;
+        int read(byte[] buff, int offset, int len) throws AnalyticsException;
         
         /**
          * Moves the current byte position to the given location.
          * @param pos The position the current position should be moved to
-         * @throws AnalyticsDataSourceException
+         * @throws AnalyticsException
          */
-        void seek(long pos) throws AnalyticsDataSourceException;
+        void seek(long pos) throws AnalyticsException;
         
         /**
          * Returns the current file pointer.
          * @return The current file pointer position
-         * @throws AnalyticsDataSourceException
+         * @throws AnalyticsException
          */
-        long getPosition() throws AnalyticsDataSourceException;
+        long getPosition() throws AnalyticsException;
 
         /**
          * Flush and close the current file input stream.
-         * @throws AnalyticsDataSourceException
+         * @throws AnalyticsException
          */
-        void close() throws AnalyticsDataSourceException;
+        void close() throws AnalyticsException;
         
     }
     
@@ -143,42 +143,42 @@ public interface FileSystem {
          * @param data The data to be written out
          * @param offset The offset from the buffer to read the data from, 0 indexed
          * @param length The length of the data to be written out
-         * @throws AnalyticsDataSourceException
+         * @throws AnalyticsException
          */
-        void write(byte[] data, int offset, int length) throws AnalyticsDataSourceException;
+        void write(byte[] data, int offset, int length) throws AnalyticsException;
                 
         /**
          * Moves the current byte position to the given location.
          * @param pos The position the current position should be moved to
-         * @throws AnalyticsDataSourceException
+         * @throws AnalyticsException
          */
-        void seek(long pos) throws AnalyticsDataSourceException;
+        void seek(long pos) throws AnalyticsException;
         
         /**
          * Returns the current file pointer.
          * @return The current file pointer position
-         * @throws AnalyticsDataSourceException
+         * @throws AnalyticsException
          */
-        long getPosition() throws AnalyticsDataSourceException;
+        long getPosition() throws AnalyticsException;
         
         /**
          * Sets the length of the current file.
          * @param length The new file length
-         * @throws AnalyticsDataSourceException
+         * @throws AnalyticsException
          */
-        void setLength(long length) throws AnalyticsDataSourceException;
+        void setLength(long length) throws AnalyticsException;
         
         /**
          * Flushes the current cached data out to the file.
-         * @throws AnalyticsDataSourceException
+         * @throws AnalyticsException
          */
-        void flush() throws AnalyticsDataSourceException;
+        void flush() throws AnalyticsException;
         
         /**
          * Flush and close the current file output stream.
-         * @throws AnalyticsDataSourceException
+         * @throws AnalyticsException
          */
-        void close() throws AnalyticsDataSourceException;
+        void close() throws AnalyticsException;
         
     }
 

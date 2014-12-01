@@ -21,7 +21,7 @@ package org.wso2.carbon.analytics.datasource.core;
 /**
  * This exception represents a situation when the requested analytics data source table is not available.
  */
-public class AnalyticsTableNotAvailableException extends AnalyticsDataSourceException {
+public class AnalyticsTableNotAvailableException extends AnalyticsException {
 
     private static final long serialVersionUID = -3197293684263626136L;
     

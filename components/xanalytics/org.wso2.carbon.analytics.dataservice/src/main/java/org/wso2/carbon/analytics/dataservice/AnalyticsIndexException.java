@@ -16,20 +16,22 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.core;
+package org.wso2.carbon.analytics.dataservice;
+
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 
 /**
- * This class represents analytics data source related exceptions.
+ * This class represents analytics indexing related exceptions.
  */
-public class AnalyticsDataSourceException extends Exception {
+public class AnalyticsIndexException extends AnalyticsException {
 
-    private static final long serialVersionUID = 6750673867599631611L;
-    
-    public AnalyticsDataSourceException(String msg) {
+    private static final long serialVersionUID = 4212613515313506802L;
+
+    public AnalyticsIndexException(String msg) {
         super(msg);
     }
     
-    public AnalyticsDataSourceException(String msg, Throwable cause) {
+    public AnalyticsIndexException(String msg, Throwable cause) {
         super(msg, cause);
     }
 

@@ -30,7 +30,7 @@ import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Parameters;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.rdbms.QueryConfigurationEntry;
 import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsDataSource;
 
@@ -42,7 +42,7 @@ public class MySQLMyISAMAnalyticsDataSourceTest extends AnalyticsDataSourceTest 
     @BeforeSuite
     @Parameters({"mysql.url", "mysql.username", "mysql.password"})
     public void setup(String url, String username, 
-            String password) throws NamingException, AnalyticsDataSourceException, SQLException {
+            String password) throws NamingException, AnalyticsException, SQLException {
         this.initDS(url, username, password);
         RDBMSAnalyticsDataSource ads = new RDBMSAnalyticsDataSource(this.generateQueryConfiguration());
         Map<String, String> props = new HashMap<String, String>();

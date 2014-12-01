@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 
 /**
  * Generic utility methods for analytics data source implementations.
@@ -62,7 +62,7 @@ public class GenericUtils {
         return parent;
     }
     
-    private static int calculateRecordValuesBufferSize(Map<String, Object> values) throws AnalyticsDataSourceException {
+    private static int calculateRecordValuesBufferSize(Map<String, Object> values) throws AnalyticsException {
         int count = 0;
         String name;
         Object value;
@@ -88,14 +88,14 @@ public class GenericUtils {
             } else if (value instanceof Float) {
                 count += Float.SIZE / 8;
             } else if (value != null) {
-                throw new AnalyticsDataSourceException("Invalid column value type in calculating column "
+                throw new AnalyticsException("Invalid column value type in calculating column "
                         + "values length: " + value.getClass());
             }
         }
         return count;
     }
     
-    public static byte[] encodeRecordValues(Map<String, Object> values) throws AnalyticsDataSourceException {
+    public static byte[] encodeRecordValues(Map<String, Object> values) throws AnalyticsException {
         ByteBuffer buffer = ByteBuffer.allocate(calculateRecordValuesBufferSize(values));
         String name, strVal;
         boolean boolVal;
@@ -134,18 +134,18 @@ public class GenericUtils {
                 } else if (value == null) {
                     buffer.put(DATA_TYPE_NULL);
                 } else {
-                    throw new AnalyticsDataSourceException("Invalid column value type in encoding "
+                    throw new AnalyticsException("Invalid column value type in encoding "
                             + "column value: " + value.getClass());
                 }
             } catch (UnsupportedEncodingException e) {
-                throw new AnalyticsDataSourceException("Error in encoding record values: " + e.getMessage());
+                throw new AnalyticsException("Error in encoding record values: " + e.getMessage());
             }
         }
         return buffer.array();
     }
     
     public static Map<String, Object> decodeRecordValues(byte[] data, 
-            Set<String> columns) throws AnalyticsDataSourceException {
+            Set<String> columns) throws AnalyticsException {
         Map<String, Object> result = new HashMap<String, Object>();
         ByteBuffer buffer = ByteBuffer.wrap(data);
         int type, size;
@@ -180,7 +180,7 @@ public class GenericUtils {
                     } else if (boolVal == BOOLEAN_FALSE) {
                         value = false;
                     } else {
-                        throw new AnalyticsDataSourceException("Invalid encoded boolean value: " + boolVal);
+                        throw new AnalyticsException("Invalid encoded boolean value: " + boolVal);
                     }
                     break;
                 case DATA_TYPE_INTEGER:
@@ -193,13 +193,13 @@ public class GenericUtils {
                     value = null;
                     break;
                 default:
-                    throw new AnalyticsDataSourceException("Unknown encoded data source type : " + type);
+                    throw new AnalyticsException("Unknown encoded data source type : " + type);
                 }
                 if (columns == null || columns.contains(colName)) {
                     result.put(colName, value);
                 }
             } catch (Exception e) {
-                throw new AnalyticsDataSourceException("Error in decoding record values: " + e.getMessage());
+                throw new AnalyticsException("Error in decoding record values: " + e.getMessage());
             }
         }
         return result;

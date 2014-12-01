@@ -18,7 +18,7 @@
  */
 package org.wso2.carbon.analytics.datasource.core.fs;
 
-import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.ChunkedStream;
 import org.wso2.carbon.analytics.datasource.core.ChunkedStream.DataChunk;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem.DataInput;
@@ -36,7 +36,7 @@ public class ChunkedDataInput implements DataInput {
     
     private long length;
     
-    public ChunkedDataInput(ChunkedStream stream) throws AnalyticsDataSourceException {
+    public ChunkedDataInput(ChunkedStream stream) throws AnalyticsException {
         this.stream = stream;
         this.length = this.stream.length();
     }
@@ -45,7 +45,7 @@ public class ChunkedDataInput implements DataInput {
         return stream;
     }
     
-    private void checkCurrentChunk() throws AnalyticsDataSourceException {
+    private void checkCurrentChunk() throws AnalyticsException {
         if (this.currentChunk == null || !this.currentChunk.containsPosition(this.getPosition())) {
             this.currentChunk = this.getStream().readChunkForPosition(this.getPosition());
         }
@@ -57,7 +57,7 @@ public class ChunkedDataInput implements DataInput {
     
     @Override
     public int read(byte[] buff, int offset, int len)
-            throws AnalyticsDataSourceException {
+            throws AnalyticsException {
         int remaining, chunkDataIndex;
         if (this.position + len > + this.length) {
             len = (int) (this.length - this.position);
@@ -79,17 +79,17 @@ public class ChunkedDataInput implements DataInput {
     }
     
     @Override
-    public void seek(long pos) throws AnalyticsDataSourceException {
+    public void seek(long pos) throws AnalyticsException {
         this.position = pos;
     }
 
     @Override
-    public long getPosition() throws AnalyticsDataSourceException {
+    public long getPosition() throws AnalyticsException {
         return position;
     }
 
     @Override
-    public void close() throws AnalyticsDataSourceException {
+    public void close() throws AnalyticsException {
         /* nothing to do */
     }
 

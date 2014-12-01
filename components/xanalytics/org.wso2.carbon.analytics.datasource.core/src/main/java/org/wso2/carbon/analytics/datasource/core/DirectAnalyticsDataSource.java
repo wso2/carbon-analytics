@@ -26,12 +26,12 @@ import java.util.List;
 public abstract class DirectAnalyticsDataSource implements AnalyticsDataSource {
     
     public RecordGroup[] get(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo, int recordsFrom, 
-            int recordsCount) throws AnalyticsDataSourceException {
+            int recordsCount) throws AnalyticsException {
         List<Record> records = this.getRecords(tenantId, tableName, columns, timeFrom, timeTo, recordsFrom, recordsCount);
         return new DirectRecordGroup[] { new DirectRecordGroup(records) };
     }
     
-    public RecordGroup[] get(int tenantId, String tableName, List<String> columns, List<String> ids) throws AnalyticsDataSourceException {
+    public RecordGroup[] get(int tenantId, String tableName, List<String> columns, List<String> ids) throws AnalyticsException {
         List<Record> records = this.getRecords(tenantId, tableName, columns, ids);
         if (records.size() > 0) {
             return new DirectRecordGroup[] { new DirectRecordGroup(records) };
@@ -41,9 +41,9 @@ public abstract class DirectAnalyticsDataSource implements AnalyticsDataSource {
     }
     
     public abstract List<Record> getRecords(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo, 
-            int recordsFrom, int recordsCount) throws AnalyticsDataSourceException;
+            int recordsFrom, int recordsCount) throws AnalyticsException;
     
-    public abstract List<Record> getRecords(int tenantId, String tableName, List<String> columns, List<String> ids) throws AnalyticsDataSourceException;
+    public abstract List<Record> getRecords(int tenantId, String tableName, List<String> columns, List<String> ids) throws AnalyticsException;
     
     /**
      * {@link RecordGroup} implementation for direct analytics data source.
@@ -59,12 +59,12 @@ public abstract class DirectAnalyticsDataSource implements AnalyticsDataSource {
         }
         
         @Override
-        public String[] getLocations() throws AnalyticsDataSourceException {
+        public String[] getLocations() throws AnalyticsException {
             return new String[] { LOCALHOST };
         }
 
         @Override
-        public List<Record> getRecords() throws AnalyticsDataSourceException {
+        public List<Record> getRecords() throws AnalyticsException {
             return records;
         }
         

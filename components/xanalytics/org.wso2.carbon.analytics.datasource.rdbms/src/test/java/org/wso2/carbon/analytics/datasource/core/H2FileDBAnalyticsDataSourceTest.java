@@ -30,7 +30,7 @@ import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.testng.annotations.BeforeSuite;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSource;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.rdbms.QueryConfigurationEntry;
 import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsDataSource;
 
@@ -40,12 +40,12 @@ import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsDataSource;
 public class H2FileDBAnalyticsDataSourceTest extends AnalyticsDataSourceTest {
 
     @BeforeSuite
-    public void setup() throws NamingException, AnalyticsDataSourceException, IOException {
+    public void setup() throws NamingException, AnalyticsException, IOException {
         AnalyticsDataSource ads = cleanupAndCreateDS();
         this.init("H2FileDBAnalyticsDataSource", ads);
     }
     
-    public static AnalyticsDataSource cleanupAndCreateDS() throws NamingException, AnalyticsDataSourceException {
+    public static AnalyticsDataSource cleanupAndCreateDS() throws NamingException, AnalyticsException {
         String dbPath = System.getProperty("java.io.tmpdir") + File.separator + "bam_test_db";
         deleteFile(dbPath + ".mv.db");
         deleteFile(dbPath + ".trace.db");

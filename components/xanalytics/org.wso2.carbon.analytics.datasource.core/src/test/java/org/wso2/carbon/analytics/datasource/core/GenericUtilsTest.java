@@ -34,7 +34,7 @@ import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 public class GenericUtilsTest {
     
     @Test
-    public void testEncodeDecodeNull() throws AnalyticsDataSourceException {
+    public void testEncodeDecodeNull() throws AnalyticsException {
         Map<String, Object> values = new HashMap<String, Object>();
         values.put("C1", null);
         byte[] data = GenericUtils.encodeRecordValues(values);
@@ -44,7 +44,7 @@ public class GenericUtilsTest {
     }
     
     @Test
-    public void testEncodeDecodeEmpty() throws AnalyticsDataSourceException {
+    public void testEncodeDecodeEmpty() throws AnalyticsException {
         Map<String, Object> values = new HashMap<String, Object>();
         byte[] data = GenericUtils.encodeRecordValues(values);
         Map<String, Object> valuesIn = GenericUtils.decodeRecordValues(data, null);
@@ -52,21 +52,21 @@ public class GenericUtilsTest {
         Assert.assertEquals(values, valuesIn);
     }
     
-    @Test (expectedExceptions = AnalyticsDataSourceException.class)
-    public void testDecodeCorruptedData() throws AnalyticsDataSourceException {
+    @Test (expectedExceptions = AnalyticsException.class)
+    public void testDecodeCorruptedData() throws AnalyticsException {
         byte[] data = new byte[] { 54 };
         GenericUtils.decodeRecordValues(data, null);
     }
     
-    @Test (expectedExceptions = AnalyticsDataSourceException.class)
-    public void testEncodeInvalidValues() throws AnalyticsDataSourceException {
+    @Test (expectedExceptions = AnalyticsException.class)
+    public void testEncodeInvalidValues() throws AnalyticsException {
         Map<String, Object> values = new HashMap<String, Object>();
         values.put("C1", new BigInteger("55353"));
         GenericUtils.encodeRecordValues(values);
     }
     
     @Test
-    public void testEncodeDecodeDataTypes() throws AnalyticsDataSourceException {
+    public void testEncodeDecodeDataTypes() throws AnalyticsException {
         Map<String, Object> values = new HashMap<String, Object>();
         values.put("C1", "ABC");
         byte[] data = GenericUtils.encodeRecordValues(values);
@@ -94,7 +94,7 @@ public class GenericUtilsTest {
     }
     
     @Test
-    public void testEncodeDecodeWithColumns() throws AnalyticsDataSourceException {
+    public void testEncodeDecodeWithColumns() throws AnalyticsException {
         Map<String, Object> values = new HashMap<String, Object>();
         values.put("C1", "ABC");
         values.put("C3", 434);
@@ -120,7 +120,7 @@ public class GenericUtilsTest {
     }
     
     @Test
-    public void testEncodeDecodeDataPerf() throws AnalyticsDataSourceException {
+    public void testEncodeDecodeDataPerf() throws AnalyticsException {
         Map<String, Object> cols = new HashMap<String, Object>();
         for (int i = 0; i < 4; i++) {
             cols.put("Column S - " + i, "OIJFFOWIJ FWOIJF EQF OIJFOIEJF EOIJFOI:JWLIFJ :WOIFJ:OIJ:OXXCW @#$#@2342323 OIJFW");

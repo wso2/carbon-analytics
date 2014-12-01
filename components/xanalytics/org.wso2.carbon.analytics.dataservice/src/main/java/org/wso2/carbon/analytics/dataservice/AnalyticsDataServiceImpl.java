@@ -19,9 +19,10 @@
 package org.wso2.carbon.analytics.dataservice;
 
 import java.util.List;
+import java.util.Set;
 
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSource;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.RecordGroup;
@@ -33,14 +34,14 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     private AnalyticsDataSource analyticsDataSource;
     
-    private AnalyticsIndexDefinitionRepository indexRepo;
+    private AnalyticsDataIndexer indexer;
     
-    public AnalyticsDataServiceImpl(AnalyticsDataSource analyticsDataSource) throws AnalyticsDataServiceException {
+    public AnalyticsDataServiceImpl(AnalyticsDataSource analyticsDataSource) throws AnalyticsException {
         this.analyticsDataSource = analyticsDataSource;
         try {
-            this.indexRepo = new AnalyticsIndexDefinitionRepository(this.analyticsDataSource.getFileSystem());
-        } catch (AnalyticsDataSourceException e) {
-            throw new AnalyticsDataServiceException("Error in creating AnalyticsIndexDefinitionRepository: " + 
+            this.indexer = new AnalyticsDataIndexer(this.analyticsDataSource.getFileSystem());
+        } catch (AnalyticsException e) {
+            throw new AnalyticsException("Error in creating AnalyticsDataIndexer: " + 
                     e.getMessage(), e);
         }
     }
@@ -48,82 +49,91 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     public AnalyticsDataServiceImpl(AnalyticsDataServiceConfiguration config) {
     }
     
+    public AnalyticsDataIndexer getIndexer() {
+        return indexer;
+    }
+    
     public AnalyticsDataSource getAnalyticsDataSource() {
         return analyticsDataSource;
     }
     
     @Override
-    public void createTable(int tenantId, String tableName) throws AnalyticsDataSourceException {
+    public void createTable(int tenantId, String tableName) throws AnalyticsException {
         this.getAnalyticsDataSource().createTable(tenantId, tableName);
     }
 
     @Override
-    public boolean tableExists(int tenantId, String tableName) throws AnalyticsDataSourceException {
+    public boolean tableExists(int tenantId, String tableName) throws AnalyticsException {
         return this.getAnalyticsDataSource().tableExists(tenantId, tableName);
     }
 
     @Override
-    public void deleteTable(int tenantId, String tableName) throws AnalyticsDataSourceException {
+    public void deleteTable(int tenantId, String tableName) throws AnalyticsException {
         this.getAnalyticsDataSource().deleteTable(tenantId, tableName);
     }
 
     @Override
-    public List<String> listTables(int tenantId) throws AnalyticsDataSourceException {
+    public List<String> listTables(int tenantId) throws AnalyticsException {
         return this.getAnalyticsDataSource().listTables(tenantId);
     }
 
     @Override
-    public long getRecordCount(int tenantId, String tableName) throws AnalyticsDataSourceException,
+    public long getRecordCount(int tenantId, String tableName) throws AnalyticsException,
             AnalyticsTableNotAvailableException {
         return this.getAnalyticsDataSource().getRecordCount(tenantId, tableName);
     }
 
     @Override
-    public void put(List<Record> records) throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException {
+    public void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
         this.getAnalyticsDataSource().put(records);
+        this.getIndexer().process(records);
     }
 
     @Override
     public RecordGroup[] get(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo,
-            int recordsFrom, int recordsCount) throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException {
-        return this.getAnalyticsDataSource().get(tenantId, tableName, columns, timeFrom, timeTo, recordsFrom, recordsCount);
+            int recordsFrom, int recordsCount) throws AnalyticsException, AnalyticsTableNotAvailableException {
+        return this.getAnalyticsDataSource().get(tenantId, tableName, columns, timeFrom, 
+                timeTo, recordsFrom, recordsCount);
     }
 
     @Override
     public RecordGroup[] get(int tenantId, String tableName, List<String> columns, List<String> ids)
-            throws AnalyticsDataSourceException, AnalyticsTableNotAvailableException {
+            throws AnalyticsException, AnalyticsTableNotAvailableException {
         return this.getAnalyticsDataSource().get(tenantId, tableName, columns, ids);
     }
 
     @Override
-    public void delete(int tenantId, String tableName, long timeFrom, long timeTo) throws AnalyticsDataSourceException,
+    public void delete(int tenantId, String tableName, long timeFrom, long timeTo) throws AnalyticsException,
             AnalyticsTableNotAvailableException {
         this.getAnalyticsDataSource().delete(tenantId, tableName, timeFrom, timeTo);
     }
 
     @Override
-    public void delete(int tenantId, String tableName, List<String> ids) throws AnalyticsDataSourceException,
+    public void delete(int tenantId, String tableName, List<String> ids) throws AnalyticsException,
             AnalyticsTableNotAvailableException {
         this.getAnalyticsDataSource().delete(tenantId, tableName, ids);
     }
 
     @Override
-    public void addIndex(int tenantId, String tableName, String column) {
-        
+    public void setIndices(int tenantId, String tableName, Set<String> columns) throws AnalyticsIndexException {
+        this.getIndexer().setIndices(tenantId, tableName, columns);
     }
 
     @Override
     public List<String> search(int tenantId, String tableName, String language, String query)
-            throws AnalyticsDataServiceException {
+            throws AnalyticsIndexException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<String> getIndices(int tenantId, String tableName) {
-        // TODO Auto-generated method stub
-        return null;
+    public Set<String> getIndices(int tenantId, String tableName) throws AnalyticsIndexException {
+        return this.getIndexer().getIndices(tenantId, tableName);
     }
 
+    @Override
+    public void clearIndices(int tenantId, String tableName) throws AnalyticsIndexException {
+        this.getIndexer().clearIndices(tenantId, tableName);
+    }
 
 }

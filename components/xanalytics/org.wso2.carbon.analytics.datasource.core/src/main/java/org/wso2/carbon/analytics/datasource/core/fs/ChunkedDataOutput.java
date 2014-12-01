@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.ChunkedStream;
 import org.wso2.carbon.analytics.datasource.core.ChunkedStream.DataChunk;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem.DataOutput;
@@ -45,13 +45,13 @@ public class ChunkedDataOutput implements DataOutput {
     
     private int flushChunkThreshold;
     
-    public ChunkedDataOutput(ChunkedStream stream, int flushChunkThreshold) throws AnalyticsDataSourceException {
+    public ChunkedDataOutput(ChunkedStream stream, int flushChunkThreshold) throws AnalyticsException {
         this.stream = stream;
         this.length = this.stream.length();
         this.flushChunkThreshold = flushChunkThreshold;
     }
     
-    public ChunkedDataOutput(ChunkedStream stream) throws AnalyticsDataSourceException {
+    public ChunkedDataOutput(ChunkedStream stream) throws AnalyticsException {
         this(stream, DEFAULT_DATA_CHUNK_FLUSH_THRESHOLD);
     }
 
@@ -73,7 +73,7 @@ public class ChunkedDataOutput implements DataOutput {
     }
     
     @Override
-    public void write(byte[] data, int offset, int len) throws AnalyticsDataSourceException {
+    public void write(byte[] data, int offset, int len) throws AnalyticsException {
         DataChunk chunk;
         int chunkPosition, remaining;
         while (len > 0) {
@@ -103,23 +103,23 @@ public class ChunkedDataOutput implements DataOutput {
     }
 
     @Override
-    public void seek(long pos) throws AnalyticsDataSourceException {
+    public void seek(long pos) throws AnalyticsException {
         this.position = pos;
     }
 
     @Override
-    public long getPosition() throws AnalyticsDataSourceException {
+    public long getPosition() throws AnalyticsException {
         return position;
     }
 
     @Override
-    public void setLength(long length) throws AnalyticsDataSourceException {
+    public void setLength(long length) throws AnalyticsException {
         this.length = length;
         this.getStream().setLength(this.length);
     }
 
     @Override
-    public void flush() throws AnalyticsDataSourceException {
+    public void flush() throws AnalyticsException {
         this.setLength(this.length);
         List<DataChunk> dataChunks = new ArrayList<ChunkedStream.DataChunk>(this.dataChunks.values());
         for (DataChunk dataChunk : dataChunks) {
@@ -131,7 +131,7 @@ public class ChunkedDataOutput implements DataOutput {
         this.dataChunks.clear();
     }
     
-    private void makeWhole(DataChunk dataChunk) throws AnalyticsDataSourceException {
+    private void makeWhole(DataChunk dataChunk) throws AnalyticsException {
         DataChunk originalChunk = this.getStream().readChunk(dataChunk.getChunkNumber());
         List<int[]> missingSections = dataChunk.calculateMissingDataSections();
         for (int[] section : missingSections) {
@@ -141,7 +141,7 @@ public class ChunkedDataOutput implements DataOutput {
     }
 
     @Override
-    public void close() throws AnalyticsDataSourceException {
+    public void close() throws AnalyticsException {
         this.flush();
     }
 

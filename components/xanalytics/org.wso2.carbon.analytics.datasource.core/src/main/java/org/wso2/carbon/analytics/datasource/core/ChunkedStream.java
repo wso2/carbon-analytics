@@ -53,11 +53,11 @@ public abstract class ChunkedStream {
      * buffer size, as mentioned in the chunk size of the stream. 
      * @param n The 0 based index of the chunk
      * @return The the data chunk that was read
-     * @throws AnalyticsDataSourceException
+     * @throws AnalyticsException
      */
-    public abstract DataChunk readChunk(long n) throws AnalyticsDataSourceException;
+    public abstract DataChunk readChunk(long n) throws AnalyticsException;
     
-    public DataChunk readChunkForPosition(long position) throws AnalyticsDataSourceException {
+    public DataChunk readChunkForPosition(long position) throws AnalyticsException {
         return this.readChunk(this.getChunkNumber(position));
     }
     
@@ -68,23 +68,23 @@ public abstract class ChunkedStream {
     /**
      * Writes the given data chunks target stream.
      * @param data The chunk data
-     * @throws AnalyticsDataSourceException
+     * @throws AnalyticsException
      */
-    public abstract void writeChunks(List<DataChunk> chunks) throws AnalyticsDataSourceException;
+    public abstract void writeChunks(List<DataChunk> chunks) throws AnalyticsException;
     
     /**
      * Returns the length of the current stream.
      * @return The stream length
-     * @throws AnalyticsDataSourceException
+     * @throws AnalyticsException
      */
-    public abstract long length() throws AnalyticsDataSourceException;
+    public abstract long length() throws AnalyticsException;
     
     /**
      * Sets the length of the current stream.
      * @param length The stream length
-     * @throws AnalyticsDataSourceException
+     * @throws AnalyticsException
      */
-    public abstract void setLength(long length) throws AnalyticsDataSourceException;
+    public abstract void setLength(long length) throws AnalyticsException;
     
     /**
      * Represents a data chunk.

@@ -33,7 +33,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.fs.ChunkedDataInput;
 import org.wso2.carbon.analytics.datasource.core.fs.ChunkedDataOutput;
 import org.wso2.carbon.analytics.datasource.core.ChunkedStream;
@@ -56,7 +56,7 @@ public class RDBMSFileSystem implements FileSystem {
     private static final Log log = LogFactory.getLog(RDBMSFileSystem.class);
     
     public RDBMSFileSystem(QueryConfigurationEntry queryConfigurationEntry, 
-            DataSource dataSource) throws AnalyticsDataSourceException {
+            DataSource dataSource) throws AnalyticsException {
         this.queryConfigurationEntry = queryConfigurationEntry;
         this.dataSource = dataSource;
         this.FS_EMPTY_DATA_CHUNK = new byte[this.getQueryConfiguration().getFsDataChunkSize()];
@@ -81,7 +81,7 @@ public class RDBMSFileSystem implements FileSystem {
     }
     
     @Override
-    public void copy(String srcPath, String destPath) throws AnalyticsDataSourceException {
+    public void copy(String srcPath, String destPath) throws AnalyticsException {
         try {
             DataInput input = this.createInput(srcPath);
             DataOutput output = this.createOutput(destPath);
@@ -92,20 +92,20 @@ public class RDBMSFileSystem implements FileSystem {
             }
             output.close();
             input.close();
-        } catch (AnalyticsDataSourceException e) {
-            throw new AnalyticsDataSourceException("Error in file copy "
+        } catch (AnalyticsException e) {
+            throw new AnalyticsException("Error in file copy "
                     + "[" + srcPath + " -> " + destPath + "]: " + e.getMessage(), e);
         }
     }
 
     @Override
-    public void delete(String path) throws AnalyticsDataSourceException {
+    public void delete(String path) throws AnalyticsException {
         Connection conn = null;
         try {
             conn = this.getConnection();
             this.deleteImpl(conn, path);
         } catch (SQLException e) {
-            throw new AnalyticsDataSourceException("Error in file delete: " + e.getMessage(), e);
+            throw new AnalyticsException("Error in file delete: " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
@@ -123,13 +123,13 @@ public class RDBMSFileSystem implements FileSystem {
     }
 
     @Override
-    public boolean exists(String path) throws AnalyticsDataSourceException {
+    public boolean exists(String path) throws AnalyticsException {
         Connection conn = null;
         try {
             conn = this.getConnection();
             return this.existsImpl(conn, path);
         } catch (SQLException e) {
-            throw new AnalyticsDataSourceException("Error in file exists: " + e.getMessage());
+            throw new AnalyticsException("Error in file exists: " + e.getMessage());
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
@@ -156,7 +156,7 @@ public class RDBMSFileSystem implements FileSystem {
     }
 
     @Override
-    public List<String> list(String path) throws AnalyticsDataSourceException {
+    public List<String> list(String path) throws AnalyticsException {
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -171,19 +171,19 @@ public class RDBMSFileSystem implements FileSystem {
             }
             return result;
         } catch (SQLException e) {
-            throw new AnalyticsDataSourceException("Error in file exists: " + e.getMessage(), e);
+            throw new AnalyticsException("Error in file exists: " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(rs, stmt, conn);
         }
     }
 
     @Override
-    public void sync(String path) throws AnalyticsDataSourceException {
+    public void sync(String path) throws AnalyticsException {
         /* nothing to do */
     }
 
     @Override
-    public void mkdir(String path) throws AnalyticsDataSourceException {
+    public void mkdir(String path) throws AnalyticsException {
         Connection conn = null;
         try {
             conn = this.getConnection(false);
@@ -191,7 +191,7 @@ public class RDBMSFileSystem implements FileSystem {
             conn.commit();
         } catch (SQLException e) {
             RDBMSUtils.rollbackConnection(conn);
-            throw new AnalyticsDataSourceException("Error in mkdir: " + e.getMessage(), e);
+            throw new AnalyticsException("Error in mkdir: " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
@@ -220,7 +220,7 @@ public class RDBMSFileSystem implements FileSystem {
         RDBMSUtils.cleanupConnection(null, stmt, null);
     }
     
-    protected void createFile(String path) throws AnalyticsDataSourceException {
+    protected void createFile(String path) throws AnalyticsException {
         Connection conn = null;
         try {
             conn = this.getConnection(false);
@@ -228,7 +228,7 @@ public class RDBMSFileSystem implements FileSystem {
             conn.commit();
         } catch (SQLException e) {
             RDBMSUtils.rollbackConnection(conn);
-            throw new AnalyticsDataSourceException("Error in creating file: " + e.getMessage());
+            throw new AnalyticsException("Error in creating file: " + e.getMessage());
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
@@ -243,13 +243,13 @@ public class RDBMSFileSystem implements FileSystem {
     }
 
     @Override
-    public long length(String path) throws AnalyticsDataSourceException {
+    public long length(String path) throws AnalyticsException {
         Connection conn = null;
         try {
             conn = this.getConnection();
             return this.lengthImpl(conn, path);
         } catch (SQLException e) {
-            throw new AnalyticsDataSourceException("Error in file length: " + e.getMessage(), e);
+            throw new AnalyticsException("Error in file length: " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
@@ -269,7 +269,7 @@ public class RDBMSFileSystem implements FileSystem {
         return result;
     }
     
-    protected void setLength(String path, long length) throws AnalyticsDataSourceException {
+    protected void setLength(String path, long length) throws AnalyticsException {
         Connection conn = null;
         PreparedStatement stmt = null;
         try {
@@ -279,7 +279,7 @@ public class RDBMSFileSystem implements FileSystem {
             stmt.setString(2, path);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new AnalyticsDataSourceException("Error in file delete: " + e.getMessage());
+            throw new AnalyticsException("Error in file delete: " + e.getMessage());
         } finally {
             RDBMSUtils.cleanupConnection(null, stmt, conn);
         }
@@ -289,7 +289,7 @@ public class RDBMSFileSystem implements FileSystem {
         return this.getQueryConfiguration().getFsSetFileLengthQuery();
     }
     
-    private byte[] inputStreamToByteArray(InputStream in) throws AnalyticsDataSourceException {
+    private byte[] inputStreamToByteArray(InputStream in) throws AnalyticsException {
         byte[] buff = new byte[256];
         int i;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -301,11 +301,11 @@ public class RDBMSFileSystem implements FileSystem {
             in.close();
             return out.toByteArray();
         } catch (IOException e) {
-            throw new AnalyticsDataSourceException("Error in converting input stream -> byte[]: " + e.getMessage(), e);
+            throw new AnalyticsException("Error in converting input stream -> byte[]: " + e.getMessage(), e);
         }
     }
     
-    protected byte[] readChunkData(String path, long n) throws AnalyticsDataSourceException {
+    protected byte[] readChunkData(String path, long n) throws AnalyticsException {
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -321,7 +321,7 @@ public class RDBMSFileSystem implements FileSystem {
                 return FS_EMPTY_DATA_CHUNK;
             }
         } catch (SQLException e) {
-            throw new AnalyticsDataSourceException("Error in file read chunk: " + e.getMessage(), e);
+            throw new AnalyticsException("Error in file read chunk: " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(rs, stmt, conn);
         }
@@ -331,7 +331,7 @@ public class RDBMSFileSystem implements FileSystem {
         return this.getQueryConfiguration().getFsReadDataChunkQuery();
     }
     
-    private void writeChunks(String path, List<DataChunk> chunks) throws AnalyticsDataSourceException {
+    private void writeChunks(String path, List<DataChunk> chunks) throws AnalyticsException {
         Connection conn = null;
         PreparedStatement stmt = null;
         try {
@@ -361,7 +361,7 @@ public class RDBMSFileSystem implements FileSystem {
     }
     
     private void writeChunksSequentially(Connection conn, String path, 
-        List<DataChunk> chunks) throws AnalyticsDataSourceException {
+        List<DataChunk> chunks) throws AnalyticsException {
         PreparedStatement stmt = null;
         String query;
         for (DataChunk chunk : chunks) {
@@ -374,14 +374,14 @@ public class RDBMSFileSystem implements FileSystem {
                 try {
                     query = this.getQueryConfiguration().getFsUpdateDataChunkQuery();
                     if (query == null) {
-                        throw new AnalyticsDataSourceException("A required property 'FsUpdateDataChunkQuery' "
+                        throw new AnalyticsException("A required property 'FsUpdateDataChunkQuery' "
                                 + "for the current analytics data source is not specified");
                     }
                     stmt = conn.prepareStatement(query);
                     this.populateStatementWithDataChunkUpdate(stmt, path, chunk);
                     stmt.execute();
                 } catch (SQLException e1) {
-                    throw new AnalyticsDataSourceException("Error in updating data chunk: " + e1.getMessage(), e1);
+                    throw new AnalyticsException("Error in updating data chunk: " + e1.getMessage(), e1);
                 }
             } finally {
                 if (stmt != null) {
@@ -434,22 +434,22 @@ public class RDBMSFileSystem implements FileSystem {
         }
 
         @Override
-        public long length() throws AnalyticsDataSourceException {
+        public long length() throws AnalyticsException {
             return RDBMSFileSystem.this.length(this.getPath());
         }
 
         @Override
-        public DataChunk readChunk(long n) throws AnalyticsDataSourceException {
+        public DataChunk readChunk(long n) throws AnalyticsException {
             return new DataChunk(n, RDBMSFileSystem.this.readChunkData(this.getPath(), n));
         }
 
         @Override
-        public void setLength(long length) throws AnalyticsDataSourceException {
+        public void setLength(long length) throws AnalyticsException {
             RDBMSFileSystem.this.setLength(this.getPath(), length);
         }
 
         @Override
-        public void writeChunks(List<DataChunk> chunks) throws AnalyticsDataSourceException {
+        public void writeChunks(List<DataChunk> chunks) throws AnalyticsException {
             RDBMSFileSystem.this.writeChunks(this.getPath(), chunks);
         }
         
@@ -457,13 +457,13 @@ public class RDBMSFileSystem implements FileSystem {
 
     @Override
     public DataInput createInput(String path)
-            throws AnalyticsDataSourceException {
+            throws AnalyticsException {
         return new ChunkedDataInput(new RDBMSDataStream(path));
     }
 
     @Override
     public DataOutput createOutput(String path)
-            throws AnalyticsDataSourceException {
+            throws AnalyticsException {
         this.createFile(path);
         return new ChunkedDataOutput(new RDBMSDataStream(path));
     }
