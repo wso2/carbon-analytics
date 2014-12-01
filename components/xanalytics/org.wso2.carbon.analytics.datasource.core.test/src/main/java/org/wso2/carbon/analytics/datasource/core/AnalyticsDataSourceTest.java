@@ -402,9 +402,18 @@ public class AnalyticsDataSourceTest {
     public void testDataRecordAddReadPerformance() throws AnalyticsException {
         System.out.println("\n************** START RECORD PERF TEST [" + this.getImplementationName() + "] **************");
         this.cleanupT1();
+        
+        /* warm-up */
+        this.analyticsDS.createTable(7, "T1");
+        List<Record> records;
+        for (int i = 0; i < 10; i++) {
+            records = this.generateRecords(7, "T1", i, 1000, -1, -1);
+            this.analyticsDS.put(records);
+        }
+        this.cleanupT1();
+        
         this.analyticsDS.createTable(7, "T1");
         long hash1 = 0;
-        List<Record> records;
         int n = 50, batch = 1000;
         long start = System.currentTimeMillis();
         for (int i = 0; i < n; i++) {
@@ -636,6 +645,14 @@ public class AnalyticsDataSourceTest {
         this.fileSystem.delete("/mydir");
         byte[] data = this.generateData(2048);
         DataOutput out;
+        
+        /* warm-up */
+        for (int i = 0; i < 100; i++) {
+            out = this.fileSystem.createOutput("/mydir/perf_warmup/file" + i);
+            out.write(data, 0, data.length);
+            out.close();
+        }        
+        
         long start = System.currentTimeMillis();
         int count = 1000;
         for (int i = 0; i < count; i++) {
