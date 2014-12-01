@@ -25,6 +25,7 @@ import javax.naming.NamingException;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceException;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceImpl;
 import org.wso2.carbon.base.MultitenantConstants;
 
@@ -36,7 +37,7 @@ public class AnalyticsDataServiceTest {
     private AnalyticsDataService service;
     
     @BeforeSuite
-    public void setup() throws NamingException, AnalyticsDataSourceException, IOException {
+    public void setup() throws NamingException, AnalyticsDataSourceException, AnalyticsDataServiceException, IOException {
         AnalyticsDataSource ads = H2FileDBAnalyticsDataSourceTest.cleanupAndCreateDS();
         this.service = new AnalyticsDataServiceImpl(ads);
     }
