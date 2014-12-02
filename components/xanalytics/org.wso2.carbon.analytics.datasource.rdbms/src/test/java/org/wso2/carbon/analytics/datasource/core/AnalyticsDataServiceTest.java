@@ -99,7 +99,7 @@ public class AnalyticsDataServiceTest {
         this.service.deleteTable(1, "T1");
     }
     
-    @Test
+    //@Test
     public void testDataRecordAddReadPerformanceNonIndex() throws AnalyticsException {
         this.cleanupTable(50, "TableX");
         System.out.println("\n************** START ANALYTICS DS (WITHOUT INDEXING, H2-FILE) PERF TEST **************");
@@ -133,11 +133,11 @@ public class AnalyticsDataServiceTest {
         System.out.println("\n************** END ANALYTICS DS (WITHOUT INDEXING, H2-FILE) PERF TEST **************");
     }
     
-    //@Test
+    @Test
     public void testDataRecordAddReadPerformanceIndex() throws AnalyticsException {
         this.cleanupTable(50, "TableX");
         System.out.println("\n************** START ANALYTICS DS (WITH INDEXING, H2-FILE) PERF TEST **************");
-        int n = 10, batch = 1000;
+        int n = 30, batch = 1000;
         List<Record> records;
         Set<String> columns = new HashSet<String>();
         columns.add("tenant");
@@ -147,7 +147,7 @@ public class AnalyticsDataServiceTest {
         /* warm-up */
         this.service.createTable(50, "TableX");
         this.service.setIndices(50, "TableX", columns);
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 1; i++) {
             records = AnalyticsDataSourceTest.generateRecords(50, "TableX", i, batch, -1, -1);
             this.service.put(records);
         }
@@ -172,8 +172,8 @@ public class AnalyticsDataServiceTest {
         System.out.println("* Read Time: " + (end - start) + " ms.");
         System.out.println("* Read Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
         
-        List<String> ids = this.service.search(50, "TableX", "lucene", "log: exception", 0, 1300);
-        Assert.assertEquals(ids.size(), 1300);
+        List<String> ids = this.service.search(50, "TableX", "lucene", "log: exception", 0, 500);
+        Assert.assertEquals(ids.size(), 500);
         System.out.println("* SEARCH RESULT COUNT: " + ids.size());
         
         this.service.clearIndices(50, "TableX");

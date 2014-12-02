@@ -103,12 +103,20 @@ public class CarbonAnalyticsDirectory extends Directory {
 
     @Override
     public boolean fileExists(String name) throws IOException {
-        return this.fileExists(this.generatePath(name));
+        try {
+            return this.fileSystem.exists(this.generatePath(name));
+        } catch (AnalyticsException e) {
+            throw new IOException("Error in file#exists '" + this.generatePath(name) + "': " + e.getMessage(), e);
+        }
     }
 
     @Override
     public long fileLength(String name) throws IOException {
-        return this.fileLength(this.generatePath(name));
+        try {
+            return this.fileSystem.length(this.generatePath(name));
+        } catch (AnalyticsException e) {
+            throw new IOException("Error in file#length '" + this.generatePath(name) + "': " + e.getMessage(), e);
+        }
     }
 
     @Override
@@ -211,7 +219,7 @@ public class CarbonAnalyticsDirectory extends Directory {
         @Override
         public void writeBytes(byte[] data, int offset, int length) throws IOException {
             try {
-                this.dataOutput.write(data, 0, data.length);
+                this.dataOutput.write(data, 0, length);
             } catch (AnalyticsException e) {
                 throw new IOException("Error in writing data: " + e.getMessage(), e);
             }
@@ -372,11 +380,11 @@ public class CarbonAnalyticsDirectory extends Directory {
 
         @Override
         public void release() throws IOException {
-//            try {
-//                this.lock.release();
-//            } catch (AnalyticsLockException e) {
-//                throw new IOException("Error in releasing lock: " + e.getMessage(), e);
-//            }
+            try {
+                this.lock.release();
+            } catch (AnalyticsLockException e) {
+                throw new IOException("Error in releasing lock: " + e.getMessage(), e);
+            }
         }
         
     }
