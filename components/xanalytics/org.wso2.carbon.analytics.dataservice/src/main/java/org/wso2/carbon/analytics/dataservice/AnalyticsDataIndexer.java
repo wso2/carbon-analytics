@@ -47,7 +47,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.NIOFSDirectory;
+import org.apache.lucene.store.MMapDirectory;
 import org.apache.lucene.util.Version;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.Record;
@@ -57,6 +57,12 @@ import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
  * This class represents the indexing functionality.
  */
 public class AnalyticsDataIndexer {
+
+    private static final String INDEX_TIMESTAMP_FIELD = "timestamp";
+
+    private static final String NULL_INDEX_VALUE = "";
+
+    private static final String INDEX_ID_FIELD = "id";
 
     private AnalyticsIndexDefinitionRepository repository;
     
@@ -74,44 +80,67 @@ public class AnalyticsDataIndexer {
         return repository;
     }
     
-    public List<String> search(int tenantId, String tableName, String language, String query) throws AnalyticsIndexException {
+    public List<String> search(int tenantId, String tableName, String language, String query, int start, int count) throws AnalyticsIndexException {
         List<String> result = new ArrayList<String>();
         String tableId = this.generateTableId(tenantId, tableName);
         IndexReader reader;
         try {
             reader = DirectoryReader.open(this.lookupIndexWriter(tableId).getDirectory());
             IndexSearcher searcher = new IndexSearcher(reader);
-            Query indexQuery = new QueryParser(Version.LUCENE_45, "log", this.analyzer).parse(query);
-            TopScoreDocCollector collector = TopScoreDocCollector.create(10, true);
+            Query indexQuery = new QueryParser(Version.LUCENE_45, null, this.analyzer).parse(query);
+            TopScoreDocCollector collector = TopScoreDocCollector.create(count, true);
             searcher.search(indexQuery, collector);
-            ScoreDoc[] hits = collector.topDocs().scoreDocs;
+            ScoreDoc[] hits = collector.topDocs(start).scoreDocs;
             Document indexDoc;
             for (ScoreDoc doc : hits) {
                 indexDoc = searcher.doc(doc.doc);
-                result.add(indexDoc.get("_id_"));
+                result.add(indexDoc.get(INDEX_ID_FIELD));
             }
             reader.close();
             return result;
         } catch (Exception e) {
             throw new AnalyticsIndexException("Error in index search: " + e.getMessage(), e);
-        }        
+        }
+    }
+    
+    private Map<String, List<Record>> generateRecordBatches(List<Record> records) throws AnalyticsException {
+        Map<String, List<Record>> recordBatches = new HashMap<String, List<Record>>();
+        List<Record> recordBatch;
+        String identity;
+        for (Record record : records) {
+            identity = this.generateTableId(record.getTenantId(), record.getTableName());
+            recordBatch = recordBatches.get(identity);
+            if (recordBatch == null) {
+                recordBatch = new ArrayList<Record>();
+                recordBatches.put(identity, recordBatch);
+            }
+            recordBatch.add(record);
+        }
+        return recordBatches;
     }
     
     public void process(List<Record> records) throws AnalyticsException {
         Set<String> indices;
-        for (Record record : records) {
-            indices = this.getIndices(record.getTenantId(), record.getTableName());
+        Map<String, List<Record>> batches = this.generateRecordBatches(records);
+        Record firstRecord;
+        for (List<Record> recordBatch : batches.values()) {
+            firstRecord = recordBatch.get(0);
+            indices = this.getIndices(firstRecord.getTenantId(), firstRecord.getTableName());
             if (indices.size() > 0) {
-                this.addToIndex(record, indices);
+                this.addToIndex(recordBatch, indices);
             }
         }
     }
     
-    private void addToIndex(Record record, Set<String> columns) throws AnalyticsIndexException {
-        String tableId = this.generateTableId(record.getTenantId(), record.getTableName());
+    private void addToIndex(List<Record> recordBatch, Set<String> columns) throws AnalyticsIndexException {
+        Record firstRecord = recordBatch.get(0);
+        String tableId = this.generateTableId(firstRecord.getTenantId(), firstRecord.getTableName());
         IndexWriter indexWriter = this.lookupIndexWriter(tableId);
         try {
-            indexWriter.addDocument(this.generateIndexDoc(record, columns));
+            for (Record record : recordBatch) {
+                indexWriter.addDocument(this.generateIndexDoc(record, columns));
+            }
+            indexWriter.commit();
         } catch (IOException e) {
             throw new AnalyticsIndexException("Error in updating index: " + e.getMessage(), e);
         }
@@ -120,9 +149,14 @@ public class AnalyticsDataIndexer {
     private Document generateIndexDoc(Record record, Set<String> columns) throws IOException, AnalyticsIndexException {
         Document doc = new Document();
         Object obj;
-        doc.add(new StringField("_id_", record.getId(), Store.NO));
+        doc.add(new StringField(INDEX_ID_FIELD, record.getId(), Store.NO));
         for (String column : columns) {
             obj = record.getValue(column);
+            /* first check if the user is sending a separate timestamp field, if not, if we are told
+             * to index the timestamp, use the internal timestamp in the record */
+            if (obj == null && INDEX_TIMESTAMP_FIELD.equals(column)) {
+                obj = record.getTimestamp();
+            }
             if (obj instanceof String) {
                 doc.add(new TextField(column, (String) obj, Store.NO));
             } else if (obj instanceof Integer) {
@@ -135,7 +169,9 @@ public class AnalyticsDataIndexer {
                 doc.add(new LongField(column, (Long) obj, Store.NO));
             } else if (obj instanceof Float) {
                 doc.add(new FloatField(column, (Float) obj, Store.NO));
-            } else {
+            } else if (obj == null) {
+                doc.add(new StringField(column, NULL_INDEX_VALUE, Store.NO));                
+            } else { /* null values we just ignore */
                 throw new AnalyticsIndexException("Unsupported data type for indexing: " + obj.getClass());
             }
         }
@@ -161,7 +197,7 @@ public class AnalyticsDataIndexer {
     
     private IndexWriter createIndexWriter(String tableId) throws AnalyticsIndexException {
         try {
-            Directory index = new NIOFSDirectory(new File("/home/laf/Desktop/index/" + tableId));
+            Directory index = new MMapDirectory(new File("/home/laf/Desktop/index/" + tableId));
             StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_45);
             IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_45, analyzer);
             return new IndexWriter(index, config);

@@ -120,9 +120,9 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     @Override
-    public List<String> search(int tenantId, String tableName, String language, String query)
-            throws AnalyticsIndexException {
-        return this.getIndexer().search(tenantId, tableName, language, query);
+    public List<String> search(int tenantId, String tableName, String language, String query,
+            int start, int count) throws AnalyticsIndexException {
+        return this.getIndexer().search(tenantId, tableName, language, query, start, count);
     }
 
     @Override

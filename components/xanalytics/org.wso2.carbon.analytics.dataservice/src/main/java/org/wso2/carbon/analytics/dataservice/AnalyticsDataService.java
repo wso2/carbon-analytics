@@ -63,11 +63,13 @@ public interface AnalyticsDataService extends AnalyticsRecordStore {
      * @param tableName The table name
      * @param language The language used to give the search query
      * @param query The search query
+     * @param start The start location of the result, 0 based
+     * @param count The maximum number of result entries to be returned
      * @return A list of record ids of matched records
      * @throws AnalyticsIndexException
      */
     List<String> search(int tenantId, String tableName, String language, 
-            String query) throws AnalyticsIndexException;
+            String query, int start, int count) throws AnalyticsIndexException;
     
     /**
      * Destroys and frees any resources taken up by the analytics data service implementation.
