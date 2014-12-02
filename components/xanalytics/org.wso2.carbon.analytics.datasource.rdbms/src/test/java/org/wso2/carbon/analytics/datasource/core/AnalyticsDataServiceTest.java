@@ -19,8 +19,11 @@
 package org.wso2.carbon.analytics.datasource.core;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.naming.NamingException;
@@ -77,6 +80,26 @@ public class AnalyticsDataServiceTest {
     }
     
     @Test
+    public void testIndexedDataAddRetrieve() throws AnalyticsException {
+        this.service.clearIndices(1, "TX");
+        this.service.deleteTable(1, "T1");
+        this.service.createTable(1, "TX");
+        Set<String> columns = new HashSet<String>();
+        columns.add("C1");
+        columns.add("T1");
+        this.service.setIndices(1, "TX", columns);
+        List<Record> records = new ArrayList<Record>();
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put("C1", "My name is jack");
+        values.put("T1", 28);
+        Record record = new Record(1, "TX", values, System.currentTimeMillis());
+        records.add(record);
+        this.service.put(records);
+        this.service.clearIndices(1, "TX");
+        this.service.deleteTable(1, "T1");
+    }
+    
+    @Test
     public void testDataRecordAddReadPerformanceNonIndex() throws AnalyticsException {
         this.cleanupTable(50, "TableX");
         System.out.println("\n************** START ANALYTICS DS (WITHOUT INDEXING, H2-FILE) PERF TEST **************");
@@ -110,7 +133,7 @@ public class AnalyticsDataServiceTest {
         System.out.println("\n************** END ANALYTICS DS (WITHOUT INDEXING, H2-FILE) PERF TEST **************");
     }
     
-    @Test
+    //@Test
     public void testDataRecordAddReadPerformanceIndex() throws AnalyticsException {
         this.cleanupTable(50, "TableX");
         System.out.println("\n************** START ANALYTICS DS (WITH INDEXING, H2-FILE) PERF TEST **************");

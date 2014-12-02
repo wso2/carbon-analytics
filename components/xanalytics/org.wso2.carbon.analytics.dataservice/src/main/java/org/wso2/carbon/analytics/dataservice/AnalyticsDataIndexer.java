@@ -18,7 +18,6 @@
  */
 package org.wso2.carbon.analytics.dataservice;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,16 +46,18 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.MMapDirectory;
 import org.apache.lucene.util.Version;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
+import org.wso2.carbon.analytics.datasource.core.lock.LockProvider;
 
 /**
  * This class represents the indexing functionality.
  */
 public class AnalyticsDataIndexer {
+
+    private static final String INDEX_DATA_FS_BASE_PATH = "/_data/index/";
 
     private static final String INDEX_TIMESTAMP_FIELD = "timestamp";
 
@@ -72,8 +73,22 @@ public class AnalyticsDataIndexer {
     
     private Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_45);
     
-    public AnalyticsDataIndexer(FileSystem fileSystem) {
-        this.repository = new AnalyticsIndexDefinitionRepository(fileSystem);
+    private FileSystem fileSystem;
+    
+    private LockProvider lockProvider;
+    
+    public AnalyticsDataIndexer(FileSystem fileSystem, LockProvider lockProvider) {
+        this.fileSystem = fileSystem;
+        this.lockProvider = lockProvider;
+        this.repository = new AnalyticsIndexDefinitionRepository(this.getFileSystem());
+    }
+    
+    public FileSystem getFileSystem() {
+        return fileSystem;
+    }
+    
+    public LockProvider getLockProvider() {
+        return lockProvider;
     }
     
     public AnalyticsIndexDefinitionRepository getRepository() {
@@ -195,9 +210,23 @@ public class AnalyticsDataIndexer {
         return cols; 
     }
     
+    private String generateDirPath(String tableId) {
+        return INDEX_DATA_FS_BASE_PATH + tableId;
+    }
+    
+    private Directory createDirectory(String tableId) throws AnalyticsIndexException {
+        String path = this.generateDirPath(tableId);
+        try {
+            return new CarbonAnalyticsDirectory(this.getFileSystem(), this.getLockProvider(), path);
+        } catch (AnalyticsException e) {
+            throw new AnalyticsIndexException("Error in creating directory: " + e.getMessage(), e);
+        }
+    }
+    
     private IndexWriter createIndexWriter(String tableId) throws AnalyticsIndexException {
         try {
-            Directory index = new MMapDirectory(new File("/home/laf/Desktop/index/" + tableId));
+            //Directory index = new MMapDirectory(new File("/home/laf/Desktop/index/" + tableId));
+            Directory index = this.createDirectory(tableId);
             StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_45);
             IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_45, analyzer);
             return new IndexWriter(index, config);

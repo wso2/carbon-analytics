@@ -21,6 +21,7 @@ package org.wso2.carbon.analytics.dataservice;
 import org.apache.axis2.engine.ListenerManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
@@ -60,7 +61,11 @@ public class AnalyticsDataServiceComponent {
     }
     
     public static HazelcastInstance getHazelcastInstance() {
-        BundleContext ctx = FrameworkUtil.getBundle(AnalyticsDataServiceComponent.class).getBundleContext();
+        Bundle bundle = FrameworkUtil.getBundle(AnalyticsDataServiceComponent.class);
+        if (bundle == null) {
+            return null;
+        }
+        BundleContext ctx = bundle.getBundleContext();
         ServiceReference<HazelcastInstance> ref = ctx.getServiceReference(HazelcastInstance.class);
         if (ref == null) {
             return null;

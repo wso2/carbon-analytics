@@ -47,16 +47,20 @@ public class CarbonAnalyticsDirectory extends Directory {
     public CarbonAnalyticsDirectory(FileSystem fileSystem, LockProvider lockProvider, 
             String path) throws AnalyticsException {
         this.fileSystem = fileSystem;
-        this.path = path;
-        if (!this.path.endsWith("/")) {
-            this.path += "/";
-        }
+        this.path = this.normalisePath(path);
         try {
             this.setLockFactory(new AnalyticsIndexLockFactoryAdaptor(lockProvider));
             this.getLockFactory().setLockPrefix(this.getPath());
         } catch (IOException e) {
             throw new AnalyticsException("Error in creating Carbon analytics directory: " + e.getMessage(), e);
         }
+    }
+    
+    private String normalisePath(String path) {
+        if (path.endsWith("/")) {
+            path += "/";
+        }
+        return path;
     }
     
     public FileSystem getFileSystem() {
@@ -80,8 +84,9 @@ public class CarbonAnalyticsDirectory extends Directory {
     public IndexOutput createOutput(String name, IOContext ctx) throws IOException {
         DataOutput output;
         try {
-            output = this.fileSystem.createOutput(this.generatePath(name));
-            return new AnalyticsIndexOutputAdaptor(output);
+            String path = this.generatePath(name);
+            output = this.fileSystem.createOutput(path);
+            return new AnalyticsIndexOutputAdaptor(output, path);
         } catch (AnalyticsException e) {
             throw new IOException("Error in creating index output for file '" + name + "': " + e.getMessage(), e);
         }        
@@ -141,41 +146,75 @@ public class CarbonAnalyticsDirectory extends Directory {
 
         private DataOutput dataOutput;
         
-        public AnalyticsIndexOutputAdaptor(DataOutput dataOutput) {
+        private String path;
+        
+        public AnalyticsIndexOutputAdaptor(DataOutput dataOutput, String path) {
             this.dataOutput = dataOutput;
+            this.path = path;
         }
         
         @Override
         public void close() throws IOException {
+            try {
+                this.dataOutput.close();
+            } catch (AnalyticsException e) {
+                throw new IOException("Error in closing data output: " + e.getMessage(), e);
+            }
         }
 
         @Override
         public void flush() throws IOException {
+            try {
+                this.dataOutput.flush();
+            } catch (AnalyticsException e) {
+                throw new IOException("Error in flushing data output: " + e.getMessage(), e);
+            }
         }
 
         @Override
         public long getFilePointer() {
-            return 0;
+            try {
+                return this.dataOutput.getPosition();
+            } catch (AnalyticsException e) {
+                throw new RuntimeException("Error in retrieving file position: " + e.getMessage(), e);
+            }
         }
 
         @Override
         public long length() throws IOException {
-            return 0;
+            try {
+                return fileSystem.length(this.path);
+            } catch (AnalyticsException e) {
+                throw new IOException("Error in retrieving file length: " + e.getMessage(), e);
+            }
         }
 
         @Override
         public void seek(long pos) throws IOException {
-            
+            try {
+                this.dataOutput.seek(pos);
+            } catch (AnalyticsException e) {
+                throw new IOException("Error in index output file seek: " + e.getMessage(), e);
+            }
         }
 
         @Override
         public void writeByte(byte data) throws IOException {
-            
+            try {
+                byte[] buff = new byte[] { data };
+                this.dataOutput.write(buff, 0, buff.length);
+            } catch (AnalyticsException e) {
+                throw new IOException("Error in writing data: " + e.getMessage(), e);
+            }
         }
 
         @Override
         public void writeBytes(byte[] data, int offset, int length) throws IOException {
-            
+            try {
+                this.dataOutput.write(data, 0, data.length);
+            } catch (AnalyticsException e) {
+                throw new IOException("Error in writing data: " + e.getMessage(), e);
+            }
         }
         
     }
@@ -187,36 +226,68 @@ public class CarbonAnalyticsDirectory extends Directory {
         
         private DataInput dataInput;
         
-        protected AnalyticsIndexInputAdaptor(String fileName, DataInput dataInput) {
-            super(fileName);
+        private String path;
+        
+        protected AnalyticsIndexInputAdaptor(String path, DataInput dataInput) {
+            super(path);
+            this.path = path;
             this.dataInput = dataInput;            
         }
 
         @Override
-        public void close() throws IOException {            
+        public void close() throws IOException {
+            try {
+                this.dataInput.close();
+            } catch (AnalyticsException e) {
+                throw new IOException("Error in closing index input: " + e.getMessage(), e);
+            }
         }
 
         @Override
         public long getFilePointer() {
-            return 0;
+            try {
+                return this.dataInput.getPosition();
+            } catch (AnalyticsException e) {
+                throw new RuntimeException("Error in retrieving file location: " + e.getMessage(), e);
+            }
         }
 
         @Override
         public long length() {
-            return 0;
+            try {
+                return fileSystem.length(this.path);
+            } catch (AnalyticsException e) {
+                throw new RuntimeException("Error in retrieving file length: " + e.getMessage(), e);
+            }
         }
 
         @Override
         public void seek(long pos) throws IOException {
+            try {
+                this.dataInput.seek(pos);
+            } catch (AnalyticsException e) {
+                throw new IOException("Error in index input file seek: " + e.getMessage(), e);
+            }
         }
 
         @Override
         public byte readByte() throws IOException {
-            return 0;
+            try {
+                byte[] buff = new byte[1];
+                this.dataInput.read(buff, 0, buff.length);
+                return buff[0];
+            } catch (AnalyticsException e) {
+                throw new RuntimeException("Error in reading data: " + e.getMessage(), e);
+            }
         }
 
         @Override
         public void readBytes(byte[] data, int offset, int length) throws IOException {
+            try {
+                this.dataInput.read(data, offset, length);
+            } catch (AnalyticsException e) {
+                throw new RuntimeException("Error in reading data: " + e.getMessage(), e);
+            }
         }
         
     }
@@ -301,11 +372,11 @@ public class CarbonAnalyticsDirectory extends Directory {
 
         @Override
         public void release() throws IOException {
-            try {
-                this.lock.release();
-            } catch (AnalyticsLockException e) {
-                throw new IOException("Error in releasing lock: " + e.getMessage(), e);
-            }
+//            try {
+//                this.lock.release();
+//            } catch (AnalyticsLockException e) {
+//                throw new IOException("Error in releasing lock: " + e.getMessage(), e);
+//            }
         }
         
     }
