@@ -122,8 +122,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public List<String> search(int tenantId, String tableName, String language, String query)
             throws AnalyticsIndexException {
-        // TODO Auto-generated method stub
-        return null;
+        return this.getIndexer().search(tenantId, tableName, language, query);
     }
 
     @Override

@@ -142,11 +142,16 @@ public class AnalyticsDataServiceTest {
         System.out.println("* Records: " + (n * batch));
         System.out.println("* Write Time: " + (end - start) + " ms.");
         System.out.println("* Write Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
+        start = System.currentTimeMillis();
         Set<Record> recordsIn = AnalyticsDataSourceTest.recordGroupsToSet(this.service.get(50, "TableX", null, -1, -1, 0, -1));
         Assert.assertEquals(recordsIn.size(), (n * batch));
         end = System.currentTimeMillis();
         System.out.println("* Read Time: " + (end - start) + " ms.");
         System.out.println("* Read Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
+        
+        List<String> ids = this.service.search(50, "TableX", "lucene", "log:Joey");
+        System.out.println("* SEARCH RESULT COUNT: " + ids.size());
+        
         this.service.clearIndices(50, "TableX");
         this.cleanupTable(50, "TableX");
         System.out.println("\n************** END ANALYTICS DS (WITH INDEXING, H2-FILE) PERF TEST **************");

@@ -20,12 +20,14 @@ package org.wso2.carbon.analytics.dataservice;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleField;
@@ -35,8 +37,15 @@ import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.document.Field.Store;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.NIOFSDirectory;
 import org.apache.lucene.util.Version;
@@ -55,12 +64,37 @@ public class AnalyticsDataIndexer {
     
     private Map<String, IndexWriter> indexWriters = new HashMap<String, IndexWriter>();
     
+    private Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_45);
+    
     public AnalyticsDataIndexer(FileSystem fileSystem) {
         this.repository = new AnalyticsIndexDefinitionRepository(fileSystem);
     }
     
     public AnalyticsIndexDefinitionRepository getRepository() {
         return repository;
+    }
+    
+    public List<String> search(int tenantId, String tableName, String language, String query) throws AnalyticsIndexException {
+        List<String> result = new ArrayList<String>();
+        String tableId = this.generateTableId(tenantId, tableName);
+        IndexReader reader;
+        try {
+            reader = DirectoryReader.open(this.lookupIndexWriter(tableId).getDirectory());
+            IndexSearcher searcher = new IndexSearcher(reader);
+            Query indexQuery = new QueryParser(Version.LUCENE_45, "log", this.analyzer).parse(query);
+            TopScoreDocCollector collector = TopScoreDocCollector.create(10, true);
+            searcher.search(indexQuery, collector);
+            ScoreDoc[] hits = collector.topDocs().scoreDocs;
+            Document indexDoc;
+            for (ScoreDoc doc : hits) {
+                indexDoc = searcher.doc(doc.doc);
+                result.add(indexDoc.get("_id_"));
+            }
+            reader.close();
+            return result;
+        } catch (Exception e) {
+            throw new AnalyticsIndexException("Error in index search: " + e.getMessage(), e);
+        }        
     }
     
     public void process(List<Record> records) throws AnalyticsException {
@@ -86,6 +120,7 @@ public class AnalyticsDataIndexer {
     private Document generateIndexDoc(Record record, Set<String> columns) throws IOException, AnalyticsIndexException {
         Document doc = new Document();
         Object obj;
+        doc.add(new StringField("_id_", record.getId(), Store.NO));
         for (String column : columns) {
             obj = record.getValue(column);
             if (obj instanceof String) {
