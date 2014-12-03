@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.core;
+package org.wso2.carbon.analytics.datasource.rdbms;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,6 +34,10 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceImpl;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSource;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceTest;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.base.MultitenantConstants;
 
 /**

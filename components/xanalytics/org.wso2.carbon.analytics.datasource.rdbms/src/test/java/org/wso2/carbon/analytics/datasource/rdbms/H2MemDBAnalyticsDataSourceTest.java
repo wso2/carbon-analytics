@@ -16,10 +16,8 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.core;
+package org.wso2.carbon.analytics.datasource.rdbms;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,90 +27,58 @@ import javax.naming.NamingException;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.Parameters;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceTest;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.rdbms.QueryConfigurationEntry;
 import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsDataSource;
 
 /**
- * MySQL implementation of analytics data source tests.
+ * H2 implementation of analytics data source tests.
  */
-public class MySQLInnoDBAnalyticsDataSourceTest extends AnalyticsDataSourceTest {
+public class H2MemDBAnalyticsDataSourceTest extends AnalyticsDataSourceTest {
 
     @BeforeSuite
-    @Parameters({"mysql.url", "mysql.username", "mysql.password"})
-    public void setup(String url, String username, 
-            String password) throws NamingException, AnalyticsException, SQLException {
-        this.initDS(url, username, password);
+    public void setup() throws NamingException, AnalyticsException {
+        this.initDS("jdbc:h2:mem:bam_test_db", "wso2carbon", "wso2carbon");
         RDBMSAnalyticsDataSource ads = new RDBMSAnalyticsDataSource(this.generateQueryConfiguration());
         Map<String, String> props = new HashMap<String, String>();
         props.put("datasource", "DS");
         ads.init(props);
-        this.init("MySQLInnoDBAnalyticsDataSource", ads);
+        this.init("H2MemDBAnalyticsDataSource", ads);
     }
     
-    private void initDS(String url, String username, String password) throws NamingException, SQLException {
+    private void initDS(String url, String username, String password) throws NamingException {
         PoolProperties pps = new PoolProperties();
-        pps.setDriverClassName("com.mysql.jdbc.Driver");
+        pps.setDriverClassName("org.h2.Driver");
         pps.setUrl(url);
         pps.setUsername(username);
         pps.setPassword(password);
         DataSource dsx = new DataSource(pps);
         new InitialContext().bind("DS", dsx);
-        this.dropSystemTables(dsx);
     }
-    
-    private void dropSystemTables(javax.sql.DataSource ds) throws SQLException {
-        Connection conn = null;
-        try {
-            conn = ds.getConnection();
-            conn.prepareStatement("DROP TABLE IF EXISTS AN_FS_DATA").executeUpdate();
-            conn.prepareStatement("DROP TABLE IF EXISTS AN_FS_PATH").executeUpdate();
-            conn.prepareStatement("DROP TABLE IF EXISTS AN_TABLE_RECORD").executeUpdate();
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException ignore) { } 
-            }
-        }
-    }
-    
-//    public static void main(String[] args) throws Exception {
-//        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/bam3", "root", "root");
-//        PreparedStatement stmt;
-//        long t1 = System.currentTimeMillis();
-//        for (int i = 0; i < 1000; i++) {
-//            //stmt = conn.prepareStatement("UPDATE ABC SET length = 5400 WHERE path = '/mydir'");
-//            stmt = conn.prepareStatement("INSERT INTO ABC (path,length,ppath) VALUES (?,?,?)");
-//            stmt.setString(1, "/mydir/" + i);
-//            stmt.setLong(2, 40500);
-//            stmt.setString(3, "/");
-//            stmt.executeUpdate();
-//            stmt.close();
-//        }
-//        long t2 = System.currentTimeMillis();
-//        conn.close();
-//        System.out.println("Time: " + (t2 - t1));
-//    }
     
     private QueryConfigurationEntry generateQueryConfiguration() {
         QueryConfigurationEntry conf = new QueryConfigurationEntry();
         String[] recordTableInitQueries = new String[2];
         recordTableInitQueries[0] = "CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data BLOB, PRIMARY KEY(record_id))";
-        recordTableInitQueries[1] = "CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON AN_TABLE_RECORD(timestamp)";        
+        recordTableInitQueries[1] = "CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)";
+        String[] recordTableDeleteQueries = new String[2];
+        recordTableDeleteQueries[0] = "DROP TABLE IF EXISTS {{TABLE_NAME}}";
+        recordTableDeleteQueries[1] = "DROP INDEX IF EXISTS {{TABLE_NAME}}_TIMESTAMP";        
         String[] fsTableInitQueries = new String[3];
         fsTableInitQueries[0] = "CREATE TABLE AN_FS_PATH (path VARCHAR(256), is_directory BOOLEAN, length BIGINT, parent_path VARCHAR(256), PRIMARY KEY(path), FOREIGN KEY (parent_path) REFERENCES AN_FS_PATH(path) ON DELETE CASCADE)";
         fsTableInitQueries[1] = "CREATE TABLE AN_FS_DATA (path VARCHAR(256), sequence BIGINT, data BLOB, PRIMARY KEY (path,sequence), FOREIGN KEY (path) REFERENCES AN_FS_PATH(path) ON DELETE CASCADE)";
         fsTableInitQueries[2] = "CREATE INDEX index_parent_id ON AN_FS_PATH(parent_path)";        
         conf.setRecordTableInitQueries(recordTableInitQueries);
+        conf.setRecordTableDeleteQueries(recordTableDeleteQueries);
         conf.setFsTableInitQueries(fsTableInitQueries);        
         conf.setFsTablesCheckQuery("SELECT record_id FROM AN_FS_PATH WHERE path = '/'");
         conf.setRecordInsertQuery("INSERT INTO {{TABLE_NAME}} (record_id, timestamp, data) VALUES (?, ?, ?)");
         conf.setRecordRetrievalQuery("SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE timestamp >= ? AND timestamp < ? LIMIT ?,?");
-        conf.setRecordRetrievalWithIdsQuery("SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE AND record_id IN (:record_ids)");
-        conf.setRecordDeletionWithIdsQuery("DELETE FROM {{TABLE_NAME}} WHERE record_id IN (:record_ids)");
-        conf.setRecordDeletionQuery("DELETE FROM {{TABLE_NAME}} WHERE timestamp >= ? AND timestamp < ? AND record_id != ?");
+        conf.setRecordRetrievalWithIdsQuery("SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})");
+        conf.setRecordDeletionWithIdsQuery("DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})");
+        conf.setRecordDeletionQuery("DELETE FROM {{TABLE_NAME}} WHERE timestamp >= ? AND timestamp < ?");
+        conf.setRecordCountQuery("SELECT COUNT(*) FROM {{TABLE_NAME}}");
         conf.setPaginationFirstZeroIndexed(true);
         conf.setPaginationFirstInclusive(true);
         conf.setPaginationSecondLength(true);

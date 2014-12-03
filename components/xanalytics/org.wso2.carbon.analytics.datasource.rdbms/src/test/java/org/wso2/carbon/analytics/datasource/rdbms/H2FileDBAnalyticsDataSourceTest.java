@@ -16,8 +16,10 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.core;
+package org.wso2.carbon.analytics.datasource.rdbms;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,25 +29,40 @@ import javax.naming.NamingException;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.testng.annotations.BeforeSuite;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSource;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceTest;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.rdbms.QueryConfigurationEntry;
 import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsDataSource;
 
 /**
  * H2 implementation of analytics data source tests.
  */
-public class H2MemDBAnalyticsDataSourceTest extends AnalyticsDataSourceTest {
+public class H2FileDBAnalyticsDataSourceTest extends AnalyticsDataSourceTest {
 
     @BeforeSuite
-    public void setup() throws NamingException, AnalyticsException {
-        this.initDS("jdbc:h2:mem:bam_test_db", "wso2carbon", "wso2carbon");
-        RDBMSAnalyticsDataSource ads = new RDBMSAnalyticsDataSource(this.generateQueryConfiguration());
+    public void setup() throws NamingException, AnalyticsException, IOException {
+        AnalyticsDataSource ads = cleanupAndCreateDS();
+        this.init("H2FileDBAnalyticsDataSource", ads);
+    }
+    
+    public static AnalyticsDataSource cleanupAndCreateDS() throws NamingException, AnalyticsException {
+        String dbPath = System.getProperty("java.io.tmpdir") + File.separator + "bam_test_db";
+        deleteFile(dbPath + ".mv.db");
+        deleteFile(dbPath + ".trace.db");
+        initDS("jdbc:h2:" + dbPath, "wso2carbon", "wso2carbon");
+        AnalyticsDataSource ads = new RDBMSAnalyticsDataSource(generateQueryConfiguration());
         Map<String, String> props = new HashMap<String, String>();
         props.put("datasource", "DS");
         ads.init(props);
-        this.init("H2MemDBAnalyticsDataSource", ads);
+        return ads;
     }
     
-    private void initDS(String url, String username, String password) throws NamingException {
+    private static void deleteFile(String path) {
+        new File(path).delete();
+    }
+    
+    private static void initDS(String url, String username, String password) throws NamingException {
         PoolProperties pps = new PoolProperties();
         pps.setDriverClassName("org.h2.Driver");
         pps.setUrl(url);
@@ -55,7 +72,7 @@ public class H2MemDBAnalyticsDataSourceTest extends AnalyticsDataSourceTest {
         new InitialContext().bind("DS", dsx);
     }
     
-    private QueryConfigurationEntry generateQueryConfiguration() {
+    private static QueryConfigurationEntry generateQueryConfiguration() {
         QueryConfigurationEntry conf = new QueryConfigurationEntry();
         String[] recordTableInitQueries = new String[2];
         recordTableInitQueries[0] = "CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data BLOB, PRIMARY KEY(record_id))";
@@ -70,7 +87,7 @@ public class H2MemDBAnalyticsDataSourceTest extends AnalyticsDataSourceTest {
         conf.setRecordTableInitQueries(recordTableInitQueries);
         conf.setRecordTableDeleteQueries(recordTableDeleteQueries);
         conf.setFsTableInitQueries(fsTableInitQueries);        
-        conf.setFsTablesCheckQuery("SELECT record_id FROM AN_FS_PATH WHERE path = '/'");
+        conf.setFsTablesCheckQuery("SELECT path FROM AN_FS_PATH WHERE path = '/'");
         conf.setRecordInsertQuery("INSERT INTO {{TABLE_NAME}} (record_id, timestamp, data) VALUES (?, ?, ?)");
         conf.setRecordRetrievalQuery("SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE timestamp >= ? AND timestamp < ? LIMIT ?,?");
         conf.setRecordRetrievalWithIdsQuery("SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})");

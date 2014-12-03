@@ -5,11 +5,11 @@
    <parameter name="mysql.password"  value="root"/>
    <test name="Analytics RDBMS Impl. Tests">
      <classes>     
-       <!--class name="org.wso2.carbon.analytics.datasource.core.MySQLInnoDBAnalyticsDataSourceTest"/>
-       <class name="org.wso2.carbon.analytics.datasource.core.MySQLMyISAMAnalyticsDataSourceTest"/-->
-       <class name="org.wso2.carbon.analytics.datasource.core.H2FileDBAnalyticsDataSourceTest"/>
-       <class name="org.wso2.carbon.analytics.datasource.core.H2MemDBAnalyticsDataSourceTest"/>
-       <class name="org.wso2.carbon.analytics.datasource.core.AnalyticsDataServiceTest"/>
+       <!--class name="org.wso2.carbon.analytics.datasource.rdbms.MySQLInnoDBAnalyticsDataSourceTest"/>
+       <class name="org.wso2.carbon.analytics.datasource.rdbms.MySQLMyISAMAnalyticsDataSourceTest"/-->
+       <class name="org.wso2.carbon.analytics.datasource.rdbms.H2FileDBAnalyticsDataSourceTest"/>
+       <class name="org.wso2.carbon.analytics.datasource.rdbms.H2MemDBAnalyticsDataSourceTest"/>
+       <class name="org.wso2.carbon.analytics.datasource.rdbms.AnalyticsDataServiceTest"/>
      </classes>
    </test>
 </suite>
