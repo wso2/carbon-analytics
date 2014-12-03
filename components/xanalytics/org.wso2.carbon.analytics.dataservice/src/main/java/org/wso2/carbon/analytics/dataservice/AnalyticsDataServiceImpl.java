@@ -96,7 +96,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
         this.getAnalyticsDataSource().put(records);
-        this.getIndexer().process(records);
+        this.getIndexer().put(records);
     }
 
     @Override
@@ -137,7 +137,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     @Override
     public Set<String> getIndices(int tenantId, String tableName) throws AnalyticsIndexException {
-        return this.getIndexer().getIndices(tenantId, tableName);
+        return this.getIndexer().lookupIndices(tenantId, tableName);
     }
 
     @Override

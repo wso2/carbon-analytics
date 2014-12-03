@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -56,20 +58,22 @@ import org.wso2.carbon.analytics.datasource.core.lock.LockProvider;
  * This class represents the indexing functionality.
  */
 public class AnalyticsDataIndexer {
-
+    
+    private static final Log log = LogFactory.getLog(AnalyticsDataIndexer.class);
+    
     private static final String INDEX_DATA_FS_BASE_PATH = "/_data/index/";
 
-    private static final String INDEX_TIMESTAMP_FIELD = "timestamp";
+    public static final String INDEX_INTERNAL_TIMESTAMP_FIELD = "timestamp_internal";
 
     private static final String NULL_INDEX_VALUE = "";
 
-    private static final String INDEX_ID_FIELD = "id";
+    public static final String INDEX_ID_INTERNAL_FIELD = "id_internal";
 
     private AnalyticsIndexDefinitionRepository repository;
     
     private Map<String, Set<String>> indexDefs = new HashMap<String, Set<String>>();
     
-    private Map<String, IndexWriter> indexWriters = new HashMap<String, IndexWriter>();
+    private Map<String, Directory> indexDirs = new HashMap<String, Directory>();
     
     private Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_45);
     
@@ -100,7 +104,7 @@ public class AnalyticsDataIndexer {
         String tableId = this.generateTableId(tenantId, tableName);
         IndexReader reader;
         try {
-            reader = DirectoryReader.open(this.lookupIndexWriter(tableId).getDirectory());
+            reader = DirectoryReader.open(this.lookupIndexDir(tableId));
             IndexSearcher searcher = new IndexSearcher(reader);
             Query indexQuery = new QueryParser(Version.LUCENE_45, null, this.analyzer).parse(query);
             TopScoreDocCollector collector = TopScoreDocCollector.create(count, true);
@@ -109,7 +113,7 @@ public class AnalyticsDataIndexer {
             Document indexDoc;
             for (ScoreDoc doc : hits) {
                 indexDoc = searcher.doc(doc.doc);
-                result.add(indexDoc.get(INDEX_ID_FIELD));
+                result.add(indexDoc.get(INDEX_ID_INTERNAL_FIELD));
             }
             reader.close();
             return result;
@@ -134,13 +138,18 @@ public class AnalyticsDataIndexer {
         return recordBatches;
     }
     
-    public void process(List<Record> records) throws AnalyticsException {
+    /**
+     * Adds the given records to the index if they are previously scheduled to be indexed.
+     * @param records The records to be indexed
+     * @throws AnalyticsException
+     */
+    public void put(List<Record> records) throws AnalyticsException {
         Set<String> indices;
         Map<String, List<Record>> batches = this.generateRecordBatches(records);
         Record firstRecord;
         for (List<Record> recordBatch : batches.values()) {
             firstRecord = recordBatch.get(0);
-            indices = this.getIndices(firstRecord.getTenantId(), firstRecord.getTableName());
+            indices = this.lookupIndices(firstRecord.getTenantId(), firstRecord.getTableName());
             if (indices.size() > 0) {
                 this.addToIndex(recordBatch, indices);
             }
@@ -150,29 +159,30 @@ public class AnalyticsDataIndexer {
     private void addToIndex(List<Record> recordBatch, Set<String> columns) throws AnalyticsIndexException {
         Record firstRecord = recordBatch.get(0);
         String tableId = this.generateTableId(firstRecord.getTenantId(), firstRecord.getTableName());
-        IndexWriter indexWriter = this.lookupIndexWriter(tableId);
+        IndexWriter indexWriter = this.createIndexWriter(tableId);
         try {
             for (Record record : recordBatch) {
                 indexWriter.addDocument(this.generateIndexDoc(record, columns));
             }
             indexWriter.commit();
-            this.closeAndRemoveIndexWriter(tableId, false);
         } catch (IOException e) {
             throw new AnalyticsIndexException("Error in updating index: " + e.getMessage(), e);
+        } finally {
+            try {
+                indexWriter.close();
+            } catch (IOException e) {
+                log.error("Error closing index writer: " + e.getMessage(), e);
+            }
         }
     }
     
     private Document generateIndexDoc(Record record, Set<String> columns) throws IOException, AnalyticsIndexException {
         Document doc = new Document();
         Object obj;
-        doc.add(new StringField(INDEX_ID_FIELD, record.getId(), Store.NO));
+        doc.add(new StringField(INDEX_ID_INTERNAL_FIELD, record.getId(), Store.NO));
+        doc.add(new LongField(INDEX_INTERNAL_TIMESTAMP_FIELD, record.getTimestamp(), Store.NO));
         for (String column : columns) {
             obj = record.getValue(column);
-            /* first check if the user is sending a separate timestamp field, if not, if we are told
-             * to index the timestamp, use the internal timestamp in the record */
-            if (obj == null && INDEX_TIMESTAMP_FIELD.equals(column)) {
-                obj = record.getTimestamp();
-            }
             if (obj instanceof String) {
                 doc.add(new TextField(column, (String) obj, Store.NO));
             } else if (obj instanceof Integer) {
@@ -187,21 +197,33 @@ public class AnalyticsDataIndexer {
                 doc.add(new FloatField(column, (Float) obj, Store.NO));
             } else if (obj == null) {
                 doc.add(new StringField(column, NULL_INDEX_VALUE, Store.NO));                
-            } else { /* null values we just ignore */
+            } else {
                 throw new AnalyticsIndexException("Unsupported data type for indexing: " + obj.getClass());
             }
         }
         return doc;
     }
     
+    private void checkInvalidIndexNames(Set<String> columns) throws AnalyticsIndexException {
+        if (columns.contains(INDEX_ID_INTERNAL_FIELD)) {
+            throw new AnalyticsIndexException("The column index '" + INDEX_ID_INTERNAL_FIELD + 
+                    "' is a reserved name");
+        }
+        if (columns.contains(INDEX_INTERNAL_TIMESTAMP_FIELD)) {
+            throw new AnalyticsIndexException("The column index '" + INDEX_INTERNAL_TIMESTAMP_FIELD + 
+                    "' is a reserved name");
+        }
+    }
+    
     public void setIndices(int tenantId, String tableName, Set<String> columns) throws AnalyticsIndexException {
+        this.checkInvalidIndexNames(columns);
         String tableId = this.generateTableId(tenantId, tableName);
         this.indexDefs.put(tableId, columns);
         this.getRepository().setIndices(tenantId, tableName, columns);
         this.notifyClusterIndexChange(tenantId, tableName);
     }
     
-    public Set<String> getIndices(int tenantId, String tableName) throws AnalyticsIndexException {
+    public Set<String> lookupIndices(int tenantId, String tableName) throws AnalyticsIndexException {
         String tableId = this.generateTableId(tenantId, tableName);
         Set<String> cols = this.indexDefs.get(tableId);
         if (cols == null) {
@@ -224,47 +246,42 @@ public class AnalyticsDataIndexer {
         }
     }
     
+    private Directory lookupIndexDir(String tableId) throws AnalyticsIndexException {
+        Directory indexDir = this.indexDirs.get(tableId);
+        if (indexDir == null) {
+            synchronized (this.indexDirs) {
+                indexDir = this.indexDirs.get(tableId);
+                if (indexDir == null) {
+                    indexDir = this.createDirectory(tableId);
+                    this.indexDirs.put(tableId, indexDir);
+                }
+            }
+        }
+        return indexDir;
+    }
+    
     private IndexWriter createIndexWriter(String tableId) throws AnalyticsIndexException {
+        Directory indexDir = this.lookupIndexDir(tableId);
+        IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_45, new StandardAnalyzer(Version.LUCENE_45));
         try {
-            Directory index = this.createDirectory(tableId);
-            StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_45);
-            IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_45, analyzer);
-            return new IndexWriter(index, config);
+            return new IndexWriter(indexDir, conf);
         } catch (IOException e) {
             throw new AnalyticsIndexException("Error in creating index writer: " + e.getMessage(), e);
         }
     }
     
-    private IndexWriter lookupIndexWriter(String tableId) throws AnalyticsIndexException {
-        IndexWriter indexWriter = this.indexWriters.get(tableId);
-        if (indexWriter == null) {
-            synchronized (this.indexWriters) {
-                if (indexWriter == null) {
-                    indexWriter = this.createIndexWriter(tableId);
-                    this.indexWriters.put(tableId, indexWriter);
-                }
-            }
-        }
-        return indexWriter;
-    }
-    
-    private void closeAndRemoveIndexWriter(String tableId, boolean deleteIndex) throws AnalyticsIndexException {
-        IndexWriter writer = this.indexWriters.remove(tableId);
-        if (writer != null) {
+    private void deleteIndexData(String tableId) throws AnalyticsIndexException {
+        IndexWriter writer = this.createIndexWriter(tableId);
+        try {
+            writer.deleteAll();
+        } catch (IOException e) {
+            throw new AnalyticsIndexException("Error in deleting index data: " + e.getMessage(), e);
+        } finally {
             try {
-                if (deleteIndex) {
-                    writer.deleteAll();
-                }
                 writer.close();
-            } catch (Exception e) {
-                throw new AnalyticsIndexException("Error in closing index writer: " + e.getMessage(), e);
+            } catch (IOException e) {
+                log.error("Error in closing index writer: " + e.getMessage(), e);
             }
-        }
-    }
-    
-    private void closeAndRemoveIndexWriters(Set<String> tableIds) throws AnalyticsIndexException {
-        for (String tableId : tableIds) {
-            this.closeAndRemoveIndexWriter(tableId, false);
         }
     }
     
@@ -272,7 +289,8 @@ public class AnalyticsDataIndexer {
         String tableId = this.generateTableId(tenantId, tableName);
         this.indexDefs.remove(tableId);
         this.getRepository().clearAllIndices(tenantId, tableName);
-        this.closeAndRemoveIndexWriter(tableId, true);
+        this.closeAndRemoveIndexDir(tableId);
+        this.deleteIndexData(tableId);
         this.notifyClusterIndexChange(tenantId, tableName);
     }
     
@@ -291,9 +309,26 @@ public class AnalyticsDataIndexer {
         
     }
     
+    private void closeAndRemoveIndexDir(String tableId) throws AnalyticsIndexException {
+        Directory indexDir = this.indexDirs.remove(tableId);
+        try {
+            if (indexDir != null) {
+                indexDir.close();
+            }
+        } catch (IOException e) {
+            throw new AnalyticsIndexException("Error in closing index directory: " + e.getMessage(), e);
+        }
+    }
+    
+    private void closeAndRemoveIndexDirs(Set<String> tableIds) throws AnalyticsIndexException {
+        for (String tableId : tableIds) {
+            this.closeAndRemoveIndexDir(tableId);
+        }
+    }
+    
     public void close() throws AnalyticsIndexException {
         this.indexDefs.clear();
-        this.closeAndRemoveIndexWriters(new HashSet<String>(this.indexWriters.keySet()));
+        this.closeAndRemoveIndexDirs(new HashSet<String>(this.indexDirs.keySet()));
     }
     
 }

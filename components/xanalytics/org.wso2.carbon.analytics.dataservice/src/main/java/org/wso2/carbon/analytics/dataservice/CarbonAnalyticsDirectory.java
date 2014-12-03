@@ -76,7 +76,7 @@ public class CarbonAnalyticsDirectory extends Directory {
         /* nothing to do */
     }
 
-    private String generatePath(String name) {
+    private String generateFilePath(String name) {
         return this.getPath() + name;
     }
     
@@ -84,7 +84,7 @@ public class CarbonAnalyticsDirectory extends Directory {
     public IndexOutput createOutput(String name, IOContext ctx) throws IOException {
         DataOutput output;
         try {
-            String path = this.generatePath(name);
+            String path = this.generateFilePath(name);
             output = this.fileSystem.createOutput(path);
             return new AnalyticsIndexOutputAdaptor(output, path);
         } catch (AnalyticsException e) {
@@ -95,34 +95,34 @@ public class CarbonAnalyticsDirectory extends Directory {
     @Override
     public void deleteFile(String name) throws IOException {
         try {
-            this.fileSystem.delete(this.generatePath(name));
+            this.fileSystem.delete(this.generateFilePath(name));
         } catch (AnalyticsException e) {
-            throw new IOException("Error in deleting file '" + this.generatePath(name) + "': " + e.getMessage(), e);
+            throw new IOException("Error in deleting file '" + this.generateFilePath(name) + "': " + e.getMessage(), e);
         }
     }
 
     @Override
     public boolean fileExists(String name) throws IOException {
         try {
-            return this.fileSystem.exists(this.generatePath(name));
+            return this.fileSystem.exists(this.generateFilePath(name));
         } catch (AnalyticsException e) {
-            throw new IOException("Error in file#exists '" + this.generatePath(name) + "': " + e.getMessage(), e);
+            throw new IOException("Error in file#exists '" + this.generateFilePath(name) + "': " + e.getMessage(), e);
         }
     }
 
     @Override
     public long fileLength(String name) throws IOException {
         try {
-            return this.fileSystem.length(this.generatePath(name));
+            return this.fileSystem.length(this.generateFilePath(name));
         } catch (AnalyticsException e) {
-            throw new IOException("Error in file#length '" + this.generatePath(name) + "': " + e.getMessage(), e);
+            throw new IOException("Error in file#length '" + this.generateFilePath(name) + "': " + e.getMessage(), e);
         }
     }
 
     @Override
     public String[] listAll() throws IOException {
         try {
-            return this.fileSystem.list(this.generatePath(this.getPath())).toArray(new String[0]);
+            return this.fileSystem.list(this.generateFilePath(this.getPath())).toArray(new String[0]);
         } catch (AnalyticsException e) {
             throw new IOException("Error in listing files in the directory '" + 
                     this.getPath() + "': " + e.getMessage(), e);
@@ -131,7 +131,7 @@ public class CarbonAnalyticsDirectory extends Directory {
 
     @Override
     public IndexInput openInput(String name, IOContext ctx) throws IOException {
-        String path = this.generatePath(name);
+        String path = this.generateFilePath(name);
         DataInput input;
         try {
             input = this.fileSystem.createInput(path);
@@ -145,7 +145,7 @@ public class CarbonAnalyticsDirectory extends Directory {
     public void sync(Collection<String> names) throws IOException {
         for (String name : names) {
             try {
-                this.getFileSystem().sync(this.generatePath(name));
+                this.getFileSystem().sync(this.generateFilePath(name));
             } catch (AnalyticsException e) {
                 throw new IOException("Error in sync: " + e.getMessage(), e);
             }

@@ -79,24 +79,6 @@ public class MySQLInnoDBAnalyticsDataSourceTest extends AnalyticsDataSourceTest 
         }
     }
     
-//    public static void main(String[] args) throws Exception {
-//        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/bam3", "root", "root");
-//        PreparedStatement stmt;
-//        long t1 = System.currentTimeMillis();
-//        for (int i = 0; i < 1000; i++) {
-//            //stmt = conn.prepareStatement("UPDATE ABC SET length = 5400 WHERE path = '/mydir'");
-//            stmt = conn.prepareStatement("INSERT INTO ABC (path,length,ppath) VALUES (?,?,?)");
-//            stmt.setString(1, "/mydir/" + i);
-//            stmt.setLong(2, 40500);
-//            stmt.setString(3, "/");
-//            stmt.executeUpdate();
-//            stmt.close();
-//        }
-//        long t2 = System.currentTimeMillis();
-//        conn.close();
-//        System.out.println("Time: " + (t2 - t1));
-//    }
-    
     private QueryConfigurationEntry generateQueryConfiguration() {
         QueryConfigurationEntry conf = new QueryConfigurationEntry();
         String[] recordTableInitQueries = new String[2];
