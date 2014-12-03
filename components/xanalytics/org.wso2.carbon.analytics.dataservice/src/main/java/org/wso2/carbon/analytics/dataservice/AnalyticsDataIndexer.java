@@ -156,6 +156,7 @@ public class AnalyticsDataIndexer {
                 indexWriter.addDocument(this.generateIndexDoc(record, columns));
             }
             indexWriter.commit();
+            this.closeAndRemoveIndexWriter(tableId, false);
         } catch (IOException e) {
             throw new AnalyticsIndexException("Error in updating index: " + e.getMessage(), e);
         }
@@ -225,7 +226,6 @@ public class AnalyticsDataIndexer {
     
     private IndexWriter createIndexWriter(String tableId) throws AnalyticsIndexException {
         try {
-            //Directory index = new MMapDirectory(new File("/home/laf/Desktop/index/" + tableId));
             Directory index = this.createDirectory(tableId);
             StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_45);
             IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_45, analyzer);

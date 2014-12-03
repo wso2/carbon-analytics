@@ -181,5 +181,19 @@ public interface FileSystem {
         void close() throws AnalyticsException;
         
     }
+    
+    /**
+     * {@link DataOutput} close event listener.
+     */
+    public interface DataOutputClosureListener {
+        
+        /**
+         * Called when the data output's close method is called.
+         * @param path The file path the data output represent
+         * @param output The {@link DataOutput} object this path represents
+         */
+        public void dataOutputClosing(String path, DataOutput output);
+        
+    }
 
 }

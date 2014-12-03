@@ -77,6 +77,7 @@ public class AnalyticsDataServiceTest {
         if (this.service.tableExists(tenantId, tableName)) {
             this.service.deleteTable(tenantId, tableName);
         }
+        this.service.clearIndices(tenantId, tableName);
     }
     
     @Test
@@ -99,7 +100,7 @@ public class AnalyticsDataServiceTest {
         this.service.deleteTable(1, "T1");
     }
     
-    //@Test
+    @Test
     public void testDataRecordAddReadPerformanceNonIndex() throws AnalyticsException {
         this.cleanupTable(50, "TableX");
         System.out.println("\n************** START ANALYTICS DS (WITHOUT INDEXING, H2-FILE) PERF TEST **************");
@@ -136,8 +137,9 @@ public class AnalyticsDataServiceTest {
     @Test
     public void testDataRecordAddReadPerformanceIndex() throws AnalyticsException {
         this.cleanupTable(50, "TableX");
+        
         System.out.println("\n************** START ANALYTICS DS (WITH INDEXING, H2-FILE) PERF TEST **************");
-        int n = 30, batch = 1000;
+        int n = 50, batch = 1000;
         List<Record> records;
         Set<String> columns = new HashSet<String>();
         columns.add("tenant");
@@ -151,7 +153,6 @@ public class AnalyticsDataServiceTest {
             records = AnalyticsDataSourceTest.generateRecords(50, "TableX", i, batch, -1, -1);
             this.service.put(records);
         }
-        this.service.clearIndices(50, "TableX");
         this.cleanupTable(50, "TableX");
         
         this.service.createTable(50, "TableX");
@@ -172,11 +173,10 @@ public class AnalyticsDataServiceTest {
         System.out.println("* Read Time: " + (end - start) + " ms.");
         System.out.println("* Read Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
         
-        List<String> ids = this.service.search(50, "TableX", "lucene", "log: exception", 0, 500);
-        Assert.assertEquals(ids.size(), 500);
+        List<String> ids = this.service.search(50, "TableX", "lucene", "log: exception", 0, 30);
+        Assert.assertEquals(ids.size(), 30);
         System.out.println("* SEARCH RESULT COUNT: " + ids.size());
         
-        this.service.clearIndices(50, "TableX");
         this.cleanupTable(50, "TableX");
         System.out.println("\n************** END ANALYTICS DS (WITH INDEXING, H2-FILE) PERF TEST **************");
     }

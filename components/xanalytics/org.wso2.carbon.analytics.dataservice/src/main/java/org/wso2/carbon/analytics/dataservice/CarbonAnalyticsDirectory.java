@@ -138,13 +138,18 @@ public class CarbonAnalyticsDirectory extends Directory {
             return new AnalyticsIndexInputAdaptor(path, input);
         } catch (AnalyticsException e) {
             throw new IOException("Error in creating index input for file '" + name + "': " + e.getMessage(), e);
-        }
-        
+        }        
     }
 
     @Override
     public void sync(Collection<String> names) throws IOException {
-        /* nothing to do */
+        for (String name : names) {
+            try {
+                this.getFileSystem().sync(this.generatePath(name));
+            } catch (AnalyticsException e) {
+                throw new IOException("Error in sync: " + e.getMessage(), e);
+            }
+        }
     }
     
     /**

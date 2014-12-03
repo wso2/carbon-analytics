@@ -27,9 +27,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -56,9 +54,7 @@ public class RDBMSFileSystem implements FileSystem {
     private DataSource dataSource;
     
     private static final Log log = LogFactory.getLog(RDBMSFileSystem.class);
-    
-    private Map<String, DataOutput> outputs = new HashMap<String, FileSystem.DataOutput>();
-    
+        
     public RDBMSFileSystem(QueryConfigurationEntry queryConfigurationEntry, 
             DataSource dataSource) throws AnalyticsException {
         this.queryConfigurationEntry = queryConfigurationEntry;
@@ -183,10 +179,8 @@ public class RDBMSFileSystem implements FileSystem {
 
     @Override
     public void sync(String path) throws AnalyticsException {
-        DataOutput out = this.outputs.get(path);
-        if (out != null) {
-            out.flush();
-        }
+        /* nothing to do here, since the data is already sync'ed when flush/close is called,
+         * this is guaranteed since, before sync is called, the users will call close */
     }
 
     @Override
@@ -472,9 +466,7 @@ public class RDBMSFileSystem implements FileSystem {
     public DataOutput createOutput(String path)
             throws AnalyticsException {
         this.createFile(path);
-        DataOutput out = new ChunkedDataOutput(new RDBMSDataStream(path));
-        this.outputs.put(path, out);
-        return out;
+        return new ChunkedDataOutput(new RDBMSDataStream(path));
     }
 
 }

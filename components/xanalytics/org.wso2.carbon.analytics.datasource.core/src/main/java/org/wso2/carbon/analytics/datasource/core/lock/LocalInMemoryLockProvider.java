@@ -78,7 +78,6 @@ public class LocalInMemoryLockProvider implements LockProvider {
             try {
                 this.lock.unlock();
             } catch (Exception e) {
-                e.printStackTrace();
                 throw new AnalyticsLockException("Error in releasing lock '" + this.getName() +
                         "': " + e.getMessage(), e);
             }
