@@ -147,7 +147,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     @Override
     public void destroy() throws AnalyticsException {
-        //this.indexer.close();
+        this.indexer.close();
     }
 
 }
