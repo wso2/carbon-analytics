@@ -20,10 +20,8 @@ package org.wso2.carbon.analytics.dataservice;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,7 +47,7 @@ public class AnalyticsIndexDefinitionRepository {
         this.fileSystem = fileSystem;
     }
     
-    public Set<String> getIndices(int tenantId, String tableName) throws AnalyticsIndexException {
+    public Map<String, IndexType> getIndices(int tenantId, String tableName) throws AnalyticsIndexException {
         DataInput in = null;
         ByteArrayOutputStream out = null;
         try {
@@ -63,9 +61,9 @@ public class AnalyticsIndexDefinitionRepository {
                 while ((i = in.read(buff, 0, buff.length)) > 0) {
                     out.write(buff, 0, i);
                 }
-                return this.decode(new String(out.toByteArray(), DEFAULT_CHARSET));
+                return this.decodeIndexDetails(new String(out.toByteArray(), DEFAULT_CHARSET));
             } else {
-                return new HashSet<String>(0);
+                return new HashMap<String, IndexType>(0);
             }
         } catch (Exception e) {
             throw new AnalyticsIndexException("Error in retrieving index definitions: " + e.getMessage(), e);
@@ -87,33 +85,47 @@ public class AnalyticsIndexDefinitionRepository {
         }
     }
     
-    private String encode(Set<String> columns) {
+    private String encodeIndexDetails(Map<String, IndexType> columns) {
         boolean firstDone = false;
         StringBuilder builder = new StringBuilder();
-        for (Iterator<String> itr = columns.iterator(); itr.hasNext();) {
+        for (Map.Entry<String, IndexType> entry : columns.entrySet()) {
             if (firstDone) {
                 builder.append("\n");
             } else {
                 firstDone = true;
             }
-            builder.append(itr.next());
+            builder.append(entry.getKey() + " " + entry.getValue().name());
         }
         return builder.toString();
     }
     
-    private Set<String> decode(String data) {
-        return new HashSet<String>(Arrays.asList(data.split("\n")));
+    private Map<String, IndexType> decodeIndexDetails(String data) throws AnalyticsIndexException {
+        String[] lines = data.split("\n");
+        Map<String, IndexType> result = new HashMap<String, IndexType>();
+        String[] entry;
+        for (String line : lines) {
+            line = line.trim();
+            if (line.length() == 0) {
+                continue;
+            }
+            entry = line.split(" ");
+            if (entry.length < 2) {
+                throw new AnalyticsIndexException("Invalid index detail entry '" + line + "'");
+            }
+            result.put(entry[0], IndexType.valueOf(entry[1]));
+        }
+        return result;
     }
     
     private String generatePath(int tenantId, String tableName) {
         return INDEX_DEFINITION_FS_ROOT + tenantId + "/" + tableName.trim();
     }
         
-    public void setIndices(int tenantId, String tableName, Set<String> columns) throws AnalyticsIndexException {
+    public void setIndices(int tenantId, String tableName, Map<String, IndexType> columns) throws AnalyticsIndexException {
         DataOutput out = null;
         try {
             out = this.fileSystem.createOutput(this.generatePath(tenantId, tableName));
-            byte[] data = this.encode(columns).getBytes(DEFAULT_CHARSET);
+            byte[] data = this.encodeIndexDetails(columns).getBytes(DEFAULT_CHARSET);
             out.write(data, 0, data.length);
         } catch (Exception e) {
             throw new AnalyticsIndexException("Error in setting indices: " + e.getMessage(), e);

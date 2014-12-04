@@ -21,7 +21,6 @@ package org.wso2.carbon.analytics.datasource.rdbms;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +33,7 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceImpl;
+import org.wso2.carbon.analytics.dataservice.IndexType;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSource;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceTest;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
@@ -67,12 +67,15 @@ public class AnalyticsDataServiceTest {
     
     private void indexAddRetrieve(int tenantId) throws AnalyticsException {
         this.service.clearIndices(tenantId, "T1");
-        Set<String> columns = new HashSet<String>();
-        columns.add("C1");
-        columns.add("C2");
-        columns.add("C3");
+        Map<String, IndexType> columns = new HashMap<String, IndexType>();
+        columns.put("C1", IndexType.STRING);
+        columns.put("C2", IndexType.TEXT);
+        columns.put("C3", IndexType.INTEGER);
+        columns.put("C4", IndexType.LONG);
+        columns.put("C5", IndexType.DOUBLE);
+        columns.put("C6", IndexType.FLOAT);
         service.setIndices(tenantId, "T1", columns);
-        Set<String> columnsIn = service.getIndices(tenantId, "T1");
+        Map<String, IndexType> columnsIn = service.getIndices(tenantId, "T1");
         Assert.assertEquals(columnsIn, columns);
         this.service.clearIndices(tenantId, "T1");
     }
@@ -84,24 +87,36 @@ public class AnalyticsDataServiceTest {
         this.service.clearIndices(tenantId, tableName);
     }
     
-    @Test
+    //@Test
     public void testIndexedDataAddRetrieve() throws AnalyticsException {
         this.service.clearIndices(1, "TX");
-        this.service.deleteTable(1, "T1");
+        this.service.deleteTable(1, "TX");
         this.service.createTable(1, "TX");
-        Set<String> columns = new HashSet<String>();
-        columns.add("C1");
-        columns.add("T1");
+        Map<String, IndexType> columns = new HashMap<String, IndexType>();
+        columns.put("C1", IndexType.TEXT);
+        columns.put("C2", IndexType.TEXT);
+        columns.put("T1", IndexType.INTEGER);
         this.service.setIndices(1, "TX", columns);
         List<Record> records = new ArrayList<Record>();
         Map<String, Object> values = new HashMap<String, Object>();
-        values.put("C1", "My name is jack");
+        values.put("C1", "My name is Jack");
+        values.put("C2", "I live in Colombo");
         values.put("T1", 28);
         Record record = new Record(1, "TX", values, System.currentTimeMillis());
         records.add(record);
         this.service.put(records);
+        List<String> result = this.service.search(1, "TX", "lucene", "C1:jack", 0, 10);
+        Assert.assertEquals(result.size(), 1);
+        Assert.assertEquals(result.get(0), record.getId());
+        result = this.service.search(1, "TX", "lucene", "C2:colombo", 0, 10);
+        Assert.assertEquals(result.size(), 1);
+        result = this.service.search(1, "TX", "lucene", "T1:28", 0, 10);
+        Assert.assertEquals(result.size(), 1);
+        Assert.assertEquals(result.get(0), record.getId());
+        result = this.service.search(1, "TX", "lucene", "T1:27", 0, 10);
+        Assert.assertEquals(result.size(), 0);
         this.service.clearIndices(1, "TX");
-        this.service.deleteTable(1, "T1");
+        this.service.deleteTable(1, "TX");
     }
     
     @Test
@@ -143,12 +158,12 @@ public class AnalyticsDataServiceTest {
         this.cleanupTable(50, "TableX");
         
         System.out.println("\n************** START ANALYTICS DS (WITH INDEXING, H2-FILE) PERF TEST **************");
-        int n = 50, batch = 1000;
+        int n = 1, batch = 1000;
         List<Record> records;
-        Set<String> columns = new HashSet<String>();
-        columns.add("tenant");
-        columns.add("ip");
-        columns.add("log");
+        Map<String, IndexType> columns = new HashMap<String, IndexType>();
+        columns.put("tenant", IndexType.INTEGER);
+        columns.put("ip", IndexType.STRING);
+        columns.put("log", IndexType.TEXT);
         
         /* warm-up */
         this.service.createTable(50, "TableX");

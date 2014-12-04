@@ -19,7 +19,7 @@
 package org.wso2.carbon.analytics.dataservice;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStore;
@@ -35,10 +35,10 @@ public interface AnalyticsDataService extends AnalyticsRecordStore {
      * indices later, i.e. these indices should be in-effect after a server restart.
      * @param tenantId The tenant id
      * @param tableName The table name
-     * @param columns The set of columns to create indices for
+     * @param columns The set of columns to create indices for, and their data types
      * @throws AnalyticsIndexException
      */
-    void setIndices(int tenantId, String tableName, Set<String> columns) throws AnalyticsIndexException;
+    void setIndices(int tenantId, String tableName, Map<String, IndexType> columns) throws AnalyticsIndexException;
     
     /**
      * Returns the declared indices for a given table under the given tenant.
@@ -47,7 +47,7 @@ public interface AnalyticsDataService extends AnalyticsRecordStore {
      * @return List of indices of the table
      * @throws AnalyticsIndexException
      */
-    Set<String> getIndices(int tenantId, String tableName) throws AnalyticsIndexException;
+    Map<String, IndexType> getIndices(int tenantId, String tableName) throws AnalyticsIndexException;
     
     /**
      * Clears all the indices for the given table.

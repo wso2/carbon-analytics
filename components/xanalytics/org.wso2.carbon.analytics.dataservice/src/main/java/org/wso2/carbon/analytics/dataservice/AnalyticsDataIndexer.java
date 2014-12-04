@@ -71,7 +71,7 @@ public class AnalyticsDataIndexer {
 
     private AnalyticsIndexDefinitionRepository repository;
     
-    private Map<String, Set<String>> indexDefs = new HashMap<String, Set<String>>();
+    private Map<String, Map<String, IndexType>> indexDefs = new HashMap<String, Map<String, IndexType>>();
     
     private Map<String, Directory> indexDirs = new HashMap<String, Directory>();
     
@@ -106,7 +106,7 @@ public class AnalyticsDataIndexer {
         try {
             reader = DirectoryReader.open(this.lookupIndexDir(tableId));
             IndexSearcher searcher = new IndexSearcher(reader);
-            Query indexQuery = new QueryParser(Version.LUCENE_45, null, this.analyzer).parse(query);
+            Query indexQuery = new QueryParser(Version.LUCENE_45, "id_internal", this.analyzer).parse(query);
             TopScoreDocCollector collector = TopScoreDocCollector.create(count, true);
             searcher.search(indexQuery, collector);
             ScoreDoc[] hits = collector.topDocs(start).scoreDocs;
@@ -144,7 +144,7 @@ public class AnalyticsDataIndexer {
      * @throws AnalyticsException
      */
     public void put(List<Record> records) throws AnalyticsException {
-        Set<String> indices;
+        Map<String, IndexType> indices;
         Map<String, List<Record>> batches = this.generateRecordBatches(records);
         Record firstRecord;
         for (List<Record> recordBatch : batches.values()) {
@@ -156,7 +156,7 @@ public class AnalyticsDataIndexer {
         }
     }
     
-    private void addToIndex(List<Record> recordBatch, Set<String> columns) throws AnalyticsIndexException {
+    private void addToIndex(List<Record> recordBatch, Map<String, IndexType> columns) throws AnalyticsIndexException {
         Record firstRecord = recordBatch.get(0);
         String tableId = this.generateTableId(firstRecord.getTenantId(), firstRecord.getTableName());
         IndexWriter indexWriter = this.createIndexWriter(tableId);
@@ -176,35 +176,97 @@ public class AnalyticsDataIndexer {
         }
     }
     
-    private Document generateIndexDoc(Record record, Set<String> columns) throws IOException, AnalyticsIndexException {
-        Document doc = new Document();
-        Object obj;
-        doc.add(new StringField(INDEX_ID_INTERNAL_FIELD, record.getId(), Store.NO));
-        doc.add(new LongField(INDEX_INTERNAL_TIMESTAMP_FIELD, record.getTimestamp(), Store.NO));
-        for (String column : columns) {
-            obj = record.getValue(column);
-            if (obj instanceof String) {
-                doc.add(new TextField(column, (String) obj, Store.NO));
-            } else if (obj instanceof Integer) {
-                doc.add(new IntField(column, (Integer) obj, Store.NO));
-            } else if (obj instanceof Double) {
-                doc.add(new DoubleField(column, (Double) obj, Store.NO));
-            } else if (obj instanceof Boolean) {
-                doc.add(new StringField(column, ((Boolean) obj).toString(), Store.NO));
+    private void checkAndAddDocEntry(Document doc, IndexType type, String name, Object obj) {
+        if (obj == null) {
+            doc.add(new StringField(name, NULL_INDEX_VALUE, Store.NO));
+            return;
+        }
+        switch (type) {
+        case STRING:
+            doc.add(new StringField(name, obj.toString(), Store.NO));
+            break;
+        case TEXT:
+            doc.add(new TextField(name, obj.toString(), Store.NO));
+            break;
+        case INTEGER:
+            if (obj instanceof Integer) {
+                doc.add(new IntField(name, (Integer) obj, Store.NO));
             } else if (obj instanceof Long) {
-                doc.add(new LongField(column, (Long) obj, Store.NO));
+                doc.add(new IntField(name, ((Long) obj).intValue(), Store.NO));
+            } else if (obj instanceof Double) {
+                doc.add(new IntField(name, ((Double) obj).intValue(), Store.NO));
             } else if (obj instanceof Float) {
-                doc.add(new FloatField(column, (Float) obj, Store.NO));
-            } else if (obj == null) {
-                doc.add(new StringField(column, NULL_INDEX_VALUE, Store.NO));                
+                doc.add(new IntField(name, ((Float) obj).intValue(), Store.NO));
             } else {
-                throw new AnalyticsIndexException("Unsupported data type for indexing: " + obj.getClass());
+                doc.add(new StringField(name, obj.toString(), Store.NO));
             }
+            break;
+        case DOUBLE:
+            if (obj instanceof Double) {
+                doc.add(new DoubleField(name, (Double) obj, Store.NO));
+            } else if (obj instanceof Integer) {
+                doc.add(new DoubleField(name, ((Integer) obj).doubleValue(), Store.NO));
+            } else if (obj instanceof Long) {
+                doc.add(new DoubleField(name, ((Long) obj).doubleValue(), Store.NO));
+            } else if (obj instanceof Float) {
+                doc.add(new DoubleField(name, ((Float) obj).doubleValue(), Store.NO));
+            } else {
+                doc.add(new StringField(name, obj.toString(), Store.NO));
+            }
+            break;
+        case LONG:
+            if (obj instanceof Long) {
+                doc.add(new LongField(name, ((Long) obj).longValue(), Store.NO));
+            } else if (obj instanceof Integer) {
+                doc.add(new LongField(name, ((Integer) obj).longValue(), Store.NO));
+            } else if (obj instanceof Double) {
+                doc.add(new LongField(name, ((Double) obj).longValue(), Store.NO));
+            } else if (obj instanceof Float) {
+                doc.add(new LongField(name, ((Float) obj).longValue(), Store.NO));
+            } else {
+                doc.add(new StringField(name, obj.toString(), Store.NO));
+            }
+            break;
+        case FLOAT:
+            if (obj instanceof Float) {
+                doc.add(new FloatField(name, ((Float) obj).floatValue(), Store.NO));
+            } else if (obj instanceof Integer) {
+                doc.add(new FloatField(name, ((Integer) obj).floatValue(), Store.NO));
+            } else if (obj instanceof Long) {
+                doc.add(new FloatField(name, ((Long) obj).floatValue(), Store.NO));
+            } else if (obj instanceof Double) {
+                doc.add(new FloatField(name, ((Double) obj).floatValue(), Store.NO));
+            } else {
+                doc.add(new StringField(name, obj.toString(), Store.NO));
+            }
+            break;
+        case BOOLEAN:
+            doc.add(new StringField(name, obj.toString(), Store.NO));
+            break;
+        }
+    }
+    
+    private Document generateIndexDoc(Record record, Map<String, IndexType> columns) 
+            throws IOException, AnalyticsIndexException {
+        Document doc = new Document();
+        doc.add(new StringField(INDEX_ID_INTERNAL_FIELD, record.getId(), Store.YES));
+        doc.add(new LongField(INDEX_INTERNAL_TIMESTAMP_FIELD, record.getTimestamp(), Store.NO));
+        /* make the best effort to store in the given timestamp, or else, 
+         * fall back to a compatible format, or else, lastly, string */
+        String name;
+        for (Map.Entry<String, IndexType> entry : columns.entrySet()) {
+            name = entry.getKey();
+            this.checkAndAddDocEntry(doc, entry.getValue(), name, record.getValue(name));
         }
         return doc;
     }
     
     private void checkInvalidIndexNames(Set<String> columns) throws AnalyticsIndexException {
+        for (String column : columns) {
+            if (column.contains(" ")) {
+                throw new AnalyticsIndexException("Index columns cannot have a space in the name: '" + column + "'");
+            }
+        }
         if (columns.contains(INDEX_ID_INTERNAL_FIELD)) {
             throw new AnalyticsIndexException("The column index '" + INDEX_ID_INTERNAL_FIELD + 
                     "' is a reserved name");
@@ -215,17 +277,18 @@ public class AnalyticsDataIndexer {
         }
     }
     
-    public void setIndices(int tenantId, String tableName, Set<String> columns) throws AnalyticsIndexException {
-        this.checkInvalidIndexNames(columns);
+    public void setIndices(int tenantId, String tableName, Map<String, IndexType> columns) 
+            throws AnalyticsIndexException {
+        this.checkInvalidIndexNames(columns.keySet());
         String tableId = this.generateTableId(tenantId, tableName);
         this.indexDefs.put(tableId, columns);
         this.getRepository().setIndices(tenantId, tableName, columns);
         this.notifyClusterIndexChange(tenantId, tableName);
     }
     
-    public Set<String> lookupIndices(int tenantId, String tableName) throws AnalyticsIndexException {
+    public Map<String, IndexType> lookupIndices(int tenantId, String tableName) throws AnalyticsIndexException {
         String tableId = this.generateTableId(tenantId, tableName);
-        Set<String> cols = this.indexDefs.get(tableId);
+        Map<String, IndexType> cols = this.indexDefs.get(tableId);
         if (cols == null) {
             cols = this.getRepository().getIndices(tenantId, tableName);
             this.indexDefs.put(tableId, cols);
@@ -302,7 +365,9 @@ public class AnalyticsDataIndexer {
         /* remove the entry from the cache, this will force the next index operations to load
          * the index definition from the back-end store, this makes sure, we have optimum cache cleanup
          * and improves memory usage for tenant partitioning */
-        this.indexDefs.remove(this.generateTableId(tenantId, tableName));
+        String tableId = this.generateTableId(tenantId, tableName);
+        this.indexDefs.remove(tableId);
+        this.closeAndRemoveIndexDir(tableId);
     }
     
     private void notifyClusterIndexChange(int tenantId, String tableName) throws AnalyticsIndexException {

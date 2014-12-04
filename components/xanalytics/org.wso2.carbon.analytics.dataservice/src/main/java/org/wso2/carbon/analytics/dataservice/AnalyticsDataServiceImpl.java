@@ -19,7 +19,7 @@
 package org.wso2.carbon.analytics.dataservice;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSource;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
@@ -125,7 +125,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     @Override
-    public void setIndices(int tenantId, String tableName, Set<String> columns) throws AnalyticsIndexException {
+    public void setIndices(int tenantId, String tableName, Map<String, IndexType> columns) throws AnalyticsIndexException {
         this.getIndexer().setIndices(tenantId, tableName, columns);
     }
 
@@ -136,7 +136,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     @Override
-    public Set<String> getIndices(int tenantId, String tableName) throws AnalyticsIndexException {
+    public Map<String, IndexType> getIndices(int tenantId, String tableName) throws AnalyticsIndexException {
         return this.getIndexer().lookupIndices(tenantId, tableName);
     }
 
