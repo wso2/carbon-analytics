@@ -48,8 +48,8 @@ public interface FileSystem {
      * @param path The path of the file to be deleted
      * @throws AnalyticsException
      */
-    void delete(String path) throws AnalyticsException;
 
+    void delete(String path) throws AnalyticsException;
     /**
      * Copies a file from a source to the target.
      * @param sourcePath The source file path
@@ -106,7 +106,7 @@ public interface FileSystem {
          * @param buff The buffer to the data will be read in
          * @param offset The offset of the buffer the data will be written to, 0 indexed
          * @param len The size of the data to be read in bytes
-         * @return The actual number of bytes that was read
+         * @return The actual number of bytes that was read, -1 if we are at EOF
          * @throws AnalyticsException
          */
         int read(byte[] buff, int offset, int len) throws AnalyticsException;

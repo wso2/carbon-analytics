@@ -87,43 +87,65 @@ public class AnalyticsDataServiceTest {
         this.service.clearIndices(tenantId, tableName);
     }
     
-    //@Test
-    public void testIndexedDataAddRetrieve() throws AnalyticsException {
-        this.service.clearIndices(1, "TX");
-        this.service.deleteTable(1, "TX");
-        this.service.createTable(1, "TX");
-        Map<String, IndexType> columns = new HashMap<String, IndexType>();
-        columns.put("C1", IndexType.TEXT);
-        columns.put("C2", IndexType.TEXT);
-        columns.put("T1", IndexType.INTEGER);
-        this.service.setIndices(1, "TX", columns);
-        List<Record> records = new ArrayList<Record>();
+    private List<Record> generateIndexRecords(int tenantId, String tableName, int n) {
         Map<String, Object> values = new HashMap<String, Object>();
-        values.put("C1", "My name is Jack");
-        values.put("C2", "I live in Colombo");
-        values.put("T1", 28);
-        Record record = new Record(1, "TX", values, System.currentTimeMillis());
-        records.add(record);
+        Record record;
+        List<Record> result = new ArrayList<Record>();
+        for (int i = 0; i < n; i++) {
+            values = new HashMap<String, Object>();
+            values.put("INT1", i);
+            values.put("STR1", "STRING" + i);
+            values.put("str2", "string" + i);
+            values.put("TXT1", "My name is bill" + i);
+            values.put("LN1", 1435000L + i);
+            values.put("DB1", 54.535 + i);
+            values.put("FL1", 3.14 + i);
+            values.put("BL1", i % 2 == 0 ? true : false);
+            record = new Record(tenantId, tableName, values, System.currentTimeMillis());
+            result.add(record);
+        }        
+        return result;
+    }
+    
+    private void indexDataAddRetrieve(int tenantId, String tableName, int n) throws AnalyticsException {
+        this.cleanupTable(tenantId, tableName);
+        Map<String, IndexType> columns = new HashMap<String, IndexType>();
+        columns.put("INT1", IndexType.INTEGER);
+        columns.put("STR1", IndexType.STRING);
+        columns.put("str2", IndexType.STRING);
+        columns.put("TXT1", IndexType.TEXT);
+        columns.put("LN1", IndexType.LONG);
+        columns.put("DB1", IndexType.DOUBLE);
+        columns.put("FL1", IndexType.FLOAT);
+        columns.put("BL1", IndexType.BOOLEAN);
+        this.service.createTable(tenantId, tableName);
+        this.service.setIndices(tenantId, tableName, columns);
+        List<Record> records = this.generateIndexRecords(tenantId, tableName, n);
         this.service.put(records);
-        List<String> result = this.service.search(1, "TX", "lucene", "C1:jack", 0, 10);
+        List<String> result = this.service.search(tenantId, tableName, "lucene", "STR1:STRING0", 0, 10);
         Assert.assertEquals(result.size(), 1);
-        Assert.assertEquals(result.get(0), record.getId());
-        result = this.service.search(1, "TX", "lucene", "C2:colombo", 0, 10);
+        result = this.service.search(tenantId, tableName, "lucene", "str2:string0", 0, 10);
         Assert.assertEquals(result.size(), 1);
-        result = this.service.search(1, "TX", "lucene", "T1:28", 0, 10);
+        result = this.service.search(tenantId, tableName, "lucene", "str2:String0", 0, 10);
         Assert.assertEquals(result.size(), 1);
-        Assert.assertEquals(result.get(0), record.getId());
-        result = this.service.search(1, "TX", "lucene", "T1:27", 0, 10);
-        Assert.assertEquals(result.size(), 0);
-        this.service.clearIndices(1, "TX");
-        this.service.deleteTable(1, "TX");
+        result = this.service.search(tenantId, tableName, "lucene", "TXT1:name", 0, n + 10);
+        Assert.assertEquals(result.size(), n);
+        this.cleanupTable(tenantId, tableName);
+    }
+    
+    @Test
+    public void testIndexedDataAddRetrieve() throws AnalyticsException {
+        this.indexDataAddRetrieve(5, "TX", 1);
+        this.indexDataAddRetrieve(5, "TX", 10);
+        this.indexDataAddRetrieve(6, "TX", 150);
+        this.indexDataAddRetrieve(7, "TX", 2500);
     }
     
     @Test
     public void testDataRecordAddReadPerformanceNonIndex() throws AnalyticsException {
         this.cleanupTable(50, "TableX");
         System.out.println("\n************** START ANALYTICS DS (WITHOUT INDEXING, H2-FILE) PERF TEST **************");
-        int n = 55, batch = 1000;
+        int n = 100, batch = 200;
         List<Record> records;
         
         /* warm-up */
@@ -158,7 +180,7 @@ public class AnalyticsDataServiceTest {
         this.cleanupTable(50, "TableX");
         
         System.out.println("\n************** START ANALYTICS DS (WITH INDEXING, H2-FILE) PERF TEST **************");
-        int n = 1, batch = 1000;
+        int n = 100, batch = 200;
         List<Record> records;
         Map<String, IndexType> columns = new HashMap<String, IndexType>();
         columns.put("tenant", IndexType.INTEGER);
@@ -168,7 +190,7 @@ public class AnalyticsDataServiceTest {
         /* warm-up */
         this.service.createTable(50, "TableX");
         this.service.setIndices(50, "TableX", columns);
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 10; i++) {
             records = AnalyticsDataSourceTest.generateRecords(50, "TableX", i, batch, -1, -1);
             this.service.put(records);
         }
@@ -192,8 +214,8 @@ public class AnalyticsDataServiceTest {
         System.out.println("* Read Time: " + (end - start) + " ms.");
         System.out.println("* Read Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
         
-        List<String> ids = this.service.search(50, "TableX", "lucene", "log: exception", 0, 30);
-        Assert.assertEquals(ids.size(), 30);
+        List<String> ids = this.service.search(50, "TableX", "lucene", "log: exception", 0, 1);
+        Assert.assertEquals(ids.size(), 1);
         System.out.println("* Search Result Count: " + ids.size());
         
         this.cleanupTable(50, "TableX");

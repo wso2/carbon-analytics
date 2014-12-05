@@ -18,6 +18,7 @@
  */
 package org.wso2.carbon.analytics.datasource.core;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -407,14 +408,14 @@ public class AnalyticsDataSourceTest {
         this.analyticsDS.createTable(7, "T1");
         List<Record> records;
         for (int i = 0; i < 10; i++) {
-            records = generateRecords(7, "T1", i, 1000, -1, -1);
+            records = generateRecords(7, "T1", i, 100, -1, -1);
             this.analyticsDS.put(records);
         }
         this.cleanupT1();
         
         this.analyticsDS.createTable(7, "T1");
         long hash1 = 0;
-        int n = 50, batch = 1000;
+        int n = 100, batch = 200;
         long start = System.currentTimeMillis();
         for (int i = 0; i < n; i++) {
             records = generateRecords(7, "T1", i, batch, -1, -1);
@@ -506,17 +507,16 @@ public class AnalyticsDataSourceTest {
         this.fileSystem.delete("/d1");
     }
     
-    @Test
-    public void testFSFileIOOperations2() throws AnalyticsException, IOException {
-        this.fileSystem.delete("/d1");
-        DataOutput out = this.fileSystem.createOutput("/d1/d2/d3");
-        byte[] data = this.generateData(1350);
-        for (int i = 0; i < 100; i++) {
+    private void fileRandomWriteRead(String path, int writerBufferSize, int readBufferSize, int n) 
+            throws AnalyticsException, IOException {
+        DataOutput out = this.fileSystem.createOutput(path);
+        byte[] data = this.generateData(writerBufferSize);
+        for (int i = 0; i < n; i++) {
             out.write(data, 0, data.length);
         }
         out.close();
-        DataInput in = this.fileSystem.createInput("/d1/d2/d3");
-        byte[] buff = new byte[500];
+        DataInput in = this.fileSystem.createInput(path);
+        byte[] buff = new byte[readBufferSize];
         int j;
         ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
         while ((j = in.read(buff, 0, buff.length)) > 0) {
@@ -525,23 +525,16 @@ public class AnalyticsDataSourceTest {
         byteOut.close();
         in.close();
         Assert.assertTrue(this.checkDataEquals(data, byteOut.toByteArray()));
-        /* overwriting earlier data again, with different buffer values */
-        out = this.fileSystem.createOutput("/d1/d2/d3");
-        data = this.generateData(135);
-        for (int i = 0; i < 1000; i++) {
-            out.write(data, 0, data.length);
-        }
-        out.close();
-        in = this.fileSystem.createInput("/d1/d2/d3");
-        buff = new byte[1000];
-        byteOut = new ByteArrayOutputStream();
-        while ((j = in.read(buff, 0, buff.length)) > 0) {
-            byteOut.write(buff, 0, j);
-        }
-        byteOut.close();
-        in.close();
-        Assert.assertTrue(this.checkDataEquals(data, byteOut.toByteArray()));
-        
+    }
+    
+    @Test
+    public void testFSFileIOOperations2() throws AnalyticsException, IOException {
+        this.fileSystem.delete("/d1");
+        this.fileRandomWriteRead("/d1/d2/f1", 1350, 1350, 100);
+        this.fileRandomWriteRead("/d1/d2/f2", 1350, 200, 100);
+        this.fileRandomWriteRead("/d1/d2/f3", 240, 2000, 100);
+        this.fileRandomWriteRead("/d1/d2/f2", 10, 500, 20);
+        this.fileRandomWriteRead("/d1/d2/f1", 1, 1, 1);
         this.fileSystem.delete("/d1");
         Assert.assertFalse(this.fileSystem.exists("/d1/d2/d3"));
     }
@@ -571,25 +564,37 @@ public class AnalyticsDataSourceTest {
         this.fileSystem.delete("/d2");
     }
     
+    private void fileReadSeekPosition(String path, int n, int chunk, int... locs) throws AnalyticsException {
+        byte[] data = this.generateData(n);
+        DataOutput out = this.fileSystem.createOutput(path);
+        out.write(data, 0, data.length);
+        out.close();
+        byte[] din = new byte[chunk];
+        ByteArrayInputStream bin = new ByteArrayInputStream(data);
+        byte[] din2 = new byte[chunk];
+        DataInput in = this.fileSystem.createInput(path);
+        int count, count2;
+        for (int i : locs) {
+            in.seek(i);
+            Assert.assertEquals(in.getPosition(), i);
+            count = in.read(din, 0, din.length);
+            Assert.assertEquals(in.getPosition(), i + (count < 0 ? 0 : count));
+            bin.reset();
+            bin.skip(i);
+            count2 = bin.read(din2, 0, din2.length);
+            Assert.assertEquals(count, count2);
+            Assert.assertTrue(this.checkDataEquals(din, din2));
+        }
+    }
+    
     @Test
     public void testFSReadSeekPosition() throws AnalyticsException {
         this.fileSystem.delete("/d1");
-        byte[] data = this.generateData(1024 * 45);
-        byte[] dataSubset = new byte[5];
-        dataSubset[0] = data[34021];
-        dataSubset[1] = data[34022];
-        dataSubset[2] = data[34023];
-        dataSubset[3] = data[34024];
-        dataSubset[4] = data[34025];
-        DataOutput out = this.fileSystem.createOutput("/d1/fx");
-        out.write(data, 0, data.length);
-        out.close();
-        DataInput in = this.fileSystem.createInput("/d1/fx");
-        in.seek(34021);
-        byte[] dataSubsetIn = new byte[5];
-        in.read(dataSubsetIn, 0, dataSubsetIn.length);
-        Assert.assertTrue(this.checkDataEquals(dataSubset, dataSubsetIn));
-        Assert.assertEquals(in.getPosition(), 34026);
+        this.fileReadSeekPosition("/d1/f1", 2000, 5, 0, 10, 5, 50, 100, 1570, 1998, 0);
+        this.fileReadSeekPosition("/d1/f2", 100, 5, 99);
+        this.fileReadSeekPosition("/d1/f3", 100, 5, 0, 10, 5, 50, 99, 0, 1, 20);
+        this.fileReadSeekPosition("/d1/f4", 10, 1, 0, 10);
+        this.fileReadSeekPosition("/d1/f4", 10, 1, 0, 10, 5, 7, 9, 0, 1, 0);
         this.fileSystem.delete("/d1");
     }
     

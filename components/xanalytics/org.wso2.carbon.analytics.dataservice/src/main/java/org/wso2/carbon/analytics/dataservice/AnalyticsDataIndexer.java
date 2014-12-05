@@ -183,9 +183,9 @@ public class AnalyticsDataIndexer {
         }
         switch (type) {
         case STRING:
-            doc.add(new StringField(name, obj.toString(), Store.NO));
-            break;
+            /* fall through */
         case TEXT:
+            doc.add(new TextField(name, obj.toString(), Store.NO));
             doc.add(new TextField(name, obj.toString(), Store.NO));
             break;
         case INTEGER:

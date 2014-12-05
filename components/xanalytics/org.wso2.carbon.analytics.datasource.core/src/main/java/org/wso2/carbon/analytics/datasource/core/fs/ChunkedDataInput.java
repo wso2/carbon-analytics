@@ -59,8 +59,11 @@ public class ChunkedDataInput implements DataInput {
     public int read(byte[] buff, int offset, int len)
             throws AnalyticsException {
         int remaining, chunkDataIndex;
-        if (this.position + len > + this.length) {
+        if (this.position + len > this.length) {
             len = (int) (this.length - this.position);
+            if (len <= 0) {
+                len = -1;
+            }
         }
         int tmpLen = len;
         while (tmpLen > 0) {
