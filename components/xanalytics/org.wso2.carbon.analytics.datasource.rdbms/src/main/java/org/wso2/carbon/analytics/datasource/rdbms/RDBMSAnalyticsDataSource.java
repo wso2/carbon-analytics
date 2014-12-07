@@ -20,6 +20,7 @@ package org.wso2.carbon.analytics.datasource.rdbms;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -543,7 +544,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     }
 
     @Override
-    public FileSystem getFileSystem() throws AnalyticsException {
+    public FileSystem getFileSystem() throws IOException {
         return new RDBMSFileSystem(this.getQueryConfiguration(), this.getDataSource());
     }
 
@@ -582,6 +583,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
         }
     }
     
+    @SuppressWarnings("resource")
     @Override
     public boolean tableExists(int tenantId, String tableName) throws AnalyticsException {
         tableName = this.normalizeTableName(tableName);

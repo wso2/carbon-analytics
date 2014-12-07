@@ -46,7 +46,7 @@ import org.wso2.carbon.base.MultitenantConstants;
 public class AnalyticsDataServiceTest {
 
     private AnalyticsDataService service;
-    
+        
     @BeforeSuite
     public void setup() throws NamingException, AnalyticsException, IOException {
         AnalyticsDataSource ads = H2FileDBAnalyticsDataSourceTest.cleanupAndCreateDS();

@@ -18,6 +18,7 @@
  */
 package org.wso2.carbon.analytics.datasource.core;
 
+import java.io.IOException;
 import java.util.Map;
 
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
@@ -42,9 +43,9 @@ public interface AnalyticsDataSource extends AnalyticsRecordStore {
     /**
      * Creates and returns a {@link FileSystem} object to do file related operations.
      * @return The {@link FileSystem} object
-     * @throws AnalyticsException
+     * @throws IOException
      */
-    FileSystem getFileSystem() throws AnalyticsException;
+    FileSystem getFileSystem() throws IOException;
     
     /**
      * Returns a lock provider for this analytics data source. This can be returned null, and the users

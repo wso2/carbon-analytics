@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -33,7 +34,6 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.fs.ChunkedDataInput;
 import org.wso2.carbon.analytics.datasource.core.fs.ChunkedDataOutput;
 import org.wso2.carbon.analytics.datasource.core.ChunkedStream;
@@ -56,7 +56,7 @@ public class RDBMSFileSystem implements FileSystem {
     private static final Log log = LogFactory.getLog(RDBMSFileSystem.class);
         
     public RDBMSFileSystem(QueryConfigurationEntry queryConfigurationEntry, 
-            DataSource dataSource) throws AnalyticsException {
+            DataSource dataSource) throws IOException {
         this.queryConfigurationEntry = queryConfigurationEntry;
         this.dataSource = dataSource;
         this.FS_EMPTY_DATA_CHUNK = new byte[this.getQueryConfiguration().getFsDataChunkSize()];
@@ -79,33 +79,15 @@ public class RDBMSFileSystem implements FileSystem {
         conn.setAutoCommit(autoCommit);
         return conn;
     }
-    
-    @Override
-    public void copy(String srcPath, String destPath) throws AnalyticsException {
-        try {
-            DataInput input = this.createInput(srcPath);
-            DataOutput output = this.createOutput(destPath);
-            byte[] buff = new byte[1024];
-            int i;
-            while ((i = input.read(buff, 0, buff.length)) > 0) {
-                output.write(buff, 0, i);
-            }
-            output.close();
-            input.close();
-        } catch (AnalyticsException e) {
-            throw new AnalyticsException("Error in file copy "
-                    + "[" + srcPath + " -> " + destPath + "]: " + e.getMessage(), e);
-        }
-    }
 
     @Override
-    public void delete(String path) throws AnalyticsException {
+    public void delete(String path) throws IOException {
         Connection conn = null;
         try {
             conn = this.getConnection();
             this.deleteImpl(conn, path);
         } catch (SQLException e) {
-            throw new AnalyticsException("Error in file delete: " + e.getMessage(), e);
+            throw new IOException("Error in file delete: " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
@@ -123,13 +105,13 @@ public class RDBMSFileSystem implements FileSystem {
     }
 
     @Override
-    public boolean exists(String path) throws AnalyticsException {
+    public boolean exists(String path) throws IOException {
         Connection conn = null;
         try {
             conn = this.getConnection();
             return this.existsImpl(conn, path);
         } catch (SQLException e) {
-            throw new AnalyticsException("Error in file exists: " + e.getMessage());
+            throw new IOException("Error in file exists: " + e.getMessage());
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
@@ -156,7 +138,7 @@ public class RDBMSFileSystem implements FileSystem {
     }
 
     @Override
-    public List<String> list(String path) throws AnalyticsException {
+    public List<String> list(String path) throws IOException {
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -171,20 +153,20 @@ public class RDBMSFileSystem implements FileSystem {
             }
             return result;
         } catch (SQLException e) {
-            throw new AnalyticsException("Error in file exists: " + e.getMessage(), e);
+            throw new IOException("Error in file exists: " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(rs, stmt, conn);
         }
     }
 
     @Override
-    public void sync(String path) throws AnalyticsException {
+    public void sync(String path) throws IOException {
         /* nothing to do here, since the data is already sync'ed when flush/close is called,
          * this is guaranteed since, before sync is called, the users will call close */
     }
 
     @Override
-    public void mkdir(String path) throws AnalyticsException {
+    public void mkdir(String path) throws IOException {
         Connection conn = null;
         try {
             conn = this.getConnection(false);
@@ -192,7 +174,7 @@ public class RDBMSFileSystem implements FileSystem {
             conn.commit();
         } catch (SQLException e) {
             RDBMSUtils.rollbackConnection(conn);
-            throw new AnalyticsException("Error in mkdir: " + e.getMessage(), e);
+            throw new IOException("Error in mkdir: " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
@@ -221,7 +203,7 @@ public class RDBMSFileSystem implements FileSystem {
         RDBMSUtils.cleanupConnection(null, stmt, null);
     }
     
-    protected void createFile(String path) throws AnalyticsException {
+    protected void createFile(String path) throws IOException {
         Connection conn = null;
         try {
             conn = this.getConnection(false);
@@ -229,7 +211,7 @@ public class RDBMSFileSystem implements FileSystem {
             conn.commit();
         } catch (SQLException e) {
             RDBMSUtils.rollbackConnection(conn);
-            throw new AnalyticsException("Error in creating file: " + e.getMessage());
+            throw new IOException("Error in creating file: " + e.getMessage());
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
@@ -244,13 +226,13 @@ public class RDBMSFileSystem implements FileSystem {
     }
 
     @Override
-    public long length(String path) throws AnalyticsException {
+    public long length(String path) {
         Connection conn = null;
         try {
             conn = this.getConnection();
             return this.lengthImpl(conn, path);
         } catch (SQLException e) {
-            throw new AnalyticsException("Error in file length: " + e.getMessage(), e);
+            throw new RuntimeException("Error in file length: " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
@@ -270,7 +252,7 @@ public class RDBMSFileSystem implements FileSystem {
         return result;
     }
     
-    protected void setLength(String path, long length) throws AnalyticsException {
+    protected void setLength(String path, long length) throws IOException {
         Connection conn = null;
         PreparedStatement stmt = null;
         try {
@@ -280,7 +262,7 @@ public class RDBMSFileSystem implements FileSystem {
             stmt.setString(2, path);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new AnalyticsException("Error in file delete: " + e.getMessage());
+            throw new IOException("Error in file delete: " + e.getMessage());
         } finally {
             RDBMSUtils.cleanupConnection(null, stmt, conn);
         }
@@ -290,7 +272,7 @@ public class RDBMSFileSystem implements FileSystem {
         return this.getQueryConfiguration().getFsSetFileLengthQuery();
     }
     
-    private byte[] inputStreamToByteArray(InputStream in) throws AnalyticsException {
+    private byte[] inputStreamToByteArray(InputStream in) throws IOException {
         byte[] buff = new byte[256];
         int i;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -302,11 +284,11 @@ public class RDBMSFileSystem implements FileSystem {
             in.close();
             return out.toByteArray();
         } catch (IOException e) {
-            throw new AnalyticsException("Error in converting input stream -> byte[]: " + e.getMessage(), e);
+            throw new IOException("Error in converting input stream -> byte[]: " + e.getMessage(), e);
         }
     }
     
-    protected byte[] readChunkData(String path, long n) throws AnalyticsException {
+    protected byte[] readChunkData(String path, long n) throws IOException {
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -322,7 +304,7 @@ public class RDBMSFileSystem implements FileSystem {
                 return FS_EMPTY_DATA_CHUNK;
             }
         } catch (SQLException e) {
-            throw new AnalyticsException("Error in file read chunk: " + e.getMessage(), e);
+            throw new IOException("Error in file read chunk: " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(rs, stmt, conn);
         }
@@ -332,7 +314,7 @@ public class RDBMSFileSystem implements FileSystem {
         return this.getQueryConfiguration().getFsReadDataChunkQuery();
     }
     
-    private void writeChunks(String path, List<DataChunk> chunks) throws AnalyticsException {
+    private void writeChunks(String path, List<DataChunk> chunks) throws IOException {
         Connection conn = null;
         PreparedStatement stmt = null;
         try {
@@ -362,7 +344,7 @@ public class RDBMSFileSystem implements FileSystem {
     }
     
     private void writeChunksSequentially(Connection conn, String path, 
-        List<DataChunk> chunks) throws AnalyticsException {
+        List<DataChunk> chunks) throws IOException {
         PreparedStatement stmt = null;
         String query;
         for (DataChunk chunk : chunks) {
@@ -375,14 +357,14 @@ public class RDBMSFileSystem implements FileSystem {
                 try {
                     query = this.getQueryConfiguration().getFsUpdateDataChunkQuery();
                     if (query == null) {
-                        throw new AnalyticsException("A required property 'FsUpdateDataChunkQuery' "
+                        throw new IOException("A required property 'FsUpdateDataChunkQuery' "
                                 + "for the current analytics data source is not specified");
                     }
                     stmt = conn.prepareStatement(query);
                     this.populateStatementWithDataChunkUpdate(stmt, path, chunk);
                     stmt.execute();
                 } catch (SQLException e1) {
-                    throw new AnalyticsException("Error in updating data chunk: " + e1.getMessage(), e1);
+                    throw new IOException("Error in updating data chunk: " + e1.getMessage(), e1);
                 }
             } finally {
                 if (stmt != null) {
@@ -435,22 +417,22 @@ public class RDBMSFileSystem implements FileSystem {
         }
 
         @Override
-        public long length() throws AnalyticsException {
+        public long length() {
             return RDBMSFileSystem.this.length(this.getPath());
         }
 
         @Override
-        public DataChunk readChunk(long n) throws AnalyticsException {
+        public DataChunk readChunk(long n) throws IOException {
             return new DataChunk(n, RDBMSFileSystem.this.readChunkData(this.getPath(), n));
         }
 
         @Override
-        public void setLength(long length) throws AnalyticsException {
+        public void setLength(long length) throws IOException {
             RDBMSFileSystem.this.setLength(this.getPath(), length);
         }
 
         @Override
-        public void writeChunks(List<DataChunk> chunks) throws AnalyticsException {
+        public void writeChunks(List<DataChunk> chunks) throws IOException {
             RDBMSFileSystem.this.writeChunks(this.getPath(), chunks);
         }
         
@@ -458,13 +440,13 @@ public class RDBMSFileSystem implements FileSystem {
 
     @Override
     public DataInput createInput(String path)
-            throws AnalyticsException {
+            throws IOException {
         return new ChunkedDataInput(new RDBMSDataStream(path));
     }
 
     @Override
-    public DataOutput createOutput(String path)
-            throws AnalyticsException {
+    public OutputStream createOutput(String path)
+            throws IOException {
         this.createFile(path);
         return new ChunkedDataOutput(new RDBMSDataStream(path));
     }

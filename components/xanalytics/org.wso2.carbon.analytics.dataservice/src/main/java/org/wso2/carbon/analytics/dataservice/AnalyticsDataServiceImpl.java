@@ -18,6 +18,7 @@
  */
 package org.wso2.carbon.analytics.dataservice;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +27,7 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.RecordGroup;
+import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
 import org.wso2.carbon.analytics.datasource.core.lock.LockProvider;
 
 /**
@@ -39,13 +41,14 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     
     public AnalyticsDataServiceImpl(AnalyticsDataSource analyticsDataSource) throws AnalyticsException {
         this.analyticsDataSource = analyticsDataSource;
+        LockProvider lockProvider = this.lookupLockProvider();
+        FileSystem fileSystem;
         try {
-            this.indexer = new AnalyticsDataIndexer(this.analyticsDataSource.getFileSystem(), 
-                    this.lookupLockProvider());
-        } catch (AnalyticsException e) {
-            throw new AnalyticsException("Error in creating AnalyticsDataIndexer: " + 
-                    e.getMessage(), e);
+            fileSystem = this.analyticsDataSource.getFileSystem();
+        } catch (IOException e) {
+            throw new AnalyticsException("Error in creating file system: " + e.getMessage(), e);
         }
+        this.indexer = new AnalyticsDataIndexer(fileSystem, lockProvider);
     }
     
     private LockProvider lookupLockProvider() throws AnalyticsException {

@@ -19,7 +19,10 @@
 package org.wso2.carbon.analytics.dataservice;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.IOContext;
@@ -27,12 +30,11 @@ import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.store.IndexOutput;
 import org.apache.lucene.store.Lock;
 import org.apache.lucene.store.LockFactory;
-import org.apache.lucene.store.LockObtainFailedException;
+import org.apache.lucene.store.OutputStreamIndexOutput;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsLockException;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem.DataInput;
-import org.wso2.carbon.analytics.datasource.core.fs.FileSystem.DataOutput;
 import org.wso2.carbon.analytics.datasource.core.lock.LockProvider;
 
 /**
@@ -40,24 +42,24 @@ import org.wso2.carbon.analytics.datasource.core.lock.LockProvider;
  */
 public class CarbonAnalyticsDirectory extends Directory {
 
+    private static final int OUTPUT_STREAM_BUFFER_SIZE = 1024 * 8;
+
     private FileSystem fileSystem;
         
     private String path;
+    
+    private LockFactory lockFactory;
     
     public CarbonAnalyticsDirectory(FileSystem fileSystem, LockProvider lockProvider, 
             String path) throws AnalyticsException {
         this.fileSystem = fileSystem;
         this.path = this.normalisePath(path);
-        try {
-            this.setLockFactory(new AnalyticsIndexLockFactoryAdaptor(lockProvider));
-            this.getLockFactory().setLockPrefix(this.getPath());
-        } catch (IOException e) {
-            throw new AnalyticsException("Error in creating Carbon analytics directory: " + e.getMessage(), e);
-        }
+        this.lockFactory = new AnalyticsIndexLockFactoryAdaptor(lockProvider);
+        this.getLockFactory().setLockPrefix(this.getPath());
     }
     
     private String normalisePath(String path) {
-        if (path.endsWith("/")) {
+        if (!path.endsWith("/")) {
             path += "/";
         }
         return path;
@@ -82,154 +84,43 @@ public class CarbonAnalyticsDirectory extends Directory {
     
     @Override
     public IndexOutput createOutput(String name, IOContext ctx) throws IOException {
-        DataOutput output;
-        try {
-            String path = this.generateFilePath(name);
-            output = this.fileSystem.createOutput(path);
-            return new AnalyticsIndexOutputAdaptor(output, path);
-        } catch (AnalyticsException e) {
-            throw new IOException("Error in creating index output for file '" + name + "': " + e.getMessage(), e);
-        }        
+        String path = this.generateFilePath(name);
+        OutputStream out = this.fileSystem.createOutput(path);
+        return new OutputStreamIndexOutput(out, OUTPUT_STREAM_BUFFER_SIZE);
     }
 
     @Override
     public void deleteFile(String name) throws IOException {
-        try {
-            this.fileSystem.delete(this.generateFilePath(name));
-        } catch (AnalyticsException e) {
-            throw new IOException("Error in deleting file '" + this.generateFilePath(name) + "': " + e.getMessage(), e);
-        }
+        this.fileSystem.delete(this.generateFilePath(name));
     }
 
     @Override
     public boolean fileExists(String name) throws IOException {
-        try {
-            return this.fileSystem.exists(this.generateFilePath(name));
-        } catch (AnalyticsException e) {
-            throw new IOException("Error in file#exists '" + this.generateFilePath(name) + "': " + e.getMessage(), e);
-        }
+        return this.fileSystem.exists(this.generateFilePath(name));        
     }
 
     @Override
     public long fileLength(String name) throws IOException {
-        try {
-            return this.fileSystem.length(this.generateFilePath(name));
-        } catch (AnalyticsException e) {
-            throw new IOException("Error in file#length '" + this.generateFilePath(name) + "': " + e.getMessage(), e);
-        }
+        return this.fileSystem.length(this.generateFilePath(name));        
     }
 
     @Override
     public String[] listAll() throws IOException {
-        try {
-            return this.fileSystem.list(this.generateFilePath(this.getPath())).toArray(new String[0]);
-        } catch (AnalyticsException e) {
-            throw new IOException("Error in listing files in the directory '" + 
-                    this.getPath() + "': " + e.getMessage(), e);
-        }
+        return this.fileSystem.list(this.generateFilePath(this.getPath())).toArray(new String[0]);
     }
 
     @Override
     public IndexInput openInput(String name, IOContext ctx) throws IOException {
         String path = this.generateFilePath(name);
-        DataInput input;
-        try {
-            input = this.fileSystem.createInput(path);
-            return new AnalyticsIndexInputAdaptor(path, input);
-        } catch (AnalyticsException e) {
-            throw new IOException("Error in creating index input for file '" + name + "': " + e.getMessage(), e);
-        }        
+        DataInput input = this.fileSystem.createInput(path);
+        return new AnalyticsIndexInputAdaptor(path, input);
     }
 
     @Override
     public void sync(Collection<String> names) throws IOException {
         for (String name : names) {
-            try {
-                this.getFileSystem().sync(this.generateFilePath(name));
-            } catch (AnalyticsException e) {
-                throw new IOException("Error in sync: " + e.getMessage(), e);
-            }
+            this.getFileSystem().sync(this.generateFilePath(name));            
         }
-    }
-    
-    /**
-     * Lucene {@link IndexOutput} adaptor implementation using Carbon analytics {@link DataOutput}.
-     */
-    private class AnalyticsIndexOutputAdaptor extends IndexOutput {
-
-        private DataOutput dataOutput;
-        
-        private String path;
-        
-        public AnalyticsIndexOutputAdaptor(DataOutput dataOutput, String path) {
-            this.dataOutput = dataOutput;
-            this.path = path;
-        }
-        
-        @Override
-        public void close() throws IOException {
-            try {
-                this.dataOutput.close();
-            } catch (AnalyticsException e) {
-                throw new IOException("Error in closing data output: " + e.getMessage(), e);
-            }
-        }
-
-        @Override
-        public void flush() throws IOException {
-            try {
-                this.dataOutput.flush();
-            } catch (AnalyticsException e) {
-                throw new IOException("Error in flushing data output: " + e.getMessage(), e);
-            }
-        }
-
-        @Override
-        public long getFilePointer() {
-            try {
-                return this.dataOutput.getPosition();
-            } catch (AnalyticsException e) {
-                throw new RuntimeException("Error in retrieving file position: " + e.getMessage(), e);
-            }
-        }
-
-        @Override
-        public long length() throws IOException {
-            try {
-                return fileSystem.length(this.path);
-            } catch (AnalyticsException e) {
-                throw new IOException("Error in retrieving file length: " + e.getMessage(), e);
-            }
-        }
-
-        @Override
-        public void seek(long pos) throws IOException {
-            try {
-                this.dataOutput.seek(pos);
-            } catch (AnalyticsException e) {
-                throw new IOException("Error in index output file seek: " + e.getMessage(), e);
-            }
-        }
-
-        @Override
-        public void writeByte(byte data) throws IOException {
-            try {
-                byte[] buff = new byte[] { data };
-                this.dataOutput.write(buff, 0, buff.length);
-            } catch (AnalyticsException e) {
-                throw new IOException("Error in writing data: " + e.getMessage(), e);
-            }
-        }
-
-        @Override
-        public void writeBytes(byte[] data, int offset, int length) throws IOException {
-            try {
-                this.dataOutput.write(data, 0, length);
-            } catch (AnalyticsException e) {
-                throw new IOException("Error in writing data: " + e.getMessage(), e);
-            }
-        }
-        
     }
     
     /**
@@ -241,66 +132,78 @@ public class CarbonAnalyticsDirectory extends Directory {
         
         private String path;
         
-        protected AnalyticsIndexInputAdaptor(String path, DataInput dataInput) {
-            super(path);
+        private long length;
+        
+        private long offset;
+        
+        private List<IndexInput> clonedInputs = new ArrayList<IndexInput>();
+        
+        protected AnalyticsIndexInputAdaptor(String path, DataInput dataInput) throws IOException {
+            this(path, dataInput, 0, fileSystem.length(path), path);            
+        }
+        
+        protected AnalyticsIndexInputAdaptor(String path, DataInput dataInput, long offset, 
+                long length, String sliceDescription) throws IOException {
+            super(sliceDescription);
             this.path = path;
-            this.dataInput = dataInput;            
+            this.dataInput = dataInput;
+            this.offset = offset;
+            this.length = length;
+            this.seek(0);
         }
 
         @Override
         public void close() throws IOException {
-            try {
-                this.dataInput.close();
-            } catch (AnalyticsException e) {
-                throw new IOException("Error in closing index input: " + e.getMessage(), e);
+            for (IndexInput in : this.clonedInputs) {
+                in.close();
             }
+            this.dataInput.close();
         }
 
         @Override
         public long getFilePointer() {
-            try {
-                return this.dataInput.getPosition();
-            } catch (AnalyticsException e) {
-                throw new RuntimeException("Error in retrieving file location: " + e.getMessage(), e);
-            }
+            return this.dataInput.getPosition() - this.offset;
         }
 
         @Override
         public long length() {
-            try {
-                return fileSystem.length(this.path);
-            } catch (AnalyticsException e) {
-                throw new RuntimeException("Error in retrieving file length: " + e.getMessage(), e);
-            }
+            return this.length;
         }
 
         @Override
         public void seek(long pos) throws IOException {
-            try {
-                this.dataInput.seek(pos);
-            } catch (AnalyticsException e) {
-                throw new IOException("Error in index input file seek: " + e.getMessage(), e);
-            }
+            this.dataInput.seek(pos + this.offset);            
         }
 
         @Override
         public byte readByte() throws IOException {
-            try {
-                byte[] buff = new byte[1];
-                this.dataInput.read(buff, 0, buff.length);
-                return buff[0];
-            } catch (AnalyticsException e) {
-                throw new RuntimeException("Error in reading data: " + e.getMessage(), e);
-            }
+            byte[] buff = new byte[1];
+            this.dataInput.read(buff, 0, buff.length);
+            return buff[0];            
         }
 
         @Override
         public void readBytes(byte[] data, int offset, int length) throws IOException {
+            this.dataInput.read(data, offset, length);
+        }
+
+        @Override
+        public IndexInput slice(String sliceDescription, long offset, long length) throws IOException {
+            return new AnalyticsIndexInputAdaptor(this.path, this.dataInput.makeCopy(), 
+                    this.offset + offset, length, sliceDescription);
+        }
+        
+        @Override
+        public IndexInput clone() {
+            IndexInput in;
             try {
-                this.dataInput.read(data, offset, length);
-            } catch (AnalyticsException e) {
-                throw new RuntimeException("Error in reading data: " + e.getMessage(), e);
-            }
+                in = new AnalyticsIndexInputAdaptor(this.path, this.dataInput.makeCopy(), 
+                        this.offset, this.length, this.toString());
+                this.clonedInputs.add(in);
+                return in;
+            } catch (IOException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }            
         }
         
     }
@@ -356,7 +259,7 @@ public class CarbonAnalyticsDirectory extends Directory {
             try {
                 return this.lock.isLocked();
             } catch (AnalyticsLockException e) {
-                throw new IOException("Error in creating lock#isLocked: " + e.getMessage(), e);
+                throw new IOException("Error in lock#isLocked: " + e.getMessage(), e);
             }
         }
 
@@ -366,32 +269,39 @@ public class CarbonAnalyticsDirectory extends Directory {
                 this.lock.acquire();
                 return true;
             } catch (AnalyticsLockException e) {
-                throw new IOException("Error in creating lock#isLocked: " + e.getMessage(), e);
-            }
-        }
-        
-        @Override
-        public boolean obtain(long lockWaitTimeout) throws IOException, LockObtainFailedException {
-            try {
-                if (!this.lock.acquire(lockWaitTimeout)) {
-                    throw new LockObtainFailedException("Timed out in obtaining a lock for '" + 
-                            lockWaitTimeout + "' ms.");
-                }
-                return true;
-            } catch (AnalyticsLockException e) {
-                throw new IOException("Error in creating lock#isLocked: " + e.getMessage(), e);
+                throw new IOException("Error in lock#isLocked: " + e.getMessage(), e);
             }
         }
 
         @Override
-        public void release() throws IOException {
+        public void close() throws IOException {
             try {
                 this.lock.release();
             } catch (AnalyticsLockException e) {
-                throw new IOException("Error in releasing lock: " + e.getMessage(), e);
+                throw new IOException("Error in lock#close: " + e.getMessage(), e);
             }
         }
         
+    }
+
+    @Override
+    public void clearLock(String name) throws IOException {
+        this.getLockFactory().clearLock(name);
+    }
+
+    @Override
+    public LockFactory getLockFactory() {
+        return lockFactory;
+    }
+
+    @Override
+    public Lock makeLock(String name) {
+        return this.getLockFactory().makeLock(name);
+    }
+
+    @Override
+    public void setLockFactory(LockFactory lockFactory) throws IOException {
+        this.lockFactory = lockFactory;
     }
 
 }

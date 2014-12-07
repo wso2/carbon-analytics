@@ -20,15 +20,14 @@ package org.wso2.carbon.analytics.dataservice;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem.DataInput;
-import org.wso2.carbon.analytics.datasource.core.fs.FileSystem.DataOutput;
 
 /**
  * This class represents a repository for storing index definitions.
@@ -78,7 +77,7 @@ public class AnalyticsIndexDefinitionRepository {
             if (in != null) {
                 try {
                     in.close();
-                } catch (AnalyticsException e) {
+                } catch (IOException e) {
                     log.error("Error in closing data input: " + e.getMessage(), e);
                 }
             }            
@@ -122,7 +121,7 @@ public class AnalyticsIndexDefinitionRepository {
     }
         
     public void setIndices(int tenantId, String tableName, Map<String, IndexType> columns) throws AnalyticsIndexException {
-        DataOutput out = null;
+        OutputStream out = null;
         try {
             out = this.fileSystem.createOutput(this.generatePath(tenantId, tableName));
             byte[] data = this.encodeIndexDetails(columns).getBytes(DEFAULT_CHARSET);
@@ -133,7 +132,7 @@ public class AnalyticsIndexDefinitionRepository {
             if (out != null) {
                 try {
                     out.close();
-                } catch (AnalyticsException e) {
+                } catch (IOException e) {
                     log.error("Error in closing data output: " + e.getMessage(), e);
                 }
             }
@@ -143,7 +142,7 @@ public class AnalyticsIndexDefinitionRepository {
     public void clearAllIndices(int tenantId, String tableName) throws AnalyticsIndexException {
         try {
             this.fileSystem.delete(this.generatePath(tenantId, tableName));
-        } catch (AnalyticsException e) {
+        } catch (IOException e) {
             throw new AnalyticsIndexException("Error in clearing indices: " + e.getMessage(), e);
         }
     }

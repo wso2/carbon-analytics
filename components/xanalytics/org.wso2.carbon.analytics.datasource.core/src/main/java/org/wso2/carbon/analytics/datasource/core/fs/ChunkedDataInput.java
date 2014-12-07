@@ -18,7 +18,8 @@
  */
 package org.wso2.carbon.analytics.datasource.core.fs;
 
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+import java.io.IOException;
+
 import org.wso2.carbon.analytics.datasource.core.ChunkedStream;
 import org.wso2.carbon.analytics.datasource.core.ChunkedStream.DataChunk;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem.DataInput;
@@ -36,7 +37,7 @@ public class ChunkedDataInput implements DataInput {
     
     private long length;
     
-    public ChunkedDataInput(ChunkedStream stream) throws AnalyticsException {
+    public ChunkedDataInput(ChunkedStream stream) {
         this.stream = stream;
         this.length = this.stream.length();
     }
@@ -45,7 +46,7 @@ public class ChunkedDataInput implements DataInput {
         return stream;
     }
     
-    private void checkCurrentChunk() throws AnalyticsException {
+    private void checkCurrentChunk() throws IOException {
         if (this.currentChunk == null || !this.currentChunk.containsPosition(this.getPosition())) {
             this.currentChunk = this.getStream().readChunkForPosition(this.getPosition());
         }
@@ -57,7 +58,7 @@ public class ChunkedDataInput implements DataInput {
     
     @Override
     public int read(byte[] buff, int offset, int len)
-            throws AnalyticsException {
+            throws IOException {
         int remaining, chunkDataIndex;
         if (this.position + len > this.length) {
             len = (int) (this.length - this.position);
@@ -82,18 +83,25 @@ public class ChunkedDataInput implements DataInput {
     }
     
     @Override
-    public void seek(long pos) throws AnalyticsException {
+    public void seek(long pos) {
         this.position = pos;
     }
 
     @Override
-    public long getPosition() throws AnalyticsException {
+    public long getPosition() {
         return position;
     }
 
     @Override
-    public void close() throws AnalyticsException {
+    public void close() throws IOException {
         /* nothing to do */
+    }
+
+    @Override
+    public DataInput makeCopy() {
+        ChunkedDataInput in = new ChunkedDataInput(this.stream);
+        in.seek(this.position);
+        return in;
     }
 
 }

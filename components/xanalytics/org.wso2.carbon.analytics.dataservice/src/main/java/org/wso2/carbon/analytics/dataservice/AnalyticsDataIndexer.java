@@ -75,7 +75,7 @@ public class AnalyticsDataIndexer {
     
     private Map<String, Directory> indexDirs = new HashMap<String, Directory>();
     
-    private Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_45);
+    private Analyzer analyzer = new StandardAnalyzer();
     
     private FileSystem fileSystem;
     
@@ -106,7 +106,7 @@ public class AnalyticsDataIndexer {
         try {
             reader = DirectoryReader.open(this.lookupIndexDir(tableId));
             IndexSearcher searcher = new IndexSearcher(reader);
-            Query indexQuery = new QueryParser(Version.LUCENE_45, "id_internal", this.analyzer).parse(query);
+            Query indexQuery = new QueryParser("id_internal", this.analyzer).parse(query);
             TopScoreDocCollector collector = TopScoreDocCollector.create(count, true);
             searcher.search(indexQuery, collector);
             ScoreDoc[] hits = collector.topDocs(start).scoreDocs;
@@ -325,7 +325,7 @@ public class AnalyticsDataIndexer {
     
     private IndexWriter createIndexWriter(String tableId) throws AnalyticsIndexException {
         Directory indexDir = this.lookupIndexDir(tableId);
-        IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_45, new StandardAnalyzer(Version.LUCENE_45));
+        IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_4_10_2, this.analyzer);
         try {
             return new IndexWriter(indexDir, conf);
         } catch (IOException e) {

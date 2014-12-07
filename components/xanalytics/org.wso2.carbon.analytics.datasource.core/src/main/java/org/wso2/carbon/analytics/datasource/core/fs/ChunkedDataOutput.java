@@ -18,40 +18,37 @@
  */
 package org.wso2.carbon.analytics.datasource.core.fs;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.ChunkedStream;
 import org.wso2.carbon.analytics.datasource.core.ChunkedStream.DataChunk;
-import org.wso2.carbon.analytics.datasource.core.fs.FileSystem.DataOutput;
 
 /**
  * Chucked data output implementation.
  */
-public class ChunkedDataOutput implements DataOutput {
+public class ChunkedDataOutput extends OutputStream {
 
     private static final int DEFAULT_DATA_CHUNK_FLUSH_THRESHOLD = 200;
     
     private ChunkedStream stream;
-        
+
     private long position;
     
-    private Map<Long, DataChunk> dataChunks = new HashMap<Long, ChunkedStream.DataChunk>();
-    
-    private long length;
-    
+    private List<DataChunk> dataChunks = new ArrayList<ChunkedStream.DataChunk>();
+        
     private int flushChunkThreshold;
     
-    public ChunkedDataOutput(ChunkedStream stream, int flushChunkThreshold) throws AnalyticsException {
+    private boolean flushed;
+    
+    public ChunkedDataOutput(ChunkedStream stream, int flushChunkThreshold) throws IOException {
         this.stream = stream;
-        this.length = this.stream.length();
         this.flushChunkThreshold = flushChunkThreshold;
     }
     
-    public ChunkedDataOutput(ChunkedStream stream) throws AnalyticsException {
+    public ChunkedDataOutput(ChunkedStream stream) throws IOException {
         this(stream, DEFAULT_DATA_CHUNK_FLUSH_THRESHOLD);
     }
 
@@ -59,43 +56,31 @@ public class ChunkedDataOutput implements DataOutput {
         return stream;
     }
     
-    private DataChunk loadChunk(long chunkNumber) {
-        DataChunk result = this.dataChunks.get(chunkNumber);
-        if (result == null) {
-            result = this.getStream().createEmptyChunk(chunkNumber);
-            this.dataChunks.put(chunkNumber, result);
-        }
-        return result;
-    }
-    
-    private DataChunk loadChunkForPosition(long position) {
-        return this.loadChunk(this.getStream().getChunkNumber(position));
+    @Override
+    public void write(int b) throws IOException {
+        byte[] data = new byte[] { (byte) b };
+        this.write(data, 0, 1);
     }
     
     @Override
-    public void write(byte[] data, int offset, int len) throws AnalyticsException {
+    public void write(byte[] data, int offset, int len) throws IOException {
         DataChunk chunk;
         int chunkPosition, remaining;
         while (len > 0) {
-            chunk = this.loadChunkForPosition(this.position);
+            this.flushed = false;
             chunkPosition = (int) (this.position % this.getStream().getChunkSize());
+            if (chunkPosition == 0) {
+                this.dataChunks.add(this.getStream().createEmptyChunk(this.position / this.getStream().getChunkSize()));
+            }
+            chunk = this.dataChunks.get(this.dataChunks.size() - 1);            
             remaining = this.getStream().getChunkSize() - chunkPosition;
             if (remaining > len) {                
                 remaining = len;
             }
             System.arraycopy(data, offset, chunk.getData(), chunkPosition, remaining);
-            if (!chunk.isWhole()) {
-                /* if the chunk is not whole, that means, the original source data is not filled in yet,
-                 * so we have to mark the data areas we fill in this chunk, so we can later read in from
-                 * the original source and fill in the blanks */
-                chunk.markModified(chunkPosition, remaining);
-            }
             this.position += remaining;
             offset += remaining;
             len -= remaining;
-            if (this.length < this.position) {
-                this.length = this.position;
-            }
             if (this.dataChunks.size() >= this.flushChunkThreshold) {
                 this.flush();
             }
@@ -103,45 +88,26 @@ public class ChunkedDataOutput implements DataOutput {
     }
 
     @Override
-    public void seek(long pos) throws AnalyticsException {
-        this.position = pos;
-    }
-
-    @Override
-    public long getPosition() throws AnalyticsException {
-        return position;
-    }
-
-    @Override
-    public void setLength(long length) throws AnalyticsException {
-        this.length = length;
-        this.getStream().setLength(this.length);
-    }
-
-    @Override
-    public void flush() throws AnalyticsException {
-        this.setLength(this.length);
-        List<DataChunk> dataChunks = new ArrayList<ChunkedStream.DataChunk>(this.dataChunks.values());
-        for (DataChunk dataChunk : dataChunks) {
-            if (!dataChunk.isWhole()) {
-                this.makeWhole(dataChunk);
-            }
+    public void flush() throws IOException {
+        if (this.flushed) {
+            return;
         }
-        this.getStream().writeChunks(dataChunks);
+        int chunkPosition = (int) (this.position % this.getStream().getChunkSize());
+        DataChunk activeChunk = null;
+        if (chunkPosition > 0) {
+            activeChunk = this.dataChunks.get(this.dataChunks.size() - 1);
+        }
+        this.getStream().setLength(this.position);
+        this.getStream().writeChunks(this.dataChunks);
         this.dataChunks.clear();
-    }
-    
-    private void makeWhole(DataChunk dataChunk) throws AnalyticsException {
-        DataChunk originalChunk = this.getStream().readChunk(dataChunk.getChunkNumber());
-        List<int[]> missingSections = dataChunk.calculateMissingDataSections();
-        for (int[] section : missingSections) {
-            System.arraycopy(originalChunk.getData(), section[0], dataChunk.getData(), section[0], 
-                    section[1] - section[0]);
+        if (activeChunk != null) {
+            this.dataChunks.add(activeChunk);
         }
+        this.flushed = true;
     }
 
     @Override
-    public void close() throws AnalyticsException {
+    public void close() throws IOException {
         this.flush();
     }
 
