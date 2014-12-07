@@ -24,7 +24,6 @@ package org.wso2.carbon.analytics.dataservice;
 public enum IndexType {
 
     STRING,
-    TEXT,
     INTEGER,
     LONG,
     FLOAT,

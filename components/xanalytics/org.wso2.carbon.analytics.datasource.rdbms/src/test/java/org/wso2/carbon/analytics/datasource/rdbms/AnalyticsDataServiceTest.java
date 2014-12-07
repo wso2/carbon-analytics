@@ -69,7 +69,7 @@ public class AnalyticsDataServiceTest {
         this.service.clearIndices(tenantId, "T1");
         Map<String, IndexType> columns = new HashMap<String, IndexType>();
         columns.put("C1", IndexType.STRING);
-        columns.put("C2", IndexType.TEXT);
+        columns.put("C2", IndexType.STRING);
         columns.put("C3", IndexType.INTEGER);
         columns.put("C4", IndexType.LONG);
         columns.put("C5", IndexType.DOUBLE);
@@ -113,7 +113,7 @@ public class AnalyticsDataServiceTest {
         columns.put("INT1", IndexType.INTEGER);
         columns.put("STR1", IndexType.STRING);
         columns.put("str2", IndexType.STRING);
-        columns.put("TXT1", IndexType.TEXT);
+        columns.put("TXT1", IndexType.STRING);
         columns.put("LN1", IndexType.LONG);
         columns.put("DB1", IndexType.DOUBLE);
         columns.put("FL1", IndexType.FLOAT);
@@ -185,7 +185,7 @@ public class AnalyticsDataServiceTest {
         Map<String, IndexType> columns = new HashMap<String, IndexType>();
         columns.put("tenant", IndexType.INTEGER);
         columns.put("ip", IndexType.STRING);
-        columns.put("log", IndexType.TEXT);
+        columns.put("log", IndexType.STRING);
         
         /* warm-up */
         this.service.createTable(50, "TableX");
