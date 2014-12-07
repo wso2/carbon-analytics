@@ -236,28 +236,54 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     private String calculateRecordIdentity(Record record) {
         return this.generateTargetTableName(record.getTenantId(), record.getTableName());
     }
-    
+
     @Override
-    public void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
+    public void update(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
+        Connection conn = null;
+        try {
+            conn = this.getConnection(false);
+            Map<String, List<Record>> recordBatches = this.generateRecordBatches(records);
+            for (List<Record> batch : recordBatches.values()) {
+                this.deleteRecordsSimilar(conn, batch);
+            }
+            for (List<Record> batch : recordBatches.values()) {
+                this.addRecordsSimilar(conn, batch);
+            }
+            conn.commit();
+        } catch (SQLException e) {
+            RDBMSUtils.rollbackConnection(conn);
+            throw new AnalyticsException("Error in updating records: " + e.getMessage(), e);
+        } finally {
+            RDBMSUtils.cleanupConnection(null, null, conn);
+        }
+    }
+    
+    private Map<String, List<Record>> generateRecordBatches(List<Record> records) {
         /* if the records have identities (unique table category and name) as the following
          * "ABABABCCAACBDABCABCDBAC", the job of this method is to make it like the following,
-         * {"AAAAAAAA", "BBBBBBB", "CCCCCC", "DD" } and add these with separate batch inserts */
+         * {"AAAAAAAA", "BBBBBBB", "CCCCCC", "DD" } */
+        Map<String, List<Record>> recordBatches = new HashMap<String, List<Record>>();
+        List<Record> recordBatch;
+        for (Record record : records) {
+            recordBatch = recordBatches.get(this.calculateRecordIdentity(record));
+            if (recordBatch == null) {
+                recordBatch = new ArrayList<Record>();
+                recordBatches.put(this.calculateRecordIdentity(record), recordBatch);
+            }
+            recordBatch.add(record);
+        }
+        return recordBatches;
+    }
+    
+    @Override
+    public void insert(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {        
         if (records.size() == 0) {
             return;
         }
         Connection conn = null;
         try {
             conn = this.getConnection(false);
-            Map<String, List<Record>> recordBatches = new HashMap<String, List<Record>>();
-            List<Record> recordBatch;
-            for (Record record : records) {
-                recordBatch = recordBatches.get(this.calculateRecordIdentity(record));
-                if (recordBatch == null) {
-                    recordBatch = new ArrayList<Record>();
-                    recordBatches.put(this.calculateRecordIdentity(record), recordBatch);
-                }
-                recordBatch.add(record);
-            }
+            Map<String, List<Record>> recordBatches = this.generateRecordBatches(records);
             for (List<Record> batch : recordBatches.values()) {
                 this.addRecordsSimilar(conn, batch);
             }
@@ -449,8 +475,35 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
         if (ids.size() == 0) {
             return;
         }
-        String sql = this.generateRecordDeletionRecordsWithIdsQuery(tenantId, tableName, ids.size());
         Connection conn = null;
+        try {
+            conn = this.getConnection();
+            this.delete(conn, tenantId, tableName, ids);
+        } catch (SQLException e) {
+            throw new AnalyticsException("Error in deleting records: " + e.getMessage(), e);
+        } finally {
+            RDBMSUtils.cleanupConnection(null, null, conn);
+        }
+    }
+    
+    private void deleteRecordsSimilar(Connection conn, List<Record> records) 
+            throws AnalyticsException, AnalyticsTableNotAvailableException {
+        if (records.size() == 0) {
+            return;
+        }
+        Record firstRecord = records.get(0);
+        int tenantId = firstRecord.getTenantId();
+        String tableName = firstRecord.getTableName();
+        List<String> ids = new ArrayList<String>(records.size());
+        for (Record record : records) {
+            ids.add(record.getId());
+        }
+        this.delete(conn, tenantId, tableName, ids);
+    }
+    
+    private void delete(Connection conn, int tenantId, String tableName, 
+            List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
+        String sql = this.generateRecordDeletionRecordsWithIdsQuery(tenantId, tableName, ids.size());
         PreparedStatement stmt = null;
         try {
             conn = this.getConnection();
@@ -466,7 +519,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
                 throw new AnalyticsException("Error in deleting records: " + e.getMessage(), e);
             }
         } finally {
-            RDBMSUtils.cleanupConnection(null, stmt, conn);
+            RDBMSUtils.cleanupConnection(null, stmt, null);
         }
     }
     
@@ -678,6 +731,6 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
         } finally {
             RDBMSUtils.cleanupConnection(rs, stmt, conn);
         }
-    }    
+    }
 
 }

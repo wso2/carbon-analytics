@@ -97,11 +97,16 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     @Override
-    public void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
-        this.getAnalyticsDataSource().put(records);
-        this.getIndexer().put(records);
+    public void insert(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
+        this.getAnalyticsDataSource().insert(records);
+        this.getIndexer().insert(records);
     }
 
+    @Override
+    public void update(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
+        this.getAnalyticsDataSource().update(records);
+    }
+    
     @Override
     public RecordGroup[] get(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo,
             int recordsFrom, int recordsCount) throws AnalyticsException, AnalyticsTableNotAvailableException {

@@ -73,12 +73,22 @@ public interface AnalyticsRecordStore {
     
     /**
      * Adds a new record to the table. If the record id is mentioned, 
-     * it will be used to do an insert/update, or else, an insert will be done with a generated id.
+     * it will be used to do the insert, or else, the insert will be done with a randomly generated id.
      * @param records The list of records to be inserted
      * @throws AnalyticsException
      * @throws AnalyticsTableNotAvailableException
      */
-    void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException;
+    void insert(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException;
+    
+    /**
+     * Updates the record store with the given records, matches by its record ids, this will be a
+     * full replace of the record, where the older record is effectively deleted and the new one is
+     * added, there will not be a merge of older record's field's with the new one.
+     * @param records The records to be updated
+     * @throws AnalyticsException
+     * @throws AnalyticsTableNotAvailableException
+     */
+    void update(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException;
     
     /**
      * Retrieves data from a table.

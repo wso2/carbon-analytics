@@ -99,7 +99,8 @@ public class AnalyticsDataIndexer {
         return repository;
     }
     
-    public List<String> search(int tenantId, String tableName, String language, String query, int start, int count) throws AnalyticsIndexException {
+    public List<String> search(int tenantId, String tableName, String language, String query, 
+            int start, int count) throws AnalyticsIndexException {
         List<String> result = new ArrayList<String>();
         String tableId = this.generateTableId(tenantId, tableName);
         IndexReader reader;
@@ -143,7 +144,7 @@ public class AnalyticsDataIndexer {
      * @param records The records to be indexed
      * @throws AnalyticsException
      */
-    public void put(List<Record> records) throws AnalyticsException {
+    public void insert(List<Record> records) throws AnalyticsException {
         Map<String, IndexType> indices;
         Map<String, List<Record>> batches = this.generateRecordBatches(records);
         Record firstRecord;

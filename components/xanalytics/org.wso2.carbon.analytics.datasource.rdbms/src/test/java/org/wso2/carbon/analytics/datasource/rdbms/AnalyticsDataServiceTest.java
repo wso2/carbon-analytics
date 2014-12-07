@@ -121,7 +121,7 @@ public class AnalyticsDataServiceTest {
         this.service.createTable(tenantId, tableName);
         this.service.setIndices(tenantId, tableName, columns);
         List<Record> records = this.generateIndexRecords(tenantId, tableName, n);
-        this.service.put(records);
+        this.service.insert(records);
         List<String> result = this.service.search(tenantId, tableName, "lucene", "STR1:STRING0", 0, 10);
         Assert.assertEquals(result.size(), 1);
         result = this.service.search(tenantId, tableName, "lucene", "str2:string0", 0, 10);
@@ -152,7 +152,7 @@ public class AnalyticsDataServiceTest {
         this.service.createTable(50, "TableX");      
         for (int i = 0; i < 10; i++) {
             records = AnalyticsDataSourceTest.generateRecords(50, "TableX", i, batch, -1, -1);
-            this.service.put(records);
+            this.service.insert(records);
         }
         this.cleanupTable(50, "TableX");
         
@@ -160,7 +160,7 @@ public class AnalyticsDataServiceTest {
         long start = System.currentTimeMillis();
         for (int i = 0; i < n; i++) {
             records = AnalyticsDataSourceTest.generateRecords(50, "TableX", i, batch, -1, -1);
-            this.service.put(records);
+            this.service.insert(records);
         }
         long end = System.currentTimeMillis();
         System.out.println("* Records: " + (n * batch));
@@ -192,7 +192,7 @@ public class AnalyticsDataServiceTest {
         this.service.setIndices(50, "TableX", columns);
         for (int i = 0; i < 10; i++) {
             records = AnalyticsDataSourceTest.generateRecords(50, "TableX", i, batch, -1, -1);
-            this.service.put(records);
+            this.service.insert(records);
         }
         this.cleanupTable(50, "TableX");
         
@@ -201,7 +201,7 @@ public class AnalyticsDataServiceTest {
         long start = System.currentTimeMillis();
         for (int i = 0; i < n; i++) {
             records = AnalyticsDataSourceTest.generateRecords(50, "TableX", i, batch, -1, -1);
-            this.service.put(records);
+            this.service.insert(records);
         }
         long end = System.currentTimeMillis();
         System.out.println("* Records: " + (n * batch));

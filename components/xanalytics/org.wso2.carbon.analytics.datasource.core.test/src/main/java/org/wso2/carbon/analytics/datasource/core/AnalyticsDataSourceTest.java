@@ -108,6 +108,21 @@ public class AnalyticsDataSourceTest {
         return result;
     }
     
+    private List<Record> generateRecordsForUpdate(List<Record> recordsIn) {
+        List<Record> result = new ArrayList<Record>();
+        Map<String, Object> values;
+        for (Record recordIn : recordsIn) {
+            values = new HashMap<String, Object>();
+            values.put("server_name", "ESB-" + recordIn.getId());
+            values.put("ip", "192.168.0." + (recordIn.getTimestamp() % 256));
+            values.put("tenant", recordIn.getTenantId());
+            values.put("change_index", recordIn.getTenantId() + 0.3454452);
+            result.add(new Record(recordIn.getId(), recordIn.getTenantId(), recordIn.getTableName(), 
+                    values, System.currentTimeMillis()));
+        }
+        return result;
+    }
+    
     public static Set<Record> recordGroupsToSet(RecordGroup[] rgs) throws AnalyticsException {
         Set<Record> result = new HashSet<Record>();
         for (RecordGroup rg : rgs) {
@@ -162,7 +177,7 @@ public class AnalyticsDataSourceTest {
         Record record = this.createRecord(7, "T1", serverName, ip, tenant, log);
         List<Record> records = new ArrayList<Record>();
         records.add(record);
-        this.analyticsDS.put(records);
+        this.analyticsDS.insert(records);
         String id = record.getId();
         List<String> ids = new ArrayList<String>();
         ids.add(id);
@@ -184,7 +199,7 @@ public class AnalyticsDataSourceTest {
         this.cleanupT1();
         this.analyticsDS.createTable(7, "T1");
         List<Record> records = generateRecords(7, "T1", 1, 100, -1, -1);
-        this.analyticsDS.put(records);
+        this.analyticsDS.insert(records);
         Set<Record> recordsIn = recordGroupsToSet(this.analyticsDS.get(7, "T1", null, -1, -1, 0, -1));
         Assert.assertEquals(recordsIn, new HashSet<Record>(records));
         List<String> columns = new ArrayList<String>();
@@ -206,12 +221,27 @@ public class AnalyticsDataSourceTest {
     }
     
     @Test
+    public void testMultipleDataRecordAddRetieveUpdate() throws AnalyticsException {
+        this.cleanupT1();
+        this.analyticsDS.createTable(15, "T1");
+        List<Record> records = generateRecords(15, "T1", 1, 50, -1, -1);
+        this.analyticsDS.insert(records);
+        Set<Record> recordsIn = recordGroupsToSet(this.analyticsDS.get(15, "T1", null, -1, -1, 0, -1));
+        Assert.assertEquals(recordsIn, new HashSet<Record>(records));
+        records = this.generateRecordsForUpdate(records);
+        this.analyticsDS.update(records);
+        recordsIn = recordGroupsToSet(this.analyticsDS.get(15, "T1", null, -1, -1, 0, -1));
+        Assert.assertEquals(recordsIn, new HashSet<Record>(records));
+        this.cleanupT1();
+    }
+    
+    @Test
     public void testDataRecordCount() throws AnalyticsException {
         this.cleanupT1();
         this.analyticsDS.createTable(7, "T1");
         int count = (int) (200 * Math.random()) + 1;
         List<Record> records = generateRecords(7, "T1", 1, count, -1, -1);
-        this.analyticsDS.put(records);
+        this.analyticsDS.insert(records);
         Assert.assertEquals(this.analyticsDS.getRecordCount(7, "T1"), count);
         this.analyticsDS.delete(7, "T1", -1, -1);
         Assert.assertEquals(this.analyticsDS.getRecordCount(7, "T1"), 0);
@@ -225,7 +255,7 @@ public class AnalyticsDataSourceTest {
         long time = System.currentTimeMillis();
         int timeOffset = 10;
         List<Record> records = generateRecords(7, "T1", 1, 100, time, timeOffset);
-        this.analyticsDS.put(records);
+        this.analyticsDS.insert(records);
         Set<Record> recordsIn = recordGroupsToSet(this.analyticsDS.get(7, "T1", null, time - 10, time + timeOffset * 100, 0, -1));
         Assert.assertEquals(recordsIn, new HashSet<Record>(records));
         recordsIn = recordGroupsToSet(this.analyticsDS.get(7, "T1", null, time, time + timeOffset * 99 + 1, 0, -1));
@@ -249,7 +279,7 @@ public class AnalyticsDataSourceTest {
         long time = System.currentTimeMillis();
         int timeOffset = 10;
         List<Record> records = generateRecords(7, "T1", 1, 100, time, timeOffset);
-        this.analyticsDS.put(records);
+        this.analyticsDS.insert(records);
         Set<Record> recordsIn = recordGroupsToSet(this.analyticsDS.get(7, "T1", null, time + 22, time + timeOffset * 100, 0, -1));
         Assert.assertEquals(recordsIn.size(), 97);
         recordsIn = recordGroupsToSet(this.analyticsDS.get(7, "T1", null, time, time + timeOffset * 96 - 2, 0, -1));
@@ -264,7 +294,7 @@ public class AnalyticsDataSourceTest {
         long time = System.currentTimeMillis();
         int timeOffset = 10;
         List<Record> records = generateRecords(7, "T1", 1, 100, time, timeOffset);
-        this.analyticsDS.put(records);
+        this.analyticsDS.insert(records);
         Set<Record> recordsIn = recordGroupsToSet(this.analyticsDS.get(7, "T1", null, time - 100, time - 10, 0, -1));
         Assert.assertEquals(recordsIn.size(), 0);
         recordsIn = recordGroupsToSet(this.analyticsDS.get(7, "T1", null, time + timeOffset * 103, time + timeOffset * 110, 0, -1));
@@ -279,7 +309,7 @@ public class AnalyticsDataSourceTest {
         long time = System.currentTimeMillis();
         int timeOffset = 10;
         List<Record> records = generateRecords(7, "T1", 2, 200, time, timeOffset);
-        this.analyticsDS.put(records);
+        this.analyticsDS.insert(records);
         Set<Record> recordsIn1 = recordGroupsToSet(this.analyticsDS.get(7, "T1", null, -1, -1, 1, -1));
         Assert.assertEquals(recordsIn1.size(), 199);        
         recordsIn1 = recordGroupsToSet(this.analyticsDS.get(7, "T1", null, -1, -1, 1, 200));
@@ -311,7 +341,7 @@ public class AnalyticsDataSourceTest {
         long time = System.currentTimeMillis();
         int timeOffset = 10;
         List<Record> records = generateRecords(7, "T1", 2, 200, time, timeOffset);
-        this.analyticsDS.put(records);
+        this.analyticsDS.insert(records);
         Set<Record> recordsIn1 = recordGroupsToSet(this.analyticsDS.get(7, "T1", null, time, time + timeOffset * 200, 1, 200));
         Assert.assertEquals(recordsIn1.size(), 199);
         recordsIn1 = recordGroupsToSet(this.analyticsDS.get(7, "T1", null, time, time + timeOffset * 200, 0, 200));
@@ -355,7 +385,7 @@ public class AnalyticsDataSourceTest {
         this.cleanupT1();
         this.analyticsDS.createTable(7, "T1");
         List<Record> records = generateRecords(7, "T1", 2, 10, -1, -1);
-        this.analyticsDS.put(records);
+        this.analyticsDS.insert(records);
         Assert.assertEquals(recordGroupsToSet(this.analyticsDS.get(7, "T1", null, -1, -1, 0, -1)).size(), 10);
         List<String> ids = new ArrayList<String>();
         ids.add(records.get(2).getId());
@@ -380,7 +410,7 @@ public class AnalyticsDataSourceTest {
         long time = System.currentTimeMillis();
         int timeOffset = 10;
         List<Record> records = generateRecords(7, "T1", 1, 100, time, timeOffset);
-        this.analyticsDS.put(records);
+        this.analyticsDS.insert(records);
         Assert.assertEquals(recordGroupsToSet(this.analyticsDS.get(7, "T1", null, -1, -1, 0, -1)).size(), 100);
         this.analyticsDS.delete(7, "T1", time - 100, time + 12);
         Set<Record> recordsIn = recordGroupsToSet(this.analyticsDS.get(7, "T1", null, -1, -1, 0, -1));
@@ -413,7 +443,7 @@ public class AnalyticsDataSourceTest {
         List<Record> records;
         for (int i = 0; i < 10; i++) {
             records = generateRecords(7, "T1", i, 100, -1, -1);
-            this.analyticsDS.put(records);
+            this.analyticsDS.insert(records);
         }
         this.cleanupT1();
         
@@ -423,7 +453,7 @@ public class AnalyticsDataSourceTest {
         long start = System.currentTimeMillis();
         for (int i = 0; i < n; i++) {
             records = generateRecords(7, "T1", i, batch, -1, -1);
-            this.analyticsDS.put(records);
+            this.analyticsDS.insert(records);
             for (Record record : records) {
                 hash1 += record.hashCode();
             }
