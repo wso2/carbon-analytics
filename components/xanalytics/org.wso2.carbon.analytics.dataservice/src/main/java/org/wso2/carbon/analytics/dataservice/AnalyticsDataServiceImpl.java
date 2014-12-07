@@ -83,6 +83,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public void deleteTable(int tenantId, String tableName) throws AnalyticsException {
         this.getAnalyticsDataSource().deleteTable(tenantId, tableName);
+        this.clearIndices(tenantId, tableName);
     }
 
     @Override
@@ -105,6 +106,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public void update(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
         this.getAnalyticsDataSource().update(records);
+        this.getIndexer().update(records);
     }
     
     @Override

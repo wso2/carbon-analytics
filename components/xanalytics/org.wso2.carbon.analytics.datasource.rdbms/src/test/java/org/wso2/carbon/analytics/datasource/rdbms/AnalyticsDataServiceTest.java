@@ -142,6 +142,52 @@ public class AnalyticsDataServiceTest {
     }
     
     @Test
+    public void testIndexUpdate() throws AnalyticsException {
+        int tenantId = 1;
+        String tableName = "T1";
+        this.cleanupTable(tenantId, tableName);
+        this.service.createTable(tenantId, tableName);
+        Map<String, IndexType> columns = new HashMap<String, IndexType>();
+        columns.put("STR1", IndexType.STRING);
+        columns.put("STR2", IndexType.STRING);
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put("STR1", "Sri Lanka is known for tea");
+        values.put("STR2", "Cricket is most famous");
+        Record record = new Record(tenantId, tableName, values, System.currentTimeMillis());
+        List<Record> records = new ArrayList<Record>();
+        records.add(record);
+        this.service.setIndices(tenantId, tableName, columns);
+        this.service.insert(records);
+        List<String> result = this.service.search(tenantId, tableName, "lucene", "STR1:tea", 0, 10);
+        Assert.assertEquals(result.size(), 1);
+        String id = record.getId();
+        Assert.assertEquals(result.get(0), id);
+        result = this.service.search(tenantId, tableName, "lucene", "STR1:diamonds", 0, 10);
+        Assert.assertEquals(result.size(), 0);
+        result = this.service.search(tenantId, tableName, "lucene", "STR2:cricket", 0, 10);
+        Assert.assertEquals(result.size(), 1);
+        Assert.assertEquals(result.get(0), id);
+        values = new HashMap<String, Object>();
+        values.put("STR1", "South Africa is know for diamonds");
+        values.put("STR2", "NBA has the best basketball action");
+        record = new Record(id, tenantId, tableName, values, System.currentTimeMillis());
+        records = new ArrayList<Record>();
+        records.add(record);
+        this.service.update(records);
+        result = this.service.search(tenantId, tableName, "lucene", "STR1:tea", 0, 10);
+        Assert.assertEquals(result.size(), 0);
+        result = this.service.search(tenantId, tableName, "lucene", "STR2:cricket", 0, 10);
+        Assert.assertEquals(result.size(), 0);
+        result = this.service.search(tenantId, tableName, "lucene", "STR1:diamonds", 0, 10);
+        Assert.assertEquals(result.size(), 1);
+        Assert.assertEquals(result.get(0), id);
+        result = this.service.search(tenantId, tableName, "lucene", "STR2:basketball", 0, 10);
+        Assert.assertEquals(result.size(), 1);
+        Assert.assertEquals(result.get(0), id);
+        this.cleanupTable(tenantId, tableName);
+    }
+    
+    @Test
     public void testDataRecordAddReadPerformanceNonIndex() throws AnalyticsException {
         this.cleanupTable(50, "TableX");
         System.out.println("\n************** START ANALYTICS DS (WITHOUT INDEXING, H2-FILE) PERF TEST **************");

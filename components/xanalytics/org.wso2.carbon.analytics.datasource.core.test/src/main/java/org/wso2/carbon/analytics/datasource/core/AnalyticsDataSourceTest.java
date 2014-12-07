@@ -617,7 +617,7 @@ public class AnalyticsDataSourceTest {
             out = this.fileSystem.createOutput("/mydir/perf_warmup/file" + i);
             out.write(data, 0, data.length);
             out.close();
-        }        
+        }
         
         long start = System.currentTimeMillis();
         int count = 1000;

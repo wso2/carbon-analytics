@@ -42,6 +42,7 @@ import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -157,13 +158,52 @@ public class AnalyticsDataIndexer {
         }
     }
     
+    /**
+     * Updates the given records in the index.
+     * @param records The records to be indexed
+     * @throws AnalyticsException
+     */
+    public void update(List<Record> records) throws AnalyticsException {
+        Map<String, IndexType> indices;
+        Map<String, List<Record>> batches = this.generateRecordBatches(records);
+        Record firstRecord;
+        for (List<Record> recordBatch : batches.values()) {
+            firstRecord = recordBatch.get(0);
+            indices = this.lookupIndices(firstRecord.getTenantId(), firstRecord.getTableName());
+            if (indices.size() > 0) {
+                this.updateIndex(recordBatch, indices);
+            }
+        }
+    }
+    
     private void addToIndex(List<Record> recordBatch, Map<String, IndexType> columns) throws AnalyticsIndexException {
         Record firstRecord = recordBatch.get(0);
         String tableId = this.generateTableId(firstRecord.getTenantId(), firstRecord.getTableName());
         IndexWriter indexWriter = this.createIndexWriter(tableId);
         try {
             for (Record record : recordBatch) {
-                indexWriter.addDocument(this.generateIndexDoc(record, columns));
+                indexWriter.addDocument(this.generateIndexDoc(record, columns).getFields());
+            }
+            indexWriter.commit();
+        } catch (IOException e) {
+            throw new AnalyticsIndexException("Error in updating index: " + e.getMessage(), e);
+        } finally {
+            try {
+                indexWriter.close();
+            } catch (IOException e) {
+                log.error("Error closing index writer: " + e.getMessage(), e);
+            }
+        }
+    }
+    
+    private void updateIndex(List<Record> recordBatch, Map<String, IndexType> columns) throws AnalyticsIndexException {
+        Record firstRecord = recordBatch.get(0);
+        String tableId = this.generateTableId(firstRecord.getTenantId(), firstRecord.getTableName());
+        IndexWriter indexWriter = this.createIndexWriter(tableId);
+        try {
+            for (Record record : recordBatch) {
+                indexWriter.updateDocument(new Term(INDEX_ID_INTERNAL_FIELD, record.getId()), 
+                        this.generateIndexDoc(record, columns).getFields());
             }
             indexWriter.commit();
         } catch (IOException e) {
