@@ -36,13 +36,14 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsLockException;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem.DataInput;
 import org.wso2.carbon.analytics.datasource.core.lock.LockProvider;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 /**
  * This represents a Lucene {@link Directory} implementation using Carbon Analytics {@link FileSystem}.
  */
-public class CarbonAnalyticsDirectory extends Directory {
+public class AnalyticsDirectory extends Directory {
 
-    private static final int OUTPUT_STREAM_BUFFER_SIZE = 1024 * 8;
+    private static final int OUTPUT_STREAM_BUFFER_SIZE = 1024 * 10;
 
     private FileSystem fileSystem;
         
@@ -50,19 +51,12 @@ public class CarbonAnalyticsDirectory extends Directory {
     
     private LockFactory lockFactory;
     
-    public CarbonAnalyticsDirectory(FileSystem fileSystem, LockProvider lockProvider, 
+    public AnalyticsDirectory(FileSystem fileSystem, LockProvider lockProvider, 
             String path) throws AnalyticsException {
         this.fileSystem = fileSystem;
-        this.path = this.normalisePath(path);
+        this.path = GenericUtils.normalizePath(path);
         this.lockFactory = new AnalyticsIndexLockFactoryAdaptor(lockProvider);
         this.getLockFactory().setLockPrefix(this.getPath());
-    }
-    
-    private String normalisePath(String path) {
-        if (!path.endsWith("/")) {
-            path += "/";
-        }
-        return path;
     }
     
     public FileSystem getFileSystem() {
@@ -79,7 +73,7 @@ public class CarbonAnalyticsDirectory extends Directory {
     }
 
     private String generateFilePath(String name) {
-        return this.getPath() + name;
+        return this.getPath() + "/" + name;
     }
     
     @Override
@@ -106,7 +100,7 @@ public class CarbonAnalyticsDirectory extends Directory {
 
     @Override
     public String[] listAll() throws IOException {
-        return this.fileSystem.list(this.generateFilePath(this.getPath())).toArray(new String[0]);
+        return this.fileSystem.list(this.getPath()).toArray(new String[0]);
     }
 
     @Override

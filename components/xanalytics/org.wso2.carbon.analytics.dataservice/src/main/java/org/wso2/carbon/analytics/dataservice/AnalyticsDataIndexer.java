@@ -176,6 +176,35 @@ public class AnalyticsDataIndexer {
         }
     }
     
+    /**
+     * Deletes the given records in the index.
+     * @param The ids of the records to be deleted
+     * @throws AnalyticsException
+     */
+    public void delete(int tenantId, String tableName, List<String> ids) throws AnalyticsException {
+        if (this.lookupIndices(tenantId, tableName).size() == 0) {
+            return;
+        }
+        String tableId = this.generateTableId(tenantId, tableName);
+        IndexWriter indexWriter = this.createIndexWriter(tableId);
+        List<Term> terms = new ArrayList<Term>(ids.size());
+        for (String id : ids) {
+            terms.add(new Term(INDEX_ID_INTERNAL_FIELD, id));
+        }
+        try {
+            indexWriter.deleteDocuments(terms.toArray(new Term[terms.size()]));
+            indexWriter.commit();
+        } catch (IOException e) {
+            throw new AnalyticsException("Error in deleting indices: " + e.getMessage(), e);
+        } finally {
+            try {
+                indexWriter.close();
+            } catch (IOException e) {
+                log.error("Error closing index writer: " + e.getMessage(), e);
+            }
+        }
+    }
+    
     private void addToIndex(List<Record> recordBatch, Map<String, IndexType> columns) throws AnalyticsIndexException {
         Record firstRecord = recordBatch.get(0);
         String tableId = this.generateTableId(firstRecord.getTenantId(), firstRecord.getTableName());
@@ -341,7 +370,7 @@ public class AnalyticsDataIndexer {
     private Directory createDirectory(String tableId) throws AnalyticsIndexException {
         String path = this.generateDirPath(tableId);
         try {
-            return new CarbonAnalyticsDirectory(this.getFileSystem(), this.getLockProvider(), path);
+            return new AnalyticsDirectory(this.getFileSystem(), this.getLockProvider(), path);            
         } catch (AnalyticsException e) {
             throw new AnalyticsIndexException("Error in creating directory: " + e.getMessage(), e);
         }

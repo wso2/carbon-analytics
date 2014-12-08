@@ -132,6 +132,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     public void delete(int tenantId, String tableName, List<String> ids) throws AnalyticsException,
             AnalyticsTableNotAvailableException {
         this.getAnalyticsDataSource().delete(tenantId, tableName, ids);
+        this.getIndexer().delete(tenantId, tableName, ids);
     }
 
     @Override

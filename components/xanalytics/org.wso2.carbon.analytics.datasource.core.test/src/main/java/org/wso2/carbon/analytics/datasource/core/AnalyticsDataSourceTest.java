@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -477,16 +478,36 @@ public class AnalyticsDataSourceTest {
         this.cleanupT1();
     }
     
+    private void addFilesToDir(String dir, String...files) throws IOException {
+        OutputStream out;
+        for (String file : files) {
+            out = this.fileSystem.createOutput(dir + "/" + file);
+            out.write(generateData(100));
+            out.close();
+        }
+    }
+    
     @Test
     public void testFSDirectoryOperations() throws IOException {
-        this.fileSystem.delete("/d1/d2/d3");
+        this.fileSystem.delete("/d1");
         this.fileSystem.mkdir("/d1/d2/d3");
         this.fileSystem.mkdir("/d1/d2/d5");
         Assert.assertTrue(this.fileSystem.exists("/d1/d2/d3"));
         Assert.assertTrue(this.fileSystem.exists("/d1/d2/d5"));
         Assert.assertFalse(this.fileSystem.exists("/d1/d2/d4"));
-        this.fileSystem.delete("/d1/d2/d3");
-        this.fileSystem.delete("/d1/d2/d5");
+        List<String> files = this.fileSystem.list("/d1/d2");
+        Assert.assertEquals(files.size(), 2);
+        /* the path must be normalized, can end with "/" or not */
+        files = this.fileSystem.list("/d1/d2/");
+        Assert.assertEquals(files.size(), 2);
+        Assert.assertEquals(new HashSet<String>(Arrays.asList(new String[] { "d3", "d5" })), 
+                new HashSet<String>(files));
+        this.addFilesToDir("/d1/d2", "f1", "f2", "f3");
+        files = this.fileSystem.list("/d1/d2");
+        Assert.assertEquals(files.size(), 5);
+        Assert.assertEquals(new HashSet<String>(Arrays.asList(new String[] { "d3", "d5", "f1", "f2", "f3" })), 
+                new HashSet<String>(files));
+        this.fileSystem.delete("/d1");
         Assert.assertFalse(this.fileSystem.exists("/d1/d2/d3"));
         Assert.assertFalse(this.fileSystem.exists("/d1/d2/d5"));
     }

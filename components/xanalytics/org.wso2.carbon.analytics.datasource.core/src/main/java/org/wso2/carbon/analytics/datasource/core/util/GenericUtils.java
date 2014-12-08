@@ -62,6 +62,21 @@ public class GenericUtils {
         return parent;
     }
     
+    /**
+     * Normalizes the path to make every path not end with "/".
+     * @param path The path
+     * @return The normalized path string
+     */
+    public static String normalizePath(String path) {
+        if (path == null || path.equals("/")) {
+            return path;
+        }
+        if (path.endsWith("/")) {
+            path = path.substring(0, path.length() - 1);
+        }
+        return path;
+    }
+    
     private static int calculateRecordValuesBufferSize(Map<String, Object> values) throws AnalyticsException {
         int count = 0;
         String name;

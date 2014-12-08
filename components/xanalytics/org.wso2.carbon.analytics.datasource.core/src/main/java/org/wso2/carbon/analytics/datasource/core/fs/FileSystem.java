@@ -23,7 +23,8 @@ import java.io.OutputStream;
 import java.util.List;
 
 /**
- * Represents a virtual file system data operations.
+ * Represents a virtual file system data operations, the path values can either terminate with "/" or not,
+ * the implementations must normalize this and store it.
  */
 public interface FileSystem {
 
@@ -38,7 +39,7 @@ public interface FileSystem {
     /**
      * Lists the files in the directory.
      * @param path The path of the directory
-     * @return The list of file name in the directory
+     * @return The list of file names in the directory
      * @throws IOException
      */
     List<String> list(String path) throws IOException;

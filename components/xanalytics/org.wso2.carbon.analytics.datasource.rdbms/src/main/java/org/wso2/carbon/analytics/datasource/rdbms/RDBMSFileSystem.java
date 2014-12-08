@@ -82,6 +82,7 @@ public class RDBMSFileSystem implements FileSystem {
 
     @Override
     public void delete(String path) throws IOException {
+        path = GenericUtils.normalizePath(path);
         Connection conn = null;
         try {
             conn = this.getConnection();
@@ -106,6 +107,7 @@ public class RDBMSFileSystem implements FileSystem {
 
     @Override
     public boolean exists(String path) throws IOException {
+        path = GenericUtils.normalizePath(path);
         Connection conn = null;
         try {
             conn = this.getConnection();
@@ -139,6 +141,7 @@ public class RDBMSFileSystem implements FileSystem {
 
     @Override
     public List<String> list(String path) throws IOException {
+        path = GenericUtils.normalizePath(path);
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -149,7 +152,7 @@ public class RDBMSFileSystem implements FileSystem {
             rs = stmt.executeQuery();
             List<String> result = new ArrayList<String>();
             while (rs.next()) {
-                result.add(rs.getString(1));
+                result.add(rs.getString(1).substring(path.length() + 1));
             }
             return result;
         } catch (SQLException e) {
@@ -167,6 +170,7 @@ public class RDBMSFileSystem implements FileSystem {
 
     @Override
     public void mkdir(String path) throws IOException {
+        path = GenericUtils.normalizePath(path);
         Connection conn = null;
         try {
             conn = this.getConnection(false);
@@ -211,7 +215,7 @@ public class RDBMSFileSystem implements FileSystem {
             conn.commit();
         } catch (SQLException e) {
             RDBMSUtils.rollbackConnection(conn);
-            throw new IOException("Error in creating file: " + e.getMessage());
+            throw new IOException("Error in creating file: " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
@@ -227,6 +231,7 @@ public class RDBMSFileSystem implements FileSystem {
 
     @Override
     public long length(String path) {
+        path = GenericUtils.normalizePath(path);
         Connection conn = null;
         try {
             conn = this.getConnection();
@@ -441,12 +446,14 @@ public class RDBMSFileSystem implements FileSystem {
     @Override
     public DataInput createInput(String path)
             throws IOException {
+        path = GenericUtils.normalizePath(path);
         return new ChunkedDataInput(new RDBMSDataStream(path));
     }
 
     @Override
     public OutputStream createOutput(String path)
             throws IOException {
+        path = GenericUtils.normalizePath(path);
         this.createFile(path);
         return new ChunkedDataOutput(new RDBMSDataStream(path));
     }

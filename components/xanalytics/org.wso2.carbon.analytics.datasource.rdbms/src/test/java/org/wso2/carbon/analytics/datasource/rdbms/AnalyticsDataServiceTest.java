@@ -46,7 +46,7 @@ import org.wso2.carbon.base.MultitenantConstants;
 public class AnalyticsDataServiceTest {
 
     private AnalyticsDataService service;
-        
+            
     @BeforeSuite
     public void setup() throws NamingException, AnalyticsException, IOException {
         AnalyticsDataSource ads = H2FileDBAnalyticsDataSourceTest.cleanupAndCreateDS();
@@ -142,7 +142,7 @@ public class AnalyticsDataServiceTest {
     }
     
     @Test
-    public void testIndexUpdate() throws AnalyticsException {
+    public void testIndexedDataUpdate() throws Exception {
         int tenantId = 1;
         String tableName = "T1";
         this.cleanupTable(tenantId, tableName);
@@ -153,9 +153,14 @@ public class AnalyticsDataServiceTest {
         Map<String, Object> values = new HashMap<String, Object>();
         values.put("STR1", "Sri Lanka is known for tea");
         values.put("STR2", "Cricket is most famous");
+        Map<String, Object> values2 = new HashMap<String, Object>();
+        values2.put("STR1", "Canada is known for Ice Hockey");
+        values2.put("STR2", "It is very cold");
         Record record = new Record(tenantId, tableName, values, System.currentTimeMillis());
+        Record record2 = new Record(tenantId, tableName, values2, System.currentTimeMillis());
         List<Record> records = new ArrayList<Record>();
         records.add(record);
+        records.add(record2);
         this.service.setIndices(tenantId, tableName, columns);
         this.service.insert(records);
         List<String> result = this.service.search(tenantId, tableName, "lucene", "STR1:tea", 0, 10);
@@ -184,6 +189,36 @@ public class AnalyticsDataServiceTest {
         result = this.service.search(tenantId, tableName, "lucene", "STR2:basketball", 0, 10);
         Assert.assertEquals(result.size(), 1);
         Assert.assertEquals(result.get(0), id);
+        result = this.service.search(tenantId, tableName, "lucene", "STR1:hockey", 0, 10);
+        Assert.assertEquals(result.size(), 1);
+        Assert.assertEquals(result.get(0), record2.getId());
+        this.cleanupTable(tenantId, tableName);
+    }
+    
+    @Test
+    public void testIndexDataDeleteWithIds() throws AnalyticsException {
+        int tenantId = 5100;
+        String tableName = "X1";
+        this.cleanupTable(tenantId, tableName);
+        Map<String, IndexType> columns = new HashMap<String, IndexType>();
+        columns.put("INT1", IndexType.INTEGER);
+        columns.put("STR1", IndexType.STRING);
+        this.service.createTable(tenantId, tableName);
+        this.service.setIndices(tenantId, tableName, columns);
+        List<Record> records = this.generateIndexRecords(tenantId, tableName, 98);
+        this.service.insert(records);
+        List<String> ids = new ArrayList<String>();
+        ids.add(records.get(0).getId());
+        ids.add(records.get(5).getId());
+        ids.add(records.get(50).getId());
+        ids.add(records.get(97).getId());
+        Assert.assertEquals(AnalyticsDataSourceTest.recordGroupsToSet(this.service.get(tenantId, tableName, null, ids)).size(), 4);
+        List<String> result = this.service.search(tenantId, tableName, "lucene", "STR1:S*", 0, 150);
+        Assert.assertEquals(result.size(), 98);
+        this.service.delete(tenantId, tableName, ids);
+        result = this.service.search(tenantId, tableName, "lucene", "STR1:S*", 0, 150);
+        Assert.assertEquals(result.size(), 94);
+        Assert.assertEquals(AnalyticsDataSourceTest.recordGroupsToSet(this.service.get(tenantId, tableName, null, ids)).size(), 0);
         this.cleanupTable(tenantId, tableName);
     }
     
