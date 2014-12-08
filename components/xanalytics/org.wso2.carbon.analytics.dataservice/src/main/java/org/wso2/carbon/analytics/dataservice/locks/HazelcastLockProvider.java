@@ -16,11 +16,11 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.core.lock;
+package org.wso2.carbon.analytics.dataservice.locks;
 
 import java.util.concurrent.TimeUnit;
 
-import org.wso2.carbon.analytics.datasource.core.AnalyticsLockException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 
 import com.hazelcast.core.HazelcastInstance;
 
@@ -40,12 +40,12 @@ public class HazelcastLockProvider implements LockProvider {
     }
 
     @Override
-    public Lock getLock(String name) throws AnalyticsLockException {
+    public Lock getLock(String name) throws AnalyticsException {
         return new HazelcastLock(name);
     }
 
     @Override
-    public void clearLock(String name) throws AnalyticsLockException {
+    public void clearLock(String name) throws AnalyticsException {
         new HazelcastLock(name).release();
     }
     
@@ -65,41 +65,41 @@ public class HazelcastLockProvider implements LockProvider {
         }
         
         @Override
-        public void acquire() throws AnalyticsLockException {
+        public void acquire() throws AnalyticsException {
             try {
                 getHazelcast().getLock(this.getName()).lock();
             } catch (Exception e) {
-                throw new AnalyticsLockException("Error in acquiring lock '" + this.getName() +
+                throw new AnalyticsException("Error in acquiring lock '" + this.getName() +
                         "': " + e.getMessage(), e);
             }
         }
 
         @Override
-        public void release() throws AnalyticsLockException {
+        public void release() throws AnalyticsException {
             try {
                 getHazelcast().getLock(this.getName()).unlock();
             } catch (Exception e) {
-                throw new AnalyticsLockException("Error in acquiring lock '" + this.getName() +
+                throw new AnalyticsException("Error in acquiring lock '" + this.getName() +
                         "': " + e.getMessage(), e);
             }
         }
 
         @Override
-        public boolean isLocked() throws AnalyticsLockException {
+        public boolean isLocked() throws AnalyticsException {
             try {
                 return getHazelcast().getLock(this.getName()).isLocked();
             } catch (Exception e) {
-                throw new AnalyticsLockException("Error in checking lock '" + this.getName() +
+                throw new AnalyticsException("Error in checking lock '" + this.getName() +
                         "': " + e.getMessage(), e);
             }
         }
 
         @Override
-        public boolean acquire(long lockWaitTimeout) throws AnalyticsLockException {
+        public boolean acquire(long lockWaitTimeout) throws AnalyticsException {
             try {
                 return getHazelcast().getLock(this.getName()).tryLock(lockWaitTimeout, TimeUnit.MILLISECONDS);
             } catch (Exception e) {
-                throw new AnalyticsLockException("Error in acquiring lock '" + this.getName() +
+                throw new AnalyticsException("Error in acquiring lock '" + this.getName() +
                         "': " + e.getMessage(), e);
             }
         }

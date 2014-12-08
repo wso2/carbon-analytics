@@ -46,12 +46,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSource;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsLockException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.DirectAnalyticsDataSource;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
-import org.wso2.carbon.analytics.datasource.core.lock.LockProvider;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.utils.CarbonUtils;
 
@@ -599,11 +597,6 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     @Override
     public FileSystem getFileSystem() throws IOException {
         return new RDBMSFileSystem(this.getQueryConfiguration(), this.getDataSource());
-    }
-
-    @Override
-    public LockProvider getLockProvider() throws AnalyticsLockException {
-        return null;
     }
     
     @Override

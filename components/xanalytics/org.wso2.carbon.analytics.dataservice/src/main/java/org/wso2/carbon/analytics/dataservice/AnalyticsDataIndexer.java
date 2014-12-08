@@ -49,10 +49,10 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.Version;
+import org.wso2.carbon.analytics.dataservice.locks.LockProvider;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
-import org.wso2.carbon.analytics.datasource.core.lock.LockProvider;
 
 /**
  * This class represents the indexing functionality.

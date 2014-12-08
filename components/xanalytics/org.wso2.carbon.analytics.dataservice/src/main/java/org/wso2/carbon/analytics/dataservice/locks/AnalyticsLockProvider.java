@@ -16,15 +16,12 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.dataservice;
+package org.wso2.carbon.analytics.dataservice.locks;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsLockException;
-import org.wso2.carbon.analytics.datasource.core.lock.HazelcastLockProvider;
-import org.wso2.carbon.analytics.datasource.core.lock.LocalInMemoryLockProvider;
-import org.wso2.carbon.analytics.datasource.core.lock.Lock;
-import org.wso2.carbon.analytics.datasource.core.lock.LockProvider;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceComponent;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 
 import com.hazelcast.core.HazelcastInstance;
 
@@ -33,13 +30,13 @@ import com.hazelcast.core.HazelcastInstance;
  * {@link HazelcastLockProvider} based on the server's clustering configuration, i.e. if clustering is disabled,
  * the operations will be delegated to {@link LocalInMemoryLockProvider} or else, to {@link HazelcastLockProvider}.
  */
-public class CarbonLockProvider implements LockProvider {
+public class AnalyticsLockProvider implements LockProvider {
     
-    private static final Log log = LogFactory.getLog(CarbonLockProvider.class);
+    private static final Log log = LogFactory.getLog(AnalyticsLockProvider.class);
     
     private LockProvider lockProviderDelegate;
     
-    public CarbonLockProvider() {
+    public AnalyticsLockProvider() {
         HazelcastInstance hazelcast = AnalyticsDataServiceComponent.getHazelcastInstance();
         if (hazelcast != null) {
             this.lockProviderDelegate = new HazelcastLockProvider(hazelcast);
@@ -47,17 +44,17 @@ public class CarbonLockProvider implements LockProvider {
             this.lockProviderDelegate = new LocalInMemoryLockProvider();
         }
         if (log.isDebugEnabled()) {
-            log.debug("CarbonLockProvider initialized with '" + this.lockProviderDelegate.getClass().getName() + "'");
+            log.debug("AnalyticsLockProvider initialized with '" + this.lockProviderDelegate.getClass().getName() + "'");
         }
     }
     
     @Override
-    public Lock getLock(String name) throws AnalyticsLockException {
+    public Lock getLock(String name) throws AnalyticsException {
         return this.lockProviderDelegate.getLock(name);
     }
 
     @Override
-    public void clearLock(String name) throws AnalyticsLockException {
+    public void clearLock(String name) throws AnalyticsException {
         this.lockProviderDelegate.clearLock(name);
     }
 

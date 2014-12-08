@@ -16,14 +16,14 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.core.lock;
+package org.wso2.carbon.analytics.dataservice.locks;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.wso2.carbon.analytics.datasource.core.AnalyticsLockException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 
 /**
  * Local in-memory implementation of {@link LockProvider}.
@@ -33,7 +33,7 @@ public class LocalInMemoryLockProvider implements LockProvider {
     private Map<String, Lock> locks = new ConcurrentHashMap<String, Lock>();
 
     @Override
-    public Lock getLock(String name) throws AnalyticsLockException {
+    public Lock getLock(String name) throws AnalyticsException {
         Lock lock = this.locks.get(name);
         if (lock == null) {
             synchronized (this.locks) {
@@ -64,41 +64,41 @@ public class LocalInMemoryLockProvider implements LockProvider {
         }
         
         @Override
-        public void acquire() throws AnalyticsLockException {
+        public void acquire() throws AnalyticsException {
             try {
                 this.lock.lock();
             } catch (Exception e) {
-                throw new AnalyticsLockException("Error in acquiring lock '" + this.getName() +
+                throw new AnalyticsException("Error in acquiring lock '" + this.getName() +
                         "': " + e.getMessage(), e);
             }
         }
 
         @Override
-        public void release() throws AnalyticsLockException {
+        public void release() throws AnalyticsException {
             try {
                 this.lock.unlock();
             } catch (Exception e) {
-                throw new AnalyticsLockException("Error in releasing lock '" + this.getName() +
+                throw new AnalyticsException("Error in releasing lock '" + this.getName() +
                         "': " + e.getMessage(), e);
             }
         }
 
         @Override
-        public boolean isLocked() throws AnalyticsLockException {
+        public boolean isLocked() throws AnalyticsException {
             try {
                 return this.lock.isLocked();
             } catch (Exception e) {
-                throw new AnalyticsLockException("Error in checking lock '" + this.getName() +
+                throw new AnalyticsException("Error in checking lock '" + this.getName() +
                         "': " + e.getMessage(), e);
             }      
         }
 
         @Override
-        public boolean acquire(long lockWaitTimeout) throws AnalyticsLockException {
+        public boolean acquire(long lockWaitTimeout) throws AnalyticsException {
             try {
                 return this.lock.tryLock(lockWaitTimeout, TimeUnit.MILLISECONDS);
             } catch (Exception e) {
-                throw new AnalyticsLockException("Error in acquiring lock '" + this.getName() +
+                throw new AnalyticsException("Error in acquiring lock '" + this.getName() +
                         "': " + e.getMessage(), e);
             }
         }
@@ -106,7 +106,7 @@ public class LocalInMemoryLockProvider implements LockProvider {
     }
 
     @Override
-    public void clearLock(String name) throws AnalyticsLockException {
+    public void clearLock(String name) throws AnalyticsException {
         Lock lock = locks.get(name);
         if (lock != null) {
             lock.release();

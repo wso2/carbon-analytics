@@ -31,11 +31,10 @@ import org.apache.lucene.store.IndexOutput;
 import org.apache.lucene.store.Lock;
 import org.apache.lucene.store.LockFactory;
 import org.apache.lucene.store.OutputStreamIndexOutput;
+import org.wso2.carbon.analytics.dataservice.locks.LockProvider;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsLockException;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem.DataInput;
-import org.wso2.carbon.analytics.datasource.core.lock.LockProvider;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 /**
@@ -221,7 +220,7 @@ public class AnalyticsDirectory extends Directory {
         public void clearLock(String lockName) throws IOException {
             try {
                 this.lockProvider.clearLock(this.generateLockName(lockName));
-            } catch (AnalyticsLockException e) {
+            } catch (AnalyticsException e) {
                 throw new IOException("Error in clearing lock '" + lockName + "': " + e.getMessage(), e);
             }
         }
@@ -230,7 +229,7 @@ public class AnalyticsDirectory extends Directory {
         public Lock makeLock(String lockName) {
             try {
                 return new AnalyticsIndexLockAdaptor(this.lockProvider.getLock(this.generateLockName(lockName)));
-            } catch (AnalyticsLockException e) {
+            } catch (AnalyticsException e) {
                 throw new RuntimeException("Error in creating lock '" + lockName + "': " + e.getMessage(), e);
             }
         }
@@ -238,13 +237,13 @@ public class AnalyticsDirectory extends Directory {
     }
     
     /**
-     * Lucene {@link Lock} adaptor implementation using Carbon analytics {@link org.wso2.carbon.analytics.datasource.core.lock.Lock}.
+     * Lucene {@link Lock} adaptor implementation using Carbon analytics {@link org.wso2.carbon.analytics.dataservice.locks.Lock}.
      */
     private class AnalyticsIndexLockAdaptor extends Lock {
 
-        private org.wso2.carbon.analytics.datasource.core.lock.Lock lock;
+        private org.wso2.carbon.analytics.dataservice.locks.Lock lock;
         
-        public AnalyticsIndexLockAdaptor(org.wso2.carbon.analytics.datasource.core.lock.Lock lock) {
+        public AnalyticsIndexLockAdaptor(org.wso2.carbon.analytics.dataservice.locks.Lock lock) {
             this.lock = lock;
         }
         
@@ -252,7 +251,7 @@ public class AnalyticsDirectory extends Directory {
         public boolean isLocked() throws IOException {
             try {
                 return this.lock.isLocked();
-            } catch (AnalyticsLockException e) {
+            } catch (AnalyticsException e) {
                 throw new IOException("Error in lock#isLocked: " + e.getMessage(), e);
             }
         }
@@ -262,7 +261,7 @@ public class AnalyticsDirectory extends Directory {
             try {
                 this.lock.acquire();
                 return true;
-            } catch (AnalyticsLockException e) {
+            } catch (AnalyticsException e) {
                 throw new IOException("Error in lock#isLocked: " + e.getMessage(), e);
             }
         }
@@ -271,7 +270,7 @@ public class AnalyticsDirectory extends Directory {
         public void close() throws IOException {
             try {
                 this.lock.release();
-            } catch (AnalyticsLockException e) {
+            } catch (AnalyticsException e) {
                 throw new IOException("Error in lock#close: " + e.getMessage(), e);
             }
         }

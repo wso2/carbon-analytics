@@ -16,17 +16,28 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.core.lock;
+package org.wso2.carbon.analytics.dataservice.locks;
 
-import org.wso2.carbon.analytics.datasource.core.AnalyticsLockException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 
 /**
- * This interface represents a lock provider, that can be used to instantiate 
+ * This interface represents a lock provider.
  */
 public interface LockProvider {
 
-    Lock getLock(String name) throws AnalyticsLockException;
+    /**
+     * Returns a lock with the given name, creates if not available already.
+     * @param name The name of the lock
+     * @return The lock
+     * @throws AnalyticsException
+     */
+    Lock getLock(String name) throws AnalyticsException;
     
-    void clearLock(String name) throws AnalyticsLockException;
+    /**
+     * Clears the given lock.
+     * @param name The name of the lock
+     * @throws AnalyticsException
+     */
+    void clearLock(String name) throws AnalyticsException;
     
 }

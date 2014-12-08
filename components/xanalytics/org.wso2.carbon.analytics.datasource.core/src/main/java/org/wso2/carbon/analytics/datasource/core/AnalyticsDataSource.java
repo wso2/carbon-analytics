@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
-import org.wso2.carbon.analytics.datasource.core.lock.LockProvider;
 
 /**
  * This interface represents the common data store implementations used in analytics. The tenant concept
@@ -46,15 +45,5 @@ public interface AnalyticsDataSource extends AnalyticsRecordStore {
      * @throws IOException
      */
     FileSystem getFileSystem() throws IOException;
-    
-    /**
-     * Returns a lock provider for this analytics data source. This can be returned null, and the users
-     * of this analytics data source should use a default lock provider, which should usually be an in-memory
-     * based implementation or a distributed memory based one for clusters. Only if there is a more efficient
-     * implementation of a lock provider is available that is bound to this data source, it should be returned. 
-     * @return Natively data source specific {@link LockProvider}
-     * @throws AnalyticsLockException
-     */
-    LockProvider getLockProvider() throws AnalyticsLockException;
 
 }

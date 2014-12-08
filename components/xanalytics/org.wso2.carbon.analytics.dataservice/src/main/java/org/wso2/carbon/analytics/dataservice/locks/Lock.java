@@ -16,36 +16,36 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.core.lock;
+package org.wso2.carbon.analytics.dataservice.locks;
 
-import org.wso2.carbon.analytics.datasource.core.AnalyticsLockException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 
 /**
  * Analytics lock functionalities.
  */
 public interface Lock {
     
-    boolean isLocked() throws AnalyticsLockException;
+    boolean isLocked() throws AnalyticsException;
     
     /**
      * Acquires the lock.
-     * @throws AnalyticsLockException
+     * @throws AnalyticsException
      */
-    void acquire() throws AnalyticsLockException;
+    void acquire() throws AnalyticsException;
     
     /**
      * Tries to acquire the lock, until lockWaitTimeout is passed.
      * @param lockWaitTimeout The timeout to wait for the lock
      * @return true if the lock is acquired, or we already had it, 
      * false, if the timeout passed waiting for the lock
-     * @throws AnalyticsLockException
+     * @throws AnalyticsException
      */
-    boolean acquire(long lockWaitTimeout) throws AnalyticsLockException;
+    boolean acquire(long lockWaitTimeout) throws AnalyticsException;
     
     /**
      * Releases the lock.
-     * @throws AnalyticsLockException
+     * @throws AnalyticsException
      */
-    void release() throws AnalyticsLockException;
+    void release() throws AnalyticsException;
     
 }

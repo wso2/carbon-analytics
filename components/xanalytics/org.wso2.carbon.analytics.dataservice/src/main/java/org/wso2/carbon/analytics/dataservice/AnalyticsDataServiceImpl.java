@@ -22,13 +22,14 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import org.wso2.carbon.analytics.dataservice.locks.AnalyticsLockProvider;
+import org.wso2.carbon.analytics.dataservice.locks.LockProvider;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSource;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.RecordGroup;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
-import org.wso2.carbon.analytics.datasource.core.lock.LockProvider;
 
 /**
  * The implementation of {@link AnalyticsDataService}.
@@ -52,11 +53,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
     
     private LockProvider lookupLockProvider() throws AnalyticsException {
-        LockProvider lockProvider = this.getAnalyticsDataSource().getLockProvider();
-        if (lockProvider == null) {
-            lockProvider = new CarbonLockProvider();
-        }
-        return lockProvider;
+        return new AnalyticsLockProvider();
     }
     
     public AnalyticsDataServiceImpl(AnalyticsDataServiceConfiguration config) {
