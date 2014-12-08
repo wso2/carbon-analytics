@@ -46,6 +46,14 @@ public class AnalyticsQueryParser extends QueryParser {
     @Override
     public Query getRangeQuery(String field, String part1, String part2, boolean si, boolean ei) throws ParseException {
         IndexType type = this.indices.get(field);
+        if (type == null) {
+            /* check for special fields */
+            if (AnalyticsDataIndexer.INDEX_ID_INTERNAL_FIELD.equals(field)) {
+                type = IndexType.STRING;
+            } else if (AnalyticsDataIndexer.INDEX_INTERNAL_TIMESTAMP_FIELD.equals(field)) {
+                type = IndexType.LONG;
+            } 
+        }
         if (type != null) {
             switch (type) {
             case STRING:
@@ -92,6 +100,14 @@ public class AnalyticsQueryParser extends QueryParser {
             throw new RuntimeException("Invalid query, a term must have a field");
         }
         IndexType type = this.indices.get(field);
+        if (type == null) {
+            /* check for special fields */
+            if (AnalyticsDataIndexer.INDEX_ID_INTERNAL_FIELD.equals(field)) {
+                type = IndexType.STRING;
+            } else if (AnalyticsDataIndexer.INDEX_INTERNAL_TIMESTAMP_FIELD.equals(field)) {
+                type = IndexType.LONG;
+            } 
+        }
         if (type != null) {
             switch (type) {
             case STRING:

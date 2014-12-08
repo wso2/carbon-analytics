@@ -87,7 +87,7 @@ public class AnalyticsDataServiceTest {
         this.service.clearIndices(tenantId, tableName);
     }
     
-    private List<Record> generateIndexRecords(int tenantId, String tableName, int n) {
+    private List<Record> generateIndexRecords(int tenantId, String tableName, int n, long startTimestamp) {
         Map<String, Object> values = new HashMap<String, Object>();
         Record record;
         List<Record> result = new ArrayList<Record>();
@@ -101,7 +101,7 @@ public class AnalyticsDataServiceTest {
             values.put("DB1", 54.535 + i);
             values.put("FL1", 3.14 + i);
             values.put("BL1", i % 2 == 0 ? true : false);
-            record = new Record(tenantId, tableName, values, System.currentTimeMillis());
+            record = new Record(tenantId, tableName, values, startTimestamp + i * 10);
             result.add(record);
         }        
         return result;
@@ -120,7 +120,7 @@ public class AnalyticsDataServiceTest {
         columns.put("BL1", IndexType.BOOLEAN);
         this.service.createTable(tenantId, tableName);
         this.service.setIndices(tenantId, tableName, columns);
-        List<Record> records = this.generateIndexRecords(tenantId, tableName, n);
+        List<Record> records = this.generateIndexRecords(tenantId, tableName, n, 0);
         this.service.insert(records);
         List<String> result = this.service.search(tenantId, tableName, "lucene", "STR1:STRING0", 0, 10);
         Assert.assertEquals(result.size(), 1);
@@ -145,6 +145,8 @@ public class AnalyticsDataServiceTest {
             Assert.assertEquals(result.size(), 3);
             result = this.service.search(tenantId, tableName, "lucene", "LN1:[1435000 TO 1435001]", 0, 10);
             Assert.assertEquals(result.size(), 2);
+            result = this.service.search(tenantId, tableName, "lucene", "LN1:[1435000 TO 1435001}", 0, 10);
+            Assert.assertEquals(result.size(), 1);
             result = this.service.search(tenantId, tableName, "lucene", "DB1:[54.01 TO 55.86]", 0, 10);
             Assert.assertEquals(result.size(), 2);
             result = this.service.search(tenantId, tableName, "lucene", "FL1:[3.01 TO 4.50]", 0, 10);
@@ -227,7 +229,7 @@ public class AnalyticsDataServiceTest {
         columns.put("STR1", IndexType.STRING);
         this.service.createTable(tenantId, tableName);
         this.service.setIndices(tenantId, tableName, columns);
-        List<Record> records = this.generateIndexRecords(tenantId, tableName, 98);
+        List<Record> records = this.generateIndexRecords(tenantId, tableName, 98, 0);
         this.service.insert(records);
         List<String> ids = new ArrayList<String>();
         ids.add(records.get(0).getId());
@@ -241,6 +243,32 @@ public class AnalyticsDataServiceTest {
         result = this.service.search(tenantId, tableName, "lucene", "STR1:S*", 0, 150);
         Assert.assertEquals(result.size(), 94);
         Assert.assertEquals(AnalyticsDataSourceTest.recordGroupsToSet(this.service.get(tenantId, tableName, null, ids)).size(), 0);
+        this.cleanupTable(tenantId, tableName);
+    }
+    
+    @Test
+    public void testIndexDataDeleteRange() throws AnalyticsException {
+        int tenantId = 230;
+        String tableName = "Scores";
+        int n = 115;
+        this.cleanupTable(tenantId, tableName);
+        Map<String, IndexType> columns = new HashMap<String, IndexType>();
+        columns.put("INT1", IndexType.INTEGER);
+        columns.put("STR1", IndexType.STRING);
+        this.service.createTable(tenantId, tableName);
+        this.service.setIndices(tenantId, tableName, columns);
+        List<Record> records = this.generateIndexRecords(tenantId, tableName, n, 1000);
+        this.service.insert(records);
+        Set<Record> recordsIn = AnalyticsDataSourceTest.recordGroupsToSet(
+                this.service.get(tenantId, tableName, null, -1, -1, 0, -1));
+        Assert.assertEquals(recordsIn.size(), n);
+        this.service.delete(tenantId, tableName, 1030, 1060);
+        recordsIn = AnalyticsDataSourceTest.recordGroupsToSet(
+                this.service.get(tenantId, tableName, null, -1, -1, 0, -1));
+        Assert.assertEquals(recordsIn.size(), n - 3);
+        /* lets test table name case-insensitiveness too */
+        List<String> results = this.service.search(tenantId, tableName.toUpperCase(), "lucene", "STR1:s*", 0, n);
+        Assert.assertEquals(results.size(), n - 3);
         this.cleanupTable(tenantId, tableName);
     }
     

@@ -178,6 +178,8 @@ public class AnalyticsDataIndexer {
     
     /**
      * Deletes the given records in the index.
+     * @param tenantId The tenant id
+     * @param tableName The table name
      * @param The ids of the records to be deleted
      * @throws AnalyticsException
      */
@@ -195,6 +197,37 @@ public class AnalyticsDataIndexer {
             indexWriter.deleteDocuments(terms.toArray(new Term[terms.size()]));
             indexWriter.commit();
         } catch (IOException e) {
+            throw new AnalyticsException("Error in deleting indices: " + e.getMessage(), e);
+        } finally {
+            try {
+                indexWriter.close();
+            } catch (IOException e) {
+                log.error("Error closing index writer: " + e.getMessage(), e);
+            }
+        }
+    }
+    
+    /**
+     * Deletes the records in the index with the given time range.
+     * @param tenantId The tenant id
+     * @param tableName The table name
+     * @param timeFrom The from time of records, inclusive
+     * @param timeTo The to time of records, non-inclusive
+     * @throws AnalyticsException
+     */
+    public void delete(int tenantId, String tableName, long timeFrom, long timeTo) throws AnalyticsException {
+        Map<String, IndexType> indices = this.lookupIndices(tenantId, tableName);
+        if (indices.size() == 0) {
+            return;
+        }
+        String tableId = this.generateTableId(tenantId, tableName);
+        IndexWriter indexWriter = this.createIndexWriter(tableId);        
+        try {
+            Query query = new AnalyticsQueryParser(DEFAULT_ANALYZER, indices).parse(
+                    INDEX_INTERNAL_TIMESTAMP_FIELD + ":[" + timeFrom + " TO " + timeTo + "}");
+            indexWriter.deleteDocuments(query);
+            indexWriter.commit();
+        } catch (Exception e) {
             throw new AnalyticsException("Error in deleting indices: " + e.getMessage(), e);
         } finally {
             try {
@@ -425,7 +458,8 @@ public class AnalyticsDataIndexer {
     }
     
     private String generateTableId(int tenantId, String tableName) {
-        return tenantId + "_" + tableName;
+        /* the table names are not case-sensitive */
+        return tenantId + "_" + tableName.toLowerCase();
     }
     
     public void clusterNoficationReceived(int tenantId, String tableName) throws AnalyticsIndexException {
