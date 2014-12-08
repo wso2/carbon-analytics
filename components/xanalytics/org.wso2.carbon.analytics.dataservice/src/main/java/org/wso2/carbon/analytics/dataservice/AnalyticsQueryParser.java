@@ -29,6 +29,8 @@ import org.apache.lucene.util.BytesRefBuilder;
 import org.apache.lucene.util.NumericUtils;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.index.Term;
+import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsDataIndexer;
+import org.wso2.carbon.analytics.dataservice.indexing.IndexType;
 
 /**
  * This represents a custom {@link QueryParser} implementation, with index data type awareness,

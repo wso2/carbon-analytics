@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.dataservice;
+package org.wso2.carbon.analytics.dataservice.indexing;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,6 +49,9 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.Version;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDirectory;
+import org.wso2.carbon.analytics.dataservice.AnalyticsIndexException;
+import org.wso2.carbon.analytics.dataservice.AnalyticsQueryParser;
 import org.wso2.carbon.analytics.dataservice.locks.LockProvider;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.Record;
@@ -63,11 +66,11 @@ public class AnalyticsDataIndexer {
     
     private static final String INDEX_DATA_FS_BASE_PATH = "/_data/index/";
 
-    public static final String INDEX_INTERNAL_TIMESTAMP_FIELD = "timestamp_internal";
+    public static final String INDEX_ID_INTERNAL_FIELD = "_id";
 
+    public static final String INDEX_INTERNAL_TIMESTAMP_FIELD = "_timestamp";
+    
     private static final String NULL_INDEX_VALUE = "";
-
-    public static final String INDEX_ID_INTERNAL_FIELD = "id_internal";
 
     private AnalyticsIndexDefinitionRepository repository;
     
@@ -99,11 +102,11 @@ public class AnalyticsDataIndexer {
         return repository;
     }
     
-    public List<String> search(int tenantId, String tableName, String language, String query, 
+    public List<SearchResultEntry> search(int tenantId, String tableName, String language, String query, 
             int start, int count) throws AnalyticsIndexException {
-        List<String> result = new ArrayList<String>();
+        List<SearchResultEntry> result = new ArrayList<SearchResultEntry>();
         String tableId = this.generateTableId(tenantId, tableName);
-        IndexReader reader;
+        IndexReader reader = null;
         try {
             reader = DirectoryReader.open(this.lookupIndexDir(tableId));
             IndexSearcher searcher = new IndexSearcher(reader);
@@ -115,12 +118,19 @@ public class AnalyticsDataIndexer {
             Document indexDoc;
             for (ScoreDoc doc : hits) {
                 indexDoc = searcher.doc(doc.doc);
-                result.add(indexDoc.get(INDEX_ID_INTERNAL_FIELD));
-            }
-            reader.close();
+                result.add(new SearchResultEntry(indexDoc.get(INDEX_ID_INTERNAL_FIELD), doc.score));
+            }            
             return result;
         } catch (Exception e) {
             throw new AnalyticsIndexException("Error in index search: " + e.getMessage(), e);
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    log.error("Error in closing the reader: " + e.getMessage(), e);;
+                }
+            }
         }
     }
     

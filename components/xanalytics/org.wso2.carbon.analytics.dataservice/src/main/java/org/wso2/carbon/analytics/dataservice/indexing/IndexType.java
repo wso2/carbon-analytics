@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.dataservice;
+package org.wso2.carbon.analytics.dataservice.indexing;
 
 /**
  * Index type definitions.

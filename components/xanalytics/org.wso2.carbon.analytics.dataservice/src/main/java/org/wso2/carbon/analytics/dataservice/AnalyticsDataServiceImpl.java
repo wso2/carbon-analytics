@@ -22,6 +22,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsDataIndexer;
+import org.wso2.carbon.analytics.dataservice.indexing.IndexType;
+import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.locks.AnalyticsLockProvider;
 import org.wso2.carbon.analytics.dataservice.locks.LockProvider;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSource;
@@ -139,7 +142,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     @Override
-    public List<String> search(int tenantId, String tableName, String language, String query,
+    public List<SearchResultEntry> search(int tenantId, String tableName, String language, String query,
             int start, int count) throws AnalyticsIndexException {
         return this.getIndexer().search(tenantId, tableName, language, query, start, count);
     }

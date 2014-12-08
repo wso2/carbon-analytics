@@ -21,6 +21,8 @@ package org.wso2.carbon.analytics.dataservice;
 import java.util.List;
 import java.util.Map;
 
+import org.wso2.carbon.analytics.dataservice.indexing.IndexType;
+import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStore;
 
@@ -65,10 +67,10 @@ public interface AnalyticsDataService extends AnalyticsRecordStore {
      * @param query The search query
      * @param start The start location of the result, 0 based
      * @param count The maximum number of result entries to be returned
-     * @return A list of record ids of matched records
+     * @return A list of {@link SearchResultEntry}s
      * @throws AnalyticsIndexException
      */
-    List<String> search(int tenantId, String tableName, String language, 
+    List<SearchResultEntry> search(int tenantId, String tableName, String language, 
             String query, int start, int count) throws AnalyticsIndexException;
     
     /**

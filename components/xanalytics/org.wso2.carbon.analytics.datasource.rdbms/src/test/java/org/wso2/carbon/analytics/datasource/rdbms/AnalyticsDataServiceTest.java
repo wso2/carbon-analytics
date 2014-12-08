@@ -33,7 +33,8 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceImpl;
-import org.wso2.carbon.analytics.dataservice.IndexType;
+import org.wso2.carbon.analytics.dataservice.indexing.IndexType;
+import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSource;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceTest;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
@@ -122,7 +123,7 @@ public class AnalyticsDataServiceTest {
         this.service.setIndices(tenantId, tableName, columns);
         List<Record> records = this.generateIndexRecords(tenantId, tableName, n, 0);
         this.service.insert(records);
-        List<String> result = this.service.search(tenantId, tableName, "lucene", "STR1:STRING0", 0, 10);
+        List<SearchResultEntry> result = this.service.search(tenantId, tableName, "lucene", "STR1:STRING0", 0, 10);
         Assert.assertEquals(result.size(), 1);
         result = this.service.search(tenantId, tableName, "lucene", "str2:string0", 0, 10);
         Assert.assertEquals(result.size(), 1);
@@ -187,15 +188,15 @@ public class AnalyticsDataServiceTest {
         records.add(record2);
         this.service.setIndices(tenantId, tableName, columns);
         this.service.insert(records);
-        List<String> result = this.service.search(tenantId, tableName, "lucene", "STR1:tea", 0, 10);
+        List<SearchResultEntry> result = this.service.search(tenantId, tableName, "lucene", "STR1:tea", 0, 10);
         Assert.assertEquals(result.size(), 1);
         String id = record.getId();
-        Assert.assertEquals(result.get(0), id);
+        Assert.assertEquals(result.get(0).getId(), id);
         result = this.service.search(tenantId, tableName, "lucene", "STR1:diamonds", 0, 10);
         Assert.assertEquals(result.size(), 0);
         result = this.service.search(tenantId, tableName, "lucene", "STR2:cricket", 0, 10);
         Assert.assertEquals(result.size(), 1);
-        Assert.assertEquals(result.get(0), id);
+        Assert.assertEquals(result.get(0).getId(), id);
         values = new HashMap<String, Object>();
         values.put("STR1", "South Africa is know for diamonds");
         values.put("STR2", "NBA has the best basketball action");
@@ -209,13 +210,13 @@ public class AnalyticsDataServiceTest {
         Assert.assertEquals(result.size(), 0);
         result = this.service.search(tenantId, tableName, "lucene", "STR1:diamonds", 0, 10);
         Assert.assertEquals(result.size(), 1);
-        Assert.assertEquals(result.get(0), id);
+        Assert.assertEquals(result.get(0).getId(), id);
         result = this.service.search(tenantId, tableName, "lucene", "STR2:basketball", 0, 10);
         Assert.assertEquals(result.size(), 1);
-        Assert.assertEquals(result.get(0), id);
+        Assert.assertEquals(result.get(0).getId(), id);
         result = this.service.search(tenantId, tableName, "lucene", "STR1:hockey", 0, 10);
         Assert.assertEquals(result.size(), 1);
-        Assert.assertEquals(result.get(0), record2.getId());
+        Assert.assertEquals(result.get(0).getId(), record2.getId());
         this.cleanupTable(tenantId, tableName);
     }
     
@@ -237,7 +238,7 @@ public class AnalyticsDataServiceTest {
         ids.add(records.get(50).getId());
         ids.add(records.get(97).getId());
         Assert.assertEquals(AnalyticsDataSourceTest.recordGroupsToSet(this.service.get(tenantId, tableName, null, ids)).size(), 4);
-        List<String> result = this.service.search(tenantId, tableName, "lucene", "STR1:S*", 0, 150);
+        List<SearchResultEntry> result = this.service.search(tenantId, tableName, "lucene", "STR1:S*", 0, 150);
         Assert.assertEquals(result.size(), 98);
         this.service.delete(tenantId, tableName, ids);
         result = this.service.search(tenantId, tableName, "lucene", "STR1:S*", 0, 150);
@@ -267,7 +268,8 @@ public class AnalyticsDataServiceTest {
                 this.service.get(tenantId, tableName, null, -1, -1, 0, -1));
         Assert.assertEquals(recordsIn.size(), n - 3);
         /* lets test table name case-insensitiveness too */
-        List<String> results = this.service.search(tenantId, tableName.toUpperCase(), "lucene", "STR1:s*", 0, n);
+        List<SearchResultEntry> results = this.service.search(tenantId, 
+                tableName.toUpperCase(), "lucene", "STR1:s*", 0, n);
         Assert.assertEquals(results.size(), n - 3);
         this.cleanupTable(tenantId, tableName);
     }
@@ -345,9 +347,9 @@ public class AnalyticsDataServiceTest {
         System.out.println("* Read Time: " + (end - start) + " ms.");
         System.out.println("* Read Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
         
-        List<String> ids = this.service.search(50, "TableX", "lucene", "log: exception", 0, 1);
-        Assert.assertEquals(ids.size(), 1);
-        System.out.println("* Search Result Count: " + ids.size());
+        List<SearchResultEntry> results = this.service.search(50, "TableX", "lucene", "log: exception", 0, 1);
+        Assert.assertEquals(results.size(), 1);
+        System.out.println("* Search Result Count: " + results.size());
         
         this.cleanupTable(50, "TableX");
         System.out.println("\n************** END ANALYTICS DS (WITH INDEXING, H2-FILE) PERF TEST **************");

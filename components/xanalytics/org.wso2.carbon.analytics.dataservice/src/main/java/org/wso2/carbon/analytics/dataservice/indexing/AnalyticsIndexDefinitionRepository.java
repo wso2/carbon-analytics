@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.dataservice;
+package org.wso2.carbon.analytics.dataservice.indexing;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.analytics.dataservice.AnalyticsIndexException;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem.DataInput;
 
