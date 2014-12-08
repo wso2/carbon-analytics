@@ -43,7 +43,6 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
@@ -76,7 +75,7 @@ public class AnalyticsDataIndexer {
     
     private Map<String, Directory> indexDirs = new HashMap<String, Directory>();
     
-    private Analyzer analyzer = new StandardAnalyzer();
+    private Analyzer DEFAULT_ANALYZER = new StandardAnalyzer();
     
     private FileSystem fileSystem;
     
@@ -108,7 +107,8 @@ public class AnalyticsDataIndexer {
         try {
             reader = DirectoryReader.open(this.lookupIndexDir(tableId));
             IndexSearcher searcher = new IndexSearcher(reader);
-            Query indexQuery = new QueryParser("id_internal", this.analyzer).parse(query);
+            Map<String, IndexType> indices = this.lookupIndices(tenantId, tableName);
+            Query indexQuery = new AnalyticsQueryParser(DEFAULT_ANALYZER, indices).parse(query);
             TopScoreDocCollector collector = TopScoreDocCollector.create(count, true);
             searcher.search(indexQuery, collector);
             ScoreDoc[] hits = collector.topDocs(start).scoreDocs;
@@ -392,7 +392,7 @@ public class AnalyticsDataIndexer {
     
     private IndexWriter createIndexWriter(String tableId) throws AnalyticsIndexException {
         Directory indexDir = this.lookupIndexDir(tableId);
-        IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_4_10_2, this.analyzer);
+        IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_4_10_2, this.DEFAULT_ANALYZER);
         try {
             return new IndexWriter(indexDir, conf);
         } catch (IOException e) {

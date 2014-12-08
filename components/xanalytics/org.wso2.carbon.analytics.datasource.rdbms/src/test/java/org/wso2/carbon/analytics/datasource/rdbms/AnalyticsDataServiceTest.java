@@ -130,6 +130,28 @@ public class AnalyticsDataServiceTest {
         Assert.assertEquals(result.size(), 1);
         result = this.service.search(tenantId, tableName, "lucene", "TXT1:name", 0, n + 10);
         Assert.assertEquals(result.size(), n);
+        result = this.service.search(tenantId, tableName, "lucene", "INT1:" + (n - 1), 0, 10);
+        Assert.assertEquals(result.size(), 1);
+        result = this.service.search(tenantId, tableName, "lucene", "LN1:1435000", 0, 10);
+        Assert.assertEquals(result.size(), 1);
+        result = this.service.search(tenantId, tableName, "lucene", "DB1:54.535", 0, 10);
+        Assert.assertEquals(result.size(), 1);
+        result = this.service.search(tenantId, tableName, "lucene", "FL1:3.14", 0, 10);
+        Assert.assertEquals(result.size(), 1);
+        result = this.service.search(tenantId, tableName, "lucene", "BL1:true", 0, 10);
+        Assert.assertTrue(result.size() > 0);
+        if (n > 4) {
+            result = this.service.search(tenantId, tableName, "lucene", "INT1:[1 TO 3]", 0, 10);
+            Assert.assertEquals(result.size(), 3);
+            result = this.service.search(tenantId, tableName, "lucene", "LN1:[1435000 TO 1435001]", 0, 10);
+            Assert.assertEquals(result.size(), 2);
+            result = this.service.search(tenantId, tableName, "lucene", "DB1:[54.01 TO 55.86]", 0, 10);
+            Assert.assertEquals(result.size(), 2);
+            result = this.service.search(tenantId, tableName, "lucene", "FL1:[3.01 TO 4.50]", 0, 10);
+            Assert.assertEquals(result.size(), 2);
+            result = this.service.search(tenantId, tableName, "lucene", "BL1:[false TO true]", 0, 10);
+            Assert.assertTrue(result.size() > 2);
+        }
         this.cleanupTable(tenantId, tableName);
     }
     
