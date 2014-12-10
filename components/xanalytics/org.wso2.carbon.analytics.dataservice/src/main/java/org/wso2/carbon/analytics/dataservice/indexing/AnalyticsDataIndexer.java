@@ -19,12 +19,16 @@
 package org.wso2.carbon.analytics.dataservice.indexing;
 
 import java.io.IOException;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -62,8 +66,12 @@ import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
  */
 public class AnalyticsDataIndexer {
     
+    private static final String LOCAL_NODE_ID = "LOCAL";
+
+    private static final int LOCAL_SHARD_COUNT = 10;
+
     private static final Log log = LogFactory.getLog(AnalyticsDataIndexer.class);
-    
+        
     private static final String INDEX_DATA_FS_BASE_PATH = "/_data/index/";
 
     public static final String INDEX_ID_INTERNAL_FIELD = "_id";
@@ -77,6 +85,10 @@ public class AnalyticsDataIndexer {
     private Map<String, Map<String, IndexType>> indexDefs = new HashMap<String, Map<String, IndexType>>();
     
     private Map<String, Directory> indexDirs = new HashMap<String, Directory>();
+    
+    private Map<String, AtomicInteger> indexShardPositions = new HashMap<String, AtomicInteger>();
+    
+    private Map<String, List<String>> localIndexShardIdsMap = new HashMap<String, List<String>>();
     
     private Analyzer DEFAULT_ANALYZER = new StandardAnalyzer();
     
@@ -102,13 +114,112 @@ public class AnalyticsDataIndexer {
         return repository;
     }
     
+    private int getNextIndexShardPosition(int tenantId, String tableName) {
+        String id = this.generateGlobalTableId(tenantId, tableName);
+        AtomicInteger pos = this.indexShardPositions.get(id);
+        /* no need to synchronize here, it's just creating an integer */
+        if (pos == null) {
+            pos = new AtomicInteger(-1);
+            this.indexShardPositions.put(id, pos);
+        }
+        return pos.incrementAndGet();
+    }
+    
+    private String byteArrayToHexString(byte[] bytes) {
+        StringBuilder builder = new StringBuilder();
+        for (byte b : bytes) {
+            builder.append(String.format("%02X", b));
+        }
+        return builder.toString();
+    }
+    
+    private String getLocalUniqueId() {
+        String id = null;
+        Enumeration<NetworkInterface> interfaces;
+        NetworkInterface nif;
+        try {
+            interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements()) {
+                nif = interfaces.nextElement();
+                if (!nif.isLoopback()) {
+                    byte[] addr = nif.getHardwareAddress();
+                    if (addr != null) {
+                        id = this.byteArrayToHexString(addr);
+                    }
+                    /* only try first valid one, if we can't get it from here, 
+                     * we wont be able to get it */
+                    break;
+                }
+            }
+        } catch (SocketException ignore) {
+            /* ignore */
+        }
+        if (id == null) {
+            log.warn("CANNOT LOOK UP UNIQUE LOCAL ID USING A VALID NETWORK INTERFACE HARDWARE ADDRESS, "
+                    + "REVERTING TO LOCAL SINGLE NODE MODE, THIS WILL NOT WORK PROPERLY IN A CLUSTER, AND MAY CAUSE INDEX CORRUPTION");
+            /* a last effort to get a unique number, Java system properties should also take in account of the 
+             * server's port offset */
+            id = LOCAL_NODE_ID + ":" + (System.getenv().hashCode() + System.getProperties().hashCode());
+        }
+        return id;
+    }
+    
+    private List<String> getLocalCandidateIndexShardIds(int tenantId, String tableName) {
+        String globalTableId = this.generateGlobalTableId(tenantId, tableName);
+        List<String> localIndexShardIds = this.localIndexShardIdsMap.get(globalTableId);
+        if (localIndexShardIds == null) {
+            String localPrefix = this.getLocalUniqueId();
+            localIndexShardIds = new ArrayList<String>();
+            for (int i = 0; i < LOCAL_SHARD_COUNT; i++) {
+                localIndexShardIds.add(localPrefix + "_" + i);
+            }
+            this.localIndexShardIdsMap.put(globalTableId, localIndexShardIds);
+        }
+        return localIndexShardIds;
+    }
+    
+    private String getNextLocalCandidateIndexShardId(int tenantId, String tableName) {
+        int pos = this.getNextIndexShardPosition(tenantId, tableName);
+        /* retrieve all the shards I own for this tenant / table, and select one */
+        List<String> shardIds = this.getLocalCandidateIndexShardIds(tenantId, tableName);
+        return shardIds.get(pos % shardIds.size());
+    }
+    
+    private List<String> lookupGloballyExistingShardIds(int tenantId, String tableName) throws AnalyticsIndexException {
+        String globalPath = this.generateDirPath(this.generateGlobalTableId(tenantId, tableName));
+        try {
+            List<String> names = this.getFileSystem().list(globalPath);
+            List<String> result = new ArrayList<String>();
+            for (String name : names) {
+                result.add(name);
+            }
+            return result;
+        } catch (IOException e) {
+            throw new AnalyticsIndexException("Error in looking up index shard directories for tenant: " + 
+                    tenantId + " table: " + tableName);
+        }
+    }
+    
     public List<SearchResultEntry> search(int tenantId, String tableName, String language, String query, 
             int start, int count) throws AnalyticsIndexException {
+        List<String> shardIds = this.lookupGloballyExistingShardIds(tenantId, tableName);
         List<SearchResultEntry> result = new ArrayList<SearchResultEntry>();
-        String tableId = this.generateTableId(tenantId, tableName);
+        for (String shardId : shardIds) {
+            result.addAll(this.search(tenantId, tableName, language, query, start, count, shardId));
+        }
+        if (result.size() > count) {
+            result = result.subList(0, count);
+        }
+        return result;
+    }
+    
+    private List<SearchResultEntry> search(int tenantId, String tableName, String language, String query, 
+            int start, int count, String shardId) throws AnalyticsIndexException {
+        List<SearchResultEntry> result = new ArrayList<SearchResultEntry>();
+        String shardedTableId = this.generateShardedTableId(tenantId, tableName, shardId);
         IndexReader reader = null;
         try {
-            reader = DirectoryReader.open(this.lookupIndexDir(tableId));
+            reader = DirectoryReader.open(this.lookupIndexDir(shardedTableId));
             IndexSearcher searcher = new IndexSearcher(reader);
             Map<String, IndexType> indices = this.lookupIndices(tenantId, tableName);
             Query indexQuery = new AnalyticsQueryParser(DEFAULT_ANALYZER, indices).parse(query);
@@ -139,7 +250,7 @@ public class AnalyticsDataIndexer {
         List<Record> recordBatch;
         String identity;
         for (Record record : records) {
-            identity = this.generateTableId(record.getTenantId(), record.getTableName());
+            identity = this.generateGlobalTableId(record.getTenantId(), record.getTableName());
             recordBatch = recordBatches.get(identity);
             if (recordBatch == null) {
                 recordBatch = new ArrayList<Record>();
@@ -187,17 +298,24 @@ public class AnalyticsDataIndexer {
     }
     
     /**
-     * Deletes the given records in the index.
-     * @param tenantId The tenant id
-     * @param tableName The table name
-     * @param The ids of the records to be deleted
-     * @throws AnalyticsException
-     */
-    public void delete(int tenantId, String tableName, List<String> ids) throws AnalyticsException {
+    * Deletes the given records in the index.
+    * @param tenantId The tenant id
+    * @param tableName The table name
+    * @param The ids of the records to be deleted
+    * @throws AnalyticsException
+    */
+   public void delete(int tenantId, String tableName, List<String> ids) throws AnalyticsException {
+       List<String> shardIds = this.lookupGloballyExistingShardIds(tenantId, tableName);
+       for (String shardId : shardIds) {
+           this.delete(tenantId, tableName, ids, shardId);
+       }
+    }
+    
+    private void delete(int tenantId, String tableName, List<String> ids, String shardId) throws AnalyticsException {
         if (this.lookupIndices(tenantId, tableName).size() == 0) {
             return;
         }
-        String tableId = this.generateTableId(tenantId, tableName);
+        String tableId = this.generateShardedTableId(tenantId, tableName, shardId);
         IndexWriter indexWriter = this.createIndexWriter(tableId);
         List<Term> terms = new ArrayList<Term>(ids.size());
         for (String id : ids) {
@@ -226,11 +344,18 @@ public class AnalyticsDataIndexer {
      * @throws AnalyticsException
      */
     public void delete(int tenantId, String tableName, long timeFrom, long timeTo) throws AnalyticsException {
+        List<String> shardIds = this.lookupGloballyExistingShardIds(tenantId, tableName);
+        for (String shardId : shardIds) {
+            this.delete(tenantId, tableName, timeFrom, timeTo, shardId);
+        }
+    }
+    
+    private void delete(int tenantId, String tableName, long timeFrom, long timeTo, String shardId) throws AnalyticsException {
         Map<String, IndexType> indices = this.lookupIndices(tenantId, tableName);
         if (indices.size() == 0) {
             return;
         }
-        String tableId = this.generateTableId(tenantId, tableName);
+        String tableId = this.generateShardedTableId(tenantId, tableName, shardId);
         IndexWriter indexWriter = this.createIndexWriter(tableId);        
         try {
             Query query = new AnalyticsQueryParser(DEFAULT_ANALYZER, indices).parse(
@@ -250,8 +375,11 @@ public class AnalyticsDataIndexer {
     
     private void addToIndex(List<Record> recordBatch, Map<String, IndexType> columns) throws AnalyticsIndexException {
         Record firstRecord = recordBatch.get(0);
-        String tableId = this.generateTableId(firstRecord.getTenantId(), firstRecord.getTableName());
-        IndexWriter indexWriter = this.createIndexWriter(tableId);
+        int tenantId = firstRecord.getTenantId();
+        String tableName = firstRecord.getTableName();
+        String shardId = this.getNextLocalCandidateIndexShardId(tenantId, tableName);
+        String shardedTableId = this.generateShardedTableId(tenantId, tableName, shardId);
+        IndexWriter indexWriter = this.createIndexWriter(shardedTableId);
         try {
             for (Record record : recordBatch) {
                 indexWriter.addDocument(this.generateIndexDoc(record, columns).getFields());
@@ -270,8 +398,17 @@ public class AnalyticsDataIndexer {
     
     private void updateIndex(List<Record> recordBatch, Map<String, IndexType> columns) throws AnalyticsIndexException {
         Record firstRecord = recordBatch.get(0);
-        String tableId = this.generateTableId(firstRecord.getTenantId(), firstRecord.getTableName());
-        IndexWriter indexWriter = this.createIndexWriter(tableId);
+        int tenantId = firstRecord.getTenantId();
+        String tableName = firstRecord.getTableName();
+        List<String> shardIds = this.lookupGloballyExistingShardIds(tenantId, tableName);
+        for (String shardId : shardIds) {
+            this.updateIndex(tenantId, tableName, recordBatch, columns, shardId);
+        }
+    }
+    
+    private void updateIndex(int tenantId, String tableName, List<Record> recordBatch, Map<String, IndexType> columns, String shardId) throws AnalyticsIndexException {
+        String shardedTableId = this.generateShardedTableId(tenantId, tableName, shardId);
+        IndexWriter indexWriter = this.createIndexWriter(shardedTableId);
         try {
             for (Record record : recordBatch) {
                 indexWriter.updateDocument(new Term(INDEX_ID_INTERNAL_FIELD, record.getId()), 
@@ -390,14 +527,14 @@ public class AnalyticsDataIndexer {
     public void setIndices(int tenantId, String tableName, Map<String, IndexType> columns) 
             throws AnalyticsIndexException {
         this.checkInvalidIndexNames(columns.keySet());
-        String tableId = this.generateTableId(tenantId, tableName);
+        String tableId = this.generateGlobalTableId(tenantId, tableName);
         this.indexDefs.put(tableId, columns);
         this.getRepository().setIndices(tenantId, tableName, columns);
         this.notifyClusterIndexChange(tenantId, tableName);
     }
     
     public Map<String, IndexType> lookupIndices(int tenantId, String tableName) throws AnalyticsIndexException {
-        String tableId = this.generateTableId(tenantId, tableName);
+        String tableId = this.generateGlobalTableId(tenantId, tableName);
         Map<String, IndexType> cols = this.indexDefs.get(tableId);
         if (cols == null) {
             cols = this.getRepository().getIndices(tenantId, tableName);
@@ -443,8 +580,16 @@ public class AnalyticsDataIndexer {
         }
     }
     
-    private void deleteIndexData(String tableId) throws AnalyticsIndexException {
-        IndexWriter writer = this.createIndexWriter(tableId);
+    private void deleteIndexData(int tenantId, String tableName) throws AnalyticsIndexException {
+        List<String> shardIds = this.lookupGloballyExistingShardIds(tenantId, tableName);
+        for (String shardId : shardIds) {
+            this.deleteIndexData(tenantId, tableName, shardId);
+        }
+    }
+    
+    private void deleteIndexData(int tenantId, String tableName, String shardId) throws AnalyticsIndexException {
+        String shardedTableId = this.generateShardedTableId(tenantId, tableName, shardId);
+        IndexWriter writer = this.createIndexWriter(shardedTableId);
         try {
             writer.deleteAll();
         } catch (IOException e) {
@@ -459,15 +604,21 @@ public class AnalyticsDataIndexer {
     }
     
     public void clearIndices(int tenantId, String tableName) throws AnalyticsIndexException {
-        String tableId = this.generateTableId(tenantId, tableName);
+        String tableId = this.generateGlobalTableId(tenantId, tableName);
         this.indexDefs.remove(tableId);
         this.getRepository().clearAllIndices(tenantId, tableName);
-        this.closeAndRemoveIndexDir(tableId);
-        this.deleteIndexData(tableId);
+        this.closeAndRemoveIndexDirs(tenantId, tableName);
+        /* delete all global index data, not only local ones */
+        this.deleteIndexData(tenantId, tableName);
         this.notifyClusterIndexChange(tenantId, tableName);
     }
     
-    private String generateTableId(int tenantId, String tableName) {
+    private String generateShardedTableId(int tenantId, String tableName, String shardId) {
+        /* the table names are not case-sensitive */
+        return this.generateGlobalTableId(tenantId, tableName) + "/" + shardId;
+    }
+    
+    private String generateGlobalTableId(int tenantId, String tableName) {
         /* the table names are not case-sensitive */
         return tenantId + "_" + tableName.toLowerCase();
     }
@@ -476,13 +627,18 @@ public class AnalyticsDataIndexer {
         /* remove the entry from the cache, this will force the next index operations to load
          * the index definition from the back-end store, this makes sure, we have optimum cache cleanup
          * and improves memory usage for tenant partitioning */
-        String tableId = this.generateTableId(tenantId, tableName);
+        String tableId = this.generateGlobalTableId(tenantId, tableName);
         this.indexDefs.remove(tableId);
-        this.closeAndRemoveIndexDir(tableId);
+        this.closeAndRemoveIndexDirs(tenantId, tableName);
     }
     
     private void notifyClusterIndexChange(int tenantId, String tableName) throws AnalyticsIndexException {
         
+    }
+    
+    private void closeAndRemoveIndexDirs(int tenantId, String tableName) throws AnalyticsIndexException {
+        List<String> tableIds = this.getLocalCandidateIndexShardIds(tenantId, tableName);
+        this.closeAndRemoveIndexDirs(new HashSet<String>(tableIds));
     }
     
     private void closeAndRemoveIndexDir(String tableId) throws AnalyticsIndexException {

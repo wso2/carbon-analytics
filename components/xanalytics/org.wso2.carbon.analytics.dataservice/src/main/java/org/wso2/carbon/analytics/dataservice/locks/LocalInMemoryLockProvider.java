@@ -18,8 +18,8 @@
  */
 package org.wso2.carbon.analytics.dataservice.locks;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -30,7 +30,7 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
  */
 public class LocalInMemoryLockProvider implements LockProvider {
     
-    private Map<String, Lock> locks = new ConcurrentHashMap<String, Lock>();
+    private Map<String, Lock> locks = new HashMap<String, Lock>();
 
     @Override
     public Lock getLock(String name) throws AnalyticsException {

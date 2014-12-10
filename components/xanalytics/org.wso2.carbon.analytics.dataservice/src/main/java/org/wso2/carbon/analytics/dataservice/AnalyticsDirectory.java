@@ -31,6 +31,7 @@ import org.apache.lucene.store.IndexOutput;
 import org.apache.lucene.store.Lock;
 import org.apache.lucene.store.LockFactory;
 import org.apache.lucene.store.OutputStreamIndexOutput;
+import org.apache.lucene.store.SingleInstanceLockFactory;
 import org.wso2.carbon.analytics.dataservice.locks.LockProvider;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
@@ -54,7 +55,7 @@ public class AnalyticsDirectory extends Directory {
             String path) throws AnalyticsException {
         this.fileSystem = fileSystem;
         this.path = GenericUtils.normalizePath(path);
-        this.lockFactory = new AnalyticsIndexLockFactoryAdaptor(lockProvider);
+        this.lockFactory = new SingleInstanceLockFactory();
         this.getLockFactory().setLockPrefix(this.getPath());
     }
     
@@ -201,82 +202,6 @@ public class AnalyticsDirectory extends Directory {
         
     }
     
-    /**
-     * Lucene {@link LockFactory} adaptor implementation using Carbon analytics {@link LockProvider}.
-     */
-    private class AnalyticsIndexLockFactoryAdaptor extends LockFactory {
-
-        private LockProvider lockProvider;
-        
-        public AnalyticsIndexLockFactoryAdaptor(LockProvider lockProvider) {
-            this.lockProvider = lockProvider;
-        }
-        
-        private String generateLockName(String lockName) {
-            return this.getLockPrefix() + lockName;
-        }
-        
-        @Override
-        public void clearLock(String lockName) throws IOException {
-            try {
-                this.lockProvider.clearLock(this.generateLockName(lockName));
-            } catch (AnalyticsException e) {
-                throw new IOException("Error in clearing lock '" + lockName + "': " + e.getMessage(), e);
-            }
-        }
-
-        @Override
-        public Lock makeLock(String lockName) {
-            try {
-                return new AnalyticsIndexLockAdaptor(this.lockProvider.getLock(this.generateLockName(lockName)));
-            } catch (AnalyticsException e) {
-                throw new RuntimeException("Error in creating lock '" + lockName + "': " + e.getMessage(), e);
-            }
-        }
-        
-    }
-    
-    /**
-     * Lucene {@link Lock} adaptor implementation using Carbon analytics {@link org.wso2.carbon.analytics.dataservice.locks.Lock}.
-     */
-    private class AnalyticsIndexLockAdaptor extends Lock {
-
-        private org.wso2.carbon.analytics.dataservice.locks.Lock lock;
-        
-        public AnalyticsIndexLockAdaptor(org.wso2.carbon.analytics.dataservice.locks.Lock lock) {
-            this.lock = lock;
-        }
-        
-        @Override
-        public boolean isLocked() throws IOException {
-            try {
-                return this.lock.isLocked();
-            } catch (AnalyticsException e) {
-                throw new IOException("Error in lock#isLocked: " + e.getMessage(), e);
-            }
-        }
-
-        @Override
-        public boolean obtain() throws IOException {
-            try {
-                this.lock.acquire();
-                return true;
-            } catch (AnalyticsException e) {
-                throw new IOException("Error in lock#isLocked: " + e.getMessage(), e);
-            }
-        }
-
-        @Override
-        public void close() throws IOException {
-            try {
-                this.lock.release();
-            } catch (AnalyticsException e) {
-                throw new IOException("Error in lock#close: " + e.getMessage(), e);
-            }
-        }
-        
-    }
-
     @Override
     public void clearLock(String name) throws IOException {
         this.getLockFactory().clearLock(name);
