@@ -24,6 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.naming.NamingException;
 
@@ -274,7 +277,7 @@ public class AnalyticsDataServiceTest {
         this.cleanupTable(tenantId, tableName);
     }
     
-    @Test
+    //@Test
     public void testDataRecordAddReadPerformanceNonIndex() throws AnalyticsException {
         this.cleanupTable(50, "TableX");
         System.out.println("\n************** START ANALYTICS DS (WITHOUT INDEXING, H2-FILE) PERF TEST **************");
@@ -308,53 +311,109 @@ public class AnalyticsDataServiceTest {
         System.out.println("\n************** END ANALYTICS DS (WITHOUT INDEXING, H2-FILE) PERF TEST **************");
     }
     
-    @Test
-    public void testDataRecordAddReadPerformanceIndex() throws AnalyticsException {
-        this.cleanupTable(50, "TableX");
-        
-        System.out.println("\n************** START ANALYTICS DS (WITH INDEXING, H2-FILE) PERF TEST **************");
-        int n = 100, batch = 200;
+    private void writeIndexRecords(int tenantId, String tableName, int n, int batch) throws AnalyticsException {
         List<Record> records;
+        for (int i = 0; i < n; i++) {
+            records = AnalyticsDataSourceTest.generateRecords(tenantId, tableName, i, batch, -1, -1);
+            this.service.insert(records);
+        }
+    }
+    
+    @Test
+    public void testDataRecordAddReadPerformanceIndex1C() throws AnalyticsException {
+        System.out.println("\n************** START ANALYTICS DS (WITH INDEXING - SINGLE THREAD, H2-FILE) PERF TEST **************");
+
+        int tenantId = 50;
+        String tableName = "TableX";
+        this.cleanupTable(tenantId, tableName);
+        int n = 100, batch = 200;
         Map<String, IndexType> columns = new HashMap<String, IndexType>();
         columns.put("tenant", IndexType.INTEGER);
         columns.put("ip", IndexType.STRING);
-        columns.put("log", IndexType.STRING);
+        columns.put("log", IndexType.STRING);        
+        this.service.createTable(tenantId, tableName);
+        this.service.setIndices(tenantId, tableName, columns);
         
-        /* warm-up */
-        this.service.createTable(50, "TableX");
-        this.service.setIndices(50, "TableX", columns);
-        for (int i = 0; i < 10; i++) {
-            records = AnalyticsDataSourceTest.generateRecords(50, "TableX", i, batch, -1, -1);
-            this.service.insert(records);
-        }
-        this.cleanupTable(50, "TableX");
-        
-        this.service.createTable(50, "TableX");
-        this.service.setIndices(50, "TableX", columns);
         long start = System.currentTimeMillis();
-        for (int i = 0; i < n; i++) {
-            records = AnalyticsDataSourceTest.generateRecords(50, "TableX", i, batch, -1, -1);
-            this.service.insert(records);
-        }
+        this.writeIndexRecords(tenantId, tableName, n, batch);
         long end = System.currentTimeMillis();
         System.out.println("* Records: " + (n * batch));
         System.out.println("* Write Time: " + (end - start) + " ms.");
         System.out.println("* Write Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
         start = System.currentTimeMillis();
-        Set<Record> recordsIn = AnalyticsDataSourceTest.recordGroupsToSet(this.service.get(50, "TableX", null, -1, -1, 0, -1));
+        Set<Record> recordsIn = AnalyticsDataSourceTest.recordGroupsToSet(this.service.get(tenantId, tableName, null, -1, -1, 0, -1));
         Assert.assertEquals(recordsIn.size(), (n * batch));
         end = System.currentTimeMillis();
         System.out.println("* Read Time: " + (end - start) + " ms.");
-        System.out.println("* Read Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
-        
+        System.out.println("* Read Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);        
         start = System.currentTimeMillis();
-        List<SearchResultEntry> results = this.service.search(50, "TableX", "lucene", "log: exception", 0, 75);
+        List<SearchResultEntry> results = this.service.search(tenantId, tableName, "lucene", "log: exception", 0, 75);
         end = System.currentTimeMillis();
         Assert.assertEquals(results.size(), 75);
         System.out.println("* Search Result Count: " + results.size() + " Time: " + (end - start) + " ms.");
         
-        this.cleanupTable(50, "TableX");
+        this.cleanupTable(tenantId, tableName);
         System.out.println("\n************** END ANALYTICS DS (WITH INDEXING, H2-FILE) PERF TEST **************");
+    }
+    
+    private void writeIndexRecords(final int tenantId, final String tableName, final int n, 
+            final int batch, final int nThreads) throws AnalyticsException {
+        ExecutorService es = Executors.newFixedThreadPool(nThreads);
+        for (int i = 0; i < nThreads; i++) {
+            es.execute(new Runnable() {            
+                @Override
+                public void run() {
+                    try {
+                        writeIndexRecords(tenantId, tableName, n, batch);
+                    } catch (AnalyticsException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+        }
+        try {
+            es.shutdown();
+            es.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            throw new AnalyticsException(e.getMessage(), e);
+        }
+    }
+    
+    @Test
+    public void testDataRecordAddReadPerformanceIndexNC() throws AnalyticsException {
+        System.out.println("\n************** START ANALYTICS DS (WITH INDEXING - MULTIPLE THREADS, H2-FILE) PERF TEST **************");
+
+        int tenantId = 50;
+        String tableName = "TableX";
+        this.cleanupTable(tenantId, tableName);        
+        int n = 100, batch = 200, nThreads = 2;
+        Map<String, IndexType> columns = new HashMap<String, IndexType>();
+        columns.put("tenant", IndexType.INTEGER);
+        columns.put("ip", IndexType.STRING);
+        columns.put("log", IndexType.STRING);        
+        this.service.createTable(tenantId, tableName);
+        this.service.setIndices(tenantId, tableName, columns);
+        
+        long start = System.currentTimeMillis();
+        this.writeIndexRecords(tenantId, tableName, n, batch, nThreads);
+        long end = System.currentTimeMillis();
+        System.out.println("* Records: " + (n * batch * nThreads));
+        System.out.println("* Write Time: " + (end - start) + " ms.");
+        System.out.println("* Write Throughput (TPS): " + (n * batch * nThreads) / (double) (end - start) * 1000.0);
+        start = System.currentTimeMillis();
+        Set<Record> recordsIn = AnalyticsDataSourceTest.recordGroupsToSet(this.service.get(tenantId, tableName, null, -1, -1, 0, -1));
+        Assert.assertEquals(recordsIn.size(), (n * batch * nThreads));
+        end = System.currentTimeMillis();
+        System.out.println("* Read Time: " + (end - start) + " ms.");
+        System.out.println("* Read Throughput (TPS): " + (n * batch * nThreads) / (double) (end - start) * 1000.0);        
+        start = System.currentTimeMillis();
+        List<SearchResultEntry> results = this.service.search(tenantId, tableName, "lucene", "log: exception", 0, 75);
+        end = System.currentTimeMillis();
+        Assert.assertEquals(results.size(), 75);
+        System.out.println("* Search Result Count: " + results.size() + " Time: " + (end - start) + " ms.");
+        
+        this.cleanupTable(tenantId, tableName);
+        System.out.println("\n************** END ANALYTICS DS (WITH INDEXING - MULTIPLE THREADS, H2-FILE) PERF TEST **************");
     }
 
 }

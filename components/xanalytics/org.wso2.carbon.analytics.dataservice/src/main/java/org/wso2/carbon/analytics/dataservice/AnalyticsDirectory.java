@@ -31,8 +31,6 @@ import org.apache.lucene.store.IndexOutput;
 import org.apache.lucene.store.Lock;
 import org.apache.lucene.store.LockFactory;
 import org.apache.lucene.store.OutputStreamIndexOutput;
-import org.apache.lucene.store.SingleInstanceLockFactory;
-import org.wso2.carbon.analytics.dataservice.locks.LockProvider;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem.DataInput;
@@ -51,11 +49,11 @@ public class AnalyticsDirectory extends Directory {
     
     private LockFactory lockFactory;
     
-    public AnalyticsDirectory(FileSystem fileSystem, LockProvider lockProvider, 
+    public AnalyticsDirectory(FileSystem fileSystem, LockFactory lockFactory, 
             String path) throws AnalyticsException {
         this.fileSystem = fileSystem;
         this.path = GenericUtils.normalizePath(path);
-        this.lockFactory = new SingleInstanceLockFactory();
+        this.lockFactory = lockFactory;
         this.getLockFactory().setLockPrefix(this.getPath());
     }
     
@@ -221,5 +219,5 @@ public class AnalyticsDirectory extends Directory {
     public void setLockFactory(LockFactory lockFactory) throws IOException {
         this.lockFactory = lockFactory;
     }
-
+    
 }

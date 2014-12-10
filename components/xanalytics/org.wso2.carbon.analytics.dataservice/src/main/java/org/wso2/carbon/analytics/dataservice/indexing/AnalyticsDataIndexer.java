@@ -22,13 +22,13 @@ import java.io.IOException;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -52,6 +52,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.SingleInstanceLockFactory;
 import org.apache.lucene.util.Version;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDirectory;
 import org.wso2.carbon.analytics.dataservice.AnalyticsIndexException;
@@ -86,7 +87,7 @@ public class AnalyticsDataIndexer {
     
     private Map<String, Directory> indexDirs = new HashMap<String, Directory>();
     
-    private Map<String, AtomicInteger> indexShardPositions = new HashMap<String, AtomicInteger>();
+    private Map<String, Integer> indexShardPositions = new HashMap<String, Integer>();
     
     private Map<String, List<String>> localIndexShardIdsMap = new HashMap<String, List<String>>();
     
@@ -116,13 +117,14 @@ public class AnalyticsDataIndexer {
     
     private int getNextIndexShardPosition(int tenantId, String tableName) {
         String id = this.generateGlobalTableId(tenantId, tableName);
-        AtomicInteger pos = this.indexShardPositions.get(id);
+        Integer pos = this.indexShardPositions.get(id);
         /* no need to synchronize here, it's just creating an integer */
         if (pos == null) {
-            pos = new AtomicInteger(-1);
-            this.indexShardPositions.put(id, pos);
+            pos = 0;
         }
-        return pos.incrementAndGet();
+        pos++;
+        this.indexShardPositions.put(id, pos);
+        return pos;
     }
     
     private String byteArrayToHexString(byte[] bytes) {
@@ -156,7 +158,8 @@ public class AnalyticsDataIndexer {
         }
         if (id == null) {
             log.warn("CANNOT LOOK UP UNIQUE LOCAL ID USING A VALID NETWORK INTERFACE HARDWARE ADDRESS, "
-                    + "REVERTING TO LOCAL SINGLE NODE MODE, THIS WILL NOT WORK PROPERLY IN A CLUSTER, AND MAY CAUSE INDEX CORRUPTION");
+                    + "REVERTING TO LOCAL SINGLE NODE MODE, THIS WILL NOT WORK PROPERLY IN A CLUSTER, "
+                    + "AND MAY CAUSE INDEX CORRUPTION");
             /* a last effort to get a unique number, Java system properties should also take in account of the 
              * server's port offset */
             id = LOCAL_NODE_ID + ":" + (System.getenv().hashCode() + System.getProperties().hashCode());
@@ -207,6 +210,7 @@ public class AnalyticsDataIndexer {
         for (String shardId : shardIds) {
             result.addAll(this.search(tenantId, tableName, language, query, start, count, shardId));
         }
+        Collections.sort(result);
         if (result.size() > count) {
             result = result.subList(0, count);
         }
@@ -233,7 +237,8 @@ public class AnalyticsDataIndexer {
             }            
             return result;
         } catch (Exception e) {
-            throw new AnalyticsIndexException("Error in index search: " + e.getMessage(), e);
+            throw new AnalyticsIndexException("Error in index search, shard table id: '" + 
+                    shardedTableId + "': " + e.getMessage(), e);
         } finally {
             if (reader != null) {
                 try {
@@ -390,6 +395,7 @@ public class AnalyticsDataIndexer {
         } finally {
             try {
                 indexWriter.close();
+                //System.out.println("CLOSE INDEX WRITER: " + shardedTableId);
             } catch (IOException e) {
                 log.error("Error closing index writer: " + e.getMessage(), e);
             }
@@ -550,7 +556,7 @@ public class AnalyticsDataIndexer {
     private Directory createDirectory(String tableId) throws AnalyticsIndexException {
         String path = this.generateDirPath(tableId);
         try {
-            return new AnalyticsDirectory(this.getFileSystem(), this.getLockProvider(), path);            
+            return new AnalyticsDirectory(this.getFileSystem(), new SingleInstanceLockFactory(), path);            
         } catch (AnalyticsException e) {
             throw new AnalyticsIndexException("Error in creating directory: " + e.getMessage(), e);
         }
@@ -571,10 +577,13 @@ public class AnalyticsDataIndexer {
     }
     
     private IndexWriter createIndexWriter(String tableId) throws AnalyticsIndexException {
+        //System.out.println("CREATE INDEX WRITER A: " + tableId);
         Directory indexDir = this.lookupIndexDir(tableId);
         IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_4_10_2, this.DEFAULT_ANALYZER);
         try {
-            return new IndexWriter(indexDir, conf);
+            IndexWriter writer = new IndexWriter(indexDir, conf);
+            //System.out.println("CREATE INDEX WRITER B: " + tableId);
+            return writer;
         } catch (IOException e) {
             throw new AnalyticsIndexException("Error in creating index writer: " + e.getMessage(), e);
         }

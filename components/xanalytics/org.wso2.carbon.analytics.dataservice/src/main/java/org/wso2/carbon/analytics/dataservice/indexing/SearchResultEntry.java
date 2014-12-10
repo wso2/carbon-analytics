@@ -21,7 +21,7 @@ package org.wso2.carbon.analytics.dataservice.indexing;
 /**
  * This represents a search result entry from {@link AnalyticsDataIndexer}.
  */
-public class SearchResultEntry {
+public class SearchResultEntry implements Comparable<SearchResultEntry> {
     
     private String id;
     
@@ -38,6 +38,17 @@ public class SearchResultEntry {
     
     public float getScore() {
         return score;
+    }
+
+    @Override
+    public int compareTo(SearchResultEntry obj) {
+        if (this.score > obj.score) {
+            return 1;
+        } else if (this.score < obj.score) {
+            return -1;
+        } else {
+            return 0;
+        }
     }
     
 }
