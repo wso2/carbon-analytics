@@ -52,12 +52,10 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.SingleInstanceLockFactory;
 import org.apache.lucene.util.Version;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDirectory;
 import org.wso2.carbon.analytics.dataservice.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.AnalyticsQueryParser;
-import org.wso2.carbon.analytics.dataservice.locks.LockProvider;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
@@ -94,21 +92,14 @@ public class AnalyticsDataIndexer {
     private Analyzer DEFAULT_ANALYZER = new StandardAnalyzer();
     
     private FileSystem fileSystem;
-    
-    private LockProvider lockProvider;
-    
-    public AnalyticsDataIndexer(FileSystem fileSystem, LockProvider lockProvider) {
+        
+    public AnalyticsDataIndexer(FileSystem fileSystem) {
         this.fileSystem = fileSystem;
-        this.lockProvider = lockProvider;
         this.repository = new AnalyticsIndexDefinitionRepository(this.getFileSystem());
     }
     
     public FileSystem getFileSystem() {
         return fileSystem;
-    }
-    
-    public LockProvider getLockProvider() {
-        return lockProvider;
     }
     
     public AnalyticsIndexDefinitionRepository getRepository() {
@@ -207,12 +198,18 @@ public class AnalyticsDataIndexer {
             int start, int count) throws AnalyticsIndexException {
         List<String> shardIds = this.lookupGloballyExistingShardIds(tenantId, tableName);
         List<SearchResultEntry> result = new ArrayList<SearchResultEntry>();
+        /* needs to improve this to do this efficiently */
         for (String shardId : shardIds) {
-            result.addAll(this.search(tenantId, tableName, language, query, start, count, shardId));
+            result.addAll(this.search(tenantId, tableName, language, query, 0, count + start, shardId));
         }
         Collections.sort(result);
-        if (result.size() > count) {
-            result = result.subList(0, count);
+        if (result.size() < start) {
+            return new ArrayList<SearchResultEntry>();
+        }
+        if (result.size() >= count + start) {
+            result = result.subList(start, start + count);
+        } else {
+            result = result.subList(start, result.size());
         }
         return result;
     }
@@ -556,7 +553,7 @@ public class AnalyticsDataIndexer {
     private Directory createDirectory(String tableId) throws AnalyticsIndexException {
         String path = this.generateDirPath(tableId);
         try {
-            return new AnalyticsDirectory(this.getFileSystem(), new SingleInstanceLockFactory(), path);            
+            return new AnalyticsDirectory(this.getFileSystem(), new AnalyticsDirectory.InMemoryLockFactory(path), path);
         } catch (AnalyticsException e) {
             throw new AnalyticsIndexException("Error in creating directory: " + e.getMessage(), e);
         }
@@ -577,13 +574,10 @@ public class AnalyticsDataIndexer {
     }
     
     private IndexWriter createIndexWriter(String tableId) throws AnalyticsIndexException {
-        //System.out.println("CREATE INDEX WRITER A: " + tableId);
         Directory indexDir = this.lookupIndexDir(tableId);
         IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_4_10_2, this.DEFAULT_ANALYZER);
         try {
-            IndexWriter writer = new IndexWriter(indexDir, conf);
-            //System.out.println("CREATE INDEX WRITER B: " + tableId);
-            return writer;
+            return new IndexWriter(indexDir, conf);
         } catch (IOException e) {
             throw new AnalyticsIndexException("Error in creating index writer: " + e.getMessage(), e);
         }

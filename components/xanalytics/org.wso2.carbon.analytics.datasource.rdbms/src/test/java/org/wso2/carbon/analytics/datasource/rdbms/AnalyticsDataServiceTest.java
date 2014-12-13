@@ -379,7 +379,7 @@ public class AnalyticsDataServiceTest {
         }
     }
     
-    @Test
+    //@Test
     public void testDataRecordAddReadPerformanceIndexNC() throws AnalyticsException {
         System.out.println("\n************** START ANALYTICS DS (WITH INDEXING - MULTIPLE THREADS, H2-FILE) PERF TEST **************");
 
