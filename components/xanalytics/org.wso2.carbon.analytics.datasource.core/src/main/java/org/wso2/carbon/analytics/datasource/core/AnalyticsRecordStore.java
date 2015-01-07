@@ -108,7 +108,6 @@ public interface AnalyticsRecordStore {
             throws AnalyticsException, AnalyticsTableNotAvailableException;
     
     /**
-     * 
      * Retrieves data from a table with given ids.
      * @param tenantId The tenant which this table belongs to
      * @param tableName The name of the table to search on

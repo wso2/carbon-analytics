@@ -18,23 +18,15 @@
  */
 package org.wso2.carbon.analytics.dataservice;
 
-import org.apache.axis2.engine.ListenerManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-
-import com.hazelcast.core.HazelcastInstance;
 
 /**
  * This class represents the analytics data service declarative services component.
  * @scr.component name="analytics.component" immediate="true"
- * @scr.reference name="listener.manager.service" interface="org.apache.axis2.engine.ListenerManager"
- * cardinality="1..1" policy="dynamic"  bind="setListenerManager" unbind="unsetListenerManager"
  */
 public class AnalyticsDataServiceComponent {
     
@@ -58,29 +50,6 @@ public class AnalyticsDataServiceComponent {
     
     private AnalyticsDataServiceConfiguration loadAnalyticsDataServiceConfig() throws AnalyticsException {
         return null;
-    }
-    
-    public static HazelcastInstance getHazelcastInstance() {
-        Bundle bundle = FrameworkUtil.getBundle(AnalyticsDataServiceComponent.class);
-        if (bundle == null) {
-            return null;
-        }
-        BundleContext ctx = bundle.getBundleContext();
-        ServiceReference<HazelcastInstance> ref = ctx.getServiceReference(HazelcastInstance.class);
-        if (ref == null) {
-            return null;
-        }
-        return ctx.getService(ref);
-    }
-    
-    protected void setListenerManager(ListenerManager lm) {
-        /* we don't really need this, the listener manager service is acquired
-         * to make sure, as a workaround, that the analytics component is initialized 
-         * after the axis2 clustering agent is initialized */
-    }
-    
-    protected void unsetListenerManager(ListenerManager lm) {
-        /* empty */
     }
 
 }
