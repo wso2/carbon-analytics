@@ -39,8 +39,7 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSource;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.RecordGroup;
-import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
-import org.wso2.carbon.analytics.datasource.core.fs.FileSystem.DataInput;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem.DataInput;
 
 /**
  * This class contains tests related to analytics data sources.
@@ -49,7 +48,7 @@ public class AnalyticsDataSourceTest {
 
     private AnalyticsDataSource analyticsDS;
     
-    private FileSystem fileSystem;
+    private AnalyticsFileSystem analyticsFileSystem;
     
     private String implementationName;
     
@@ -63,7 +62,7 @@ public class AnalyticsDataSourceTest {
         this.analyticsDS.deleteTable(7, "mytable1");
         this.analyticsDS.deleteTable(7, "T1");
         try {
-            this.fileSystem = this.analyticsDS.getFileSystem();
+            this.analyticsFileSystem = this.analyticsDS.getFileSystem();
         } catch (IOException e) {
             throw new AnalyticsException(e.getMessage(), e);
         }
@@ -481,7 +480,7 @@ public class AnalyticsDataSourceTest {
     private void addFilesToDir(String dir, String...files) throws IOException {
         OutputStream out;
         for (String file : files) {
-            out = this.fileSystem.createOutput(dir + "/" + file);
+            out = this.analyticsFileSystem.createOutput(dir + "/" + file);
             out.write(generateData(100));
             out.close();
         }
@@ -489,27 +488,27 @@ public class AnalyticsDataSourceTest {
     
     @Test
     public void testFSDirectoryOperations() throws IOException {
-        this.fileSystem.delete("/d1");
-        this.fileSystem.mkdir("/d1/d2/d3");
-        this.fileSystem.mkdir("/d1/d2/d5");
-        Assert.assertTrue(this.fileSystem.exists("/d1/d2/d3"));
-        Assert.assertTrue(this.fileSystem.exists("/d1/d2/d5"));
-        Assert.assertFalse(this.fileSystem.exists("/d1/d2/d4"));
-        List<String> files = this.fileSystem.list("/d1/d2");
+        this.analyticsFileSystem.delete("/d1");
+        this.analyticsFileSystem.mkdir("/d1/d2/d3");
+        this.analyticsFileSystem.mkdir("/d1/d2/d5");
+        Assert.assertTrue(this.analyticsFileSystem.exists("/d1/d2/d3"));
+        Assert.assertTrue(this.analyticsFileSystem.exists("/d1/d2/d5"));
+        Assert.assertFalse(this.analyticsFileSystem.exists("/d1/d2/d4"));
+        List<String> files = this.analyticsFileSystem.list("/d1/d2");
         Assert.assertEquals(files.size(), 2);
         /* the path must be normalized, can end with "/" or not */
-        files = this.fileSystem.list("/d1/d2/");
+        files = this.analyticsFileSystem.list("/d1/d2/");
         Assert.assertEquals(files.size(), 2);
         Assert.assertEquals(new HashSet<String>(Arrays.asList(new String[] { "d3", "d5" })), 
                 new HashSet<String>(files));
         this.addFilesToDir("/d1/d2", "f1", "f2", "f3");
-        files = this.fileSystem.list("/d1/d2");
+        files = this.analyticsFileSystem.list("/d1/d2");
         Assert.assertEquals(files.size(), 5);
         Assert.assertEquals(new HashSet<String>(Arrays.asList(new String[] { "d3", "d5", "f1", "f2", "f3" })), 
                 new HashSet<String>(files));
-        this.fileSystem.delete("/d1");
-        Assert.assertFalse(this.fileSystem.exists("/d1/d2/d3"));
-        Assert.assertFalse(this.fileSystem.exists("/d1/d2/d5"));
+        this.analyticsFileSystem.delete("/d1");
+        Assert.assertFalse(this.analyticsFileSystem.exists("/d1/d2/d3"));
+        Assert.assertFalse(this.analyticsFileSystem.exists("/d1/d2/d5"));
     }
     
     public static byte[] generateData(int size) {
@@ -527,8 +526,8 @@ public class AnalyticsDataSourceTest {
     
     @Test
     public void testFSFileIOOperations() throws IOException {
-        this.fileSystem.delete("/d1");
-        OutputStream out = this.fileSystem.createOutput("/d1/d2/d3/f1");
+        this.analyticsFileSystem.delete("/d1");
+        OutputStream out = this.analyticsFileSystem.createOutput("/d1/d2/d3/f1");
         byte[] data = generateData(1024 * 1024 + 7);
         long start = System.currentTimeMillis();
         out.write(data, 0, data.length);
@@ -536,8 +535,8 @@ public class AnalyticsDataSourceTest {
         out.close();
         long end = System.currentTimeMillis();
         System.out.println("File data (1 MB) written in: " + (end - start) + " ms.");
-        Assert.assertEquals(this.fileSystem.length("/d1/d2/d3/f1"), data.length);
-        DataInput in = this.fileSystem.createInput("/d1/d2/d3/f1");
+        Assert.assertEquals(this.analyticsFileSystem.length("/d1/d2/d3/f1"), data.length);
+        DataInput in = this.analyticsFileSystem.createInput("/d1/d2/d3/f1");
         byte[] dataIn = new byte[data.length];
         start = System.currentTimeMillis();
         int len = in.read(dataIn, 0, dataIn.length);
@@ -546,16 +545,16 @@ public class AnalyticsDataSourceTest {
         System.out.println("File data (1 MB) read in: " + (end - start) + " ms.");
         Assert.assertEquals(len, data.length);
         Assert.assertEquals(data, dataIn);
-        this.fileSystem.delete("/d1/d2/d3/f1");
-        Assert.assertFalse(this.fileSystem.exists("/d1/d2/d3/f1"));
-        this.fileSystem.delete("/d1/d2/d3");
-        Assert.assertFalse(this.fileSystem.exists("/d1/d2/d3"));
-        this.fileSystem.delete("/d1");
+        this.analyticsFileSystem.delete("/d1/d2/d3/f1");
+        Assert.assertFalse(this.analyticsFileSystem.exists("/d1/d2/d3/f1"));
+        this.analyticsFileSystem.delete("/d1/d2/d3");
+        Assert.assertFalse(this.analyticsFileSystem.exists("/d1/d2/d3"));
+        this.analyticsFileSystem.delete("/d1");
     }
     
     private void fileRandomWriteRead(String path, int writerBufferSize, int readBufferSize, int n) 
             throws IOException {
-        OutputStream out = this.fileSystem.createOutput(path);
+        OutputStream out = this.analyticsFileSystem.createOutput(path);
         ByteArrayOutputStream byteOut1 = new ByteArrayOutputStream();
         byte[] data = generateData(writerBufferSize);
         for (int i = 0; i < n; i++) {
@@ -567,8 +566,8 @@ public class AnalyticsDataSourceTest {
         }
         out.close();
         byteOut1.close();
-        Assert.assertEquals(this.fileSystem.length(path), n * writerBufferSize);
-        DataInput in = this.fileSystem.createInput(path);
+        Assert.assertEquals(this.analyticsFileSystem.length(path), n * writerBufferSize);
+        DataInput in = this.analyticsFileSystem.createInput(path);
         byte[] buff = new byte[readBufferSize];
         int j;
         ByteArrayOutputStream byteOut2 = new ByteArrayOutputStream();
@@ -582,25 +581,25 @@ public class AnalyticsDataSourceTest {
     
     @Test
     public void testFSFileIOOperations2() throws AnalyticsException, IOException {
-        this.fileSystem.delete("/d1");
+        this.analyticsFileSystem.delete("/d1");
         this.fileRandomWriteRead("/d1/d2/f1", 1350, 1350, 100);
         this.fileRandomWriteRead("/d1/d2/f2", 1350, 200, 150);
         this.fileRandomWriteRead("/d1/d2/f3", 240, 2000, 50);
         this.fileRandomWriteRead("/d1/d2/f2", 10, 500, 300);
         this.fileRandomWriteRead("/d1/d2/f1", 1, 1, 1);
-        this.fileSystem.delete("/d1");
-        Assert.assertFalse(this.fileSystem.exists("/d1/d2/d3"));
+        this.analyticsFileSystem.delete("/d1");
+        Assert.assertFalse(this.analyticsFileSystem.exists("/d1/d2/d3"));
     }
     
     private void fileReadSeekPosition(String path, int n, int chunk, int... locs) throws IOException {
         byte[] data = generateData(n);
-        OutputStream out = this.fileSystem.createOutput(path);
+        OutputStream out = this.analyticsFileSystem.createOutput(path);
         out.write(data, 0, data.length);
         out.close();
         byte[] din = new byte[chunk];
         ByteArrayInputStream bin = new ByteArrayInputStream(data);
         byte[] din2 = new byte[chunk];
-        DataInput in = this.fileSystem.createInput(path);
+        DataInput in = this.analyticsFileSystem.createInput(path);
         int count, count2;
         for (int i : locs) {
             in.seek(i);
@@ -617,25 +616,25 @@ public class AnalyticsDataSourceTest {
     
     @Test
     public void testFSReadSeekPosition() throws IOException {
-        this.fileSystem.delete("/d1");
+        this.analyticsFileSystem.delete("/d1");
         this.fileReadSeekPosition("/d1/f1", 2000, 5, 0, 10, 5, 50, 100, 1570, 1998, 0);
         this.fileReadSeekPosition("/d1/f2", 100, 5, 99);
         this.fileReadSeekPosition("/d1/f3", 100, 5, 0, 10, 5, 50, 99, 0, 1, 20);
         this.fileReadSeekPosition("/d1/f4", 10, 1, 0, 10);
         this.fileReadSeekPosition("/d1/f4", 10, 1, 0, 10, 5, 7, 9, 0, 1, 0);
-        this.fileSystem.delete("/d1");
+        this.analyticsFileSystem.delete("/d1");
     }
     
     @Test
     public void testFSPerfTest() throws IOException {
         System.out.println("\n************** START FS PERF TEST [" + this.getImplementationName() + "] **************");
-        this.fileSystem.delete("/mydir");
+        this.analyticsFileSystem.delete("/mydir");
         byte[] data = generateData(2048);
         OutputStream out;
         
         /* warm-up */
         for (int i = 0; i < 100; i++) {
-            out = this.fileSystem.createOutput("/mydir/perf_warmup/file" + i);
+            out = this.analyticsFileSystem.createOutput("/mydir/perf_warmup/file" + i);
             out.write(data, 0, data.length);
             out.close();
         }
@@ -643,7 +642,7 @@ public class AnalyticsDataSourceTest {
         long start = System.currentTimeMillis();
         int count = 1000;
         for (int i = 0; i < count; i++) {
-            out = this.fileSystem.createOutput("/mydir/perf/file" + i);
+            out = this.analyticsFileSystem.createOutput("/mydir/perf/file" + i);
             out.write(data, 0, data.length);
             out.close();
         }
@@ -655,14 +654,14 @@ public class AnalyticsDataSourceTest {
         int len;
         start = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
-            in = this.fileSystem.createInput("/mydir/perf/file" + i);
+            in = this.analyticsFileSystem.createInput("/mydir/perf/file" + i);
             len = in.read(dataIn, 0, dataIn.length);
             in.close();
             Assert.assertEquals(len, dataIn.length);
         }
         end = System.currentTimeMillis();
         System.out.println("* " + count + " 2K files read in: " + (end - start) + " ms. " + (count / (double) (end - start) * 1000.0) + " FPS.");
-        this.fileSystem.delete("/mydir");
+        this.analyticsFileSystem.delete("/mydir");
         System.out.println("\n************** END FS PERF TEST [" + this.getImplementationName() + "] **************");
     }
     

@@ -21,8 +21,6 @@ package org.wso2.carbon.analytics.datasource.core;
 import java.io.IOException;
 import java.util.Map;
 
-import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
-
 /**
  * This interface represents the common data store implementations used in analytics. The tenant concept
  * is put here as a design vs performance compromise, where if we not to introduce the tenant specifics here,
@@ -40,10 +38,10 @@ public interface AnalyticsDataSource extends AnalyticsRecordStore {
     void init(Map<String, String> properties) throws AnalyticsException;
     
     /**
-     * Creates and returns a {@link FileSystem} object to do file related operations.
-     * @return The {@link FileSystem} object
+     * Creates and returns a {@link AnalyticsFileSystem} object to do file related operations.
+     * @return The {@link AnalyticsFileSystem} object
      * @throws IOException
      */
-    FileSystem getFileSystem() throws IOException;
+    AnalyticsFileSystem getFileSystem() throws IOException;
 
 }

@@ -19,12 +19,20 @@
 package org.wso2.carbon.analytics.datasource.core;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * This interface represents all the analytic record related operations.
  */
 public interface AnalyticsRecordStore {
 
+    /**
+     * This method initializes the AnalyticsRecordStore implementation, and is called once before any other method.
+     * @param properties The properties associated with this analytics record store
+     * @throws AnalyticsException
+     */
+    void init(Map<String, String> properties) throws AnalyticsException;
+    
     /**
      * Creates a table, if not already there, where the columns are not defined here, but can contain any arbitrary number
      * of columns when data is added. The table names are not case sensitive.

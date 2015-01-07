@@ -35,33 +35,33 @@ import org.apache.lucene.store.Lock;
 import org.apache.lucene.store.LockFactory;
 import org.apache.lucene.store.OutputStreamIndexOutput;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
-import org.wso2.carbon.analytics.datasource.core.fs.FileSystem.DataInput;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem.DataInput;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 /**
- * This represents a Lucene {@link Directory} implementation using Carbon Analytics {@link FileSystem}.
+ * This represents a Lucene {@link Directory} implementation using Carbon Analytics {@link AnalyticsFileSystem}.
  */
 public class AnalyticsDirectory extends Directory {
 
     private static final int OUTPUT_STREAM_BUFFER_SIZE = 1024 * 10;
 
-    private FileSystem fileSystem;
+    private AnalyticsFileSystem analyticsFileSystem;
         
     private String path;
     
     private LockFactory lockFactory;
     
-    public AnalyticsDirectory(FileSystem fileSystem, LockFactory lockFactory, 
+    public AnalyticsDirectory(AnalyticsFileSystem analyticsFileSystem, LockFactory lockFactory, 
             String path) throws AnalyticsException {
-        this.fileSystem = fileSystem;
+        this.analyticsFileSystem = analyticsFileSystem;
         this.path = GenericUtils.normalizePath(path);
         this.lockFactory = lockFactory;
         this.getLockFactory().setLockPrefix(this.getPath());
     }
     
-    public FileSystem getFileSystem() {
-        return fileSystem;
+    public AnalyticsFileSystem getFileSystem() {
+        return analyticsFileSystem;
     }
     
     public String getPath() {
@@ -80,34 +80,34 @@ public class AnalyticsDirectory extends Directory {
     @Override
     public IndexOutput createOutput(String name, IOContext ctx) throws IOException {
         String path = this.generateFilePath(name);
-        OutputStream out = this.fileSystem.createOutput(path);
+        OutputStream out = this.analyticsFileSystem.createOutput(path);
         return new OutputStreamIndexOutput(out, OUTPUT_STREAM_BUFFER_SIZE);
     }
 
     @Override
     public void deleteFile(String name) throws IOException {
-        this.fileSystem.delete(this.generateFilePath(name));
+        this.analyticsFileSystem.delete(this.generateFilePath(name));
     }
 
     @Override
     public boolean fileExists(String name) throws IOException {
-        return this.fileSystem.exists(this.generateFilePath(name));        
+        return this.analyticsFileSystem.exists(this.generateFilePath(name));        
     }
 
     @Override
     public long fileLength(String name) throws IOException {
-        return this.fileSystem.length(this.generateFilePath(name));        
+        return this.analyticsFileSystem.length(this.generateFilePath(name));        
     }
 
     @Override
     public String[] listAll() throws IOException {
-        return this.fileSystem.list(this.getPath()).toArray(new String[0]);
+        return this.analyticsFileSystem.list(this.getPath()).toArray(new String[0]);
     }
 
     @Override
     public IndexInput openInput(String name, IOContext ctx) throws IOException {
         String path = this.generateFilePath(name);
-        DataInput input = this.fileSystem.createInput(path);
+        DataInput input = this.analyticsFileSystem.createInput(path);
         return new AnalyticsIndexInputAdaptor(path, input);
     }
 
@@ -134,7 +134,7 @@ public class AnalyticsDirectory extends Directory {
         private List<IndexInput> clonedInputs = new ArrayList<IndexInput>();
         
         protected AnalyticsIndexInputAdaptor(String path, DataInput dataInput) throws IOException {
-            this(path, dataInput, 0, fileSystem.length(path), path);            
+            this(path, dataInput, 0, analyticsFileSystem.length(path), path);            
         }
         
         protected AnalyticsIndexInputAdaptor(String path, DataInput dataInput, long offset, 

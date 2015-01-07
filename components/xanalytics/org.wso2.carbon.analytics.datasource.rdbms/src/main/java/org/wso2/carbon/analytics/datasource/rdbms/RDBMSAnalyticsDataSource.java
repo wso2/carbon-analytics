@@ -48,8 +48,8 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSource;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.DirectAnalyticsDataSource;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.Record;
-import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.utils.CarbonUtils;
 
@@ -595,7 +595,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     }
 
     @Override
-    public FileSystem getFileSystem() throws IOException {
+    public AnalyticsFileSystem getFileSystem() throws IOException {
         return new RDBMSFileSystem(this.getQueryConfiguration(), this.getDataSource());
     }
     

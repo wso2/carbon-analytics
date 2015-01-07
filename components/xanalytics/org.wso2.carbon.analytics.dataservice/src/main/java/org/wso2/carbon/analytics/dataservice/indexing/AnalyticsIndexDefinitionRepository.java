@@ -27,8 +27,8 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.AnalyticsIndexException;
-import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
-import org.wso2.carbon.analytics.datasource.core.fs.FileSystem.DataInput;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem.DataInput;
 
 /**
  * This class represents a repository for storing index definitions.
@@ -41,10 +41,10 @@ public class AnalyticsIndexDefinitionRepository {
     
     private static final String DEFAULT_CHARSET = "UTF8";
     
-    private FileSystem fileSystem;
+    private AnalyticsFileSystem analyticsFileSystem;
     
-    public AnalyticsIndexDefinitionRepository(FileSystem fileSystem) {
-        this.fileSystem = fileSystem;
+    public AnalyticsIndexDefinitionRepository(AnalyticsFileSystem analyticsFileSystem) {
+        this.analyticsFileSystem = analyticsFileSystem;
     }
     
     public Map<String, IndexType> getIndices(int tenantId, String tableName) throws AnalyticsIndexException {
@@ -52,9 +52,9 @@ public class AnalyticsIndexDefinitionRepository {
         ByteArrayOutputStream out = null;
         try {
             String path = this.generatePath(tenantId, tableName);
-            if (this.fileSystem.exists(path)) {
-                this.fileSystem.createInput(path);
-                in = this.fileSystem.createInput(path);
+            if (this.analyticsFileSystem.exists(path)) {
+                this.analyticsFileSystem.createInput(path);
+                in = this.analyticsFileSystem.createInput(path);
                 out = new ByteArrayOutputStream();
                 byte[] buff = new byte[1024];
                 int i;
@@ -124,7 +124,7 @@ public class AnalyticsIndexDefinitionRepository {
     public void setIndices(int tenantId, String tableName, Map<String, IndexType> columns) throws AnalyticsIndexException {
         OutputStream out = null;
         try {
-            out = this.fileSystem.createOutput(this.generatePath(tenantId, tableName));
+            out = this.analyticsFileSystem.createOutput(this.generatePath(tenantId, tableName));
             byte[] data = this.encodeIndexDetails(columns).getBytes(DEFAULT_CHARSET);
             out.write(data, 0, data.length);
         } catch (Exception e) {
@@ -142,7 +142,7 @@ public class AnalyticsIndexDefinitionRepository {
     
     public void clearAllIndices(int tenantId, String tableName) throws AnalyticsIndexException {
         try {
-            this.fileSystem.delete(this.generatePath(tenantId, tableName));
+            this.analyticsFileSystem.delete(this.generatePath(tenantId, tableName));
         } catch (IOException e) {
             throw new AnalyticsIndexException("Error in clearing indices: " + e.getMessage(), e);
         }

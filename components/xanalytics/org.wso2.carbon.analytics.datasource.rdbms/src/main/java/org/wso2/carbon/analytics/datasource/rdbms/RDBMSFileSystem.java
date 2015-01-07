@@ -34,18 +34,18 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.datasource.core.fs.ChunkedDataInput;
-import org.wso2.carbon.analytics.datasource.core.fs.ChunkedDataOutput;
+import org.wso2.carbon.analytics.datasource.core.ChunkedDataInput;
+import org.wso2.carbon.analytics.datasource.core.ChunkedDataOutput;
 import org.wso2.carbon.analytics.datasource.core.ChunkedStream;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.ChunkedStream.DataChunk;
-import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.datasource.rdbms.RDBMSUtils;
 
 /**
- * RDBMS {@link FileSystem} implementation.
+ * RDBMS {@link AnalyticsFileSystem} implementation.
  */
-public class RDBMSFileSystem implements FileSystem {
+public class RDBMSFileSystem implements AnalyticsFileSystem {
     
     private final byte[] FS_EMPTY_DATA_CHUNK;
     

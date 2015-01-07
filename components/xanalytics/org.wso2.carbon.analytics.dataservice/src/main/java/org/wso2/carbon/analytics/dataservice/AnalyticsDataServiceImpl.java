@@ -28,9 +28,9 @@ import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSource;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsTableNotAvailableException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.RecordGroup;
-import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
 
 /**
  * The implementation of {@link AnalyticsDataService}.
@@ -43,13 +43,13 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     
     public AnalyticsDataServiceImpl(AnalyticsDataSource analyticsDataSource) throws AnalyticsException {
         this.analyticsDataSource = analyticsDataSource;
-        FileSystem fileSystem;
+        AnalyticsFileSystem analyticsFileSystem;
         try {
-            fileSystem = this.analyticsDataSource.getFileSystem();
+            analyticsFileSystem = this.analyticsDataSource.getFileSystem();
         } catch (IOException e) {
             throw new AnalyticsException("Error in creating file system: " + e.getMessage(), e);
         }
-        this.indexer = new AnalyticsDataIndexer(fileSystem);
+        this.indexer = new AnalyticsDataIndexer(analyticsFileSystem);
     }
     
     public AnalyticsDataServiceImpl(AnalyticsDataServiceConfiguration config) {

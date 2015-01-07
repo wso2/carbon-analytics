@@ -57,8 +57,8 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsDirectory;
 import org.wso2.carbon.analytics.dataservice.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.AnalyticsQueryParser;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.Record;
-import org.wso2.carbon.analytics.datasource.core.fs.FileSystem;
 
 /**
  * This class represents the indexing functionality.
@@ -91,15 +91,15 @@ public class AnalyticsDataIndexer {
     
     private Analyzer DEFAULT_ANALYZER = new StandardAnalyzer();
     
-    private FileSystem fileSystem;
+    private AnalyticsFileSystem analyticsFileSystem;
         
-    public AnalyticsDataIndexer(FileSystem fileSystem) {
-        this.fileSystem = fileSystem;
+    public AnalyticsDataIndexer(AnalyticsFileSystem analyticsFileSystem) {
+        this.analyticsFileSystem = analyticsFileSystem;
         this.repository = new AnalyticsIndexDefinitionRepository(this.getFileSystem());
     }
     
-    public FileSystem getFileSystem() {
-        return fileSystem;
+    public AnalyticsFileSystem getFileSystem() {
+        return analyticsFileSystem;
     }
     
     public AnalyticsIndexDefinitionRepository getRepository() {

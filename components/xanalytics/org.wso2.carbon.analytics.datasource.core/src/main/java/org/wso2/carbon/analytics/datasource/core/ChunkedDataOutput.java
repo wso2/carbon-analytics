@@ -16,14 +16,13 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.core.fs;
+package org.wso2.carbon.analytics.datasource.core;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.wso2.carbon.analytics.datasource.core.ChunkedStream;
 import org.wso2.carbon.analytics.datasource.core.ChunkedStream.DataChunk;
 
 /**
