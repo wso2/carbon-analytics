@@ -69,11 +69,15 @@
                                 </properties>
                             </adviceFile>
                             <bundles>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.message.tracer.handler.ui:${wso2carbon.version}</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.message.tracer.handler.stub:${wso2carbon.version}</bundleDef>
+                                <bundleDef>
+                                    org.wso2.carbon:org.wso2.carbon.bam.message.tracer.handler.ui:${project.version}
+                                </bundleDef>
+                                <bundleDef>
+                                    org.wso2.carbon:org.wso2.carbon.bam.message.tracer.handler.stub:${project.version}
+                                </bundleDef>
                             </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core.ui:${wso2carbon.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core.ui:${carbon.platform.version}</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>
