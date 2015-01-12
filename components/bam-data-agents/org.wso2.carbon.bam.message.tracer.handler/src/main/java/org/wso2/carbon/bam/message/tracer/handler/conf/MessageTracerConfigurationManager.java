@@ -19,11 +19,13 @@
 package org.wso2.carbon.bam.message.tracer.handler.conf;
 
 import org.w3c.dom.Document;
+import org.wso2.carbon.bam.message.tracer.handler.exception.MessageTracerHandlerException;
 import org.wso2.carbon.bam.message.tracer.handler.util.HandlerUtils;
 import org.wso2.carbon.utils.CarbonUtils;
 
 import javax.xml.bind.JAXBContext;
 import java.io.File;
+import java.io.FileNotFoundException;
 
 public class MessageTracerConfigurationManager {
 
@@ -31,22 +33,25 @@ public class MessageTracerConfigurationManager {
 
     private static MessageTracerConfiguration configuration;
 
-    private MessageTracerConfigurationManager() {}
+    private MessageTracerConfigurationManager() {
+    }
 
     public static MessageTracerConfiguration getMessageTracerConfiguration() throws Exception {
-		try {
-			File msgTracerConfigFile = new File(CarbonUtils.getCarbonConfigDirPath() + File.separator + "etc" +
+        try {
+            File msgTracerConfigFile = new File(CarbonUtils.getCarbonConfigDirPath() + File.separator + "etc" +
                     File.separator + MSG_TRACER_FILE);
-			if (msgTracerConfigFile.exists()) {
+            if (msgTracerConfigFile.exists()) {
                 Document doc = HandlerUtils.convertToDocument(msgTracerConfigFile);
                 JAXBContext ctx = JAXBContext.newInstance(MessageTracerConfiguration.class);
                 configuration = (MessageTracerConfiguration) ctx.createUnmarshaller().unmarshal(doc);
-			}
-		} catch (Exception e) {
-			throw new Exception("Error in initializing message tracer configuration: " +
-		            e.getMessage(), e);
-		}
+            } else {
+                throw new FileNotFoundException("Message tracer configuration file " + MSG_TRACER_FILE + " not found.");
+            }
+        } catch (Exception e) {
+            throw new MessageTracerHandlerException("Error in initializing message tracer configuration: " +
+                    e.getMessage(), e);
+        }
         return configuration;
-	}
-    
+    }
+
 }

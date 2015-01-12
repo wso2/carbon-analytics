@@ -102,7 +102,7 @@ public class JmxTask extends AbstractTask {
                 String streamId = dataPublisher.findStreamId(streamName, version);
 
                 if (streamId == null) {
-                    createStreamDefinition(streamName, version, jmxAgent, dataPublisher);
+                    streamId = createStreamDefinition(streamName, version, jmxAgent, dataPublisher);
                 }
                 publishData(streamId, dataPublisher, jmxAgent, profileName);
 
@@ -259,7 +259,7 @@ public class JmxTask extends AbstractTask {
         }
     }
 
-    private void createStreamDefinition(String streamName, String version, JmxAgent jmxAgent,
+    private String createStreamDefinition(String streamName, String version, JmxAgent jmxAgent,
                                         DataPublisher dataPublisher)
             throws MalformedURLException, StreamDefinitionException,
                    DifferentStreamDefinitionAlreadyDefinedException, AgentException,
@@ -309,8 +309,6 @@ public class JmxTask extends AbstractTask {
             stringBuilder.deleteCharAt(stringBuilder.length() - 1);
             stringBuilder.append("  ]}");
 
-            dataPublisher.defineStream(stringBuilder.toString());
-
         } finally {
             if (jmxConnector != null) {
                 try {
@@ -319,6 +317,8 @@ public class JmxTask extends AbstractTask {
                     log.error("Unable to close Jmx connection.", e);
                 }
             }
+
+            return dataPublisher.defineStream(stringBuilder.toString());
         }
     }
 

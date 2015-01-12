@@ -387,8 +387,7 @@ function selectAttribute() {
                 if ($(this).find("input").length) {
                     childArray.push($(this).find("input").val());
                 }
-                //if this is the attribute name <td>
-                else if ($(this).attr('title') != '') {
+               	else if (!(typeof $(this).attr('title') === 'undefined')) { //if the row cell has title attribute
                     var data = $(this).attr('title');
                     //check whether it's compositeData
                     var splitData = data.split("______");

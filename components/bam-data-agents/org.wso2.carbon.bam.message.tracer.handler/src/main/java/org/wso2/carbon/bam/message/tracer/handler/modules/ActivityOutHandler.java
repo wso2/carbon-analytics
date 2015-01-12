@@ -26,8 +26,6 @@ import org.apache.axis2.description.HandlerDescription;
 import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.transport.http.HTTPConstants;
-import org.apache.axis2.wsdl.WSDLConstants;
-import org.apache.commons.httpclient.Header;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.bam.data.publisher.util.BAMDataPublisherConstants;
@@ -40,10 +38,10 @@ import org.wso2.carbon.bam.message.tracer.handler.util.HandlerUtils;
 import org.wso2.carbon.bam.message.tracer.handler.util.MessageTracerConstants;
 import org.wso2.carbon.bam.message.tracer.handler.util.TenantEventConfigData;
 import org.wso2.carbon.core.util.SystemFilter;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ActivityOutHandler extends AbstractHandler {
@@ -65,15 +63,21 @@ public class ActivityOutHandler extends AbstractHandler {
 
     @Override
     public InvocationResponse invoke(MessageContext messageContext) throws AxisFault {
-
         MessageContext inMessageContext = null;
+        Object inTransportHeaders = null;
         int tenantID = PublisherUtil.getTenantId(messageContext);
-        if (tenantID == -1) {
+        if (tenantID == MultitenantConstants.INVALID_TENANT_ID) {
             inMessageContext = messageContext.getOperationContext().getMessageContext(
                     WSDL2Constants.MESSAGE_LABEL_IN);
-            Object tId = inMessageContext.getProperty(MessageTracerConstants.TENANT_ID);
-            if (tId != null) {
-                tenantID = Integer.parseInt(tId.toString());
+            if (inMessageContext != null) {
+                Object tId = inMessageContext.getProperty(MessageTracerConstants.TENANT_ID);
+                if (tId != null) {
+                    tenantID = Integer.parseInt(tId.toString());
+                }else {
+                   return InvocationResponse.CONTINUE;
+                }
+            }else {
+               return InvocationResponse.CONTINUE;
             }
         }
         Map<Integer, EventingConfigData> tenantSpecificEventConfig = TenantEventConfigData.getTenantSpecificEventingConfigData();
@@ -102,7 +106,8 @@ public class ActivityOutHandler extends AbstractHandler {
                 //engage transport headers
                 Object transportHeaders = messageContext.getProperty(MessageContext.TRANSPORT_HEADERS);
 
-                Object inTransportHeaders = inMessageContext.getProperty(MessageContext.TRANSPORT_HEADERS);
+               if(inMessageContext != null)
+                inTransportHeaders = inMessageContext.getProperty(MessageContext.TRANSPORT_HEADERS);
 
                 if (transportHeaders != null) {
                     String aid = (String) ((Map) transportHeaders).get(MessageTracerConstants.ACTIVITY_ID);
@@ -134,19 +139,9 @@ public class ActivityOutHandler extends AbstractHandler {
                             }
                         }
                     }
-//                    Map<String, String> headers = new TreeMap<String, String>();
-//                    headers.put(MessageTracerConstants.ACTIVITY_ID, activityID);
-//                    messageContext.setProperty(MessageContext.TRANSPORT_HEADERS, headers);
-
-                    MessageContext responseMessageContext;
-                    List headersList = new ArrayList();
-                    
-                    //The messageContext passed to this is already outMessageContext,
-                    // hence we can directly use that.
-                    responseMessageContext =  messageContext;
-                    
-                    headersList.add(new Header(MessageTracerConstants.ACTIVITY_ID, activityID));
-                    responseMessageContext.setProperty(HTTPConstants.HTTP_HEADERS, headersList);
+                    Map<String, String> headers = new HashMap<String, String>(1);
+                    headers.put(MessageTracerConstants.ACTIVITY_ID, activityID);
+                    messageContext.setProperty(MessageContext.TRANSPORT_HEADERS, headers);
                 }
 
                 TracingInfo tracingInfo = new TracingInfo();
@@ -156,9 +151,20 @@ public class ActivityOutHandler extends AbstractHandler {
                 tracingInfo.setHost(PublisherUtil.getHostAddress());
                 tracingInfo.setServiceName(messageContext.getAxisService().getName());
                 tracingInfo.setOperationName(messageContext.getAxisOperation().getName().getLocalPart());
+                Map<String, String> transportHeadersMap = (Map<String, String>) messageContext.getProperty(MessageContext.TRANSPORT_HEADERS);
+
+                AgentUtil.setTransportHeaders(tracingInfo, transportHeadersMap);
 
                 try {
                     if (eventingConfigData.isDumpBodyEnable()) {
+                        boolean isEmptyBody=false;
+                        if(transportHeadersMap!=null){
+                            String contentLength=transportHeadersMap.get(HTTPConstants.HEADER_CONTENT_LENGTH);
+                            if(contentLength!=null && Integer.parseInt(contentLength)==0){
+                                isEmptyBody=true;
+                            }
+                        }
+                        if(!isEmptyBody){
                         try {
                             Class cls = Class.forName(MessageTracerConstants.ORG_APACHE_SYNAPSE_TRANSPORT_PASSTHRU_UTIL_RELAY_UTILS_CLASS_NAME);
                             Class[] paramClasses = new Class[]{MessageContext.class, Boolean.TYPE};
@@ -178,6 +184,7 @@ public class ActivityOutHandler extends AbstractHandler {
                         SOAPHeader header = soapEnvelope.getHeader();
                         if (header != null) {
                             tracingInfo.setHeader(header.toString());
+                        }
                         }
                     }
 
