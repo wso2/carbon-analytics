@@ -1,6 +1,0 @@
-<StreamDefinition>
-    <ReplicationFactor>1</ReplicationFactor>
-    <ReadConsistencyLevel>QUORUM</ReadConsistencyLevel>
-    <WriteConsistencyLevel>QUORUM</WriteConsistencyLevel>
-    <StrategyClass>org.apache.cassandra.locator.SimpleStrategy</StrategyClass>
-</StreamDefinition>
