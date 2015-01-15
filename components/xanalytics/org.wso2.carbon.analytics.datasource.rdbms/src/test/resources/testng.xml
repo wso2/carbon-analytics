@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<suite name="MySQL Analytics Data Source Test Suite" parallel="methods" thread-count="1">
-   <parameter name="url"  value="jdbc:mysql://localhost/bam3"/>
-   <parameter name="username"  value="root"/>
-   <parameter name="password"  value="root"/>
-   <test name="Analytics Test">
+<suite name="RDBMS Analytics Data Source Test Suite" parallel="methods" thread-count="1">
+   <parameter name="mysql.url"  value="jdbc:mysql://localhost/bam3"/>
+   <parameter name="mysql.username"  value="root"/>
+   <parameter name="mysql.password"  value="root"/>
+   <test name="Analytics RDBMS Impl. Tests">
      <classes>     
-       <!-- class name="org.wso2.carbon.analytics.datasource.core.MySQLMyISAMAnalyticsDataSourceTest" /-->
-       <class name="org.wso2.carbon.analytics.datasource.core.MySQLInnoDBAnalyticsDataSourceTest" />
+       <!--class name="org.wso2.carbon.analytics.datasource.rdbms.MySQLInnoDBAnalyticsDataSourceTest"/>
+       <class name="org.wso2.carbon.analytics.datasource.rdbms.MySQLMyISAMAnalyticsDataSourceTest"/-->
+       <class name="org.wso2.carbon.analytics.datasource.rdbms.H2FileDBAnalyticsDataSourceTest"/>
+       <class name="org.wso2.carbon.analytics.datasource.rdbms.H2MemDBAnalyticsDataSourceTest"/>
+       <class name="org.wso2.carbon.analytics.datasource.rdbms.AnalyticsDataServiceTest"/>
      </classes>
    </test>
 </suite>

@@ -58,11 +58,7 @@ public class StreamDefCreator {
         List<Attribute> metaList = new ArrayList<Attribute>(7);
 
         metaList.add(new Attribute(BAMDataPublisherConstants.REQUEST_URL, AttributeType.STRING));
-        metaList.add(new Attribute(BAMDataPublisherConstants.REMOTE_ADDRESS, AttributeType.STRING));
-        metaList.add(new Attribute(BAMDataPublisherConstants.CONTENT_TYPE, AttributeType.STRING));
-        metaList.add(new Attribute(BAMDataPublisherConstants.USER_AGENT, AttributeType.STRING));
         metaList.add(new Attribute(BAMDataPublisherConstants.HOST, AttributeType.STRING));
-        metaList.add(new Attribute(BAMDataPublisherConstants.REFERER, AttributeType.STRING));
         metaList.add(new Attribute(SERVER_NAME, AttributeType.STRING));
 
         return metaList;

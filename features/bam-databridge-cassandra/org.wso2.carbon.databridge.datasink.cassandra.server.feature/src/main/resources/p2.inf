@@ -1,3 +1,0 @@
-instructions.configure = \
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.databridge.datasink.cassandra.server_${feature.version}/conf/cassandra-datasink-config.xml,target:${installFolder}/../../conf/data-bridge/cassandra-datasink-config.xml,overwrite:true);\
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.databridge.datasink.cassandra.server_${feature.version}/conf/streamdefn.xml,target:${installFolder}/../../conf/advanced/streamdefn.xml,overwrite:true);\

@@ -25,19 +25,11 @@ public class TracingInfo {
 
     private String requestUrl;
 
-    private String referer;
-
     private String server;
 
     private String operationName;
 
     private String serviceName;
-
-    private String remoteAddress;
-
-    private String contentType;
-
-    private String userAgent;
 
     private Long timestamp;
 
@@ -75,14 +67,6 @@ public class TracingInfo {
         this.requestUrl = requestUrl;
     }
 
-    public String getReferer() {
-        return referer;
-    }
-
-    public void setReferer(String referer) {
-        this.referer = referer;
-    }
-
     public String getServer() {
         return server;
     }
@@ -105,30 +89,6 @@ public class TracingInfo {
 
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
-    }
-
-    public String getRemoteAddress() {
-        return remoteAddress;
-    }
-
-    public void setRemoteAddress(String remoteAddress) {
-        this.remoteAddress = remoteAddress;
-    }
-
-    public String getContentType() {
-        return contentType;
-    }
-
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
-    }
-
-    public String getUserAgent() {
-        return userAgent;
-    }
-
-    public void setUserAgent(String userAgent) {
-        this.userAgent = userAgent;
     }
 
     public Long getTimestamp() {

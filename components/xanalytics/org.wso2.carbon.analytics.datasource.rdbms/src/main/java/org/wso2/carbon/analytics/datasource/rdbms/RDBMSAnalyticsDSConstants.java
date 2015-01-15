@@ -26,13 +26,5 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSource;
 public class RDBMSAnalyticsDSConstants {
 
     public static final String DATASOURCE = "datasource";
-    
-    public static final String FS_PATH_TABLE = "AN_FS_PATH";
-        
-    public static final String FS_DATA_TABLE = "AN_FS_DATA";
-    
-    public static final int FS_DATA_CHUNK_SIZE = 1024;
-    
-    public static final byte[] FS_EMPTY_DATA_CHUNK = new byte[FS_DATA_CHUNK_SIZE];
         
 }

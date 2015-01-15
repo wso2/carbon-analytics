@@ -34,17 +34,8 @@
     <url>http://wso2.org</url>
 
     <modules>
-        <!--<module>service</module>-->
-        <!--<module>webapps</module>-->
-
         <module>message-tracer-handler</module>
         <module>jmx</module>
-
     </modules>
-
-
-
-
-
 </project>
 

@@ -16,32 +16,18 @@
 package org.wso2.carbon.bam.message.tracer.handler.util;
 
 
-import org.wso2.carbon.bam.data.publisher.util.BAMDataPublisherConstants;
-import org.wso2.carbon.bam.data.publisher.util.PublisherUtil;
 import org.wso2.carbon.bam.message.tracer.handler.data.TracingInfo;
 import org.wso2.carbon.bam.message.tracer.handler.internal.MessageTracerServiceComponent;
 import org.wso2.carbon.base.ServerConfiguration;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AgentUtil {
 
     private static final String NAME = "Name";
+    public static final String TRANSPORT_HEADER = "transport-header-";
     private static String serverName = null;
-
-    public static void extractInfoFromHttpHeaders(TracingInfo eventData, Object requestProperty) {
-
-        if (requestProperty instanceof HttpServletRequest) {
-            HttpServletRequest httpServletRequest = (HttpServletRequest) requestProperty;
-            eventData.setRequestUrl(httpServletRequest.getRequestURL().toString());
-            eventData.setRemoteAddress(PublisherUtil.getHostAddress());
-            eventData.setContentType(httpServletRequest.getContentType());
-            eventData.setUserAgent(httpServletRequest.getHeader(
-                    BAMDataPublisherConstants.HTTP_HEADER_USER_AGENT));
-            eventData.setReferer(httpServletRequest.getHeader(
-                    BAMDataPublisherConstants.HTTP_HEADER_REFERER));
-        }
-    }
 
     public static String getServerName() {
         if (serverName == null) {
@@ -56,8 +42,27 @@ public class AgentUtil {
 
     public static boolean allowedServices(String serverName) {
         return MessageTracerConstants.SYNAPSE_SERVICE.equals(serverName) ||
-                MessageTracerConstants.MULTITENANT_SYNAPSE_SERVICE.equals(serverName) ||
-                MessageTracerServiceComponent.getMessageTracerConfiguration().
-                        getMessageTracingEnabledAdminServices().contains(serverName);
+               MessageTracerServiceComponent.getMessageTracerConfiguration().
+                       getMessageTracingEnabledAdminServices().contains(serverName);
+    }
+
+    public static void setTransportHeaders(TracingInfo tracingInfo,
+                                           Map<String, String> properties) {
+
+        if ((tracingInfo != null) && (properties != null)) {
+            Map<String, String> transportHeaders = new HashMap<String, String>(properties.size());
+            for (String headerName : properties.keySet()) {
+                String headerValue = properties.get(headerName);
+                if (headerValue != null) {
+                    transportHeaders.put(TRANSPORT_HEADER + headerName, properties.get(headerName));
+                }
+            }
+
+            if (tracingInfo.getAdditionalValues() != null) {
+                tracingInfo.getAdditionalValues().putAll(transportHeaders);
+            } else {
+                tracingInfo.setAdditionalValues(transportHeaders);
+            }
+        }
     }
 }
