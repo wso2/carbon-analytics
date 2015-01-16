@@ -27,13 +27,18 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.ChunkedDataInput;
 import org.wso2.carbon.analytics.datasource.core.ChunkedDataOutput;
 import org.wso2.carbon.analytics.datasource.core.ChunkedStream;
@@ -45,21 +50,85 @@ import org.wso2.carbon.analytics.datasource.rdbms.RDBMSUtils;
 /**
  * RDBMS {@link AnalyticsFileSystem} implementation.
  */
-public class RDBMSFileSystem implements AnalyticsFileSystem {
+public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
     
-    private final byte[] FS_EMPTY_DATA_CHUNK;
+    /** One time set empty data chunk value */
+    private byte[] FS_EMPTY_DATA_CHUNK;
     
     private QueryConfigurationEntry queryConfigurationEntry;
     
     private DataSource dataSource;
     
-    private static final Log log = LogFactory.getLog(RDBMSFileSystem.class);
-        
-    public RDBMSFileSystem(QueryConfigurationEntry queryConfigurationEntry, 
-            DataSource dataSource) throws IOException {
-        this.queryConfigurationEntry = queryConfigurationEntry;
-        this.dataSource = dataSource;
+    private static final Log log = LogFactory.getLog(RDBMSAnalyticsFileSystem.class);
+
+    @Override
+    public void init(Map<String, String> properties) throws AnalyticsException {
+        String dsName = properties.get(RDBMSAnalyticsDSConstants.DATASOURCE);
+        if (dsName == null) {
+            throw new AnalyticsException("The property '" + 
+                    RDBMSAnalyticsDSConstants.DATASOURCE + "' is required");
+        }
+        try {
+            this.dataSource = (DataSource) InitialContext.doLookup(dsName);
+        } catch (NamingException e) {
+            throw new AnalyticsException("Error in looking up data source: " + 
+                    e.getMessage(), e);
+        }
+        if (this.queryConfigurationEntry == null) {
+            this.queryConfigurationEntry = RDBMSUtils.lookupCurrentQueryConfigurationEntry(this.dataSource);
+        }
         this.FS_EMPTY_DATA_CHUNK = new byte[this.getQueryConfiguration().getFsDataChunkSize()];
+        /* create the system tables */
+        this.checkAndCreateSystemTables();
+    }
+    
+    public RDBMSAnalyticsFileSystem() {
+        this.queryConfigurationEntry = null;
+    }
+    
+    public RDBMSAnalyticsFileSystem(QueryConfigurationEntry queryConfigurationEntry) throws IOException {
+        this.queryConfigurationEntry = queryConfigurationEntry;
+    }
+    
+    private void checkAndCreateSystemTables() throws AnalyticsException {
+        Connection conn = null;
+        try {
+            conn = this.getConnection(false);
+            Statement stmt;
+            if (!this.checkSystemTables(conn)) {
+                for (String query : this.getFsTableInitSQLQueries()) {
+                    stmt = conn.createStatement();
+                    stmt.executeUpdate(query);
+                    stmt.close();
+                }
+            }
+            conn.commit();
+        } catch (SQLException e) {
+            RDBMSUtils.rollbackConnection(conn);
+            throw new AnalyticsException("Error in creating system tables: " + e.getMessage(), e);
+        } finally {
+            RDBMSUtils.cleanupConnection(null, null, conn);
+        }
+    }
+    
+    private boolean checkSystemTables(Connection conn) {
+        Statement stmt = null;
+        try {
+            stmt = conn.createStatement();
+            stmt.execute(this.getSystemTableCheckQuery());
+            return true;
+        } catch (SQLException ignore) {
+            RDBMSUtils.cleanupConnection(null, stmt, null);
+            return false;
+        }
+    }
+    
+    private String[] getFsTableInitSQLQueries() {
+        return this.getQueryConfiguration().getFsTableInitQueries();
+    }
+    
+    private String getSystemTableCheckQuery() {
+        return this.getQueryConfiguration().getFsTablesCheckQuery();
     }
     
     public QueryConfigurationEntry getQueryConfiguration() {
@@ -423,22 +492,22 @@ public class RDBMSFileSystem implements AnalyticsFileSystem {
 
         @Override
         public long length() {
-            return RDBMSFileSystem.this.length(this.getPath());
+            return RDBMSAnalyticsFileSystem.this.length(this.getPath());
         }
 
         @Override
         public DataChunk readChunk(long n) throws IOException {
-            return new DataChunk(n, RDBMSFileSystem.this.readChunkData(this.getPath(), n));
+            return new DataChunk(n, RDBMSAnalyticsFileSystem.this.readChunkData(this.getPath(), n));
         }
 
         @Override
         public void setLength(long length) throws IOException {
-            RDBMSFileSystem.this.setLength(this.getPath(), length);
+            RDBMSAnalyticsFileSystem.this.setLength(this.getPath(), length);
         }
 
         @Override
         public void writeChunks(List<DataChunk> chunks) throws IOException {
-            RDBMSFileSystem.this.writeChunks(this.getPath(), chunks);
+            RDBMSAnalyticsFileSystem.this.writeChunks(this.getPath(), chunks);
         }
         
     }
