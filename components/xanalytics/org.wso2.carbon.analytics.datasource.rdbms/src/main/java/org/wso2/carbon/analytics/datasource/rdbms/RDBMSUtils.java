@@ -30,6 +30,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.utils.CarbonUtils;
 
@@ -39,8 +40,6 @@ import org.wso2.carbon.utils.CarbonUtils;
 public class RDBMSUtils {
     
     private static final String RDBMS_QUERY_CONFIG_FILE = "rdbms-query-config.xml";
-
-    private static final String ANALYTICS_CONF_DIR = "analytics";
     
     public static String lookupDatabaseType(DataSource ds) throws AnalyticsException {
         Connection conn = null;
@@ -55,11 +54,11 @@ public class RDBMSUtils {
         }
     }
     
-    public static QueryConfigurationEntry lookupCurrentQueryConfigurationEntry(
+    public static RDBMSQueryConfigurationEntry lookupCurrentQueryConfigurationEntry(
             DataSource ds) throws AnalyticsException {
         String dbType = lookupDatabaseType(ds);
-        QueryConfiguration qcon = loadQueryConfiguration();
-        for (QueryConfigurationEntry entry : qcon.getDatabases()) {
+        RDBMSQueryConfiguration qcon = loadQueryConfiguration();
+        for (RDBMSQueryConfigurationEntry entry : qcon.getDatabases()) {
             if (entry.getDatabaseName().equalsIgnoreCase(dbType)) {
                 return entry;
             }
@@ -68,17 +67,17 @@ public class RDBMSUtils {
                 + "query configuration for the database: " + dbType);
     }
     
-    public static QueryConfiguration loadQueryConfiguration() throws AnalyticsException {
+    public static RDBMSQueryConfiguration loadQueryConfiguration() throws AnalyticsException {
         try {
             File confFile = new File(CarbonUtils.getCarbonConfigDirPath() + 
-                    File.separator + ANALYTICS_CONF_DIR + File.separator + RDBMS_QUERY_CONFIG_FILE);
+                    File.separator + AnalyticsDataSourceConstants.ANALYTICS_CONF_DIR + File.separator + RDBMS_QUERY_CONFIG_FILE);
             if (!confFile.exists()) {
                 throw new AnalyticsException("Cannot initalize RDBMS analytics data source, "
                         + "the query configuration file cannot be found at: " + confFile.getPath());
             }
-            JAXBContext ctx = JAXBContext.newInstance(QueryConfiguration.class);
+            JAXBContext ctx = JAXBContext.newInstance(RDBMSQueryConfiguration.class);
             Unmarshaller unmarshaller = ctx.createUnmarshaller();
-            return (QueryConfiguration) unmarshaller.unmarshal(confFile);
+            return (RDBMSQueryConfiguration) unmarshaller.unmarshal(confFile);
         } catch (JAXBException e) {
             throw new AnalyticsException(
                     "Error in processing RDBMS query configuration: " + e.getMessage(), e);

@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * This class represents the query configuration required to initialize a {@link RDBMSAnalyticsRecordStore}.
  */
 @XmlRootElement (name = "database")
-public class QueryConfigurationEntry {
+public class RDBMSQueryConfigurationEntry {
 
     private String databaseName;
     

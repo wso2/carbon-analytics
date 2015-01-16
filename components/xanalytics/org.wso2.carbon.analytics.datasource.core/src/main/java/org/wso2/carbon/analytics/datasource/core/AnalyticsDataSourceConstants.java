@@ -16,26 +16,13 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.rdbms;
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+package org.wso2.carbon.analytics.datasource.core;
 
 /**
- * This class contains all the RDBMS query configuration mappings.
+ * This class represents constants related to analytics data sources.
  */
-@XmlRootElement (name = "query-configuration")
-public class QueryConfiguration {
+public class AnalyticsDataSourceConstants {
 
-    private QueryConfigurationEntry[] databases;
-        
-    @XmlElement (name = "database")
-    public QueryConfigurationEntry[] getDatabases() {
-        return databases;
-    }
+    public static final String ANALYTICS_CONF_DIR = "analytics";
     
-    public void setDatabases(QueryConfigurationEntry[] databases) {
-        this.databases = databases;
-    }
-
 }

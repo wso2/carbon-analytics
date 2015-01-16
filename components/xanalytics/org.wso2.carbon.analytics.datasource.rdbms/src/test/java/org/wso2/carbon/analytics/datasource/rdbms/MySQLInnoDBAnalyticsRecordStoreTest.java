@@ -32,7 +32,7 @@ import org.testng.annotations.Parameters;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.rdbms.QueryConfigurationEntry;
+import org.wso2.carbon.analytics.datasource.rdbms.RDBMSQueryConfigurationEntry;
 import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore;
 
 /**
@@ -62,8 +62,8 @@ public class MySQLInnoDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTes
         new InitialContext().bind("DS", dsx);
     }
     
-    private QueryConfigurationEntry generateQueryConfiguration() {
-        QueryConfigurationEntry conf = new QueryConfigurationEntry();
+    private RDBMSQueryConfigurationEntry generateQueryConfiguration() {
+        RDBMSQueryConfigurationEntry conf = new RDBMSQueryConfigurationEntry();
         String[] recordTableInitQueries = new String[2];
         recordTableInitQueries[0] = "CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data BLOB, PRIMARY KEY(record_id))";
         recordTableInitQueries[1] = "CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}}(timestamp)";        

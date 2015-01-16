@@ -50,6 +50,8 @@ public abstract class DirectAnalyticsRecordStore implements AnalyticsRecordStore
      */
     public class DirectRecordGroup implements RecordGroup {
 
+        private static final long serialVersionUID = -1195668816256005842L;
+
         private static final String LOCALHOST = "127.0.0.1";
         
         private List<Record> records;

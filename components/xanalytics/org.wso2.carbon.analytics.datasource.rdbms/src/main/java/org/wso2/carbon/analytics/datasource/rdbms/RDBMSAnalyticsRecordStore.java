@@ -59,14 +59,14 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
     
     private Map<String, String> properties;
     
-    private QueryConfigurationEntry queryConfigurationEntry;
+    private RDBMSQueryConfigurationEntry rDBMSQueryConfigurationEntry;
     
     public RDBMSAnalyticsRecordStore() throws AnalyticsException {
-        this.queryConfigurationEntry = null;
+        this.rDBMSQueryConfigurationEntry = null;
     }
     
-    public RDBMSAnalyticsRecordStore(QueryConfigurationEntry queryConfigurationEntry) {
-        this.queryConfigurationEntry = queryConfigurationEntry;
+    public RDBMSAnalyticsRecordStore(RDBMSQueryConfigurationEntry rDBMSQueryConfigurationEntry) {
+        this.rDBMSQueryConfigurationEntry = rDBMSQueryConfigurationEntry;
     }
     
     @Override
@@ -84,13 +84,13 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
             throw new AnalyticsException("Error in looking up data source: " + 
                     e.getMessage(), e);
         }
-        if (this.queryConfigurationEntry == null) {
-            this.queryConfigurationEntry = RDBMSUtils.lookupCurrentQueryConfigurationEntry(this.dataSource);
+        if (this.rDBMSQueryConfigurationEntry == null) {
+            this.rDBMSQueryConfigurationEntry = RDBMSUtils.lookupCurrentQueryConfigurationEntry(this.dataSource);
         }
     }
     
-    public QueryConfigurationEntry getQueryConfiguration() {
-        return queryConfigurationEntry;
+    public RDBMSQueryConfigurationEntry getQueryConfiguration() {
+        return rDBMSQueryConfigurationEntry;
     }
     
     private String[] getRecordTableInitQueries(long tableCategoryId, String tableName) {

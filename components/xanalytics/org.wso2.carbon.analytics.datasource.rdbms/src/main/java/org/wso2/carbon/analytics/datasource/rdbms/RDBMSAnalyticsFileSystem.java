@@ -55,7 +55,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
     /** One time set empty data chunk value */
     private byte[] FS_EMPTY_DATA_CHUNK;
     
-    private QueryConfigurationEntry queryConfigurationEntry;
+    private RDBMSQueryConfigurationEntry rDBMSQueryConfigurationEntry;
     
     private DataSource dataSource;
     
@@ -74,8 +74,8 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
             throw new AnalyticsException("Error in looking up data source: " + 
                     e.getMessage(), e);
         }
-        if (this.queryConfigurationEntry == null) {
-            this.queryConfigurationEntry = RDBMSUtils.lookupCurrentQueryConfigurationEntry(this.dataSource);
+        if (this.rDBMSQueryConfigurationEntry == null) {
+            this.rDBMSQueryConfigurationEntry = RDBMSUtils.lookupCurrentQueryConfigurationEntry(this.dataSource);
         }
         this.FS_EMPTY_DATA_CHUNK = new byte[this.getQueryConfiguration().getFsDataChunkSize()];
         /* create the system tables */
@@ -83,11 +83,11 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
     }
     
     public RDBMSAnalyticsFileSystem() {
-        this.queryConfigurationEntry = null;
+        this.rDBMSQueryConfigurationEntry = null;
     }
     
-    public RDBMSAnalyticsFileSystem(QueryConfigurationEntry queryConfigurationEntry) throws IOException {
-        this.queryConfigurationEntry = queryConfigurationEntry;
+    public RDBMSAnalyticsFileSystem(RDBMSQueryConfigurationEntry rDBMSQueryConfigurationEntry) throws IOException {
+        this.rDBMSQueryConfigurationEntry = rDBMSQueryConfigurationEntry;
     }
     
     private void checkAndCreateSystemTables() throws AnalyticsException {
@@ -131,8 +131,8 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
         return this.getQueryConfiguration().getFsTablesCheckQuery();
     }
     
-    public QueryConfigurationEntry getQueryConfiguration() {
-        return queryConfigurationEntry;
+    public RDBMSQueryConfigurationEntry getQueryConfiguration() {
+        return rDBMSQueryConfigurationEntry;
     }
     
     public DataSource getDataSource() {
