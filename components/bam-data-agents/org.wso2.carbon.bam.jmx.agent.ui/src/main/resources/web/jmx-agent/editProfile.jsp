@@ -313,7 +313,7 @@ function saveProfile() {
                     childArray.push($(this).find("input").val());
                 }
                 //if this is the attribute name <td>
-                else if ($(this).attr('title') != '') {
+                else if (!(typeof $(this).attr('title') === 'undefined')) {
                     var data = $(this).attr('title');
                     //check whether it's compositeData
                     var splitData = data.split("______");
@@ -421,6 +421,25 @@ function setUpPage(dPReceiverConnectionTyp, dPSecureUrlConnectionType) {
 
 }
 
+jQuery(document).ready(function(){
+	
+	var cronValueArray = [];
+	
+	jQuery("#presetCronExpr option").each(function(){ //get each default values in the dropdown list
+		cronValueArray.push(jQuery(this).attr("value"));
+	});
+	
+	var cronExpr = "<%= profile.getCronExpression() %>";
+	
+	if(jQuery.inArray(cronExpr, cronValueArray) != -1){ //if the array contains the profile's cron Expr
+		jQuery("#presetCronExpr").val(cronExpr);
+	}else {
+		jQuery("#presetCronExpr").val("custom"); //else it should be a custom cron expr
+		changeCronType();
+		jQuery("#cronExprTxtInput").val(cronExpr);
+	}
+});
+
 </script>
 
 
@@ -515,9 +534,6 @@ function setUpPage(dPReceiverConnectionTyp, dPSecureUrlConnectionType) {
                     <option value="0/15 * * ? * *">once every 15 seconds (0/15 * * ? * *)</option>
                     <option value="custom">Custom</option>
                 </select>
-
-                <%--Display the current value--%>
-                Current selection is <%out.print(profile.getCronExpression());%>
             </div>
 
             <input name="cronExprTxtInput" style="display:none" type="text" id="cronExprTxtInput"
@@ -530,8 +546,6 @@ function setUpPage(dPReceiverConnectionTyp, dPSecureUrlConnectionType) {
 
         </td>
     </tr>
-
-
 </table>
 <%--</div>--%>
 <!-- sectionSub Div -->

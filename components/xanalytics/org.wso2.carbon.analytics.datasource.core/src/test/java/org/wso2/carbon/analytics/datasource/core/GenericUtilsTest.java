@@ -19,13 +19,13 @@
 package org.wso2.carbon.analytics.datasource.core;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.wso2.carbon.analytics.datasource.core.Record.Column;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 /**
@@ -34,72 +34,98 @@ import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 public class GenericUtilsTest {
     
     @Test
-    public void testEncodeDecodeNull() throws AnalyticsDataSourceException {
-        List<Column> values = new ArrayList<Record.Column>();
-        values.add(new Column("C1", null));
+    public void testEncodeDecodeNull() throws AnalyticsException {
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put("C1", null);
         byte[] data = GenericUtils.encodeRecordValues(values);
-        List<Column> valuesIn = GenericUtils.decodeRecordValues(data);
-        valuesIn = GenericUtils.decodeRecordValues(data);
-        Assert.assertEquals(new HashSet<Column>(values), new HashSet<Column>(valuesIn));
+        Map<String, Object> valuesIn = GenericUtils.decodeRecordValues(data, null);
+        valuesIn = GenericUtils.decodeRecordValues(data, null);
+        Assert.assertEquals(values, valuesIn);
     }
     
     @Test
-    public void testEncodeDecodeEmpty() throws AnalyticsDataSourceException {
-        List<Column> values = new ArrayList<Record.Column>();
+    public void testEncodeDecodeEmpty() throws AnalyticsException {
+        Map<String, Object> values = new HashMap<String, Object>();
         byte[] data = GenericUtils.encodeRecordValues(values);
-        List<Column> valuesIn = GenericUtils.decodeRecordValues(data);
-        valuesIn = GenericUtils.decodeRecordValues(data);
-        Assert.assertEquals(new HashSet<Column>(values), new HashSet<Column>(valuesIn));
+        Map<String, Object> valuesIn = GenericUtils.decodeRecordValues(data, null);
+        valuesIn = GenericUtils.decodeRecordValues(data, null);
+        Assert.assertEquals(values, valuesIn);
     }
     
-    @Test (expectedExceptions = AnalyticsDataSourceException.class)
-    public void testDecodeCorruptedData() throws AnalyticsDataSourceException {
+    @Test (expectedExceptions = AnalyticsException.class)
+    public void testDecodeCorruptedData() throws AnalyticsException {
         byte[] data = new byte[] { 54 };
-        GenericUtils.decodeRecordValues(data);
+        GenericUtils.decodeRecordValues(data, null);
     }
     
-    @Test (expectedExceptions = AnalyticsDataSourceException.class)
-    public void testEncodeInvalidValues() throws AnalyticsDataSourceException {
-        List<Column> values = new ArrayList<Record.Column>();
-        values.add(new Column("C1", new BigInteger("55353")));
-        GenericUtils.encodeColumnObject(values);
+    @Test (expectedExceptions = AnalyticsException.class)
+    public void testEncodeInvalidValues() throws AnalyticsException {
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put("C1", new BigInteger("55353"));
+        GenericUtils.encodeRecordValues(values);
     }
     
     @Test
-    public void testEncodeDecodeDataTypes() throws AnalyticsDataSourceException {
-        List<Column> values = new ArrayList<Record.Column>();
-        values.add(new Column("C1", "ABC"));
+    public void testEncodeDecodeDataTypes() throws AnalyticsException {
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put("C1", "ABC");
         byte[] data = GenericUtils.encodeRecordValues(values);
-        List<Column> valuesIn = GenericUtils.decodeRecordValues(data);
-        Assert.assertEquals(new HashSet<Column>(values), new HashSet<Column>(valuesIn));
-        values.add(new Column("C2", "ABC2"));
+        Map<String, Object> valuesIn = GenericUtils.decodeRecordValues(data, null);
+        Assert.assertEquals(values, valuesIn);
+        values.put("C2", "ABC2");
         data = GenericUtils.encodeRecordValues(values);
-        valuesIn = GenericUtils.decodeRecordValues(data);
-        Assert.assertEquals(new HashSet<Column>(values), new HashSet<Column>(valuesIn));
-        values.add(new Column("C3", 434));
-        values.add(new Column("C4", -5501));
-        values.add(new Column("C5", 4493855L));
-        values.add(new Column("C6", true));
-        values.add(new Column("C7", false));
-        values.add(new Column("C8", 445.6));
-        values.add(new Column("C9", 3.14f));
-        values.add(new Column("C10", null));
+        valuesIn = GenericUtils.decodeRecordValues(data, null);
+        Assert.assertEquals(values, valuesIn);
+        values.put("C3", 434);
+        values.put("C4", -5501);
+        values.put("C5", 4493855L);
+        values.put("C6", true);
+        values.put("C7", false);
+        values.put("C8", 445.6);
+        values.put("C9", 3.14f);
+        values.put("C10", null);
         data = GenericUtils.encodeRecordValues(values);
-        valuesIn = GenericUtils.decodeRecordValues(data);
-        Assert.assertEquals(new HashSet<Column>(values), new HashSet<Column>(valuesIn));
-        values.add(new Column("C11", "END"));
+        valuesIn = GenericUtils.decodeRecordValues(data, null);
+        Assert.assertEquals(values, valuesIn);
+        values.put("C11", "END");
         data = GenericUtils.encodeRecordValues(values);
-        valuesIn = GenericUtils.decodeRecordValues(data);
-        Assert.assertEquals(new HashSet<Column>(values), new HashSet<Column>(valuesIn));
+        valuesIn = GenericUtils.decodeRecordValues(data, null);
+        Assert.assertEquals(values, valuesIn);
     }
     
     @Test
-    public void testEncodeDecodeDataPerf() throws AnalyticsDataSourceException {
-        List<Column> cols = new ArrayList<Record.Column>();
+    public void testEncodeDecodeWithColumns() throws AnalyticsException {
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put("C1", "ABC");
+        values.put("C3", 434);
+        values.put("C4", -5501);
+        values.put("C5", 4493855L);
+        values.put("C6", true);
+        values.put("C7", false);
+        values.put("C8", 445.6);
+        values.put("C9", 3.14f);
+        values.put("C10", null);
+        byte[] data = GenericUtils.encodeRecordValues(values);
+        Set<String> columns = new HashSet<String>();
+        columns.add("C1");
+        columns.add("C5");
+        columns.add("C10");
+        Map<String, Object> valuesIn = GenericUtils.decodeRecordValues(data, columns);
+        Assert.assertEquals(valuesIn.size(), 3);
+        Set<String> columnsIn = new HashSet<String>();
+        for (String col : valuesIn.keySet()) {
+            columnsIn.add(col);
+        }
+        Assert.assertEquals(columns, columnsIn);
+    }
+    
+    @Test
+    public void testEncodeDecodeDataPerf() throws AnalyticsException {
+        Map<String, Object> cols = new HashMap<String, Object>();
         for (int i = 0; i < 4; i++) {
-            cols.add(new Column("Column S - " + i, "OIJFFOWIJ FWOIJF EQF OIJFOIEJF EOIJFOI:JWLIFJ :WOIFJ:OIJ:OXXCW @#$#@2342323 OIJFW"));
-            cols.add(new Column("Column I - " + i, (long) i));
-            cols.add(new Column("Column D - " + i, i + 0.535));
+            cols.put("Column S - " + i, "OIJFFOWIJ FWOIJF EQF OIJFOIEJF EOIJFOI:JWLIFJ :WOIFJ:OIJ:OXXCW @#$#@2342323 OIJFW");
+            cols.put("Column I - " + i, (long) i);
+            cols.put("Column D - " + i, i + 0.535);
         }
         long start = System.currentTimeMillis();
         int count = 100000;
@@ -111,7 +137,7 @@ public class GenericUtilsTest {
         System.out.println("Record Encode TPS: " + (count) / (double) (end - start) * 1000.0);
         start = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
-            GenericUtils.decodeRecordValues(data);
+            GenericUtils.decodeRecordValues(data, null);
         }
         end = System.currentTimeMillis();
         System.out.println("Record Decode TPS: " + (count) / (double) (end - start) * 1000.0);

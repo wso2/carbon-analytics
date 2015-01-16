@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
- ~ Copyright (c) 2009-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~ Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  ~
  ~ Licensed under the Apache License, Version 2.0 (the "License");
  ~ you may not use this file except in compliance with the License.
@@ -29,14 +29,15 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>analytics</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon X-Analytics Aggregator Module</name>
+    <name>WSO2 Carbon - Analytics Aggregator Module</name>
     <url>http://wso2.org</url>
 
     <modules>
         <module>org.wso2.carbon.analytics.datasource.core</module>
+        <module>org.wso2.carbon.analytics.datasource.core.test</module>
         <module>org.wso2.carbon.analytics.datasource.rdbms</module>
         <module>org.wso2.carbon.analytics.dataservice</module>
+        <module>org.wso2.carbon.analytics.dataservice.rest</module>
     </modules>
-
 
 </project>

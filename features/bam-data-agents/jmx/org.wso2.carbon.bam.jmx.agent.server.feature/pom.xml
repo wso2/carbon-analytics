@@ -73,8 +73,8 @@
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.data.publisher.util</bundleDef>
                             </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.databridge.agent.thrift.server:${wso2carbon.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.ntask.core:${wso2carbon.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.databridge.agent.thrift.server:${carbon.platform.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.ntask.core:${carbon.platform.version}</importFeatureDef>
                             </importFeatures>
                          </configuration>
                     </execution>

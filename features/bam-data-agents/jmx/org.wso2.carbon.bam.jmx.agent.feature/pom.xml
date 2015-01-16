@@ -64,11 +64,15 @@
                             <id>org.wso2.carbon.bam.jmx.agent</id>
                             <propertiesFile>../../../../etc/feature.properties</propertiesFile>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core:${wso2carbon.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core:${carbon.platform.version}</importFeatureDef>
                             </importFeatures>
                             <includedFeatures>
-                                <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.bam.jmx.agent.server.feature:${wso2carbon.version}</includedFeatureDef>
-                                <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.bam.jmx.agent.ui.feature:${wso2carbon.version}</includedFeatureDef>
+                                <includedFeatureDef>
+                                    org.wso2.carbon:org.wso2.carbon.bam.jmx.agent.server.feature:${project.version}
+                                </includedFeatureDef>
+                                <includedFeatureDef>
+                                    org.wso2.carbon:org.wso2.carbon.bam.jmx.agent.ui.feature:${project.version}
+                                </includedFeatureDef>
                             </includedFeatures>
                         </configuration>
                     </execution>

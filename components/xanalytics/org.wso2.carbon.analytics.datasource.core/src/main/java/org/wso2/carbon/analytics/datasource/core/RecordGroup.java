@@ -28,15 +28,15 @@ public interface RecordGroup {
     /**
      * Returns all the locations this record group is situation at.
      * @return The list of hosts
-     * @throws AnalyticsDataSourceException
+     * @throws AnalyticsException
      */
-    String[] getLocations() throws AnalyticsDataSourceException;
+    String[] getLocations() throws AnalyticsException;
     
     /**
      * Reads in all the records this record group represents.
      * @return A list of {@link Record} objects
-     * @throws AnalyticsDataSourceException
+     * @throws AnalyticsException
      */
-    List<Record> getRecords() throws AnalyticsDataSourceException;
+    List<Record> getRecords() throws AnalyticsException;
     
 }

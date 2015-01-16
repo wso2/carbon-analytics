@@ -18,11 +18,8 @@
  */
 package org.wso2.carbon.analytics.datasource.core;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * Base class for chucked data stream implementations.
@@ -53,66 +50,52 @@ public abstract class ChunkedStream {
      * buffer size, as mentioned in the chunk size of the stream. 
      * @param n The 0 based index of the chunk
      * @return The the data chunk that was read
-     * @throws AnalyticsDataSourceException
+     * @throws IOException
      */
-    public abstract DataChunk readChunk(long n) throws AnalyticsDataSourceException;
+    public abstract DataChunk readChunk(long n) throws IOException;
     
-    public DataChunk readChunkForPosition(long position) throws AnalyticsDataSourceException {
+    public DataChunk readChunkForPosition(long position) throws IOException {
         return this.readChunk(this.getChunkNumber(position));
     }
     
     public DataChunk createEmptyChunk(long n) {
-        return new DataChunk(n, new byte[this.getChunkSize()], false);
+        return new DataChunk(n, new byte[this.getChunkSize()]);
     }
     
     /**
      * Writes the given data chunks target stream.
      * @param data The chunk data
-     * @throws AnalyticsDataSourceException
+     * @throws IOException
      */
-    public abstract void writeChunks(List<DataChunk> chunks) throws AnalyticsDataSourceException;
+    public abstract void writeChunks(List<DataChunk> chunks) throws IOException;
     
     /**
      * Returns the length of the current stream.
      * @return The stream length
-     * @throws AnalyticsDataSourceException
      */
-    public abstract long length() throws AnalyticsDataSourceException;
+    public abstract long length();
     
     /**
      * Sets the length of the current stream.
      * @param length The stream length
-     * @throws AnalyticsDataSourceException
+     * @throws IOException
      */
-    public abstract void setLength(long length) throws AnalyticsDataSourceException;
+    public abstract void setLength(long length) throws IOException;
     
     /**
      * Represents a data chunk.
      */
     public class DataChunk {
         
-        private static final int MODIFICATION_BEGIN = 1;
-        
-        private static final int MODIFICATION_END = 2;
-        
         private long chunkNumber;
         
         private byte[] data;
         
-        private boolean whole;
-        
-        private SortedMap<Integer, Integer> modificationEvents = new TreeMap<Integer, Integer>();
-        
         public DataChunk(long chunkNumber, byte[] data) {
-            this(chunkNumber, data, true);
-        }
-        
-        public DataChunk(long chunkNumber, byte[] data, boolean whole) {
             this.chunkNumber = chunkNumber;
             this.data = data;
-            this.whole = whole;
         }
-
+        
         public long getChunkNumber() {
             return chunkNumber;
         }
@@ -121,46 +104,8 @@ public abstract class ChunkedStream {
             return data;
         }
 
-        public boolean isWhole() {
-            return whole;
-        }
-        
-        public void setWhole(boolean whole) {
-            this.whole = whole;
-        }
-        
         public boolean containsPosition(long position) {
             return ChunkedStream.this.getChunkNumber(position) == this.getChunkNumber();
-        }
-        
-        public void markModified(int position, int length) {
-            this.modificationEvents.put(position, MODIFICATION_BEGIN);
-            this.modificationEvents.put(position + length, MODIFICATION_END);
-        }
-        
-        public List<int[]> calculateMissingDataSections() {
-            List<int[]> result = new ArrayList<int[]>();
-            int beginCount = 0;
-            int lastEmptyLocation = 0;
-            for (Map.Entry<Integer, Integer> entry : this.modificationEvents.entrySet()) {
-                if (entry.getValue() == MODIFICATION_BEGIN) {
-                    if (beginCount == 0) {
-                        if (entry.getKey() > lastEmptyLocation) {
-                            result.add(new int[] { lastEmptyLocation, entry.getKey() });
-                        }
-                    }
-                    beginCount++;
-                } else if (entry.getValue() == MODIFICATION_END) {
-                    beginCount--;
-                    if (beginCount == 0) {
-                        lastEmptyLocation = entry.getKey();
-                    }
-                }
-            }
-            if (lastEmptyLocation < this.getData().length) {
-                result.add(new int[] { lastEmptyLocation, this.getData().length });
-            }
-            return result;
         }
         
     }

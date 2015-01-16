@@ -111,7 +111,7 @@ public class Publisher {
                     LoadBalancingDataPublisher loadBalancingDataPublisher = eventPublisherConfig.getLoadBalancingDataPublisher();
 
                     loadBalancingDataPublisher.publish(streamDef.getName(), streamDef.getVersion(), getObjectArray(metaData), getObjectArray(correlationData),
-                                                       getObjectArray(payLoadData));
+                                                       getObjectArray(payLoadData), tracingInfo.getAdditionalValues());
                     if (log.isDebugEnabled()) {
                         log.debug("Successfully published data.");
                     }
@@ -149,7 +149,7 @@ public class Publisher {
 
                     asyncDataPublisher.publish(streamDef.getName(), streamDef.getVersion(), getObjectArray(metaData),
                                                getObjectArray(correlationData),
-                                               getObjectArray(payLoadData));
+                                               getObjectArray(payLoadData), tracingInfo.getAdditionalValues());
                     if (log.isDebugEnabled()) {
                         log.debug("Successfully published data.");
                     }
@@ -179,11 +179,7 @@ public class Publisher {
 
         List<Object> metaData = new ArrayList<Object>(7);
         metaData.add(tracingInfo.getRequestUrl());
-        metaData.add(tracingInfo.getRemoteAddress());
-        metaData.add(tracingInfo.getContentType());
-        metaData.add(tracingInfo.getUserAgent());
         metaData.add(tracingInfo.getHost());
-        metaData.add(tracingInfo.getReferer());
         metaData.add(tracingInfo.getServer());
 
         return metaData;

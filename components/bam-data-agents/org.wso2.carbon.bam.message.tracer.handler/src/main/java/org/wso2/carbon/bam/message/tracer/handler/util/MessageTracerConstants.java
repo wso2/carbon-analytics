@@ -55,4 +55,6 @@ public class MessageTracerConstants {
     public static final String STATUS_FAULT = "fault";
 
     public static final String STATUS_SUCCESS = "success";
+
+    public static final String TRANSPORT_IN_URL = "TransportInURL";
 }

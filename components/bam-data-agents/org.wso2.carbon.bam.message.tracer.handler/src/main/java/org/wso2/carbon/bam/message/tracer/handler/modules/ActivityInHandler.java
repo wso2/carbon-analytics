@@ -19,13 +19,13 @@ import org.apache.axiom.om.OMException;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
+import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.HandlerDescription;
 import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.handlers.AbstractHandler;
-import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.bam.data.publisher.util.BAMDataPublisherConstants;
@@ -40,6 +40,7 @@ import org.wso2.carbon.bam.message.tracer.handler.util.TenantEventConfigData;
 import org.wso2.carbon.core.util.SystemFilter;
 
 import java.lang.reflect.Method;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -100,8 +101,7 @@ public class ActivityInHandler extends AbstractHandler {
                             }
                         }
                     } else {
-                        ((Map) messageContext.getProperty(MessageContext.TRANSPORT_HEADERS)).
-                                put(MessageTracerConstants.ACTIVITY_ID, activityUUID);
+                        ((Map) transportHeaders).put(MessageTracerConstants.ACTIVITY_ID, activityUUID);
                         if (log.isDebugEnabled()) {
                             log.debug("Propagated AID was null, IN generating new AID");
                         }
@@ -124,14 +124,9 @@ public class ActivityInHandler extends AbstractHandler {
                 tracingInfo.setHost(PublisherUtil.getHostAddress());
                 tracingInfo.setServiceName(messageContext.getAxisService().getName());
                 tracingInfo.setOperationName(messageContext.getAxisOperation().getName().getLocalPart());
+                tracingInfo.setRequestUrl(String.valueOf(messageContext.getProperty(MessageTracerConstants.TRANSPORT_IN_URL)));
 
-                MessageContext inMessageContext = messageContext.getOperationContext().getMessageContext(
-                        WSDL2Constants.MESSAGE_LABEL_IN);
-                if (inMessageContext != null) {
-                    Object requestProperty = inMessageContext.getProperty(
-                            HTTPConstants.MC_HTTP_SERVLETREQUEST);
-                    AgentUtil.extractInfoFromHttpHeaders(tracingInfo, requestProperty);
-                }
+                AgentUtil.setTransportHeaders(tracingInfo, (Map<String, String>) messageContext.getProperty(MessageContext.TRANSPORT_HEADERS));
 
                 try {
                     if (eventingConfigData.isDumpBodyEnable()) {
@@ -146,6 +141,22 @@ public class ActivityInHandler extends AbstractHandler {
                             throw new AxisFault("Error in building input message: " + e.getMessage(), e);
                         }
                         SOAPEnvelope soapEnvelope = messageContext.getEnvelope();
+						if (soapEnvelope.getHeader() != null) {
+							Iterator headerBlocks = soapEnvelope.getHeader()
+									.getHeadersToProcess(null);
+							while (headerBlocks.hasNext()) {
+								SOAPHeaderBlock headerBlock = (SOAPHeaderBlock) headerBlocks
+										.next();
+								// if this header block mustUnderstand but has
+								// not been processed
+								// then mark it as processed to get the message
+								// in to Synapse
+								if (!headerBlock.isProcessed()
+										&& headerBlock.getMustUnderstand()) {
+									headerBlock.setProcessed();
+								}
+							}
+						}                      
                         SOAPBody body = soapEnvelope.getBody();
                         if (body != null) {
                             tracingInfo.setPayload(body.toString());
@@ -178,4 +189,6 @@ public class ActivityInHandler extends AbstractHandler {
         }
         return InvocationResponse.CONTINUE;
     }
+
+
 }
