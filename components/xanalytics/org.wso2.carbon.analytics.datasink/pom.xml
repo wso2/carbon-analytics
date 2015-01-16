@@ -29,7 +29,7 @@
     <groupId>org.wso2.carbon</groupId>
     <artifactId>org.wso2.carbon.analytics.datasink</artifactId>
     <packaging>bundle</packaging>
-    <name>WSO2 Analytics Datasink Module</name>
+    <name>WSO2 Carbon - Analytics Datasink Module</name>
     <url>http://wso2.org</url>
 
     <dependencies>
