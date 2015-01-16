@@ -19,8 +19,6 @@
 package org.wso2.carbon.analytics.datasource.rdbms;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
 import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -38,31 +36,18 @@ import java.util.Set;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSource;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsTableNotAvailableException;
-import org.wso2.carbon.analytics.datasource.core.DirectAnalyticsDataSource;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem;
+import org.wso2.carbon.analytics.datasource.core.DirectAnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
-import org.wso2.carbon.utils.CarbonUtils;
 
 /**
- * Abstract RDBMS database backed implementation of {@link AnalyticsDataSource}.
+ * Abstract RDBMS database backed implementation of {@link AnalyticsRecordStore}.
  */
-public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
-
-    private static final String RDBMS_QUERY_CONFIG_FILE = "rdbms-query-config.xml";
-
-    private static final String ANALYTICS_CONF_DIR = "analytics";
-
-    private static final Log log = LogFactory.getLog(RDBMSAnalyticsDataSource.class);
+public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
     
     private static final String ANALYTICS_USER_TABLE_PREFIX = "ANX";
 
@@ -76,10 +61,11 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     
     private QueryConfigurationEntry queryConfigurationEntry;
     
-    public RDBMSAnalyticsDataSource() throws AnalyticsException {
+    public RDBMSAnalyticsRecordStore() throws AnalyticsException {
+        this.queryConfigurationEntry = null;
     }
     
-    public RDBMSAnalyticsDataSource(QueryConfigurationEntry queryConfigurationEntry) {
+    public RDBMSAnalyticsRecordStore(QueryConfigurationEntry queryConfigurationEntry) {
         this.queryConfigurationEntry = queryConfigurationEntry;
     }
     
@@ -99,100 +85,12 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
                     e.getMessage(), e);
         }
         if (this.queryConfigurationEntry == null) {
-            this.queryConfigurationEntry = lookupCurrentQueryConfigurationEntry();
+            this.queryConfigurationEntry = RDBMSUtils.lookupCurrentQueryConfigurationEntry(this.dataSource);
         }
-        /* create the system tables */
-        this.checkAndCreateSystemTables();
-    }
-    
-    private String lookupDatabaseType() throws AnalyticsException {
-        Connection conn = null;
-        try {
-            conn = this.getConnection();
-            DatabaseMetaData dmd = conn.getMetaData();
-            return dmd.getDatabaseProductName();
-        } catch (SQLException e) {
-            throw new AnalyticsException("Error in looking up database type: " + e.getMessage(), e);
-        } finally {
-            RDBMSUtils.cleanupConnection(null, null, conn);
-        }
-    }
-    
-    private QueryConfiguration loadQueryConfiguration() throws AnalyticsException {
-        try {
-            File confFile = new File(CarbonUtils.getCarbonConfigDirPath() + 
-                    File.separator + ANALYTICS_CONF_DIR + File.separator + RDBMS_QUERY_CONFIG_FILE);
-            if (!confFile.exists()) {
-                throw new AnalyticsException("Cannot initalize RDBMS analytics data source, "
-                        + "the query configuration file cannot be found at: " + confFile.getPath());
-            }
-            JAXBContext ctx = JAXBContext.newInstance(QueryConfiguration.class);
-            Unmarshaller unmarshaller = ctx.createUnmarshaller();
-            return (QueryConfiguration) unmarshaller.unmarshal(confFile);
-        } catch (JAXBException e) {
-            throw new AnalyticsException(
-                    "Error in processing RDBMS query configuration: " + e.getMessage(), e);
-        }
-    }
-    
-    private QueryConfigurationEntry lookupCurrentQueryConfigurationEntry() throws AnalyticsException {
-        String dbType = this.lookupDatabaseType();
-        if (log.isDebugEnabled()) {
-            log.debug("Loaded RDBMS Analytics Database Type: " + dbType);
-        }
-        QueryConfiguration qcon = this.loadQueryConfiguration();
-        for (QueryConfigurationEntry entry : qcon.getDatabases()) {
-            if (entry.getDatabaseName().equalsIgnoreCase(dbType)) {
-                return entry;
-            }
-        }
-        throw new AnalyticsException("Cannot find a database section in the RDBMS "
-                + "query configuration for the database: " + dbType);
     }
     
     public QueryConfigurationEntry getQueryConfiguration() {
         return queryConfigurationEntry;
-    }
-
-    private void checkAndCreateSystemTables() throws AnalyticsException {
-        Connection conn = null;
-        try {
-            conn = this.getConnection(false);
-            Statement stmt;
-            if (!this.checkSystemTables(conn)) {
-            	for (String query : this.getFsTableInitSQLQueries()) {
-            		stmt = conn.createStatement();
-            		stmt.executeUpdate(query);
-            		stmt.close();
-            	}
-            }
-            conn.commit();
-        } catch (SQLException e) {
-        	RDBMSUtils.rollbackConnection(conn);
-            throw new AnalyticsException("Error in creating system tables: " + e.getMessage(), e);
-        } finally {
-            RDBMSUtils.cleanupConnection(null, null, conn);
-        }
-    }
-    
-    private boolean checkSystemTables(Connection conn) {
-    	Statement stmt = null;
-    	try {
-    		stmt = conn.createStatement();
-    		stmt.execute(this.getSystemTableCheckQuery());
-    		return true;
-    	} catch (SQLException ignore) {
-    		RDBMSUtils.cleanupConnection(null, stmt, null);
-    		return false;
-    	}
-    }
-    
-    private String[] getFsTableInitSQLQueries() {
-    	return this.getQueryConfiguration().getFsTableInitQueries();
-    }
-    
-    private String getSystemTableCheckQuery() {
-    	return this.getQueryConfiguration().getFsTablesCheckQuery();
     }
     
     private String[] getRecordTableInitQueries(long tableCategoryId, String tableName) {
@@ -522,7 +420,7 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
     }
     
     private String generateTablePrefix(long tableCategoryId) {
-        return RDBMSAnalyticsDataSource.ANALYTICS_USER_TABLE_PREFIX + "_" + tableCategoryId + "_";
+        return RDBMSAnalyticsRecordStore.ANALYTICS_USER_TABLE_PREFIX + "_" + tableCategoryId + "_";
     }
     
     private String generateTargetTableName(long tableCategoryId, String tableName) {
@@ -592,11 +490,6 @@ public class RDBMSAnalyticsDataSource extends DirectAnalyticsDataSource {
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
-    }
-
-    @Override
-    public AnalyticsFileSystem getFileSystem() throws IOException {
-        return new RDBMSFileSystem(this.getQueryConfiguration(), this.getDataSource());
     }
     
     @Override

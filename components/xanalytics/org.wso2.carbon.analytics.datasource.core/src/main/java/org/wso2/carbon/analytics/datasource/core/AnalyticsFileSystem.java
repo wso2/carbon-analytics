@@ -21,6 +21,7 @@ package org.wso2.carbon.analytics.datasource.core;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a virtual file system data operations, the path values can either terminate with "/" or not,
@@ -28,6 +29,13 @@ import java.util.List;
  */
 public interface AnalyticsFileSystem {
 
+    /**
+     * This method initializes the AnalyticsFileSystem implementation, and is called once before any other method.
+     * @param properties The properties associated with this analytics file system
+     * @throws AnalyticsException
+     */
+    void init(Map<String, String> properties) throws AnalyticsException;
+    
     /**
      * Checks if the file already exists.
      * @param path The location of the file
