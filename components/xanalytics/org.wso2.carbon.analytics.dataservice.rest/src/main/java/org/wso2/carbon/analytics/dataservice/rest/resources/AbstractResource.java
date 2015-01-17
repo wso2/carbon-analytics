@@ -21,7 +21,6 @@ import org.wso2.carbon.analytics.dataservice.rest.beans.ResponseBean;
 import javax.ws.rs.core.Response;
 
 public abstract class AbstractResource {
-
     public Response handleResponse(ResponseStatus responseStatus, String message) {
         Response response;
         switch (responseStatus) {

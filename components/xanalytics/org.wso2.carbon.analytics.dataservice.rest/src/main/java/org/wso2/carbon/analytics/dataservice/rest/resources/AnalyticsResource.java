@@ -47,7 +47,7 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.RecordGroup;
 
-@Path("/analytics")
+@Path("/")
 @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 @Produces(MediaType.APPLICATION_JSON)
 public class AnalyticsResource  extends AbstractResource {
@@ -55,7 +55,6 @@ public class AnalyticsResource  extends AbstractResource {
 	AnalyticsDataService analyticsDataService;
 	
 	public AnalyticsResource() throws AnalyticsRESTException{
-		
 		analyticsDataService = Utils.getAnalyticsDataService();
 		if(analyticsDataService == null) {
 			throw new AnalyticsRESTException("AnalyticsRESTException occurred. AnalyticsDataService is null");

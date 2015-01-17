@@ -53,7 +53,7 @@
 				<version>2.2</version>
 				<configuration>
 					<webXml>${basedir}/src/main/webapp/WEB-INF/web.xml</webXml>
-					<warName>analytics-rest</warName>
+					<warName>analytics</warName>
 				</configuration>
 			</plugin>
 			<plugin>

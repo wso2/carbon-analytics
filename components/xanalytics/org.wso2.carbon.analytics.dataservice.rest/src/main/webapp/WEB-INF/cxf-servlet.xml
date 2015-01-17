@@ -4,7 +4,7 @@
        xmlns:jaxrs="http://cxf.apache.org/jaxrs"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
 
-    <jaxrs:server id="analyticsServices" address="/rest">
+    <jaxrs:server id="analyticsServices" address="/">
         <jaxrs:serviceBeans>
             <ref bean="analyticsBean"/>
         </jaxrs:serviceBeans>
