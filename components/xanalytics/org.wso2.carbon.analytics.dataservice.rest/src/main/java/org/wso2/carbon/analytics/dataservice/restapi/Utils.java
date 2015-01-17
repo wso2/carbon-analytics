@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.analytics.dataservice.rest;
+package org.wso2.carbon.analytics.dataservice.restapi;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,44 +25,70 @@ import java.util.Set;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.indexing.IndexType;
 import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
-import org.wso2.carbon.analytics.dataservice.rest.beans.IndexTypeBean;
-import org.wso2.carbon.analytics.dataservice.rest.beans.RecordBean;
-import org.wso2.carbon.analytics.dataservice.rest.beans.RecordGroupBean;
-import org.wso2.carbon.analytics.dataservice.rest.beans.SearchResultEntryBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.IndexTypeBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordGroupBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.SearchResultEntryBean;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.RecordGroup;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 
+/**
+ * The Class Utils.
+ */
 public class Utils {
 
+	/**
+	 * Instantiates a new Utils class.
+	 */
 	private Utils() {
 
 	}
 
+	/**
+	 * Gets the analytics data service.
+	 * @return the analytics data service
+	 */
 	public static AnalyticsDataService getAnalyticsDataService() {
 		return (AnalyticsDataService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
 		                                                     .getOSGiService(AnalyticsDataService.class,
 		                                                                     null);
 	}
 
+	/**
+	 * Gets the record from record bean.
+	 * @param recordBean
+	 *            the record bean
+	 * @return the record from record bean
+	 */
 	public static Record getRecordFromRecordBean(RecordBean recordBean) {
-
 		Record record =
 		                new Record(recordBean.getTenantId(), recordBean.getTableName(),
 		                           recordBean.getValues(), recordBean.getTimestamp());
 		return record;
 	}
 
+	/**
+	 * Gets the records from record beans.
+	 * @param recordBeans
+	 *            the record beans
+	 * @return the records from record beans
+	 */
 	public static List<Record> getRecordsFromRecordBeans(List<RecordBean> recordBeans) {
-
 		List<Record> records = new ArrayList<Record>();
-		for ( RecordBean recordBean : recordBeans) {
+		for (RecordBean recordBean : recordBeans) {
 			records.add(getRecordFromRecordBean(recordBean));
 		}
 		return records;
 	}
 
+	/**
+	 * Creates the record bean from record.
+	 * @param record
+	 *            the record
+	 * @return the record bean
+	 */
 	public static RecordBean createRecordBeanFromRecord(Record record) {
 		RecordBean recordBean = new RecordBean();
 		recordBean.setId(record.getId());
@@ -73,8 +99,16 @@ public class Utils {
 		return recordBean;
 	}
 
+	/**
+	 * Creates the record group bean from record group.
+	 * @param recordGroup
+	 *            the record group
+	 * @return the record group bean
+	 * @throws AnalyticsException
+	 *             the analytics exception
+	 */
 	public static RecordGroupBean createRecordGroupBeanFromRecordGroup(RecordGroup recordGroup)
-	                                                         throws AnalyticsException {
+	                                                                                           throws AnalyticsException {
 		RecordGroupBean recordGroupBean = new RecordGroupBean();
 		recordGroupBean.setLocations(recordGroup.getLocations());
 		List<Record> recordList = recordGroup.getRecords();
@@ -86,22 +120,42 @@ public class Utils {
 		return recordGroupBean;
 	}
 
-	public static List<RecordGroupBean> createRecordGroupBeansFromRecordGroups ( RecordGroup[] recordGroups) 
-			throws AnalyticsException {
+	/**
+	 * Creates the record group beans from record groups.
+	 * @param recordGroups
+	 *            the record groups
+	 * @return the list
+	 * @throws AnalyticsException
+	 *             the analytics exception
+	 */
+	public static List<RecordGroupBean> createRecordGroupBeansFromRecordGroups(RecordGroup[] recordGroups)
+	                                           throws AnalyticsException {
 		List<RecordGroupBean> recordGroupBeans = new ArrayList<RecordGroupBean>();
-		for ( RecordGroup recordGroup : recordGroups) {
+		for (RecordGroup recordGroup : recordGroups) {
 			recordGroupBeans.add(createRecordGroupBeanFromRecordGroup(recordGroup));
 		}
 		return recordGroupBeans;
 	}
-	public static SearchResultEntryBean createSearchResultBeanFromSearchResult(SearchResultEntry 
-	                                                                           searchResultEntry) {
+
+	/**
+	 * Creates the search result bean from search result.
+	 * @param searchResultEntry
+	 *            the search result entry
+	 * @return the search result entry bean
+	 */
+	public static SearchResultEntryBean createSearchResultBeanFromSearchResult(SearchResultEntry searchResultEntry) {
 		SearchResultEntryBean searchResultEntryBean = new SearchResultEntryBean();
 		searchResultEntryBean.setId(searchResultEntry.getId());
 		searchResultEntryBean.setScore(searchResultEntry.getScore());
 		return searchResultEntryBean;
 	}
 
+	/**
+	 * Creates the search result beans from search results.
+	 * @param searchResults
+	 *            the search results
+	 * @return the list
+	 */
 	public static List<SearchResultEntryBean> createSearchResultBeansFromSearchResults(List<SearchResultEntry> searchResults) {
 		List<SearchResultEntryBean> searchResultBeanList = new ArrayList<SearchResultEntryBean>();
 		for (SearchResultEntry searchResult : searchResults) {
@@ -110,7 +164,13 @@ public class Utils {
 		return searchResultBeanList;
 	}
 
-	public static IndexTypeBean createIndexTypeBeanFromIndexType( IndexType indexType) {
+	/**
+	 * Creates the index type bean from index type.
+	 * @param indexType
+	 *            the index type
+	 * @return the index type bean
+	 */
+	public static IndexTypeBean createIndexTypeBeanFromIndexType(IndexType indexType) {
 		switch (indexType) {
 			case BOOLEAN:
 				return IndexTypeBean.BOOLEAN;
@@ -125,11 +185,17 @@ public class Utils {
 			case STRING:
 				return IndexTypeBean.STRING;
 			default:
-				return IndexTypeBean.STRING;	
+				return IndexTypeBean.STRING;
 		}
 	}
-	
-	public static IndexType createIndexTypeFromIndexTypeBean( IndexTypeBean indexTypeBean) {
+
+	/**
+	 * Creates the index type from index type bean.
+	 * @param indexTypeBean
+	 *            the index type bean
+	 * @return the index type
+	 */
+	public static IndexType createIndexTypeFromIndexTypeBean(IndexTypeBean indexTypeBean) {
 		switch (indexTypeBean) {
 			case BOOLEAN:
 				return IndexType.BOOLEAN;
@@ -144,30 +210,48 @@ public class Utils {
 			case STRING:
 				return IndexType.STRING;
 			default:
-				return IndexType.STRING;	
+				return IndexType.STRING;
 		}
 	}
-	
-	public static Map<String, IndexTypeBean> createIndexTypeBeanMapFronIndexTypeMap(Map<String, 
-	                                                                                IndexType> indexTypeMap) {
+
+	/**
+	 * Creates the index type bean map fron index type map.
+	 * @param indexTypeMap
+	 *            the index type map
+	 * @return the map
+	 */
+	public static Map<String, IndexTypeBean> createIndexTypeBeanMapFronIndexTypeMap(Map<String, IndexType> indexTypeMap) {
 		Map<String, IndexTypeBean> indexTypeBeanMap = new HashMap<String, IndexTypeBean>();
 		Set<String> columns = indexTypeMap.keySet();
-		for(String column : columns) {
+		for (String column : columns) {
 			indexTypeBeanMap.put(column, createIndexTypeBeanFromIndexType(indexTypeMap.get(column)));
 		}
 		return indexTypeBeanMap;
 	}
-	
-	public static Map<String, IndexType> createIndexTypeMapFronIndexTypeBeanMap(Map<String, 
-	                                                                                IndexTypeBean> indexTypeBeanMap) {
+
+	/**
+	 * Creates the index type map from index type bean map.
+	 * @param indexTypeBeanMap
+	 *            the index type bean map
+	 * @return the map
+	 */
+	public static Map<String, IndexType> createIndexTypeMapFronIndexTypeBeanMap(Map<String, IndexTypeBean> indexTypeBeanMap) {
 		Map<String, IndexType> indexTypeMap = new HashMap<String, IndexType>();
 		Set<String> columns = indexTypeBeanMap.keySet();
-		for(String column : columns) {
+		for (String column : columns) {
 			indexTypeMap.put(column, createIndexTypeFromIndexTypeBean(indexTypeBeanMap.get(column)));
 		}
 		return indexTypeMap;
 	}
-	
+
+	/**
+	 * Gets the complete error message.
+	 * @param msg
+	 *            the Message
+	 * @param e
+	 *            the exception
+	 * @return the complete error message
+	 */
 	public static String getCompleteErrorMessage(String msg, Exception e) {
 		String message = null;
 		if (e.getCause() != null) {
