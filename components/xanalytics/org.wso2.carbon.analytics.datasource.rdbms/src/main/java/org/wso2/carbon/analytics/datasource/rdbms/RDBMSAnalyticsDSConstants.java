@@ -18,8 +18,6 @@
  */
 package org.wso2.carbon.analytics.datasource.rdbms;
 
-import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSource;
-
 /**
  * Constants related to RDBMS based {@link AnalyticsDataSource}s.
  */

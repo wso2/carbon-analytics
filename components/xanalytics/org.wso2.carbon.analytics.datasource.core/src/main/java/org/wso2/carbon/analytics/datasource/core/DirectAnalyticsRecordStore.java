@@ -21,9 +21,9 @@ package org.wso2.carbon.analytics.datasource.core;
 import java.util.List;
 
 /**
- * Analytics data source implementation without data locality semantics. 
+ * Analytics record source implementation without data locality semantics. 
  */
-public abstract class DirectAnalyticsDataSource implements AnalyticsDataSource {
+public abstract class DirectAnalyticsRecordStore implements AnalyticsRecordStore {
     
     public RecordGroup[] get(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo, int recordsFrom, 
             int recordsCount) throws AnalyticsException {

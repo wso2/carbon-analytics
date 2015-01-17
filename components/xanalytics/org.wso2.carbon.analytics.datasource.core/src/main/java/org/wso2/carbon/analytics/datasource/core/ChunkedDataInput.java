@@ -24,7 +24,7 @@ import org.wso2.carbon.analytics.datasource.core.ChunkedStream.DataChunk;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem.DataInput;
 
 /**
- * Chucked data input implementation.
+ * Chuncked data input implementation.
  */
 public class ChunkedDataInput implements DataInput {
         

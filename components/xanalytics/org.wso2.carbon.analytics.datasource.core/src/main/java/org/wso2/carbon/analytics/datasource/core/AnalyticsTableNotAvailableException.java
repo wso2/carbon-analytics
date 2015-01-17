@@ -25,20 +25,22 @@ public class AnalyticsTableNotAvailableException extends AnalyticsException {
 
     private static final long serialVersionUID = -3197293684263626136L;
     
-    private long tableCategoryId;
+    private int tenantId;
     
     private String tableName;
 
-    public AnalyticsTableNotAvailableException(long tableCategoryId, String tableName) {
-        super("[" + tableCategoryId + ":" + tableName + "] does not exist");
+    public AnalyticsTableNotAvailableException(int tenantId, String tableName) {
+        this(tenantId, tableName, null);
     }
     
-    public AnalyticsTableNotAvailableException(long tableCategoryId, String tableName, Throwable cause) {
-        super("[" + tableCategoryId + ":" + tableName + "] does not exist", cause);
+    public AnalyticsTableNotAvailableException(int tenantId, String tableName, Throwable cause) {
+        super("[" + tenantId + ":" + tableName + "] does not exist", cause);
+        this.tenantId = tenantId;
+        this.tableName = tableName;
     }
     
-    public long getTableCategoryId() {
-        return tableCategoryId;
+    public long getTenantId() {
+        return tenantId;
     }
     
     public String getTableName() {
