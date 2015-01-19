@@ -93,20 +93,20 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         return rDBMSQueryConfigurationEntry;
     }
     
-    private String[] getRecordTableInitQueries(long tableCategoryId, String tableName) {
+    private String[] getRecordTableInitQueries(int tenantId, String tableName) {
         String[] queries = this.getQueryConfiguration().getRecordTableInitQueries();
         String[] result = new String[queries.length];
         for (int i = 0; i < queries.length; i++) {
-            result[i] = this.translateQueryWithTableInfo(queries[i], tableCategoryId, tableName);
+            result[i] = this.translateQueryWithTableInfo(queries[i], tenantId, tableName);
         }
         return result;
     }
     
-    private String[] getRecordTableDeleteQueries(long tableCategoryId, String tableName) {
+    private String[] getRecordTableDeleteQueries(int tenantId, String tableName) {
         String[] queries = this.getQueryConfiguration().getRecordTableDeleteQueries();
         String[] result = new String[queries.length];
         for (int i = 0; i < queries.length; i++) {
-            result[i] = this.translateQueryWithTableInfo(queries[i], tableCategoryId, tableName);
+            result[i] = this.translateQueryWithTableInfo(queries[i], tenantId, tableName);
         }
         return result;
     }
@@ -223,9 +223,9 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         }
     }
     
-    private String getRecordInsertSQL(long tableCategoryId, String tableName) {
+    private String getRecordInsertSQL(int tenantId, String tableName) {
     	String query = this.getQueryConfiguration().getRecordInsertQuery();
-    	return translateQueryWithTableInfo(query, tableCategoryId, tableName);
+    	return translateQueryWithTableInfo(query, tenantId, tableName);
     }
 
     @Override
@@ -419,37 +419,41 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         }
     }
     
-    private String generateTablePrefix(long tableCategoryId) {
-        return RDBMSAnalyticsRecordStore.ANALYTICS_USER_TABLE_PREFIX + "_" + tableCategoryId + "_";
+    private String generateTablePrefix(int tenantId) {
+        if (tenantId < 0) {
+            return RDBMSAnalyticsRecordStore.ANALYTICS_USER_TABLE_PREFIX + "_X" + Math.abs(tenantId) + "_";
+        } else {
+            return RDBMSAnalyticsRecordStore.ANALYTICS_USER_TABLE_PREFIX + "_" + tenantId + "_";
+        }
     }
     
-    private String generateTargetTableName(long tableCategoryId, String tableName) {
-        return this.normalizeTableName(this.generateTablePrefix(tableCategoryId) + tableName);
+    private String generateTargetTableName(int tenantId, String tableName) {
+        return this.normalizeTableName(this.generateTablePrefix(tenantId) + tableName);
     }
     
-    private String translateQueryWithTableInfo(String query, long tableCategoryId, String tableName) {
-        return query.replace(TABLE_NAME_PLACEHOLDER, this.generateTargetTableName(tableCategoryId, tableName));
+    private String translateQueryWithTableInfo(String query, int tenantId, String tableName) {
+        return query.replace(TABLE_NAME_PLACEHOLDER, this.generateTargetTableName(tenantId, tableName));
     }
     
     private String translateQueryWithRecordIdsInfo(String query, int recordCount) {
         return query.replace(RECORD_IDS_PLACEHOLDER, this.getDynamicSQLParams(recordCount));
     }
     
-    private String getRecordRetrievalQuery(long tableCategoryId, String tableName) {
+    private String getRecordRetrievalQuery(int tenantId, String tableName) {
         String query = this.getQueryConfiguration().getRecordRetrievalQuery();
-        return this.translateQueryWithTableInfo(query, tableCategoryId, tableName);
+        return this.translateQueryWithTableInfo(query, tenantId, tableName);
     }
     
-    private String generateGetRecordRetrievalWithIdQuery(long tableCategoryId, String tableName, int recordCount) {
+    private String generateGetRecordRetrievalWithIdQuery(int tenantId, String tableName, int recordCount) {
         String query = this.getQueryConfiguration().getRecordRetrievalWithIdsQuery();
-        query = this.translateQueryWithTableInfo(query, tableCategoryId, tableName);
+        query = this.translateQueryWithTableInfo(query, tenantId, tableName);
         query = this.translateQueryWithRecordIdsInfo(query, recordCount);
         return query;
     }
     
-    private String generateRecordDeletionRecordsWithIdsQuery(long tableCategoryId, String tableName, int recordCount) {
+    private String generateRecordDeletionRecordsWithIdsQuery(int tenantId, String tableName, int recordCount) {
         String query = this.getQueryConfiguration().getRecordDeletionWithIdsQuery();
-        query = this.translateQueryWithTableInfo(query, tableCategoryId, tableName);
+        query = this.translateQueryWithTableInfo(query, tenantId, tableName);
         query = this.translateQueryWithRecordIdsInfo(query, recordCount);
         return query;
     }
@@ -466,9 +470,9 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         return builder.toString();
     }
     
-    private String getRecordDeletionQuery(long tableCategoryId, String tableName) {
+    private String getRecordDeletionQuery(int tenantId, String tableName) {
         String query = this.getQueryConfiguration().getRecordDeletionQuery();
-        return this.translateQueryWithTableInfo(query, tableCategoryId, tableName);
+        return this.translateQueryWithTableInfo(query, tenantId, tableName);
     }
 
     @Override
@@ -583,13 +587,13 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         }
     }
 
-    private String getRecordCountQuery(long tableCategoryId, String tableName) {
+    private String getRecordCountQuery(int tenantId, String tableName) {
         String query = this.getQueryConfiguration().getRecordCountQuery();
-        return this.translateQueryWithTableInfo(query, tableCategoryId, tableName);
+        return this.translateQueryWithTableInfo(query, tenantId, tableName);
     }
     
-    private String printableTableName(long tableCategoryId, String tableName) {
-        return "[" + tableCategoryId + ":" + tableName + "]";
+    private String printableTableName(int tenantId, String tableName) {
+        return "[" + tenantId + ":" + tableName + "]";
     }
     
     @Override
