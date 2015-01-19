@@ -85,7 +85,7 @@ public class RDBMSQueryConfigurationEntry {
         this.databaseName = databaseName;
     }
     
-    @XmlAttribute (name = "name")
+    @XmlAttribute (name = "name", required = true)
     public String getDatabaseName() {
         return databaseName;
     }

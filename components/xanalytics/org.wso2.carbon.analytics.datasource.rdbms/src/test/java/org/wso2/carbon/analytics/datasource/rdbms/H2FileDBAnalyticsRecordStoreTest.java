@@ -67,6 +67,7 @@ public class H2FileDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
         pps.setUrl(url);
         pps.setUsername(username);
         pps.setPassword(password);
+        pps.setDefaultAutoCommit(false);
         DataSource dsx = new DataSource(pps);
         new InitialContext().bind("DS", dsx);
     }

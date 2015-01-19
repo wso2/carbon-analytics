@@ -426,6 +426,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
                 stmt = conn.prepareStatement(this.getQueryConfiguration().getFsWriteDataChunkQuery());
                 this.populateStatementWithDataChunk(stmt, path, chunk);
                 stmt.execute();
+                conn.commit();
             } catch (SQLException e) {
                 /* maybe the chunk is already there, lets try the update */
                 try {
@@ -437,6 +438,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
                     stmt = conn.prepareStatement(query);
                     this.populateStatementWithDataChunkUpdate(stmt, path, chunk);
                     stmt.execute();
+                    conn.commit();
                 } catch (SQLException e1) {
                     throw new IOException("Error in updating data chunk: " + e1.getMessage(), e1);
                 }

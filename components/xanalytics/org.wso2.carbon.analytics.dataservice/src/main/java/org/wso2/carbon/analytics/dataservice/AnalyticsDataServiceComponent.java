@@ -31,11 +31,14 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfiguration;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.utils.CarbonUtils;
 
 /**
  * This class represents the analytics data service declarative services component.
  * @scr.component name="analytics.component" immediate="true"
+ * @scr.reference name="registry.service" interface="org.wso2.carbon.registry.core.service.RegistryService"
+ * cardinality="1..1" policy="dynamic"  bind="setRegistryService" unbind="unsetRegistryService"
  */
 public class AnalyticsDataServiceComponent {
     
@@ -76,6 +79,13 @@ public class AnalyticsDataServiceComponent {
             throw new AnalyticsException(
                     "Error in processing analytics data service configuration: " + e.getMessage(), e);
         }
+    }
+    
+    protected void setRegistryService(RegistryService registryService) {
+        /* just to make sure this component is initialized later after data sources are available */
+    }
+
+    protected void unsetRegistryService(RegistryService registryService) {
     }
 
 }
