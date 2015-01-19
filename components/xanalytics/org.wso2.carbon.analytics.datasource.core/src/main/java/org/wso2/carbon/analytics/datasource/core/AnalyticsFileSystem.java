@@ -93,8 +93,9 @@ public interface AnalyticsFileSystem {
      * Returns the length of the given file.
      * @param path The path of the file
      * @return The size of the file in bytes
+     * @throws IOException
      */
-    long length(String path);
+    long length(String path) throws IOException;
     
     /**
      * Represents file data stream reading operations.
@@ -134,8 +135,9 @@ public interface AnalyticsFileSystem {
          * Creates a copy of the current data input object, with its copy having an
          * independent data pointer.
          * @return The cloned {@link DataInput} object
+         * @throws IOException
          */
-        DataInput makeCopy();
+        DataInput makeCopy() throws IOException;
         
     }
     

@@ -36,7 +36,7 @@ public class ChunkedDataInput implements DataInput {
     
     private long length;
     
-    public ChunkedDataInput(ChunkedStream stream) {
+    public ChunkedDataInput(ChunkedStream stream) throws IOException {
         this.stream = stream;
         this.length = this.stream.length();
     }
@@ -97,7 +97,7 @@ public class ChunkedDataInput implements DataInput {
     }
 
     @Override
-    public DataInput makeCopy() {
+    public DataInput makeCopy() throws IOException {
         ChunkedDataInput in = new ChunkedDataInput(this.stream);
         in.seek(this.position);
         return in;

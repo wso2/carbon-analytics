@@ -299,14 +299,14 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
     }
 
     @Override
-    public long length(String path) {
+    public long length(String path) throws IOException {
         path = GenericUtils.normalizePath(path);
         Connection conn = null;
         try {
             conn = this.getConnection();
             return this.lengthImpl(conn, path);
         } catch (SQLException e) {
-            throw new RuntimeException("Error in file length: " + e.getMessage(), e);
+            throw new IOException("Error in file length: " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
@@ -479,7 +479,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
         
         private String path;
         
-        public RDBMSDataStream(String path) {
+        public RDBMSDataStream(String path) throws IOException {
             super(getQueryConfiguration().getFsDataChunkSize());
             this.path = path;
         }
@@ -493,7 +493,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
         }
 
         @Override
-        public long length() {
+        public long length() throws IOException {
             return RDBMSAnalyticsFileSystem.this.length(this.getPath());
         }
 

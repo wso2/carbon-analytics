@@ -72,8 +72,9 @@ public abstract class ChunkedStream {
     /**
      * Returns the length of the current stream.
      * @return The stream length
+     * @throws IOException
      */
-    public abstract long length();
+    public abstract long length() throws IOException;
     
     /**
      * Sets the length of the current stream.
