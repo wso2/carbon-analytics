@@ -40,21 +40,6 @@ public class AnalyticsDataServiceImplDummy implements Serializable {
 
     private AnalyticsDataIndexer indexer;
 
-//    public AnalyticsDataServiceImplDummy(AnalyticsDataSource analyticsDataSource) throws AnalyticsException {
-//        this.analyticsDataSource = analyticsDataSource;
-//        FileSystem fileSystem;
-//        try {
-//            fileSystem = this.analyticsDataSource.getFileSystem();
-//        } catch (IOException e) {
-//            throw new AnalyticsException("Error in creating file system: " + e.getMessage(), e);
-//        }
-//        this.indexer = new AnalyticsDataIndexer(fileSystem);
-//    }
-//
-//    public AnalyticsDataServiceImplDummy(AnalyticsDataServiceConfiguration config) {
-//    }
-
-
     public AnalyticsDataIndexer getIndexer() {
         return indexer;
     }
@@ -121,56 +106,22 @@ public class AnalyticsDataServiceImplDummy implements Serializable {
     public void delete(int tenantId, String tableName, long timeFrom, long timeTo)
             throws AnalyticsException,
             AnalyticsTableNotAvailableException {
-//        this.getIndexer().delete(tenantId, tableName, timeFrom, timeTo);
-//        this.getAnalyticsDataSource().delete(tenantId, tableName, timeFrom, timeTo);
     }
 
 
     public void delete(int tenantId, String tableName, List<String> ids) throws AnalyticsException,
             AnalyticsTableNotAvailableException {
-//        this.getIndexer().delete(tenantId, tableName, ids);
-//        this.getAnalyticsDataSource().delete(tenantId, tableName, ids);
     }
-
-
-//    public void setIndices(int tenantId, String tableName, Map<String, IndexType> columns)
-//            throws AnalyticsIndexException {
-////        this.getIndexer().setIndices(tenantId, tableName, columns);
-//    }
-//
-//
-//    public List<SearchResultEntry> search(int tenantId, String tableName, String language,
-//                                          String query,
-//                                          int start, int count) throws AnalyticsIndexException {
-//        return this.getIndexer().search(tenantId, tableName, language, query, start, count);
-//    }
-//
-//
-//    public Map<String, IndexType> getIndices(int tenantId, String tableName)
-//            throws AnalyticsIndexException {
-//        return this.getIndexer().lookupIndices(tenantId, tableName);
-//    }
-//
-//
-//    public void clearIndices(int tenantId, String tableName) throws AnalyticsIndexException {
-////        this.getIndexer().clearIndices(tenantId, tableName);
-//    }
-
 
     public void destroy() throws AnalyticsException {
 //        this.indexer.close();
     }
 
     private RecordGroup[] createRecordGroups() {
-//        ArrayList<RecordGroup> recordGroupsArr = new ArrayList<RecordGroup>();
         RecordGroup[] recordGroups = new RecordGroup[3];
-
         for (int i = 0; i < 3; i++) {
-//            recordGroupsArr.add(new DummyRecordGroup(Integer.toString(i)));
             recordGroups[i] = new DummyRecordGroup(Integer.toString(i));
         }
-
-//        return (RecordGroup[]) recordGroupsArr.toArray();
         return recordGroups;
     }
 
