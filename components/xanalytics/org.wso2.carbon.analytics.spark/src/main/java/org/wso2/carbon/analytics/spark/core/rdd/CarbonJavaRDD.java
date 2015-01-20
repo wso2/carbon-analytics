@@ -27,7 +27,6 @@ import scala.reflect.ClassTag;
  */
 public class CarbonJavaRDD extends JavaRDD {
 
-
     public CarbonJavaRDD(RDD rdd, ClassTag classTag) {
         super(rdd, classTag);
     }

@@ -56,41 +56,5 @@ public class SparkTest {
             System.out.println(row.toString());
         }
 
-
-//        System.out.println("=== Data source: RDD ===");
-//        // Load a text file and convert each line to a Java Bean.
-//        JavaRDD<Person> people = ctx.textFile("org.wso2.carbon.analytics.spark.test/src/main/resources/people.txt").map(
-//                new Function<String, Person>() {
-//                    @Override
-//                    public Person call(String line) {
-//                        String[] parts = line.split(",");
-//
-//                        Person person = new Person();
-//                        person.setName(parts[0]);
-//                        person.setAge(Integer.parseInt(parts[1].trim()));
-//
-//                        return person;
-//                    }
-//                });
-//
-//        // Apply a schema to an RDD of Java Beans and register it as a table.
-//        JavaSchemaRDD schemaPeople = sqlCtx.applySchema(people, Person.class);
-//        schemaPeople.registerTempTable("people");
-//
-//        // SQL can be run over RDDs that have been registered as tables.
-//        JavaSchemaRDD teenagers = sqlCtx.sql("SELECT name FROM people WHERE age >= 13 AND age <= 19");
-//
-//        // The results of SQL queries are SchemaRDDs and support all the normal RDD operations.
-//        // The columns of a row in the result can be accessed by ordinal.
-//        List<String> teenagerNames = teenagers.map(new Function<Row, String>() {
-//            @Override
-//            public String call(Row row) {
-//                return "Name: " + row.getString(0);
-//            }
-//        }).collect();
-//        for (String name : teenagerNames) {
-//            System.out.println(name);
-//        }
-
     }
 }
