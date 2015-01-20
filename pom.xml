@@ -16,6 +16,7 @@
         <module>features/bam-data-agents</module>
         <module>features/analytics-core</module>
         <module>features/analytics-datasources</module>
+        <module>features/analytics-rest</module>
     </modules>
 
     <dependencyManagement>
