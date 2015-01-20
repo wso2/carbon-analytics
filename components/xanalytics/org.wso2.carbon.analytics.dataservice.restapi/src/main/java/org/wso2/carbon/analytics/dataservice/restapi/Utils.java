@@ -69,12 +69,11 @@ public class Utils {
 	 * @param recordBean
 	 *            the record bean
 	 * @return the record from record bean
-	 * @throws AnalyticsException 
 	 */
-	public static Record getRecordFromRecordBean(RecordBean recordBean) throws AnalyticsException {
+	public static Record getRecordFromRecordBean(RecordBean recordBean) {
 		Record record =
 		                new Record(recordBean.getTenantId(), recordBean.getTableName(),
-		                           recordBean.getValues(), Utils.getTimeStampFromString(recordBean.getTimestamp()));
+		                           recordBean.getValues(), recordBean.getTimestamp());
 		return record;
 	}
 
@@ -83,9 +82,8 @@ public class Utils {
 	 * @param recordBeans
 	 *            the record beans
 	 * @return the records from record beans
-	 * @throws AnalyticsException 
 	 */
-	public static List<Record> getRecordsFromRecordBeans(List<RecordBean> recordBeans) throws AnalyticsException {
+	public static List<Record> getRecordsFromRecordBeans(List<RecordBean> recordBeans) {
 		List<Record> records = new ArrayList<Record>();
 		for (RecordBean recordBean : recordBeans) {
 			records.add(getRecordFromRecordBean(recordBean));
@@ -113,13 +111,11 @@ public class Utils {
 	 * @return the record bean
 	 */
 	public static RecordBean createRecordBeanFromRecord(Record record) {
-		Date timeStamp = new Date(record.getTimestamp());
-		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		RecordBean recordBean = new RecordBean();
 		recordBean.setId(record.getId());
 		recordBean.setTableName(record.getTableName());
 		recordBean.setTenantId(record.getTenantId());
-		recordBean.setTimestamp(dateFormatter.format(timeStamp));
+		recordBean.setTimestamp(record.getTimestamp());
 		recordBean.setValues(record.getValues());
 		return recordBean;
 	}

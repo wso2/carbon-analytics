@@ -43,7 +43,7 @@ public class RecordBean {
 
 	/** The timestamp. */
 	@XmlElement(required = true)
-	private String timestamp;
+	private long timestamp;
 
 	/** The id. */
 	@XmlElement(required = true)
@@ -84,7 +84,7 @@ public class RecordBean {
 	 * @param timestamp
 	 *            the new timestamp
 	 */
-	public void setTimestamp(String timestamp) {
+	public void setTimestamp(long timestamp) {
 		this.timestamp = timestamp;
 	}
 
@@ -143,7 +143,7 @@ public class RecordBean {
 	 * Gets the timestamp.
 	 * @return the timestamp
 	 */
-	public String getTimestamp() {
+	public long getTimestamp() {
 		return timestamp;
 	}
 

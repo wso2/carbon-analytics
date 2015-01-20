@@ -45,6 +45,7 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.RecordGroup;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class AnalyticsResource represents the REST APIs for AnalyticsDataService.
  */
@@ -73,7 +74,8 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Creates the table.
-	 * @param queryBean the query bean
+	 *
+	 * @param tableName the table name
 	 * @return the response
 	 */
 	@POST
@@ -102,7 +104,6 @@ public class AnalyticsResource extends AbstractResource {
 	/**
 	 * Checks if a table exist.
 	 *
-	 * @param tenantId the tenant id
 	 * @param tableName the table name
 	 * @return the response
 	 */
@@ -127,7 +128,8 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Delete table.
-	 * @param queryBean the query bean
+	 *
+	 * @param tableName the table name
 	 * @return the response
 	 */
 	@DELETE
@@ -154,8 +156,8 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Delete records.
+	 *
 	 * @param tableName the table name
-	 * @param tenantId the tenant id
 	 * @param timeFrom the time from
 	 * @param timeTo the time to
 	 * @param ids the ids
@@ -164,8 +166,8 @@ public class AnalyticsResource extends AbstractResource {
 	@DELETE
 	@Path("records/{tableName}/{timeFrom}/{timeTo}")
 	public Response deleteRecords(@PathParam("tableName") String tableName,
-	                              @PathParam("timeFrom") String timeFrom,
-	                              @PathParam("timeTo") String timeTo,
+	                              @PathParam("timeFrom") long timeFrom,
+	                              @PathParam("timeTo") long timeTo,
 	                              List<String> ids) {
 		int tenantId = -1234;
 		long lTimeFrom;
@@ -176,9 +178,7 @@ public class AnalyticsResource extends AbstractResource {
 		}
 		try {
 			if (ids == null) {
-				lTimeFrom = Utils.getTimeStampFromString(timeFrom);
-				lTimeTo = Utils.getTimeStampFromString(timeTo);
-				analyticsDataService.delete(tenantId, tableName, lTimeFrom, lTimeTo);
+				analyticsDataService.delete(tenantId, tableName, timeFrom, timeTo);
 			} else {
 				analyticsDataService.delete(tenantId, tableName, ids);
 			}
@@ -197,7 +197,8 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * List all the tables.
-	 * @param tenantId the tenant id
+	 *
+	 * @param tenantI the tenant i
 	 * @return the response
 	 */
 	@GET
@@ -220,8 +221,9 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Gets the record count.
+	 *
 	 * @param tableName the table name
-	 * @param tenantId the tenant id
+	 * @param tenantI the tenant i
 	 * @return the record count
 	 */
 	@GET
@@ -248,10 +250,8 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Gets the records.
+	 *
 	 * @param tableName the table name
-	 * @param tenantId the tenant id
-	 * @param columns the columns
-	 * @param ids the ids
 	 * @param timeFrom the start time
 	 * @param timeTo the end time
 	 * @param recordsFrom the starting record
@@ -261,23 +261,19 @@ public class AnalyticsResource extends AbstractResource {
 	@GET
 	@Path("records/{tableName}/{from}/{to}/{start}/{count}")
 	public Response getRecords(@PathParam("tableName") String tableName,
-	                                @PathParam("from") String timeFrom,
-	                                @PathParam("to") String timeTo,
+	                                @PathParam("from") long timeFrom,
+	                                @PathParam("to") long timeTo,
 	                                @PathParam("start") int recordsFrom,
 	                                @PathParam("count") int count) {
 		int tenantId = -1234;
-		long lTimeFrom;
-		long lTimeTo;
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking getRecordGroups for tableName: " + tableName + " tenantId :" +
 			             tenantId);
 		}
 		try {
-			lTimeFrom = Utils.getTimeStampFromString(timeFrom);
-			lTimeTo = Utils.getTimeStampFromString(timeTo);
 			RecordGroup[] recordGroups;
-			recordGroups = analyticsDataService.get(tenantId, tableName, null, lTimeFrom,
-				                                        lTimeTo, recordsFrom, count);
+			recordGroups = analyticsDataService.get(tenantId, tableName, null, timeFrom,
+				                                        timeTo, recordsFrom, count);
 			List<RecordBean> recordBeans = Utils.getAllRecordBeansFromRecordGroups(recordGroups);
 			return Response.ok(recordBeans).build();
 		} catch (AnalyticsException e) {
@@ -289,11 +285,27 @@ public class AnalyticsResource extends AbstractResource {
 			return handleResponse(ResponseStatus.FAILED, message);
 		}
 	}
+	
+	/**
+	 * Gets the records.
+	 * @param tableName the table name
+	 * @param timeFrom the time from
+	 * @param timeTo the time to
+	 * @return the records
+	 */
+	@GET
+	@Path("records/{tableName}/{from}/{to}")
+	public Response getRecords(@PathParam("tableName") String tableName,
+	                           @PathParam("from") long timeFrom, @PathParam("to") long timeTo) {
+		return getRecords(tableName, timeFrom, timeTo, 0, -1);
+	}
 
 	/**
 	 * Gets the records, But this is a POST request, since we have to send ids in the content.
+	 *
 	 * @param tableName the table name
 	 * @param ids the ids
+	 * @return the records by ids
 	 */
 	@POST
 	@Path("records/{tableName}")
@@ -367,8 +379,9 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Sets the indices.
+	 *
 	 * @param tableName the table name
-	 * @param tenantId the tenant id
+	 * @param tenantI the tenant i
 	 * @param columnsBean the columns bean containing all the indices
 	 * @return the response
 	 */
@@ -400,8 +413,9 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Gets the indices.
+	 *
 	 * @param tableName the table name
-	 * @param tenantId the tenant id
+	 * @param tenantI the tenant i
 	 * @return the indices
 	 */
 	@GET
@@ -430,8 +444,9 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Clear indices.
+	 *
 	 * @param tableName the table name
-	 * @param tenantId the tenant id
+	 * @param tenantI the tenant i
 	 * @return the response
 	 */
 	@DELETE
@@ -459,7 +474,8 @@ public class AnalyticsResource extends AbstractResource {
 	}
 
 	/**
-	 * Search records
+	 * Search records.
+	 *
 	 * @param queryBean the query bean
 	 * @return the response
 	 */
