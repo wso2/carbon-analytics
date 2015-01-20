@@ -33,7 +33,7 @@ import java.util.List;
 public class SparkTest {
 
     public static void main(String[] args) {
-        SparkConf sparkConf = new SparkConf().setMaster("local").setAppName("JavaSparkSQL");
+        SparkConf sparkConf = new SparkConf().setMaster("local[4]").setAppName("JavaSparkSQL");
         JavaSparkContext ctx = new JavaSparkContext(sparkConf);
         JavaSQLContext sqlCtx = new JavaSQLContext(ctx);
 
@@ -42,17 +42,24 @@ public class SparkTest {
 
         tableRDD.printSchema();
         System.out.println("count: " + tableRDD.count());
-        List<Row> result = sqlCtx.sql("SELECT * from table1").collect();
-        for (Row row : result) {
+        List<Row> result0 = sqlCtx.sql("SELECT * from table1").collect();
+        for (Row row : result0) {
             System.out.println(row.toString());
         }
 
-
-        JavaSchemaRDD resultRDD = sqlCtx.sql("SELECT * from table1 where age > 20"); //where last_name = 'bishop'
+        JavaSchemaRDD resultRDD = sqlCtx.sql("SELECT age from table1"); //where last_name = 'bishop'
         resultRDD.printSchema();
         System.out.println("result count: " + resultRDD.count());
         List<Row> result1 = resultRDD.collect();
         for (Row row : result1) {
+            System.out.println(row.toString());
+        }
+
+        JavaSchemaRDD resultRDD2 = sqlCtx.sql("SELECT * from table1 where age > 20"); //where last_name = 'bishop'
+        resultRDD2.printSchema();
+        System.out.println("result count: " + resultRDD.count());
+        List<Row> result2 = resultRDD2.collect();
+        for (Row row : result2) {
             System.out.println(row.toString());
         }
 

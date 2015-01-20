@@ -18,8 +18,6 @@
 
 package org.wso2.carbon.analytics.dataservice.dummy;
 
-import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsDataIndexer;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSource;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.Record;
@@ -35,19 +33,6 @@ import java.util.Map;
  * Created by niranda on 1/7/15.
  */
 public class AnalyticsDataServiceImplDummy implements Serializable {
-
-    private AnalyticsDataSource analyticsDataSource;
-
-    private AnalyticsDataIndexer indexer;
-
-    public AnalyticsDataIndexer getIndexer() {
-        return indexer;
-    }
-
-    public AnalyticsDataSource getAnalyticsDataSource() {
-        return analyticsDataSource;
-    }
-
 
     public void createTable(int tenantId, String tableName) throws AnalyticsException {
     }
