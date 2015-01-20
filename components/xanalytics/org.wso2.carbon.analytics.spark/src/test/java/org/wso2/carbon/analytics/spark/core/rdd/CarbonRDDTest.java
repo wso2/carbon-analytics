@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.analytics.spark.core.rdd;
 
-import org.apache.spark.Partition;
 import org.junit.Test;
 
 public class CarbonRDDTest {
@@ -30,10 +29,5 @@ public class CarbonRDDTest {
 
     @Test
     public void testGetPartitions() throws Exception {
-        CarbonRDD rdd = new CarbonRDD(null, null);
-
-        Partition[] parts = rdd.getPartitions();
-
-        System.out.println(parts[0].index());
     }
 }
