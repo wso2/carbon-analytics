@@ -16,12 +16,17 @@
 
 package org.wso2.carbon.analytics.dataservice.restapi;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.indexing.IndexType;
 import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
@@ -34,6 +39,9 @@ import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.RecordGroup;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 
+import com.hazelcast.logging.Logger;
+
+// TODO: Auto-generated Javadoc
 /**
  * The Class Utils.
  */
@@ -81,6 +89,19 @@ public class Utils {
 			records.add(getRecordFromRecordBean(recordBean));
 		}
 		return records;
+	}
+	
+	/**
+	 * Creates the record beans from records.
+	 * @param records the records
+	 * @return the list of recordBeans
+	 */
+	public static List<RecordBean> createRecordBeansFromRecords(List<Record> records) {
+		List<RecordBean> recordBeans = new ArrayList<RecordBean>();
+		for(Record record : records) {
+			recordBeans.add(createRecordBeanFromRecord(record));
+		}
+		return recordBeans;
 	}
 
 	/**
@@ -243,6 +264,35 @@ public class Utils {
 		}
 		return indexTypeMap;
 	}
+	
+	/**
+	 * Gets the all record beans from record groups.
+	 *
+	 * @param recordGroups the record groups
+	 * @return the all record beans from record groups
+	 * @throws AnalyticsException the analytics exception
+	 */
+	public static List<RecordBean> getAllRecordBeansFromRecordGroups(RecordGroup[] recordGroups) 
+			throws AnalyticsException {
+		List<RecordBean> recordBeans = new ArrayList<RecordBean>();
+		for ( RecordGroup recordGroup : recordGroups) {
+			recordBeans.addAll(createRecordBeansFromRecords(recordGroup.getRecords()));
+		}
+		return recordBeans;
+	}
+	
+	/**
+	 * Gets the record ids from search results.
+	 * @param searchResults the search results
+	 * @return the record ids from search results
+	 */
+	public static List<String> getRecordIdsFromSearchResults(List<SearchResultEntry> searchResults) {
+		List<String> ids = new ArrayList<String>();
+		for(SearchResultEntry searchResult : searchResults) {
+			ids.add(searchResult.getId());
+		}
+		return ids;
+	}
 
 	/**
 	 * Gets the complete error message.
@@ -263,5 +313,23 @@ public class Utils {
 			message = msg.replace("Tenant ID cannot be -1", "Tenant domain is invalid");
 		}
 		return message;
+	}
+	
+	/**
+	 * Gets the time stamp from string.
+	 *
+	 * @param stringTimeStamp the string time stamp
+	 * @return the time stamp from string
+	 * @throws AnalyticsException the analytics exception
+	 */
+	public static long getTimeStampFromString(String stringTimeStamp) throws AnalyticsException{
+		SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.TIMESTAMP_PATTERN);
+	    Date parsedDate;
+        try {
+	        parsedDate = dateFormat.parse(stringTimeStamp);
+	        return parsedDate.getTime();
+        } catch (ParseException e) {
+	       throw new AnalyticsException("Error occurred while parsing the timestamps", e);
+        }
 	}
 }

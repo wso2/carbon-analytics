@@ -20,6 +20,8 @@ package org.wso2.carbon.analytics.dataservice.restapi;
  */
 public class Constants {
 
+	public static final String TIMESTAMP_PATTERN = "yyyy-MM-dd hh:mm:ss";
+
 	/**
 	 * Instantiates a new constants.
 	 */

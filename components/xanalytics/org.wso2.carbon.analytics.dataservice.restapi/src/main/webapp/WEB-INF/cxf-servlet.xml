@@ -13,7 +13,7 @@
         </jaxrs:providers>
     </jaxrs:server>
 
-    <bean id="analyticsBean" class="org.wso2.carbon.analytics.dataservice.rest.resources.AnalyticsResource"/>
+    <bean id="analyticsBean" class="org.wso2.carbon.analytics.dataservice.restapi.resources.AnalyticsResource"/>
     <bean id="jacksonJsonProvider"
           class="com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider"/>
 </beans>
