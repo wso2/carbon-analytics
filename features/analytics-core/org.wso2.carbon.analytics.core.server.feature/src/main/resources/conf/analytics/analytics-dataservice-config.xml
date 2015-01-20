@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<analytics-dataservice-configuration>
+   <analytics-file-system>
+      <implementation>org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsFileSystem</implementation>
+      <properties>
+            <property name = "datasource">jdbc/AnalyticsDB</property>
+      </properties>
+   </analytics-file-system>
+   <analytics-record-store>
+      <implementation>org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore</implementation>
+      <properties>
+            <property name = "datasource">jdbc/AnalyticsDB</property>
+      </properties>
+   </analytics-record-store>
+</analytics-dataservice-configuration>

@@ -14,10 +14,29 @@
         <module>components/xanalytics</module>
         <module>components/bam-data-agents</module>
         <module>features/bam-data-agents</module>
+        <module>features/analytics-core</module>
+        <module>features/analytics-datasources</module>
     </modules>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.analytics.datasource.rdbms.server.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.analytics.core.server.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.lucene.wso2</groupId>
+                <artifactId>lucene</artifactId>
+                <version>${lucene.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.analytics.datasource.core</artifactId>
@@ -959,6 +978,10 @@
         <snapshot.430>4.3.0-SNAPSHOT</snapshot.430>
 
         <carbon.analytics.version>1.0.0-SNAPSHOT</carbon.analytics.version>
+
+        <lucene.version>4.10.3.wso2v1</lucene.version>
+
+        <carbon.version>4.3.0</carbon.version>
 
     </properties>
 

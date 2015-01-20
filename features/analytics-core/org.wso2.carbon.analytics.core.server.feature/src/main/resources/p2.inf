@@ -1,0 +1,3 @@
+instructions.configure = \
+org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../conf/analytics/);\
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.analytics.core.server_${feature.version}/conf/analytics/analytics-dataservice-config.xml,target:${installFolder}/../../conf/analytics/analytics-dataservice-config.xml,overwrite:true);\
