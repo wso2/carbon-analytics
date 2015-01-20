@@ -1,7 +1,8 @@
 package org.wso2.carbon.analytics.spark.sources
 
 import org.apache.spark.sql._
-import org.wso2.carbon.analytics.spark.util.CarbonSparkConstants._
+import org.wso2.carbon.analytics.spark.CarbonSparkConstants
+import CarbonSparkConstants._
 
 case class DefineSchema(schemaString: String)(){
 
