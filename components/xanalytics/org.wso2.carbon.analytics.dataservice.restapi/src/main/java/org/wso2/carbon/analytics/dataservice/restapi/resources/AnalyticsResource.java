@@ -488,7 +488,7 @@ public class AnalyticsResource extends AbstractResource {
 		}
 		try {
 			List<SearchResultEntry> searchResults =
-			                                        analyticsDataService.search(queryBean.getTenantId(),
+			                                        analyticsDataService.search(-1234,
 			                                                                    queryBean.getTableName(),
 			                                                                    queryBean.getLanguage(),
 			                                                                    queryBean.getQuery(),
