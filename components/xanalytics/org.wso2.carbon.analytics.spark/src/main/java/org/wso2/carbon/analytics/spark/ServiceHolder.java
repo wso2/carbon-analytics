@@ -16,18 +16,22 @@
  * under the License.
  */
 
-package org.wso2.carbon.analytics.spark.util;
+package org.wso2.carbon.analytics.spark;
+
+import org.wso2.carbon.analytics.spark.service.SparkExecutorService;
 
 /**
- * Created by niranda on 1/19/15.
+ * Created by niranda on 1/20/15.
  */
-public class CarbonSparkConstants {
-    /**
-     * Constants used in the Carbon Spark integration
-     */
-    public static final String STRING_TYPE = "string";
-    public static final String INT_TYPE = "int";
-    public static final String BOOLEAN_TYPE = "boolean";
-    public static final String DOUBLE_TYPE = "double";
-    public static final String FLOAT_TYPE = "float";
+public class ServiceHolder {
+
+    private static SparkExecutorService sparkExecutorService;
+
+    public static SparkExecutorService getSparkExecutorService() {
+        return sparkExecutorService;
+    }
+
+    public static void setSparkExecutorService(SparkExecutorService sparkExecutorService) {
+        ServiceHolder.sparkExecutorService = sparkExecutorService;
+    }
 }
