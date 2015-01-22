@@ -28,7 +28,48 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>org.wso2.carbon.analytics.spark.ui</artifactId>
+    <packaging>bundle</packaging>
     <name>WSO2 Carbon Analytics - Spark UI</name>
+    <version>1.0.0-SNAPSHOT</version>
+
+    <dependencies>
+       <dependency>
+           <groupId>org.wso2.carbon</groupId>
+           <artifactId>org.wso2.carbon.ui</artifactId>
+           <version>4.2.0</version>
+       </dependency>
+       <dependency>
+          <groupId>org.wso2.carbon</groupId>
+          <artifactId>org.wso2.carbon.core</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.wso2.carbon</groupId>
+          <artifactId>org.wso2.carbon.utils</artifactId>
+      </dependency>
+    </dependencies>
+
+
+    <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-bundle-plugin</artifactId>
+                    
+                    <extensions>true</extensions>
+                    <configuration>
+                        <instructions>
+                            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                            <Bundle-Name>${project.artifactId}</Bundle-Name>
+                            <Export-Package>
+                              org.wso2.carbon.analytics.spark.ui.*;version="${carbon.platform.package.export.version}"
+                            </Export-Package>
+                            <DynamicImport-Package>*</DynamicImport-Package>
+                            <Carbon-Component>UIBundle</Carbon-Component>                     
+                        </instructions>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </build>
 
 
 </project>
