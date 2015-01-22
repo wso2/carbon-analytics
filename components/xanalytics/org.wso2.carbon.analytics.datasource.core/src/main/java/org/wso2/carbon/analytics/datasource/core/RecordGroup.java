@@ -19,7 +19,6 @@
 package org.wso2.carbon.analytics.datasource.core;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * This interface represents a record group, which represents the availability set of records local to a common environment. 
@@ -32,12 +31,5 @@ public interface RecordGroup extends Serializable {
      * @throws AnalyticsException
      */
     String[] getLocations() throws AnalyticsException;
-    
-    /**
-     * Reads in all the records this record group represents.
-     * @return A list of {@link Record} objects
-     * @throws AnalyticsException
-     */
-    List<Record> getRecords() throws AnalyticsException;
     
 }

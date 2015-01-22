@@ -19,6 +19,7 @@
 package org.wso2.carbon.analytics.dataservice;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -133,6 +134,11 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     public RecordGroup[] get(int tenantId, String tableName, List<String> columns, List<String> ids)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
         return this.getAnalyticsRecordStore().get(tenantId, tableName, columns, ids);
+    }
+    
+    @Override
+    public Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException {
+        return this.getAnalyticsRecordStore().readRecords(recordGroup);
     }
 
     @Override

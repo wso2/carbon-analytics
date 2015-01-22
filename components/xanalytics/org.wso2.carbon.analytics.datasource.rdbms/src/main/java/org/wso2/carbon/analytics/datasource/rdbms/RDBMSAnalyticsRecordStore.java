@@ -29,6 +29,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -229,7 +230,7 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
     }
 
     @Override
-    public List<Record> getRecords(int tenantId, String tableName, List<String> columns,
+    public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns,
             long timeFrom, long timeTo, int recordsFrom, 
             int recordsCount) throws AnalyticsException, AnalyticsTableNotAvailableException {
         Connection conn = null;
@@ -255,16 +256,14 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
             stmt.setInt(3, this.adjustRecordsFromForProvider(recordsFrom));
             stmt.setInt(4, this.adjustRecordsCountForProvider(recordsFrom, recordsCount));            
             rs = stmt.executeQuery();
-            List<Record> result = this.processRecordResultSet(tenantId, tableName, rs, columns);
-            return result;
+            return new RDBMSResultSetIterator(tenantId, tableName, columns, conn, stmt, rs);
         } catch (SQLException e) {
+            RDBMSUtils.cleanupConnection(rs, stmt, conn);
             if (!this.tableExists(tenantId, tableName)) {
                 throw new AnalyticsTableNotAvailableException(tenantId, tableName);
             } else {
                 throw new AnalyticsException("Error in retrieving records: " + e.getMessage(), e);
-            }
-        } finally {
-            RDBMSUtils.cleanupConnection(rs, stmt, conn);
+            }            
         }
     }
     
@@ -289,28 +288,9 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         }
         return recordsCount;
     }
-    
-    private List<Record> processRecordResultSet(int tenantId, String tableName, ResultSet rs, 
-            List<String> columns) throws SQLException, AnalyticsException {
-        List<Record> result = new ArrayList<Record>();
-        Record record;
-        Blob blob;
-        Map<String, Object> values;
-        Set<String> colSet = null;
-        if (columns != null && columns.size() > 0) {
-            colSet = new HashSet<String>(columns);
-        }
-        while (rs.next()) {
-            blob = rs.getBlob(3);
-            values = GenericUtils.decodeRecordValues(blob.getBytes(1, (int) blob.length()), colSet);
-            record = new Record(rs.getString(1), tenantId, tableName, values, rs.getLong(2));
-            result.add(record);            
-        }
-        return result;
-    }
 
     @Override
-    public List<Record> getRecords(int tenantId, String tableName, List<String> columns,
+    public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns,
             List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
         String recordGetSQL = this.generateGetRecordRetrievalWithIdQuery(tenantId, tableName, ids.size());
         Connection conn = null;
@@ -323,16 +303,14 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
                 stmt.setString(i + 1, ids.get(i));
             }
             rs = stmt.executeQuery();
-            List<Record> result = this.processRecordResultSet(tenantId, tableName, rs, columns);
-            return result;
+            return new RDBMSResultSetIterator(tenantId, tableName, columns, conn, stmt, rs);
         } catch (SQLException e) {
+            RDBMSUtils.cleanupConnection(rs, stmt, conn);
             if (!this.tableExists(tenantId, tableName)) {
                 throw new AnalyticsTableNotAvailableException(tenantId, tableName);
             } else {
                 throw new AnalyticsException("Error in retrieving records: " + e.getMessage(), e);
             }
-        } finally {
-            RDBMSUtils.cleanupConnection(rs, stmt, conn);
         }
     }
     
@@ -621,6 +599,80 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         } finally {
             RDBMSUtils.cleanupConnection(rs, stmt, conn);
         }
+    }
+    
+    /**
+     * This class represents the RDBMS result set iterator, which will stream the result records out.
+     */
+    private class RDBMSResultSetIterator implements Iterator<Record> {
+
+        private int tenantId;
+        
+        private String tableName;
+        
+        private List<String> columns;
+        
+        private Connection conn;
+        
+        private Statement stmt;
+        
+        private ResultSet rs;
+        
+        private Record nextValue;
+        
+        private boolean prefetched;
+        
+        public RDBMSResultSetIterator(int tenantId, String tableName, List<String> columns, 
+                Connection conn, Statement stmt, ResultSet rs) {
+            this.tenantId = tenantId;
+            this.tableName = tableName;
+            this.columns = columns;
+            this.conn = conn;
+            this.stmt = stmt;
+            this.rs = rs;
+        }
+        
+        @Override
+        public boolean hasNext() {
+            if (!this.prefetched) {
+                this.nextValue = this.next();
+                this.prefetched = true;
+            }
+            return nextValue != null;
+        }
+
+        @Override
+        public Record next() {
+            if (this.prefetched) {
+                this.prefetched = false;
+                Record result = this.nextValue;
+                this.nextValue = null;
+                return result;
+            }
+            Set<String> colSet = null;
+            if (this.columns != null && this.columns.size() > 0) {
+                colSet = new HashSet<String>(this.columns);
+            }
+            try {
+                if (this.rs.next()) {
+                    Blob blob = this.rs.getBlob(3);
+                    Map<String, Object> values = GenericUtils.decodeRecordValues(blob.getBytes(1, (int) blob.length()), colSet);
+                    return new Record(this.rs.getString(1), this.tenantId, this.tableName, values, this.rs.getLong(2));                
+                } else {
+                    /* end of the result set, time to clean up.. */
+                    RDBMSUtils.cleanupConnection(this.rs, this.stmt, this.conn);
+                    return null;
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+        }
+
+        @Override
+        public void remove() {
+            /* this is a read-only iterator, nothing will be removed */
+        }
+        
     }
 
 }

@@ -16,24 +16,27 @@
  * under the License.
  */
 
-package org.wso2.carbon.analytics.spark.core.rdd;
+package org.wso2.carbon.analytics.spark.core;
 
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.rdd.RDD;
-import scala.reflect.ClassTag;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 
 /**
- * Created by niranda on 12/11/14.
+ * This class represents the service holder for analytics spark module.
  */
-public class CarbonJavaRDD extends JavaRDD {
+public class AnalyticsServiceHolder {
 
-    public CarbonJavaRDD(RDD rdd, ClassTag classTag) {
-        super(rdd, classTag);
+    private static AnalyticsDataService analyticsDataService;
+    
+    public static void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {
+        AnalyticsServiceHolder.analyticsDataService = analyticsDataService; 
     }
-
-    @Override
-    public ClassTag classTag() {
-        return null;
+    
+    public static void clearAnalyticsDataService() {
+        AnalyticsServiceHolder.analyticsDataService = null;
     }
+    
+    public static AnalyticsDataService getAnalyticsDataService() {
+        return analyticsDataService;
+    }
+    
 }
-

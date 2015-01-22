@@ -52,7 +52,7 @@ public class H2FileDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
         initDS("jdbc:h2:" + dbPath, "wso2carbon", "wso2carbon");
         AnalyticsRecordStore ars = new RDBMSAnalyticsRecordStore(generateQueryConfiguration());
         Map<String, String> props = new HashMap<String, String>();
-        props.put("datasource", "DS");
+        props.put("datasource", "DSRS");
         ars.init(props);
         return ars;
     }
@@ -69,7 +69,7 @@ public class H2FileDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
         pps.setPassword(password);
         pps.setDefaultAutoCommit(false);
         DataSource dsx = new DataSource(pps);
-        new InitialContext().bind("DS", dsx);
+        new InitialContext().bind("DSRS", dsx);
     }
     
     private static RDBMSQueryConfigurationEntry generateQueryConfiguration() {

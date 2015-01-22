@@ -23,11 +23,11 @@
         <groupId>org.wso2.carbon</groupId>
         <version>4.3.0-SNAPSHOT</version>
     </parent>
+    
     <modelVersion>4.0.0</modelVersion>
-
-    <artifactId>org.wso2.carbon.analytics.spark</artifactId>
-
+    <artifactId>org.wso2.carbon.analytics.spark.core</artifactId>
     <packaging>jar</packaging>
+    <version>1.0.0-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
@@ -35,7 +35,6 @@
             <artifactId>spark-core_2.10</artifactId>
             <version>1.2.0</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-sql_2.10</artifactId>
@@ -44,14 +43,13 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.analytics.dataservice</artifactId>
-            <version>4.3.0-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.analytics.datasource.core</artifactId>
-            <version>4.3.0-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

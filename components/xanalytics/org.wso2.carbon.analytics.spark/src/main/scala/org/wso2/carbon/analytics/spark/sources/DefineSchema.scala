@@ -1,8 +1,8 @@
-package org.wso2.carbon.analytics.spark.sources
+package org.wso2.carbon.analytics.spark.core.sources
 
 import org.apache.spark.sql._
-import org.wso2.carbon.analytics.spark.CarbonSparkConstants
-import CarbonSparkConstants._
+import org.wso2.carbon.analytics.spark.core.AnalyticsSparkConstants
+import AnalyticsSparkConstants._
 
 case class DefineSchema(schemaString: String)(){
 
@@ -11,13 +11,14 @@ case class DefineSchema(schemaString: String)(){
    */
   def getSchema =
     StructType(
-      schemaString.split(";").map(fieldName  => StructField(fieldName.trim.split(" ")(0),
+      schemaString.split(",").map(fieldName  => StructField(fieldName.trim.split(" ")(0),
                                                             resolveType(fieldName.trim.split(" ")(1)), true)))
 
   def resolveType(typeString: String): DataType =
     typeString.toLowerCase match {
       case STRING_TYPE => StringType
       case INT_TYPE => IntegerType
+      case INTEGER_TYPE => IntegerType
       case DOUBLE_TYPE => DoubleType
       case FLOAT_TYPE => FloatType
       case BOOLEAN_TYPE => BooleanType

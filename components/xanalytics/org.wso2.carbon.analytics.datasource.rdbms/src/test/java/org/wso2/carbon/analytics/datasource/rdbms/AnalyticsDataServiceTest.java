@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -34,6 +33,7 @@ import org.testng.Assert;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDSUtils;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceImpl;
 import org.wso2.carbon.analytics.dataservice.indexing.IndexType;
@@ -43,6 +43,7 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.Record;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.base.MultitenantConstants;
 
 /**
@@ -242,13 +243,13 @@ public class AnalyticsDataServiceTest {
         ids.add(records.get(5).getId());
         ids.add(records.get(50).getId());
         ids.add(records.get(97).getId());
-        Assert.assertEquals(AnalyticsRecordStoreTest.recordGroupsToSet(this.service.get(tenantId, tableName, null, ids)).size(), 4);
+        Assert.assertEquals(AnalyticsDSUtils.listRecords(this.service, this.service.get(tenantId, tableName, null, ids)).size(), 4);
         List<SearchResultEntry> result = this.service.search(tenantId, tableName, "lucene", "STR1:S*", 0, 150);
         Assert.assertEquals(result.size(), 98);
         this.service.delete(tenantId, tableName, ids);
         result = this.service.search(tenantId, tableName, "lucene", "STR1:S*", 0, 150);
         Assert.assertEquals(result.size(), 94);
-        Assert.assertEquals(AnalyticsRecordStoreTest.recordGroupsToSet(this.service.get(tenantId, tableName, null, ids)).size(), 0);
+        Assert.assertEquals(AnalyticsDSUtils.listRecords(this.service, this.service.get(tenantId, tableName, null, ids)).size(), 0);
         this.cleanupTable(tenantId, tableName);
     }
     
@@ -265,11 +266,11 @@ public class AnalyticsDataServiceTest {
         this.service.setIndices(tenantId, tableName, columns);
         List<Record> records = this.generateIndexRecords(tenantId, tableName, n, 1000);
         this.service.insert(records);
-        Set<Record> recordsIn = AnalyticsRecordStoreTest.recordGroupsToSet(
+        List<Record> recordsIn = AnalyticsDSUtils.listRecords(this.service, 
                 this.service.get(tenantId, tableName, null, -1, -1, 0, -1));
         Assert.assertEquals(recordsIn.size(), n);
         this.service.delete(tenantId, tableName, 1030, 1060);
-        recordsIn = AnalyticsRecordStoreTest.recordGroupsToSet(
+        recordsIn = AnalyticsDSUtils.listRecords(this.service, 
                 this.service.get(tenantId, tableName, null, -1, -1, 0, -1));
         Assert.assertEquals(recordsIn.size(), n - 3);
         /* lets test table name case-insensitiveness too */
@@ -304,7 +305,7 @@ public class AnalyticsDataServiceTest {
         System.out.println("* Records: " + (n * batch));
         System.out.println("* Write Time: " + (end - start) + " ms.");
         System.out.println("* Write Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
-        Set<Record> recordsIn = AnalyticsRecordStoreTest.recordGroupsToSet(this.service.get(50, "TableX", null, -1, -1, 0, -1));
+        List<Record> recordsIn = AnalyticsDSUtils.listRecords(this.service, this.service.get(50, "TableX", null, -1, -1, 0, -1));
         Assert.assertEquals(recordsIn.size(), (n * batch));
         end = System.currentTimeMillis();
         System.out.println("* Read Time: " + (end - start) + " ms.");
@@ -343,7 +344,7 @@ public class AnalyticsDataServiceTest {
         System.out.println("* Write Time: " + (end - start) + " ms.");
         System.out.println("* Write Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
         start = System.currentTimeMillis();
-        Set<Record> recordsIn = AnalyticsRecordStoreTest.recordGroupsToSet(this.service.get(tenantId, tableName, null, -1, -1, 0, -1));
+        List<Record> recordsIn = AnalyticsDSUtils.listRecords(this.service, this.service.get(tenantId, tableName, null, -1, -1, 0, -1));
         Assert.assertEquals(recordsIn.size(), (n * batch));
         end = System.currentTimeMillis();
         System.out.println("* Read Time: " + (end - start) + " ms.");
@@ -403,7 +404,7 @@ public class AnalyticsDataServiceTest {
         System.out.println("* Write Time: " + (end - start) + " ms.");
         System.out.println("* Write Throughput (TPS): " + (n * batch * nThreads) / (double) (end - start) * 1000.0);
         start = System.currentTimeMillis();
-        Set<Record> recordsIn = AnalyticsRecordStoreTest.recordGroupsToSet(this.service.get(tenantId, tableName, null, -1, -1, 0, -1));
+        List<Record> recordsIn = AnalyticsDSUtils.listRecords(this.service, this.service.get(tenantId, tableName, null, -1, -1, 0, -1));
         Assert.assertEquals(recordsIn.size(), (n * batch * nThreads));
         end = System.currentTimeMillis();
         System.out.println("* Read Time: " + (end - start) + " ms.");

@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.analytics.spark.core.sources;
+package org.wso2.carbon.analytics.spark.core;
 
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.SQLContext;
@@ -24,32 +24,47 @@ import org.apache.spark.sql.api.java.JavaSQLContext;
 import org.apache.spark.sql.catalyst.expressions.Row;
 import org.apache.spark.sql.catalyst.types.StructType;
 import org.apache.spark.sql.sources.TableScan;
-import org.wso2.carbon.analytics.spark.core.rdd.CarbonRDD;
-import org.wso2.carbon.analytics.spark.sources.DefineSchema;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.spark.core.sources.DefineSchema;
+import java.util.ArrayList;
+
+import static scala.collection.JavaConversions.asJavaCollection;
+
 import scala.reflect.ClassTag$;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by niranda on 1/6/15.
+ * This class represents a Spark SQL relation.
  */
-public class CarbonDatasourceRelation extends TableScan {
+public class AnalyticsRelation extends TableScan {
 
     private JavaSQLContext sqlContext;
-    private Map<String, String> schemaMap = new HashMap<String, String>();
-
-    // todo: decide on a proper constructor
-    public CarbonDatasourceRelation(JavaSQLContext sqlContext, String tableName) {
+    
+    private StructType schema;
+    
+    private AnalyticsDataService analyticsDS;
+    
+    private int tenantId;
+    
+    private String tableName;
+    
+    public AnalyticsRelation(AnalyticsDataService analyticsDS, int tenantId, String tableName, 
+            JavaSQLContext sqlContext, String schemaString) {
+        this.analyticsDS = analyticsDS;
+        this.tenantId = tenantId;
+        this.tableName = tableName;
         this.sqlContext = sqlContext;
-        schemaMap.put("first_name", "String");
-        schemaMap.put("last_name", "String");
+        this.schema = new DefineSchema(schemaString).getSchema();
     }
 
     @Override
     public RDD<Row> buildScan() {
-        return new CarbonRDD<Row>(sqlContext.sqlContext().sparkContext(), scala.collection.Seq$.MODULE$.empty(),
-                                  ClassTag$.MODULE$.<Row>apply(Row.class));
+        return new AnalyticsRDD(this.analyticsDS, this.tenantId, this.tableName, 
+                new ArrayList<String>(asJavaCollection(this.schema.fieldNames().toList())), 
+                sqlContext.sqlContext().sparkContext(), scala.collection.Seq$.MODULE$.empty(), 
+                ClassTag$.MODULE$.<Row>apply(Row.class));
     }
 
     @Override
@@ -59,11 +74,7 @@ public class CarbonDatasourceRelation extends TableScan {
 
     @Override
     public StructType schema() {
-        // todo: make the schema compatible with all types
-        // update: schema string is compatible with string, int, boolean, float, double
-        // format: "<field1> <type>; <field2> <type>; ..."
-        String schemaString = "first_name String; last_name String; age Int";
-
-        return new DefineSchema(schemaString).getSchema();
+        return schema;
     }
+    
 }
