@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -16,20 +16,23 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.core;
+package org.wso2.carbon.analytics.spark.core;
 
-import java.io.Serializable;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 
 /**
- * This interface represents a record group, which represents the availability set of records local to a common environment. 
+ * This class represents executions occuring in Spark query execution.
  */
-public interface RecordGroup extends Serializable {
+public class AnalyticsExecutionException extends AnalyticsException {
+
+    private static final long serialVersionUID = 1L;
     
-    /**
-     * Returns all the locations this record group is situation at.
-     * @return The list of hosts
-     * @throws AnalyticsException
-     */
-    String[] getLocations() throws AnalyticsException;
+    public AnalyticsExecutionException(String msg) {
+        super(msg);
+    }
     
+    public AnalyticsExecutionException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+
 }

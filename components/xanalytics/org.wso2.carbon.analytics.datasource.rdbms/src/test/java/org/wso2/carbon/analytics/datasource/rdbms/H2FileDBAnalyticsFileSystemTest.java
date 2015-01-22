@@ -52,7 +52,7 @@ public class H2FileDBAnalyticsFileSystemTest extends AnalyticsFileSystemTest {
         initDS("jdbc:h2:" + dbPath, "wso2carbon", "wso2carbon");
         AnalyticsFileSystem afs = new RDBMSAnalyticsFileSystem(generateQueryConfiguration());
         Map<String, String> props = new HashMap<String, String>();
-        props.put("datasource", "DS");
+        props.put("datasource", "DSFS");
         afs.init(props);
         return afs;
     }
@@ -69,7 +69,7 @@ public class H2FileDBAnalyticsFileSystemTest extends AnalyticsFileSystemTest {
         pps.setPassword(password);
         pps.setDefaultAutoCommit(false);
         DataSource dsx = new DataSource(pps);
-        new InitialContext().bind("DS", dsx);
+        new InitialContext().bind("DSFS", dsx);
     }
     
     private static RDBMSQueryConfigurationEntry generateQueryConfiguration() {

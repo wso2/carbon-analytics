@@ -170,8 +170,6 @@ public class AnalyticsResource extends AbstractResource {
 	                              @PathParam("timeTo") long timeTo,
 	                              List<String> ids) {
 		int tenantId = -1234;
-		long lTimeFrom;
-		long lTimeTo;
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking deleteRecords for tenantId :" + tenantId + " tableName : " +
 			             tableName);

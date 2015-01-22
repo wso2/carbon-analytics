@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.wso2.carbon.analytics.dataservice.restapi;
 
 import java.text.ParseException;
@@ -25,43 +24,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.indexing.IndexType;
 import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.IndexTypeBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordBean;
-import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordGroupBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.SearchResultEntryBean;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.RecordGroup;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDSUtils;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 
-import com.hazelcast.logging.Logger;
-
-// TODO: Auto-generated Javadoc
 /**
- * The Class Utils.
+ * REST API utility class.
  */
 public class Utils {
-
-	/**
-	 * Instantiates a new Utils class.
-	 */
-	private Utils() {
-
-	}
+    
+    private static AnalyticsDataService analyticsDS;
 
 	/**
 	 * Gets the analytics data service.
 	 * @return the analytics data service
 	 */
 	public static AnalyticsDataService getAnalyticsDataService() {
-		return (AnalyticsDataService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
-		                                                     .getOSGiService(AnalyticsDataService.class,
-		                                                                     null);
+	    if (analyticsDS == null) {
+		    analyticsDS = (AnalyticsDataService) PrivilegedCarbonContext.
+		        getThreadLocalCarbonContext().getOSGiService(AnalyticsDataService.class, null);
+	    }
+	    return analyticsDS;
 	}
 
 	/**
@@ -118,44 +109,6 @@ public class Utils {
 		recordBean.setTimestamp(record.getTimestamp());
 		recordBean.setValues(record.getValues());
 		return recordBean;
-	}
-
-	/**
-	 * Creates the record group bean from record group.
-	 * @param recordGroup
-	 *            the record group
-	 * @return the record group bean
-	 * @throws AnalyticsException
-	 *             the analytics exception
-	 */
-	public static RecordGroupBean createRecordGroupBeanFromRecordGroup(RecordGroup recordGroup)
-	                                                                                           throws AnalyticsException {
-		RecordGroupBean recordGroupBean = new RecordGroupBean();
-		recordGroupBean.setLocations(recordGroup.getLocations());
-		List<Record> recordList = recordGroup.getRecords();
-		List<RecordBean> recordBeanList = new ArrayList<RecordBean>();
-		for (Record record : recordList) {
-			recordBeanList.add(createRecordBeanFromRecord(record));
-		}
-		recordGroupBean.setRecords(recordBeanList);
-		return recordGroupBean;
-	}
-
-	/**
-	 * Creates the record group beans from record groups.
-	 * @param recordGroups
-	 *            the record groups
-	 * @return the list
-	 * @throws AnalyticsException
-	 *             the analytics exception
-	 */
-	public static List<RecordGroupBean> createRecordGroupBeansFromRecordGroups(RecordGroup[] recordGroups)
-	                                           throws AnalyticsException {
-		List<RecordGroupBean> recordGroupBeans = new ArrayList<RecordGroupBean>();
-		for (RecordGroup recordGroup : recordGroups) {
-			recordGroupBeans.add(createRecordGroupBeanFromRecordGroup(recordGroup));
-		}
-		return recordGroupBeans;
 	}
 
 	/**
@@ -274,11 +227,7 @@ public class Utils {
 	 */
 	public static List<RecordBean> getAllRecordBeansFromRecordGroups(RecordGroup[] recordGroups) 
 			throws AnalyticsException {
-		List<RecordBean> recordBeans = new ArrayList<RecordBean>();
-		for ( RecordGroup recordGroup : recordGroups) {
-			recordBeans.addAll(createRecordBeansFromRecords(recordGroup.getRecords()));
-		}
-		return recordBeans;
+		return createRecordBeansFromRecords(AnalyticsDSUtils.listRecords(getAnalyticsDataService(), recordGroups));
 	}
 	
 	/**

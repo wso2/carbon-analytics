@@ -18,6 +18,7 @@
  */
 package org.wso2.carbon.analytics.datasource.core;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -27,49 +28,30 @@ public abstract class DirectAnalyticsRecordStore implements AnalyticsRecordStore
     
     public RecordGroup[] get(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo, int recordsFrom, 
             int recordsCount) throws AnalyticsException {
-        List<Record> records = this.getRecords(tenantId, tableName, columns, timeFrom, timeTo, recordsFrom, recordsCount);
-        return new DirectRecordGroup[] { new DirectRecordGroup(records) };
+        return new DirectRecordGroup[] { new DirectRecordGroup(tenantId, tableName, columns, timeFrom, timeTo, recordsFrom, recordsCount) };
     }
     
     public RecordGroup[] get(int tenantId, String tableName, List<String> columns, List<String> ids) throws AnalyticsException {
-        List<Record> records = this.getRecords(tenantId, tableName, columns, ids);
-        if (records.size() > 0) {
-            return new DirectRecordGroup[] { new DirectRecordGroup(records) };
+        return new DirectRecordGroup[] { new DirectRecordGroup(tenantId, tableName, columns, ids) };        
+    }
+    
+    public Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException {
+        if (!(recordGroup instanceof DirectRecordGroup)) {
+            throw new AnalyticsException("Invalid RecordGroup implementation in DirectAnalyticsRecordStore: " + 
+                    recordGroup.getClass());
+        }
+        DirectRecordGroup drg = (DirectRecordGroup) recordGroup;
+        if (drg.isWithIds()) {
+            return this.getRecords(drg.getTenantId(), drg.getTableName(), drg.getColumns(), drg.getIds());
         } else {
-            return new DirectRecordGroup[0];
+            return this.getRecords(drg.getTenantId(), drg.getTableName(), drg.getColumns(), drg.getTimeFrom(), 
+                    drg.getTimeTo(), drg.getRecordsFrom(), drg.getRecordsCount());
         }
     }
     
-    public abstract List<Record> getRecords(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo, 
+    public abstract Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo, 
             int recordsFrom, int recordsCount) throws AnalyticsException;
     
-    public abstract List<Record> getRecords(int tenantId, String tableName, List<String> columns, List<String> ids) throws AnalyticsException;
-    
-    /**
-     * {@link RecordGroup} implementation for direct analytics data source.
-     */
-    public class DirectRecordGroup implements RecordGroup {
-
-        private static final long serialVersionUID = -1195668816256005842L;
-
-        private static final String LOCALHOST = "127.0.0.1";
-        
-        private List<Record> records;
-        
-        public DirectRecordGroup(List<Record> records) {
-            this.records = records;
-        }
-        
-        @Override
-        public String[] getLocations() throws AnalyticsException {
-            return new String[] { LOCALHOST };
-        }
-
-        @Override
-        public List<Record> getRecords() throws AnalyticsException {
-            return records;
-        }
-        
-    }
+    public abstract Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns, List<String> ids) throws AnalyticsException;
 
 }

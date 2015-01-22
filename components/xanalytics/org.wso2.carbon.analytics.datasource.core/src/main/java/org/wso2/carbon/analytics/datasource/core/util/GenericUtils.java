@@ -20,11 +20,17 @@ package org.wso2.carbon.analytics.datasource.core.util;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.collections.IteratorUtils;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStore;
+import org.wso2.carbon.analytics.datasource.core.Record;
+import org.wso2.carbon.analytics.datasource.core.RecordGroup;
 
 /**
  * Generic utility methods for analytics data source implementations.
@@ -219,5 +225,15 @@ public class GenericUtils {
         }
         return result;
     }
+    
+    @SuppressWarnings("unchecked")
+    public static List<Record> listRecords(AnalyticsRecordStore rs, 
+            RecordGroup[] rgs) throws AnalyticsException {
+        List<Record> result = new ArrayList<Record>();
+        for (RecordGroup rg : rgs) {
+            result.addAll(IteratorUtils.toList(rs.readRecords(rg)));
+        }
+        return result;
+    }    
     
 }

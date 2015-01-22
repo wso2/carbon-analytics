@@ -23,7 +23,6 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.api.java.JavaSQLContext;
 import org.apache.spark.sql.api.java.JavaSchemaRDD;
 import org.apache.spark.sql.api.java.Row;
-import org.wso2.carbon.analytics.spark.util.TableOperations;
 
 import java.util.List;
 
@@ -33,35 +32,35 @@ import java.util.List;
 public class SparkTest {
 
     public static void main(String[] args) {
-        SparkConf sparkConf = new SparkConf().setMaster("local[4]").setAppName("JavaSparkSQL");
-        JavaSparkContext ctx = new JavaSparkContext(sparkConf);
-        JavaSQLContext sqlCtx = new JavaSQLContext(ctx);
-
-        JavaSchemaRDD tableRDD = TableOperations.getTableRDD(sqlCtx, "table1");
-        tableRDD.registerTempTable("table1");
-
-        tableRDD.printSchema();
-        System.out.println("count: " + tableRDD.count());
-        List<Row> result0 = sqlCtx.sql("SELECT * from table1").collect();
-        for (Row row : result0) {
-            System.out.println(row.toString());
-        }
-
-        JavaSchemaRDD resultRDD = sqlCtx.sql("SELECT age from table1"); //where last_name = 'bishop'
-        resultRDD.printSchema();
-        System.out.println("result count: " + resultRDD.count());
-        List<Row> result1 = resultRDD.collect();
-        for (Row row : result1) {
-            System.out.println(row.toString());
-        }
-
-        JavaSchemaRDD resultRDD2 = sqlCtx.sql("SELECT * from table1 where age > 20"); //where last_name = 'bishop'
-        resultRDD2.printSchema();
-        System.out.println("result count: " + resultRDD.count());
-        List<Row> result2 = resultRDD2.collect();
-        for (Row row : result2) {
-            System.out.println(row.toString());
-        }
+//        SparkConf sparkConf = new SparkConf().setMaster("local[4]").setAppName("JavaSparkSQL");
+//        JavaSparkContext ctx = new JavaSparkContext(sparkConf);
+//        JavaSQLContext sqlCtx = new JavaSQLContext(ctx);
+//
+//        JavaSchemaRDD tableRDD = TableOperations.getTableRDD(sqlCtx, "table1");
+//        tableRDD.registerTempTable("table1");
+//
+//        tableRDD.printSchema();
+//        System.out.println("count: " + tableRDD.count());
+//        List<Row> result0 = sqlCtx.sql("SELECT * from table1").collect();
+//        for (Row row : result0) {
+//            System.out.println(row.toString());
+//        }
+//
+//        JavaSchemaRDD resultRDD = sqlCtx.sql("SELECT age from table1"); //where last_name = 'bishop'
+//        resultRDD.printSchema();
+//        System.out.println("result count: " + resultRDD.count());
+//        List<Row> result1 = resultRDD.collect();
+//        for (Row row : result1) {
+//            System.out.println(row.toString());
+//        }
+//
+//        JavaSchemaRDD resultRDD2 = sqlCtx.sql("SELECT * from table1 where age > 20"); //where last_name = 'bishop'
+//        resultRDD2.printSchema();
+//        System.out.println("result count: " + resultRDD.count());
+//        List<Row> result2 = resultRDD2.collect();
+//        for (Row row : result2) {
+//            System.out.println(row.toString());
+//        }
 
     }
 }
