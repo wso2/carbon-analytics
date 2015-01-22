@@ -37,7 +37,6 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.spark.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionContext;
-import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.AnalyticsQueryResult;
 
 /**
