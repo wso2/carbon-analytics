@@ -575,7 +575,7 @@ public class AnalyticsDataIndexer {
     
     private IndexWriter createIndexWriter(String tableId) throws AnalyticsIndexException {
         Directory indexDir = this.lookupIndexDir(tableId);
-        IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_4_10_2, this.DEFAULT_ANALYZER);
+        IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_4_10_3, this.DEFAULT_ANALYZER);
         try {
             return new IndexWriter(indexDir, conf);
         } catch (IOException e) {

@@ -153,6 +153,26 @@ public class AnalyticsRecordStoreTest {
     }
     
     @Test
+    public void testTableCreateDeleteListNegativeTenantIds() throws AnalyticsException {
+        this.analyticsRS.deleteTable(-1234, "TABLE1");
+        this.analyticsRS.deleteTable(-1234, "TABLE2");
+        this.analyticsRS.createTable(-1234, "TABLE1");
+        List<String> tables = this.analyticsRS.listTables(-1234);
+        Assert.assertEquals(tables.size(), 1);
+        Assert.assertTrue(new HashSet<String>(tables).contains("TABLE1"));
+        Assert.assertTrue(this.analyticsRS.tableExists(-1234, "table1"));
+        Assert.assertTrue(this.analyticsRS.tableExists(-1234, "TABLE1"));
+        /* this should not throw an exception */
+        this.analyticsRS.createTable(-1234, "Table1");
+        Record record = this.createRecord(-1234, "TABLE2", "S1", "10.0.0.1", 1, "LOG");
+        List<Record> records = new ArrayList<Record>();
+        records.add(record);
+        this.analyticsRS.deleteTable(-1234, "TABLE2");
+        this.analyticsRS.deleteTable(-1234, "TABLE1");
+        Assert.assertEquals(this.analyticsRS.listTables(-1234).size(), 0);
+    }
+    
+    @Test
     public void testDataRecordAddRetrieve() throws AnalyticsException {
         this.cleanupT1();
         String serverName = "ESB1";

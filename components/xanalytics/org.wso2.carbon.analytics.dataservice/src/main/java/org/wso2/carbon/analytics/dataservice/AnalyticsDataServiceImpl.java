@@ -18,9 +18,12 @@
  */
 package org.wso2.carbon.analytics.dataservice;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfigProperty;
+import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfiguration;
 import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsDataIndexer;
 import org.wso2.carbon.analytics.dataservice.indexing.IndexType;
 import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
@@ -46,7 +49,30 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         this.indexer = new AnalyticsDataIndexer(analyticsFileSystem);
     }
     
-    public AnalyticsDataServiceImpl(AnalyticsDataServiceConfiguration config) {
+    public AnalyticsDataServiceImpl(AnalyticsDataServiceConfiguration config) throws AnalyticsException {
+        AnalyticsRecordStore ars;
+        AnalyticsFileSystem afs;
+        try {
+            String arsClass = config.getAnalyticsRecordStoreConfiguration().getImplementation();
+            String afsClass = config.getAnalyticsFileSystemConfiguration().getImplementation();
+            ars = (AnalyticsRecordStore) Class.forName(arsClass).newInstance();
+            afs = (AnalyticsFileSystem) Class.forName(afsClass).newInstance();
+            ars.init(this.convertToMap(config.getAnalyticsRecordStoreConfiguration().getProperties()));
+            afs.init(this.convertToMap(config.getAnalyticsFileSystemConfiguration().getProperties()));
+        } catch (Exception e) {
+            throw new AnalyticsException("Error in creating analytics data service from configuration: " + 
+                    e.getMessage(), e);
+        }
+        this.analyticsRecordStore = ars;
+        this.indexer = new AnalyticsDataIndexer(afs);
+    }
+    
+    private Map<String, String> convertToMap(AnalyticsDataServiceConfigProperty[] props) {
+        Map<String, String> result = new HashMap<String, String>();
+        for (AnalyticsDataServiceConfigProperty prop : props) {
+            result.put(prop.getName(), prop.getValue());
+        }
+        return result;
     }
     
     public AnalyticsDataIndexer getIndexer() {

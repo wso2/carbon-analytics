@@ -55,7 +55,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
     /** One time set empty data chunk value */
     private byte[] FS_EMPTY_DATA_CHUNK;
     
-    private QueryConfigurationEntry queryConfigurationEntry;
+    private RDBMSQueryConfigurationEntry rDBMSQueryConfigurationEntry;
     
     private DataSource dataSource;
     
@@ -74,8 +74,8 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
             throw new AnalyticsException("Error in looking up data source: " + 
                     e.getMessage(), e);
         }
-        if (this.queryConfigurationEntry == null) {
-            this.queryConfigurationEntry = RDBMSUtils.lookupCurrentQueryConfigurationEntry(this.dataSource);
+        if (this.rDBMSQueryConfigurationEntry == null) {
+            this.rDBMSQueryConfigurationEntry = RDBMSUtils.lookupCurrentQueryConfigurationEntry(this.dataSource);
         }
         this.FS_EMPTY_DATA_CHUNK = new byte[this.getQueryConfiguration().getFsDataChunkSize()];
         /* create the system tables */
@@ -83,11 +83,11 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
     }
     
     public RDBMSAnalyticsFileSystem() {
-        this.queryConfigurationEntry = null;
+        this.rDBMSQueryConfigurationEntry = null;
     }
     
-    public RDBMSAnalyticsFileSystem(QueryConfigurationEntry queryConfigurationEntry) throws IOException {
-        this.queryConfigurationEntry = queryConfigurationEntry;
+    public RDBMSAnalyticsFileSystem(RDBMSQueryConfigurationEntry rDBMSQueryConfigurationEntry) throws IOException {
+        this.rDBMSQueryConfigurationEntry = rDBMSQueryConfigurationEntry;
     }
     
     private void checkAndCreateSystemTables() throws AnalyticsException {
@@ -131,8 +131,8 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
         return this.getQueryConfiguration().getFsTablesCheckQuery();
     }
     
-    public QueryConfigurationEntry getQueryConfiguration() {
-        return queryConfigurationEntry;
+    public RDBMSQueryConfigurationEntry getQueryConfiguration() {
+        return rDBMSQueryConfigurationEntry;
     }
     
     public DataSource getDataSource() {
@@ -299,14 +299,14 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
     }
 
     @Override
-    public long length(String path) {
+    public long length(String path) throws IOException {
         path = GenericUtils.normalizePath(path);
         Connection conn = null;
         try {
             conn = this.getConnection();
             return this.lengthImpl(conn, path);
         } catch (SQLException e) {
-            throw new RuntimeException("Error in file length: " + e.getMessage(), e);
+            throw new IOException("Error in file length: " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
@@ -426,6 +426,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
                 stmt = conn.prepareStatement(this.getQueryConfiguration().getFsWriteDataChunkQuery());
                 this.populateStatementWithDataChunk(stmt, path, chunk);
                 stmt.execute();
+                conn.commit();
             } catch (SQLException e) {
                 /* maybe the chunk is already there, lets try the update */
                 try {
@@ -437,6 +438,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
                     stmt = conn.prepareStatement(query);
                     this.populateStatementWithDataChunkUpdate(stmt, path, chunk);
                     stmt.execute();
+                    conn.commit();
                 } catch (SQLException e1) {
                     throw new IOException("Error in updating data chunk: " + e1.getMessage(), e1);
                 }
@@ -477,7 +479,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
         
         private String path;
         
-        public RDBMSDataStream(String path) {
+        public RDBMSDataStream(String path) throws IOException {
             super(getQueryConfiguration().getFsDataChunkSize());
             this.path = path;
         }
@@ -491,7 +493,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
         }
 
         @Override
-        public long length() {
+        public long length() throws IOException {
             return RDBMSAnalyticsFileSystem.this.length(this.getPath());
         }
 

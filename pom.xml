@@ -14,10 +14,50 @@
         <module>components/xanalytics</module>
         <module>components/bam-data-agents</module>
         <module>features/bam-data-agents</module>
+        <module>features/analytics-core</module>
+        <module>features/analytics-datasources</module>
+        <module>features/analytics-rest</module>
     </modules>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.analytics.datasource.rdbms.server.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.analytics.core.server.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.lucene.wso2</groupId>
+                <artifactId>lucene</artifactId>
+                <version>${lucene.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.analytics.datasource.core</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.analytics.dataservice</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.analytics.datasource.rdbms</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.analytics.dataservice.rest</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.axis2.wso2</groupId>
                 <artifactId>axis2</artifactId>
@@ -58,11 +98,6 @@
                 <artifactId>commons-logging</artifactId>
                 <version>${commons-logging.version}</version>
             </dependency>
-            <!--<dependency>-->
-            <!--<groupId>org.apache.shindig.wso2</groupId>-->
-            <!--<artifactId>shindig</artifactId>-->
-            <!--<version>${shindig.version}</version>-->
-            <!--</dependency>-->
             <dependency>
                 <groupId>joda-time.wso2</groupId>
                 <artifactId>joda-time</artifactId>
@@ -88,11 +123,6 @@
                 <artifactId>js</artifactId>
                 <version>${rhino.version}</version>
             </dependency>
-            <!--<dependency>-->
-            <!--<groupId>net.sf.jasperreports</groupId>-->
-            <!--<artifactId>jasperreports</artifactId>-->
-            <!--<version>${jasperreports.version}</version>-->
-            <!--</dependency>-->
             <dependency>
                 <groupId>org.eclipse.equinox</groupId>
                 <artifactId>javax.servlet</artifactId>
@@ -149,11 +179,6 @@
                 <artifactId>guice2</artifactId>
                 <version>${google.guice.version}</version>
             </dependency>
-            <!--<dependency>-->
-            <!--<groupId>com.google.guava.wso2</groupId>-->
-            <!--<artifactId>guava</artifactId>-->
-            <!--<version>${google.guava.wso2.version}</version>-->
-            <!--</dependency>-->
             <dependency>
                 <groupId>com.googlecode.json-simple.wso2</groupId>
                 <artifactId>json-simple</artifactId>
@@ -299,36 +324,6 @@
                 <artifactId>org.wso2.carbon.ntask.core</artifactId>
                 <version>${snapshot.430}</version>
             </dependency>
-            <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon</groupId>-->
-            <!--<artifactId>org.wso2.carbon.ntask.solutions</artifactId>-->
-            <!--<version>${snapshot.430}</version>-->
-            <!--</dependency>-->
-            <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon</groupId>-->
-            <!--<artifactId>org.wso2.carbon.ndatasource.core</artifactId>-->
-            <!--<version>${carbon.platform.version}</version>-->
-            <!--</dependency>-->
-            <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon</groupId>-->
-            <!--<artifactId>org.wso2.carbon.ndatasource.rdbms</artifactId>-->
-            <!--<version>${carbon.platform.version}</version>-->
-            <!--</dependency>-->
-            <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon</groupId>-->
-            <!--<artifactId>org.wso2.carbon.authenticator.stub</artifactId>-->
-            <!--<version>${carbon.platform.version}</version>-->
-            <!--</dependency>-->
-            <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon</groupId>-->
-            <!--<artifactId>org.wso2.carbon.authenticator.proxy</artifactId>-->
-            <!--<version>${carbon.platform.version}</version>-->
-            <!--</dependency>-->
-            <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon</groupId>-->
-            <!--<artifactId>org.wso2.carbon.identity.authentication</artifactId>-->
-            <!--<version>${carbon.platform.version}</version>-->
-            <!--</dependency>-->
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.databridge.core</artifactId>
@@ -349,31 +344,11 @@
                 <artifactId>org.wso2.carbon.bam.datasource.utils</artifactId>
                 <version>${snapshot.430}</version>
             </dependency>
-            <!--<dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.bam2.core</artifactId>
-                <version>${carbon.platform.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.bam2.core.ui</artifactId>
-                <version>${carbon.platform.version}</version>
-            </dependency>-->
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.bam2.utils</artifactId>
                 <version>${carbon.platform.version}</version>
             </dependency>
-            <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon</groupId>-->
-            <!--<artifactId>org.wso2.carbon.bam2.analyzer</artifactId>-->
-            <!--<version>${carbon.platform.version}</version>-->
-            <!--</dependency>-->
-            <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon</groupId>-->
-            <!--<artifactId>org.wso2.carbon.bam2.analyzer.ui</artifactId>-->
-            <!--<version>${carbon.platform.version}</version>-->
-            <!--</dependency>-->
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.bam2.receiver</artifactId>
@@ -395,16 +370,6 @@
                 <artifactId>org.wso2.carbon.databridge.agent.thrift</artifactId>
                 <version>${snapshot.430}</version>
             </dependency>
-            <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon</groupId>-->
-            <!--<artifactId>org.wso2.carbon.event.stream.manager.core</artifactId>-->
-            <!--<version>${event.processor.version}</version>-->
-            <!--</dependency>-->
-            <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon</groupId>-->
-            <!--<artifactId>org.wso2.carbon.event.processor.api</artifactId>-->
-            <!--<version>${event.processor.version}</version>-->
-            <!--</dependency>-->
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.registry.social.api</artifactId>
@@ -434,11 +399,6 @@
                 <version>1.3</version>
                 <scope>test</scope>
             </dependency>
-            <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon</groupId>-->
-            <!--<artifactId>org.wso2.carbon.statistics</artifactId>-->
-            <!--<version>${snapshot.430}</version>-->
-            <!--</dependency>-->
             <dependency>
                 <groupId>org.apache.axis2</groupId>
                 <artifactId>axis2-transport-mail</artifactId>
@@ -449,41 +409,16 @@
                 <artifactId>axis2-transport-base</artifactId>
                 <version>${axis2-transports.version}</version>
             </dependency>
-            <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon</groupId>-->
-            <!--<artifactId>org.wso2.carbon.event.core</artifactId>-->
-            <!--<version>${wso2carbon.version}</version>-->
-            <!--</dependency>-->
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.event.ws</artifactId>
                 <version>${carbon.platform.version}</version>
             </dependency>
-            <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon</groupId>-->
-            <!--<artifactId>org.wso2.carbon.email.verification</artifactId>-->
-            <!--<version>${carbon.platform.version}</version>-->
-            <!--</dependency>-->
             <dependency>
                 <groupId>org.apache.ws.commons.axiom</groupId>
                 <artifactId>axiom-impl</artifactId>
                 <version>${axiom.version}</version>
             </dependency>
-            <!--<dependency>-->
-            <!--<groupId>org.apache.synapse</groupId>-->
-            <!--<artifactId>synapse-core</artifactId>-->
-            <!--<version>${synapse.version}</version>-->
-            <!--</dependency>-->
-            <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon</groupId>-->
-            <!--<artifactId>org.wso2.carbon.mediation.initializer</artifactId>-->
-            <!--<version>${snapshot.430}</version>-->
-            <!--</dependency>-->
-            <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon</groupId>-->
-            <!--<artifactId>org.wso2.carbon.mediation.statistics</artifactId>-->
-            <!--<version>${snapshot.430}</version>-->
-            <!--</dependency>-->
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.base</artifactId>
@@ -499,11 +434,6 @@
                 <artifactId>org.wso2.carbon.bam.jmx.agent.stub</artifactId>
                 <version>${snapshot.430}</version>
             </dependency>
-            <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon</groupId>-->
-            <!--<artifactId>org.wso2.carbon.bam.mediationstats.data.publisher.stub</artifactId>-->
-            <!--<version>${snapshot.430}</version>-->
-            <!--</dependency>-->
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>javax.servlet-api</artifactId>
@@ -529,16 +459,6 @@
                 <artifactId>gson</artifactId>
                 <version>${gson.version}</version>
             </dependency>
-            <!--<dependency>-->
-                <!--<groupId>org.wso2.carbon</groupId>-->
-                <!--<artifactId>org.wso2.carbon.bam.service.data.publisher.stub</artifactId>-->
-                <!--<version>${snapshot.430}</version>-->
-            <!--</dependency>-->
-            <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon</groupId>-->
-            <!--<artifactId>org.wso2.carbon.webapp.mgt</artifactId>-->
-            <!--<version>${carbon.platform.version}</version>-->
-            <!--</dependency>-->
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.securevault</artifactId>
@@ -826,8 +746,8 @@
         <!-- Servlet API -->
         <!--<exp.pkg.version.javax.servlet>2.6.0</exp.pkg.version.javax.servlet>-->
         <imp.pkg.version.javax.servlet>[2.6.0, 3.0.0)</imp.pkg.version.javax.servlet>
-        <!--<imp.pkg.version.javax.servlet.jsp>[2.2.0, 2.3.0)</imp.pkg.version.javax.servlet.jsp>-->
-        <!--<imp.pkg.version.javax.servlet.jsp.jstl>[1.2.1, 1.3.0)</imp.pkg.version.javax.servlet.jsp.jstl>-->
+        <imp.pkg.version.javax.servlet.jsp>[2.2.0, 2.3.0)</imp.pkg.version.javax.servlet.jsp>
+        <imp.pkg.version.javax.servlet.jsp.jstl>[1.2.1, 1.3.0)</imp.pkg.version.javax.servlet.jsp.jstl>
 
         <!-- Misc -->
         <!--<google.guice.version>2.0.0.wso2v2</google.guice.version>-->
@@ -937,6 +857,13 @@
         <!--<jaggery.feature.version>0.9.0.ALPHA4.wso2v1</jaggery.feature.version>-->
 
         <snapshot.430>4.3.0-SNAPSHOT</snapshot.430>
+
+        <carbon.analytics.version>1.0.0-SNAPSHOT</carbon.analytics.version>
+
+        <lucene.version>4.10.3.wso2v1</lucene.version>
+
+        <carbon.version>4.3.0</carbon.version>
+
     </properties>
 
     <repositories>

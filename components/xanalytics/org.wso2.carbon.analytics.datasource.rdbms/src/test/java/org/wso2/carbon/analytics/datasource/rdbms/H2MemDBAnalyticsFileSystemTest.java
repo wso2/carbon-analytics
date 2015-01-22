@@ -31,7 +31,7 @@ import org.testng.annotations.BeforeSuite;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystemTest;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.rdbms.QueryConfigurationEntry;
+import org.wso2.carbon.analytics.datasource.rdbms.RDBMSQueryConfigurationEntry;
 
 /**
  * H2 implementation of analytics data source tests.
@@ -58,8 +58,8 @@ public class H2MemDBAnalyticsFileSystemTest extends AnalyticsFileSystemTest {
         new InitialContext().bind("DS", dsx);
     }
     
-    private QueryConfigurationEntry generateQueryConfiguration() {
-        QueryConfigurationEntry conf = new QueryConfigurationEntry();
+    private RDBMSQueryConfigurationEntry generateQueryConfiguration() {
+        RDBMSQueryConfigurationEntry conf = new RDBMSQueryConfigurationEntry();
         String[] fsTableInitQueries = new String[3];
         fsTableInitQueries[0] = "CREATE TABLE AN_FS_PATH (path VARCHAR(256), is_directory BOOLEAN, length BIGINT, parent_path VARCHAR(256), PRIMARY KEY(path), FOREIGN KEY (parent_path) REFERENCES AN_FS_PATH(path) ON DELETE CASCADE)";
         fsTableInitQueries[1] = "CREATE TABLE AN_FS_DATA (path VARCHAR(256), sequence BIGINT, data BLOB, PRIMARY KEY (path,sequence), FOREIGN KEY (path) REFERENCES AN_FS_PATH(path) ON DELETE CASCADE)";
