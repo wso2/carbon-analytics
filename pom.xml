@@ -14,9 +14,9 @@
         <module>components/xanalytics</module>
         <module>components/bam-data-agents</module>
         <module>features/bam-data-agents</module>
-        <module>features/analytics-core</module>
-        <module>features/analytics-datasources</module>
-        <module>features/analytics-rest</module>
+        <module>features/analytics/analytics-core</module>
+        <module>features/analytics/analytics-datasources</module>
+        <module>features/analytics/analytics-rest</module>
     </modules>
 
     <dependencyManagement>
