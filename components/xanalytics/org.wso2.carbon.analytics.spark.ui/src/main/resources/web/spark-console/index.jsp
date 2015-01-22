@@ -25,126 +25,16 @@
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
 <fmt:bundle basename="org.wso2.carbon.analytics.hive.ui.i18n.Resources">
-    <carbon:breadcrumb label="analytics_list.menu"
-                       resourceBundle="org.wso2.carbon.analytics.hive.ui.i18n.Resources"
+    <carbon:breadcrumb label="spark.conosle.menu"
+                       resourceBundle="i18n.Resources"
                        topPage="true" request="<%=request%>"/>
-    <script type="text/javascript">
-        function deleteRow(name, msg) {
-            CARBON.showConfirmationDialog(msg + "' " + name + " ' ?", function() {
-                document.location.href = "deleteScript.jsp?" + "scriptName=" + name;
-            });
-        }
-    </script>
-    <%
-        String serverURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);
-        ConfigurationContext configContext =
-                (ConfigurationContext) config.getServletContext().getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
-        String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
-
-        HiveScriptStoreClient client = new HiveScriptStoreClient(cookie, serverURL, configContext);
-        String[] scriptNames = null;
-
-        try {
-            scriptNames = client.getAllScriptNames();
-        } catch (Exception e) {
-    %>
-    <script type="text/javascript">
-        CARBON.showErrorDialog("Error while getting the list of scripts");
-    </script>
-    <%
-        }
-    %>
+    
     <div id="middle">
-        <h2>Available Scripts</h2>
+        <h2>Interactive Spark Console</h2>
 
         <div id="workArea">
-
-            <form id="listScripts" name="listScripts" action="" method="POST">
-                <table class="styledLeft">
-                    <thead>
-                    <tr>
-                        <th style="width:200px"><span style="float: left; position: relative; margin-top: 2px;">
-                            <fmt:message key="analytic.scripts"/></span>
-                        </th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-
-                    <% if (null != scriptNames) {
-                        for (String aName : scriptNames) {
-                            if ("true".equals(client.getScriptEditability(aName)))
-                            {
-                    %>
-                    <tr>
-                        <td><label>
-                            <%=aName%>
-                        </label>
-                        </td>
-                        <td>
-                            <a class="icon-link" style="background: url('../hive-explorer/images/edit.gif') no-repeat;"
-                               href="../hive-explorer/hiveexplorer.jsp?mode=edit&editability=true&scriptName=<%=aName%>">Edit</a>
-                            <a class="icon-link" href="../hive-explorer/execute.jsp?scriptName=<%=aName%>"
-                               style="background: url('../hive-explorer/images/execute.gif') no-repeat;">
-                                Execute</a>
-                            <a class="icon-link" style="background: url('images/tasks-icon.gif') no-repeat;"
-                                      href="../hive-explorer/scheduleAndSave.jsp?editability=true&scriptName=<%=aName%>">Schedule
-                                Script
-                            </a>
-                            <a onclick="deleteRow('<%=aName%>','Do you want to delete')"
-                               class="delete-icon-link" href="#">Delete</a>
-                        </td>
-
-                    </tr>
-                    <%
-                            } else {
-                    %>
-                    <tr>
-                        <td><label>
-                            <%=aName%>
-                        </label>
-                        </td>
-                        <td>
-                            <a class="icon-link" style="background: url('../hive-explorer/images/edit.gif') no-repeat;"
-                               href="../hive-explorer/viewScript.jsp?mode=edit&editability=false&scriptName=<%=aName%>">View</a>
-                            <a class="icon-link" href="../hive-explorer/execute.jsp?scriptName=<%=aName%>"
-                               style="background: url('../hive-explorer/images/execute.gif') no-repeat;">
-                                Execute</a>
-                            <a class="icon-link" style="background: url('images/tasks-icon.gif') no-repeat;"
-                               href="../hive-explorer/scheduleAndSave.jsp?editability=false&scriptName=<%=aName%>">Schedule
-                                Script
-                            </a>
-                            <a onclick="deleteRow('<%=aName%>','Do you want to delete')"
-                               class="delete-icon-link" href="#">Delete</a>
-                        </td>
-
-                    </tr>
-                    <%
-                            }
-                        }
-                    } else { %>
-                    <tr>
-                        <td colspan="2">No scripts found.</td>
-                    </tr>
-
-                    <% }
-                    %>
-                    </tbody>
-                    <input type="hidden" id="driver" name="driver" value="">
-                </table>
-            </form>
-            <table>
-                <tbody>
-                <tr>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td><a class="icon-link" style="background-image:url(images/add.gif);"
-                           href="hiveexplorer.jsp?editability=true"><fmt:message
-                            key="script.add.main"/></a></td>
-                </tr>
-                </tbody>
-            </table>
+            <p>Some stuff will go there</p>
+            
 
         </div>
     </div>
