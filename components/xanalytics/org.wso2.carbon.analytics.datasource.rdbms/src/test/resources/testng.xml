@@ -6,12 +6,12 @@
    <test name="Analytics RDBMS Impl. Tests">
      <classes>     
        <!--class name="org.wso2.carbon.analytics.datasource.rdbms.MySQLInnoDBAnalyticsRecordStoreTest"/>
-       <class name="org.wso2.carbon.analytics.datasource.rdbms.MySQLMyISAMAnalyticsDataSourceTest"/>
+       <class name="org.wso2.carbon.analytics.datasource.rdbms.MySQLMyISAMAnalyticsDataSourceTest"/-->
        <class name="org.wso2.carbon.analytics.datasource.rdbms.H2FileDBAnalyticsRecordStoreTest"/>
        <class name="org.wso2.carbon.analytics.datasource.rdbms.H2FileDBAnalyticsFileSystemTest"/>
        <class name="org.wso2.carbon.analytics.datasource.rdbms.H2MemDBAnalyticsRecordStoreTest"/>
        <class name="org.wso2.carbon.analytics.datasource.rdbms.H2MemDBAnalyticsFileSystemTest"/>
-       <class name="org.wso2.carbon.analytics.datasource.rdbms.AnalyticsDataServiceTest"/-->
+       <class name="org.wso2.carbon.analytics.datasource.rdbms.AnalyticsDataServiceTest"/>
        <class name="org.wso2.carbon.analytics.datasource.rdbms.AnalyticsSparkSQLTest"/>
        
      </classes>
