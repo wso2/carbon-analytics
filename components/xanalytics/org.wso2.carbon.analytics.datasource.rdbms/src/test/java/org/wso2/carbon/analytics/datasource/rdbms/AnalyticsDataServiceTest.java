@@ -329,7 +329,7 @@ public class AnalyticsDataServiceTest {
         int tenantId = 50;
         String tableName = "TableX";
         this.cleanupTable(tenantId, tableName);
-        int n = 100, batch = 200;
+        int n = 50, batch = 200;
         Map<String, IndexType> columns = new HashMap<String, IndexType>();
         columns.put("tenant", IndexType.INTEGER);
         columns.put("ip", IndexType.STRING);
@@ -389,7 +389,7 @@ public class AnalyticsDataServiceTest {
         int tenantId = 50;
         String tableName = "TableX";
         this.cleanupTable(tenantId, tableName);        
-        int n = 100, batch = 200, nThreads = 2;
+        int n = 50, batch = 200, nThreads = 2;
         Map<String, IndexType> columns = new HashMap<String, IndexType>();
         columns.put("tenant", IndexType.INTEGER);
         columns.put("ip", IndexType.STRING);

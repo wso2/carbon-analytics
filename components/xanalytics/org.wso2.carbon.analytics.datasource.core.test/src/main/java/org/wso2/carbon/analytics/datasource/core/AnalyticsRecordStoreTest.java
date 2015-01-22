@@ -449,7 +449,7 @@ public class AnalyticsRecordStoreTest {
         
         this.analyticsRS.createTable(7, "T1");
         long hash1 = 0;
-        int n = 100, batch = 200;
+        int n = 50, batch = 200;
         long start = System.currentTimeMillis();
         for (int i = 0; i < n; i++) {
             records = generateRecords(7, "T1", i, batch, -1, -1);
