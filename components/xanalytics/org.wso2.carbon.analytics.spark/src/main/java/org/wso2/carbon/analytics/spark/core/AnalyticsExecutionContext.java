@@ -28,8 +28,6 @@ import org.apache.spark.sql.api.java.JavaSQLContext;
 import org.apache.spark.sql.api.java.JavaSchemaRDD;
 import org.apache.spark.sql.api.java.Row;
 
-import static scala.collection.JavaConversions.seqAsJavaList;
-
 /**
  * This class represents the analytics query execution context.
  */
