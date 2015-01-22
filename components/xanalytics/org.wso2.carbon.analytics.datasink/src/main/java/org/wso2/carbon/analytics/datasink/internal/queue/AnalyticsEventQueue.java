@@ -20,10 +20,12 @@ package org.wso2.carbon.analytics.datasink.internal.queue;
 import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.datasink.internal.AnalyticsDatasinkConfiguration;
 import org.wso2.carbon.databridge.commons.Event;
+
 import java.util.concurrent.Executors;
 
 public class AnalyticsEventQueue {
@@ -36,6 +38,7 @@ public class AnalyticsEventQueue {
         }
     };
 
+    @SuppressWarnings("unchecked")
     public AnalyticsEventQueue(int tenantId) {
         Disruptor<Event> eventQueue = new Disruptor<Event>(EVENT_FACTORY, AnalyticsDatasinkConfiguration.
                 getInstance().getQueueSize(), Executors.newCachedThreadPool());
