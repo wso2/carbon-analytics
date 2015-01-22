@@ -28,7 +28,6 @@ import org.apache.spark.sql.catalyst.expressions.Row;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.RecordGroup;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 
 import scala.collection.Seq;
 import scala.reflect.ClassTag;
@@ -47,8 +46,6 @@ import static scala.collection.JavaConversions.asScalaIterator;
 public class AnalyticsRDD extends RDD<Row> implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    private AnalyticsDataService analyticsDS;
     
     private List<String> columns;
     
@@ -56,20 +53,20 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
     
     private String tableName;
     
-    public AnalyticsRDD(AnalyticsDataService analyticsDS, int tenantId, String tableName, List<String> columns, 
+    public AnalyticsRDD(int tenantId, String tableName, List<String> columns, 
             SparkContext sc, Seq<Dependency<?>> deps, ClassTag<Row> evidence) {
         super(sc, deps, evidence);
-        this.analyticsDS = analyticsDS;  
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.columns = columns;
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public scala.collection.Iterator<Row> compute(Partition split, TaskContext context) {
         AnalyticsPartition partition = (AnalyticsPartition) split;
         try {
-            Iterator<Record> recordsItr = this.analyticsDS.readRecords(partition.getRecordGroup());
+            Iterator<Record> recordsItr = AnalyticsServiceHolder.getAnalyticsDataService().readRecords(partition.getRecordGroup());            
             return new InterruptibleIterator(context, asScalaIterator(new RowRecordIteratorAdaptor(recordsItr)));
         } catch (AnalyticsException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -118,7 +115,8 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
     public Partition[] getPartitions() {
         RecordGroup[] rgs;
         try {
-            rgs = this.analyticsDS.get(this.tenantId, this.tableName, this.columns, -1, -1, 0, 0);
+            rgs = AnalyticsServiceHolder.getAnalyticsDataService().get(this.tenantId, this.tableName, 
+                    this.columns, -1, -1, 0, Integer.MAX_VALUE);
         } catch (AnalyticsException e) {
             throw new RuntimeException(e.getMessage(), e);
         } 

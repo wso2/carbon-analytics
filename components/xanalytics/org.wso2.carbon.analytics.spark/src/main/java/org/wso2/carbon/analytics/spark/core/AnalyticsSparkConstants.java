@@ -25,8 +25,9 @@ public class AnalyticsSparkConstants {
 
     public static final String STRING_TYPE = "string";
     public static final String INT_TYPE = "int";
-    public static final String INTEGER_TYPE = "int";
+    public static final String INTEGER_TYPE = "integer";
     public static final String BOOLEAN_TYPE = "boolean";
     public static final String DOUBLE_TYPE = "double";
     public static final String FLOAT_TYPE = "float";
+    public static final String LONG_TYPE = "long";
 }

@@ -21,6 +21,7 @@ case class DefineSchema(schemaString: String)(){
       case INTEGER_TYPE => IntegerType
       case DOUBLE_TYPE => DoubleType
       case FLOAT_TYPE => FloatType
+      case LONG_TYPE => LongType
       case BOOLEAN_TYPE => BooleanType
 
       case other => sys.error(s"Unsupported type $other")

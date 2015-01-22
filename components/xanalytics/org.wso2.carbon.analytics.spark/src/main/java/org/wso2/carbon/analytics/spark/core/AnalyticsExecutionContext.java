@@ -18,12 +18,17 @@
  */
 package org.wso2.carbon.analytics.spark.core;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.AbstractList;
+
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.api.java.JavaSQLContext;
 import org.apache.spark.sql.api.java.JavaSchemaRDD;
+import org.apache.spark.sql.api.java.Row;
 
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import static scala.collection.JavaConversions.seqAsJavaList;
 
 /**
  * This class represents the analytics query execution context.
@@ -32,13 +37,10 @@ public class AnalyticsExecutionContext {
 
     private static final String TABLE = "table";
     private static final String DEFINE = "define";
-    
-    private static AnalyticsDataService analyticsDS;
-    
+        
     private static JavaSQLContext sqlCtx;
     
-    public static void init(AnalyticsDataService analyticsDS) {
-        AnalyticsExecutionContext.analyticsDS = analyticsDS;
+    public static void init() {
         SparkConf sparkConf = new SparkConf().setMaster("local").setAppName("CarbonAnalytics");
         JavaSparkContext ctx = new JavaSparkContext(sparkConf);
         sqlCtx = new JavaSQLContext(ctx);
@@ -63,11 +65,22 @@ public class AnalyticsExecutionContext {
     }
     
     private static AnalyticsQueryResult toResult(JavaSchemaRDD schemaRDD) throws AnalyticsExecutionException {
-        return new AnalyticsQueryResult(schemaRDD.schema().getFields(), schemaRDD.collect());
+        return new AnalyticsQueryResult(schemaRDD.schema().getFields(), convertRowsToObjects(schemaRDD.collect()));
+    }
+    
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private static List<List<Object>> convertRowsToObjects(List<Row> rows) {
+        List<List<Object>> result = new ArrayList<List<Object>>();
+        List<Object> objects;
+        for (Row row : rows) {
+            objects = new ArrayList<Object>((AbstractList) row.get(0));
+            result.add(objects);
+        }
+        return result;
     }
     
     private static void registerTable(int tenantId, String tableName, String schemaString) {
-        AnalyticsRelation table = new AnalyticsRelation(analyticsDS, tenantId, tableName, sqlCtx, schemaString);
+        AnalyticsRelation table = new AnalyticsRelation(tenantId, tableName, sqlCtx, schemaString);
         JavaSchemaRDD schemaRDD = sqlCtx.baseRelationToSchemaRDD(table);
         schemaRDD.registerTempTable(tableName);
     }

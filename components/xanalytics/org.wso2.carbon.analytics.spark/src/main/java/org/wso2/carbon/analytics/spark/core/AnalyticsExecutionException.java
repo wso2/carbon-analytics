@@ -18,10 +18,12 @@
  */
 package org.wso2.carbon.analytics.spark.core;
 
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+
 /**
  * This class represents executions occuring in Spark query execution.
  */
-public class AnalyticsExecutionException extends Exception {
+public class AnalyticsExecutionException extends AnalyticsException {
 
     private static final long serialVersionUID = 1L;
     

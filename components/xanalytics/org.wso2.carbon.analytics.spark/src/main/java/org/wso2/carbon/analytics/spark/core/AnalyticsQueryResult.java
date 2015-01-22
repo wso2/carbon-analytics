@@ -20,7 +20,6 @@ package org.wso2.carbon.analytics.spark.core;
 
 import java.util.List;
 
-import org.apache.spark.sql.api.java.Row;
 import org.apache.spark.sql.api.java.StructField;
 
 /**
@@ -30,9 +29,9 @@ public class AnalyticsQueryResult {
 
     private StructField[] columns;
     
-    private List<Row> rows;
+    private List<List<Object>> rows;
     
-    public AnalyticsQueryResult(StructField[] columns, List<Row> rows) {
+    public AnalyticsQueryResult(StructField[] columns, List<List<Object>> rows) {
         this.columns = columns;
         this.rows = rows;
     }
@@ -41,8 +40,25 @@ public class AnalyticsQueryResult {
         return columns;
     }
     
-    public List<Row> getRows() {
+    public List<List<Object>> getRows() {
         return rows;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        for (StructField column : this.getColumns()) {
+            builder.append("|" + column.getName() + "|\t");
+        }
+        builder.append("\n");
+        for (List<Object> row : this.getRows()) {
+            for (Object obj : row) {
+                builder.append(obj + "\t");
+            }
+            builder.append("\n");
+        }
+        builder.append("\n");
+        return builder.toString();
     }
     
 }

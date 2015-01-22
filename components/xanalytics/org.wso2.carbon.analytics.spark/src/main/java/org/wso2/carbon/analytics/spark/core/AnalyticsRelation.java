@@ -43,16 +43,13 @@ public class AnalyticsRelation extends TableScan {
     private JavaSQLContext sqlContext;
     
     private StructType schema;
-    
-    private AnalyticsDataService analyticsDS;
-    
+        
     private int tenantId;
     
     private String tableName;
     
-    public AnalyticsRelation(AnalyticsDataService analyticsDS, int tenantId, String tableName, 
+    public AnalyticsRelation(int tenantId, String tableName, 
             JavaSQLContext sqlContext, String schemaString) {
-        this.analyticsDS = analyticsDS;
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.sqlContext = sqlContext;
@@ -61,7 +58,7 @@ public class AnalyticsRelation extends TableScan {
 
     @Override
     public RDD<Row> buildScan() {
-        return new AnalyticsRDD(this.analyticsDS, this.tenantId, this.tableName, 
+        return new AnalyticsRDD(this.tenantId, this.tableName, 
                 new ArrayList<String>(asJavaCollection(this.schema.fieldNames().toList())), 
                 sqlContext.sqlContext().sparkContext(), scala.collection.Seq$.MODULE$.empty(), 
                 ClassTag$.MODULE$.<Row>apply(Row.class));

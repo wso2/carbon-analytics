@@ -44,7 +44,7 @@ public class AnalyticsPartition implements Partition {
     @Override
     public int index() {
         try {
-            return Arrays.asList(recordGroup.getLocations()).hashCode();
+            return Arrays.asList(this.recordGroup.getLocations()).hashCode();
         } catch (AnalyticsException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
