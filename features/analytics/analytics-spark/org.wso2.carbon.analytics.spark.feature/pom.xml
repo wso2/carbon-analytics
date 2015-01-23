@@ -39,9 +39,8 @@
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.analytics.spark.core</artifactId>
+            <artifactId>org.wso2.carbon.analytics.spark.ui.feature</artifactId>
             <version>${project.version}</version>
-            <type>zip</type>
         </dependency>
     </dependencies>
 
