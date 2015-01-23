@@ -17,6 +17,7 @@ package org.wso2.carbon.analytics.dataservice.restapi.beans;
 
 import javax.xml.bind.annotation.*;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -30,7 +31,7 @@ import java.util.Map;
 public class RecordBean {
 
 	/** The tenant id. */
-	@XmlElement(required = true)
+	@XmlElement(required = false)
 	private int tenantId;
 
 	/** The table name. */
@@ -42,15 +43,14 @@ public class RecordBean {
 	private Map<String, Object> values;
 
 	/** The timestamp. */
-	@XmlElement(required = true)
-	private long timestamp;
+	@XmlElement(required = false, nillable = true)
+	private Long timestamp;
 
 	/** The id. */
-	@XmlElement(required = true)
+	@XmlElement(required = false)
 	private String id;
 
 	/** The hash code. */
-	private int hashCode = -1;
 
 	/**
 	 * Sets the tenant id.
@@ -85,7 +85,7 @@ public class RecordBean {
 	 *            the new timestamp
 	 */
 	public void setTimestamp(long timestamp) {
-		this.timestamp = timestamp;
+		this.timestamp = new Long(timestamp);
 	}
 
 	/**
@@ -144,7 +144,10 @@ public class RecordBean {
 	 * @return the timestamp
 	 */
 	public long getTimestamp() {
-		return timestamp;
+		if (timestamp == null ){
+			return (new Date()).getTime();
+		}
+		return timestamp.longValue();
 	}
 
 	/*
@@ -170,22 +173,6 @@ public class RecordBean {
 			return false;
 		}
 		return this.getNotNullValues().equals(rhs.getNotNullValues());
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		if (this.hashCode == -1) {
-			this.hashCode = ((Integer) this.getTenantId()).hashCode();
-			this.hashCode += this.getTableName().hashCode() >> 2;
-			this.hashCode += this.getId().hashCode() >> 4;
-			this.hashCode += String.valueOf(this.getTimestamp()).hashCode() >> 8;
-			this.hashCode += this.getNotNullValues().hashCode() >> 16;
-		}
-		return this.hashCode;
 	}
 
 	/**
