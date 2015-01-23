@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
        <artifactId>org.wso2.carbon.analytics.dashboard.ui.feature</artifactId>
        <packaging>pom</packaging>
-       <name>WSO2 Carbon - BAM Dashboard UI Feature</name>
+       <name>WSO2 Carbon - Analytics BAM Dashboard UI Feature</name>
        <url>http://wso2.org</url>
        <description>This feature contains the bundles required for BAM dashboard</description>
 
