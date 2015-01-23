@@ -32,7 +32,6 @@ import java.util.List;
 
 public class AnalyticsWSO2EventConsumer implements WSO2EventListConsumer {
     private static final Log log = LogFactory.getLog(AnalyticsWSO2EventConsumer.class);
-
     private String streamId;
     private int tenantId;
 
