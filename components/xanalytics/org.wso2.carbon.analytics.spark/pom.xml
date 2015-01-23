@@ -26,6 +26,7 @@
     
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.analytics.spark.core</artifactId>
+    <name>WSO2 Carbon - Analytics Spark Core</name>
     <packaging>jar</packaging>
     <version>1.0.0-SNAPSHOT</version>
 

@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>bam-message-tracer-handler-feature</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon - BAM Message Tracer Handler Feature Aggregator Module</name>
+    <name>WSO2 Carbon - Analytics Message Tracer Handler Feature Aggregator Module</name>
     <url>http://wso2.org</url>
 
     <modules>

@@ -20,7 +20,6 @@ package org.wso2.carbon.analytics.datasink.internal.queue;
 import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.datasink.internal.AnalyticsDatasinkConfiguration;
@@ -50,14 +49,12 @@ public class AnalyticsEventQueue {
         }
     }
 
-
     public void put(Event event) {
         long sequence = this.ringBuffer.next();
         Event bufferedEvent = this.ringBuffer.get(sequence);
         updateEvent(bufferedEvent, event);
         this.ringBuffer.publish(sequence);
     }
-
 
     private void updateEvent(Event oldEvent, Event newEvent) {
         oldEvent.setArbitraryDataMap(newEvent.getArbitraryDataMap());
@@ -67,5 +64,4 @@ public class AnalyticsEventQueue {
         oldEvent.setStreamId(newEvent.getStreamId());
         oldEvent.setTimeStamp(newEvent.getTimeStamp());
     }
-
 }

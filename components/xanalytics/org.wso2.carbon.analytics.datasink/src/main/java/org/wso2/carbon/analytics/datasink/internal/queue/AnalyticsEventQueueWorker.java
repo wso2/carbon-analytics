@@ -27,11 +27,12 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.Event;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class AnalyticsEventQueueWorker implements EventHandler<Event> {
     private static final Log log = LogFactory.getLog(AnalyticsEventQueueWorker.class);
 
-    private ArrayList<Event> events;
+    private List<Event> events;
     private int tenantId;
 
     public AnalyticsEventQueueWorker(int tenantId) {
@@ -51,7 +52,7 @@ public class AnalyticsEventQueueWorker implements EventHandler<Event> {
         }
     }
 
-    public void insertEventList(ArrayList<Event> eventList) {
+    private void insertEventList(List<Event> eventList) {
         try {
             PrivilegedCarbonContext.startTenantFlow();
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId, true);

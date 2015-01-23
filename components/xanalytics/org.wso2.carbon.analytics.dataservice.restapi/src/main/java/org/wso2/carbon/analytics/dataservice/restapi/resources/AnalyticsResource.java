@@ -45,7 +45,6 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.RecordGroup;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class AnalyticsResource represents the REST APIs for AnalyticsDataService.
  */
@@ -272,7 +271,8 @@ public class AnalyticsResource extends AbstractResource {
 			RecordGroup[] recordGroups;
 			recordGroups = analyticsDataService.get(tenantId, tableName, null, timeFrom,
 				                                        timeTo, recordsFrom, count);
-			List<RecordBean> recordBeans = Utils.getAllRecordBeansFromRecordGroups(recordGroups);
+			List<RecordBean> recordBeans = Utils.getAllRecordBeansFromRecordGroups(analyticsDataService, 
+			                                                                       recordGroups);
 			return Response.ok(recordBeans).build();
 		} catch (AnalyticsException e) {
 			String message =
@@ -297,6 +297,17 @@ public class AnalyticsResource extends AbstractResource {
 	                           @PathParam("from") long timeFrom, @PathParam("to") long timeTo) {
 		return getRecords(tableName, timeFrom, timeTo, 0, -1);
 	}
+	
+	/**
+	 * Gets all the records.
+	 * @param tableName the table name
+	 * @return the records
+	 */
+	@GET
+	@Path("records/{tableName}")
+	public Response getRecords(@PathParam("tableName") String tableName) {
+		return getRecords(tableName, -1, -1, 0, -1);
+	}
 
 	/**
 	 * Gets the records, But this is a POST request, since we have to send ids in the content.
@@ -317,7 +328,8 @@ public class AnalyticsResource extends AbstractResource {
 		try {
 			RecordGroup[] recordGroups;
 			recordGroups = analyticsDataService.get(tenantId, tableName, null, ids);
-			List<RecordBean> recordBeans = Utils.getAllRecordBeansFromRecordGroups(recordGroups);
+			List<RecordBean> recordBeans = Utils.getAllRecordBeansFromRecordGroups(analyticsDataService, 
+			                                                                       recordGroups);
 			return Response.ok(recordBeans).build();
 		} catch (AnalyticsException e) {
 			String message =
@@ -340,8 +352,9 @@ public class AnalyticsResource extends AbstractResource {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking insertRecords");
 		}
+		int tenantId = -1234;
 		try {
-			List<Record> records = Utils.getRecordsFromRecordBeans(recordBeans);
+			List<Record> records = Utils.getRecordsFromRecordBeans(tenantId, recordBeans);
 			analyticsDataService.insert(records);
 			return handleResponse(ResponseStatus.SUCCESS, "Successfully added records");
 		} catch (AnalyticsException e) {
@@ -363,8 +376,9 @@ public class AnalyticsResource extends AbstractResource {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking updateRecords");
 		}
+		int tenantId = -1234;
 		try {
-			List<Record> records = Utils.getRecordsFromRecordBeans(recordBeans);
+			List<Record> records = Utils.getRecordsFromRecordBeans(tenantId, recordBeans);
 			analyticsDataService.update(records);
 			return handleResponse(ResponseStatus.SUCCESS, "Successfully updated records");
 		} catch (AnalyticsException e) {
@@ -494,7 +508,8 @@ public class AnalyticsResource extends AbstractResource {
 			                                                                    queryBean.getCount());
 			List<String> ids = Utils.getRecordIdsFromSearchResults(searchResults);
 			RecordGroup[] recordGroups = analyticsDataService.get(-1234, queryBean.getTableName(), null, ids);
-			List<RecordBean> recordBeans = Utils.getAllRecordBeansFromRecordGroups(recordGroups);
+			List<RecordBean> recordBeans = Utils.getAllRecordBeansFromRecordGroups(analyticsDataService, 
+			                                                                       recordGroups);
 			return Response.ok(recordBeans).build();
 		} catch (AnalyticsException e) {
 			String message =

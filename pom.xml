@@ -6,7 +6,7 @@
     <artifactId>carbon-analytics</artifactId>
     <packaging>pom</packaging>
     <version>4.3.0-SNAPSHOT</version>
-    <name>WSO2 Carbon - Platform Aggregator Pom</name>
+    <name>WSO2 Carbon - Analytics Platform Aggregator Pom</name>
     <url>http://wso2.org</url>
 
     <modules>
@@ -17,6 +17,8 @@
         <module>features/analytics/analytics-core</module>
         <module>features/analytics/analytics-datasources</module>
         <module>features/analytics/analytics-rest</module>
+        <module>features/analytics/analytics-spark</module>
+        <module>features/dashboards/analytics-dashboards</module>
     </modules>
 
     <dependencyManagement>

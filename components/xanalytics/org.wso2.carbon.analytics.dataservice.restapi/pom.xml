@@ -30,7 +30,7 @@
 	<artifactId>org.wso2.carbon.analytics.dataservice.restapi</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>war</packaging>
-	<name>Analytics Data Service JAX-RS Webapp</name>
+	<name>WSO2 Carbon - Analytics Data Service JAX-RS Webapp</name>
 	<description>Analytics Data Service JAX-RS Webapp</description>
 	<properties>
 		<jackson.version>1.8.6</jackson.version>

@@ -30,7 +30,7 @@
     <artifactId>bam-jmx-agent-feature</artifactId>
     <version>4.3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon - BAM JMX Data Agent Feature Aggregator Module</name>
+    <name>WSO2 Carbon - Analytics JMX Data Agent Feature Aggregator Module</name>
     <url>http://wso2.org</url>
 
     <modules>

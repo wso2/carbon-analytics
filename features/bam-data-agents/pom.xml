@@ -30,7 +30,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>bam-data-agents-features</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon - BAM Data Agents Aggregator Module</name>
+    <name>WSO2 Carbon - Analytics Data Agents Aggregator Module</name>
     <url>http://wso2.org</url>
 
     <modules>

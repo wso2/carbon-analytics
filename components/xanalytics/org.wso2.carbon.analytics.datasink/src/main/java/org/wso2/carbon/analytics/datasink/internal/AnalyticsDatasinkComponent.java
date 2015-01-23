@@ -70,7 +70,6 @@ public class AnalyticsDatasinkComponent {
 
     protected void setEventStreamService(EventStreamService eventStreamService) {
         ServiceHolder.setAnalyticsEventStreamListener(new AnalyticsEventStreamListener());
-
         eventStreamService.registerEventStreamListener(ServiceHolder.getAnalyticsEventStreamListener());
         ServiceHolder.setEventStreamService(eventStreamService);
     }
@@ -86,5 +85,4 @@ public class AnalyticsDatasinkComponent {
     protected void unsetAnalyticsDataservice(AnalyticsDataService analyticsDataservice) {
         ServiceHolder.setAnalyticsDataService(null);
     }
-
 }

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wso2.carbon.analytics.dataservice.restapi;
 
 import java.text.ParseException;
@@ -24,35 +25,40 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.wso2.carbon.analytics.dataservice.AnalyticsDSUtils;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.indexing.IndexType;
 import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.IndexTypeBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordGroupBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.SearchResultEntryBean;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.RecordGroup;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDSUtils;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 
+// TODO: Auto-generated Javadoc
 /**
- * REST API utility class.
+ * The Class Utils.
  */
 public class Utils {
-    
-    private static AnalyticsDataService analyticsDS;
+	
+	/**
+	 * Instantiates a new Utils class.
+	 */
+	private Utils() {
+
+	}
 
 	/**
 	 * Gets the analytics data service.
 	 * @return the analytics data service
 	 */
 	public static AnalyticsDataService getAnalyticsDataService() {
-	    if (analyticsDS == null) {
-		    analyticsDS = (AnalyticsDataService) PrivilegedCarbonContext.
-		        getThreadLocalCarbonContext().getOSGiService(AnalyticsDataService.class, null);
-	    }
-	    return analyticsDS;
+		return (AnalyticsDataService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+		                                                     .getOSGiService(AnalyticsDataService.class,
+		                                                                     null);
 	}
 
 	/**
@@ -61,9 +67,9 @@ public class Utils {
 	 *            the record bean
 	 * @return the record from record bean
 	 */
-	public static Record getRecordFromRecordBean(RecordBean recordBean) {
+	public static Record getRecordFromRecordBean(int tenantId, RecordBean recordBean) {
 		Record record =
-		                new Record(recordBean.getTenantId(), recordBean.getTableName(),
+		                new Record(recordBean.getId(), tenantId, recordBean.getTableName(),
 		                           recordBean.getValues(), recordBean.getTimestamp());
 		return record;
 	}
@@ -74,10 +80,10 @@ public class Utils {
 	 *            the record beans
 	 * @return the records from record beans
 	 */
-	public static List<Record> getRecordsFromRecordBeans(List<RecordBean> recordBeans) {
+	public static List<Record> getRecordsFromRecordBeans(int tenantId, List<RecordBean> recordBeans) {
 		List<Record> records = new ArrayList<Record>();
 		for (RecordBean recordBean : recordBeans) {
-			records.add(getRecordFromRecordBean(recordBean));
+			records.add(getRecordFromRecordBean(tenantId, recordBean));
 		}
 		return records;
 	}
@@ -110,7 +116,6 @@ public class Utils {
 		recordBean.setValues(record.getValues());
 		return recordBean;
 	}
-
 	/**
 	 * Creates the search result bean from search result.
 	 * @param searchResultEntry
@@ -225,9 +230,12 @@ public class Utils {
 	 * @return the all record beans from record groups
 	 * @throws AnalyticsException the analytics exception
 	 */
-	public static List<RecordBean> getAllRecordBeansFromRecordGroups(RecordGroup[] recordGroups) 
+	public static List<RecordBean> getAllRecordBeansFromRecordGroups(AnalyticsDataService ads, 
+	                                                                 RecordGroup[] recordGroups) 
 			throws AnalyticsException {
-		return createRecordBeansFromRecords(AnalyticsDSUtils.listRecords(getAnalyticsDataService(), recordGroups));
+		List<RecordBean> recordBeans = new ArrayList<RecordBean>();
+		recordBeans.addAll(createRecordBeansFromRecords(AnalyticsDSUtils.listRecords(ads, recordGroups)));
+		return recordBeans;
 	}
 	
 	/**

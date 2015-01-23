@@ -1,0 +1,15 @@
+<component xmlns="http://products.wso2.org/carbon">
+	<menus>
+        <menu>
+            <id>dashboard_menu_1</id>
+            <i18n-key>bam.dashbaord.log</i18n-key>
+            <i18n-bundle>../org.wso2.carbon.analytics.dashboard.ui.i18n.Resources</i18n-bundle>
+            <parent-menu>dashboard_main_menu</parent-menu>
+            <link>../analytics-dashboard/analytics-dashboard.jsp</link>
+            <region>region1</region>
+            <order>2</order>
+            <style-class>manage</style-class>
+            <icon>../analytics-dashboard/images/dashboard.gif</icon>
+        </menu>
+	</menus>
+</component>

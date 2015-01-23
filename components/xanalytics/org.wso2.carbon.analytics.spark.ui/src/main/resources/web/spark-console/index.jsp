@@ -32,7 +32,7 @@
     <script type="text/javascript">
 
         $( document ).ready(function() {
-          console.log("Shirunthi bae!");
+            console.log("Document loaded...")
       });
 
     </script>
@@ -41,35 +41,39 @@
         <h2>Interactive Spark Console</h2>
 
         <div id="workArea">
-            <p>Some stuff will go there bae!</p> <br/>
+            <!-- <p>Some stuff will go there bae!</p> <br/> -->
 
             <table class="styledLeft">
-            	<thead>
-            		<tr><th><fmt:message key="spark.console.title"/></th>
-            	    </tr>
-            	</thead>
-            	<tbody>
-	            	<tr>
-	            		<td>
-	            			<textarea rows="10" style="width:100%"></textarea>
-	            		</td>
-	            	</tr>
-
-	            	<tr>
-	            		<td>
-	            			<textarea id="queryPane"rows="10" style="width:100%"></textarea>
-	            		</td>
-	            	</tr>
-
-	            	<tr>
-	            		<td class="buttonRow">
-	            			<input type="button" value="Submit" id="btnSubmit" onclick="submitQuery()"/>
-	            		</td>
-	            	</tr>
-
-	            	
-            	</tbody>
+                <tbody>
+                    <tr >
+                        <td style="padding:5px;height:auto" id="resultsPane">
+                            
+                        </td>
+                    </tr>
+                </tbody>
            </table>
+
+            <br/><br/>
+
+           <table class="styledLeft">
+            <thead>
+                <tr><th>Type your Spark query below</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <textarea id="queryPane" rows="5" style="margin-top:5px;margin-bottom:5px;width:100%"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="buttonRow">
+                        <input type="button" value="Execute!" id="btnSubmit" onclick="submitQuery()">
+                    </td>
+                </tr>
+            </tbody>
+          </table>
+                        
             
 
         </div>

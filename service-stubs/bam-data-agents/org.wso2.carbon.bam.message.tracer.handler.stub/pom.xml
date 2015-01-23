@@ -30,7 +30,7 @@
     <artifactId>org.wso2.carbon.bam.message.tracer.handler.stub</artifactId>
     <version>4.3.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
-    <name>WSO2 Carbon - BAM Message Tracer Handler Stub</name>
+    <name>WSO2 Carbon - Analytics Message Tracer Handler Stub</name>
     <url>http://wso2.org</url>
 
     <build>
