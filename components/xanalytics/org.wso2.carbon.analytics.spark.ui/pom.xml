@@ -29,7 +29,7 @@
 
     <artifactId>org.wso2.carbon.analytics.spark.ui</artifactId>
     <packaging>bundle</packaging>
-    <name>WSO2 Carbon Analytics - Spark UI</name>
+    <name>WSO2 Carbon - Analytics Spark UI</name>
     <version>1.0.0-SNAPSHOT</version>
 
     <dependencies>

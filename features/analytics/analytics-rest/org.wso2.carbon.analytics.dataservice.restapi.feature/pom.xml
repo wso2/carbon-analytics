@@ -32,7 +32,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.analytics.dataservice.restapi.server.feature</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon - Analytics - REST API Server Feature</name>
+    <name>WSO2 Carbon - Analytics REST API Server Feature</name>
     <version>1.0.0-SNAPSHOT</version>
     <url>http://wso2.org</url>
     <description>

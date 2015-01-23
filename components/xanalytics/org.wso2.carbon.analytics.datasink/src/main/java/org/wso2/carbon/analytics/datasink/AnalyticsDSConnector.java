@@ -46,7 +46,8 @@ public class AnalyticsDSConnector {
         return streamDefinition.getName();
     }
 
-    private List<Record> convertEventsToRecord(int tenantId, List<Event> events) throws StreamDefinitionStoreException {
+    private List<Record> convertEventsToRecord(int tenantId, List<Event> events)
+            throws StreamDefinitionStoreException {
         List<Record> records = new ArrayList<Record>();
         for (Event event : events) {
             long timestamp;
@@ -54,11 +55,14 @@ public class AnalyticsDSConnector {
                     getStreamDefinition(event.getStreamId(), tenantId);
             Map<String, Object> eventAttributes = new HashMap<String, Object>();
             populateCommonAttributes(streamDefinition, eventAttributes);
-            populateTypedAttributes(AnalyticsDatasinkConstants.EVENT_META_DATA_TYPE, streamDefinition.getMetaData(),
+            populateTypedAttributes(AnalyticsDatasinkConstants.EVENT_META_DATA_TYPE,
+                    streamDefinition.getMetaData(),
                     event.getMetaData(), eventAttributes);
-            populateTypedAttributes(AnalyticsDatasinkConstants.EVENT_CORRELATION_DATA_TYPE, streamDefinition.getCorrelationData(),
+            populateTypedAttributes(AnalyticsDatasinkConstants.EVENT_CORRELATION_DATA_TYPE,
+                    streamDefinition.getCorrelationData(),
                     event.getCorrelationData(), eventAttributes);
-            populateTypedAttributes(AnalyticsDatasinkConstants.EVENT_PAYLOAD_DATA_TYPE, streamDefinition.getPayloadData(),
+            populateTypedAttributes(AnalyticsDatasinkConstants.EVENT_PAYLOAD_DATA_TYPE,
+                    streamDefinition.getPayloadData(),
                     event.getPayloadData(), eventAttributes);
             eventAttributes.putAll(event.getArbitraryDataMap());
             if (event.getTimeStamp() != 0L) timestamp = event.getTimeStamp();
@@ -87,5 +91,4 @@ public class AnalyticsDSConnector {
     public void deleteStream(int tenantId, StreamDefinition streamDefinition) throws AnalyticsException {
         ServiceHolder.getAnalyticsDataService().deleteTable(tenantId, generateTableName(streamDefinition));
     }
-
 }
