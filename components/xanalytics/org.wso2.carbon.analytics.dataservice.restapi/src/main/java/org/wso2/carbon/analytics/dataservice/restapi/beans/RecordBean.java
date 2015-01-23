@@ -50,8 +50,6 @@ public class RecordBean {
 	@XmlElement(required = false)
 	private String id;
 
-	/** The hash code. */
-
 	/**
 	 * Sets the tenant id.
 	 * @param tenantId
