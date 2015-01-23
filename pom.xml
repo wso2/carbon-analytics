@@ -17,6 +17,7 @@
         <module>features/analytics/analytics-core</module>
         <module>features/analytics/analytics-datasources</module>
         <module>features/analytics/analytics-rest</module>
+        <module>features/analytics/analytics-spark</module>
     </modules>
 
     <dependencyManagement>
