@@ -20,7 +20,6 @@ package org.wso2.carbon.analytics.spark.core;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.AbstractList;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -66,12 +65,14 @@ public class AnalyticsExecutionContext {
         return new AnalyticsQueryResult(schemaRDD.schema().getFields(), convertRowsToObjects(schemaRDD.collect()));
     }
     
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     private static List<List<Object>> convertRowsToObjects(List<Row> rows) {
         List<List<Object>> result = new ArrayList<List<Object>>();
         List<Object> objects;
         for (Row row : rows) {
-            objects = new ArrayList<Object>((AbstractList) row.get(0));
+            objects = new ArrayList<Object>();
+            for (int i = 0; i < row.length(); i++) {
+                objects.add(row.get(i));
+            }
             result.add(objects);
         }
         return result;

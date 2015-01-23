@@ -72,7 +72,7 @@ public class AnalyticsSparkSQLTest {
         this.service.insert(records);
         AnalyticsExecutionContext.executeQuery(1, "define table Log server_name STRING, "
                 + "ip STRING, tenant INTEGER, sequence LONG, summary STRING");
-        AnalyticsQueryResult result = AnalyticsExecutionContext.executeQuery(1, "SELECT * FROM Log");
+        AnalyticsQueryResult result = AnalyticsExecutionContext.executeQuery(1, "SELECT ip FROM Log");
         Assert.assertEquals(result.getRows().size(), 10);
         System.out.println(result);
         this.service.deleteTable(1, "Log");

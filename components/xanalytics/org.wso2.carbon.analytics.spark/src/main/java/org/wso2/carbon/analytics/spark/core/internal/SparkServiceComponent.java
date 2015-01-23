@@ -41,7 +41,7 @@ public class SparkServiceComponent {
             }
         } catch (Throwable e) {
             log.error(e.getMessage(), e);
-        }        
+        }
     }
     
     public static void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {

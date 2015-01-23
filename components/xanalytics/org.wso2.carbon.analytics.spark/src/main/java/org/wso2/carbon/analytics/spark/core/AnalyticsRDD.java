@@ -33,7 +33,6 @@ import scala.collection.Seq;
 import scala.reflect.ClassTag;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Iterator;
 import java.util.Map;
@@ -97,9 +96,9 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
                 return null;
             }
             Map<String, Object> recordVals = record.getValues();
-            List<Object> rowVals = new ArrayList<Object>(columns.size());
-            for (String column : columns) {
-                rowVals.add(recordVals.get(column));
+            Object[] rowVals = new Object[columns.size()];
+            for (int i = 0; i < columns.size(); i++) {
+                rowVals[i] = recordVals.get(columns.get(i));
             }
             return org.apache.spark.sql.api.java.Row.create(rowVals).row();
         }
