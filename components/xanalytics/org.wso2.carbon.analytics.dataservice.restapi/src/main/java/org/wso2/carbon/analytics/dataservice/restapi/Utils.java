@@ -31,25 +31,16 @@ import org.wso2.carbon.analytics.dataservice.indexing.IndexType;
 import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.IndexTypeBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordBean;
-import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordGroupBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.SearchResultEntryBean;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.RecordGroup;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class Utils.
+ * This class represents a set of utility functionalities for the analytics REST API.
  */
 public class Utils {
-	
-	/**
-	 * Instantiates a new Utils class.
-	 */
-	private Utils() {
-
-	}
 
 	/**
 	 * Gets the analytics data service.

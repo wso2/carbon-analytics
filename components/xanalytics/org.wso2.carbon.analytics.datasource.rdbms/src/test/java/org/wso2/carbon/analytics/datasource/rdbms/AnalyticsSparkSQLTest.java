@@ -75,6 +75,9 @@ public class AnalyticsSparkSQLTest {
         AnalyticsQueryResult result = AnalyticsExecutionContext.executeQuery(1, "SELECT ip FROM Log");
         Assert.assertEquals(result.getRows().size(), 10);
         System.out.println(result);
+        result = AnalyticsExecutionContext.executeQuery(1, "SELECT * FROM Log");
+        Assert.assertEquals(result.getRows().size(), 10);
+        System.out.println(result);
         this.service.deleteTable(1, "Log");
     }
     

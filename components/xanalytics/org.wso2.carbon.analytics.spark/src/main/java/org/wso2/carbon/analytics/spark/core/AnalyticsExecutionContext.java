@@ -33,6 +33,7 @@ import org.apache.spark.sql.api.java.Row;
 public class AnalyticsExecutionContext {
 
     private static final String TABLE = "table";
+    
     private static final String DEFINE = "define";
         
     private static JavaSQLContext sqlCtx;

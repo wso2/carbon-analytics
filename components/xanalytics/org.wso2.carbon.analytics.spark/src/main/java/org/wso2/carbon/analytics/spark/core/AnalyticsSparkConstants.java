@@ -30,4 +30,5 @@ public class AnalyticsSparkConstants {
     public static final String DOUBLE_TYPE = "double";
     public static final String FLOAT_TYPE = "float";
     public static final String LONG_TYPE = "long";
+    
 }

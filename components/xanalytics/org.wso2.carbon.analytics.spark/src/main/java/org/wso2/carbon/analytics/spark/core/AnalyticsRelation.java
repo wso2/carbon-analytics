@@ -24,16 +24,11 @@ import org.apache.spark.sql.api.java.JavaSQLContext;
 import org.apache.spark.sql.catalyst.expressions.Row;
 import org.apache.spark.sql.catalyst.types.StructType;
 import org.apache.spark.sql.sources.TableScan;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
-import org.wso2.carbon.analytics.spark.core.sources.DefineSchema;
+
 import java.util.ArrayList;
 
 import static scala.collection.JavaConversions.asJavaCollection;
-
 import scala.reflect.ClassTag$;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This class represents a Spark SQL relation.
@@ -53,9 +48,10 @@ public class AnalyticsRelation extends TableScan {
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.sqlContext = sqlContext;
-        this.schema = new DefineSchema(schemaString).getSchema();
+        this.schema = new AnalyticsSchema(schemaString);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public RDD<Row> buildScan() {
         return new AnalyticsRDD(this.tenantId, this.tableName, 
