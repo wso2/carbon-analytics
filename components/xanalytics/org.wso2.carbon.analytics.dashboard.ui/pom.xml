@@ -54,15 +54,6 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Private-Package>
-                            
-                        </Private-Package>
-                        <Export-Package>
-                            
-                        </Export-Package>
-                        <Import-Package>
-
-                        </Import-Package>
                         <Carbon-Component>UIBundle</Carbon-Component>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>

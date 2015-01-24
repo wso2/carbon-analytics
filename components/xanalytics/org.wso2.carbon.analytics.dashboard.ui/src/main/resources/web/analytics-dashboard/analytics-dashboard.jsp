@@ -20,6 +20,7 @@
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ page import="org.wso2.carbon.context.CarbonContext" %>
 
+
 <%
 
     /*ConfigurationContext configContext =
@@ -54,7 +55,7 @@
                 dashboardUrl = "../../../../../"+url;
             }
         } */
-        location.href = "http://localhost:9763/BamLog/index.jag"; //hard coded for now
+        location.href = "http://localhost:9763/log-analyzer/index.jag"; //hard coded for now
     });
 
 </script>
