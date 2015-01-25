@@ -1,0 +1,23 @@
+#resultsPane {
+  height: 15em;
+  overflow: auto;
+
+  background: #ffffff;
+  /*border: #3b3512 solid 1px;*/
+  margin: 10px;
+}
+
+#resultsPane table {
+	/*border: 1px solid #b1b1b1;*/
+	padding:10px;
+}
+
+#resultsPane table td{
+	/*border: 1px solid #b1b1b1;*/
+	padding-top:10px;
+	padding-left:10px;
+}
+
+.error {
+	color:#121212;
+}

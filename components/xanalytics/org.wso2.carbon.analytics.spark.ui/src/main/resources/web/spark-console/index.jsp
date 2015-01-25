@@ -28,6 +28,8 @@
                        resourceBundle="org.wso2.carbon.analytics.spark.ui.i18n.Resources"
                        topPage="true" request="<%=request%>"/>
 
+    <link type="text/css" href="css/main.css" rel="stylesheet"/>                   
+
 
     <script type="text/javascript">
 
@@ -46,8 +48,18 @@
             <table class="styledLeft">
                 <tbody>
                     <tr >
-                        <td style="padding:5px;height:auto" id="resultsPane">
-                            
+                        <td>
+                            <div id="resultsPane">
+                                <pre id="pre">
+
+                                Welcome to interactive Spark SQL shell
+
+                                This interactive shell lets you execute Spark SQL commands against a local Spark cluster
+
+                                Initialzing Spark client...
+
+                                </pre>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
@@ -68,6 +80,7 @@
                 </tr>
                 <tr>
                     <td class="buttonRow">
+                        <input type="button" value="Reset" id="btnReset" onclick="resetQueryPane()">
                         <input type="button" value="Execute!" id="btnSubmit" onclick="submitQuery()">
                     </td>
                 </tr>
@@ -81,29 +94,71 @@
 
     <script type="text/javascript">
 
-    	function submitQuery() {
-    		console.log("inside button click");
-    		jQuery.ajax({
+        function resetQueryPane() {
+            document.getElementById("queryPane").value = "";
+        }
 
-    		    url : '../spark-console/execute_spark_ajaxprocessor.jsp',
-    		    type : 'POST',
-    		    data : {
-    		        'numberOfWords' : 10
-    		    },
-    		    dataType:'json',
-    		    success : function(data) {              
-    		        
-    		        alert(data.response);
-    		        
-    		    },
-    		    error : function(request,error) {
-    		        alert("Request: "+JSON.stringify(request));
-    		    }
-    		});
-    	
-    	}	//end of submitQuery
+        function submitQuery() {
+          var resultsPane = document.getElementById("resultsPane");
+          var query = document.getElementById("queryPane").value;
 
-    	
+          jQuery.ajax({
+
+              url : '../spark-console/execute_spark_ajaxprocessor.jsp',
+              type : 'POST',
+              data : {
+                  'query' : query
+              },
+              dataType:'json',
+              success : function(data) {              
+                  // alert('Data: '+data.response.items.length);
+                  var results = data.response.items;
+                  var columns = data.meta.columns;
+
+                  var table = document.createElement('table');
+                  
+                  //append table headers
+                  var header = document.createElement('tr');  
+                  for (var i = 0; i < columns.length; i++) {
+                    var td = document.createElement('td');
+                    var text = document.createTextNode(columns[i]);
+
+                    td.appendChild(text);
+                    header.appendChild(td);
+                  }
+                  table.appendChild(header);
+
+                  for (var i = 0; i < results.length; i++){
+                    var element = results[i];
+
+
+                    var tr = document.createElement('tr');  
+
+                    for (var j = 0; j < columns.length; j++) {
+                      var td = document.createElement('td');
+                      var text = document.createTextNode(element[j]);
+
+                      td.appendChild(text);
+                      tr.appendChild(td);
+                    }; 
+                    table.appendChild(tr);
+                  }
+
+                  resultsPane.appendChild(table);
+                  resultsPane.appendChild(document.createElement("br"));
+
+
+                  resultsPane.scrollTop = resultsPane.scrollHeight;
+
+              } ,
+              error : function(request,error) {
+                  alert("Request: "+JSON.stringify(request));
+              }
+
+        }); //end of ajax
+
+      }
+      
 
     </script>
 
