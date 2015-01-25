@@ -18,7 +18,6 @@ package org.wso2.carbon.analytics.dataservice.restapi.beans;
 import javax.xml.bind.annotation.*;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -178,7 +177,7 @@ public class RecordBean {
 	 * @return the not null values
 	 */
 	public Map<String, Object> getNotNullValues() {
-		Map<String, Object> result = new HashMap<String, Object>(this.getValues());
+		Map<String, Object> result = this.getValues();
 		Iterator<Map.Entry<String, Object>> itr = result.entrySet().iterator();
 		while (itr.hasNext()) {
 			if (itr.next().getValue() == null) {
