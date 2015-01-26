@@ -8,16 +8,16 @@
     try {
         String jsonResult = client.execute(-1234, query.trim());
 
-        response.setStatus(response.SC_OK);
+        response.setStatus(HttpServletResponse.SC_OK);
 %>
 <%=jsonResult%>
 <%
     } catch (AnalyticsExecutionException e) {
 //        e.printStackTrace();
-        response.sendError(response.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
     } catch (RuntimeException e) {
 //        e.printStackTrace();
-        response.sendError(response.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
 %>
