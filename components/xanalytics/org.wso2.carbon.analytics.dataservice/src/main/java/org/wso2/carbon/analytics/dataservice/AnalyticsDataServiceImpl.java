@@ -165,6 +165,12 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             int start, int count) throws AnalyticsIndexException {
         return this.getIndexer().search(tenantId, tableName, language, query, start, count);
     }
+    
+    @Override
+    public int searchCount(int tenantId, String tableName, String language, 
+            String query) throws AnalyticsIndexException {
+        return this.getIndexer().searchCount(tenantId, tableName, language, query);
+    }
 
     @Override
     public Map<String, IndexType> getIndices(int tenantId, String tableName) throws AnalyticsIndexException {

@@ -172,6 +172,31 @@ public class AnalyticsDataServiceTest {
     }
     
     @Test
+    public void testSearchCount() throws AnalyticsException {
+        int tenantId = 4;
+        String tableName = "Books";
+        this.cleanupTable(tenantId, tableName);
+        Map<String, IndexType> columns = new HashMap<String, IndexType>();
+        columns.put("INT1", IndexType.INTEGER);
+        columns.put("STR1", IndexType.STRING);
+        columns.put("str2", IndexType.STRING);
+        columns.put("TXT1", IndexType.STRING);
+        columns.put("LN1", IndexType.LONG);
+        columns.put("DB1", IndexType.DOUBLE);
+        columns.put("FL1", IndexType.FLOAT);
+        columns.put("BL1", IndexType.BOOLEAN);
+        this.service.createTable(tenantId, tableName);
+        this.service.setIndices(tenantId, tableName, columns);
+        List<Record> records = this.generateIndexRecords(tenantId, tableName, 100, 0);
+        this.service.insert(records);
+        int count = this.service.searchCount(tenantId, tableName, "lucene", "STR1:STRING55");
+        Assert.assertEquals(count, 1);
+        count = this.service.searchCount(tenantId, tableName, "lucene", "TXT1:name");
+        Assert.assertEquals(count, 100);
+        this.cleanupTable(tenantId, tableName);
+    }
+    
+    @Test
     public void testIndexedDataUpdate() throws Exception {
         int tenantId = 1;
         String tableName = "T1";

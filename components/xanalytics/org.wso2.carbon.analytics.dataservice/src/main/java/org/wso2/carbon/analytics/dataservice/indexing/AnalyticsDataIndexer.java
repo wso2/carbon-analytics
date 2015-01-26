@@ -51,6 +51,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopScoreDocCollector;
+import org.apache.lucene.search.TotalHitCountCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.Version;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDirectory;
@@ -198,7 +199,6 @@ public class AnalyticsDataIndexer {
             int start, int count) throws AnalyticsIndexException {
         List<String> shardIds = this.lookupGloballyExistingShardIds(tenantId, tableName);
         List<SearchResultEntry> result = new ArrayList<SearchResultEntry>();
-        /* needs to improve this to do this efficiently */
         for (String shardId : shardIds) {
             result.addAll(this.search(tenantId, tableName, language, query, 0, count + start, shardId));
         }
@@ -210,6 +210,16 @@ public class AnalyticsDataIndexer {
             result = result.subList(start, start + count);
         } else {
             result = result.subList(start, result.size());
+        }
+        return result;
+    }
+    
+    public int searchCount(int tenantId, String tableName, String language, 
+            String query) throws AnalyticsIndexException {
+        List<String> shardIds = this.lookupGloballyExistingShardIds(tenantId, tableName);
+        int result = 0;
+        for (String shardId : shardIds) {
+            result += this.searchCount(tenantId, tableName, language, query, shardId);
         }
         return result;
     }
@@ -235,6 +245,32 @@ public class AnalyticsDataIndexer {
             return result;
         } catch (Exception e) {
             throw new AnalyticsIndexException("Error in index search, shard table id: '" + 
+                    shardedTableId + "': " + e.getMessage(), e);
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    log.error("Error in closing the reader: " + e.getMessage(), e);;
+                }
+            }
+        }
+    }
+    
+    private int searchCount(int tenantId, String tableName, String language, String query,
+            String shardId) throws AnalyticsIndexException {
+        String shardedTableId = this.generateShardedTableId(tenantId, tableName, shardId);
+        IndexReader reader = null;
+        try {
+            reader = DirectoryReader.open(this.lookupIndexDir(shardedTableId));
+            IndexSearcher searcher = new IndexSearcher(reader);
+            Map<String, IndexType> indices = this.lookupIndices(tenantId, tableName);
+            Query indexQuery = new AnalyticsQueryParser(DEFAULT_ANALYZER, indices).parse(query);
+            TotalHitCountCollector collector = new TotalHitCountCollector();
+            searcher.search(indexQuery, collector);
+            return collector.getTotalHits();
+        } catch (Exception e) {
+            throw new AnalyticsIndexException("Error in index search count, shard table id: '" + 
                     shardedTableId + "': " + e.getMessage(), e);
         } finally {
             if (reader != null) {

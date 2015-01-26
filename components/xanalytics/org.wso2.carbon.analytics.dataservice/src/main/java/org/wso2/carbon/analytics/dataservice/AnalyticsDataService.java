@@ -203,6 +203,18 @@ public interface AnalyticsDataService {
             String query, int start, int count) throws AnalyticsIndexException;
     
     /**
+     * Returns the search count of results of a given search query.
+     * @param tenantId The tenant id
+     * @param tableName The table name
+     * @param language The language used to give the search query
+     * @param query The search query
+     * @return The count of results
+     * @throws AnalyticsIndexException
+     */
+    int searchCount(int tenantId, String tableName, String language, 
+            String query) throws AnalyticsIndexException;
+    
+    /**
      * Destroys and frees any resources taken up by the analytics data service implementation.
      */
     void destroy() throws AnalyticsException;

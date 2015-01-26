@@ -520,4 +520,31 @@ public class AnalyticsResource extends AbstractResource {
 			return handleResponse(ResponseStatus.FAILED, message);
 		}
 	}
+	
+	/**
+     * Returns the search record count.
+     *
+     * @param queryBean the query bean
+     * @return the response
+     */
+    @POST
+    @Path("search_count")
+    public Response searchCount(QueryBean queryBean) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Invoking search count for tenantId :" + queryBean.getTenantId() +
+                         " tableName : " + queryBean.getTableName());
+        }
+        try {
+            int result = analyticsDataService.searchCount(-1234, queryBean.getTableName(), queryBean.getLanguage(),
+                    queryBean.getQuery());
+            return Response.ok(result).build();
+        } catch (AnalyticsException e) {
+            String message = "Error in search count; table: " + queryBean.getTableName() + " tenantId: "
+                    + queryBean.getTenantId();
+            message = Utils.getCompleteErrorMessage(message, e);
+            logger.error(message, e);
+            return handleResponse(ResponseStatus.FAILED, message);
+        }
+    }
+	
 }
