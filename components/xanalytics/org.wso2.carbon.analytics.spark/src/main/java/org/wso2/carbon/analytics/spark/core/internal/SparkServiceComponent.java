@@ -40,6 +40,7 @@ public class SparkServiceComponent {
             if (log.isDebugEnabled()) {
                 log.debug("Starting 'SparkServiceComponent'");
             }
+
             AnalyticsExecutionContext.init();
         } catch (Throwable e) {
             log.error(e.getMessage(), e);
