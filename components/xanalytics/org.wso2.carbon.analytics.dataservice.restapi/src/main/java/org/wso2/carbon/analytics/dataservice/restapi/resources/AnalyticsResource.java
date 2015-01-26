@@ -498,9 +498,10 @@ public class AnalyticsResource extends AbstractResource {
 			logger.debug("Invoking search for tenantId :" + queryBean.getTenantId() +
 			             " tableName : " + queryBean.getTableName());
 		}
+		int tenantId = -1234;
 		try {
 			List<SearchResultEntry> searchResults =
-			                                        analyticsDataService.search(-1234,
+			                                        analyticsDataService.search(tenantId,
 			                                                                    queryBean.getTableName(),
 			                                                                    queryBean.getLanguage(),
 			                                                                    queryBean.getQuery(),
@@ -514,7 +515,7 @@ public class AnalyticsResource extends AbstractResource {
 		} catch (AnalyticsException e) {
 			String message =
 			                 "Error while searching table: " + queryBean.getTableName() +
-			                         " tenantId: " + queryBean.getTenantId();
+			                         " tenantId: " + tenantId;
 			message = Utils.getCompleteErrorMessage(message, e);
 			logger.error(message, e);
 			return handleResponse(ResponseStatus.FAILED, message);
@@ -534,13 +535,14 @@ public class AnalyticsResource extends AbstractResource {
             logger.debug("Invoking search count for tenantId :" + queryBean.getTenantId() +
                          " tableName : " + queryBean.getTableName());
         }
+        int tenantId = -1234;
         try {
-            int result = analyticsDataService.searchCount(-1234, queryBean.getTableName(), queryBean.getLanguage(),
+            int result = analyticsDataService.searchCount(tenantId, queryBean.getTableName(), queryBean.getLanguage(),
                     queryBean.getQuery());
             return Response.ok(result).build();
         } catch (AnalyticsException e) {
             String message = "Error in search count; table: " + queryBean.getTableName() + " tenantId: "
-                    + queryBean.getTenantId();
+                    + tenantId;
             message = Utils.getCompleteErrorMessage(message, e);
             logger.error(message, e);
             return handleResponse(ResponseStatus.FAILED, message);
