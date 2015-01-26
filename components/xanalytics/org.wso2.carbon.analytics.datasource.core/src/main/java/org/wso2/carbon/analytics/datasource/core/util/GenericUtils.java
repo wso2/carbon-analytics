@@ -21,7 +21,7 @@ package org.wso2.carbon.analytics.datasource.core.util;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -167,7 +167,8 @@ public class GenericUtils {
     
     public static Map<String, Object> decodeRecordValues(byte[] data, 
             Set<String> columns) throws AnalyticsException {
-        Map<String, Object> result = new HashMap<String, Object>();
+        /* using LinkedHashMap to retain the column order */
+        Map<String, Object> result = new LinkedHashMap<String, Object>();
         ByteBuffer buffer = ByteBuffer.wrap(data);
         int type, size;
         String colName;
