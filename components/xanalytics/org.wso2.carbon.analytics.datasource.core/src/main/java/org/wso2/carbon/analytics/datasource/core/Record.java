@@ -18,8 +18,8 @@
  */
 package org.wso2.carbon.analytics.datasource.core;
 
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -126,7 +126,7 @@ public class Record {
     }
 
     public Map<String, Object> getNotNullValues() {
-        Map<String, Object> result = new HashMap<String, Object>(this.getValues());
+        Map<String, Object> result = new LinkedHashMap<String, Object>(this.getValues());
         Iterator<Map.Entry<String, Object>> itr = result.entrySet().iterator();
         while (itr.hasNext()) {
             if (itr.next().getValue() == null) {
