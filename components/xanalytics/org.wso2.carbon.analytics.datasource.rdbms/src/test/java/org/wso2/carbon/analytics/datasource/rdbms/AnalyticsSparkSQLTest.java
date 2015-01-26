@@ -79,6 +79,7 @@ public class AnalyticsSparkSQLTest {
         Assert.assertEquals(result.getRows().size(), 10);
         System.out.println(result);
         this.service.deleteTable(1, "Log");
+        AnalyticsExecutionContext.stop();
     }
     
 }

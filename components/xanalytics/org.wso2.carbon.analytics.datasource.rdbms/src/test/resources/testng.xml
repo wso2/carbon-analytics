@@ -13,7 +13,8 @@
        <class name="org.wso2.carbon.analytics.datasource.rdbms.H2MemDBAnalyticsFileSystemTest"/>
        <class name="org.wso2.carbon.analytics.datasource.rdbms.AnalyticsDataServiceTest"/>
        <class name="org.wso2.carbon.analytics.datasource.rdbms.AnalyticsSparkSQLTest"/>
-       
+       <class name="org.wso2.carbon.analytics.datasource.rdbms.AnalyticsSparkSQLUITest"/>
+
      </classes>
    </test>
 </suite>
