@@ -37,8 +37,8 @@ public class SparkExecutionClient {
 
     private static Log log = LogFactory.getLog(SparkExecutionClient.class);
 
-    public String execute(int tenantID, String query) {
-        String resultString = null;
+    public String execute(int tenantID, String query) throws AnalyticsExecutionException, RuntimeException{
+        String resultString;
         try {
             AnalyticsQueryResult result = AnalyticsExecutionContext.executeQuery(tenantID, query);
             if (result != null) {
@@ -49,8 +49,10 @@ public class SparkExecutionClient {
         } catch (AnalyticsExecutionException e) {
 //            e.printStackTrace();
             resultString = JsonError(e);
+            throw e;
         } catch (RuntimeException e){
             resultString = JsonError(e);
+            throw e;
         }
         return resultString;
     }
