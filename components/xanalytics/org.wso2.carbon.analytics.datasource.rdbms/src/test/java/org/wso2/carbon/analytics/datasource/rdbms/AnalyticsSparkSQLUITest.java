@@ -18,13 +18,7 @@
  */
 package org.wso2.carbon.analytics.datasource.rdbms;
 
-import java.io.IOException;
-import java.util.List;
-
-import javax.naming.NamingException;
-
 import junit.framework.Assert;
-
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
@@ -35,51 +29,63 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.Record;
-import org.wso2.carbon.analytics.spark.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionContext;
-import org.wso2.carbon.analytics.spark.core.AnalyticsQueryResult;
+import org.wso2.carbon.analytics.spark.core.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.spark.ui.client.SparkExecutionClient;
+
+import javax.naming.NamingException;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * This class represents tests related to Spark SQL based analytics.
  */
-public class AnalyticsSparkSQLTest {
+public class AnalyticsSparkSQLUITest {
 
     private AnalyticsDataService service;
-    
+
     @BeforeSuite
     public void setup() throws NamingException, AnalyticsException, IOException {
         AnalyticsRecordStore ars = H2FileDBAnalyticsRecordStoreTest.cleanupAndCreateARS();
         AnalyticsFileSystem afs = H2FileDBAnalyticsFileSystemTest.cleanupAndCreateAFS();
         this.service = new AnalyticsDataServiceImpl(ars, afs);
     }
-    
+
     @AfterSuite
     public void done() throws NamingException, AnalyticsException, IOException {
         this.service.destroy();
     }
-    
+
     @Test
-    public void testExecutionContextInit() {
+    public void testUIJsonStringGeneration() throws AnalyticsException {
+        System.out.printf("***** AnalyticsSparkSQLUITest ***** ");
         AnalyticsServiceHolder.setAnalyticsDataService(this.service);
         AnalyticsExecutionContext.init();
-    }
-    
-    @Test (dependsOnMethods = "testExecutionContextInit")
-    public void testExecutionSelectQuery() throws AnalyticsException {
+
         List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 10, -1, -1);
         this.service.deleteTable(1, "Log");
         this.service.createTable(1, "Log");
         this.service.insert(records);
-        AnalyticsExecutionContext.executeQuery(1, "define table Log server_name STRING, "
-                + "ip STRING, tenant INTEGER, sequence LONG, summary STRING");
-        AnalyticsQueryResult result = AnalyticsExecutionContext.executeQuery(1, "SELECT ip FROM Log");
-        Assert.assertEquals(result.getRows().size(), 10);
+
+        SparkExecutionClient client = new SparkExecutionClient();
+        String result = client.execute(1, "define table Log server_name STRING, "
+                                          + "ip STRING, tenant INTEGER, sequence LONG, summary STRING");
+        Assert.assertEquals(result.charAt(0), '{');
+        Assert.assertEquals(result.charAt(result.length()-1), '}');
         System.out.println(result);
-        result = AnalyticsExecutionContext.executeQuery(1, "SELECT * FROM Log");
-        Assert.assertEquals(result.getRows().size(), 10);
+
+        result = client.execute(1, "SELECT * FROM Log");
         System.out.println(result);
+        Assert.assertEquals(result.charAt(0), '{');
+        Assert.assertEquals(result.charAt(result.length()-1), '}');
+
+        result = client.execute(1, "SELECT * from ABC");
+        System.out.println(result);
+        Assert.assertEquals(result.charAt(0), '{');
+        Assert.assertEquals(result.charAt(result.length()-1), '}');
+
         this.service.deleteTable(1, "Log");
         AnalyticsExecutionContext.stop();
     }
-    
+
 }
