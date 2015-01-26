@@ -18,14 +18,14 @@
  */
 package org.wso2.carbon.analytics.spark.core;
 
-import java.util.List;
-import java.util.ArrayList;
-
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.api.java.JavaSQLContext;
 import org.apache.spark.sql.api.java.JavaSchemaRDD;
 import org.apache.spark.sql.api.java.Row;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class represents the analytics query execution context.
@@ -42,6 +42,10 @@ public class AnalyticsExecutionContext {
         SparkConf sparkConf = new SparkConf().setMaster("local").setAppName("CarbonAnalytics");
         JavaSparkContext ctx = new JavaSparkContext(sparkConf);
         sqlCtx = new JavaSQLContext(ctx);
+    }
+
+    public static void stop(){
+        sqlCtx.sqlContext().sparkContext().stop();
     }
     
     public static AnalyticsQueryResult executeQuery(int tenantId, String query) throws AnalyticsExecutionException {
