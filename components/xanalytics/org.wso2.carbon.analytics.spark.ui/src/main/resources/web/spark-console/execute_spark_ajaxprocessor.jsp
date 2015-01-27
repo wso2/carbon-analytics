@@ -4,14 +4,11 @@
 
     String query = request.getParameter("query");
     SparkExecutionClient client = new SparkExecutionClient();
-
+    String jsonResult ="";
     try {
-        String jsonResult = client.execute(-1234, query.trim());
+        jsonResult = client.execute(-1234, query.trim());
 
         response.setStatus(HttpServletResponse.SC_OK);
-%>
-<%=jsonResult%>
-<%
     } catch (AnalyticsExecutionException e) {
 //        e.printStackTrace();
         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
@@ -21,4 +18,4 @@
     }
 
 %>
-
+<%=jsonResult%>
