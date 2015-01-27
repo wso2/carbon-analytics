@@ -38,15 +38,15 @@
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.bam.jmx.agent</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.ntask.core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.utils</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.registry.common</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
@@ -84,7 +84,6 @@
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.data.publisher.util</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.ntask.core</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.databridge.agent.thrift</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.registry.common</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>

@@ -30,7 +30,6 @@ import org.wso2.carbon.bam.jmx.agent.tasks.internal.JmxTaskServiceComponent;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.core.util.CryptoException;
 import org.wso2.carbon.core.util.CryptoUtil;
-import org.wso2.carbon.registry.common.services.RegistryAbstractAdmin;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
@@ -46,12 +45,12 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-public class ProfileManager extends RegistryAbstractAdmin {
+public class ProfileManager {
 
     private static final Log log = LogFactory.getLog(ProfileManager.class);
 
-    static final String PROFILE_SAVE_REG_LOCATION =  "repository/components/org.wso2.carbon.publish.jmx.agent/";
-    
+    static final String PROFILE_SAVE_REG_LOCATION = "repository/components/org.wso2.carbon.publish.jmx.agent/";
+
     private Registry registry;
 
     public ProfileManager() {

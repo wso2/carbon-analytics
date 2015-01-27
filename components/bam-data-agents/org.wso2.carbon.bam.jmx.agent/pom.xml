@@ -28,10 +28,6 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.registry.common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.databridge.agent.thrift</artifactId>
         </dependency>
         <dependency>
@@ -62,6 +58,7 @@
                             org.wso2.carbon.bam.jmx.agent.*
                         </Export-Package>
                         <Import-Package>
+                            org.apache.commons.logging.*,
                             *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
