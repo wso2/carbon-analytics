@@ -797,7 +797,7 @@
         <orbit.version.commons.lang>2.6.0.wso2v1</orbit.version.commons.lang>
         <!--<orbit.version.json-simple>1.1.wso2v1</orbit.version.json-simple>-->
         <!--<antlr.orbit.version>3.2.0.wso2v1</antlr.orbit.version>-->
-        <!--<asm.orbit.version>3.1.wso2v1</asm.orbit.version>-->
+        <asm.orbit.version>3.1.wso2v1</asm.orbit.version>
         <!--<commons.cli.orbit.version>1.2.0.wso2v1</commons.cli.orbit.version>-->
         <commons.codec.orbit.version>1.4.0.wso2v1</commons.codec.orbit.version>
         <commons.collections.orbit.version>3.2.0.wso2v1</commons.collections.orbit.version>
