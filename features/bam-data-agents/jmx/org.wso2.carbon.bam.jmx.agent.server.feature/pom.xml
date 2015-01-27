@@ -52,10 +52,6 @@
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.databridge.agent.thrift</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.bam.data.publisher.util</artifactId>
-        </dependency>
     </dependencies>
 
     <build>
@@ -81,7 +77,6 @@
                             </adviceFile>
                             <bundles>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.jmx.agent</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.data.publisher.util</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.ntask.core</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.databridge.agent.thrift</bundleDef>
                             </bundles>

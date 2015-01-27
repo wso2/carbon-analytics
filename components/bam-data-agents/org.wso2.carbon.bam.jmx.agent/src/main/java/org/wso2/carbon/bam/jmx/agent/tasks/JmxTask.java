@@ -21,9 +21,9 @@ package org.wso2.carbon.bam.jmx.agent.tasks;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.bam.data.publisher.util.PublisherUtil;
 import org.wso2.carbon.bam.jmx.agent.JmxAgent;
 import org.wso2.carbon.bam.jmx.agent.JmxConstant;
+import org.wso2.carbon.bam.jmx.agent.PublisherUtil;
 import org.wso2.carbon.bam.jmx.agent.TenantPublisherConfigData;
 import org.wso2.carbon.bam.jmx.agent.exceptions.JmxConnectionException;
 import org.wso2.carbon.bam.jmx.agent.exceptions.JmxMBeanException;

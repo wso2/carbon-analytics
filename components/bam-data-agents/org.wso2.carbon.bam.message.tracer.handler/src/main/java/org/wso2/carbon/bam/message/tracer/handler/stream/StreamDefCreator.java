@@ -15,7 +15,7 @@
  */
 package org.wso2.carbon.bam.message.tracer.handler.stream;
 
-import org.wso2.carbon.bam.data.publisher.util.BAMDataPublisherConstants;
+import org.wso2.carbon.bam.message.tracer.handler.util.MessageTracerConstants;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.AttributeType;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
@@ -57,8 +57,8 @@ public class StreamDefCreator {
 
         List<Attribute> metaList = new ArrayList<Attribute>(7);
 
-        metaList.add(new Attribute(BAMDataPublisherConstants.REQUEST_URL, AttributeType.STRING));
-        metaList.add(new Attribute(BAMDataPublisherConstants.HOST, AttributeType.STRING));
+        metaList.add(new Attribute(MessageTracerConstants.REQUEST_URL, AttributeType.STRING));
+        metaList.add(new Attribute(MessageTracerConstants.HOST, AttributeType.STRING));
         metaList.add(new Attribute(SERVER_NAME, AttributeType.STRING));
 
         return metaList;
@@ -68,12 +68,12 @@ public class StreamDefCreator {
 
         List<Attribute> payloadList = new ArrayList<Attribute>(7);
 
-        payloadList.add(new Attribute(BAMDataPublisherConstants.SERVICE_NAME, AttributeType.STRING));
-        payloadList.add(new Attribute(BAMDataPublisherConstants.OPERATION_NAME, AttributeType.STRING));
-        payloadList.add(new Attribute(BAMDataPublisherConstants.MSG_DIRECTION, AttributeType.STRING));
-        payloadList.add(new Attribute(BAMDataPublisherConstants.SOAP_BODY, AttributeType.STRING));
-        payloadList.add(new Attribute(BAMDataPublisherConstants.SOAP_HEADER, AttributeType.STRING));
-        payloadList.add(new Attribute(BAMDataPublisherConstants.TIMESTAMP, AttributeType.LONG));
+        payloadList.add(new Attribute(MessageTracerConstants.SERVICE_NAME, AttributeType.STRING));
+        payloadList.add(new Attribute(MessageTracerConstants.OPERATION_NAME, AttributeType.STRING));
+        payloadList.add(new Attribute(MessageTracerConstants.MSG_DIRECTION, AttributeType.STRING));
+        payloadList.add(new Attribute(MessageTracerConstants.SOAP_BODY, AttributeType.STRING));
+        payloadList.add(new Attribute(MessageTracerConstants.SOAP_HEADER, AttributeType.STRING));
+        payloadList.add(new Attribute(MessageTracerConstants.TIMESTAMP, AttributeType.LONG));
         payloadList.add(new Attribute(ACTIVITY_STATUS, AttributeType.STRING));
 
         return payloadList;

@@ -57,4 +57,17 @@ public class MessageTracerConstants {
     public static final String STATUS_SUCCESS = "success";
 
     public static final String TRANSPORT_IN_URL = "TransportInURL";
+    public static final String SOAP_BODY = "soap_body";
+    public static final String HOST = "host";
+    public static final String REQUEST_URL = "request_url";
+    public static final String SERVICE_NAME = "service_name";
+    public static final String OPERATION_NAME = "operation_name";
+    public static final String TIMESTAMP = "timestamp";
+    public static final String MSG_DIRECTION = "message_direction";
+    public static final String SOAP_HEADER = "soap_header";
+    public static final String IN_DIRECTION = "IN";
+    public static final String OUT_DIRECTION = "OUT";
+    public static final String BAM_URL = "BAMUrl";
+    public static final String BAM_USER_NAME = "BAMUserName";
+    public static final String BAM_PASSWORD = "BAMPassword";
 }

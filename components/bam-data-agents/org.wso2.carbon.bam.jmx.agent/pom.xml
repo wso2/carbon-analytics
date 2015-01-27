@@ -30,10 +30,6 @@
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.databridge.agent.thrift</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.bam.data.publisher.util</artifactId>
-        </dependency>
     </dependencies>
 
     <properties>

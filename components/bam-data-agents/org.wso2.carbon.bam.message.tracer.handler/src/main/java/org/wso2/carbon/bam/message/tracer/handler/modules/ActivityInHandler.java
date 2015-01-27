@@ -24,18 +24,16 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.HandlerDescription;
-import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.bam.data.publisher.util.BAMDataPublisherConstants;
-import org.wso2.carbon.bam.data.publisher.util.PublisherUtil;
 import org.wso2.carbon.bam.message.tracer.handler.conf.EventingConfigData;
 import org.wso2.carbon.bam.message.tracer.handler.data.TracingInfo;
 import org.wso2.carbon.bam.message.tracer.handler.publish.Publisher;
 import org.wso2.carbon.bam.message.tracer.handler.util.AgentUtil;
 import org.wso2.carbon.bam.message.tracer.handler.util.HandlerUtils;
 import org.wso2.carbon.bam.message.tracer.handler.util.MessageTracerConstants;
+import org.wso2.carbon.bam.message.tracer.handler.util.PublisherUtil;
 import org.wso2.carbon.bam.message.tracer.handler.util.TenantEventConfigData;
 import org.wso2.carbon.core.util.SystemFilter;
 
@@ -120,7 +118,7 @@ public class ActivityInHandler extends AbstractHandler {
                 TracingInfo tracingInfo = new TracingInfo();
                 tracingInfo.setActivityId(activityUUID);
                 tracingInfo.setServer(AgentUtil.getServerName());
-                tracingInfo.setMessageDirection(BAMDataPublisherConstants.IN_DIRECTION);
+                tracingInfo.setMessageDirection(MessageTracerConstants.IN_DIRECTION);
                 tracingInfo.setHost(PublisherUtil.getHostAddress());
                 tracingInfo.setServiceName(messageContext.getAxisService().getName());
                 tracingInfo.setOperationName(messageContext.getAxisOperation().getName().getLocalPart());

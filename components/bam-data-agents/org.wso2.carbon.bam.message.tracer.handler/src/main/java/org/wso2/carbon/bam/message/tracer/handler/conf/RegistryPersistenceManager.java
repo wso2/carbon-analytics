@@ -18,7 +18,6 @@ package org.wso2.carbon.bam.message.tracer.handler.conf;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.bam.data.publisher.util.BAMDataPublisherConstants;
 import org.wso2.carbon.bam.message.tracer.handler.publish.ClusterNotifier;
 import org.wso2.carbon.bam.message.tracer.handler.util.MessageTracerConstants;
 import org.wso2.carbon.bam.message.tracer.handler.util.ServiceHolder;
@@ -52,9 +51,9 @@ public class RegistryPersistenceManager {
         try {
             String enableTrace = getConfigurationProperty(tenantId, MessageTracerConstants.ENABLE_TRACE);
             String enablePublishToBAM  = getConfigurationProperty(tenantId, MessageTracerConstants.ENABLE_PUBLISH_TO_BAM);
-            String bamUrl = getConfigurationProperty(tenantId, BAMDataPublisherConstants.BAM_URL);
-            String bamUserName = getConfigurationProperty(tenantId, BAMDataPublisherConstants.BAM_USER_NAME);
-            String bamPassword = getConfigurationProperty(tenantId, BAMDataPublisherConstants.BAM_PASSWORD);
+            String bamUrl = getConfigurationProperty(tenantId, MessageTracerConstants.BAM_URL);
+            String bamUserName = getConfigurationProperty(tenantId, MessageTracerConstants.BAM_USER_NAME);
+            String bamPassword = getConfigurationProperty(tenantId, MessageTracerConstants.BAM_PASSWORD);
             String dumpBody = getConfigurationProperty(tenantId, MessageTracerConstants.ENABLE_DUMP_MESSAGE_BODY);
             String enableLogging = getConfigurationProperty(tenantId, MessageTracerConstants.ENABLE_LOGGING);
 
@@ -123,11 +122,11 @@ public class RegistryPersistenceManager {
 
         updateConfigurationProperty(tenantId, MessageTracerConstants.ENABLE_TRACE,
                                     eventingConfigData.isMessageTracingEnable());
-        updateConfigurationProperty(tenantId, BAMDataPublisherConstants.BAM_URL,
+        updateConfigurationProperty(tenantId, MessageTracerConstants.BAM_URL,
                                     eventingConfigData.getUrl());
-        updateConfigurationProperty(tenantId, BAMDataPublisherConstants.BAM_USER_NAME,
+        updateConfigurationProperty(tenantId, MessageTracerConstants.BAM_USER_NAME,
                                     eventingConfigData.getUserName());
-        updateConfigurationProperty(tenantId, BAMDataPublisherConstants.BAM_PASSWORD,
+        updateConfigurationProperty(tenantId, MessageTracerConstants.BAM_PASSWORD,
                                     eventingConfigData.getPassword());
         updateConfigurationProperty(tenantId, MessageTracerConstants.ENABLE_DUMP_MESSAGE_BODY,
                                     eventingConfigData.isDumpBodyEnable());

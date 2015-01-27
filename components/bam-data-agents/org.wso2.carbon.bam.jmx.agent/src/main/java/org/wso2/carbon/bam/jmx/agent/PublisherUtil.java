@@ -16,38 +16,30 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.wso2.carbon.bam.data.publisher.util;
+package org.wso2.carbon.bam.jmx.agent;
 
 
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.utils.CarbonUtils;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class PublisherUtil {
 
+    private static Log log = LogFactory.getLog(PublisherUtil.class);
+
     private static final String PORTS_OFFSET = "Ports.Offset";
     private static final int CARBON_SERVER_DEFAULT_PORT = 9763;
-
-    private static Log log = LogFactory.getLog(PublisherUtil.class);
-    private static final String UNKNOWN_HOST = "UNKNOWN_HOST";
-
     private static String hostAddressAndPort = null;
-    public static final String CLOUD_DEPLOYMENT_PROP = "IsCloudDeployment";
-    public static final String HOST_NAME = "HostName";
+    private static final String HOST_NAME = "HostName";
 
 
     public static String getHostAddress() {
@@ -55,7 +47,7 @@ public class PublisherUtil {
         if (hostAddressAndPort != null) {
             return hostAddressAndPort;
         }
-        String hostAddress =   ServerConfiguration.getInstance().getFirstProperty(HOST_NAME);
+        String hostAddress = ServerConfiguration.getInstance().getFirstProperty(HOST_NAME);
         if (null == hostAddress) {
             InetAddress localAddress = getLocalAddress();
             if (localAddress != null) {
@@ -74,7 +66,7 @@ public class PublisherUtil {
         }
     }
 
-    private static InetAddress getLocalAddress(){
+    private static InetAddress getLocalAddress() {
         Enumeration<NetworkInterface> ifaces = null;
         try {
             ifaces = NetworkInterface.getNetworkInterfaces();
@@ -101,19 +93,4 @@ public class PublisherUtil {
     public static int getTenantId(MessageContext msgContext) {
         return PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
     }
-
-     public static ArrayList<String> getReceiverGroups(String urls) {
-        ArrayList<String> matchList = new ArrayList<String>();
-        Pattern regex = Pattern.compile("\\{.*?\\}");
-        Matcher regexMatcher = regex.matcher(urls);
-        while (regexMatcher.find()) {
-            matchList.add(regexMatcher.group().replace("{", "").replace("}", ""));
-        }
-        if (matchList.size() == 0) {
-            matchList.add(urls.replace("{", "").replace("}", ""));
-        }
-        return matchList;
-    }
-
-
 }

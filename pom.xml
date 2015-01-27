@@ -426,11 +426,7 @@
                 <!--<artifactId>org.wso2.carbon.base</artifactId>-->
                 <!--<version>${carbon.platform.version}</version>-->
             <!--</dependency>-->
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.bam.data.publisher.util</artifactId>
-                <version>${snapshot.430}</version>
-            </dependency>
+
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.bam.jmx.agent.stub</artifactId>
