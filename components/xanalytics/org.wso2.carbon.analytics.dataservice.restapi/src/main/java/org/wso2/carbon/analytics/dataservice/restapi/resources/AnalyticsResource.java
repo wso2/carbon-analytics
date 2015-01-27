@@ -21,7 +21,6 @@ import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -259,10 +258,10 @@ public class AnalyticsResource extends AbstractResource {
 	@GET
 	@Path("records/{tableName}/{from}/{to}/{start}/{count}")
 	public Response getRecords(@PathParam("tableName") String tableName,
-	                                @PathParam("from") @DefaultValue("-1") long timeFrom ,
-	                                @PathParam("to") @DefaultValue("-1") long timeTo,
-	                                @PathParam("start") @DefaultValue("0") int recordsFrom,
-	                                @PathParam("count") @DefaultValue("-1") int count) {
+	                                @PathParam("from") long timeFrom,
+	                                @PathParam("to") long timeTo,
+	                                @PathParam("start") int recordsFrom,
+	                                @PathParam("count") int count) {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking getRecordGroups for tableName: " + tableName + " tenantId :" +
@@ -283,6 +282,31 @@ public class AnalyticsResource extends AbstractResource {
 			logger.error(message, e);
 			return handleResponse(ResponseStatus.FAILED, message);
 		}
+	}
+	
+	/**
+	 * Gets the records.
+	 * @param tableName the table name
+	 * @param timeFrom the time from
+	 * @param timeTo the time to
+	 * @return the records
+	 */
+	@GET
+	@Path("records/{tableName}/{from}/{to}")
+	public Response getRecords(@PathParam("tableName") String tableName,
+	                           @PathParam("from") long timeFrom, @PathParam("to") long timeTo) {
+		return getRecords(tableName, timeFrom, timeTo, 0, -1);
+	}
+	
+	/**
+	 * Gets all the records.
+	 * @param tableName the table name
+	 * @return the records
+	 */
+	@GET
+	@Path("records/{tableName}")
+	public Response getRecords(@PathParam("tableName") String tableName) {
+		return getRecords(tableName, -1, -1, 0, -1);
 	}
 
 	/**
