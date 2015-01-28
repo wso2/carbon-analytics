@@ -153,6 +153,19 @@
               } ,
               error : function(request,error) {
                   alert("Request: "+JSON.stringify(request));
+
+                  var errorDiv = document.createElement("div");
+                  var errorText = document.createTextNode(error);
+
+                  errorDiv.className = "error";
+                  errorDiv.appendChild(errorText);
+
+                  resultsPane.appendChild(table);
+                  resultsPane.appendChild(document.createElement("br"));
+
+
+                  resultsPane.scrollTop = resultsPane.scrollHeight;
+
               }
 
         }); //end of ajax
