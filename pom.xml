@@ -359,7 +359,6 @@
         <tag>HEAD</tag>
     </scm>
 
-
     <build>
         <extensions>
             <extension>
@@ -371,6 +370,14 @@
 
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>1.7</source>
+                        <target>1.7</target>
+                    </configuration>
+                </plugin>
                 <plugin>
                     <groupId>org.jvnet.maven.incrementalbuild</groupId>
                     <artifactId>incremental-build-plugin</artifactId>
@@ -384,16 +391,6 @@
                     </executions>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>2.3.1</version>
-                    <configuration>
-                        <encoding>UTF-8</encoding>
-                        <source>1.6</source>
-                        <target>1.6</target>
-                    </configuration>
-                </plugin>
-                <plugin>
                     <groupId>org.wso2.maven</groupId>
                     <artifactId>carbon-p2-plugin</artifactId>
                     <version>${carbon.p2.plugin.version}</version>
@@ -401,7 +398,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>1.7</version>
+                    <version>1.8</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.felix</groupId>
@@ -427,7 +424,6 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>2.4</version>
                     <executions>
                         <execution>
                             <id>copy-resources</id>
@@ -453,7 +449,6 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>2.1.2</version>
                     <executions>
                         <execution>
                             <id>attach-sources</id>
@@ -465,10 +460,6 @@
                     </executions>
                 </plugin>
                 <plugin>
-                    <artifactId>maven-assembly-plugin</artifactId>
-                    <version>2.2-beta-2</version>
-                </plugin>
-                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
                     <version>2.4</version>
@@ -477,41 +468,6 @@
         </pluginManagement>
     </build>
 
-    <pluginRepositories>
-        <pluginRepository>
-            <id>wso2.releases</id>
-            <name>WSO2 internal Repository</name>
-            <url>http://maven.wso2.org/nexus/content/repositories/releases/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-                <checksumPolicy>ignore</checksumPolicy>
-            </releases>
-        </pluginRepository>
-        <pluginRepository>
-            <id>wso2.snapshots</id>
-            <name>WSO2 Snapshot Repository</name>
-            <url>http://maven.wso2.org/nexus/content/repositories/snapshots/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </pluginRepository>
-        <pluginRepository>
-            <id>wso2-nexus</id>
-            <name>WSO2 internal Repository</name>
-            <url>http://maven.wso2.org/nexus/content/groups/wso2-public/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-                <checksumPolicy>ignore</checksumPolicy>
-            </releases>
-        </pluginRepository>
-    </pluginRepositories>
-
     <profiles>
         <profile>
             <id>default</id>
@@ -519,6 +475,15 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <modules>
+                <module>service-stubs</module>
+                <module>components/xanalytics</module>
+                <module>components/analytics-data-agents</module>
+                <module>features/analytics-data-agents</module>
+                <module>features/analytics/analytics-core</module>
+                <module>features/analytics/analytics-datasources</module>
+                <module>features/analytics/analytics-rest</module>
+                <module>features/analytics/analytics-spark</module>
+                <module>features/dashboards/analytics-dashboards</module>
             </modules>
         </profile>
         <profile>
@@ -530,7 +495,15 @@
                 </property>
             </activation>
             <modules>
+                <module>service-stubs</module>
+                <module>components/xanalytics</module>
                 <module>components/analytics-data-agents</module>
+                <module>features/analytics-data-agents</module>
+                <module>features/analytics/analytics-core</module>
+                <module>features/analytics/analytics-datasources</module>
+                <module>features/analytics/analytics-rest</module>
+                <module>features/analytics/analytics-spark</module>
+                <module>features/dashboards/analytics-dashboards</module>
             </modules>
         </profile>
         <profile>
@@ -543,6 +516,7 @@
             </activation>
             <modules>
                 <module>components/analytics-data-agents</module>
+                <module>components/xanalytics</module>
             </modules>
         </profile>
     </profiles>
@@ -560,10 +534,8 @@
         <orbit.version.axis2>1.6.1.wso2v11</orbit.version.axis2>
         <axis2-transports.version>1.6.1-wso2v11</axis2-transports.version>
         <axis2.osgi.version.range>[1.6.1.wso2v11, 1.7.0)</axis2.osgi.version.range>
-        <!--<orbit.version.wsdl4j>1.6.2.wso2v4</orbit.version.wsdl4j>-->
         <orbit.version.neethi>2.0.4.wso2v4</orbit.version.neethi>
-        <!--<rampart.wso2.version>1.7.0-SNAPSHOT</rampart.wso2.version>-->
-        <!---->
+
         <!-- Axiom Version -->
         <axiom.version>1.2.11-wso2v5</axiom.version>
         <axiom.wso2.version>1.2.11.wso2v5</axiom.wso2.version>
@@ -571,191 +543,48 @@
         <orbit.version.axiom>1.2.11.wso2v5</orbit.version.axiom>
         <axiom.osgi.version.range>[1.2.11.wso2v5, 1.3.0)</axiom.osgi.version.range>
 
-        <!-- Servet Version -->
-        <!--<version.javax.servlet.jsp>2.2.0.v201112011158</version.javax.servlet.jsp>-->
-
         <!-- Servlet API -->
-        <!--<exp.pkg.version.javax.servlet>2.6.0</exp.pkg.version.javax.servlet>-->
         <imp.pkg.version.javax.servlet>[2.6.0, 3.0.0)</imp.pkg.version.javax.servlet>
         <imp.pkg.version.javax.servlet.jsp>[2.2.0, 2.3.0)</imp.pkg.version.javax.servlet.jsp>
         <imp.pkg.version.javax.servlet.jsp.jstl>[1.2.1, 1.3.0)</imp.pkg.version.javax.servlet.jsp.jstl>
 
         <!-- Misc -->
-        <!--<google.guice.version>2.0.0.wso2v2</google.guice.version>-->
-        <!--<google.guava.wso2.version>12.0.0.wso2v1</google.guava.wso2.version>-->
         <carbon.p2.plugin.version>1.5.3</carbon.p2.plugin.version>
-        <!--<version.solr>1.4.1.wso2v1</version.solr>-->
-        <!--<derby.version>10.4.2.0</derby.version>-->
-        <!--<activation.version>1.1</activation.version>-->
-        <!--<javamail.version>1.4</javamail.version>-->
-        <!--<wss4j.version>1.5.11.wso2v1</wss4j.version>-->
         <wsdl4j.wso2.version>1.6.2.wso2v2</wsdl4j.wso2.version>
-        <!--<jetty.version>6.1.5</jetty.version>-->
-        <!--<xml-apis.version>1.3.04</xml-apis.version>-->
-        <!--<jaxen.version>1.1.1</jaxen.version>-->
-        <!--<woodstox.version>3.2.9</woodstox.version>-->
-        <!--<geronimo-stax-api.wso2.version>1.0.1.wso2v1</geronimo-stax-api.wso2.version>-->
-        <!--<validateutility.version>0.95</validateutility.version>-->
-        <!--<wsdl-validator.version>1.2.0.wso2v1</wsdl-validator.version>-->
-        <!--<uddi4j.version>1.0.1</uddi4j.version>-->
-        <!--<xercesImpl.version>2.8.1</xercesImpl.version>-->
-        <!--<juddi.wso2.version>3.0.3.wso2v2</juddi.wso2.version>-->
         <junit.version>4.9</junit.version>
-        <!--<xmlschema.version>1.4.3</xmlschema.version>-->
-        <version.javax.servlet>3.0.0.v201112011016</version.javax.servlet>
-        <!--<event.processor.version>2.0.0-SNAPSHOT</event.processor.version>-->
-        <!--<cxf.version>2.5.1</cxf.version>-->
         <cxf.wso2.version>2.6.1.wso2v2</cxf.wso2.version>
         <slf4j.orbit.version>1.5.10.wso2v1</slf4j.orbit.version>
         <slf4j.version>1.6.1</slf4j.version>
         <log4j.version>1.2.14</log4j.version>
-        <libthrift.version>0.5.wso2v1</libthrift.version>
-        <!--<libfb303.orbit.version>0.7.0.wso2v1</libfb303.orbit.version>-->
-        <!--<shindig.version>1.1.0.wso2v7</shindig.version>-->
-        <!--<joda-time.version>1.6.0.wso2v1</joda-time.version>-->
-        <!--<jdom.version>1.0.0.wso2v1</jdom.version>-->
-        <!--<rhino.version>1.7.0.R4.wso2v1</rhino.version>-->
-        <!--<google.collect.osgi.version>1.0.0.wso2v2</google.collect.osgi.version>-->
         <version.equinox.osgi>3.8.1.v20120830-144521</version.equinox.osgi>
         <gson.version>2.1</gson.version>
 
         <!-- Orbits -->
         <orbit.version.xmlschema>1.4.7.wso2v2</orbit.version.xmlschema>
-        <!--<orbit.version.infinispan>5.1.2.wso2v1</orbit.version.infinispan>-->
-        <!--<orbit.version.h2.engine>1.2.140.wso2v3</orbit.version.h2.engine>-->
         <orbit.version.commons.lang>2.6.0.wso2v1</orbit.version.commons.lang>
-        <!--<orbit.version.json-simple>1.1.wso2v1</orbit.version.json-simple>-->
-        <!--<antlr.orbit.version>3.2.0.wso2v1</antlr.orbit.version>-->
         <asm.orbit.version>3.1.wso2v1</asm.orbit.version>
-        <!--<commons.cli.orbit.version>1.2.0.wso2v1</commons.cli.orbit.version>-->
         <commons.codec.orbit.version>1.4.0.wso2v1</commons.codec.orbit.version>
         <commons.collections.orbit.version>3.2.0.wso2v1</commons.collections.orbit.version>
-        <!--<commons.configuration.orbit.version>1.6.0.wso2v1</commons.configuration.orbit.version>-->
-        <commons.dbcp.orbit.version>1.4.0.wso2v1</commons.dbcp.orbit.version>
-        <!--<javaewah.orbit.version>0.3.2.wso2v1</javaewah.orbit.version>-->
-        <!--<jdo.orbit.version>3.0.0.wso2v1</jdo.orbit.version>-->
-
-        <!-- Abdera -->
-        <!--&lt;!&ndash;<version.abdera>1.0-wso2v2</version.abdera>&ndash;&gt;-->
-        <!--&lt;!&ndash;<orbit.version.abdera>1.0.0.wso2v2</orbit.version.abdera>&ndash;&gt;-->
-        <!--&lt;!&ndash;<exp.pkg.version.abdera>1.0.0.wso2v2</exp.pkg.version.abdera>&ndash;&gt;-->
-        <!--&lt;!&ndash;<imp.pkg.version.abdera>[1.0.0.wso2v2, 2)</imp.pkg.version.abdera>&ndash;&gt;-->
-
-        <!--Apache Geronimo-->
-        <!--<version.geronimo.specs.geronimo-jpa_2.0_spec>1.0</version.geronimo.specs.geronimo-jpa_2.0_spec>-->
-
-        <!--OpenJPA -->
-        <!--<openjpa.version>2.2.0-wso2v1</openjpa.version>-->
-
-        <!--SCM-->
-        <!--<orbit.version.maven-scm>1.7.0.wso2v1</orbit.version.maven-scm>-->
-
-        <!-- Rampart -->
-        <!--<rampart.version>1.7.0-SNAPSHOT</rampart.version>-->
-        <!--<rampart.mar.version>1.6.1-wso2v10</rampart.mar.version>-->
-        <!--<rampart.osgi.version>1.6.1.wso2v10</rampart.osgi.version>-->
-        <!--<orbit.version.rampart>1.6.1.wso2v10</orbit.version.rampart>-->
 
         <!-- Equinox -->
         <version.equinox.osgi.services>3.3.100.v20120522-1822</version.equinox.osgi.services>
         <version.equinox.osgi>3.8.1.v20120830-144521</version.equinox.osgi>
 
         <!-- Commons -->
-        <!--<commons-beanutils.version>1.8.0</commons-beanutils.version>-->
-        <!--<commons-collections.version>3.2</commons-collections.version>-->
-        <!--<commons-digester.version>1.8</commons-digester.version>-->
-        <!--<orbit.version.commons.beanutils>1.8.0.wso2v1</orbit.version.commons.beanutils>-->
-        <!--<commons-io.wso2.version>2.0.0.wso2v1</commons-io.wso2.version>-->
-        <!--<commons-fileupload.version>1.1.1</commons-fileupload.version>-->
-        <!--<commons-httpclient.version>3.0.1</commons-httpclient.version>-->
-        <!--<commons-dbcp.version>1.2.2</commons-dbcp.version>-->
         <commons-logging.version>1.1</commons-logging.version>
-        <!--<commons-lang.wso2.version>2.6.0.wso2v1</commons-lang.wso2.version>-->
         <commons.pool.orbit.version>1.5.6.wso2v1</commons.pool.orbit.version>
         <httpcomponents-httpclient.version>4.2.5.wso2v1</httpcomponents-httpclient.version>
-        <!--<json.orbit.version>2.0.0.wso2v1</json.orbit.version>-->
-        <!--<orbit.version.geronimo-jms_1.1_spec>1.1.0.wso2v1</orbit.version.geronimo-jms_1.1_spec>-->
         <orbit.version.json>2.0.0.wso2v1</orbit.version.json>
-        <!--<batik.version>1.7.0.wso2v1</batik.version>-->
-
-        <!-- Synapse -->
-        <!--<synapse.version>2.1.1-wso2v8</synapse.version>-->
 
         <!-- Javax-->
         <javax.servelet.version>3.0.1</javax.servelet.version>
 
-        <!-- Jaggery-->
-        <!--<jaggery.feature.version>0.9.0.ALPHA4.wso2v1</jaggery.feature.version>-->
-
         <lucene.version>4.10.3</lucene.version>
-
         <lucene.regex.version>3.0.3</lucene.regex.version>
-
         <lucene.orbit.version>4.10.3.wso2v1</lucene.orbit.version>
-
-        <carbon.kernel.version>4.3.0</carbon.kernel.version>
-
         <carbon.commons.version>4.3.0-SNAPSHOT</carbon.commons.version>
-
         <event.processing.version>2.0.0-SNAPSHOT</event.processing.version>
 
     </properties>
-
-    <repositories>
-        <!-- Before adding ANYTHING in here, please start a discussion on the dev list.
-Ideally the Axis2 build should only use Maven central (which is available
-by default) and nothing else. We had troubles with other repositories in
-the past. Therefore configuring additional repositories here should be
-considered very carefully. -->
-        <repository>
-            <id>wso2-nexus</id>
-            <name>WSO2 internal Repository</name>
-            <url>http://maven.wso2.org/nexus/content/groups/wso2-public/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-                <checksumPolicy>ignore</checksumPolicy>
-            </releases>
-        </repository>
-
-        <repository>
-            <id>wso2.releases</id>
-            <name>WSO2 internal Repository</name>
-            <url>http://maven.wso2.org/nexus/content/repositories/releases/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-                <checksumPolicy>ignore</checksumPolicy>
-            </releases>
-        </repository>
-
-        <repository>
-            <id>wso2.snapshots</id>
-            <name>WSO2 Snapshot Repository</name>
-            <url>http://maven.wso2.org/nexus/content/repositories/snapshots/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-    </repositories>
-
-
-    <distributionManagement>
-        <repository>
-            <id>wso2.releases</id>
-            <name>WSO2 internal Repository</name>
-            <url>http://maven.wso2.org/nexus/content/repositories/releases/</url>
-        </repository>
-
-        <snapshotRepository>
-            <id>wso2.snapshots</id>
-            <name>WSO2 Snapshot Repository</name>
-            <url>http://maven.wso2.org/nexus/content/repositories/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
 
 </project>
