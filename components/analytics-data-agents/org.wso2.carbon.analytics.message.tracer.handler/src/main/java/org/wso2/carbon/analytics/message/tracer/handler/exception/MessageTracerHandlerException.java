@@ -16,7 +16,7 @@
 * under the License.
 */
 
-package org.wso2.carbon.bam.message.tracer.handler.exception;
+package org.wso2.carbon.analytics.message.tracer.handler.exception;
 
 public class MessageTracerHandlerException extends Exception {
 

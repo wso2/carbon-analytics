@@ -20,7 +20,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>analytics-message-tracer-handler-feature</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
@@ -29,21 +29,19 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.analytics.message.tracer.handler.feature</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.0-SNAPSHOT</version>
     <name>WSO2 Carbon - Analytics Message Tracer Handler Aggregate Feature</name>
-    <url>http://wso2.org</url>
 
-   <dependencies>
+    <dependencies>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.message.tracer.handler.server.feature</artifactId>
             <type>zip</type>
-	    </dependency>
+        </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.message.tracer.handler.ui.feature</artifactId>
             <type>zip</type>
-	    </dependency>
+        </dependency>
     </dependencies>
 
     <build>
@@ -51,7 +49,6 @@
             <plugin>
                 <groupId>org.wso2.maven</groupId>
                 <artifactId>carbon-p2-plugin</artifactId>
-                <version>${carbon.p2.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>4-p2-feature-generation</id>
@@ -67,10 +64,10 @@
                             </importFeatures>
                             <includedFeatures>
                                 <includedFeatureDef>
-                                    org.wso2.carbon:org.wso2.carbon.analytics.message.tracer.handler.server.feature:${project.version}
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.message.tracer.handler.server.feature:${project.version}
                                 </includedFeatureDef>
                                 <includedFeatureDef>
-                                    org.wso2.carbon:org.wso2.carbon.analytics.message.tracer.handler.ui.feature:${project.version}
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.message.tracer.handler.ui.feature:${project.version}
                                 </includedFeatureDef>
                             </includedFeatures>
                         </configuration>

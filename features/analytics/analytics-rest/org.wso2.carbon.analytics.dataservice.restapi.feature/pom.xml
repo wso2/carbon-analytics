@@ -23,7 +23,7 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>analytics-restapi-feature</artifactId>
         <version>1.0.0-SNAPSHOT</version>
 	<relativePath>../pom.xml</relativePath>
@@ -33,15 +33,13 @@
     <artifactId>org.wso2.carbon.analytics.dataservice.restapi.server.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Analytics REST API Server Feature</name>
-    <version>1.0.0-SNAPSHOT</version>
-    <url>http://wso2.org</url>
     <description>
         This feature contains the bundles required for the REST API of the data bridge
     </description>
 
     <dependencies>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.dataservice.restapi</artifactId>
             <version>${project.version}</version>
             <type>war</type>
@@ -63,7 +61,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.4</version>
                 <executions>
                     <execution>
                         <id>copy</id>
@@ -74,7 +71,7 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>org.wso2.carbon</groupId>
+                                    <groupId>org.wso2.carbon.analytics</groupId>
                                     <artifactId>org.wso2.carbon.analytics.dataservice.restapi</artifactId>
                                     <version>${project.version}</version>
                                     <type>war</type>

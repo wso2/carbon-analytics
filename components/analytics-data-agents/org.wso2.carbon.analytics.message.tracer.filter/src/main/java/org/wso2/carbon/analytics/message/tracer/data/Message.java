@@ -19,7 +19,7 @@
  * Time: 2:14 PM
  */
 
-package org.wso2.carbon.bam.message.tracer.data;
+package org.wso2.carbon.analytics.message.tracer.data;
 
 import java.util.HashMap;
 import java.util.Map;

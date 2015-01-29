@@ -16,7 +16,7 @@
 * under the License.
 */
 
-package org.wso2.carbon.bam.message.tracer.handler.ui;
+package org.wso2.carbon.analytics.message.tracer.handler.ui;
 
 import java.io.IOException;
 import java.net.Socket;

@@ -23,17 +23,15 @@
 
     <parent>
         <artifactId>carbon-analytics</artifactId>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.analytics</groupId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>analytics-core-feature</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Analytics Core Feature Aggregator Module</name>
-    <url>http://wso2.org</url>
 
     <modules>
        <module>org.wso2.carbon.analytics.core.server.feature</module>

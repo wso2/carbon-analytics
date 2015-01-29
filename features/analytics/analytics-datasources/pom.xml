@@ -22,19 +22,15 @@
 
     <parent>
         <artifactId>carbon-analytics</artifactId>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.analytics</groupId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon</groupId>
     <artifactId>analytics-datasources-feature</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Analytics Data Sources</name>
-    <url>http://maven.apache.org</url>
-
 
     <modules>
         <module>org.wso2.carbon.analytics.datasource.rdbms.server.feature</module>
@@ -63,6 +59,5 @@
             </releases>
         </repository>
     </repositories>
-    
 
 </project>

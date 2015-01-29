@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.bam.message.tracer.handler.ui;
+package org.wso2.carbon.analytics.message.tracer.handler.ui;
 
 
 import org.apache.axis2.AxisFault;
@@ -22,8 +22,8 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.bam.message.tracer.handler.stub.MessageTracerAdminStub;
-import org.wso2.carbon.bam.message.tracer.handler.stub.conf.EventingConfigData;
+import org.wso2.carbon.analytics.message.tracer.handler.stub.MessageTracerAdminStub;
+import org.wso2.carbon.analytics.message.tracer.handler.stub.conf.EventingConfigData;
 
 import java.rmi.RemoteException;
 import java.util.Locale;

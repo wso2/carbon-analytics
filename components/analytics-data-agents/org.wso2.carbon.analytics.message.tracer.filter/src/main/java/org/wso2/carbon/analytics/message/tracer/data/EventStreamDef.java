@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.bam.message.tracer.data;
+package org.wso2.carbon.analytics.message.tracer.data;
 
 public class EventStreamDef {
 

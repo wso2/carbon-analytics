@@ -65,7 +65,7 @@
                             org.apache.taglibs.standard.tlv,
                             org.eclipse.equinox.http.helper,
                             org.eclipse.equinox.jsp.jasper,
-                            org.wso2.carbon.analytics.message.tracer.handler.stub.*;version="${carbon.kernel.package.import.version.range}",
+                            org.wso2.carbon.analytics.message.tracer.handler.stub.*;version="${project.version}",
                             *;resolution:=optional
                         </Import-Package>
                         <Fragment-Host>org.wso2.carbon.ui</Fragment-Host>

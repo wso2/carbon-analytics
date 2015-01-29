@@ -16,32 +16,32 @@
  ~ under the License.
  -->
 <module name="wso2bammessagetracerservice"
-        class="org.wso2.carbon.bam.message.tracer.handler.modules.MessageTracerModule">
+        class="org.wso2.carbon.analytics.message.tracer.handler.modules.MessageTracerModule">
 
     <InFlow>
         <handler name="ActivityInHandler"
-                 class="org.wso2.carbon.bam.message.tracer.handler.modules.ActivityInHandler">
+                 class="org.wso2.carbon.analytics.message.tracer.handler.modules.ActivityInHandler">
             <order phaseFirst="true" phase="OpPhase"/>
         </handler>
     </InFlow>
 
     <OutFlow>
         <handler name="ActivityOutHandler"
-                 class="org.wso2.carbon.bam.message.tracer.handler.modules.ActivityOutHandler">
+                 class="org.wso2.carbon.analytics.message.tracer.handler.modules.ActivityOutHandler">
             <order phase="OpPhase" phaseLast="true"/>
         </handler>
     </OutFlow>
 
     <InFaultFlow>
         <handler name="ActivityInHandler"
-                 class="org.wso2.carbon.bam.message.tracer.handler.modules.ActivityInHandler">
+                 class="org.wso2.carbon.analytics.message.tracer.handler.modules.ActivityInHandler">
             <order phaseFirst="true" phase="OpPhase"/>
         </handler>
     </InFaultFlow>
 
     <OutFaultFlow>
         <handler name="ActivityOutHandler"
-                 class="org.wso2.carbon.bam.message.tracer.handler.modules.ActivityOutHandler">
+                 class="org.wso2.carbon.analytics.message.tracer.handler.modules.ActivityOutHandler">
             <order phase="OperationOutFaultPhase" phaseLast="true"/>
         </handler>
     </OutFaultFlow>

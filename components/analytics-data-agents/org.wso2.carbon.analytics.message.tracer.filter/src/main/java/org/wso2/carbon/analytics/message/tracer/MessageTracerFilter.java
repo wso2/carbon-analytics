@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.bam.message.tracer;
+package org.wso2.carbon.analytics.message.tracer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.bam.message.tracer.data.Message;
-import org.wso2.carbon.bam.message.tracer.data.ServerConfig;
-import org.wso2.carbon.bam.message.tracer.internal.publisher.EventPublisher;
+import org.wso2.carbon.analytics.message.tracer.data.Message;
+import org.wso2.carbon.analytics.message.tracer.data.ServerConfig;
+import org.wso2.carbon.analytics.message.tracer.internal.publisher.EventPublisher;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;

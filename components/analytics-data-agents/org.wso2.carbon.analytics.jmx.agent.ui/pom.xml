@@ -13,11 +13,9 @@
     <packaging>bundle</packaging>
     <version>1.0.0-SNAPSHOT</version>
     <name>WSO2 Carbon - Analytics JMX Data Agent UI</name>
-    <url>http://maven.apache.org</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <axis2.version>1.6.1.wso2v6</axis2.version>
     </properties>
 
     <dependencies>

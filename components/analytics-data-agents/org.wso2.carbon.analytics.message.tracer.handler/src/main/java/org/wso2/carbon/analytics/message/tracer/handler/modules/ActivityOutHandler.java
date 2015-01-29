@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.bam.message.tracer.handler.modules;
+package org.wso2.carbon.analytics.message.tracer.handler.modules;
 
 import org.apache.axiom.om.OMException;
 import org.apache.axiom.soap.SOAPBody;
@@ -28,14 +28,14 @@ import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.bam.message.tracer.handler.conf.EventingConfigData;
-import org.wso2.carbon.bam.message.tracer.handler.data.TracingInfo;
-import org.wso2.carbon.bam.message.tracer.handler.publish.Publisher;
-import org.wso2.carbon.bam.message.tracer.handler.util.AgentUtil;
-import org.wso2.carbon.bam.message.tracer.handler.util.HandlerUtils;
-import org.wso2.carbon.bam.message.tracer.handler.util.MessageTracerConstants;
-import org.wso2.carbon.bam.message.tracer.handler.util.PublisherUtil;
-import org.wso2.carbon.bam.message.tracer.handler.util.TenantEventConfigData;
+import org.wso2.carbon.analytics.message.tracer.handler.conf.EventingConfigData;
+import org.wso2.carbon.analytics.message.tracer.handler.data.TracingInfo;
+import org.wso2.carbon.analytics.message.tracer.handler.publish.Publisher;
+import org.wso2.carbon.analytics.message.tracer.handler.util.AgentUtil;
+import org.wso2.carbon.analytics.message.tracer.handler.util.HandlerUtils;
+import org.wso2.carbon.analytics.message.tracer.handler.util.MessageTracerConstants;
+import org.wso2.carbon.analytics.message.tracer.handler.util.PublisherUtil;
+import org.wso2.carbon.analytics.message.tracer.handler.util.TenantEventConfigData;
 import org.wso2.carbon.core.util.SystemFilter;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 

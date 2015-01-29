@@ -20,7 +20,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>analytics-data-agents-features</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
@@ -28,10 +28,8 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>analytics-jmx-agent-feature</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Analytics JMX Data Agent Feature Aggregator Module</name>
-    <url>http://wso2.org</url>
 
     <modules>
         <module>org.wso2.carbon.analytics.jmx.agent.server.feature</module>

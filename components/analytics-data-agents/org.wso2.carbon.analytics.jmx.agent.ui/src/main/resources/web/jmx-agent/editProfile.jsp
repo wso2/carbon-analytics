@@ -1,14 +1,14 @@
 <%@ page import="org.apache.axis2.context.ConfigurationContext" %>
 <%@ page import="org.wso2.carbon.CarbonConstants" %>
-<%@ page import="org.wso2.carbon.bam.jmx.agent.ui.JmxConnector" %>
+<%@ page import="org.wso2.carbon.analytics.jmx.agent.ui.JmxConnector" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
-<%@ page import="org.wso2.carbon.bam.jmx.agent.stub.profiles.xsd.Profile" %>
-<%@ page import="org.wso2.carbon.bam.jmx.agent.stub.profiles.xsd.MBean" %>
-<%@ page import="org.wso2.carbon.bam.jmx.agent.stub.profiles.xsd.MBeanAttribute" %>
-<%@ page import="org.wso2.carbon.bam.jmx.agent.stub.profiles.xsd.MBeanAttributeProperty" %>
-<%@ page import="org.wso2.carbon.bam.jmx.agent.stub.JmxAgentProfileDoesNotExistExceptionException" %>
-<%@ page import="org.wso2.carbon.bam.jmx.agent.stub.JmxAgentJmxProfileExceptionException" %>
+<%@ page import="org.wso2.carbon.analytics.jmx.agent.stub.profiles.xsd.Profile" %>
+<%@ page import="org.wso2.carbon.analytics.jmx.agent.stub.profiles.xsd.MBean" %>
+<%@ page import="org.wso2.carbon.analytics.jmx.agent.stub.profiles.xsd.MBeanAttribute" %>
+<%@ page import="org.wso2.carbon.analytics.jmx.agent.stub.profiles.xsd.MBeanAttributeProperty" %>
+<%@ page import="org.wso2.carbon.analytics.jmx.agent.stub.JmxAgentProfileDoesNotExistExceptionException" %>
+<%@ page import="org.wso2.carbon.analytics.jmx.agent.stub.JmxAgentJmxProfileExceptionException" %>
 
 <% String serverURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);
 

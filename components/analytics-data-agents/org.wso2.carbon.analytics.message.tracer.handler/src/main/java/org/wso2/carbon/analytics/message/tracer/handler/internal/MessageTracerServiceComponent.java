@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.bam.message.tracer.handler.internal;
+package org.wso2.carbon.analytics.message.tracer.handler.internal;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
@@ -21,11 +21,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.bam.message.tracer.handler.conf.MessageTracerConfiguration;
-import org.wso2.carbon.bam.message.tracer.handler.conf.MessageTracerConfigurationManager;
-import org.wso2.carbon.bam.message.tracer.handler.conf.RegistryPersistenceManager;
-import org.wso2.carbon.bam.message.tracer.handler.util.MessageTracerConstants;
-import org.wso2.carbon.bam.message.tracer.handler.util.ServiceHolder;
+import org.wso2.carbon.analytics.message.tracer.handler.conf.MessageTracerConfiguration;
+import org.wso2.carbon.analytics.message.tracer.handler.conf.MessageTracerConfigurationManager;
+import org.wso2.carbon.analytics.message.tracer.handler.conf.RegistryPersistenceManager;
+import org.wso2.carbon.analytics.message.tracer.handler.util.MessageTracerConstants;
+import org.wso2.carbon.analytics.message.tracer.handler.util.ServiceHolder;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;

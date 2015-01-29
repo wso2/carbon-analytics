@@ -41,19 +41,11 @@
                 <artifactId>org.wso2.carbon.analytics.spark.core</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>com.fasterxml.jackson.jaxrs</groupId>
                 <artifactId>jackson-jaxrs-json-provider</artifactId>
                 <version>2.4.2</version>
             </dependency>
-
-            <dependency>
-                <groupId>org.apache.cxf.wso2</groupId>
-                <artifactId>cxf-bundle</artifactId>
-                <version>2.6.1.wso2v2</version>
-            </dependency>
-
             <dependency>
                 <groupId>org.apache.spark</groupId>
                 <artifactId>spark-core_2.10</artifactId>
@@ -352,6 +344,11 @@
                 <version>${project.version}</version>
                 <type>zip</type>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.analytics.dashboard.ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -608,7 +605,7 @@
         <version.javax.servlet>3.0.0.v201112011016</version.javax.servlet>
         <!--<event.processor.version>2.0.0-SNAPSHOT</event.processor.version>-->
         <!--<cxf.version>2.5.1</cxf.version>-->
-        <!--<cxf.wso2.version>2.6.1.wso2v2</cxf.wso2.version>-->
+        <cxf.wso2.version>2.6.1.wso2v2</cxf.wso2.version>
         <slf4j.orbit.version>1.5.10.wso2v1</slf4j.orbit.version>
         <slf4j.version>1.6.1</slf4j.version>
         <log4j.version>1.2.14</log4j.version>

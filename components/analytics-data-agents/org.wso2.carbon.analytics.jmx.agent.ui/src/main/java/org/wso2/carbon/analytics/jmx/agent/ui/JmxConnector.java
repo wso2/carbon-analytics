@@ -17,7 +17,7 @@
 *
 */
 
-package org.wso2.carbon.bam.jmx.agent.ui;
+package org.wso2.carbon.analytics.jmx.agent.ui;
 
 
 import org.apache.axis2.AxisFault;
@@ -26,17 +26,17 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.bam.jmx.agent.stub.ArrayOfString;
-import org.wso2.carbon.bam.jmx.agent.stub.JmxAgentIOExceptionException;
-import org.wso2.carbon.bam.jmx.agent.stub.JmxAgentInstanceNotFoundExceptionException;
-import org.wso2.carbon.bam.jmx.agent.stub.JmxAgentIntrospectionExceptionException;
-import org.wso2.carbon.bam.jmx.agent.stub.JmxAgentJmxProfileExceptionException;
-import org.wso2.carbon.bam.jmx.agent.stub.JmxAgentMalformedObjectNameExceptionException;
-import org.wso2.carbon.bam.jmx.agent.stub.JmxAgentProfileAlreadyExistsExceptionException;
-import org.wso2.carbon.bam.jmx.agent.stub.JmxAgentProfileDoesNotExistExceptionException;
-import org.wso2.carbon.bam.jmx.agent.stub.JmxAgentReflectionExceptionException;
-import org.wso2.carbon.bam.jmx.agent.stub.JmxAgentStub;
-import org.wso2.carbon.bam.jmx.agent.stub.profiles.xsd.Profile;
+import org.wso2.carbon.analytics.jmx.agent.stub.ArrayOfString;
+import org.wso2.carbon.analytics.jmx.agent.stub.JmxAgentIOExceptionException;
+import org.wso2.carbon.analytics.jmx.agent.stub.JmxAgentInstanceNotFoundExceptionException;
+import org.wso2.carbon.analytics.jmx.agent.stub.JmxAgentIntrospectionExceptionException;
+import org.wso2.carbon.analytics.jmx.agent.stub.JmxAgentJmxProfileExceptionException;
+import org.wso2.carbon.analytics.jmx.agent.stub.JmxAgentMalformedObjectNameExceptionException;
+import org.wso2.carbon.analytics.jmx.agent.stub.JmxAgentProfileAlreadyExistsExceptionException;
+import org.wso2.carbon.analytics.jmx.agent.stub.JmxAgentProfileDoesNotExistExceptionException;
+import org.wso2.carbon.analytics.jmx.agent.stub.JmxAgentReflectionExceptionException;
+import org.wso2.carbon.analytics.jmx.agent.stub.JmxAgentStub;
+import org.wso2.carbon.analytics.jmx.agent.stub.profiles.xsd.Profile;
 
 import java.rmi.RemoteException;
 
@@ -64,7 +64,6 @@ public class JmxConnector {
 
     public String[][] getMBeans(String url, String userName, String Password)
             throws RemoteException, JmxAgentIOExceptionException {
-
 
         ArrayOfString[] arr = stub.getMBeans(url, userName, Password);
         int width = arr[0].getArray().length;

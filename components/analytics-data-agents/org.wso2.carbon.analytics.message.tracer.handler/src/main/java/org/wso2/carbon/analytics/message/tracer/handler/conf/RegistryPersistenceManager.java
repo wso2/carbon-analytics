@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.bam.message.tracer.handler.conf;
+package org.wso2.carbon.analytics.message.tracer.handler.conf;
 
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.bam.message.tracer.handler.publish.ClusterNotifier;
-import org.wso2.carbon.bam.message.tracer.handler.util.MessageTracerConstants;
-import org.wso2.carbon.bam.message.tracer.handler.util.ServiceHolder;
-import org.wso2.carbon.bam.message.tracer.handler.util.TenantEventConfigData;
+import org.wso2.carbon.analytics.message.tracer.handler.publish.ClusterNotifier;
+import org.wso2.carbon.analytics.message.tracer.handler.util.MessageTracerConstants;
+import org.wso2.carbon.analytics.message.tracer.handler.util.ServiceHolder;
+import org.wso2.carbon.analytics.message.tracer.handler.util.TenantEventConfigData;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.Resource;

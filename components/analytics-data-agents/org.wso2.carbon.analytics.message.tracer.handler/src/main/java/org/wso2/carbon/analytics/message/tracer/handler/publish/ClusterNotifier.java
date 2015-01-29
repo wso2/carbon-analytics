@@ -15,14 +15,14 @@
  *  * limitations under the License.
  *
  */
-package org.wso2.carbon.bam.message.tracer.handler.publish;
+package org.wso2.carbon.analytics.message.tracer.handler.publish;
 
 import org.apache.axis2.clustering.ClusteringAgent;
 import org.apache.axis2.clustering.ClusteringFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.bam.message.tracer.handler.util.ServiceHolder;
+import org.wso2.carbon.analytics.message.tracer.handler.util.ServiceHolder;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
 public class ClusterNotifier {

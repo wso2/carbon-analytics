@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.bam.message.tracer.handler.stream;
+package org.wso2.carbon.analytics.message.tracer.handler.stream;
 
-import org.wso2.carbon.bam.message.tracer.handler.util.MessageTracerConstants;
+import org.wso2.carbon.analytics.message.tracer.handler.util.MessageTracerConstants;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.AttributeType;
 import org.wso2.carbon.databridge.commons.StreamDefinition;

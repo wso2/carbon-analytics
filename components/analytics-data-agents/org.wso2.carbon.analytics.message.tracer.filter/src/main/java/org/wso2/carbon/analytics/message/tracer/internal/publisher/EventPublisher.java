@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.bam.message.tracer.internal.publisher;
+package org.wso2.carbon.analytics.message.tracer.internal.publisher;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.bam.message.tracer.data.EventStreamDef;
-import org.wso2.carbon.bam.message.tracer.data.Message;
-import org.wso2.carbon.bam.message.tracer.data.ServerConfig;
-import org.wso2.carbon.bam.message.tracer.internal.conf.EventPublisherConfig;
-import org.wso2.carbon.bam.message.tracer.internal.utils.EventConfigUtil;
-import org.wso2.carbon.bam.message.tracer.internal.utils.EventPublishConfigHolder;
-import org.wso2.carbon.bam.message.tracer.internal.utils.StreamDefUtil;
+import org.wso2.carbon.analytics.message.tracer.data.EventStreamDef;
+import org.wso2.carbon.analytics.message.tracer.data.Message;
+import org.wso2.carbon.analytics.message.tracer.data.ServerConfig;
+import org.wso2.carbon.analytics.message.tracer.internal.conf.EventPublisherConfig;
+import org.wso2.carbon.analytics.message.tracer.internal.utils.EventConfigUtil;
+import org.wso2.carbon.analytics.message.tracer.internal.utils.EventPublishConfigHolder;
+import org.wso2.carbon.analytics.message.tracer.internal.utils.StreamDefUtil;
 import org.wso2.carbon.databridge.agent.thrift.AsyncDataPublisher;
 import org.wso2.carbon.databridge.agent.thrift.exception.AgentException;
 import org.wso2.carbon.databridge.agent.thrift.lb.DataPublisherHolder;

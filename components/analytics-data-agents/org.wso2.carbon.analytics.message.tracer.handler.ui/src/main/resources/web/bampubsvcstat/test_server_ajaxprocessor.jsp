@@ -16,7 +16,7 @@
   ~  limitations under the License.
   --%>
 
-<%@ page import="org.wso2.carbon.bam.message.tracer.handler.ui.TestServerAjaxProcessorHelper" %>
+<%@ page import="org.wso2.carbon.analytics.message.tracer.handler.ui.TestServerAjaxProcessorHelper" %>
 
 <%
     TestServerAjaxProcessorHelper testServerAjaxProcessorHelper = new TestServerAjaxProcessorHelper();

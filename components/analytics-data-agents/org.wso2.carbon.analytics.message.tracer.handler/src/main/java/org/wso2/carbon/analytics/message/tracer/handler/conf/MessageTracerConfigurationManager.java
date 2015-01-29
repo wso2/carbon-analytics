@@ -16,11 +16,11 @@
 * under the License.
 */
 
-package org.wso2.carbon.bam.message.tracer.handler.conf;
+package org.wso2.carbon.analytics.message.tracer.handler.conf;
 
 import org.w3c.dom.Document;
-import org.wso2.carbon.bam.message.tracer.handler.exception.MessageTracerHandlerException;
-import org.wso2.carbon.bam.message.tracer.handler.util.HandlerUtils;
+import org.wso2.carbon.analytics.message.tracer.handler.exception.MessageTracerHandlerException;
+import org.wso2.carbon.analytics.message.tracer.handler.util.HandlerUtils;
 import org.wso2.carbon.utils.CarbonUtils;
 
 import javax.xml.bind.JAXBContext;

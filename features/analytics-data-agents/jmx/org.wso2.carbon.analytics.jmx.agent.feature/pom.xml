@@ -20,7 +20,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>analytics-jmx-agent-feature</artifactId>
         <version>1.0.0-SNAPSHOT</version>
 	<relativePath>../pom.xml</relativePath>
@@ -30,18 +30,16 @@
     <artifactId>org.wso2.carbon.analytics.jmx.agent.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Analytics JMX Data Agent Aggregate Feature</name>
-    <url>http://wso2.org</url>
     <description>This feature contains the bundles required for BAM JMX agent Components</description>
-    <version>1.0.0-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.jmx.agent.server.feature</artifactId>
             <type>zip</type>
 	    </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.jmx.agent.ui.feature</artifactId>
             <type>zip</type>
 	    </dependency>
@@ -67,10 +65,10 @@
                             </importFeatures>
                             <includedFeatures>
                                 <includedFeatureDef>
-                                    org.wso2.carbon:org.wso2.carbon.analytics.jmx.agent.server.feature:${project.version}
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.jmx.agent.server.feature:${project.version}
                                 </includedFeatureDef>
                                 <includedFeatureDef>
-                                    org.wso2.carbon:org.wso2.carbon.analytics.jmx.agent.ui.feature:${project.version}
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.jmx.agent.ui.feature:${project.version}
                                 </includedFeatureDef>
                             </includedFeatures>
                         </configuration>

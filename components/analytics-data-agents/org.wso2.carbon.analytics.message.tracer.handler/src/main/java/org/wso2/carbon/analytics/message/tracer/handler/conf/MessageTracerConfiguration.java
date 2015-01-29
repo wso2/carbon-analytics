@@ -16,7 +16,7 @@
 * under the License.
 */
 
-package org.wso2.carbon.bam.message.tracer.handler.conf;
+package org.wso2.carbon.analytics.message.tracer.handler.conf;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;

@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.bam.message.tracer.handler.util;
+package org.wso2.carbon.analytics.message.tracer.handler.util;
 
 
-import org.wso2.carbon.bam.message.tracer.handler.data.TracingInfo;
-import org.wso2.carbon.bam.message.tracer.handler.internal.MessageTracerServiceComponent;
+import org.wso2.carbon.analytics.message.tracer.handler.data.TracingInfo;
+import org.wso2.carbon.analytics.message.tracer.handler.internal.MessageTracerServiceComponent;
 import org.wso2.carbon.base.ServerConfiguration;
 
 import java.util.HashMap;

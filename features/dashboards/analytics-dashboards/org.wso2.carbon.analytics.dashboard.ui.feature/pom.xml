@@ -21,25 +21,23 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>analytics-dashboards-ui-feature</artifactId>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.analytics</groupId>
         <version>1.0.0-SNAPSHOT</version>
-	<relativePath>../pom.xml</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-       <artifactId>org.wso2.carbon.analytics.dashboard.ui.feature</artifactId>
-       <packaging>pom</packaging>
-       <name>WSO2 Carbon - Analytics BAM Dashboard UI Feature</name>
-       <url>http://wso2.org</url>
-       <description>This feature contains the bundles required for BAM dashboard</description>
+    <artifactId>org.wso2.carbon.analytics.dashboard.ui.feature</artifactId>
+    <packaging>pom</packaging>
+    <name>WSO2 Carbon - Analytics BAM Dashboard UI Feature</name>
+    <description>This feature contains the bundles required for BAM dashboard</description>
 
 
-       <dependencies>
-		<dependency>
-		    <groupId>org.wso2.carbon</groupId>
-		    <artifactId>org.wso2.carbon.analytics.dashboard.ui</artifactId>
-          	    <version>${project.version}</version>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.analytics.dashboard.ui</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -65,7 +63,9 @@
                                 </properties>
                             </adviceFile>
                             <bundles>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.analytics.dashboard.ui:${project.version}</bundleDef>
+                                <bundleDef>
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.dashboard.ui:${project.version}
+                                </bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.ui:${carbon.kernel.version}</importFeatureDef>

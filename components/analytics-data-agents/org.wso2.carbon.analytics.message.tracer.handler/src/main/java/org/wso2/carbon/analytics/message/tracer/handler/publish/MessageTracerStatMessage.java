@@ -15,7 +15,7 @@
  *  * limitations under the License.
  *
  */
-package org.wso2.carbon.bam.message.tracer.handler.publish;
+package org.wso2.carbon.analytics.message.tracer.handler.publish;
 
 import org.apache.axis2.clustering.ClusteringCommand;
 import org.apache.axis2.clustering.ClusteringFault;
@@ -23,7 +23,7 @@ import org.apache.axis2.clustering.ClusteringMessage;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.bam.message.tracer.handler.conf.RegistryPersistenceManager;
+import org.wso2.carbon.analytics.message.tracer.handler.conf.RegistryPersistenceManager;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 

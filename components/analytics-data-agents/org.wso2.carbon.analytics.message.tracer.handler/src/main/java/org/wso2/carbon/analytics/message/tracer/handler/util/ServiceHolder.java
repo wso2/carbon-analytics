@@ -15,7 +15,7 @@
  *  * limitations under the License.
  *
  */
-package org.wso2.carbon.bam.message.tracer.handler.util;
+package org.wso2.carbon.analytics.message.tracer.handler.util;
 
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.utils.ConfigurationContextService;

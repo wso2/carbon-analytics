@@ -20,7 +20,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>analytics-message-tracer-handler-feature</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
@@ -28,20 +28,17 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.analytics.message.tracer.handler.ui.feature</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Analytics Message Tracer Handler UI Feature</name>
-    <url>http://wso2.org</url>
-
-    <description>This feature contains the core bundles required for BAM Message Tracer Handler UI functionality</description>
+    <description>This feature contains the core bundles required for Analytics Message Tracer Handler UI functionality</description>
 
     <dependencies>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.message.tracer.handler.ui</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.message.tracer.handler.stub</artifactId>
         </dependency>
     </dependencies>
@@ -51,7 +48,6 @@
             <plugin>
                 <groupId>org.wso2.maven</groupId>
                 <artifactId>carbon-p2-plugin</artifactId>
-                <version>${carbon.p2.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>4-p2-feature-generation</id>
@@ -70,10 +66,10 @@
                             </adviceFile>
                             <bundles>
                                 <bundleDef>
-                                    org.wso2.carbon:org.wso2.carbon.analytics.message.tracer.handler.ui:${project.version}
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.message.tracer.handler.ui:${project.version}
                                 </bundleDef>
                                 <bundleDef>
-                                    org.wso2.carbon:org.wso2.carbon.analytics.message.tracer.handler.stub:${project.version}
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.message.tracer.handler.stub:${project.version}
                                 </bundleDef>
                             </bundles>
                             <importFeatures>
@@ -85,6 +81,4 @@
             </plugin>
         </plugins>
     </build>
-
-
 </project>

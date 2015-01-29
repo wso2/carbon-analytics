@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.bam.message.tracer.internal.utils;
+package org.wso2.carbon.analytics.message.tracer.internal.utils;
 
 
-import org.wso2.carbon.bam.message.tracer.internal.conf.EventPublisherConfig;
+import org.wso2.carbon.analytics.message.tracer.internal.conf.EventPublisherConfig;
 
 import java.util.HashMap;
 import java.util.Map;

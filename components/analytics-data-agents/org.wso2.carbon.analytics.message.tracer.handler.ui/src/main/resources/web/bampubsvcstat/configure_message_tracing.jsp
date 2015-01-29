@@ -2,8 +2,8 @@
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <%@ page import="org.apache.axis2.context.ConfigurationContext" %>
 <%@ page import="org.wso2.carbon.CarbonConstants" %>
-<%@ page import="org.wso2.carbon.bam.message.tracer.handler.stub.conf.EventingConfigData" %>
-<%@ page import="org.wso2.carbon.bam.message.tracer.handler.ui.MessageTracerHandlerAdminClient" %>
+<%@ page import="org.wso2.carbon.analytics.message.tracer.handler.stub.conf.EventingConfigData" %>
+<%@ page import="org.wso2.carbon.analytics.message.tracer.handler.ui.MessageTracerHandlerAdminClient" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
