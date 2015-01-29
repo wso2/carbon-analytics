@@ -18,8 +18,8 @@
     <modules>
         <module>service-stubs</module>
         <module>components/xanalytics</module>
-        <!--module>components/analytics-data-agents</module-->
-        <module>features/analytics-data-agents</module>
+        <!--module>components/analytics-data-agents</module>
+        <module>features/analytics-data-agents</module-->
         <module>features/analytics/analytics-core</module>
         <module>features/analytics/analytics-datasources</module>
         <module>features/analytics/analytics-rest</module>
@@ -29,6 +29,12 @@
 
     <dependencyManagement>
         <dependencies>
+
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.event.stream.manager.core</artifactId>
+                <version>${event.processing.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
@@ -688,7 +694,9 @@
 
         <carbon.kernel.version>4.3.0</carbon.kernel.version>
 
-        <carbon.commons.version>4.3.0</carbon.commons.version>
+        <carbon.commons.version>4.3.0-SNAPSHOT</carbon.commons.version>
+
+        <event.processing.version>2.0.0-SNAPSHOT</event.processing.version>
 
     </properties>
 
