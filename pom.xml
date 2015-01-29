@@ -18,7 +18,7 @@
     <modules>
         <module>service-stubs</module>
         <module>components/xanalytics</module>
-        <module>components/analytics-data-agents</module>
+        <!--module>components/analytics-data-agents</module-->
         <module>features/analytics-data-agents</module>
         <module>features/analytics/analytics-core</module>
         <module>features/analytics/analytics-datasources</module>
@@ -96,6 +96,24 @@
 		</dependency>
 
             <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.core.common</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.authenticator.proxy</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.spark.ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.spark.ui.feature</artifactId>
                 <version>${project.version}</version>
@@ -151,7 +169,12 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbo.analyticsn</groupId>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.datasource.core.test</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.dataservice</artifactId>
                 <version>${project.version}</version>
             </dependency>
