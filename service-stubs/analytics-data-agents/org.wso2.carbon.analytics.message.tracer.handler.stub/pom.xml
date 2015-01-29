@@ -103,7 +103,7 @@
                         </Bundle-SymbolicName>
                         <Export-Package>
                             org.wso2.carbon.analytics.message.tracer.handler.stub.*;
-                            version="${carbon.platform.package.export.version}"
+                            version="${carbon.kernel.package.export.version}"
                         </Export-Package>
                     </instructions>
                 </configuration>

@@ -80,7 +80,7 @@
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core:${carbon.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.analytics.core.server:${carbon.analytics.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.analytics.core.server:${project.version}</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>
