@@ -140,33 +140,33 @@
             <dependency>
                 <groupId>org.apache.lucene.wso2</groupId>
                 <artifactId>lucene</artifactId>
-                <version>${lucene.version}</version>
+                <version>${lucene.orbit.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-core</artifactId>
-                <version>4.10.3</version>
+                <version>${lucene.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-analyzers-common</artifactId>
-                <version>4.10.3</version>
+                <version>${lucene.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-queryparser</artifactId>
-                <version>4.10.3</version>
+                <version>${lucene.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-queries</artifactId>
-                <version>4.10.3</version>
+                <version>${lucene.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-regex</artifactId>
-                <version>3.0.3</version>
+                <version>${lucene.regex.version}</version>
             </dependency>
 
             <dependency>
@@ -690,7 +690,11 @@
         <!-- Jaggery-->
         <!--<jaggery.feature.version>0.9.0.ALPHA4.wso2v1</jaggery.feature.version>-->
 
-        <lucene.version>4.10.3.wso2v1</lucene.version>
+        <lucene.version>4.10.3</lucene.version>
+
+        <lucene.regex.version>3.0.3</lucene.regex.version>
+
+        <lucene.orbit.version>4.10.3.wso2v1</lucene.orbit.version>
 
         <carbon.kernel.version>4.3.0</carbon.kernel.version>
 
