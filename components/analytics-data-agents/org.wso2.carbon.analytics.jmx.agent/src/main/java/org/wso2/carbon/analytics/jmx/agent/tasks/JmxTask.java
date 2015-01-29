@@ -17,23 +17,23 @@
 *
 */
 
-package org.wso2.carbon.bam.jmx.agent.tasks;
+package org.wso2.carbon.analytics.jmx.agent.tasks;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.bam.jmx.agent.JmxAgent;
-import org.wso2.carbon.bam.jmx.agent.JmxConstant;
-import org.wso2.carbon.bam.jmx.agent.PublisherUtil;
-import org.wso2.carbon.bam.jmx.agent.TenantPublisherConfigData;
-import org.wso2.carbon.bam.jmx.agent.exceptions.JmxConnectionException;
-import org.wso2.carbon.bam.jmx.agent.exceptions.JmxMBeanException;
-import org.wso2.carbon.bam.jmx.agent.exceptions.JmxProfileException;
-import org.wso2.carbon.bam.jmx.agent.exceptions.ProfileDoesNotExistException;
-import org.wso2.carbon.bam.jmx.agent.profiles.MBean;
-import org.wso2.carbon.bam.jmx.agent.profiles.MBeanAttribute;
-import org.wso2.carbon.bam.jmx.agent.profiles.MBeanAttributeProperty;
-import org.wso2.carbon.bam.jmx.agent.profiles.Profile;
-import org.wso2.carbon.bam.jmx.agent.profiles.ProfileManager;
+import org.wso2.carbon.analytics.jmx.agent.JmxAgent;
+import org.wso2.carbon.analytics.jmx.agent.JmxConstant;
+import org.wso2.carbon.analytics.jmx.agent.PublisherUtil;
+import org.wso2.carbon.analytics.jmx.agent.TenantPublisherConfigData;
+import org.wso2.carbon.analytics.jmx.agent.exceptions.JmxConnectionException;
+import org.wso2.carbon.analytics.jmx.agent.exceptions.JmxMBeanException;
+import org.wso2.carbon.analytics.jmx.agent.exceptions.JmxProfileException;
+import org.wso2.carbon.analytics.jmx.agent.exceptions.ProfileDoesNotExistException;
+import org.wso2.carbon.analytics.jmx.agent.profiles.MBean;
+import org.wso2.carbon.analytics.jmx.agent.profiles.MBeanAttribute;
+import org.wso2.carbon.analytics.jmx.agent.profiles.MBeanAttributeProperty;
+import org.wso2.carbon.analytics.jmx.agent.profiles.Profile;
+import org.wso2.carbon.analytics.jmx.agent.profiles.ProfileManager;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.databridge.agent.thrift.DataPublisher;
 import org.wso2.carbon.databridge.agent.thrift.exception.AgentException;

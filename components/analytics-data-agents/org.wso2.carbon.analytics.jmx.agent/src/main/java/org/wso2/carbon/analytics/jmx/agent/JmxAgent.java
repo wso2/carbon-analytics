@@ -17,12 +17,12 @@
 *
 */
 
-package org.wso2.carbon.bam.jmx.agent;
+package org.wso2.carbon.analytics.jmx.agent;
 
 import org.apache.log4j.Logger;
-import org.wso2.carbon.bam.jmx.agent.exceptions.JmxConnectionException;
-import org.wso2.carbon.bam.jmx.agent.exceptions.JmxMBeanException;
-import org.wso2.carbon.bam.jmx.agent.profiles.Profile;
+import org.wso2.carbon.analytics.jmx.agent.exceptions.JmxConnectionException;
+import org.wso2.carbon.analytics.jmx.agent.exceptions.JmxMBeanException;
+import org.wso2.carbon.analytics.jmx.agent.profiles.Profile;
 
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;

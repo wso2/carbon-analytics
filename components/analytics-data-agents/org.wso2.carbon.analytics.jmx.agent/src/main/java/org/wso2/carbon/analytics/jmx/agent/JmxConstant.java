@@ -17,7 +17,7 @@
 *
 */
 
-package org.wso2.carbon.bam.jmx.agent;
+package org.wso2.carbon.analytics.jmx.agent;
 
 
 public class JmxConstant {

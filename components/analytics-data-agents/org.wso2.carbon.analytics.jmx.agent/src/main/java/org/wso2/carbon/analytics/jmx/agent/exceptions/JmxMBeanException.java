@@ -19,7 +19,7 @@
  * Time: 11:59 AM
  */
 
-package org.wso2.carbon.bam.jmx.agent.exceptions;
+package org.wso2.carbon.analytics.jmx.agent.exceptions;
 
 public class JmxMBeanException extends Exception {
 

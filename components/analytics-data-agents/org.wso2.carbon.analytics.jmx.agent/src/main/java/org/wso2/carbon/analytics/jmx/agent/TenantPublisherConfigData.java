@@ -1,4 +1,4 @@
-package org.wso2.carbon.bam.jmx.agent;
+package org.wso2.carbon.analytics.jmx.agent;
 
 import org.wso2.carbon.databridge.agent.thrift.DataPublisher;
 

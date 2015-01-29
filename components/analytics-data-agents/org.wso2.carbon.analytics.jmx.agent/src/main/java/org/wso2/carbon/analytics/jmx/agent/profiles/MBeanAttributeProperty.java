@@ -19,7 +19,7 @@
  * Time: 4:56 PM
  */
 
-package org.wso2.carbon.bam.jmx.agent.profiles;
+package org.wso2.carbon.analytics.jmx.agent.profiles;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;

@@ -17,14 +17,14 @@
 *
 */
 
-package org.wso2.carbon.bam.jmx.agent.tasks.internal;
+package org.wso2.carbon.analytics.jmx.agent.tasks.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.bam.jmx.agent.JmxConstant;
-import org.wso2.carbon.bam.jmx.agent.TenantPublisherConfigData;
+import org.wso2.carbon.analytics.jmx.agent.JmxConstant;
+import org.wso2.carbon.analytics.jmx.agent.TenantPublisherConfigData;
 import org.wso2.carbon.databridge.agent.thrift.DataPublisher;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.service.TaskService;

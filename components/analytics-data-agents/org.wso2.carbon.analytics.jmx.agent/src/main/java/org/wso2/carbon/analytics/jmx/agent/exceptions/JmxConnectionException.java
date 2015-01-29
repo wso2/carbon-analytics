@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.bam.jmx.agent.exceptions;
+package org.wso2.carbon.analytics.jmx.agent.exceptions;
 
 public class JmxConnectionException extends Exception {
 
