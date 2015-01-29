@@ -19,12 +19,12 @@
         <module>service-stubs</module>
         <module>components/xanalytics</module>
         <module>components/analytics-data-agents</module>
-        <!--module>features/analytics-data-agents</module>
+        <module>features/analytics-data-agents</module>
         <module>features/analytics/analytics-core</module>
         <module>features/analytics/analytics-datasources</module>
         <module>features/analytics/analytics-rest</module>
         <module>features/analytics/analytics-spark</module>
-        <module>features/dashboards/analytics-dashboards</module-->
+        <module>features/dashboards/analytics-dashboards</module>
     </modules>
 
     <dependencyManagement>
