@@ -18,12 +18,12 @@
 		<dependency>
 			<groupId>org.wso2.carbon</groupId>
 			<artifactId>org.wso2.carbon.analytics.datasource.core.test</artifactId>
-			<version>${project.version}</version>
+			<version>${carbon.analytics.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.wso2.carbon</groupId>
 			<artifactId>org.wso2.carbon.analytics.dataservice</artifactId>
-			<version>${project.version}</version>
+			<version>${carbon.analytics.version}</version>
 			<scope>test</scope>
 		</dependency>
 
