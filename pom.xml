@@ -29,9 +29,8 @@
 
     <dependencyManagement>
         <dependencies>
-
             <dependency>
-                <groupId>org.wso2.carbon</groupId>
+                <groupId>org.wso2.carbon.event-processing</groupId>
                 <artifactId>org.wso2.carbon.event.stream.manager.core</artifactId>
                 <version>${event.processing.version}</version>
                 <exclusions>
