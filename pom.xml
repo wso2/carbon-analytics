@@ -34,6 +34,16 @@
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.event.stream.manager.core</artifactId>
                 <version>${event.processing.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.wso2.siddhi</groupId>
+                        <artifactId>siddhi-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.wso2.carbon</groupId>
+                        <artifactId>org.wso2.carbon.stratos.common</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -349,6 +359,11 @@
                 <artifactId>org.wso2.carbon.analytics.dashboard.ui</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.googlecode.disruptor.wso2</groupId>
+                <artifactId>disruptor</artifactId>
+                <version>2.10.4-wso2v2</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -582,9 +597,44 @@
         <lucene.version>4.10.3</lucene.version>
         <lucene.regex.version>3.0.3</lucene.regex.version>
         <lucene.orbit.version>4.10.3.wso2v1</lucene.orbit.version>
-        <carbon.commons.version>4.3.0-SNAPSHOT</carbon.commons.version>
+        <carbon.commons.version>4.3.0</carbon.commons.version>
         <event.processing.version>2.0.0-SNAPSHOT</event.processing.version>
-
     </properties>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>wso2.releases</id>
+            <name>WSO2 internal Repository</name>
+            <url>http://maven.wso2.org/nexus/content/repositories/releases/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+                <checksumPolicy>ignore</checksumPolicy>
+            </releases>
+        </pluginRepository>
+
+        <pluginRepository>
+            <id>wso2.snapshots</id>
+            <name>Apache Snapshot Repository</name>
+            <url>http://maven.wso2.org/nexus/content/repositories/snapshots/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </pluginRepository>
+        <pluginRepository>
+            <id>wso2-nexus</id>
+            <name>WSO2 internal Repository</name>
+            <url>http://maven.wso2.org/nexus/content/groups/wso2-public/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+                <checksumPolicy>ignore</checksumPolicy>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
 
 </project>

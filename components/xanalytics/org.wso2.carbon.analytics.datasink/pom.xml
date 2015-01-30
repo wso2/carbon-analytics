@@ -49,10 +49,10 @@
             <artifactId>org.wso2.carbon.databridge.commons</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.wso2.carbon.commons</groupId>
-            <artifactId>org.wso2.carbon.databridge.streamdefn.registry</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.wso2.carbon.commons</groupId>-->
+            <!--<artifactId>org.wso2.carbon.databridge.streamdefn.registry</artifactId>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
@@ -87,7 +87,6 @@
         <dependency>
             <groupId>com.googlecode.disruptor.wso2</groupId>
             <artifactId>disruptor</artifactId>
-            <version>2.10.4-wso2v2</version>
         </dependency>
 
         <!-- test dependencies for unit tests -->
