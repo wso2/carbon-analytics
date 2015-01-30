@@ -110,12 +110,19 @@ public class AnalyticsFileSystemTest {
         DataInput in = this.analyticsFileSystem.createInput("/d1/d2/d3/f1");
         byte[] dataIn = new byte[data.length];
         start = System.currentTimeMillis();
-        int len = in.read(dataIn, 0, dataIn.length);
+        int len;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        while ((len = in.read(dataIn, 0, dataIn.length)) != -1) {
+            baos.write(dataIn, 0, len);
+        }
         in.close();
+        int resSize = baos.size();
+        byte[] result = baos.toByteArray();
+        baos.close();
         end = System.currentTimeMillis();
         System.out.println("File data (1 MB) read in: " + (end - start) + " ms.");
-        Assert.assertEquals(len, data.length);
-        Assert.assertEquals(data, dataIn);
+        Assert.assertEquals(resSize, data.length);
+        Assert.assertEquals(data, result);
         this.analyticsFileSystem.delete("/d1/d2/d3/f1");
         Assert.assertFalse(this.analyticsFileSystem.exists("/d1/d2/d3/f1"));
         this.analyticsFileSystem.delete("/d1/d2/d3");
