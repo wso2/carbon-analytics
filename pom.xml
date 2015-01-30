@@ -602,7 +602,7 @@
         <lucene.version>4.10.3</lucene.version>
         <lucene.regex.version>3.0.3</lucene.regex.version>
         <lucene.orbit.version>4.10.3.wso2v1</lucene.orbit.version>
-        <carbon.commons.version>4.3.0</carbon.commons.version>
+        <carbon.commons.version>4.3.1</carbon.commons.version>
         <event.processing.version>2.0.0-SNAPSHOT</event.processing.version>
 
         <carbon.analytics.version>1.0.0-SNAPSHOT</carbon.analytics.version>
