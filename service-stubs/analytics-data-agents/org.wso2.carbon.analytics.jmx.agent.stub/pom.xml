@@ -84,7 +84,7 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Export-Package>
                             org.wso2.carbon.analytics.jmx.agent.stub.*;
-                            version="${project.version}"
+                            version="${carbon.analytics.version}"
                         </Export-Package>
                         <Import-Package>
                             !javax.xml.namespace,

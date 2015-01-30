@@ -64,7 +64,7 @@
                             </adviceFile>
                             <bundles>
                                 <bundleDef>
-                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.ui:${project.version}
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.ui:${carbon.analytics.version}
                                 </bundleDef>
                             </bundles>
                             <importFeatures>

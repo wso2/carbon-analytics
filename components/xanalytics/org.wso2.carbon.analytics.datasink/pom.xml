@@ -30,8 +30,6 @@
     <artifactId>org.wso2.carbon.analytics.datasink</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Analytics Datasink Module</name>
-    <version>1.0.0-SNAPSHOT</version>
-    <url>http://wso2.org</url>
 
     <dependencies>
         <dependency>

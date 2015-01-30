@@ -59,7 +59,7 @@
                             <propertiesFile>../../../../etc/feature.properties</propertiesFile>
                             <includedFeatures>
                                 <includedFeatureDef>
-                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasource.rdbms.server.feature:${project.version}
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasource.rdbms.server.feature:${carbon.analytics.version}
                                 </includedFeatureDef>
                             </includedFeatures>
                         </configuration>

@@ -64,10 +64,10 @@
                             </importFeatures>
                             <includedFeatures>
                                 <includedFeatureDef>
-                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.message.tracer.handler.server.feature:${project.version}
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.message.tracer.handler.server.feature:${carbon.analytics.version}
                                 </includedFeatureDef>
                                 <includedFeatureDef>
-                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.message.tracer.handler.ui.feature:${project.version}
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.message.tracer.handler.ui.feature:${carbon.analytics.version}
                                 </includedFeatureDef>
                             </includedFeatures>
                         </configuration>

@@ -26,11 +26,9 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-
     <artifactId>org.wso2.carbon.analytics.dashboard.ui</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Analytics Dashboards</name>
-
 
     <dependencies>
         <dependency>

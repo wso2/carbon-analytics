@@ -66,10 +66,10 @@
                             </adviceFile>
                             <bundles>
                                 <bundleDef>
-                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.message.tracer.handler.ui:${project.version}
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.message.tracer.handler.ui:${carbon.analytics.version}
                                 </bundleDef>
                                 <bundleDef>
-                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.message.tracer.handler.stub:${project.version}
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.message.tracer.handler.stub:${carbon.analytics.version}
                                 </bundleDef>
                             </bundles>
                             <importFeatures>

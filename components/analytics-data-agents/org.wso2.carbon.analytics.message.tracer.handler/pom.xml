@@ -30,7 +30,7 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Axis2Module>${project.artifactId}-${project.version}</Axis2Module>
+                        <Axis2Module>${project.artifactId}-${carbon.analytics.version}</Axis2Module>
                         <Export-Package>
                             org.wso2.carbon.analytics.message.tracer.handler.*
                         </Export-Package>

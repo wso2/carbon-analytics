@@ -75,7 +75,7 @@
                                     org.wso2.carbon.commons:org.wso2.carbon.databridge.agent.thrift:${carbon.commons.version}
                                 </bundleDef>
                                 <bundleDef>
-                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.message.tracer.handler:${project.version}
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.message.tracer.handler:${carbon.analytics.version}
                                 </bundleDef>
                             </bundles>
                             <importFeatures>

@@ -58,7 +58,7 @@
                             <id>org.wso2.carbon.analytics.spark</id>
                             <propertiesFile>../feature.properties</propertiesFile>
                             <includedFeatures>
-                                <includedFeatureDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.ui.feature:${project.version}</includedFeatureDef>
+                                <includedFeatureDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.ui.feature:${carbon.analytics.version}</includedFeatureDef>
                             </includedFeatures>
                         </configuration>
                     </execution>

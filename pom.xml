@@ -49,7 +49,7 @@
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.spark.core</artifactId>
-                <version>${project.version}</version>
+                <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.jaxrs</groupId>
@@ -66,77 +66,67 @@
                 <artifactId>spark-sql_2.10</artifactId>
                 <version>1.2.0</version>
             </dependency>
-
             <dependency>
                 <groupId>xerces</groupId>
                 <artifactId>xercesImpl</artifactId>
                 <version>2.11.0</version>
             </dependency>
-
             <dependency>
                 <groupId>com.hazelcast</groupId>
                 <artifactId>hazelcast</artifactId>
                 <version>3.2.6</version>
             </dependency>
-
             <dependency>
                 <groupId>org.apache.tomcat</groupId>
                 <artifactId>tomcat-jdbc</artifactId>
                 <version>7.0.55</version>
             </dependency>
-
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
                 <version>6.3.1</version>
             </dependency>
-
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>5.1.33</version>
             </dependency>
-
             <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
                 <version>1.4.182</version>
             </dependency>
-
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.core.common</artifactId>
                 <version>${carbon.kernel.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.authenticator.proxy</artifactId>
                 <version>${carbon.kernel.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.spark.ui</artifactId>
-                <version>${project.version}</version>
+                <version>${carbon.analytics.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.spark.ui.feature</artifactId>
-                <version>${project.version}</version>
+                <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.datasource.rdbms.server.feature</artifactId>
-                <version>${project.version}</version>
+                <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.core.server.feature</artifactId>
-                <version>${project.version}</version>
+                <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
             <dependency>
@@ -144,7 +134,6 @@
                 <artifactId>lucene</artifactId>
                 <version>${lucene.orbit.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-core</artifactId>
@@ -170,26 +159,25 @@
                 <artifactId>lucene-regex</artifactId>
                 <version>${lucene.regex.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.datasource.core</artifactId>
-                <version>${project.version}</version>
+                <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.datasource.core.test</artifactId>
-                <version>${project.version}</version>
+                <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.dataservice</artifactId>
-                <version>${project.version}</version>
+                <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.datasource.rdbms</artifactId>
-                <version>${project.version}</version>
+                <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.axis2.wso2</groupId>
@@ -287,7 +275,7 @@
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.jmx.agent.stub</artifactId>
-                <version>${project.version}</version>
+                <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>
@@ -302,7 +290,7 @@
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.message.tracer.handler.stub</artifactId>
-                <version>${project.version}</version>
+                <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.code.gson</groupId>
@@ -312,24 +300,24 @@
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.jmx.agent.server.feature</artifactId>
-                <version>${project.version}</version>
+                <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.jmx.agent.ui.feature</artifactId>
-                <version>${project.version}</version>
+                <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.jmx.agent</artifactId>
-                <version>${project.version}</version>
+                <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.jmx.agent.ui</artifactId>
-                <version>${project.version}</version>
+                <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.cxf.wso2</groupId>
@@ -340,24 +328,24 @@
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.message.tracer.handler.ui</artifactId>
-                <version>${project.version}</version>
+                <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.message.tracer.handler.server.feature</artifactId>
-                <version>${project.version}</version>
+                <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.message.tracer.handler.ui.feature</artifactId>
-                <version>${project.version}</version>
+                <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.analytics.dashboard.ui</artifactId>
-                <version>${project.version}</version>
+                <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.googlecode.disruptor.wso2</groupId>
@@ -382,7 +370,6 @@
                 <version>2.1</version>
             </extension>
         </extensions>
-
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -478,6 +465,18 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
                     <version>2.4</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <configuration>
+                        <preparationGoals>clean install</preparationGoals>
+                        <autoVersionSubmodules>false</autoVersionSubmodules>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -599,6 +598,8 @@
         <lucene.orbit.version>4.10.3.wso2v1</lucene.orbit.version>
         <carbon.commons.version>4.3.0</carbon.commons.version>
         <event.processing.version>2.0.0-SNAPSHOT</event.processing.version>
+
+        <carbon.analytics.version>1.0.0-SNAPSHOT</carbon.analytics.version>
     </properties>
 
     <pluginRepositories>
@@ -612,7 +613,6 @@
                 <checksumPolicy>ignore</checksumPolicy>
             </releases>
         </pluginRepository>
-
         <pluginRepository>
             <id>wso2.snapshots</id>
             <name>Apache Snapshot Repository</name>
