@@ -352,6 +352,12 @@
                 <artifactId>disruptor</artifactId>
                 <version>2.10.4-wso2v2</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.dataservice.restapi</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>war</type>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
