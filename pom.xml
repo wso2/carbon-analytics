@@ -603,6 +603,7 @@
         <event.processing.version>2.0.1</event.processing.version>
 
         <carbon.analytics.version>1.0.0-SNAPSHOT</carbon.analytics.version>
+        <project.scm.id>my-scm-server</project.scm.id>
     </properties>
 
     <pluginRepositories>
