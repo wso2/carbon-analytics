@@ -341,7 +341,7 @@
                 <type>zip</type>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon</groupId>
+                <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.dashboard.ui</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
