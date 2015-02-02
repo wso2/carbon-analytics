@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>analytics-data-agents-service-stubs</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -35,11 +35,11 @@
                                 </path>
 
                                 <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
-                                    <arg line="-uri src/main/resources/JmxAgent.wsdl -u -uw -o target/generated-code -p org.wso2.carbon.analytics.jmx.agent.stub                                    -ns2p http://profiles.agent.jmx.analytics.carbon.wso2.org/xsd=org.wso2.carbon.analytics.jmx.agent.stub.profiles.xsd,http://profiles.agent.jmx.analytics.carbon.wso2.org=org.wso2.carbon.analytics.jmx.agent.stub.profiles,http://org.apache.axis2/xsd=org.wso2.carbon.analytics.jmx.agent.stub.axis2.xsd,http://org.apache.axis2/xsd=org.wso2.carbon.analytics.jmx.agent.stub.types.axis2,http://agent.jmx.analytics.carbon.wso2.org=org.wso2.carbon.analytics.jmx.agent.stub" />
+                                    <arg line="-uri src/main/resources/JmxAgent.wsdl -u -uw -o target/generated-code -p org.wso2.carbon.analytics.jmx.agent.stub -ns2p http://profiles.agent.jmx.analytics.carbon.wso2.org/xsd=org.wso2.carbon.analytics.jmx.agent.stub.profiles.xsd,http://profiles.agent.jmx.analytics.carbon.wso2.org=org.wso2.carbon.analytics.jmx.agent.stub.profiles,http://org.apache.axis2/xsd=org.wso2.carbon.analytics.jmx.agent.stub.axis2.xsd,http://org.apache.axis2/xsd=org.wso2.carbon.analytics.jmx.agent.stub.types.axis2,http://agent.jmx.analytics.carbon.wso2.org=org.wso2.carbon.analytics.jmx.agent.stub" />
                                     <classpath refid="wsdl2java.classpath" />
                                 </java>
                                 <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
-                                    <arg line="-uri src/main/resources/JmxAgent.wsdl -u -uw -o target/generated-code -p org.wso2.carbon.analytics.jmx.agent.stub                                    -ns2p http://exceptions.agent.jmx.analytics.carbon.wso2.org/xsd=org.wso2.carbon.analytics.jmx.agent.stub.exceptions.xsd,http://exceptions.agent.jmx.analytics.carbon.wso2.org=org.wso2.carbon.analytics.jmx.agent.stub.exceptions" />
+                                    <arg line="-uri src/main/resources/JmxAgent.wsdl -u -uw -o target/generated-code -p org.wso2.carbon.analytics.jmx.agent.stub -ns2p http://exceptions.agent.jmx.analytics.carbon.wso2.org/xsd=org.wso2.carbon.analytics.jmx.agent.stub.exceptions.xsd,http://exceptions.agent.jmx.analytics.carbon.wso2.org=org.wso2.carbon.analytics.jmx.agent.stub.exceptions" />
                                     <classpath refid="wsdl2java.classpath" />
                                 </java>
                             </tasks>
