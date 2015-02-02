@@ -26,7 +26,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon</groupId>
+    <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.datasink</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Analytics Datasink Module</name>
