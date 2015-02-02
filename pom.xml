@@ -44,7 +44,6 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.spark.core</artifactId>
@@ -372,7 +371,7 @@
             <extension>
                 <groupId>org.apache.maven.wagon</groupId>
                 <artifactId>wagon-ssh</artifactId>
-                <version>2.1</version>
+                <version>2.6</version>
             </extension>
         </extensions>
         <pluginManagement>
@@ -423,7 +422,7 @@
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>2.3.5</version>
+                    <version>2.3.7</version>
                     <extensions>true</extensions>
                     <configuration>
                         <obrRepository>NONE</obrRepository>
@@ -540,7 +539,6 @@
         </profile>
     </profiles>
 
-
     <properties>
         <!-- Carbon platform version comes here-->
         <carbon.kernel.version>4.3.0</carbon.kernel.version>
@@ -601,8 +599,8 @@
         <lucene.version>4.10.3</lucene.version>
         <lucene.regex.version>3.0.3</lucene.regex.version>
         <lucene.orbit.version>4.10.3.wso2v1</lucene.orbit.version>
-        <carbon.commons.version>4.3.1</carbon.commons.version>
-        <event.processing.version>2.0.0-SNAPSHOT</event.processing.version>
+        <carbon.commons.version>4.3.2</carbon.commons.version>
+        <event.processing.version>2.0.1</event.processing.version>
 
         <carbon.analytics.version>1.0.0-SNAPSHOT</carbon.analytics.version>
     </properties>
