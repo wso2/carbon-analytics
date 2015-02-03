@@ -55,6 +55,8 @@ public class GenericUtils {
     
     private static final byte DATA_TYPE_BOOLEAN = 0x06;
     
+    private static final byte DATA_TYPE_BINARY = 0x07;
+    
     private static final String DEFAULT_CHARSET = "UTF8";
 
     public static String getParentPath(String path) {
@@ -108,6 +110,9 @@ public class GenericUtils {
                 count += Integer.SIZE / 8;
             } else if (value instanceof Float) {
                 count += Float.SIZE / 8;
+            } else if (value instanceof byte[]) {
+                count += Integer.SIZE / 8;
+                count += ((byte[]) value).length;
             } else if (value != null) {
                 throw new AnalyticsException("Invalid column value type in calculating column "
                         + "values length: " + value.getClass());
@@ -121,6 +126,7 @@ public class GenericUtils {
         String name, strVal;
         boolean boolVal;
         Object value;
+        byte[] binData;
         for (Map.Entry<String, Object> entry : values.entrySet()) {
             try {
                 name = entry.getKey();
@@ -152,6 +158,11 @@ public class GenericUtils {
                 } else if (value instanceof Float) {
                     buffer.put(DATA_TYPE_FLOAT);
                     buffer.putFloat((Float) value);
+                } else if (value instanceof byte[]) {
+                    buffer.put(DATA_TYPE_BINARY);
+                    binData = (byte[]) value;
+                    buffer.putInt(binData.length);
+                    buffer.put(binData);
                 } else if (value == null) {
                     buffer.put(DATA_TYPE_NULL);
                 } else {
@@ -175,6 +186,7 @@ public class GenericUtils {
         Object value;
         byte[] buff;
         byte boolVal;
+        byte[] binData;
         while (buffer.remaining() > 0) {
             try {
                 size = buffer.getInt();
@@ -210,6 +222,12 @@ public class GenericUtils {
                     break;
                 case DATA_TYPE_FLOAT:
                     value = buffer.getFloat();
+                    break;
+                case DATA_TYPE_BINARY:
+                    size = buffer.getInt();
+                    binData = new byte[size];
+                    buffer.get(binData);
+                    value = binData;
                     break;
                 case DATA_TYPE_NULL:
                     value = null;
