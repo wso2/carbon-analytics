@@ -18,9 +18,6 @@
  */
 package org.wso2.carbon.analytics.dataservice;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 
 import com.hazelcast.core.HazelcastInstance;
@@ -38,17 +35,7 @@ public class AnalyticsServiceHolder {
         AnalyticsServiceHolder.hazelcastInstance = hazelcastInstance;
     }
     
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     public static HazelcastInstance getHazelcastInstance() {
-        if (hazelcastInstance == null) {
-            /* this is just a lookup, no need to do any locking etc.. */
-            BundleContext ctx = FrameworkUtil.getBundle(AnalyticsServiceHolder.class).getBundleContext();
-            ServiceReference ref = ctx.getServiceReference(HazelcastInstance.class);
-            if (ref == null) {
-                return null;
-            }
-            hazelcastInstance = (HazelcastInstance) ctx.getService(ref);
-        }
         return hazelcastInstance;
     }
 

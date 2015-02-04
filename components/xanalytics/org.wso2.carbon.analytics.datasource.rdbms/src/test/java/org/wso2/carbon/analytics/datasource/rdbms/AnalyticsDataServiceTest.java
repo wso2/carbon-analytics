@@ -59,20 +59,12 @@ import com.hazelcast.core.HazelcastInstance;
  */
 public class AnalyticsDataServiceTest implements GroupEventListener {
 
-    private AnalyticsDataService service;
+    protected AnalyticsDataService service;
     
     private boolean becameLeader, leaderUpdated;
-                
-    @BeforeSuite
-    public void setup() throws NamingException, AnalyticsException, IOException {
-        AnalyticsRecordStore ars = H2FileDBAnalyticsRecordStoreTest.cleanupAndCreateARS();
-        AnalyticsFileSystem afs = H2FileDBAnalyticsFileSystemTest.cleanupAndCreateAFS();
-        this.service = new AnalyticsDataServiceImpl(ars, afs);
-    }
-    
-    @AfterSuite
-    public void done() throws NamingException, AnalyticsException, IOException {
-        this.service.destroy();
+               
+    public void init(AnalyticsDataService service) {
+        this.service = service;
     }
     
     @Test
@@ -454,27 +446,25 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         System.out.println("\n************** END ANALYTICS DS (WITH INDEXING - MULTIPLE THREADS, H2-FILE) PERF TEST **************");
     }
     
-    private void resertClusterTestResults() {
+    private void resetClusterTestResults() {
         this.becameLeader = false;
         this.leaderUpdated = false;
     }
     
     @Test
     public void testAnalyticsClusterManager() throws AnalyticsClusterException {
-        this.resertClusterTestResults();
-        Hazelcast.shutdownAll();
-        HazelcastInstance hz = Hazelcast.newHazelcastInstance();
-        AnalyticsServiceHolder.setHazelcastInstance(hz);
-        AnalyticsClusterManager acm = new AnalyticsClusterManagerImpl();
-        AnalyticsServiceHolder.setAnalyticsClusterManager(acm);
+        AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
+        if (!acm.isClusteringEnabled()) {
+            return;
+        }
+        this.resetClusterTestResults();        
         acm.joinGroup("G1", this);
         Assert.assertTrue(this.leaderUpdated);
         int value = 5;
         List<Integer> result = acm.execute("G1", new ClusterGroupTestMessage(value));
         Assert.assertTrue(result.size() > 0);
         Assert.assertEquals((int) result.get(0), value + 1);
-        Hazelcast.shutdownAll();
-        this.resertClusterTestResults();
+        this.resetClusterTestResults();
     }
 
     @Override
