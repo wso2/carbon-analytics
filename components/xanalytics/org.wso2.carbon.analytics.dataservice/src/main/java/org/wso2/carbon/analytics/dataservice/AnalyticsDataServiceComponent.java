@@ -28,6 +28,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
+import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
+import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerImpl;
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfiguration;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
@@ -54,11 +56,14 @@ public class AnalyticsDataServiceComponent {
         try {
             AnalyticsDataServiceConfiguration config = this.loadAnalyticsDataServiceConfig();
             bundleContext.registerService(AnalyticsDataService.class, new AnalyticsDataServiceImpl(config), null);
+            AnalyticsClusterManager clusterManager = new AnalyticsClusterManagerImpl();
+            bundleContext.registerService(AnalyticsClusterManager.class, clusterManager, null);            
+            AnalyticsServiceHolder.setAnalyticsClusterManager(clusterManager);
             if (log.isDebugEnabled()) {
                 log.debug("Finished AnalyticsDataServiceComponent#activate");
             }
         } catch(AnalyticsException e) {
-            log.error("Error in registering analytics data service: " + e.getMessage(), e);
+            log.error("Error in activating analytics data service: " + e.getMessage(), e);
         }        
     }
     
