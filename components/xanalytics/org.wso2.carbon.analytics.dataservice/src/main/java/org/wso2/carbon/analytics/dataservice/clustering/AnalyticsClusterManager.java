@@ -18,6 +18,7 @@
  */
 package org.wso2.carbon.analytics.dataservice.clustering;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -44,6 +45,22 @@ public interface AnalyticsClusterManager {
      * @throws AnalyticsClusterException
      */
     <T> List<T> execute(String groupId, Callable<T> callable) throws AnalyticsClusterException;
+
+    /**
+     * Sets a property local to the given group.
+     * @param groupId The group id of the group
+     * @param name The name of the property
+     * @param value The property value
+     */
+    void setProperty(String groupId, String name, Serializable value);
+    
+    /**
+     * Retrieves a property local to a given group.
+     * @param groupId The group id of the group
+     * @param name THe name of the property
+     * @return The property value
+     */
+    Serializable getProperty(String groupId, String name);
     
     /**
      * Checks if the server is in clustered mode.

@@ -18,6 +18,7 @@
  */
 package org.wso2.carbon.analytics.dataservice.clustering;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -45,7 +46,9 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
 
     private static final String ANALYTICS_GROUP_EXECUTOR_SERVICE_PREFIX = "_ANALYTICS_GROUP_EXECUTOR_SERVICE_";
 
-    private static final String ANALYTICS_CLUSTER_GROUP_PREFIX = "_ANALYTICS_CLUSTER_GROUP_";
+    private static final String ANALYTICS_CLUSTER_GROUP_MEMBERS_PREFIX = "_ANALYTICS_CLUSTER_GROUP_MEMBERS_";
+    
+    private static final String ANALYTICS_CLUSTER_GROUP_DATA_PREFIX = "_ANALYTICS_CLUSTER_GROUP_DATA_";
     
     private static final Log log = LogFactory.getLog(AnalyticsClusterManagerImpl.class);
         
@@ -87,11 +90,15 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
     }
     
     private String generateGroupListId(String groupId) {
-        return ANALYTICS_CLUSTER_GROUP_PREFIX + groupId;
+        return ANALYTICS_CLUSTER_GROUP_MEMBERS_PREFIX + groupId;
     }
     
     private String generateGroupExecutorId(String groupId) {
         return ANALYTICS_GROUP_EXECUTOR_SERVICE_PREFIX + groupId;
+    }
+    
+    private String generateGroupDataMapId(String groupId) {
+        return ANALYTICS_CLUSTER_GROUP_DATA_PREFIX + groupId;
     }
     
     private List<Member> getGroupMembers(String groupId) {
@@ -134,6 +141,18 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
             }
         }
         return result;
+    }
+    
+    @Override
+    public void setProperty(String groupId, String name, Serializable value) {
+        Map<String, Serializable> data = this.hz.getMap(this.generateGroupDataMapId(groupId));
+        data.put(name, value);
+    }
+
+    @Override
+    public Serializable getProperty(String groupId, String name) {
+        Map<String, Serializable> data = this.hz.getMap(this.generateGroupDataMapId(groupId));
+        return data.get(name);
     }
 
     @Override
@@ -207,5 +226,5 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         }
 
     }
-
+    
 }

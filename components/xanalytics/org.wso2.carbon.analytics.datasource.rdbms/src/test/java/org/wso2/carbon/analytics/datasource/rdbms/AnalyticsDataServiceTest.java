@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -36,6 +37,11 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDSUtils;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceImpl;
+import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterException;
+import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
+import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerImpl;
+import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
 import org.wso2.carbon.analytics.dataservice.indexing.IndexType;
 import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem;
@@ -45,13 +51,18 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.base.MultitenantConstants;
 
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
+
 /**
  * This class represents the analytics data service tests.
  */
-public class AnalyticsDataServiceTest {
+public class AnalyticsDataServiceTest implements GroupEventListener {
 
     private AnalyticsDataService service;
-            
+    
+    private boolean becameLeader, leaderUpdated;
+                
     @BeforeSuite
     public void setup() throws NamingException, AnalyticsException, IOException {
         AnalyticsRecordStore ars = H2FileDBAnalyticsRecordStoreTest.cleanupAndCreateARS();
@@ -441,6 +452,63 @@ public class AnalyticsDataServiceTest {
         
         this.cleanupTable(tenantId, tableName);
         System.out.println("\n************** END ANALYTICS DS (WITH INDEXING - MULTIPLE THREADS, H2-FILE) PERF TEST **************");
+    }
+    
+    private void resertClusterTestResults() {
+        this.becameLeader = false;
+        this.leaderUpdated = false;
+    }
+    
+    @Test
+    public void testAnalyticsClusterManager() throws AnalyticsClusterException {
+        this.resertClusterTestResults();
+        Hazelcast.shutdownAll();
+        HazelcastInstance hz = Hazelcast.newHazelcastInstance();
+        AnalyticsServiceHolder.setHazelcastInstance(hz);
+        AnalyticsClusterManager acm = new AnalyticsClusterManagerImpl();
+        AnalyticsServiceHolder.setAnalyticsClusterManager(acm);
+        acm.joinGroup("G1", this);
+        Assert.assertTrue(this.leaderUpdated);
+        int value = 5;
+        List<Integer> result = acm.execute("G1", new ClusterGroupTestMessage(value));
+        Assert.assertTrue(result.size() > 0);
+        Assert.assertEquals((int) result.get(0), value + 1);
+        Hazelcast.shutdownAll();
+        this.resertClusterTestResults();
+    }
+
+    @Override
+    public void onBecomingLeader() {
+        this.becameLeader = true;
+        AnalyticsServiceHolder.getAnalyticsClusterManager().setProperty("G1", "location", "10.0.0.2");
+    }
+
+    @Override
+    public void onLeaderUpdate() {
+        this.leaderUpdated = true;
+        Assert.assertTrue(this.becameLeader);
+        String location = (String) AnalyticsServiceHolder.getAnalyticsClusterManager().getProperty("G1", "location");
+        Assert.assertEquals(location, "10.0.0.2");
+        location = (String) AnalyticsServiceHolder.getAnalyticsClusterManager().getProperty("GX", "location");
+        Assert.assertNull(location);
+    }
+    
+    /**
+     * Test cluster message implementation.
+     */
+    public static class ClusterGroupTestMessage implements Callable<Integer> {
+
+        private int data;
+        
+        public ClusterGroupTestMessage(int data) {
+            this.data = data;
+        }
+        
+        @Override
+        public Integer call() throws Exception {
+            return data + 1;
+        }
+        
     }
 
 }

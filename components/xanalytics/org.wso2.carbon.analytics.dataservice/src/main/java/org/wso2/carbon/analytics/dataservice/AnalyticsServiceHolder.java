@@ -34,6 +34,10 @@ public class AnalyticsServiceHolder {
     
     private static AnalyticsClusterManager analyticsClusterManager;
 
+    public static void setHazelcastInstance(HazelcastInstance hazelcastInstance) {
+        AnalyticsServiceHolder.hazelcastInstance = hazelcastInstance;
+    }
+    
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static HazelcastInstance getHazelcastInstance() {
         if (hazelcastInstance == null) {
