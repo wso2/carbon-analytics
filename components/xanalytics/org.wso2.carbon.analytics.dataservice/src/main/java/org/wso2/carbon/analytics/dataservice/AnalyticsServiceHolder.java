@@ -34,15 +34,16 @@ public class AnalyticsServiceHolder {
     
     private static AnalyticsClusterManager analyticsClusterManager;
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public static HazelcastInstance getHazelcastInstance() {
         if (hazelcastInstance == null) {
             /* this is just a lookup, no need to do any locking etc.. */
             BundleContext ctx = FrameworkUtil.getBundle(AnalyticsServiceHolder.class).getBundleContext();
-            ServiceReference<HazelcastInstance> ref = ctx.getServiceReference(HazelcastInstance.class);
+            ServiceReference ref = ctx.getServiceReference(HazelcastInstance.class);
             if (ref == null) {
                 return null;
             }
-            hazelcastInstance = ctx.getService(ref);
+            hazelcastInstance = (HazelcastInstance) ctx.getService(ref);
         }
         return hazelcastInstance;
     }
