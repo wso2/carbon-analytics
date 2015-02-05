@@ -65,6 +65,14 @@ public class GenericUtilsTest {
         GenericUtils.encodeRecordValues(values);
     }
     
+    private byte[] generateBinaryData(int size) {
+        byte[] data = new byte[size];
+        for (int i = 0; i < size; i++) {
+            data[i] = (byte) (Math.random() * Byte.MAX_VALUE);
+        }
+        return data;
+    }
+    
     @Test
     public void testEncodeDecodeDataTypes() throws AnalyticsException {
         Map<String, Object> values = new HashMap<String, Object>();
@@ -84,10 +92,11 @@ public class GenericUtilsTest {
         values.put("C8", 445.6);
         values.put("C9", 3.14f);
         values.put("C10", null);
+        values.put("C11", this.generateBinaryData(1000));
         data = GenericUtils.encodeRecordValues(values);
         valuesIn = GenericUtils.decodeRecordValues(data, null);
         Assert.assertEquals(values, valuesIn);
-        values.put("C11", "END");
+        values.put("C12", "END");
         data = GenericUtils.encodeRecordValues(values);
         valuesIn = GenericUtils.decodeRecordValues(data, null);
         Assert.assertEquals(values, valuesIn);
@@ -100,6 +109,7 @@ public class GenericUtilsTest {
         values.put("C3", 434);
         values.put("C4", -5501);
         values.put("C5", 4493855L);
+        values.put("CB", this.generateBinaryData(1000));
         values.put("C6", true);
         values.put("C7", false);
         values.put("C8", 445.6);

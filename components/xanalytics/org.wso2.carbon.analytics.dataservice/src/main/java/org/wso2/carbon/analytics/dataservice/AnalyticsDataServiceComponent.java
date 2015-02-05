@@ -27,12 +27,18 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
+import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
+import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerImpl;
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfiguration;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.utils.CarbonUtils;
+
+import com.hazelcast.core.HazelcastInstance;
 
 /**
  * This class represents the analytics data service declarative services component.
@@ -54,12 +60,25 @@ public class AnalyticsDataServiceComponent {
         try {
             AnalyticsDataServiceConfiguration config = this.loadAnalyticsDataServiceConfig();
             bundleContext.registerService(AnalyticsDataService.class, new AnalyticsDataServiceImpl(config), null);
+            this.loadHazelcast();
+            AnalyticsClusterManager clusterManager = new AnalyticsClusterManagerImpl();
+            bundleContext.registerService(AnalyticsClusterManager.class, clusterManager, null);            
+            AnalyticsServiceHolder.setAnalyticsClusterManager(clusterManager);
             if (log.isDebugEnabled()) {
                 log.debug("Finished AnalyticsDataServiceComponent#activate");
             }
         } catch(AnalyticsException e) {
-            log.error("Error in registering analytics data service: " + e.getMessage(), e);
+            log.error("Error in activating analytics data service: " + e.getMessage(), e);
         }        
+    }
+    
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private void loadHazelcast() {
+        BundleContext ctx = FrameworkUtil.getBundle(AnalyticsServiceHolder.class).getBundleContext();
+        ServiceReference ref = ctx.getServiceReference(HazelcastInstance.class);
+        if (ref != null) {
+            AnalyticsServiceHolder.setHazelcastInstance((HazelcastInstance) ctx.getService(ref));
+        }
     }
     
     private AnalyticsDataServiceConfiguration loadAnalyticsDataServiceConfig() throws AnalyticsException {
