@@ -23,6 +23,7 @@
         <module>features/analytics/analytics-datasources</module>
         <module>features/analytics/analytics-rest</module>
         <module>features/analytics/analytics-spark</module>
+        <module>features/analytics/analytics-datasink</module>
         <module>features/dashboards/analytics-dashboards</module>
     </modules>
 
@@ -355,6 +356,17 @@
                 <version>${carbon.analytics.version}</version>
                 <type>war</type>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.datasink</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.datasink.server.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -500,6 +512,7 @@
                 <module>features/analytics/analytics-datasources</module>
                 <module>features/analytics/analytics-rest</module>
                 <module>features/analytics/analytics-spark</module>
+                <module>features/analytics/analytics-datasink</module>
                 <module>features/dashboards/analytics-dashboards</module>
             </modules>
         </profile>
@@ -520,6 +533,7 @@
                 <module>features/analytics/analytics-datasources</module>
                 <module>features/analytics/analytics-rest</module>
                 <module>features/analytics/analytics-spark</module>
+                <module>features/analytics/analytics-datasink</module>
                 <module>features/dashboards/analytics-dashboards</module>
             </modules>
         </profile>
@@ -598,8 +612,9 @@
         <lucene.version>4.10.3</lucene.version>
         <lucene.regex.version>3.0.3</lucene.regex.version>
         <lucene.orbit.version>4.10.3.wso2v1</lucene.orbit.version>
-        <carbon.commons.version>4.3.2</carbon.commons.version>
-        <event.processing.version>2.0.1</event.processing.version>
+        <carbon.commons.version>4.3.4</carbon.commons.version>
+        <carbon.commons.imp.pkg.version>[4.3.4, 4.4.0)</carbon.commons.imp.pkg.version>
+        <event.processing.version>2.0.2</event.processing.version>
 
         <carbon.analytics.version>1.0.1-SNAPSHOT</carbon.analytics.version>
         <project.scm.id>my-scm-server</project.scm.id>

@@ -18,8 +18,8 @@
 package org.wso2.carbon.analytics.datasink.internal.util;
 
 public class AnalyticsDatasinkConstants {
-    public static final int DEFAULT_EVENT_QUEUE_SIZE = 100000;
-    public static final int DEFAULT_BUNDLE_SIZE = 1000;
+    public static final int DEFAULT_EVENT_QUEUE_SIZE = 131072; // This value need to be power of 2
+    public static final int DEFAULT_BUNDLE_SIZE = 1024;
     public static final String EVENT_META_DATA_TYPE = "meta";
     public static final String EVENT_PAYLOAD_DATA_TYPE = "payload";
     public static final String EVENT_CORRELATION_DATA_TYPE = "correlation";

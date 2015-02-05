@@ -43,7 +43,11 @@ public class AnalyticsDSConnector {
     }
 
     private String generateTableName(StreamDefinition streamDefinition) {
-        return streamDefinition.getName();
+        String tableName = streamDefinition.getName();
+        if (tableName != null && !tableName.isEmpty()) {
+            tableName = tableName.replace('.', '_');
+        }
+        return tableName;
     }
 
     private List<Record> convertEventsToRecord(int tenantId, List<Event> events)
@@ -64,9 +68,16 @@ public class AnalyticsDSConnector {
             populateTypedAttributes(AnalyticsDatasinkConstants.EVENT_PAYLOAD_DATA_TYPE,
                     streamDefinition.getPayloadData(),
                     event.getPayloadData(), eventAttributes);
-            eventAttributes.putAll(event.getArbitraryDataMap());
-            if (event.getTimeStamp() != 0L) timestamp = event.getTimeStamp();
-            else timestamp = System.currentTimeMillis();
+
+            if (event.getArbitraryDataMap() != null && !event.getArbitraryDataMap().isEmpty()) {
+                eventAttributes.putAll(event.getArbitraryDataMap());
+            }
+
+            if (event.getTimeStamp() != 0L) {
+                timestamp = event.getTimeStamp();
+            } else {
+                timestamp = System.currentTimeMillis();
+            }
 
             Record record = new Record(tenantId, generateTableName(streamDefinition), eventAttributes, timestamp);
             records.add(record);
@@ -76,6 +87,11 @@ public class AnalyticsDSConnector {
 
     private void populateTypedAttributes(String type, List<Attribute> attributes, Object[] values,
                                          Map<String, Object> eventAttribute) {
+
+        if (attributes == null) {
+            return;
+        }
+
         int iteration = 0;
         for (Attribute attribute : attributes) {
             String attributeKey = type + "_" + attribute.getName();
