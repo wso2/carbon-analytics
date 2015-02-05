@@ -10,7 +10,7 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>carbon-analytics</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
     <name>WSO2 Carbon - Analytics Platform Aggregator Pom</name>
     <url>http://wso2.org</url>
 
@@ -374,7 +374,7 @@
         <url>https://github.com/wso2/carbon-analytics.git</url>
         <developerConnection>scm:git:https://github.com/wso2/carbon-analytics.git</developerConnection>
         <connection>scm:git:https://github.com/wso2/carbon-analytics.git</connection>
-        <tag>HEAD</tag>
+        <tag>carbon-analytics-1.0.1</tag>
     </scm>
 
     <build>
@@ -616,7 +616,7 @@
         <carbon.commons.imp.pkg.version>[4.3.4, 4.4.0)</carbon.commons.imp.pkg.version>
         <event.processing.version>2.0.2</event.processing.version>
 
-        <carbon.analytics.version>1.0.1-SNAPSHOT</carbon.analytics.version>
+        <carbon.analytics.version>1.0.1</carbon.analytics.version>
         <project.scm.id>my-scm-server</project.scm.id>
     </properties>
 
