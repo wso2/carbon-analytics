@@ -58,7 +58,7 @@
                                     org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasink:${carbon.analytics.version}
                                 </bundleDef>
                                 <bundleDef>
-                                    org.wso2.carbon.event-processing:org.wso2.carbon.event.stream.manager.core:${event.processing.version}
+                                    org.wso2.carbon.event-processing:org.wso2.carbon.event.stream.manager.core:${carbon.event-processing.version}
                                 </bundleDef>
                                 <bundleDef>
                                     com.googlecode.disruptor.wso2:disruptor:2.10.4-wso2v2

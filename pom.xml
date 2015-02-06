@@ -32,7 +32,7 @@
             <dependency>
                 <groupId>org.wso2.carbon.event-processing</groupId>
                 <artifactId>org.wso2.carbon.event.stream.manager.core</artifactId>
-                <version>${event.processing.version}</version>
+                <version>${carbon.event-processing.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.wso2.siddhi</groupId>
@@ -614,7 +614,7 @@
         <lucene.orbit.version>4.10.3.wso2v1</lucene.orbit.version>
         <carbon.commons.version>4.3.4</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.3.4, 4.4.0)</carbon.commons.imp.pkg.version>
-        <event.processing.version>2.0.2</event.processing.version>
+        <carbon.event-processing.version>2.0.2</carbon.event-processing.version>
 
         <carbon.analytics.version>1.0.2-SNAPSHOT</carbon.analytics.version>
         <project.scm.id>my-scm-server</project.scm.id>
