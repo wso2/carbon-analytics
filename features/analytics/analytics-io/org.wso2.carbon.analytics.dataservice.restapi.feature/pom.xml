@@ -30,7 +30,7 @@
     <artifactId>org.wso2.carbon.analytics.dataservice.restapi.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Analytics REST API Feature</name>
-    <description>This feature contains the bundles required for the REST API of the data bridge</description>
+    <description>This feature contains the aggregate REST API bundles</description>
 
     <dependencies>
         <dependency>
@@ -53,7 +53,7 @@
                             <goal>p2-feature-gen</goal>
                         </goals>
                         <configuration>
-                            <id>org.wso2.carbon.analytics.datasink</id>
+                            <id>org.wso2.carbon.analytics.dataservice.restapi</id>
                             <includedFeatures>
                                 <includedFeatureDef>
                                     org.wso2.carbon.analytics:org.wso2.carbon.analytics.dataservice.restapi.server.feature:${carbon.analytics.version}
