@@ -34,7 +34,10 @@
     <modules>
         <module>analytics-core</module>
         <module>analytics-data-connectors</module>
+        <module>analytics-processors</module>
+        <!--module>analytics-io</module-->
         <module>analytics-lite</module>
+        <!--module>analytics-spark-core</module-->
     </modules>
 
 
