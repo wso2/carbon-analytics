@@ -30,9 +30,6 @@ import org.apache.commons.collections.IteratorUtils;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.Test;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.Record;
-import org.wso2.carbon.analytics.datasource.core.RecordGroup;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 /**
