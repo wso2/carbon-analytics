@@ -45,7 +45,6 @@ import org.wso2.carbon.analytics.datasource.core.ChunkedStream;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.ChunkedStream.DataChunk;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
-import org.wso2.carbon.analytics.datasource.rdbms.RDBMSUtils;
 
 /**
  * RDBMS {@link AnalyticsFileSystem} implementation.

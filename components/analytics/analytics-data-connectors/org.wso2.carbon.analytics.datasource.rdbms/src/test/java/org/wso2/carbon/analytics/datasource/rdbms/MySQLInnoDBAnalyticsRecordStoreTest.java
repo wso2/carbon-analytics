@@ -32,8 +32,6 @@ import org.testng.annotations.Parameters;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.rdbms.RDBMSQueryConfigurationEntry;
-import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore;
 
 /**
  * MySQL implementation of analytics record store tests.

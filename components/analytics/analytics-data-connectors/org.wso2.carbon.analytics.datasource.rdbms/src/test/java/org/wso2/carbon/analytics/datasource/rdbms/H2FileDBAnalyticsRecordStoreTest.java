@@ -32,7 +32,6 @@ import org.testng.annotations.BeforeSuite;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
-import org.wso2.carbon.analytics.datasource.rdbms.RDBMSQueryConfigurationEntry;
 
 /**
  * H2 implementation of analytics record store tests.

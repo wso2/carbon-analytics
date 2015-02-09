@@ -29,8 +29,6 @@ import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.testng.annotations.BeforeSuite;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.rdbms.RDBMSQueryConfigurationEntry;
-import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore;
 
 /**
  * H2 implementation of analytics data source tests.

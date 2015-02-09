@@ -18,7 +18,6 @@
  */
 package org.wso2.carbon.analytics.datasource.rdbms;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,50 +28,36 @@ import javax.naming.NamingException;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.testng.annotations.BeforeSuite;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystemTest;
-import org.wso2.carbon.analytics.datasource.rdbms.RDBMSQueryConfigurationEntry;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 
 /**
- * H2 implementation of analytics file system tests.
+ * H2 implementation of analytics data source tests.
  */
-public class H2FileDBAnalyticsFileSystemTest extends AnalyticsFileSystemTest {
+public class H2MemDBAnalyticsFileSystemTest extends AnalyticsFileSystemTest {
 
     @BeforeSuite
     public void setup() throws NamingException, AnalyticsException, IOException {
-        AnalyticsFileSystem afs = cleanupAndCreateAFS();
-        this.init("H2FileDBAnalyticsDataSource", afs);
-    }
-    
-    public static AnalyticsFileSystem cleanupAndCreateAFS() throws NamingException, IOException, AnalyticsException {
-        String dbPath = System.getProperty("java.io.tmpdir") + File.separator + "bam_test_db";
-        deleteFile(dbPath + ".mv.db");
-        deleteFile(dbPath + ".trace.db");
-        initDS("jdbc:h2:" + dbPath, "wso2carbon", "wso2carbon");
-        AnalyticsFileSystem afs = new RDBMSAnalyticsFileSystem(generateQueryConfiguration());
+        this.initDS("jdbc:h2:mem:bam_test_db", "wso2carbon", "wso2carbon");
+        AnalyticsFileSystem afs = new RDBMSAnalyticsFileSystem(this.generateQueryConfiguration());
         Map<String, String> props = new HashMap<String, String>();
-        props.put("datasource", "DSFS");
+        props.put("datasource", "DS");
         afs.init(props);
-        return afs;
+        this.init("H2MemDBAnalyticsDataSource", afs);
     }
     
-    private static void deleteFile(String path) {
-        new File(path).delete();
-    }
-    
-    private static void initDS(String url, String username, String password) throws NamingException {
+    private void initDS(String url, String username, String password) throws NamingException {
         PoolProperties pps = new PoolProperties();
         pps.setDriverClassName("org.h2.Driver");
         pps.setUrl(url);
         pps.setUsername(username);
         pps.setPassword(password);
-        pps.setDefaultAutoCommit(false);
         DataSource dsx = new DataSource(pps);
-        new InitialContext().bind("DSFS", dsx);
+        new InitialContext().bind("DS", dsx);
     }
     
-    private static RDBMSQueryConfigurationEntry generateQueryConfiguration() {
+    private RDBMSQueryConfigurationEntry generateQueryConfiguration() {
         RDBMSQueryConfigurationEntry conf = new RDBMSQueryConfigurationEntry();
         String[] fsTableInitQueries = new String[3];
         fsTableInitQueries[0] = "CREATE TABLE AN_FS_PATH (path VARCHAR(256), is_directory BOOLEAN, length BIGINT, parent_path VARCHAR(256), PRIMARY KEY(path), FOREIGN KEY (parent_path) REFERENCES AN_FS_PATH(path) ON DELETE CASCADE)";
