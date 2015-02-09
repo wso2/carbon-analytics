@@ -35,7 +35,6 @@
         <module>analytics-io</module>
         <module>analytics-processors</module>
         <module>analytics-data-connectors</module>
-        <module>org.wso2.carbon.analytics.dashboard.ui</module>
     </modules>
 
 </project>
