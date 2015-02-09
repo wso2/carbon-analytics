@@ -31,11 +31,9 @@
     <url>http://wso2.org</url>
 
     <modules>
-        <module>org.wso2.carbon.analytics.datasource.core</module>
-        <module>org.wso2.carbon.analytics.datasource.core.test</module>
+        <module>analytics-core</module>
         <module>org.wso2.carbon.analytics.datasource.rdbms</module>
         <!--module>org.wso2.carbon.analytics.datasource.hdfs</module-->
-        <module>org.wso2.carbon.analytics.dataservice</module>
         <module>org.wso2.carbon.analytics.dataservice.restapi</module>
         <module>org.wso2.carbon.analytics.datasink</module>
         <module>org.wso2.carbon.analytics.spark</module>
