@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>analytics-data-connectors</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon - Analytics Core Aggregator Module</name>
+    <name>WSO2 Carbon - Analytics Data Connectors Aggregator Module</name>
 
     <modules>
         <module>org.wso2.carbon.analytics.datasource.rdbms</module>
