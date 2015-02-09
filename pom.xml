@@ -18,6 +18,7 @@
         <module>service-stubs</module>
         <module>components/analytics</module>
         <module>components/analytics-data-agents</module>
+        <module>components/analytics-dashboard</module>
         <module>features/analytics-data-agents</module>
         <module>features/analytics/analytics-core</module>
         <module>features/analytics/analytics-datasources</module>
@@ -507,6 +508,7 @@
                 <module>service-stubs</module>
                 <module>components/analytics</module>
                 <module>components/analytics-data-agents</module>
+                <module>components/analytics-dashboard</module>
                 <module>features/analytics-data-agents</module>
                 <module>features/analytics/analytics-core</module>
                 <module>features/analytics/analytics-datasources</module>
@@ -528,6 +530,7 @@
                 <module>service-stubs</module>
                 <module>components/analytics</module>
                 <module>components/analytics-data-agents</module>
+                <module>components/analytics-dashboard</module>
                 <module>features/analytics-data-agents</module>
                 <module>features/analytics/analytics-core</module>
                 <module>features/analytics/analytics-datasources</module>
@@ -548,6 +551,7 @@
             <modules>
                 <module>components/analytics-data-agents</module>
                 <module>components/analytics</module>
+                <module>components/analytics-dashboard</module>
             </modules>
         </profile>
     </profiles>
