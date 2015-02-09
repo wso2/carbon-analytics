@@ -16,7 +16,7 @@
 
     <modules>
         <module>service-stubs</module>
-        <module>components/xanalytics</module>
+        <module>components/analytics</module>
         <module>components/analytics-data-agents</module>
         <module>features/analytics-data-agents</module>
         <module>features/analytics/analytics-core</module>
