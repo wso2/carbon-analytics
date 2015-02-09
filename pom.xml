@@ -20,11 +20,7 @@
         <module>components/analytics-data-agents</module>
         <module>components/analytics-dashboard</module>
         <module>features/analytics-data-agents</module>
-        <module>features/analytics/analytics-core</module>
-        <module>features/analytics/analytics-datasources</module>
-        <module>features/analytics/analytics-rest</module>
-        <module>features/analytics/analytics-spark</module>
-        <module>features/analytics/analytics-datasink</module>
+        <module>features/analytics</module>
         <module>features/dashboards/analytics-dashboards</module>
     </modules>
 
@@ -510,11 +506,7 @@
                 <module>components/analytics-data-agents</module>
                 <module>components/analytics-dashboard</module>
                 <module>features/analytics-data-agents</module>
-                <module>features/analytics/analytics-core</module>
-                <module>features/analytics/analytics-datasources</module>
-                <module>features/analytics/analytics-rest</module>
-                <module>features/analytics/analytics-spark</module>
-                <module>features/analytics/analytics-datasink</module>
+                <module>features/analytics</module>
                 <module>features/dashboards/analytics-dashboards</module>
             </modules>
         </profile>
@@ -532,11 +524,7 @@
                 <module>components/analytics-data-agents</module>
                 <module>components/analytics-dashboard</module>
                 <module>features/analytics-data-agents</module>
-                <module>features/analytics/analytics-core</module>
-                <module>features/analytics/analytics-datasources</module>
-                <module>features/analytics/analytics-rest</module>
-                <module>features/analytics/analytics-spark</module>
-                <module>features/analytics/analytics-datasink</module>
+                <module>features/analytics</module>
                 <module>features/dashboards/analytics-dashboards</module>
             </modules>
         </profile>
