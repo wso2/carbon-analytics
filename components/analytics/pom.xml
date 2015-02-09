@@ -34,8 +34,7 @@
         <module>analytics-core</module>
         <module>analytics-io</module>
         <module>analytics-processors</module>
-        <module>org.wso2.carbon.analytics.datasource.rdbms</module>
-        <!--module>org.wso2.carbon.analytics.datasource.hdfs</module-->
+        <module>analytics-data-connectors</module>
         <module>org.wso2.carbon.analytics.dashboard.ui</module>
     </modules>
 
