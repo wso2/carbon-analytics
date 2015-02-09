@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>analytics-processors</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon - Analytics I/O Aggregator Module</name>
+    <name>WSO2 Carbon - Analytics Processors Aggregator Module</name>
 
     <modules>
         <module>org.wso2.carbon.analytics.spark.core</module>
