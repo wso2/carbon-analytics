@@ -21,21 +21,21 @@
 
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
-        <artifactId>analytics-spark-feature</artifactId>
+        <artifactId>analytics-io-feature</artifactId>
         <version>1.0.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>org.wso2.carbon.analytics.spark.feature</artifactId>
+    <artifactId>org.wso2.carbon.analytics.dataservice.restapi.feature</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon - Analytics Spark Feature</name>
-    <description>This feature contains the aggeregated Spark bundles required for Spark related functionality</description>
+    <name>WSO2 Carbon - Analytics REST API Feature</name>
+    <description>This feature contains the aggregate REST API bundles</description>
 
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.analytics.spark.ui.feature</artifactId>
+            <artifactId>org.wso2.carbon.analytics.dataservice.restapi.server.feature</artifactId>
             <type>zip</type>
         </dependency>
     </dependencies>
@@ -53,10 +53,11 @@
                             <goal>p2-feature-gen</goal>
                         </goals>
                         <configuration>
-                            <id>org.wso2.carbon.analytics.spark</id>
-                            <propertiesFile>../feature.properties</propertiesFile>
+                            <id>org.wso2.carbon.analytics.dataservice.restapi</id>
                             <includedFeatures>
-                                <includedFeatureDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.ui.feature:${carbon.analytics.version}</includedFeatureDef>
+                                <includedFeatureDef>
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.dataservice.restapi.server.feature:${carbon.analytics.version}
+                                </includedFeatureDef>
                             </includedFeatures>
                         </configuration>
                     </execution>

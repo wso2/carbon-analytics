@@ -20,11 +20,7 @@
         <module>components/analytics-data-agents</module>
         <module>components/analytics-dashboard</module>
         <module>features/analytics-data-agents</module>
-        <module>features/analytics/analytics-core</module>
-        <module>features/analytics/analytics-datasources</module>
-        <module>features/analytics/analytics-rest</module>
-        <module>features/analytics/analytics-spark</module>
-        <module>features/analytics/analytics-datasink</module>
+        <module>features/analytics</module>
         <module>features/dashboards/analytics-dashboards</module>
     </modules>
 
@@ -359,6 +355,12 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.dataservice.restapi.server.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.datasink</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
@@ -510,11 +512,7 @@
                 <module>components/analytics-data-agents</module>
                 <module>components/analytics-dashboard</module>
                 <module>features/analytics-data-agents</module>
-                <module>features/analytics/analytics-core</module>
-                <module>features/analytics/analytics-datasources</module>
-                <module>features/analytics/analytics-rest</module>
-                <module>features/analytics/analytics-spark</module>
-                <module>features/analytics/analytics-datasink</module>
+                <module>features/analytics</module>
                 <module>features/dashboards/analytics-dashboards</module>
             </modules>
         </profile>
@@ -532,11 +530,7 @@
                 <module>components/analytics-data-agents</module>
                 <module>components/analytics-dashboard</module>
                 <module>features/analytics-data-agents</module>
-                <module>features/analytics/analytics-core</module>
-                <module>features/analytics/analytics-datasources</module>
-                <module>features/analytics/analytics-rest</module>
-                <module>features/analytics/analytics-spark</module>
-                <module>features/analytics/analytics-datasink</module>
+                <module>features/analytics</module>
                 <module>features/dashboards/analytics-dashboards</module>
             </modules>
         </profile>

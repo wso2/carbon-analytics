@@ -23,16 +23,22 @@
         <artifactId>carbon-analytics</artifactId>
         <groupId>org.wso2.carbon.analytics</groupId>
         <version>1.0.2-SNAPSHOT</version>
-        <relativePath>../../../pom.xml</relativePath>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>analytics-spark-feature</artifactId>
+    <artifactId>analytics-feature</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon - Analytics Spark Feature Aggregator Module</name>
+    <name>WSO2 Carbon - Analytics Feature Aggregator Module</name>
 
     <modules>
-       <module>org.wso2.carbon.analytics.spark.feature</module>
-       <module>org.wso2.carbon.analytics.spark.ui.feature</module>
+        <module>analytics-core</module>
+        <module>analytics-data-connectors</module>
+        <module>analytics-processors</module>
+        <module>analytics-io</module>
+        <module>analytics-lite</module>
+        <!--module>analytics-spark-core</module-->
     </modules>
+
+
 </project>

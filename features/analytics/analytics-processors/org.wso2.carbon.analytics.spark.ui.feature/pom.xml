@@ -21,61 +21,52 @@
 
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
-        <artifactId>analytics-datasources-feature</artifactId>
+        <artifactId>analytics-processors-feature</artifactId>
         <version>1.0.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>org.wso2.carbon.analytics.datasource.rdbms.server.feature</artifactId>
+    <artifactId>org.wso2.carbon.analytics.spark.ui.feature</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon - Analytics Data Source RDBMS Server Feature</name>
-    <description>This feature contains the RDBMS analytics data source bundles</description>
+    <name>WSO2 Carbon - Analytics Spark UI Feature</name>
+    <description>This feature contains the UI bundles required for spark related functionality</description>
 
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.analytics.datasource.rdbms</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.analytics.core.server.feature</artifactId>
-            <type>zip</type>
+            <artifactId>org.wso2.carbon.analytics.spark.ui</artifactId>
         </dependency>
     </dependencies>
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
                 <groupId>org.wso2.maven</groupId>
                 <artifactId>carbon-p2-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>4-p2-feature-generation</id>
+                        <id>p2-feature-generation</id>
                         <phase>package</phase>
                         <goals>
                             <goal>p2-feature-gen</goal>
                         </goals>
                         <configuration>
-                            <id>org.wso2.carbon.analytics.datasource.rdbms.server</id>
-                            <propertiesFile>../../../../etc/feature.properties</propertiesFile>
+                            <id>org.wso2.carbon.analytics.spark.ui</id>
+                            <propertiesFile>../feature.properties</propertiesFile>
                             <adviceFile>
                                 <properties>
-                                    <propertyDef>org.wso2.carbon.p2.category.type:server</propertyDef>
+                                    <propertyDef>org.wso2.carbon.p2.category.type:console</propertyDef>
                                     <propertyDef>org.eclipse.equinox.p2.type.group:false</propertyDef>
                                 </properties>
                             </adviceFile>
                             <bundles>
-                                <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasource.rdbms</bundleDef>
+                                <bundleDef>
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.ui:${carbon.analytics.version}
+                                </bundleDef>
                             </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.analytics.core.server:${carbon.analytics.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core.ui:${carbon.kernel.version}</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>
@@ -83,4 +74,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

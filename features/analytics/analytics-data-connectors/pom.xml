@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-~ Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+~ Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 ~
 ~ WSO2 Inc. licenses this file to you under the Apache License,
 ~ Version 2.0 (the "License"); you may not use this file except
@@ -17,21 +17,22 @@
 ~ under the License.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
-        <artifactId>carbon-analytics</artifactId>
         <groupId>org.wso2.carbon.analytics</groupId>
+        <artifactId>analytics-feature</artifactId>
         <version>1.0.2-SNAPSHOT</version>
-        <relativePath>../../../pom.xml</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>analytics-restapi-feature</artifactId>
+    <artifactId>analytics-data-connectors-feature</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon - Analytics REST APIs Feature Module</name>
+    <name>WSO2 Carbon - Analytics Data Connectors Aggregate Feature</name>
 
     <modules>
-       <module>org.wso2.carbon.analytics.dataservice.restapi.feature</module>
+        <module>org.wso2.carbon.analytics.datasource.rdbms.server.feature</module>
+        <module>org.wso2.carbon.analytics.datasource.feature</module>
     </modules>
 </project>

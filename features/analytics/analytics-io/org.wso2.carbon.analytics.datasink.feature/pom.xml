@@ -21,21 +21,22 @@
 
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
-        <artifactId>analytics-spark-feature</artifactId>
+        <artifactId>analytics-io-feature</artifactId>
         <version>1.0.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>org.wso2.carbon.analytics.spark.ui.feature</artifactId>
+    <artifactId>org.wso2.carbon.analytics.datasink.feature</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon - Analytics Spark UI Feature</name>
-    <description>This feature contains the UI bundles required for spark related functionality</description>
+    <name>WSO2 Carbon - Analytics Datasink Feature</name>
+    <description>This feature contains the aggregate datasink features</description>
 
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.analytics.spark.ui</artifactId>
+            <artifactId>org.wso2.carbon.analytics.datasink.server.feature</artifactId>
+            <type>zip</type>
         </dependency>
     </dependencies>
 
@@ -46,33 +47,22 @@
                 <artifactId>carbon-p2-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>p2-feature-generation</id>
+                        <id>4-p2-feature-generation</id>
                         <phase>package</phase>
                         <goals>
                             <goal>p2-feature-gen</goal>
                         </goals>
                         <configuration>
-                            <id>org.wso2.carbon.analytics.spark.ui</id>
-                            <propertiesFile>../feature.properties</propertiesFile>
-                            <adviceFile>
-                                <properties>
-                                    <propertyDef>org.wso2.carbon.p2.category.type:console</propertyDef>
-                                    <propertyDef>org.eclipse.equinox.p2.type.group:false</propertyDef>
-                                </properties>
-                            </adviceFile>
-                            <bundles>
-                                <bundleDef>
-                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.ui:${carbon.analytics.version}
-                                </bundleDef>
-                            </bundles>
-                            <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core.ui:${carbon.kernel.version}</importFeatureDef>
-                            </importFeatures>
+                            <id>org.wso2.carbon.analytics.datasink</id>
+                            <includedFeatures>
+                                <includedFeatureDef>
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasink.server.feature:${carbon.analytics.version}
+                                </includedFeatureDef>
+                            </includedFeatures>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
-
 </project>
