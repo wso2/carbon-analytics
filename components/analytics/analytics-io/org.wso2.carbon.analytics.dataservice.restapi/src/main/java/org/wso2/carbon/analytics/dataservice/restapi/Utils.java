@@ -16,10 +16,7 @@
 
 package org.wso2.carbon.analytics.dataservice.restapi;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -257,27 +254,6 @@ public class Utils {
 		} else if (e.getMessage() != null) {
 			message = msg.concat(". (" + e.getMessage() + ")");
 		}
-		if (msg.contains("Tenant ID cannot be -1")) {
-			message = msg.replace("Tenant ID cannot be -1", "Tenant domain is invalid");
-		}
 		return message;
-	}
-	
-	/**
-	 * Gets the time stamp from string.
-	 *
-	 * @param stringTimeStamp the string time stamp
-	 * @return the time stamp from string
-	 * @throws AnalyticsException the analytics exception
-	 */
-	public static long getTimeStampFromString(String stringTimeStamp) throws AnalyticsException{
-		SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.TIMESTAMP_PATTERN);
-	    Date parsedDate;
-        try {
-	        parsedDate = dateFormat.parse(stringTimeStamp);
-	        return parsedDate.getTime();
-        } catch (ParseException e) {
-	       throw new AnalyticsException("Error occurred while parsing the timestamps", e);
-        }
 	}
 }

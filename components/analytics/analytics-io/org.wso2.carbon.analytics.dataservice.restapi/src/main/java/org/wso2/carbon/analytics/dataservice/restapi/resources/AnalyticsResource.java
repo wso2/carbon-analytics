@@ -57,7 +57,7 @@ public class AnalyticsResource extends AbstractResource {
 	private Log logger = LogFactory.getLog(AnalyticsResource.class);
 	
 	/** The analytics data service. */
-	AnalyticsDataService analyticsDataService;
+	private AnalyticsDataService analyticsDataService;
 
 	/**
 	 * Instantiates a new analytics resource.
