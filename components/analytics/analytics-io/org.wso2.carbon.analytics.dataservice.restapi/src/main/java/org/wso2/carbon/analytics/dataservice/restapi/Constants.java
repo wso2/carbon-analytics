@@ -33,6 +33,8 @@ public class Constants {
 	 */
 	public static final class Status {
 
+		/** The Constant CREATED. */
+		public static final String CREATED = "created";
 		/** The Constant FAILED. */
 		public static final String FAILED = "failed";
 

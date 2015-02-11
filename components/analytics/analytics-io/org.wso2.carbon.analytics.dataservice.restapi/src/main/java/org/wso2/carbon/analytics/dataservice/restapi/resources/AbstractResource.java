@@ -36,6 +36,10 @@ public abstract class AbstractResource {
 	public Response handleResponse(ResponseStatus responseStatus, String message) {
 		Response response;
 		switch (responseStatus) {
+			case CREATED:
+				ResponseBean created = getResponseMessage(Constants.Status.CREATED, message);
+				response = Response.status(201).entity(created).build();
+				break;
 			case SUCCESS:
 				ResponseBean success = getResponseMessage(Constants.Status.SUCCESS, message);
 				response = Response.ok().entity(success).build();
@@ -85,16 +89,17 @@ public abstract class AbstractResource {
 	 * The Enum ResponseStatus.
 	 */
 	public enum ResponseStatus {
-
-		/** The success. */
+		/** The "created" response */
+		CREATED,
+		/** The "success" response. */
 		SUCCESS,
-		/** The failed. */
+		/** The "failed" response. */
 		FAILED,
-		/** The invalid. */
+		/** The "invalid" response. */
 		INVALID,
-		/** The forbidden. */
+		/** The "forbidden" response. */
 		FORBIDDEN,
-		/** The non existent. */
+		/** The "non existent" response. */
 		NON_EXISTENT
 	}
 

@@ -87,7 +87,7 @@ public class AnalyticsResource extends AbstractResource {
 		}
 		try {
 			analyticsDataService.createTable(tenantId, tableName);
-			return handleResponse(ResponseStatus.SUCCESS,
+			return handleResponse(ResponseStatus.CREATED,
 			                      "Successfully created table: " + tableName +
 			                              " for tenantId: " + tenantId);
 		} catch (AnalyticsException e) {
@@ -356,7 +356,7 @@ public class AnalyticsResource extends AbstractResource {
 		try {
 			List<Record> records = Utils.getRecordsFromRecordBeans(tenantId, recordBeans);
 			analyticsDataService.insert(records);
-			return handleResponse(ResponseStatus.SUCCESS, "Successfully added records");
+			return handleResponse(ResponseStatus.CREATED, "Successfully added records");
 		} catch (AnalyticsException e) {
 			String message = "Error while adding records";
 			message = Utils.getCompleteErrorMessage(message, e);
@@ -411,7 +411,7 @@ public class AnalyticsResource extends AbstractResource {
 			Map<String, IndexType> columns =
 			                                 Utils.createIndexTypeMapFronIndexTypeBeanMap(columnsBean);
 			analyticsDataService.setIndices(tenantId, tableName, columns);
-			return handleResponse(ResponseStatus.SUCCESS, "Successfully set indices in table: " +
+			return handleResponse(ResponseStatus.CREATED, "Successfully set indices in table: " +
 			                                              tableName + " for tenantId: " + tenantId);
 		} catch (AnalyticsException e) {
 			String message =
