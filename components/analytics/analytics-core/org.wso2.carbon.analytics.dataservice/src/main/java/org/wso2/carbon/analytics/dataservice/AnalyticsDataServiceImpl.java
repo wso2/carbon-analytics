@@ -18,11 +18,13 @@
  */
 package org.wso2.carbon.analytics.dataservice;
 
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfigProperty;
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfiguration;
 import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsDataIndexer;
@@ -53,19 +55,22 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     public AnalyticsDataServiceImpl(AnalyticsDataServiceConfiguration config) throws AnalyticsException {
         AnalyticsRecordStore ars;
         AnalyticsFileSystem afs;
+        Analyzer luceneAnalyzer;
         try {
             String arsClass = config.getAnalyticsRecordStoreConfiguration().getImplementation();
             String afsClass = config.getAnalyticsFileSystemConfiguration().getImplementation();
+            String analyzerClass = config.getLuceneAnalyzerConfiguration().getImplementation();
             ars = (AnalyticsRecordStore) Class.forName(arsClass).newInstance();
             afs = (AnalyticsFileSystem) Class.forName(afsClass).newInstance();
             ars.init(this.convertToMap(config.getAnalyticsRecordStoreConfiguration().getProperties()));
             afs.init(this.convertToMap(config.getAnalyticsFileSystemConfiguration().getProperties()));
+            luceneAnalyzer = (Analyzer) Class.forName(analyzerClass).newInstance();
         } catch (Exception e) {
             throw new AnalyticsException("Error in creating analytics data service from configuration: " + 
                     e.getMessage(), e);
         }
         this.analyticsRecordStore = ars;
-        this.indexer = new AnalyticsDataIndexer(afs);
+        this.indexer = new AnalyticsDataIndexer(afs, luceneAnalyzer);
     }
     
     private Map<String, String> convertToMap(AnalyticsDataServiceConfigProperty[] props) {

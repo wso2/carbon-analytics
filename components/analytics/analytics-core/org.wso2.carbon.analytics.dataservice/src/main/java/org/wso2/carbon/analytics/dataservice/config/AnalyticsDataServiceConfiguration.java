@@ -31,6 +31,8 @@ public class AnalyticsDataServiceConfiguration {
     
     private AnalyticsFileSystemConfiguration analyticsFileSystem;
     
+    private AnalyticsLuceneAnalyzerConfiguration luceneAnalyzerConfiguration;
+    
     @XmlElement (name = "analytics-record-store", nillable = false)
     public AnalyticsRecordStoreConfiguration getAnalyticsRecordStoreConfiguration() {
         return analyticsRecordStoreConfiguration;
@@ -48,5 +50,14 @@ public class AnalyticsDataServiceConfiguration {
     public void setAnalyticsFileSystemConfiguration(AnalyticsFileSystemConfiguration analyticsFileSystem) {
         this.analyticsFileSystem = analyticsFileSystem;
     }
+    
+    @XmlElement (name = "analytics-lucene-analyzer")
+	public AnalyticsLuceneAnalyzerConfiguration getLuceneAnalyzerConfiguration() {
+		return luceneAnalyzerConfiguration;
+	}
+
+	public void setLuceneAnalyzerConfiguration(AnalyticsLuceneAnalyzerConfiguration luceneAnalyzerConfiguration) {
+		this.luceneAnalyzerConfiguration = luceneAnalyzerConfiguration;
+	}
 
 }

@@ -90,12 +90,18 @@ public class AnalyticsDataIndexer {
     
     private Map<String, List<String>> localIndexShardIdsMap = new HashMap<String, List<String>>();
     
-    private Analyzer DEFAULT_ANALYZER = new StandardAnalyzer();
-    
+    private Analyzer luceneAnalyzer;    
     private AnalyticsFileSystem analyticsFileSystem;
         
     public AnalyticsDataIndexer(AnalyticsFileSystem analyticsFileSystem) {
+    	this.luceneAnalyzer = new StandardAnalyzer();
         this.analyticsFileSystem = analyticsFileSystem;
+        this.repository = new AnalyticsIndexDefinitionRepository(this.getFileSystem());
+    }
+    
+    public AnalyticsDataIndexer(AnalyticsFileSystem analyticsFileSystem, Analyzer analyzer){
+    	this.luceneAnalyzer = analyzer;
+    	this.analyticsFileSystem = analyticsFileSystem;
         this.repository = new AnalyticsIndexDefinitionRepository(this.getFileSystem());
     }
     
@@ -233,7 +239,7 @@ public class AnalyticsDataIndexer {
             reader = DirectoryReader.open(this.lookupIndexDir(shardedTableId));
             IndexSearcher searcher = new IndexSearcher(reader);
             Map<String, IndexType> indices = this.lookupIndices(tenantId, tableName);
-            Query indexQuery = new AnalyticsQueryParser(DEFAULT_ANALYZER, indices).parse(query);
+            Query indexQuery = new AnalyticsQueryParser(luceneAnalyzer, indices).parse(query);
             TopScoreDocCollector collector = TopScoreDocCollector.create(count, true);
             searcher.search(indexQuery, collector);
             ScoreDoc[] hits = collector.topDocs(start).scoreDocs;
@@ -265,7 +271,7 @@ public class AnalyticsDataIndexer {
             reader = DirectoryReader.open(this.lookupIndexDir(shardedTableId));
             IndexSearcher searcher = new IndexSearcher(reader);
             Map<String, IndexType> indices = this.lookupIndices(tenantId, tableName);
-            Query indexQuery = new AnalyticsQueryParser(DEFAULT_ANALYZER, indices).parse(query);
+            Query indexQuery = new AnalyticsQueryParser(luceneAnalyzer, indices).parse(query);
             TotalHitCountCollector collector = new TotalHitCountCollector();
             searcher.search(indexQuery, collector);
             return collector.getTotalHits();
@@ -396,7 +402,7 @@ public class AnalyticsDataIndexer {
         String tableId = this.generateShardedTableId(tenantId, tableName, shardId);
         IndexWriter indexWriter = this.createIndexWriter(tableId);        
         try {
-            Query query = new AnalyticsQueryParser(DEFAULT_ANALYZER, indices).parse(
+            Query query = new AnalyticsQueryParser(luceneAnalyzer, indices).parse(
                     INDEX_INTERNAL_TIMESTAMP_FIELD + ":[" + timeFrom + " TO " + timeTo + "}");
             indexWriter.deleteDocuments(query);
             indexWriter.commit();
@@ -611,7 +617,7 @@ public class AnalyticsDataIndexer {
     
     private IndexWriter createIndexWriter(String tableId) throws AnalyticsIndexException {
         Directory indexDir = this.lookupIndexDir(tableId);
-        IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_4_10_3, this.DEFAULT_ANALYZER);
+        IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_4_10_3, this.luceneAnalyzer);
         try {
             return new IndexWriter(indexDir, conf);
         } catch (IOException e) {

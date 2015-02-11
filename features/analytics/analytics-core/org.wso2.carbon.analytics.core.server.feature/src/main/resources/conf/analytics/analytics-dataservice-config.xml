@@ -12,4 +12,7 @@
             <property name = "datasource">jdbc/AnalyticsDB</property>
       </properties>
    </analytics-record-store>
+   <analytics-lucene-analyzer>
+   		<implementation>org.apache.lucene.analysis.standard.StandardAnalyzer</implementation>
+   </analytics-lucene-analyzer>
 </analytics-dataservice-configuration>
