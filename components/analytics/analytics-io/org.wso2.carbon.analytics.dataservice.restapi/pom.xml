@@ -30,7 +30,8 @@
 	<packaging>war</packaging>
 	<name>WSO2 Carbon - Analytics Data Service JAX-RS Webapp</name>
 	<description>Analytics Data Service JAX-RS Webapp</description>
-	
+
+
 	<dependencies>
 		<dependency>
 			<groupId>com.fasterxml.jackson.jaxrs</groupId>
@@ -57,6 +58,11 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
 			</plugin>
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
@@ -64,6 +70,20 @@
 				<configuration>
 					<webXml>${basedir}/src/main/webapp/WEB-INF/web.xml</webXml>
 					<warName>analytics</warName>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<buildcommands>
+						<buildcommand>org.eclipse.jdt.core.javabuilder</buildcommand>
+					</buildcommands>
+					<projectnatures>
+						<projectnature>org.wso2.developerstudio.eclipse.jaxrs.project.nature
+						</projectnature>
+						<projectnature>org.eclipse.jdt.core.javanature</projectnature>
+					</projectnatures>
 				</configuration>
 			</plugin>
 		</plugins>
