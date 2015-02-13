@@ -79,7 +79,6 @@
             </plugin>
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
-                <version>2.6.1</version>
                 <configuration>
                     <filesets>
                         <fileset>
@@ -127,7 +126,6 @@
                         </goals>
                         <configuration>
                             <id>org.wso2.carbon.analytics.dataservice.restapi.server</id>
-                            <propertiesFile>../../../etc/feature.properties</propertiesFile>
                             <adviceFile>
                                 <properties>
                                     <propertyDef>org.wso2.carbon.p2.category.type:server</propertyDef>
