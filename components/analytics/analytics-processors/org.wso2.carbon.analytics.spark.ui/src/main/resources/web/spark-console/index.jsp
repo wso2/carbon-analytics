@@ -28,17 +28,17 @@
                        resourceBundle="org.wso2.carbon.analytics.spark.ui.i18n.Resources"
                        topPage="true" request="<%=request%>"/>
 
-    <link type="text/css" href="css/main.css" rel="stylesheet"/>                   
+    <link type="text/css" href="css/main.css" rel="stylesheet"/>
 
 
     <script type="text/javascript">
 
-        $( document ).ready(function() {
+        $(document).ready(function () {
             console.log("Document loaded...")
-      });
+        });
 
     </script>
-    
+
     <div id="middle">
         <h2>Interactive Spark Console</h2>
 
@@ -47,9 +47,9 @@
 
             <table class="styledLeft">
                 <tbody>
-                    <tr >
-                        <td>
-                            <div id="resultsPane">
+                <tr>
+                    <td>
+                        <div id="resultsPane">
                                 <pre id="pre">
 
                                 Welcome to interactive Spark SQL shell
@@ -59,35 +59,37 @@
                                 Initialzing Spark client...
 
                                 </pre>
-                            </div>
-                        </td>
-                    </tr>
+                        </div>
+                    </td>
+                </tr>
                 </tbody>
-           </table>
+            </table>
 
             <br/><br/>
 
-           <table class="styledLeft">
-            <thead>
-                <tr><th>Type your Spark query below</th>
+            <table class="styledLeft">
+                <thead>
+                <tr>
+                    <th>Type your Spark query below</th>
                 </tr>
-            </thead>
-            <tbody>
+                </thead>
+                <tbody>
                 <tr>
                     <td>
-                        <textarea id="queryPane" rows="5" style="margin-top:5px;margin-bottom:5px;width:100%"></textarea>
+                        <textarea id="queryPane" rows="5"
+                                  style="margin-top:5px;margin-bottom:5px;width:100%"></textarea>
                     </td>
                 </tr>
                 <tr>
                     <td class="buttonRow">
                         <input type="button" value="Reset" id="btnReset" onclick="resetQueryPane()">
-                        <input type="button" value="Execute!" id="btnSubmit" onclick="submitQuery()">
+                        <input type="button" value="Execute!" id="btnSubmit"
+                               onclick="submitQuery()">
                     </td>
                 </tr>
-            </tbody>
-          </table>
-                        
-            
+                </tbody>
+            </table>
+
 
         </div>
     </div>
@@ -99,79 +101,89 @@
         }
 
         function submitQuery() {
-          var resultsPane = document.getElementById("resultsPane");
-          var query = document.getElementById("queryPane").value;
+            var resultsPane = document.getElementById("resultsPane");
+            var query = document.getElementById("queryPane").value;
 
-          jQuery.ajax({
+            jQuery.ajax({
 
-              url : '../spark-console/execute_spark_ajaxprocessor.jsp',
-              type : 'POST',
-              data : {
-                  'query' : query
-              },
-              dataType:'json',
-              success : function(data) {              
-                  // alert('Data: '+data.response.items.length);
-                  var results = data.response.items;
-                  var columns = data.meta.columns;
+                            url: '../spark-console/execute_spark_ajaxprocessor.jsp',
+                            type: 'POST',
+                            data: {
+                                'query': query
+                            },
+                            dataType: 'json',
+                            success: function (data) {
+                                // alert('Data: '+data.response.items.length);
 
-                  var table = document.createElement('table');
-                  
-                  //append table headers
-                  var header = document.createElement('tr');  
-                  for (var i = 0; i < columns.length; i++) {
-                    var td = document.createElement('td');
-                    var text = document.createTextNode(columns[i]);
+                                var resultDiv = document.createElement("div");
+                                resultDiv.className = "response";
+                                resultDiv.appendChild(document.createTextNode(data.meta.responseMessage));
+                                resultsPane.appendChild(resultDiv);
+                                resultsPane.appendChild(document.createElement("br"));
 
-                    td.appendChild(text);
-                    header.appendChild(td);
-                  }
-                  table.appendChild(header);
+                                resultsPane.scrollTop = resultsPane.scrollHeight;
 
-                  for (var i = 0; i < results.length; i++){
-                    var element = results[i];
+                                var results = data.response.items;
+                                if (!results.isEmpty) {
+                                    var columns = data.meta.columns;
 
+                                    var table = document.createElement('table');
 
-                    var tr = document.createElement('tr');  
+                                    //append table headers
+                                    var header = document.createElement('tr');
+                                    for (var i = 0; i < columns.length; i++) {
+                                        var td = document.createElement('td');
+                                        var text = document.createTextNode(columns[i]);
 
-                    for (var j = 0; j < columns.length; j++) {
-                      var td = document.createElement('td');
-                      var text = document.createTextNode(element[j]);
+                                        td.appendChild(text);
+                                        header.appendChild(td);
+                                    }
+                                    table.appendChild(header);
 
-                      td.appendChild(text);
-                      tr.appendChild(td);
-                    }; 
-                    table.appendChild(tr);
-                  }
-
-                  resultsPane.appendChild(table);
-                  resultsPane.appendChild(document.createElement("br"));
+                                    for (var i = 0; i < results.length; i++) {
+                                        var element = results[i];
 
 
-                  resultsPane.scrollTop = resultsPane.scrollHeight;
+                                        var tr = document.createElement('tr');
 
-              } ,
-              error : function(request,error) {
-                  alert("Request: "+JSON.stringify(request));
+                                        for (var j = 0; j < columns.length; j++) {
+                                            var td = document.createElement('td');
+                                            var text = document.createTextNode(element[j]);
 
-                  var errorDiv = document.createElement("div");
-                  var errorText = document.createTextNode(error);
+                                            td.appendChild(text);
+                                            tr.appendChild(td);
+                                        }
+                                        ;
+                                        table.appendChild(tr);
+                                    }
 
-                  errorDiv.className = "error";
-                  errorDiv.appendChild(errorText);
-
-                  resultsPane.appendChild(table);
-                  resultsPane.appendChild(document.createElement("br"));
+                                    resultsPane.appendChild(table);
+                                    resultsPane.appendChild(document.createElement("br"));
 
 
-                  resultsPane.scrollTop = resultsPane.scrollHeight;
+                                    resultsPane.scrollTop = resultsPane.scrollHeight;
+                                }
+                            },
+                            error: function (xhr, error, errorThrown) {
 
-              }
+                                var errorDiv = document.createElement("div");
+                                var errorMsg = xhr.responseText;
+                                var errorText = document.createTextNode("ERROR : " + $(errorMsg)[6].innerText);
 
-        }); //end of ajax
+//                                $(errorDiv).addClass("error");
+                                errorDiv.style.color = "#ff0000";
+                                errorDiv.appendChild(errorText);
 
-      }
-      
+                                resultsPane.appendChild(errorDiv);
+                                resultsPane.appendChild(document.createElement("br"));
+
+                                resultsPane.scrollTop = resultsPane.scrollHeight;
+                            }
+
+                        }); //end of ajax
+
+        }
+
 
     </script>
 

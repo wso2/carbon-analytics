@@ -39,7 +39,9 @@ public class AnalyticsExecutionContext {
     private static JavaSQLContext sqlCtx;
     
     public static void init() {
-        SparkConf sparkConf = new SparkConf().setMaster("local").setAppName("CarbonAnalytics");
+        SparkConf sparkConf = new SparkConf()
+                .setMaster("local")
+                .setAppName("CarbonAnalytics");
         JavaSparkContext ctx = new JavaSparkContext(sparkConf);
         sqlCtx = new JavaSQLContext(ctx);
     }
