@@ -237,6 +237,7 @@
                                 <bundleDef>io.netty:netty</bundleDef>
                                 <bundleDef>org.spark-project.protobuf:protobuf-java</bundleDef>
                                 <bundleDef>org.uncommons.maths.wso2:uncommons-maths</bundleDef>
+                                <bundleDef>com.ning:compress-lzf</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}
