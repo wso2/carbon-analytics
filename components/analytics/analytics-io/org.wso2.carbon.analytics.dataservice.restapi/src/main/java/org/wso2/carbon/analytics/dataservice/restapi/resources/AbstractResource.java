@@ -36,6 +36,10 @@ public abstract class AbstractResource {
 	public Response handleResponse(ResponseStatus responseStatus, String message) {
 		Response response;
 		switch (responseStatus) {
+			case CONFLICT:
+				ResponseBean conflicted = getResponseMessage(Constants.Status.FAILED, message);
+				response = Response.status(409).entity(conflicted).build();
+				break;
 			case CREATED:
 				ResponseBean created = getResponseMessage(Constants.Status.CREATED, message);
 				response = Response.status(201).entity(created).build();
@@ -89,6 +93,8 @@ public abstract class AbstractResource {
 	 * The Enum ResponseStatus.
 	 */
 	public enum ResponseStatus {
+		/** The "conflict" response */
+		CONFLICT,
 		/** The "created" response */
 		CREATED,
 		/** The "success" response. */

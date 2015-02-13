@@ -17,9 +17,12 @@ package org.wso2.carbon.analytics.dataservice.restapi.beans;
 
 import javax.xml.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * The Class RecordBean.
@@ -28,10 +31,6 @@ import java.util.Map;
 @XmlType(propOrder = { "id", "tenantId", "tableName", "timestamp", "values" })
 @XmlRootElement(name = "record")
 public class RecordBean {
-
-	/** The tenant id. */
-	@XmlElement(required = false)
-	private int tenantId;
 
 	/** The table name. */
 	@XmlElement(required = true)
@@ -48,15 +47,6 @@ public class RecordBean {
 	/** The id. */
 	@XmlElement(required = false)
 	private String id;
-
-	/**
-	 * Sets the tenant id.
-	 * @param tenantId
-	 *            the new tenant id
-	 */
-	public void setTenantId(int tenantId) {
-		this.tenantId = tenantId;
-	}
 
 	/**
 	 * Sets the table name.
@@ -101,15 +91,6 @@ public class RecordBean {
 	public String getId() {
 		return id;
 	}
-
-	/**
-	 * Gets the tenant id.
-	 * @return the tenant id
-	 */
-	public int getTenantId() {
-		return tenantId;
-	}
-
 	/**
 	 * Gets the table name.
 	 * @return the table name
@@ -147,31 +128,6 @@ public class RecordBean {
 		return timestamp.longValue();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof RecordBean)) {
-			return false;
-		}
-		RecordBean rhs = (RecordBean) obj;
-		if (this.getTenantId() != rhs.getTenantId()) {
-			return false;
-		}
-		if (!this.getTableName().equals(rhs.getTableName())) {
-			return false;
-		}
-		if (!this.getId().equals(rhs.getId())) {
-			return false;
-		}
-		if (this.getTimestamp() != rhs.getTimestamp()) {
-			return false;
-		}
-		return this.getNotNullValues().equals(rhs.getNotNullValues());
-	}
-
 	/**
 	 * Gets the not null values.
 	 * @return the not null values
@@ -185,5 +141,15 @@ public class RecordBean {
 			}
 		}
 		return result;
+	}
+	
+	@Override
+	public String toString(){
+		List<String> valueList = new ArrayList<String>();
+		for (Entry<String, Object> entry : values.entrySet()) {
+			valueList.add(entry.getKey() + ":" + entry.getValue());
+		}
+		return valueList.toString();
+		
 	}
 }

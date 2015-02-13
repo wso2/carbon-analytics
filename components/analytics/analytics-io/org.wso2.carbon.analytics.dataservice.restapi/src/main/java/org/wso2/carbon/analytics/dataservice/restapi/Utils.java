@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.wso2.carbon.analytics.dataservice.AnalyticsDSUtils;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.indexing.IndexType;
 import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
@@ -31,7 +30,6 @@ import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.SearchResultEntryBean;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.Record;
-import org.wso2.carbon.analytics.datasource.core.RecordGroup;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 
 /**
@@ -42,24 +40,17 @@ public class Utils {
 	/**
 	 * Gets the analytics data service.
 	 * @return the analytics data service
+	 * @throws AnalyticsRESTException 
 	 */
-	public static AnalyticsDataService getAnalyticsDataService() {
-		return (AnalyticsDataService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+	public static AnalyticsDataService getAnalyticsDataService() throws AnalyticsException {
+		AnalyticsDataService analyticsDataService;
+		analyticsDataService = (AnalyticsDataService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
 		                                                     .getOSGiService(AnalyticsDataService.class,
 		                                                                     null);
-	}
-
-	/**
-	 * Gets the record from record bean.
-	 * @param recordBean
-	 *            the record bean
-	 * @return the record from record bean
-	 */
-	public static Record getRecordFromRecordBean(int tenantId, RecordBean recordBean) {
-		Record record =
-		                new Record(recordBean.getId(), tenantId, recordBean.getTableName(),
-		                           recordBean.getValues(), recordBean.getTimestamp());
-		return record;
+		if(analyticsDataService == null) {
+			throw new AnalyticsException("AnalyticsDataService is not available.");
+		}
+		return analyticsDataService;
 	}
 
 	/**
@@ -68,10 +59,11 @@ public class Utils {
 	 *            the record beans
 	 * @return the records from record beans
 	 */
-	public static List<Record> getRecordsFromRecordBeans(int tenantId, List<RecordBean> recordBeans) {
+	public static List<Record> getRecords(int tenantId, List<RecordBean> recordBeans) {
 		List<Record> records = new ArrayList<Record>();
 		for (RecordBean recordBean : recordBeans) {
-			records.add(getRecordFromRecordBean(tenantId, recordBean));
+			records.add(new Record(recordBean.getId(), tenantId, recordBean.getTableName(),
+		                           recordBean.getValues(), recordBean.getTimestamp()));
 		}
 		return records;
 	}
@@ -81,42 +73,19 @@ public class Utils {
 	 * @param records the records
 	 * @return the list of recordBeans
 	 */
-	public static List<RecordBean> createRecordBeansFromRecords(List<Record> records) {
+	public static List<RecordBean> createRecordBeans(List<Record> records) {
 		List<RecordBean> recordBeans = new ArrayList<RecordBean>();
 		for(Record record : records) {
-			recordBeans.add(createRecordBeanFromRecord(record));
+			RecordBean recordBean = new RecordBean();
+			recordBean.setId(record.getId());
+			recordBean.setTableName(record.getTableName());
+			recordBean.setTimestamp(record.getTimestamp());
+			recordBean.setValues(record.getValues());
+			recordBeans.add(recordBean);
 		}
 		return recordBeans;
 	}
-
-	/**
-	 * Creates the record bean from record.
-	 * @param record
-	 *            the record
-	 * @return the record bean
-	 */
-	public static RecordBean createRecordBeanFromRecord(Record record) {
-		RecordBean recordBean = new RecordBean();
-		recordBean.setId(record.getId());
-		recordBean.setTableName(record.getTableName());
-		recordBean.setTenantId(record.getTenantId());
-		recordBean.setTimestamp(record.getTimestamp());
-		recordBean.setValues(record.getValues());
-		return recordBean;
-	}
-	/**
-	 * Creates the search result bean from search result.
-	 * @param searchResultEntry
-	 *            the search result entry
-	 * @return the search result entry bean
-	 */
-	public static SearchResultEntryBean createSearchResultBeanFromSearchResult(SearchResultEntry searchResultEntry) {
-		SearchResultEntryBean searchResultEntryBean = new SearchResultEntryBean();
-		searchResultEntryBean.setId(searchResultEntry.getId());
-		searchResultEntryBean.setScore(searchResultEntry.getScore());
-		return searchResultEntryBean;
-	}
-
+	
 	/**
 	 * Creates the search result beans from search results.
 	 * @param searchResults
@@ -126,7 +95,10 @@ public class Utils {
 	public static List<SearchResultEntryBean> createSearchResultBeansFromSearchResults(List<SearchResultEntry> searchResults) {
 		List<SearchResultEntryBean> searchResultBeanList = new ArrayList<SearchResultEntryBean>();
 		for (SearchResultEntry searchResult : searchResults) {
-			searchResultBeanList.add(createSearchResultBeanFromSearchResult(searchResult));
+			SearchResultEntryBean searchResultEntryBean = new SearchResultEntryBean();
+			searchResultEntryBean.setId(searchResult.getId());
+			searchResultEntryBean.setScore(searchResult.getScore());
+			searchResultBeanList.add(searchResultEntryBean);
 		}
 		return searchResultBeanList;
 	}
@@ -137,7 +109,7 @@ public class Utils {
 	 *            the index type
 	 * @return the index type bean
 	 */
-	public static IndexTypeBean createIndexTypeBeanFromIndexType(IndexType indexType) {
+	public static IndexTypeBean createIndexTypeBean(IndexType indexType) {
 		switch (indexType) {
 			case BOOLEAN:
 				return IndexTypeBean.BOOLEAN;
@@ -162,7 +134,7 @@ public class Utils {
 	 *            the index type bean
 	 * @return the index type
 	 */
-	public static IndexType createIndexTypeFromIndexTypeBean(IndexTypeBean indexTypeBean) {
+	public static IndexType createIndexType(IndexTypeBean indexTypeBean) {
 		switch (indexTypeBean) {
 			case BOOLEAN:
 				return IndexType.BOOLEAN;
@@ -187,11 +159,11 @@ public class Utils {
 	 *            the index type map
 	 * @return the map
 	 */
-	public static Map<String, IndexTypeBean> createIndexTypeBeanMapFronIndexTypeMap(Map<String, IndexType> indexTypeMap) {
+	public static Map<String, IndexTypeBean> createIndexTypeBeanMap(Map<String, IndexType> indexTypeMap) {
 		Map<String, IndexTypeBean> indexTypeBeanMap = new HashMap<String, IndexTypeBean>();
 		Set<String> columns = indexTypeMap.keySet();
 		for (String column : columns) {
-			indexTypeBeanMap.put(column, createIndexTypeBeanFromIndexType(indexTypeMap.get(column)));
+			indexTypeBeanMap.put(column, createIndexTypeBean(indexTypeMap.get(column)));
 		}
 		return indexTypeBeanMap;
 	}
@@ -202,28 +174,13 @@ public class Utils {
 	 *            the index type bean map
 	 * @return the map
 	 */
-	public static Map<String, IndexType> createIndexTypeMapFronIndexTypeBeanMap(Map<String, IndexTypeBean> indexTypeBeanMap) {
+	public static Map<String, IndexType> createIndexTypeMap(Map<String, IndexTypeBean> indexTypeBeanMap) {
 		Map<String, IndexType> indexTypeMap = new HashMap<String, IndexType>();
 		Set<String> columns = indexTypeBeanMap.keySet();
 		for (String column : columns) {
-			indexTypeMap.put(column, createIndexTypeFromIndexTypeBean(indexTypeBeanMap.get(column)));
+			indexTypeMap.put(column, createIndexType(indexTypeBeanMap.get(column)));
 		}
 		return indexTypeMap;
-	}
-	
-	/**
-	 * Gets the all record beans from record groups.
-	 *
-	 * @param recordGroups the record groups
-	 * @return the all record beans from record groups
-	 * @throws AnalyticsException the analytics exception
-	 */
-	public static List<RecordBean> getAllRecordBeansFromRecordGroups(AnalyticsDataService ads, 
-	                                                                 RecordGroup[] recordGroups) 
-			throws AnalyticsException {
-		List<RecordBean> recordBeans = new ArrayList<RecordBean>();
-		recordBeans.addAll(createRecordBeansFromRecords(AnalyticsDSUtils.listRecords(ads, recordGroups)));
-		return recordBeans;
 	}
 	
 	/**
@@ -231,7 +188,7 @@ public class Utils {
 	 * @param searchResults the search results
 	 * @return the record ids from search results
 	 */
-	public static List<String> getRecordIdsFromSearchResults(List<SearchResultEntry> searchResults) {
+	public static List<String> getRecordIds(List<SearchResultEntry> searchResults) {
 		List<String> ids = new ArrayList<String>();
 		for(SearchResultEntry searchResult : searchResults) {
 			ids.add(searchResult.getId());
@@ -249,8 +206,8 @@ public class Utils {
 	 */
 	public static String getCompleteErrorMessage(String msg, Exception e) {
 		String message = null;
-		if (e.getCause() != null) {
-			message = msg.concat(". (" + e.getCause().getMessage() + ")");
+		if (e.getCause() != null) { 
+			message = msg.concat(". (" + e.getCause().getMessage() + ")"); //TODO use stringbuilders
 		} else if (e.getMessage() != null) {
 			message = msg.concat(". (" + e.getMessage() + ")");
 		}
