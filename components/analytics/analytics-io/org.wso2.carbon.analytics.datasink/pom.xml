@@ -80,7 +80,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.googlecode.disruptor.wso2</groupId>
+            <groupId>com.lmax.wso2</groupId>
             <artifactId>disruptor</artifactId>
         </dependency>
 

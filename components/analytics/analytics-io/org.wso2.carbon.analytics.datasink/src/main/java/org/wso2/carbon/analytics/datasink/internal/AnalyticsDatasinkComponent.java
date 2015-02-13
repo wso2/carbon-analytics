@@ -44,14 +44,18 @@ public class AnalyticsDatasinkComponent {
     private static Log log = LogFactory.getLog(AnalyticsDatasinkComponent.class);
 
     protected void activate(ComponentContext componentContext) {
-        if (log.isDebugEnabled()) {
-            log.debug("Started the Data bridge Analytics Data Sink component");
-        }
-        componentContext.getBundleContext().registerService(Axis2ConfigurationContextObserver.class.getName(),
-                new AnalyticsDatasinkConfigurationContextObserver(), null);
+        try {
+            if (log.isDebugEnabled()) {
+                log.debug("Started the Data bridge Analytics Data Sink component");
+            }
+            componentContext.getBundleContext().registerService(Axis2ConfigurationContextObserver.class.getName(),
+                    new AnalyticsDatasinkConfigurationContextObserver(), null);
 
-        ServiceHolder.getAnalyticsEventStreamListener().loadEventStreams(MultitenantConstants.SUPER_TENANT_ID);
-        ServiceHolder.setAnalyticsDSConnector(new AnalyticsDSConnector());
+            ServiceHolder.setAnalyticsDSConnector(new AnalyticsDSConnector());
+            ServiceHolder.getAnalyticsEventStreamListener().loadEventStreams(MultitenantConstants.SUPER_TENANT_ID);
+        }catch (Throwable e){
+            log.error(e.getCause(), e);
+        }
     }
 
     protected void deactivate(ComponentContext componentContext) {

@@ -87,11 +87,9 @@ public class AnalyticsDSConnector {
 
     private void populateTypedAttributes(String type, List<Attribute> attributes, Object[] values,
                                          Map<String, Object> eventAttribute) {
-
         if (attributes == null) {
             return;
         }
-
         int iteration = 0;
         for (Attribute attribute : attributes) {
             String attributeKey = type + "_" + attribute.getName();

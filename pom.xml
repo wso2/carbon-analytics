@@ -343,9 +343,9 @@
                 <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.googlecode.disruptor.wso2</groupId>
+                <groupId>com.lmax.wso2</groupId>
                 <artifactId>disruptor</artifactId>
-                <version>2.10.4-wso2v2</version>
+                <version>3.2.1.wso2v1</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
