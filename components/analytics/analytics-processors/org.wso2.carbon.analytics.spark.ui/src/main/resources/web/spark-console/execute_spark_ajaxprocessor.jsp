@@ -10,10 +10,10 @@
 
         response.setStatus(HttpServletResponse.SC_OK);
     } catch (AnalyticsExecutionException e) {
-//        e.printStackTrace();
+        e.printStackTrace();
         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
     } catch (RuntimeException e) {
-//        e.printStackTrace();
+        e.printStackTrace();
         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
     }
 

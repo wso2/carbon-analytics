@@ -37,47 +37,46 @@ public class SparkExecutionClient {
 
     private static Log log = LogFactory.getLog(SparkExecutionClient.class);
 
-    public String execute(int tenantID, String query) throws AnalyticsExecutionException, RuntimeException{
+    public String execute(int tenantID, String query)
+            throws AnalyticsExecutionException, RuntimeException {
         String resultString;
         try {
             AnalyticsQueryResult result = AnalyticsExecutionContext.executeQuery(tenantID, query);
-            if (result != null) {
-                resultString = JsonResult(result);
-            } else {
-                resultString = JsonResult(query);
-            }
+            resultString = JsonResult(query, result);
         } catch (AnalyticsExecutionException e) {
-//            e.printStackTrace();
-            resultString = JsonError(e);
             throw e;
-        } catch (RuntimeException e){
-            resultString = JsonError(e);
+        } catch (RuntimeException e) {
             throw e;
         }
         return resultString;
     }
 
-    private String JsonResult(AnalyticsQueryResult res) {
+    private String JsonResult(String query, AnalyticsQueryResult res) {
         JsonObject resObj = new JsonObject();
 
         JsonObject meta = new JsonObject();
         meta.addProperty("code", 200);
-        meta.addProperty("errorMessage", "");
+        meta.addProperty("responseMessage", "EXECUTED QUERY : " + query);
         JsonArray colArray = new JsonArray();
-        for (StructField col : res.getColumns()) {
-            colArray.add(new JsonPrimitive(col.getName()));
-        }
-        meta.add("columns", colArray);
-        resObj.add("meta", meta);
 
-        JsonObject response = new JsonObject();
-        JsonArray rows = new JsonArray();
-        for (List<Object> row : res.getRows()) {
-            JsonArray singleRow = new JsonArray();
-            for (Object elm : row) {
-                singleRow.add(new JsonPrimitive(elm.toString()));
+        if (res != null ) {
+            for (StructField col : res.getColumns()) {
+                colArray.add(new JsonPrimitive(col.getName()));
             }
-            rows.add(singleRow);
+        }
+        meta.add("columns", colArray);
+        resObj.add("meta", meta);
+
+        JsonObject response = new JsonObject();
+        JsonArray rows = new JsonArray();
+        if (res != null ) {
+            for (List<Object> row : res.getRows()) {
+                JsonArray singleRow = new JsonArray();
+                for (Object elm : row) {
+                    singleRow.add(new JsonPrimitive(elm.toString()));
+                }
+                rows.add(singleRow);
+            }
         }
         response.add("items", rows);
         resObj.add("response", response);
@@ -85,41 +84,4 @@ public class SparkExecutionClient {
         return resObj.toString();
     }
 
-
-    private String JsonResult(String query) {
-        JsonObject resObj = new JsonObject();
-
-        JsonObject meta = new JsonObject();
-        meta.addProperty("code", 200);
-        meta.addProperty("errorMessage", "");
-        JsonArray colArray = new JsonArray();
-        colArray.add(new JsonPrimitive("Message"));
-        meta.add("columns", colArray);
-        resObj.add("meta", meta);
-
-        JsonObject response = new JsonObject();
-        JsonArray rows = new JsonArray();
-        rows.add(new JsonPrimitive(query));
-        response.add("items", rows);
-        resObj.add("response", response);
-
-        return resObj.toString();
-    }
-
-    private String JsonError(Exception e) {
-        JsonObject resObj = new JsonObject();
-
-        JsonObject meta = new JsonObject();
-        meta.addProperty("code", 500);
-        meta.addProperty("errorMessage", e.getMessage());
-        JsonArray colArray = new JsonArray();
-        meta.add("columns", colArray);
-        resObj.add("meta", meta);
-
-        JsonObject response = new JsonObject();
-        response.add("items", new JsonArray());
-        resObj.add("response", response);
-
-        return resObj.toString();
-    }
 }
