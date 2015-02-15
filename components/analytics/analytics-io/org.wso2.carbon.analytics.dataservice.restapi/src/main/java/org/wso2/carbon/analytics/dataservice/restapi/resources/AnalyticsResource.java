@@ -26,7 +26,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -34,6 +33,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDSUtils;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.indexing.IndexType;
 import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.restapi.Utils;
@@ -43,15 +43,17 @@ import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.TableBean;
 import org.wso2.carbon.analytics.dataservice.restapi.http.methods.PATCH;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.RecordGroup;
 
 /**
- * The Class AnalyticsResource represents the REST APIs for AnalyticsDataService.
+ * The Class AnalyticsResource represents the REST APIs for
+ * AnalyticsDataService.
  */
 @Path("/")
-@Consumes({ MediaType.APPLICATION_JSON})
-@Produces({ MediaType.APPLICATION_JSON}) 
+@Consumes({ MediaType.APPLICATION_JSON })
+@Produces({ MediaType.APPLICATION_JSON })
 public class AnalyticsResource extends AbstractResource {
 
 	private static final int DEFAULT_START_INDEX = 0;
@@ -61,585 +63,495 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Creates the table.
-	 * @param tableName the table name
+	 * @param tableName
+	 *            the table name
 	 * @return the response
+	 * @throws AnalyticsException
 	 */
 	@POST
 	@Path("tables")
-	public Response createTable(TableBean tableBean) {
+	public Response createTable(TableBean tableBean) throws AnalyticsException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
-			logger.debug("Invoking createTable for tenantId :" + -1234 +
-			             " tableName : " + tableBean.getTableName());
+			logger.debug("Invoking createTable for tenantId :" + -1234 + " tableName : " +
+			             tableBean.getTableName());
 		}
-		try {
-			AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
-			if(analyticsDataService.tableExists(tenantId, tableBean.getTableName())) {
-				return handleResponse(ResponseStatus.CONFLICT, "table :" + tableBean.getTableName() + 
-				                      " already exists");
-			}
-			analyticsDataService.createTable(tenantId, tableBean.getTableName());
-			return handleResponse(ResponseStatus.CREATED,
-			                      "Successfully created table: " + tableBean.getTableName() +
-			                              " for tenantId: " + tenantId);
-		} catch (AnalyticsException e) {
-			String message = "Error while creating table: " + tableBean.getTableName() +
-			                         " tenantId: " + tenantId;
-			message = Utils.getCompleteErrorMessage(message, e);
-			logger.error(message, e);
-			return handleResponse(ResponseStatus.FAILED, message);
+		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
+		if (analyticsDataService.tableExists(tenantId, tableBean.getTableName())) {
+			return handleResponse(ResponseStatus.CONFLICT, "table :" + tableBean.getTableName() +
+			                                               " already exists");
 		}
+		analyticsDataService.createTable(tenantId, tableBean.getTableName());
+		return handleResponse(ResponseStatus.CREATED,
+		                      "Successfully created table: " + tableBean.getTableName() +
+		                              " for tenantId: " + tenantId);
 	}
 
 	/**
 	 * List all the tables.
 	 * @return the response
+	 * @throws AnalyticsException
 	 */
 	@GET
 	@Path("tables")
-	public Response listTables() {
+	public Response listTables() throws AnalyticsException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking listTables for tenantId :" + tenantId);
 		}
-		try {
-			AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
-			List<String> tables = analyticsDataService.listTables(tenantId);
-			if (logger.isDebugEnabled()) {
-				logger.debug("Table List : " + tables);
-			}
-			return Response.ok(tables).build();
-		} catch (AnalyticsException e) {
-			String message = "Error while listing tables for tenantId: " + tenantId;
-			message = Utils.getCompleteErrorMessage(message, e);
-			logger.error(message, e);
-			return handleResponse(ResponseStatus.FAILED, message);
-		}
-	}
-
-	/**
-	 * Checks if a table exist.
-	 * @param tableName the table name
-	 * @return the response
-	 */
-	@GET
-	@Path("table_exists")
-	public Response tableExist(@QueryParam("tableName") String tableName) {
-		int tenantId = -1234;
+		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
+		List<String> tables = analyticsDataService.listTables(tenantId);
 		if (logger.isDebugEnabled()) {
-			logger.debug("Invoking tableExist for tenantId :" + tenantId + " tableName : " +
-			             tableName);
+			logger.debug("Table List : " + tables);
 		}
-		try {
-			AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
-			boolean tableExists = analyticsDataService.tableExists(tenantId, tableName);
-			if(tableExists) {
-				return handleResponse(ResponseStatus.SUCCESS,
-				                      "table :" + tableName + " exists!");
-			} else {
-				return handleResponse(ResponseStatus.NON_EXISTENT,
-						                      "table: " + tableName +
-                        " does not exists." );
-			}
-		} catch (AnalyticsException e) {
-			String message = "Error while checking table: " + tableName + " tenantId: " + tenantId;
-			message = Utils.getCompleteErrorMessage(message, e);
-			logger.error(message, e);
-			return handleResponse(ResponseStatus.FAILED, message);
-		}
+		return Response.ok(tables).build();
 	}
 
 	/**
 	 * Delete table.
-	 * @param tableName the table name
+	 * @param tableName
+	 *            the table name
 	 * @return the response
+	 * @throws AnalyticsException
 	 */
 	@DELETE
 	@Path("tables")
-	public Response deleteTable(TableBean tableBean) {
+	public Response deleteTable(TableBean tableBean) throws AnalyticsException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
-			logger.debug("Invoking deleteTable for tenantId :" + tenantId +
-			             " tableName : " + tableBean.getTableName());
+			logger.debug("Invoking deleteTable for tenantId :" + tenantId + " tableName : " +
+			             tableBean.getTableName());
 		}
-		try {
-			AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
-			if(analyticsDataService.tableExists(tenantId, tableBean.getTableName())){
-				analyticsDataService.deleteTable(-1234, tableBean.getTableName());
-				return handleResponse(ResponseStatus.SUCCESS,
-				                      "Successfully deleted table: " + tableBean.getTableName() +
-				                              " for tenantId: " + -1234);
-			}
-			return handleResponse(ResponseStatus.NON_EXISTENT,
-			                      "table: " + tableBean.getTableName() +
-			                              " does not exists." );
-			
-		} catch (AnalyticsException e) {
-			String message =
-			                 "Error while deleting table: " + tableBean.getTableName() +
-			                         " tenantId: " + -1234;
-			message = Utils.getCompleteErrorMessage(message, e);
-			logger.error(message, e);
-			return handleResponse(ResponseStatus.FAILED, message);
+		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
+		if (analyticsDataService.tableExists(tenantId, tableBean.getTableName())) {
+			analyticsDataService.deleteTable(-1234, tableBean.getTableName());
+			return handleResponse(ResponseStatus.SUCCESS, "Successfully deleted table: " +
+			                                              tableBean.getTableName() +
+			                                              " for tenantId: " + -1234);
 		}
+		return handleResponse(ResponseStatus.NON_EXISTENT, "table: " + tableBean.getTableName() +
+		                                                   " does not exists.");
 	}
 
 	/**
 	 * Delete records either the time range, but not both
-	 * @param tableName the table name
-	 * @param timeFrom the time from
-	 * @param timeTo the time to
+	 * @param tableName
+	 *            the table name
+	 * @param timeFrom
+	 *            the time from
+	 * @param timeTo
+	 *            the time to
 	 * @return the response
+	 * @throws AnalyticsException
 	 */
 	@DELETE
 	@Path("tables/{tableName}/{timeFrom}/{timeTo}")
 	public Response deleteRecords(@PathParam("tableName") String tableName,
 	                              @PathParam("timeFrom") long timeFrom,
-	                              @PathParam("timeTo") long timeTo) {
+	                              @PathParam("timeTo") long timeTo) throws AnalyticsException,
+	                                                               AnalyticsTableNotAvailableException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking deleteRecords for tenantId :" + tenantId + " tableName : " +
 			             tableName);
 		}
-		try {
-			AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
-			if (analyticsDataService.tableExists(tenantId, tableName)) {
-				if (logger.isDebugEnabled()) {
-					logger.debug("deleting the records from " + timeFrom + " to " + timeTo);
-				}
-				analyticsDataService.delete(tenantId, tableName, timeFrom, timeTo);
-				return handleResponse(ResponseStatus.SUCCESS,
-				                      "Successfully deleted records in table: " + tableName +
-				                              " for tenantId: " + tenantId);
-			}
-			return handleResponse(ResponseStatus.NON_EXISTENT, "table: " + tableName +
-			                              " does not exists." );
-		} catch (AnalyticsException e) {
-			String message =
-			                 "Error while deleting recods in table: " + tableName + " tenantId: " +
-			                         tenantId;
-			message = Utils.getCompleteErrorMessage(message, e);
-			logger.error(message, e);
-			return handleResponse(ResponseStatus.FAILED, message);
+		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("deleting the records from " + timeFrom + " to " + timeTo);
 		}
+		analyticsDataService.delete(tenantId, tableName, timeFrom, timeTo);
+		return handleResponse(ResponseStatus.SUCCESS, "Successfully deleted records in table: " +
+		                                              tableName + " for tenantId: " + tenantId);
 	}
 
 	/**
 	 * Delete records either by ids
-	 * @param tableName the table name
-	 * @param ids the ids
+	 * @param tableName
+	 *            the table name
+	 * @param ids
+	 *            the ids
 	 * @return the response
+	 * @throws AnalyticsException
+	 * @throws AnalyticsTableNotAvailableException
 	 */
 	@DELETE
 	@Path("tables/{tableName}")
-	public Response deleteRecordsByIds(@PathParam("tableName") String tableName, List<String> ids) {
+	public Response deleteRecordsByIds(@PathParam("tableName") String tableName, List<String> ids)
+	                                          throws AnalyticsException, AnalyticsTableNotAvailableException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking deleteRecords for tenantId :" + tenantId + " tableName : " +
 			             tableName);
 		}
-		try {
-			AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
-			if (analyticsDataService.tableExists(tenantId, tableName)) {
-				if (logger.isDebugEnabled()) {
-					logger.debug("deleting the records for ids :" + ids);
-				}
-				analyticsDataService.delete(tenantId, tableName, ids);
-				return handleResponse(ResponseStatus.SUCCESS,
-				                      "Successfully deleted records in table: " + tableName +
-				                              " for tenantId: " + tenantId);
-			}
-			return handleResponse(ResponseStatus.NON_EXISTENT, "table: " + tableName +
-			                              " does not exists." );
-		} catch (AnalyticsException e) {
-			String message =
-			                 "Error while deleting recods in table: " + tableName + " tenantId: " +
-			                         tenantId;
-			message = Utils.getCompleteErrorMessage(message, e);
-			logger.error(message, e);
-			return handleResponse(ResponseStatus.FAILED, message);
+		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("deleting the records for ids :" + ids);
 		}
+		analyticsDataService.delete(tenantId, tableName, ids);
+		return handleResponse(ResponseStatus.SUCCESS, "Successfully deleted records in table: " +
+		                                              tableName + " for tenantId: " + tenantId);
 	}
-	
+
 	/**
 	 * Gets the record count.
-	 * @param tableName the table name
+	 * @param tableName
+	 *            the table name
 	 * @return the record count
+	 * @throws AnalyticsException
+	 * @throws AnalyticsTableNotAvailableException
 	 */
 	@GET
 	@Path("tables/{tableName}/recordcount")
-	public Response getRecordCount(@PathParam("tableName") String tableName) {
+	public Response getRecordCount(@PathParam("tableName") String tableName)
+	                                                                        throws AnalyticsTableNotAvailableException,
+	                                                                        AnalyticsException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking getRecordCount for tableName: " + tableName + " tenantId :" +
 			             tenantId);
 		}
-		try {
-			AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
-			if (analyticsDataService.tableExists(tenantId, tableName)) {
-				long recordCount = analyticsDataService.getRecordCount(tenantId, tableName);
-				if (logger.isDebugEnabled()) {
-					logger.debug("RecordCount for tableName: " + tableName + " is " +
-					             recordCount);
-				}
-				return Response.ok(recordCount).build();
-			}
-			return handleResponse(ResponseStatus.NON_EXISTENT, "table: " + tableName +
-			                                                   " does not exists.");
-		} catch (AnalyticsException e) {
-			String message =
-			                 "Error while retrieving record count for tableName: " + tableName +
-			                         " tenantId: " + tenantId;
-			message = Utils.getCompleteErrorMessage(message, e);
-			logger.error(message, e);
-			return handleResponse(ResponseStatus.FAILED, message);
+		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
+
+		long recordCount = analyticsDataService.getRecordCount(tenantId, tableName);
+		if (logger.isDebugEnabled()) {
+			logger.debug("RecordCount for tableName: " + tableName + " is " + recordCount);
 		}
+		return Response.ok(recordCount).build();
 	}
 
 	/**
 	 * Gets the records.
-	 * @param tableName the table name
-	 * @param timeFrom the start time
-	 * @param timeTo the end time
-	 * @param recordsFrom the starting record
-	 * @param count the count
+	 * @param tableName
+	 *            the table name
+	 * @param timeFrom
+	 *            the start time
+	 * @param timeTo
+	 *            the end time
+	 * @param recordsFrom
+	 *            the starting record
+	 * @param count
+	 *            the count
 	 * @return the record groups
+	 * @throws AnalyticsException
+	 * @throws AnalyticsTableNotAvailableException
 	 */
 	@GET
 	@Path("tables/{tableName}/{from}/{to}/{start}/{count}")
 	public Response getRecords(@PathParam("tableName") String tableName,
-	                                @PathParam("from") long timeFrom,
-	                                @PathParam("to") long timeTo,
-	                                @PathParam("start") int recordsFrom,
-	                                @PathParam("count") int count) {
+	                           @PathParam("from") long timeFrom, @PathParam("to") long timeTo,
+	                           @PathParam("start") int recordsFrom, @PathParam("count") int count)
+	                                          throws AnalyticsTableNotAvailableException, AnalyticsException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking getRecordGroups for tableName: " + tableName + " tenantId :" +
 			             tenantId);
 		}
-		try {
-			AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
-			RecordGroup[] recordGroups;
-			if (analyticsDataService.tableExists(tenantId, tableName)) {
-				recordGroups = analyticsDataService.get(tenantId, tableName, null, timeFrom,
-				                                        timeTo, recordsFrom, count);
-				List<RecordBean> recordBeans = Utils
-					.createRecordBeans(AnalyticsDSUtils.listRecords(analyticsDataService, recordGroups));
-				if (logger.isDebugEnabled()) {
-					for(RecordBean recordBean : recordBeans){
-						logger.debug("Retrieved -- Record Id: " + recordBean.getId() + " values :" +
-					             recordBean.toString());
-					}
-				}
-				return Response.ok(recordBeans).build();
+		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
+		RecordGroup[] recordGroups;
+
+		recordGroups =
+		               analyticsDataService.get(tenantId, tableName, null, timeFrom, timeTo,
+		                                        recordsFrom, count);
+		List<RecordBean> recordBeans =
+		                               Utils.createRecordBeans(AnalyticsDSUtils.listRecords(analyticsDataService,
+		                                                                                    recordGroups));
+		if (logger.isDebugEnabled()) {
+			for (RecordBean recordBean : recordBeans) {
+				logger.debug("Retrieved -- Record Id: " + recordBean.getId() + " values :" +
+				             recordBean.toString());
 			}
-			return handleResponse(ResponseStatus.NON_EXISTENT,
-			                      "table: " + tableName + " does not exists." );
-		} catch (AnalyticsException e) {
-			String message =
-			                 "Error while retrieving recordgroups for tableName: " + tableName +
-			                         " tenantId: " + tenantId;
-			message = Utils.getCompleteErrorMessage(message, e);
-			logger.error(message, e);
-			return handleResponse(ResponseStatus.FAILED, message);
 		}
+		return Response.ok(recordBeans).build();
 	}
-	
+
 	/**
 	 * Gets the records.
-	 * @param tableName the table name
-	 * @param timeFrom the time from
-	 * @param timeTo the time to
+	 * @param tableName
+	 *            the table name
+	 * @param timeFrom
+	 *            the time from
+	 * @param timeTo
+	 *            the time to
 	 * @return the records
+	 * @throws AnalyticsException
+	 * @throws AnalyticsTableNotAvailableException
 	 */
 	@GET
 	@Path("tables/{tableName}/{from}/{to}/{start}")
 	public Response getRecords(@PathParam("tableName") String tableName,
 	                           @PathParam("from") long timeFrom, @PathParam("to") long timeTo,
-	                           @PathParam("start") int start) {
+	                           @PathParam("start") int start)
+	                                                         throws AnalyticsTableNotAvailableException,
+	                                                         AnalyticsException {
 		return getRecords(tableName, timeFrom, timeTo, start, DEFAULT_INFINITY_INDEX);
 	}
-	
+
 	/**
 	 * Gets the records.
-	 * @param tableName the table name
-	 * @param timeFrom the time from
-	 * @param timeTo the time to
+	 * @param tableName
+	 *            the table name
+	 * @param timeFrom
+	 *            the time from
+	 * @param timeTo
+	 *            the time to
 	 * @return the records
+	 * @throws AnalyticsException
+	 * @throws AnalyticsTableNotAvailableException
 	 */
 	@GET
 	@Path("tables/{tableName}/{from}/{to}")
 	public Response getRecords(@PathParam("tableName") String tableName,
-	                           @PathParam("from") long timeFrom, @PathParam("to") long timeTo) {
+	                           @PathParam("from") long timeFrom, @PathParam("to") long timeTo)
+	                  throws AnalyticsTableNotAvailableException, AnalyticsException {
 		return getRecords(tableName, timeFrom, timeTo, DEFAULT_START_INDEX, DEFAULT_INFINITY_INDEX);
 	}
-	
+
 	/**
 	 * Gets the records.
-	 * @param tableName the table name
-	 * @param timeFrom the time from
-	 * @param timeTo the time to
+	 * @param tableName
+	 *            the table name
+	 * @param timeFrom
+	 *            the time from
+	 * @param timeTo
+	 *            the time to
 	 * @return the records
+	 * @throws AnalyticsException
+	 * @throws AnalyticsTableNotAvailableException
 	 */
 	@GET
 	@Path("tables/{tableName}/{from}")
 	public Response getRecords(@PathParam("tableName") String tableName,
-	                           @PathParam("from") long timeFrom) {
-		return getRecords(tableName, timeFrom, DEFAULT_INFINITY_INDEX, DEFAULT_START_INDEX, DEFAULT_INFINITY_INDEX);
+	                           @PathParam("from") long timeFrom)
+	                                                            throws AnalyticsTableNotAvailableException,
+	                                                            AnalyticsException {
+		return getRecords(tableName, timeFrom, DEFAULT_INFINITY_INDEX, DEFAULT_START_INDEX,
+		                  DEFAULT_INFINITY_INDEX);
 	}
-	
+
 	/**
 	 * Gets all the records.
-	 * @param tableName the table name
+	 * @param tableName
+	 *            the table name
 	 * @return the records
+	 * @throws AnalyticsException
+	 * @throws AnalyticsTableNotAvailableException
 	 */
 	@GET
 	@Path("tables/{tableName}")
-	public Response getRecords(@PathParam("tableName") String tableName) {
-		return getRecords(tableName, DEFAULT_INFINITY_INDEX, DEFAULT_INFINITY_INDEX, 
-		                  DEFAULT_START_INDEX, DEFAULT_INFINITY_INDEX); 
+	public Response getRecords(@PathParam("tableName") String tableName)
+	                                                                    throws AnalyticsTableNotAvailableException,
+	                                                                    AnalyticsException {
+		return getRecords(tableName, DEFAULT_INFINITY_INDEX, DEFAULT_INFINITY_INDEX,
+		                  DEFAULT_START_INDEX, DEFAULT_INFINITY_INDEX);
 	}
 
 	/**
 	 * Inserts a list of records.
-	 * @param recordBeans the list of the record beans
+	 * @param recordBeans
+	 *            the list of the record beans
 	 * @return the response
+	 * @throws AnalyticsException
+	 * @throws AnalyticsTableNotAvailableException
 	 */
 	@POST
 	@Path("records")
-	public Response insertRecords(List<RecordBean> recordBeans) {
+	public Response insertRecords(List<RecordBean> recordBeans)
+	                                                           throws AnalyticsTableNotAvailableException,
+	                                                           AnalyticsException {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking insertRecords");
 		}
 		int tenantId = -1234;
-		try {
-			AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
-			if (logger.isDebugEnabled()) {
-				for(RecordBean recordBean : recordBeans){
-					logger.debug(" inserting -- Record Id: " + recordBean.getId() + " values :" +
+		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
+		if (logger.isDebugEnabled()) {
+			for (RecordBean recordBean : recordBeans) {
+				logger.debug(" inserting -- Record Id: " + recordBean.getId() + " values :" +
 				             recordBean.toString());
-				}
 			}
-			List<Record> records = Utils.getRecords(tenantId, recordBeans);
-			analyticsDataService.insert(records);
-			return handleResponse(ResponseStatus.CREATED, "Successfully added records");
-		} catch (AnalyticsException e) {
-			String message = "Error while adding records";
-			message = Utils.getCompleteErrorMessage(message, e);
-			logger.error(message, e);
-			return handleResponse(ResponseStatus.FAILED, message);
 		}
+		List<Record> records = Utils.getRecords(tenantId, recordBeans);
+		analyticsDataService.insert(records);
+		return handleResponse(ResponseStatus.CREATED, "Successfully added records");
 	}
 
 	/**
 	 * Updates a list of records.
-	 * @param recordBeans the record beans
+	 * @param recordBeans
+	 *            the record beans
 	 * @return the response
+	 * @throws AnalyticsException
+	 *             , AnalyticsTableNotAvailableException
 	 */
 	@PATCH
 	@Path("records")
-	public Response updateRecords(List<RecordBean> recordBeans) {
+	public Response updateRecords(List<RecordBean> recordBeans) throws AnalyticsException,
+	                                                           AnalyticsTableNotAvailableException {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking updateRecords");
 		}
 		int tenantId = -1234;
-		try {
-			AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
-			if (logger.isDebugEnabled()) {
-				for(RecordBean recordBean : recordBeans){
-					logger.debug(" updating -- Record Id: " + recordBean.getId() + " values :" +
+
+		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
+		if (logger.isDebugEnabled()) {
+			for (RecordBean recordBean : recordBeans) {
+				logger.debug(" updating -- Record Id: " + recordBean.getId() + " values :" +
 				             recordBean.toString());
-				}
 			}
-			List<Record> records = Utils.getRecords(tenantId, recordBeans);
-			analyticsDataService.update(records);
-			return handleResponse(ResponseStatus.SUCCESS, "Successfully updated records");
-		} catch (AnalyticsException e) {
-			String message = "Error while updating records";
-			message = Utils.getCompleteErrorMessage(message, e);
-			logger.error(message, e);
-			return handleResponse(ResponseStatus.FAILED, message);
 		}
+		List<Record> records = Utils.getRecords(tenantId, recordBeans);
+		analyticsDataService.update(records);
+		return handleResponse(ResponseStatus.SUCCESS, "Successfully updated records");
 	}
 
 	/**
 	 * Sets the indices.
-	 * @param tableName the table name
-	 * @param columnsBean the columns bean containing all the indices
+	 * @param tableName
+	 *            the table name
+	 * @param columnsBean
+	 *            the columns bean containing all the indices
 	 * @return the response
+	 * @throws AnalyticsException
 	 */
 	@POST
 	@Path("tables/{tableName}/indices")
 	public Response setIndices(@PathParam("tableName") String tableName,
-	                           Map<String, IndexTypeBean> columnsBean) {
+	                           Map<String, IndexTypeBean> columnsBean) throws AnalyticsException,
+	                                                                  AnalyticsIndexException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking setIndices for tenantId :" + tenantId + " tableName : " +
 			             tableName);
 		}
-		try {
-			AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
-			if (analyticsDataService.tableExists(tenantId, tableName)) {
-				Map<String, IndexType> columns = Utils.createIndexTypeMap(columnsBean);
-				if (logger.isDebugEnabled()) {
-					logger.debug("Setting indices : " + columns.keySet().toArray() );
-				}
-				analyticsDataService.setIndices(tenantId, tableName, columns);
-				return handleResponse(ResponseStatus.CREATED,
-				                      "Successfully set indices in table: " + tableName +
-				                              " for tenantId: " + tenantId);
-			}
-			return handleResponse(ResponseStatus.NON_EXISTENT, "table: " + tableName +
-                    " does not exists." );
-		} catch (AnalyticsException e) {
-			String message =
-			                 "Error while setting indices in table: " + tableName + " tenantId: " +
-			                         tenantId;
-			message = Utils.getCompleteErrorMessage(message, e);
-			logger.error(message, e);
-			return handleResponse(ResponseStatus.FAILED, message);
+
+		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
+		Map<String, IndexType> columns = Utils.createIndexTypeMap(columnsBean);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Setting indices : " + columns.keySet().toArray());
 		}
+		analyticsDataService.setIndices(tenantId, tableName, columns);
+		return handleResponse(ResponseStatus.CREATED, "Successfully set indices in table: " +
+		                                              tableName + " for tenantId: " + tenantId);
 	}
 
 	/**
 	 * Gets the indices.
-	 * @param tableName the table name
+	 * @param tableName
+	 *            the table name
 	 * @return the indices
+	 * @throws AnalyticsException
+	 *             , AnalyticsIndexException
 	 */
 	@GET
 	@Path("tables/{tableName}/indices")
-	public Response getIndices(@PathParam("tableName") String tableName) {
+	public Response getIndices(@PathParam("tableName") String tableName) throws AnalyticsException,
+	                                                                    AnalyticsIndexException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking getIndices for tenantId :" + tenantId + " tableName : " +
 			             tableName);
 		}
-		try {
-			AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
-			if(analyticsDataService.tableExists(tenantId, tableName)){
-				Map<String, IndexType> columns = analyticsDataService.getIndices(tenantId, tableName);
-				Map<String, IndexTypeBean> columnsBean = Utils.createIndexTypeBeanMap(columns);
-				if (logger.isDebugEnabled()) {
-					logger.debug("Getting indices : " + columnsBean.keySet().toArray() );
-				}
-				return Response.ok(columnsBean).build();
-			}
-			return handleResponse(ResponseStatus.NON_EXISTENT, "table: " + tableName +
-                    " does not exists." );
-		} catch (AnalyticsException e) {
-			String message =
-			                 "Error while getting indices in table: " + tableName + " tenantId: " +
-			                         tenantId;
-			message = Utils.getCompleteErrorMessage(message, e);
-			logger.error(message, e);
-			return handleResponse(ResponseStatus.FAILED, message);
+
+		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
+
+		Map<String, IndexType> columns = analyticsDataService.getIndices(tenantId, tableName);
+		Map<String, IndexTypeBean> columnsBean = Utils.createIndexTypeBeanMap(columns);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Getting indices : " + columnsBean.keySet().toArray());
 		}
+		return Response.ok(columnsBean).build();
 	}
 
 	/**
 	 * Clear indices.
-	 * @param tableName the table name
+	 * @param tableName
+	 *            the table name
 	 * @return the response
+	 * @throws AnalyticsException
 	 */
 	@DELETE
 	@Path("tables/{tableName}/indices")
-	public Response clearIndices(@PathParam("tableName") String tableName) {
+	public Response clearIndices(@PathParam("tableName") String tableName)
+	                                                                      throws AnalyticsException,
+	                                                                      AnalyticsIndexException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking clearIndices for tenantId :" + tenantId + " tableName : " +
 			             tableName);
 		}
-		try {
-			AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
-			if(analyticsDataService.tableExists(tenantId, tableName)) {
-				analyticsDataService.clearIndices(tenantId, tableName);
-				return handleResponse(ResponseStatus.SUCCESS,
-			                      "Successfully cleared indices in table: " + tableName +
-			                              " for tenantId: " + tenantId);
-			}
-			return handleResponse(ResponseStatus.NON_EXISTENT, "table: " + tableName +
-                    " does not exists." );
-		} catch (AnalyticsException e) {
-			String message =
-			                 "Error while clearing indices in table: " + tableName + " tenantId: " +
-			                         tenantId;
-			message = Utils.getCompleteErrorMessage(message, e);
-			logger.error(message, e);
-			return handleResponse(ResponseStatus.FAILED, message);
-		}
+
+		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
+		analyticsDataService.clearIndices(tenantId, tableName);
+		return handleResponse(ResponseStatus.SUCCESS, "Successfully cleared indices in table: " +
+		                                              tableName + " for tenantId: " + tenantId);
 	}
 
 	/**
 	 * Search records.
-	 * @param queryBean the query bean
+	 * @param queryBean
+	 *            the query bean
 	 * @return the response
+	 * @throws AnalyticsException
+	 *             , AnalyticsIndexException
 	 */
 	@POST
 	@Path("search")
-	public Response search(QueryBean queryBean) {
+	public Response search(QueryBean queryBean) throws AnalyticsException, AnalyticsIndexException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking search for tenantId :" + queryBean.getTenantId() +
 			             " tableName : " + queryBean.getTableName());
 		}
-		try {
-			AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
-			List<SearchResultEntry> searchResults =
-			                                        analyticsDataService.search(tenantId,
-			                                                                    queryBean.getTableName(),
-			                                                                    queryBean.getLanguage(),
-			                                                                    queryBean.getQuery(),
-			                                                                    queryBean.getStart(),
-			                                                                    queryBean.getCount());
-			List<String> ids = Utils.getRecordIds(searchResults);
-			RecordGroup[] recordGroups = analyticsDataService.get(-1234, queryBean.getTableName(), null, ids);
-			List<RecordBean> recordBeans = Utils.
-					createRecordBeans(AnalyticsDSUtils.listRecords(analyticsDataService, recordGroups));
-			if (logger.isDebugEnabled()) {
-				for(RecordBean recordBean : recordBeans){
-					logger.debug("Search Result -- Record Id: " + recordBean.getId() + " values :" +
+		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
+		List<SearchResultEntry> searchResults =
+		                                        analyticsDataService.search(tenantId,
+		                                                                    queryBean.getTableName(),
+		                                                                    queryBean.getLanguage(),
+		                                                                    queryBean.getQuery(),
+		                                                                    queryBean.getStart(),
+		                                                                    queryBean.getCount());
+		List<String> ids = Utils.getRecordIds(searchResults);
+		RecordGroup[] recordGroups =
+		                             analyticsDataService.get(-1234, queryBean.getTableName(),
+		                                                      null, ids);
+		List<RecordBean> recordBeans =
+		                               Utils.createRecordBeans(AnalyticsDSUtils.listRecords(analyticsDataService,
+		                                                                                    recordGroups));
+		if (logger.isDebugEnabled()) {
+			for (RecordBean recordBean : recordBeans) {
+				logger.debug("Search Result -- Record Id: " + recordBean.getId() + " values :" +
 				             recordBean.toString());
-				}
 			}
-			return Response.ok(recordBeans).build();
-		} catch (AnalyticsException e) {
-			String message =
-			                 "Error while searching table: " + queryBean.getTableName() +
-			                         " tenantId: " + tenantId;
-			message = Utils.getCompleteErrorMessage(message, e);
-			logger.error(message, e);
-			return handleResponse(ResponseStatus.FAILED, message);
 		}
+		return Response.ok(recordBeans).build();
 	}
-	
+
 	/**
-     * Returns the search record count.
-     * @param queryBean the query bean
-     * @return the response
-     */
-    @POST
-    @Path("search_count")
-    public Response searchCount(QueryBean queryBean) {
-    	int tenantId = -1234;
-        if (logger.isDebugEnabled()) {
-            logger.debug("Invoking search count for tenantId :" + queryBean.getTenantId() +
-                         " tableName : " + queryBean.getTableName());
-        } 
-        try {
-        	AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
-            int result = analyticsDataService.searchCount(tenantId, queryBean.getTableName(), queryBean.getLanguage(),
-                    queryBean.getQuery());
-            if (logger.isDebugEnabled()) {
-                logger.debug("Search count : " + result);
-            } 
-            return Response.ok(result).build();
-        } catch (AnalyticsException e) {
-            String message = "Error in search count; table: " + queryBean.getTableName() + " tenantId: "
-                    + tenantId;
-            message = Utils.getCompleteErrorMessage(message, e);
-            logger.error(message, e);
-            return handleResponse(ResponseStatus.FAILED, message);
-        }
-    }
-	
+	 * Returns the search record count.
+	 * @param queryBean
+	 *            the query bean
+	 * @return the response
+	 * @throws AnalyticsException
+	 */
+	@POST
+	@Path("search_count")
+	public Response searchCount(QueryBean queryBean) throws AnalyticsException,
+	                                                AnalyticsIndexException {
+		int tenantId = -1234;
+		if (logger.isDebugEnabled()) {
+			logger.debug("Invoking search count for tenantId :" + queryBean.getTenantId() +
+			             " tableName : " + queryBean.getTableName());
+		}
+
+		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
+		int result =
+		             analyticsDataService.searchCount(tenantId, queryBean.getTableName(),
+		                                              queryBean.getLanguage(), queryBean.getQuery());
+		if (logger.isDebugEnabled()) {
+			logger.debug("Search count : " + result);
+		}
+		return Response.ok(result).build();
+	}
+
 }
