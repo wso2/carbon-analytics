@@ -21,3 +21,12 @@
 .error {
 	color: #ff0000;
 }
+
+#terminalArea {
+    height: 50em;
+    overflow: auto;
+
+    /*background: #000000;*/
+    /*border: #3b3512 solid 1px;*/
+    margin: 1px;
+}

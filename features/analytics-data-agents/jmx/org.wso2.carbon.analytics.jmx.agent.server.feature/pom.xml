@@ -73,8 +73,6 @@
                             </adviceFile>
                             <bundles>
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.jmx.agent</bundleDef>
-                                <bundleDef>org.wso2.carbon.commons:org.wso2.carbon.ntask.core</bundleDef>
-                                <bundleDef>org.wso2.carbon.commons:org.wso2.carbon.databridge.agent.thrift</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>

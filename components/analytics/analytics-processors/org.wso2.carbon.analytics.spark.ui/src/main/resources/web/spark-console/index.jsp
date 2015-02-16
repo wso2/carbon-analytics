@@ -30,162 +30,96 @@
 
     <link type="text/css" href="css/main.css" rel="stylesheet"/>
 
+    <script src="js/jquery-1.7.1.min.js"></script>
+    <script src="js/jquery.mousewheel-min.js"></script>
+    <script src="js/jquery.terminal-min.js"></script>
+    <link href="css/jquery.terminal.css" rel="stylesheet"/>
 
-    <script type="text/javascript">
-
-        $(document).ready(function () {
-            console.log("Document loaded...")
-        });
-
-    </script>
+    <%--<link type="text/css" href="css/ui.all.css" rel="stylesheet"/>--%>
+    <%--<script type="text/javascript" src="js/jquery-ui-1.6.custom.min.js"></script>--%>
+    <%--<script type="text/javascript" src="js/jquery.hoverIntent.js"></script>--%>
+    <%--<script type="text/javascript" src="js/jquery.cluetip.js"></script>--%>
 
     <div id="middle">
         <h2>Interactive Spark Console</h2>
 
         <div id="workArea">
-            <!-- <p>Some stuff will go there bae!</p> <br/> -->
 
-            <table class="styledLeft">
-                <tbody>
-                <tr>
-                    <td>
-                        <div id="resultsPane">
-                                <pre id="pre">
+            <div id="terminalArea">
 
-                                Welcome to interactive Spark SQL shell
+                <script>
+                    $(document).ready(function ($) {
+                        var id = 1;
+                        $('#terminalArea').terminal(function (command, term) {
+                            $('#terminalArea').addClass('terminalArea');
+                            if ($.trim(command) == "") {
+                                term.resume();
+                            }
+                            else if ($.trim(command) == 'help') {
+                                term.echo("Please refer documentation!");
+                            } else {
+                                term.pause();
+                                jQuery.ajax({
+                                                url: '../spark-console/execute_spark_ajaxprocessor.jsp',
+                                                type: 'POST',
+                                                data: {
+                                                    'query': command
+                                                },
+                                                dataType: 'json',
+                                                success: function (data) {
+                                                    // alert('Data: '+data.response.items.length);
+                                                    console.log(data);
+                                                    term.resume();
+                                                    term.echo(data.meta.responseMessage);
 
-                                This interactive shell lets you execute Spark SQL commands against a local Spark cluster
+                                                    var results = data.response.items;
+                                                    if (results.length != 0) {
+                                                        term.echo(results.length + " results returned!");
+                                                        var columns = data.meta.columns;
+                                                        var columnRow = "";
+                                                        for (var i = 0; i < columns.length; i++) {
+                                                            columnRow = columnRow + columns[i] + "\t|\t";
+                                                        }
+                                                        term.echo(columnRow);
 
-                                Initialzing Spark client...
+                                                        var row = "";
+                                                        for (var i = 0; i < results.length; i++) {
+                                                            var element = results[i];
+                                                            row = "";
+                                                            for (var j = 0; j < columns.length; j++) {
+                                                                row = row + element[j] + "\t"
+                                                            }
+                                                            ;
+                                                            term.echo(row);
+                                                        }
+                                                    }
+                                                },
+                                                error: function (xhr, error, errorThrown) {
+                                                    console.log($(xhr.responseText)[3].innerHTML);
+                                                    term.error('ERROR : ' + $(xhr.responseText)[3].innerHTML);
+                                                    term.resume();
+                                                }
+                                            }); //end of ajax
 
-                                </pre>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+                            }
+                            ;
+                        }, {
+                                                        greetings: "Welcome to interactive Spark SQL shell\n" +
+                                                                   "This interactive shell lets you execute Spark SQL commands against a local Spark cluster \n" +
+                                                                   "Initializing Spark client...",
+                                                        prompt: "SparkSQL>",
+                                                        onBlur: function () {
+                                                            // prevent loosing focus
+                                                            return false;
+                                                        }
+                                                    });
+                    })
+                    ;
 
-            <br/><br/>
-
-            <table class="styledLeft">
-                <thead>
-                <tr>
-                    <th>Type your Spark query below</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>
-                        <textarea id="queryPane" rows="5"
-                                  style="margin-top:5px;margin-bottom:5px;width:100%"></textarea>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="buttonRow">
-                        <input type="button" value="Reset" id="btnReset" onclick="resetQueryPane()">
-                        <input type="button" value="Execute!" id="btnSubmit"
-                               onclick="submitQuery()">
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-
+                </script>
+            </div>
 
         </div>
     </div>
-
-    <script type="text/javascript">
-
-        function resetQueryPane() {
-            document.getElementById("queryPane").value = "";
-        }
-
-        function submitQuery() {
-            var resultsPane = document.getElementById("resultsPane");
-            var query = document.getElementById("queryPane").value;
-
-            jQuery.ajax({
-
-                            url: '../spark-console/execute_spark_ajaxprocessor.jsp',
-                            type: 'POST',
-                            data: {
-                                'query': query
-                            },
-                            dataType: 'json',
-                            success: function (data) {
-                                // alert('Data: '+data.response.items.length);
-
-                                var resultDiv = document.createElement("div");
-                                resultDiv.className = "response";
-                                resultDiv.appendChild(document.createTextNode(data.meta.responseMessage));
-                                resultsPane.appendChild(resultDiv);
-                                resultsPane.appendChild(document.createElement("br"));
-
-                                resultsPane.scrollTop = resultsPane.scrollHeight;
-
-                                var results = data.response.items;
-                                if (!results.isEmpty) {
-                                    var columns = data.meta.columns;
-
-                                    var table = document.createElement('table');
-
-                                    //append table headers
-                                    var header = document.createElement('tr');
-                                    for (var i = 0; i < columns.length; i++) {
-                                        var td = document.createElement('td');
-                                        var text = document.createTextNode(columns[i]);
-
-                                        td.appendChild(text);
-                                        header.appendChild(td);
-                                    }
-                                    table.appendChild(header);
-
-                                    for (var i = 0; i < results.length; i++) {
-                                        var element = results[i];
-
-
-                                        var tr = document.createElement('tr');
-
-                                        for (var j = 0; j < columns.length; j++) {
-                                            var td = document.createElement('td');
-                                            var text = document.createTextNode(element[j]);
-
-                                            td.appendChild(text);
-                                            tr.appendChild(td);
-                                        }
-                                        ;
-                                        table.appendChild(tr);
-                                    }
-
-                                    resultsPane.appendChild(table);
-                                    resultsPane.appendChild(document.createElement("br"));
-
-
-                                    resultsPane.scrollTop = resultsPane.scrollHeight;
-                                }
-                            },
-                            error: function (xhr, error, errorThrown) {
-
-                                var errorDiv = document.createElement("div");
-                                var errorMsg = xhr.responseText;
-                                var errorText = document.createTextNode("ERROR : " + $(errorMsg)[6].innerText);
-
-//                                $(errorDiv).addClass("error");
-                                errorDiv.style.color = "#ff0000";
-                                errorDiv.appendChild(errorText);
-
-                                resultsPane.appendChild(errorDiv);
-                                resultsPane.appendChild(document.createElement("br"));
-
-                                resultsPane.scrollTop = resultsPane.scrollHeight;
-                            }
-
-                        }); //end of ajax
-
-        }
-
-
-    </script>
-
 
 </fmt:bundle>

@@ -95,11 +95,11 @@ public class GenericUtils {
             /* column name length value + data type (including null) */
             count += Integer.SIZE / 8 + 1;
             /* column name */
-            count += name.length();
+            count += name.getBytes().length;
             if (value instanceof String) {
                 /* string length + value */
                 count += Integer.SIZE / 8;
-                count += ((String) value).length();
+                count += ((String) value).getBytes().length;
             } else if (value instanceof Long) {
                 count += Long.SIZE / 8;
             } else if (value instanceof Double) {
