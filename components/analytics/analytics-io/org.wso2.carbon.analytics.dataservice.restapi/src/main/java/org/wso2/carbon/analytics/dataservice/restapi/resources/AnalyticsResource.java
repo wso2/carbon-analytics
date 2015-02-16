@@ -52,8 +52,6 @@ import org.wso2.carbon.analytics.datasource.core.RecordGroup;
  * AnalyticsDataService.
  */
 @Path("/")
-@Consumes({ MediaType.APPLICATION_JSON })
-@Produces({ MediaType.APPLICATION_JSON })
 public class AnalyticsResource extends AbstractResource {
 
 	private static final int DEFAULT_START_INDEX = 0;
@@ -70,6 +68,8 @@ public class AnalyticsResource extends AbstractResource {
 	 */
 	@POST
 	@Path("tables")
+	@Consumes({ MediaType.APPLICATION_JSON})
+	@Produces({ MediaType.APPLICATION_JSON })
 	public Response createTable(TableBean tableBean) throws AnalyticsException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
@@ -94,6 +94,7 @@ public class AnalyticsResource extends AbstractResource {
 	 */
 	@GET
 	@Path("tables")
+	@Produces({ MediaType.APPLICATION_JSON })
 	public Response listTables() throws AnalyticsException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
@@ -116,6 +117,8 @@ public class AnalyticsResource extends AbstractResource {
 	 */
 	@DELETE
 	@Path("tables")
+	@Consumes({ MediaType.APPLICATION_JSON})
+	@Produces({ MediaType.APPLICATION_JSON })
 	public Response deleteTable(TableBean tableBean) throws AnalyticsException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
@@ -145,6 +148,7 @@ public class AnalyticsResource extends AbstractResource {
 	 * @throws AnalyticsException
 	 */
 	@DELETE
+	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}/{timeFrom}/{timeTo}")
 	public Response deleteRecords(@PathParam("tableName") String tableName,
 	                              @PathParam("timeFrom") long timeFrom,
@@ -176,6 +180,8 @@ public class AnalyticsResource extends AbstractResource {
 	 * @throws AnalyticsTableNotAvailableException
 	 */
 	@DELETE
+	@Consumes({ MediaType.APPLICATION_JSON})
+	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}")
 	public Response deleteRecordsByIds(@PathParam("tableName") String tableName, List<String> ids)
 	                                          throws AnalyticsException, AnalyticsTableNotAvailableException {
@@ -203,6 +209,7 @@ public class AnalyticsResource extends AbstractResource {
 	 * @throws AnalyticsTableNotAvailableException
 	 */
 	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}/recordcount")
 	public Response getRecordCount(@PathParam("tableName") String tableName)
 	                                                                        throws AnalyticsTableNotAvailableException,
@@ -238,6 +245,7 @@ public class AnalyticsResource extends AbstractResource {
 	 * @throws AnalyticsTableNotAvailableException
 	 */
 	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}/{from}/{to}/{start}/{count}")
 	public Response getRecords(@PathParam("tableName") String tableName,
 	                           @PathParam("from") long timeFrom, @PathParam("to") long timeTo,
@@ -279,6 +287,7 @@ public class AnalyticsResource extends AbstractResource {
 	 * @throws AnalyticsTableNotAvailableException
 	 */
 	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}/{from}/{to}/{start}")
 	public Response getRecords(@PathParam("tableName") String tableName,
 	                           @PathParam("from") long timeFrom, @PathParam("to") long timeTo,
@@ -301,6 +310,7 @@ public class AnalyticsResource extends AbstractResource {
 	 * @throws AnalyticsTableNotAvailableException
 	 */
 	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}/{from}/{to}")
 	public Response getRecords(@PathParam("tableName") String tableName,
 	                           @PathParam("from") long timeFrom, @PathParam("to") long timeTo)
@@ -321,6 +331,7 @@ public class AnalyticsResource extends AbstractResource {
 	 * @throws AnalyticsTableNotAvailableException
 	 */
 	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}/{from}")
 	public Response getRecords(@PathParam("tableName") String tableName,
 	                           @PathParam("from") long timeFrom)
@@ -339,6 +350,7 @@ public class AnalyticsResource extends AbstractResource {
 	 * @throws AnalyticsTableNotAvailableException
 	 */
 	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}")
 	public Response getRecords(@PathParam("tableName") String tableName)
 	                                                                    throws AnalyticsTableNotAvailableException,
@@ -356,6 +368,8 @@ public class AnalyticsResource extends AbstractResource {
 	 * @throws AnalyticsTableNotAvailableException
 	 */
 	@POST
+	@Consumes({ MediaType.APPLICATION_JSON})
+	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("records")
 	public Response insertRecords(List<RecordBean> recordBeans)
 	                                                           throws AnalyticsTableNotAvailableException,
@@ -385,6 +399,8 @@ public class AnalyticsResource extends AbstractResource {
 	 *             , AnalyticsTableNotAvailableException
 	 */
 	@PATCH
+	@Consumes({ MediaType.APPLICATION_JSON})
+	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("records")
 	public Response updateRecords(List<RecordBean> recordBeans) throws AnalyticsException,
 	                                                           AnalyticsTableNotAvailableException {
@@ -415,6 +431,8 @@ public class AnalyticsResource extends AbstractResource {
 	 * @throws AnalyticsException
 	 */
 	@POST
+	@Consumes({ MediaType.APPLICATION_JSON})
+	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}/indices")
 	public Response setIndices(@PathParam("tableName") String tableName,
 	                           Map<String, IndexTypeBean> columnsBean) throws AnalyticsException,
@@ -444,6 +462,7 @@ public class AnalyticsResource extends AbstractResource {
 	 *             , AnalyticsIndexException
 	 */
 	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}/indices")
 	public Response getIndices(@PathParam("tableName") String tableName) throws AnalyticsException,
 	                                                                    AnalyticsIndexException {
@@ -471,6 +490,7 @@ public class AnalyticsResource extends AbstractResource {
 	 * @throws AnalyticsException
 	 */
 	@DELETE
+	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}/indices")
 	public Response clearIndices(@PathParam("tableName") String tableName)
 	                                                                      throws AnalyticsException,
@@ -496,6 +516,8 @@ public class AnalyticsResource extends AbstractResource {
 	 *             , AnalyticsIndexException
 	 */
 	@POST
+	@Consumes({ MediaType.APPLICATION_JSON})
+	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("search")
 	public Response search(QueryBean queryBean) throws AnalyticsException, AnalyticsIndexException {
 		int tenantId = -1234;
@@ -535,6 +557,8 @@ public class AnalyticsResource extends AbstractResource {
 	 * @throws AnalyticsException
 	 */
 	@POST
+	@Consumes({ MediaType.APPLICATION_JSON})
+	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("search_count")
 	public Response searchCount(QueryBean queryBean) throws AnalyticsException,
 	                                                AnalyticsIndexException {
