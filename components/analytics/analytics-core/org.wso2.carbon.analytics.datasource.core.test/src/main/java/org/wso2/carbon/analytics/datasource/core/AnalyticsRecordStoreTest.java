@@ -226,7 +226,7 @@ public class AnalyticsRecordStoreTest {
         List<Record> recordsIn = GenericUtils.listRecords(this.analyticsRS, this.analyticsRS.get(15, "T1", null, -1, -1, 0, -1));
         Assert.assertEquals(new HashSet<Record>(recordsIn), new HashSet<Record>(records));
         records = this.generateRecordsForUpdate(records);
-        this.analyticsRS.update(records);
+        this.analyticsRS.insert(records);
         recordsIn = GenericUtils.listRecords(this.analyticsRS, this.analyticsRS.get(15, "T1", null, -1, -1, 0, -1));
         Assert.assertEquals(new HashSet<Record>(recordsIn), new HashSet<Record>(records));
         this.cleanupT1();

@@ -18,7 +18,6 @@
  */
 package org.wso2.carbon.analytics.dataservice;
 
-import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -120,12 +119,6 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     public void insert(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
         this.getAnalyticsRecordStore().insert(records);
         this.getIndexer().insert(records);
-    }
-
-    @Override
-    public void update(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
-        this.getAnalyticsRecordStore().update(records);
-        this.getIndexer().update(records);
     }
     
     @Override

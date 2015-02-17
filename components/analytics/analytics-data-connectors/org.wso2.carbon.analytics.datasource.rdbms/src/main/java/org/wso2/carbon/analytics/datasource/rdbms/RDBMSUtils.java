@@ -77,11 +77,27 @@ public class RDBMSUtils {
             }
             JAXBContext ctx = JAXBContext.newInstance(RDBMSQueryConfiguration.class);
             Unmarshaller unmarshaller = ctx.createUnmarshaller();
-            return (RDBMSQueryConfiguration) unmarshaller.unmarshal(confFile);
+            RDBMSQueryConfiguration conf = (RDBMSQueryConfiguration) unmarshaller.unmarshal(confFile);
+            validateRDBMSQueryConfiguration(conf);
+            return conf;
         } catch (JAXBException e) {
             throw new AnalyticsException(
                     "Error in processing RDBMS query configuration: " + e.getMessage(), e);
         }
+    }
+    
+    private static void validateRDBMSQueryConfiguration(RDBMSQueryConfiguration conf) throws AnalyticsException {
+        for (RDBMSQueryConfigurationEntry entry : conf.getDatabases()) {
+            if (isEmpty(entry.getRecordMergeQuery()) && (isEmpty(entry.getRecordInsertQuery()) || 
+                    isEmpty(entry.getRecordUpdateQuery()))) {
+                throw new AnalyticsException("RDBMS configuration database entry: " + 
+                        entry.getDatabaseName() + ", either record merge query or both insert/update queries must be provided");
+            }
+        }
+    }
+    
+    private static boolean isEmpty(String field) {
+        return (field == null || field.trim().length() == 0);
     }
     
     public static void cleanupConnection(ResultSet rs, Statement stmt, Connection conn) {

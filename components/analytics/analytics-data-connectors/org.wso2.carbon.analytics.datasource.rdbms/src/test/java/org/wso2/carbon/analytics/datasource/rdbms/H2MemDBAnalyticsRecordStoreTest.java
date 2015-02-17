@@ -65,7 +65,8 @@ public class H2MemDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
         recordTableDeleteQueries[1] = "DROP INDEX IF EXISTS {{TABLE_NAME}}_TIMESTAMP";        
         conf.setRecordTableInitQueries(recordTableInitQueries);
         conf.setRecordTableDeleteQueries(recordTableDeleteQueries);
-        conf.setRecordInsertQuery("INSERT INTO {{TABLE_NAME}} (record_id, timestamp, data) VALUES (?, ?, ?)");
+        conf.setRecordInsertQuery("INSERT INTO {{TABLE_NAME}} (timestamp, data, record_id) VALUES (?, ?, ?)");
+        conf.setRecordUpdateQuery("UPDATE {{TABLE_NAME}} SET timestamp = ?, data = ? WHERE record_id = ?");
         conf.setRecordRetrievalQuery("SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE timestamp >= ? AND timestamp < ? LIMIT ?,?");
         conf.setRecordRetrievalWithIdsQuery("SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})");
         conf.setRecordDeletionWithIdsQuery("DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})");

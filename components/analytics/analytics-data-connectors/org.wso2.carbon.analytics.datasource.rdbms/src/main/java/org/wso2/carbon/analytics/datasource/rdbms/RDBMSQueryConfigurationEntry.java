@@ -41,7 +41,11 @@ public class RDBMSQueryConfigurationEntry {
     
     private String fsTablesCheckQuery;
     
+    private String recordMergeQuery;
+    
     private String recordInsertQuery;
+    
+    private String recordUpdateQuery;
     
     private String recordRetrievalQuery;
     
@@ -128,12 +132,28 @@ public class RDBMSQueryConfigurationEntry {
         this.fsTablesCheckQuery = fsTablesCheckQuery;
     }
     
+    public String getRecordMergeQuery() {
+        return recordMergeQuery;
+    }
+    
+    public void setRecordMergeQuery(String recordMergeQuery) {
+        this.recordMergeQuery = recordMergeQuery;
+    }
+    
     public String getRecordInsertQuery() {
         return recordInsertQuery;
     }
     
     public void setRecordInsertQuery(String recordInsertQuery) {
         this.recordInsertQuery = recordInsertQuery;
+    }
+    
+    public String getRecordUpdateQuery() {
+        return recordUpdateQuery;
+    }
+    
+    public void setRecordUpdateQuery(String recordUpdateQuery) {
+        this.recordUpdateQuery = recordUpdateQuery;
     }
     
     public String getRecordRetrievalQuery() {

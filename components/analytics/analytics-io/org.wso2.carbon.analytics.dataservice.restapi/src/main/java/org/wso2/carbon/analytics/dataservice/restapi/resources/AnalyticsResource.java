@@ -417,7 +417,7 @@ public class AnalyticsResource extends AbstractResource {
 			}
 		}
 		List<Record> records = Utils.getRecords(tenantId, recordBeans);
-		analyticsDataService.update(records);
+		analyticsDataService.insert(records);
 		return handleResponse(ResponseStatus.SUCCESS, "Successfully updated records");
 	}
 

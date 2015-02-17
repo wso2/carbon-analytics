@@ -21,8 +21,6 @@ package org.wso2.carbon.analytics.spark.ui.client;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.spark.sql.api.java.StructField;
 import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionContext;
 import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionException;
@@ -34,8 +32,6 @@ import java.util.List;
  * This is client will be talking to the backend spark server and output a result as a JSON string
  */
 public class SparkExecutionClient {
-
-    private static Log log = LogFactory.getLog(SparkExecutionClient.class);
 
     public String execute(int tenantID, String query)
             throws AnalyticsExecutionException, RuntimeException {

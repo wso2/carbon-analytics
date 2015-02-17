@@ -133,27 +133,6 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
     private String calculateRecordIdentity(Record record) {
         return this.generateTargetTableName(record.getTenantId(), record.getTableName());
     }
-
-    @Override
-    public void update(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
-        Connection conn = null;
-        try {
-            conn = this.getConnection(false);
-            Map<String, List<Record>> recordBatches = this.generateRecordBatches(records);
-            for (List<Record> batch : recordBatches.values()) {
-                this.deleteRecordsSimilar(conn, batch);
-            }
-            for (List<Record> batch : recordBatches.values()) {
-                this.addRecordsSimilar(conn, batch);
-            }
-            conn.commit();
-        } catch (SQLException e) {
-            RDBMSUtils.rollbackConnection(conn);
-            throw new AnalyticsException("Error in updating records: " + e.getMessage(), e);
-        } finally {
-            RDBMSUtils.cleanupConnection(null, null, conn);
-        }
-    }
     
     private Map<String, List<Record>> generateRecordBatches(List<Record> records) {
         /* if the records have identities (unique table category and name) as the following
@@ -202,14 +181,29 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         Record firstRecord = records.get(0);
         int tenantId = firstRecord.getTenantId();
         String tableName = firstRecord.getTableName();
-        String query = this.getRecordInsertSQL(tenantId, tableName);
+        if (this.getRecordMergeSQL(tenantId, tableName) != null) {
+            this.mergeRecordsSimilar(conn, records, tenantId, tableName);
+        } else {
+            this.insertAndUpdateRecordsSimilar(conn, records, tenantId, tableName);
+        }
+    }
+    
+    private void populateStatementForAdd(PreparedStatement stmt, 
+            Record record) throws SQLException, AnalyticsException {        
+        stmt.setLong(1, record.getTimestamp());
+        stmt.setBlob(2, new ByteArrayInputStream(GenericUtils.encodeRecordValues(record.getValues())));
+        stmt.setString(3, record.getId());
+    }
+    
+    private void mergeRecordsSimilar(Connection conn, 
+            List<Record> records, int tenantId, String tableName) throws SQLException, 
+            AnalyticsException, AnalyticsTableNotAvailableException {
+        String query = this.getRecordMergeSQL(tenantId, tableName);
         PreparedStatement stmt = null;
         try {
             stmt = conn.prepareStatement(query);
             for (Record record : records) {
-                stmt.setString(1, record.getId());
-                stmt.setLong(2, record.getTimestamp());
-                stmt.setBlob(3, new ByteArrayInputStream(GenericUtils.encodeRecordValues(record.getValues())));
+                this.populateStatementForAdd(stmt, record);
                 stmt.addBatch();
             }
             stmt.executeBatch();
@@ -224,9 +218,76 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         }
     }
     
-    private String getRecordInsertSQL(int tenantId, String tableName) {
-    	String query = this.getQueryConfiguration().getRecordInsertQuery();
+    private void insertAndUpdateRecordsSimilar(Connection conn, 
+            List<Record> records, int tenantId, String tableName) throws SQLException, 
+            AnalyticsException, AnalyticsTableNotAvailableException {
+        try {
+            this.insertBatchRecordsSimilar(conn, records, tenantId, tableName);
+        } catch (SQLException e) {
+            /* batch insert failed, maybe because one of the records were already there,
+             * lets try to sequentially insert/update */
+            this.insertAndUpdateRecordsSimilarSequentially(conn, records, tenantId, tableName);
+        } catch (AnalyticsException e) {
+            throw e;
+        }
+    }
+    
+    private void insertAndUpdateRecordsSimilarSequentially(Connection conn, 
+            List<Record> records, int tenantId, String tableName) throws SQLException, AnalyticsException {
+        String insertQuery = this.getRecordInsertSQL(tenantId, tableName);
+        String updateQuery = this.getRecordUpdateSQL(tenantId, tableName);
+        PreparedStatement stmt = null;
+        stmt = conn.prepareStatement(insertQuery);
+        for (Record record : records) {            
+            this.populateStatementForAdd(stmt, record);
+            try {
+                stmt.executeUpdate();
+            } catch (SQLException e) {
+                /* maybe the record is already there, lets try to update */
+                stmt.close();
+                stmt = conn.prepareStatement(updateQuery);
+                this.populateStatementForAdd(stmt, record);
+                stmt.executeUpdate();
+            }
+        }        
+    }
+    
+    private void insertBatchRecordsSimilar(Connection conn, 
+            List<Record> records, int tenantId, String tableName) throws SQLException, 
+            AnalyticsException, AnalyticsTableNotAvailableException {
+        String query = this.getRecordInsertSQL(tenantId, tableName);
+        PreparedStatement stmt = null;
+        try {
+            stmt = conn.prepareStatement(query);
+            for (Record record : records) {
+                this.populateStatementForAdd(stmt, record);
+                stmt.addBatch();
+            }
+            stmt.executeBatch();
+        } catch (SQLException e) {
+            if (!this.tableExists(tenantId, tableName)) {
+                throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+            } else {
+                throw e;
+            }
+        } finally {
+            RDBMSUtils.cleanupConnection(null, stmt, null);
+        }
+    }
+    
+    private String getRecordMergeSQL(int tenantId, String tableName) {
+    	String query = this.getQueryConfiguration().getRecordMergeQuery();
     	return translateQueryWithTableInfo(query, tenantId, tableName);
+    }
+    
+    private String getRecordInsertSQL(int tenantId, String tableName) {
+        String query = this.getQueryConfiguration().getRecordInsertQuery();
+        return translateQueryWithTableInfo(query, tenantId, tableName);
+    }
+    
+    private String getRecordUpdateSQL(int tenantId, String tableName) {
+        String query = this.getQueryConfiguration().getRecordUpdateQuery();
+        return translateQueryWithTableInfo(query, tenantId, tableName);
     }
 
     @Override
@@ -360,21 +421,6 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         }
     }
     
-    private void deleteRecordsSimilar(Connection conn, List<Record> records) 
-            throws AnalyticsException, AnalyticsTableNotAvailableException {
-        if (records.size() == 0) {
-            return;
-        }
-        Record firstRecord = records.get(0);
-        int tenantId = firstRecord.getTenantId();
-        String tableName = firstRecord.getTableName();
-        List<String> ids = new ArrayList<String>(records.size());
-        for (Record record : records) {
-            ids.add(record.getId());
-        }
-        this.delete(conn, tenantId, tableName, ids);
-    }
-    
     private void delete(Connection conn, int tenantId, String tableName, 
             List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
         String sql = this.generateRecordDeletionRecordsWithIdsQuery(tenantId, tableName, ids.size());
@@ -410,6 +456,9 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
     }
     
     private String translateQueryWithTableInfo(String query, int tenantId, String tableName) {
+        if (query == null) {
+            return null;
+        }
         return query.replace(TABLE_NAME_PLACEHOLDER, this.generateTargetTableName(tenantId, tableName));
     }
     
