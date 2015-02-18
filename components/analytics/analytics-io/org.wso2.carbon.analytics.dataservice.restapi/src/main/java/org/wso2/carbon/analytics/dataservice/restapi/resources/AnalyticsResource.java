@@ -26,6 +26,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -85,6 +86,32 @@ public class AnalyticsResource extends AbstractResource {
 		return handleResponse(ResponseStatus.CREATED,
 		                      "Successfully created table: " + tableBean.getTableName() +
 		                              " for tenantId: " + tenantId);
+	}
+	
+	/**
+	 * Check if the table Exists
+	 * @return the response
+	 * @throws AnalyticsException
+	 */
+	@GET
+	@Path("table_exists")
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response tableExists(@QueryParam("tableName")String tableName) throws AnalyticsException {
+		int tenantId = -1234;
+		if (logger.isDebugEnabled()) {
+			logger.debug("Invoking listTables for tenantId :" + tenantId);
+		}
+		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
+		boolean tableExists = analyticsDataService.tableExists(tenantId, tableName);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Table's Existance : " + tableExists);
+		}
+		if(!tableExists) {
+			return handleResponse(ResponseStatus.NON_EXISTENT,
+			                      "Table : " + tableName + " does not exist.");
+		}
+		return handleResponse(ResponseStatus.SUCCESS,
+		                      "Table : " + tableName + " exists.");
 	}
 
 	/**
