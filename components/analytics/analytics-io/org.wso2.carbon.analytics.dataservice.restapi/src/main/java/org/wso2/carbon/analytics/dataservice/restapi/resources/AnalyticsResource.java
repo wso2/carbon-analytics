@@ -62,8 +62,7 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Creates the table.
-	 * @param tableBean
-	 *            the table name as a json object
+	 * @param tableBean the table name as a json object
 	 * @return the response
 	 * @throws AnalyticsException
 	 */
@@ -137,7 +136,6 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Delete table.
-	 *
 	 * @param tableBean the table name as a json object
 	 * @return the response
 	 * @throws AnalyticsException the analytics exception
@@ -165,12 +163,9 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Delete records either the time range, but not both
-	 * @param tableName
-	 *            the table name
-	 * @param timeFrom
-	 *            the time from
-	 * @param timeTo
-	 *            the time to
+	 * @param tableName  the table name
+	 * @param timeFrom the time from
+	 * @param timeTo the time to
 	 * @return the response
 	 * @throws AnalyticsException
 	 */
@@ -198,10 +193,8 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Delete records either by ids
-	 * @param tableName
-	 *            the table name
-	 * @param ids
-	 *            the ids
+	 * @param tableName the table name
+	 * @param ids the ids
 	 * @return the response
 	 * @throws AnalyticsException
 	 * @throws AnalyticsTableNotAvailableException
@@ -229,8 +222,7 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Gets the record count.
-	 * @param tableName
-	 *            the table name
+	 * @param tableName the table name
 	 * @return the record count
 	 * @throws AnalyticsException
 	 * @throws AnalyticsTableNotAvailableException
@@ -257,16 +249,11 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Gets the records.
-	 * @param tableName
-	 *            the table name
-	 * @param timeFrom
-	 *            the start time
-	 * @param timeTo
-	 *            the end time
-	 * @param recordsFrom
-	 *            the starting record
-	 * @param count
-	 *            the count
+	 * @param tableName the table name
+	 * @param timeFrom the start time
+	 * @param timeTo the end time
+	 * @param recordsFrom the starting record
+	 * @param count the count
 	 * @return the record groups
 	 * @throws AnalyticsException
 	 * @throws AnalyticsTableNotAvailableException
@@ -303,12 +290,9 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Gets the records.
-	 * @param tableName
-	 *            the table name
-	 * @param timeFrom
-	 *            the time from
-	 * @param timeTo
-	 *            the time to
+	 * @param tableName the table name
+	 * @param timeFrom the time from
+	 * @param timeTo  the time to
 	 * @return the records
 	 * @throws AnalyticsException
 	 * @throws AnalyticsTableNotAvailableException
@@ -326,12 +310,9 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Gets the records.
-	 * @param tableName
-	 *            the table name
-	 * @param timeFrom
-	 *            the time from
-	 * @param timeTo
-	 *            the time to
+	 * @param tableName the table name
+	 * @param timeFrom the time from
+	 * @param timeTo the time to
 	 * @return the records
 	 * @throws AnalyticsException
 	 * @throws AnalyticsTableNotAvailableException
@@ -347,12 +328,9 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Gets the records.
-	 * @param tableName
-	 *            the table name
-	 * @param timeFrom
-	 *            the time from
-	 * @param timeTo
-	 *            the time to
+	 * @param tableName  the table name
+	 * @param timeFrom the time from
+	 * @param timeTo the time to
 	 * @return the records
 	 * @throws AnalyticsException
 	 * @throws AnalyticsTableNotAvailableException
@@ -370,8 +348,7 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Gets all the records.
-	 * @param tableName
-	 *            the table name
+	 * @param tableName the table name
 	 * @return the records
 	 * @throws AnalyticsException
 	 * @throws AnalyticsTableNotAvailableException
@@ -388,8 +365,7 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Inserts a list of records.
-	 * @param recordBeans
-	 *            the list of the record beans
+	 * @param recordBeans the list of the record beans
 	 * @return the response
 	 * @throws AnalyticsException
 	 * @throws AnalyticsTableNotAvailableException
@@ -419,8 +395,7 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Updates a list of records.
-	 * @param recordBeans
-	 *            the record beans
+	 * @param recordBeans  the record beans
 	 * @return the response
 	 * @throws AnalyticsException
 	 *             , AnalyticsTableNotAvailableException
@@ -450,10 +425,8 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Sets the indices.
-	 * @param tableName
-	 *            the table name
-	 * @param columnsBean
-	 *            the columns bean containing all the indices
+	 * @param tableName the table name
+	 * @param columnsBean the columns bean containing all the indices
 	 * @return the response
 	 * @throws AnalyticsException
 	 */
@@ -481,8 +454,7 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Gets the indices.
-	 * @param tableName
-	 *            the table name
+	 * @param tableName the table name
 	 * @return the indices
 	 * @throws AnalyticsException
 	 *             , AnalyticsIndexException
@@ -508,8 +480,7 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Clear indices.
-	 * @param tableName
-	 *            the table name
+	 * @param tableName the table name
 	 * @return the response
 	 * @throws AnalyticsException
 	 */
@@ -532,8 +503,7 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Search records.
-	 * @param queryBean
-	 *            the query bean
+	 * @param queryBean the query bean
 	 * @return the response
 	 * @throws AnalyticsException
 	 *             , AnalyticsIndexException
@@ -570,9 +540,8 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Returns the search record count.
-	 * @param queryBean
-	 *            the query bean
-	 * @return the response
+	 * @param queryBean the query bean
+	 * @return the {@link Response}response
 	 * @throws AnalyticsException
 	 */
 	@POST
