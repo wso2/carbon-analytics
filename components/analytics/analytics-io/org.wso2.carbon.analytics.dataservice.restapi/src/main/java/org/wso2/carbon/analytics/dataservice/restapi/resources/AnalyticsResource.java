@@ -469,7 +469,6 @@ public class AnalyticsResource extends AbstractResource {
 			logger.debug("Invoking setIndices for tenantId :" + tenantId + " tableName : " +
 			             tableName);
 		}
-
 		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
 		Map<String, IndexType> columns = Utils.createIndexTypeMap(columnsBean);
 		if (logger.isDebugEnabled()) {
@@ -498,9 +497,7 @@ public class AnalyticsResource extends AbstractResource {
 			logger.debug("Invoking getIndices for tenantId :" + tenantId + " tableName : " +
 			             tableName);
 		}
-
 		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
-
 		Map<String, IndexType> columns = analyticsDataService.getIndices(tenantId, tableName);
 		Map<String, IndexTypeBean> columnsBean = Utils.createIndexTypeBeanMap(columns);
 		if (logger.isDebugEnabled()) {
@@ -527,7 +524,6 @@ public class AnalyticsResource extends AbstractResource {
 			logger.debug("Invoking clearIndices for tenantId :" + tenantId + " tableName : " +
 			             tableName);
 		}
-
 		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
 		analyticsDataService.clearIndices(tenantId, tableName);
 		return handleResponse(ResponseStatus.SUCCESS, "Successfully cleared indices in table: " +
@@ -553,19 +549,15 @@ public class AnalyticsResource extends AbstractResource {
 			             " tableName : " + queryBean.getTableName());
 		}
 		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
-		List<SearchResultEntry> searchResults =
-		                                        analyticsDataService.search(tenantId,
+		List<SearchResultEntry> searchResults = analyticsDataService.search(tenantId,
 		                                                                    queryBean.getTableName(),
 		                                                                    queryBean.getLanguage(),
 		                                                                    queryBean.getQuery(),
 		                                                                    queryBean.getStart(),
 		                                                                    queryBean.getCount());
 		List<String> ids = Utils.getRecordIds(searchResults);
-		RecordGroup[] recordGroups =
-		                             analyticsDataService.get(-1234, queryBean.getTableName(),
-		                                                      null, ids);
-		List<RecordBean> recordBeans =
-		                               Utils.createRecordBeans(AnalyticsDSUtils.listRecords(analyticsDataService,
+		RecordGroup[] recordGroups = analyticsDataService.get(-1234, queryBean.getTableName(), null, ids);
+		List<RecordBean> recordBeans = Utils.createRecordBeans(AnalyticsDSUtils.listRecords(analyticsDataService,
 		                                                                                    recordGroups));
 		if (logger.isDebugEnabled()) {
 			for (RecordBean recordBean : recordBeans) {
@@ -596,8 +588,7 @@ public class AnalyticsResource extends AbstractResource {
 		}
 
 		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
-		int result =
-		             analyticsDataService.searchCount(tenantId, queryBean.getTableName(),
+		int result = analyticsDataService.searchCount(tenantId, queryBean.getTableName(),
 		                                              queryBean.getLanguage(), queryBean.getQuery());
 		if (logger.isDebugEnabled()) {
 			logger.debug("Search count : " + result);
