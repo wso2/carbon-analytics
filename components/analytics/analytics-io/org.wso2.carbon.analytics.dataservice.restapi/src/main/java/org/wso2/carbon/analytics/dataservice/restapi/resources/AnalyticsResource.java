@@ -62,8 +62,8 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Creates the table.
-	 * @param tableName
-	 *            the table name
+	 * @param tableBean
+	 *            the table name as a json object
 	 * @return the response
 	 * @throws AnalyticsException
 	 */
@@ -137,10 +137,10 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Delete table.
-	 * @param tableName
-	 *            the table name
+	 *
+	 * @param tableBean the table name as a json object
 	 * @return the response
-	 * @throws AnalyticsException
+	 * @throws AnalyticsException the analytics exception
 	 */
 	@DELETE
 	@Path("tables")
