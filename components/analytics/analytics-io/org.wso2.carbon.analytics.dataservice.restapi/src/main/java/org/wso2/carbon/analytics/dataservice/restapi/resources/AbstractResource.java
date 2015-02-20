@@ -19,6 +19,7 @@ import org.wso2.carbon.analytics.dataservice.restapi.Constants;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.ResponseBean;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 /**
  * The Abstract Class AbstractResource.
@@ -38,11 +39,11 @@ public abstract class AbstractResource {
 		switch (responseStatus) {
 			case CONFLICT:
 				ResponseBean conflicted = getResponseMessage(Constants.Status.FAILED, message);
-				response = Response.status(409).entity(conflicted).build();
+				response = Response.status(Status.CONFLICT.getStatusCode()).entity(conflicted).build();
 				break;
 			case CREATED:
 				ResponseBean created = getResponseMessage(Constants.Status.CREATED, message);
-				response = Response.status(201).entity(created).build();
+				response = Response.status(Status.CREATED.getStatusCode()).entity(created).build();
 				break;
 			case SUCCESS:
 				ResponseBean success = getResponseMessage(Constants.Status.SUCCESS, message);
@@ -54,17 +55,17 @@ public abstract class AbstractResource {
 				break;
 			case INVALID:
 				ResponseBean invalid = getResponseMessage(Constants.Status.FAILED, message);
-				response = Response.status(400).entity(invalid).build();
+				response = Response.status(Status.BAD_REQUEST.getStatusCode()).entity(invalid).build();
 				break;
 			case FORBIDDEN:
 				ResponseBean forbidden = getResponseMessage(Constants.Status.FAILED, message);
-				response = Response.status(403).entity(forbidden).build();
+				response = Response.status(Status.FORBIDDEN.getStatusCode()).entity(forbidden).build();
 				break;
 			case NON_EXISTENT:
 				ResponseBean nonExistent =
 				                           getResponseMessage(Constants.Status.NON_EXISTENT,
 				                                              message);
-				response = Response.status(404).entity(nonExistent).build();
+				response = Response.status(Status.NOT_FOUND.getStatusCode()).entity(nonExistent).build();
 				break;
 			default:
 				response = Response.noContent().build();
