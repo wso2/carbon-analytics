@@ -18,7 +18,7 @@
  */
 package org.wso2.carbon.analytics.datasource.rdbms;
 
-import junit.framework.Assert;
+import org.testng.Assert;
 
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;

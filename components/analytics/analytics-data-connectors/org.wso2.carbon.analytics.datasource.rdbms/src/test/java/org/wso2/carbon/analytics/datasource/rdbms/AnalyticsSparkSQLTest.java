@@ -18,26 +18,20 @@
  */
 package org.wso2.carbon.analytics.datasource.rdbms;
 
-import java.io.IOException;
-import java.util.List;
-
-import javax.naming.NamingException;
-
-import junit.framework.Assert;
-
+import org.testng.Assert;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceImpl;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStore;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
-import org.wso2.carbon.analytics.datasource.core.Record;
-import org.wso2.carbon.analytics.spark.core.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.datasource.core.*;
 import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionContext;
 import org.wso2.carbon.analytics.spark.core.AnalyticsQueryResult;
+import org.wso2.carbon.analytics.spark.core.AnalyticsServiceHolder;
+
+import javax.naming.NamingException;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * This class represents tests related to Spark SQL based analytics.
