@@ -182,7 +182,6 @@ public class AnalyticsResource extends AbstractResource {
 			             tableName);
 		}
 		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
-
 		if (logger.isDebugEnabled()) {
 			logger.debug("deleting the records from " + timeFrom + " to " + timeTo);
 		}
@@ -211,7 +210,6 @@ public class AnalyticsResource extends AbstractResource {
 			             tableName);
 		}
 		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
-
 		if (logger.isDebugEnabled()) {
 			logger.debug("deleting the records for ids :" + ids);
 		}
@@ -239,7 +237,6 @@ public class AnalyticsResource extends AbstractResource {
 			             tenantId);
 		}
 		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
-
 		long recordCount = analyticsDataService.getRecordCount(tenantId, tableName);
 		if (logger.isDebugEnabled()) {
 			logger.debug("RecordCount for tableName: " + tableName + " is " + recordCount);
@@ -272,7 +269,6 @@ public class AnalyticsResource extends AbstractResource {
 		}
 		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
 		RecordGroup[] recordGroups;
-
 		recordGroups =
 		               analyticsDataService.get(tenantId, tableName, null, timeFrom, timeTo,
 		                                        recordsFrom, count);
@@ -410,7 +406,6 @@ public class AnalyticsResource extends AbstractResource {
 			logger.debug("Invoking updateRecords");
 		}
 		int tenantId = -1234;
-
 		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
 		if (logger.isDebugEnabled()) {
 			for (RecordBean recordBean : recordBeans) {
@@ -555,7 +550,6 @@ public class AnalyticsResource extends AbstractResource {
 			logger.debug("Invoking search count for tenantId :" + queryBean.getTenantId() +
 			             " tableName : " + queryBean.getTableName());
 		}
-
 		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
 		int result = analyticsDataService.searchCount(tenantId, queryBean.getTableName(),
 		                                              queryBean.getLanguage(), queryBean.getQuery());
