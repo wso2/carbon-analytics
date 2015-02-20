@@ -37,7 +37,9 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.indexing.IndexType;
 import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.restapi.Constants;
 import org.wso2.carbon.analytics.dataservice.restapi.Utils;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.CredentialBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.IndexTypeBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.QueryBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordBean;
@@ -47,6 +49,7 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.RecordGroup;
+import org.wso2.carbon.analytics.oauth.OAuthServiceClient;
 
 /**
  * The Class AnalyticsResource represents the REST APIs for
@@ -326,7 +329,6 @@ public class AnalyticsResource extends AbstractResource {
 	 * Gets the records.
 	 * @param tableName  the table name
 	 * @param timeFrom the time from
-	 * @param timeTo the time to
 	 * @return the records
 	 * @throws AnalyticsException
 	 * @throws AnalyticsTableNotAvailableException
@@ -493,7 +495,7 @@ public class AnalyticsResource extends AbstractResource {
 		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
 		analyticsDataService.clearIndices(tenantId, tableName);
 		return handleResponse(ResponseStatus.SUCCESS, "Successfully cleared indices in table: " +
-		                                              tableName + " for tenantId: " + tenantId);
+                                                      tableName + " for tenantId: " + tenantId);
 	}
 
 	/**
@@ -559,4 +561,16 @@ public class AnalyticsResource extends AbstractResource {
 		return Response.ok(result).build();
 	}
 
+    @POST
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    @Path(Constants.ResourcePath.GENERATE_TOKEN)
+    public Response getAccessToken(CredentialBean credentialBean) {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Request received to create OAuth access token to user:" + credentialBean.getUsername());
+        }
+        String token = OAuthServiceClient.createToken(credentialBean.getUsername(), credentialBean.getPassword());
+        return handleResponse(ResponseStatus.SUCCESS, token);
+    }
 }

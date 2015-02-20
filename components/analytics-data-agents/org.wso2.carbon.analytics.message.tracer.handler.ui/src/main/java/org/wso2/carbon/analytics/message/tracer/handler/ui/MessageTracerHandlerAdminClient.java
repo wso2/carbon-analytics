@@ -32,7 +32,7 @@ import java.util.ResourceBundle;
 public class MessageTracerHandlerAdminClient {
 
     private static final Log log = LogFactory.getLog(MessageTracerHandlerAdminClient.class);
-    private static final String BUNDLE = "org.wso2.carbon.bam.message.tracer.handler.ui.i18n.Resources";
+    private static final String BUNDLE = "org.wso2.carbon.analytics.message.tracer.handler.ui.i18n.Resources";
     private MessageTracerAdminStub stub;
     private ResourceBundle bundle;
 

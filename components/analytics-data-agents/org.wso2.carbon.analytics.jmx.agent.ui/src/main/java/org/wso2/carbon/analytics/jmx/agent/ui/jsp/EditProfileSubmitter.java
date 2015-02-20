@@ -1,4 +1,4 @@
-package org.wso2.carbon.bam.jmx.agent.ui.jsp;
+package org.wso2.carbon.analytics.jmx.agent.ui.jsp;
 
 /**
  * Created with IntelliJ IDEA.

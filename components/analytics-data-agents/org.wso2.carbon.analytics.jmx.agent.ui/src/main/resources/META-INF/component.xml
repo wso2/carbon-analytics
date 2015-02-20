@@ -21,7 +21,7 @@
         <menu>
             <id>test_menu</id>
             <i18n-key>MenuName</i18n-key>
-            <i18n-bundle>org.wso2.carbon.bam.jmx.agent.ui.i18n.Resources</i18n-bundle>
+            <i18n-bundle>org.wso2.carbon.analytics.jmx.agent.ui.i18n.Resources</i18n-bundle>
             <parent-menu>configure_menu</parent-menu>
             <link>../jmx-agent/index.jsp</link>
             <region>region1</region>

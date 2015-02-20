@@ -20,7 +20,7 @@ import org.wso2.carbon.core.RegistryResources;
 public class MessageTracerConstants {
 
     public static final String ACTIVITY_REG_PATH = RegistryResources.COMPONENTS
-                                                   + "org.wso2.carbon.bam.message.tracer.handler/tracing/";
+                                                   + "org.wso2.carbon.analytics.message.tracer.handler/tracing/";
 
     public static final String CLOUD_DEPLOYMENT_PROP = "IsCloudDeployment";
 
@@ -28,7 +28,7 @@ public class MessageTracerConstants {
 
     public static final String DEFAULT_BAM_SERVER_URL = "tcp://127.0.0.1:7611";
 
-    public static final String BAM_SERVICE_MESSAGE_TRACER_MODULE_NAME = "wso2bammessagetracerservice";
+    public static final String ANALYTICS_SERVICE_MESSAGE_TRACER_MODULE_NAME = "wso2analyticsmessagetracerservice";
 
     public static final String ENABLE_TRACE = "EnableMessageTrace";
 
