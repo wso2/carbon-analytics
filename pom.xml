@@ -79,7 +79,7 @@
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
-                <version>6.3.1</version>
+                <version>6.8.21</version>
             </dependency>
             <dependency>
                 <groupId>mysql</groupId>
@@ -89,7 +89,7 @@
             <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
-                <version>1.4.182</version>
+                <version>1.4.185</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>

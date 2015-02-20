@@ -119,6 +119,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.setIndices(tenantId, tableName, columns);
         List<Record> records = this.generateIndexRecords(tenantId, tableName, n, 0);
         this.service.insert(records);
+        this.service.waitForIndexing(-1);
         List<SearchResultEntry> result = this.service.search(tenantId, tableName, "lucene", "STR1:STRING0", 0, 10);
         Assert.assertEquals(result.size(), 1);
         result = this.service.search(tenantId, tableName, "lucene", "str2:string0", 0, 10);
@@ -180,6 +181,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.setIndices(tenantId, tableName, columns);
         List<Record> records = this.generateIndexRecords(tenantId, tableName, 100, 0);
         this.service.insert(records);
+        this.service.waitForIndexing(-1);
         int count = this.service.searchCount(tenantId, tableName, "lucene", "STR1:STRING55");
         Assert.assertEquals(count, 1);
         count = this.service.searchCount(tenantId, tableName, "lucene", "TXT1:name");
@@ -187,7 +189,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.cleanupTable(tenantId, tableName);
     }
     
-    //@Test
+    @Test
     public void testIndexedDataUpdate() throws Exception {
         int tenantId = 1;
         String tableName = "T1";
@@ -209,6 +211,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         records.add(record2);
         this.service.setIndices(tenantId, tableName, columns);
         this.service.insert(records);
+        this.service.waitForIndexing(-1);
         List<SearchResultEntry> result = this.service.search(tenantId, tableName, "lucene", "STR1:tea", 0, 10);
         Assert.assertEquals(result.size(), 1);
         String id = record.getId();
@@ -226,6 +229,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         records.add(record);
         /* update */
         this.service.insert(records);
+        this.service.waitForIndexing(-1);
         result = this.service.search(tenantId, tableName, "lucene", "STR1:tea", 0, 10);
         Assert.assertEquals(result.size(), 0);
         result = this.service.search(tenantId, tableName, "lucene", "STR2:cricket", 0, 10);
@@ -260,9 +264,11 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         ids.add(records.get(50).getId());
         ids.add(records.get(97).getId());
         Assert.assertEquals(AnalyticsDSUtils.listRecords(this.service, this.service.get(tenantId, tableName, null, ids)).size(), 4);
+        this.service.waitForIndexing(-1);
         List<SearchResultEntry> result = this.service.search(tenantId, tableName, "lucene", "STR1:S*", 0, 150);
         Assert.assertEquals(result.size(), 98);
         this.service.delete(tenantId, tableName, ids);
+        this.service.waitForIndexing(-1);
         result = this.service.search(tenantId, tableName, "lucene", "STR1:S*", 0, 150);
         Assert.assertEquals(result.size(), 94);
         Assert.assertEquals(AnalyticsDSUtils.listRecords(this.service, this.service.get(tenantId, tableName, null, ids)).size(), 0);
@@ -290,6 +296,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
                 this.service.get(tenantId, tableName, null, -1, -1, 0, -1));
         Assert.assertEquals(recordsIn.size(), n - 3);
         /* lets test table name case-insensitiveness too */
+        this.service.waitForIndexing(-1);
         List<SearchResultEntry> results = this.service.search(tenantId, 
                 tableName.toUpperCase(), "lucene", "STR1:s*", 0, n);
         Assert.assertEquals(results.size(), n - 3);
@@ -345,7 +352,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         int tenantId = 50;
         String tableName = "TableX";
         this.cleanupTable(tenantId, tableName);
-        int n = 50, batch = 200;
+        int n = 250, batch = 200;
         Map<String, IndexType> columns = new HashMap<String, IndexType>();
         columns.put("tenant", IndexType.INTEGER);
         columns.put("ip", IndexType.STRING);
@@ -355,6 +362,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         
         long start = System.currentTimeMillis();
         this.writeIndexRecords(tenantId, tableName, n, batch);
+        this.service.waitForIndexing(-1);
         long end = System.currentTimeMillis();
         System.out.println("* Records: " + (n * batch));
         System.out.println("* Write Time: " + (end - start) + " ms.");
@@ -398,14 +406,14 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         }
     }
     
-    //@Test
+    @Test
     public void testDataRecordAddReadPerformanceIndexNC() throws AnalyticsException {
         System.out.println("\n************** START ANALYTICS DS (WITH INDEXING - MULTIPLE THREADS, H2-FILE) PERF TEST **************");
 
         int tenantId = 50;
         String tableName = "TableX";
         this.cleanupTable(tenantId, tableName);        
-        int n = 50, batch = 200, nThreads = 2;
+        int n = 50, batch = 200, nThreads = 5;
         Map<String, IndexType> columns = new HashMap<String, IndexType>();
         columns.put("tenant", IndexType.INTEGER);
         columns.put("ip", IndexType.STRING);
@@ -415,6 +423,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         
         long start = System.currentTimeMillis();
         this.writeIndexRecords(tenantId, tableName, n, batch, nThreads);
+        this.service.waitForIndexing(-1);
         long end = System.currentTimeMillis();
         System.out.println("* Records: " + (n * batch * nThreads));
         System.out.println("* Write Time: " + (end - start) + " ms.");
@@ -456,12 +465,14 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.resetClusterTestResults();
     }
 
+    @Test (enabled = false)
     @Override
     public void onBecomingLeader() {
         this.becameLeader = true;
         AnalyticsServiceHolder.getAnalyticsClusterManager().setProperty("G1", "location", "10.0.0.2");
     }
 
+    @Test (enabled = false)
     @Override
     public void onLeaderUpdate() {
         this.leaderUpdated = true;

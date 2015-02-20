@@ -426,7 +426,6 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         String sql = this.generateRecordDeletionRecordsWithIdsQuery(tenantId, tableName, ids.size());
         PreparedStatement stmt = null;
         try {
-            conn = this.getConnection();
             stmt = conn.prepareStatement(sql);
             for (int i = 0; i < ids.size(); i++) {
                 stmt.setString(i + 1, ids.get(i));
@@ -713,6 +712,7 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
                     return null;
                 }
             } catch (Exception e) {
+                RDBMSUtils.cleanupConnection(this.rs, this.stmt, this.conn);
                 throw new RuntimeException(e.getMessage(), e);
             }
         }

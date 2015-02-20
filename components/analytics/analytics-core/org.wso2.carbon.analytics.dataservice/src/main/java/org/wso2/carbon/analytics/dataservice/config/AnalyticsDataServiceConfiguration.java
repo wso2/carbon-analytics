@@ -33,6 +33,8 @@ public class AnalyticsDataServiceConfiguration {
     
     private AnalyticsLuceneAnalyzerConfiguration luceneAnalyzerConfiguration;
     
+    private int shardCount;
+    
     @XmlElement (name = "analytics-record-store", nillable = false)
     public AnalyticsRecordStoreConfiguration getAnalyticsRecordStoreConfiguration() {
         return analyticsRecordStoreConfiguration;
@@ -60,4 +62,22 @@ public class AnalyticsDataServiceConfiguration {
 		this.luceneAnalyzerConfiguration = luceneAnalyzerConfiguration;
 	}
 
+    
+    public AnalyticsFileSystemConfiguration getAnalyticsFileSystem() {
+        return analyticsFileSystem;
+    }
+
+    
+    public void setAnalyticsFileSystem(AnalyticsFileSystemConfiguration analyticsFileSystem) {
+        this.analyticsFileSystem = analyticsFileSystem;
+    }
+    
+    public int getShardCount() {
+        return shardCount;
+    }
+    
+    public void setShardCount(int shardCount) {
+        this.shardCount = shardCount;
+    }
+    
 }

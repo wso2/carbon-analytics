@@ -18,6 +18,7 @@
  */
 package org.wso2.carbon.analytics.datasource.core;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -26,7 +27,9 @@ import java.util.Map;
  * This class represents a data record in {@link AnalyticsDataSource}. A record's equality is measured
  * by the non-null column name/values that it has, the null column values are ignored.
  */
-public class Record {
+public class Record implements Serializable {
+
+    private static final long serialVersionUID = -1415468443958067528L;
 
     private int tenantId;
     

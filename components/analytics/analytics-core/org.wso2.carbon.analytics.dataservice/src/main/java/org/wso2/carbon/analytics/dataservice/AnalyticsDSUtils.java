@@ -15,10 +15,17 @@
  */
 package org.wso2.carbon.analytics.dataservice;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections.IteratorUtils;
+import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsDataIndexer.IndexBatchOperation;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsDataCorruptionException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.RecordGroup;
@@ -36,6 +43,44 @@ public class AnalyticsDSUtils {
             result.addAll(IteratorUtils.toList(ads.readRecords(rg)));
         }
         return result;
+    }
+    
+    public static byte[] indexBatchOpToBinary(IndexBatchOperation indexBatchOp) {
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        ObjectOutputStream objOut = null;
+        try {
+            objOut = new ObjectOutputStream(byteOut);
+            objOut.writeObject(indexBatchOp);
+            return byteOut.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException("Error in indexBatchOpToBinary: " + e.getMessage(), e);
+        } finally {
+            try {
+                if (objOut != null) {
+                    objOut.close();
+                }
+                byteOut.close();
+            } catch (Exception ignore) { /* ignore */ }
+        }
+    }
+    
+    public static IndexBatchOperation binaryToIndexBatchOp(byte[] data) throws AnalyticsDataCorruptionException {
+        ByteArrayInputStream byteIn = new ByteArrayInputStream(data);
+        ObjectInputStream objIn = null;
+        try {            
+            objIn = new ObjectInputStream(byteIn);
+            return (IndexBatchOperation) objIn.readObject();
+        } catch (Exception e) {
+            throw new AnalyticsDataCorruptionException(
+                    "Error in converting binary data to index batch operation: " + e.getMessage(), e);
+        } finally {
+            try {
+                if (objIn != null) {
+                    objIn.close();
+                }
+                byteIn.close();
+            } catch (Exception ignore) { /* ignore */ }
+        }
     }
     
 }

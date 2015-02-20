@@ -33,6 +33,7 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem.DataInput;
 /**
  * This class contains tests related to {@link AnalyticsFileSystem}.
  */
+@Test (singleThreaded = true)
 public class AnalyticsFileSystemTest {
 
     private AnalyticsFileSystem analyticsFileSystem;

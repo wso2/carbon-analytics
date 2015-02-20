@@ -19,6 +19,7 @@
 package org.wso2.carbon.analytics.datasource.rdbms;
 
 import junit.framework.Assert;
+
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
@@ -34,6 +35,7 @@ import org.wso2.carbon.analytics.spark.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.spark.ui.client.SparkExecutionClient;
 
 import javax.naming.NamingException;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -48,7 +50,7 @@ public class AnalyticsSparkSQLUITest {
     public void setup() throws NamingException, AnalyticsException, IOException {
         AnalyticsRecordStore ars = H2FileDBAnalyticsRecordStoreTest.cleanupAndCreateARS();
         AnalyticsFileSystem afs = H2FileDBAnalyticsFileSystemTest.cleanupAndCreateAFS();
-        this.service = new AnalyticsDataServiceImpl(ars, afs);
+        this.service = new AnalyticsDataServiceImpl(ars, afs, 5);
     }
 
     @AfterSuite

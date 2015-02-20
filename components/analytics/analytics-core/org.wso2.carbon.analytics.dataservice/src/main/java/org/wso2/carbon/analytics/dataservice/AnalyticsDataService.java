@@ -26,6 +26,7 @@ import org.wso2.carbon.analytics.dataservice.indexing.IndexType;
 import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsTableNotAvailableException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsTimeoutException;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.RecordGroup;
 
@@ -206,6 +207,14 @@ public interface AnalyticsDataService {
      */
     int searchCount(int tenantId, String tableName, String language, 
             String query) throws AnalyticsIndexException;
+    
+    /**
+     * This method waits until the current indexing operations for the system is done.
+     * @param maxWait Maximum amount of time in milliseconds, if the time is reached, 
+     * an {@link AnalyticsTimeoutException} will be thrown, -1 for infinity
+     * @throws AnalyticsException
+     */
+    public void waitForIndexing(long maxWait) throws AnalyticsException, AnalyticsTimeoutException;
     
     /**
      * Destroys and frees any resources taken up by the analytics data service implementation.

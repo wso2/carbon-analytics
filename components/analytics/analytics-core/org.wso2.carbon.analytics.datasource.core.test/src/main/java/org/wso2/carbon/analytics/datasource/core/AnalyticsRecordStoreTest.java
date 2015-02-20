@@ -35,6 +35,7 @@ import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 /**
  * This class contains tests related to {@link AnalyticsRecordStore}.
  */
+@Test (singleThreaded = true)
 public class AnalyticsRecordStoreTest {
 
     private AnalyticsRecordStore analyticsRS;

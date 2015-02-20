@@ -50,7 +50,7 @@ public class AnalyticsSparkSQLTest {
     public void setup() throws NamingException, AnalyticsException, IOException {
         AnalyticsRecordStore ars = H2FileDBAnalyticsRecordStoreTest.cleanupAndCreateARS();
         AnalyticsFileSystem afs = H2FileDBAnalyticsFileSystemTest.cleanupAndCreateAFS();
-        this.service = new AnalyticsDataServiceImpl(ars, afs);
+        this.service = new AnalyticsDataServiceImpl(ars, afs, 5);
     }
     
     @AfterSuite

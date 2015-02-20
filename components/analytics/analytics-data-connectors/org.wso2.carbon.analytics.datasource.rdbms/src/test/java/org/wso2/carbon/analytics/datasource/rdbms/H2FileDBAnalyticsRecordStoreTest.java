@@ -64,6 +64,9 @@ public class H2FileDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
         PoolProperties pps = new PoolProperties();
         pps.setDriverClassName("org.h2.Driver");
         pps.setUrl(url);
+        pps.setRemoveAbandonedTimeout(10);
+        pps.setRemoveAbandoned(true);
+        pps.setLogAbandoned(true);
         pps.setUsername(username);
         pps.setPassword(password);
         pps.setDefaultAutoCommit(false);

@@ -18,6 +18,7 @@
  */
 package org.wso2.carbon.analytics.dataservice;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -33,6 +34,7 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsTimeoutException;
 import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.core.RecordGroup;
 
@@ -46,9 +48,9 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private AnalyticsDataIndexer indexer;
     
     public AnalyticsDataServiceImpl(AnalyticsRecordStore analyticsRecordStore,
-            AnalyticsFileSystem analyticsFileSystem) throws AnalyticsException {
+            AnalyticsFileSystem analyticsFileSystem, int shardCount) throws AnalyticsException {
         this.analyticsRecordStore = analyticsRecordStore;
-        this.indexer = new AnalyticsDataIndexer(analyticsFileSystem);
+        this.indexer = new AnalyticsDataIndexer(analyticsRecordStore, analyticsFileSystem, shardCount);
     }
     
     public AnalyticsDataServiceImpl(AnalyticsDataServiceConfiguration config) throws AnalyticsException {
@@ -69,7 +71,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
                     e.getMessage(), e);
         }
         this.analyticsRecordStore = ars;
-        this.indexer = new AnalyticsDataIndexer(afs, luceneAnalyzer);
+        this.indexer = new AnalyticsDataIndexer(ars, afs, config.getShardCount(), luceneAnalyzer);
     }
     
     private Map<String, String> convertToMap(AnalyticsDataServiceConfigProperty[] props) {
@@ -142,8 +144,20 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public void delete(int tenantId, String tableName, long timeFrom, long timeTo) throws AnalyticsException,
             AnalyticsTableNotAvailableException {
-        this.getIndexer().delete(tenantId, tableName, timeFrom, timeTo);
+        this.getIndexer().delete(tenantId, tableName, 
+                this.getRecordIdsFromTimeRange(tenantId, tableName, timeFrom, timeTo));
         this.getAnalyticsRecordStore().delete(tenantId, tableName, timeFrom, timeTo);
+    }
+    
+    private List<String> getRecordIdsFromTimeRange(int tenantId, String tableName, long timeFrom, 
+            long timeTo) throws AnalyticsException {
+        List<Record> records = AnalyticsDSUtils.listRecords(this, 
+                this.get(tenantId, tableName, null, timeFrom, timeTo, 0, -1));
+        List<String> result = new ArrayList<>(records.size());
+        for (Record record : records) {
+            result.add(record.getId());
+        }
+        return result;
     }
 
     @Override
@@ -178,6 +192,12 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public void clearIndices(int tenantId, String tableName) throws AnalyticsIndexException {
         this.getIndexer().clearIndices(tenantId, tableName);
+    }
+
+    @Override
+    public void waitForIndexing(long maxWait) throws AnalyticsException,
+            AnalyticsTimeoutException {
+        this.getIndexer().waitForIndexing(maxWait);
     }
 
     @Override

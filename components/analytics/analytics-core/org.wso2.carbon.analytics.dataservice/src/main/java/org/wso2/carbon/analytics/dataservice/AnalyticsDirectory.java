@@ -237,7 +237,6 @@ public class AnalyticsDirectory extends Directory {
         public void clearLock(String name) throws IOException {
             Lock lock = this.locks.remove(this.baseName + ":" + name);
             lock.close();
-            System.out.println("### LOCK CLEARED: " + name);
         }
 
         @Override
