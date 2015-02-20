@@ -22,8 +22,8 @@ import java.io.IOException;
 
 import javax.naming.NamingException;
 
-import org.testng.annotations.AfterSuite;
-import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceImpl;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerImpl;
@@ -36,7 +36,7 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStore;
  */
 public class AnalyticsDataServiceStandaloneTest extends AnalyticsDataServiceTest {
 
-    @BeforeSuite
+    @BeforeClass
     public void setup() throws NamingException, AnalyticsException, IOException {
         AnalyticsRecordStore ars = H2FileDBAnalyticsRecordStoreTest.cleanupAndCreateARS();
         AnalyticsFileSystem afs = H2FileDBAnalyticsFileSystemTest.cleanupAndCreateAFS();
@@ -45,10 +45,11 @@ public class AnalyticsDataServiceStandaloneTest extends AnalyticsDataServiceTest
         this.init(new AnalyticsDataServiceImpl(ars, afs, 5));
     }
     
-    @AfterSuite
+    @AfterClass
     public void done() throws NamingException, AnalyticsException, IOException {
         this.service.destroy();
         AnalyticsServiceHolder.setAnalyticsClusterManager(null);
+        System.out.println("XXXXXXXXXXX: DONE CALLED *************");
     }
     
 }

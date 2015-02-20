@@ -22,10 +22,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.IOContext;
@@ -222,70 +219,5 @@ public class AnalyticsDirectory extends Directory {
     public void setLockFactory(LockFactory lockFactory) throws IOException {
         this.lockFactory = lockFactory;
     }
-    
-    public static class InMemoryLockFactory extends LockFactory {
 
-        private Map<String, Lock> locks = new HashMap<String, Lock>();
-        
-        private String baseName;
-        
-        public InMemoryLockFactory(String baseName) {
-            this.baseName = baseName;
-        }
-        
-        @Override
-        public void clearLock(String name) throws IOException {
-            Lock lock = this.locks.remove(this.baseName + ":" + name);
-            lock.close();
-        }
-
-        @Override
-        public Lock makeLock(String name) {
-            Lock lock = locks.get(this.baseName + ":" + name);
-            if (lock == null) {
-                synchronized (this.locks) {
-                    lock = locks.get(this.baseName + ":" + name);
-                    if (lock == null) {
-                        lock = new InMemoryLock(this.baseName + ":" + name);
-                        locks.put(this.baseName + ":" + name, lock);
-                    }
-                }
-            }
-            return lock;
-        }
-        
-        public class InMemoryLock extends Lock {
-
-            private ReentrantLock lock = new ReentrantLock();
-            
-            private String name;
-            
-            public InMemoryLock(String name) {
-                this.name = name;
-            }
-            
-            @Override
-            public void close() throws IOException {
-                this.lock.unlock();
-            }
-
-            @Override
-            public boolean isLocked() throws IOException {
-                return lock.isLocked();
-            }
-
-            @Override
-            public boolean obtain() throws IOException {      
-                return lock.tryLock();
-            }
-            
-            @Override
-            public String toString() {
-                return this.name;
-            }
-            
-        }
-        
-    }
-    
 }

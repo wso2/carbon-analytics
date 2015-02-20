@@ -72,6 +72,7 @@ public class AnalyticsDataServiceConfiguration {
         this.analyticsFileSystem = analyticsFileSystem;
     }
     
+    @XmlElement (name = "shardCount", defaultValue = "5")
     public int getShardCount() {
         return shardCount;
     }

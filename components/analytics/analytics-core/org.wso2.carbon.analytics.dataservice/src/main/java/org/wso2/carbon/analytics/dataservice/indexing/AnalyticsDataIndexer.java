@@ -54,6 +54,7 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.TotalHitCountCollector;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.SingleInstanceLockFactory;
 import org.apache.lucene.util.Version;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDSUtils;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDirectory;
@@ -73,6 +74,8 @@ import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
  */
 public class AnalyticsDataIndexer {
     
+    private static final String DISABLE_INDEXING_ENV_PROP = "disableIndexing";
+
     private static final int WAIT_INDEX_TIME_INTERVAL = 1000;
 
     private static final String INDEX_BATCH_OP_ATTRIBUTE = "INDEX_BATCH_OP";
@@ -121,9 +124,15 @@ public class AnalyticsDataIndexer {
     	this.analyticsFileSystem = analyticsFileSystem;
     	this.shardCount = shardCount;
         this.repository = new AnalyticsIndexDefinitionRepository(this.getFileSystem());
-        this.initializeWorkers();
+        if (this.checkIfIndexingNode()) {
+            this.initializeWorkers();
+        }
     }
-        
+    
+    private boolean checkIfIndexingNode() {
+        return System.getProperty(DISABLE_INDEXING_ENV_PROP) == null;
+    }
+    
     private void initializeWorkers() {
         if (workersInited) {
             String msg = "********** AnalyticsIndexer workers already created! ***********";
@@ -715,7 +724,7 @@ public class AnalyticsDataIndexer {
     private Directory createDirectory(String tableId) throws AnalyticsIndexException {
         String path = this.generateDirPath(tableId);
         try {
-            return new AnalyticsDirectory(this.getFileSystem(), new AnalyticsDirectory.InMemoryLockFactory(path), path);
+            return new AnalyticsDirectory(this.getFileSystem(), new SingleInstanceLockFactory(), path);
         } catch (AnalyticsException e) {
             throw new AnalyticsIndexException("Error in creating directory: " + e.getMessage(), e);
         }
@@ -835,7 +844,9 @@ public class AnalyticsDataIndexer {
     public void close() throws AnalyticsIndexException {
         this.indexDefs.clear();
         this.closeAndRemoveIndexDirs(new HashSet<String>(this.indexDirs.keySet()));
-        this.executor.shutdownNow();
+        if (this.executor != null) {
+            this.executor.shutdownNow();
+        }
         workersInited = false;
     }
     

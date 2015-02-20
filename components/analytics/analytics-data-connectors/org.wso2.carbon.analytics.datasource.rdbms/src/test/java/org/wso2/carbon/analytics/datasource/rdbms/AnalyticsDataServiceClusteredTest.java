@@ -22,8 +22,8 @@ import java.io.IOException;
 
 import javax.naming.NamingException;
 
-import org.testng.annotations.AfterSuite;
-import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceImpl;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerImpl;
@@ -38,7 +38,7 @@ import com.hazelcast.core.Hazelcast;
  */
 public class AnalyticsDataServiceClusteredTest extends AnalyticsDataServiceTest {
 
-    @BeforeSuite
+    @BeforeClass
     public void setup() throws NamingException, AnalyticsException, IOException {
         Hazelcast.shutdownAll();
         AnalyticsRecordStore ars = H2FileDBAnalyticsRecordStoreTest.cleanupAndCreateARS();
@@ -48,11 +48,11 @@ public class AnalyticsDataServiceClusteredTest extends AnalyticsDataServiceTest 
         this.init(new AnalyticsDataServiceImpl(ars, afs, 5));
     }
     
-    @AfterSuite
+    @AfterClass
     public void done() throws NamingException, AnalyticsException, IOException {
         this.service.destroy();
         AnalyticsServiceHolder.setAnalyticsClusterManager(null);
-        Hazelcast.shutdownAll();
+        //Hazelcast.shutdownAll();
     }
     
 }
