@@ -109,9 +109,7 @@ public class AnalyticsDataIndexer {
     private int shardCount;
     
     private ExecutorService executor;
-    
-    private static boolean workersInited;
-        
+            
     public AnalyticsDataIndexer(AnalyticsRecordStore analyticsRecordStore, 
             AnalyticsFileSystem analyticsFileSystem, int shardCount) {
     	this(analyticsRecordStore, analyticsFileSystem, shardCount, new StandardAnalyzer());
@@ -134,16 +132,10 @@ public class AnalyticsDataIndexer {
     }
     
     private void initializeWorkers() {
-        if (workersInited) {
-            String msg = "********** AnalyticsIndexer workers already created! ***********";
-            System.out.println(msg);
-            throw new RuntimeException(msg);
-        }
         this.executor = Executors.newFixedThreadPool(this.getShardCount());
         for (int i = 0; i < this.getShardCount(); i++) {
             this.executor.execute(new IndexWorker(i));
         }
-        workersInited = true;
     }
     
     public AnalyticsFileSystem getFileSystem() {
@@ -847,7 +839,6 @@ public class AnalyticsDataIndexer {
         if (this.executor != null) {
             this.executor.shutdownNow();
         }
-        workersInited = false;
     }
     
     private List<String> extractRecordIds(List<Record> records) {
@@ -911,10 +902,10 @@ public class AnalyticsDataIndexer {
                 try {
                     processIndexBatchOperations(this.getShardIndex());
                     Thread.sleep(INDEX_WORKER_SLEEP_TIME);
-                } catch (InterruptedException e) {
+                } catch (AnalyticsException e) { 
+                    log.error("Error in processing index batch operations: " + e.getMessage(), e);
+                } catch (InterruptedException e) { 
                     break;
-                } catch (Exception e) {
-                    log.error("Error in index worker: " + e.getMessage(), e);
                 }
             }
         }

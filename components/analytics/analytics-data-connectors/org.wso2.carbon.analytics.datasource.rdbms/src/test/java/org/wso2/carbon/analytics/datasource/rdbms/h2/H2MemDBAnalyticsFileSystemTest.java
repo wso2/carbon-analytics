@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.rdbms;
+package org.wso2.carbon.analytics.datasource.rdbms.h2;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -27,34 +27,56 @@ import javax.naming.NamingException;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
-import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystemTest;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsFileSystem;
+import org.wso2.carbon.analytics.datasource.rdbms.RDBMSQueryConfigurationEntry;
 
 /**
  * H2 implementation of analytics data source tests.
  */
 public class H2MemDBAnalyticsFileSystemTest extends AnalyticsFileSystemTest {
 
-    @BeforeSuite
+    private DataSource dataSource;
+    
+    private AnalyticsFileSystem afs;
+
+    @BeforeClass
     public void setup() throws NamingException, AnalyticsException, IOException {
-        this.initDS("jdbc:h2:mem:bam_test_db", "wso2carbon", "wso2carbon");
-        AnalyticsFileSystem afs = new RDBMSAnalyticsFileSystem(this.generateQueryConfiguration());
+        this.dataSource = createDataSource("jdbc:h2:mem:bam_test_afs_db", "wso2carbon", "wso2carbon");
+        new InitialContext().bind("DSFS", this.dataSource);
+        this.afs = new RDBMSAnalyticsFileSystem(this.generateQueryConfiguration());
         Map<String, String> props = new HashMap<String, String>();
-        props.put("datasource", "DS");
-        afs.init(props);
-        this.init("H2MemDBAnalyticsDataSource", afs);
+        props.put("datasource", "DSFS");
+        this.afs.init(props);
+        this.init("H2FileDBAnalyticsDataSource", this.afs);
     }
     
-    private void initDS(String url, String username, String password) throws NamingException {
+    public AnalyticsFileSystem getAFS() {
+        return this.afs;
+    }
+    
+    @AfterClass
+    public void destroy() {
+        try {
+            new InitialContext().unbind("DSFS");
+        } catch (NamingException ignore) { }
+        if (this.dataSource != null) {
+            this.dataSource.close(true);
+        }
+    }
+    
+    private DataSource createDataSource(String url, String username, String password) {
         PoolProperties pps = new PoolProperties();
         pps.setDriverClassName("org.h2.Driver");
         pps.setUrl(url);
         pps.setUsername(username);
         pps.setPassword(password);
-        DataSource dsx = new DataSource(pps);
-        new InitialContext().bind("DS", dsx);
+        pps.setDefaultAutoCommit(false);
+        return new DataSource(pps);
     }
     
     private RDBMSQueryConfigurationEntry generateQueryConfiguration() {

@@ -26,6 +26,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import javax.naming.Context;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem.DataInput;
@@ -33,12 +35,15 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem.DataInput;
 /**
  * This class contains tests related to {@link AnalyticsFileSystem}.
  */
-@Test (singleThreaded = true)
 public class AnalyticsFileSystemTest {
 
     private AnalyticsFileSystem analyticsFileSystem;
     
     private String implementationName;
+    
+    public AnalyticsFileSystemTest() {
+        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, InMemoryICFactory.class.getName());
+    }
     
     public void init(String implementationName, AnalyticsFileSystem analyticsFileSystem) throws AnalyticsException {
         this.implementationName = implementationName;

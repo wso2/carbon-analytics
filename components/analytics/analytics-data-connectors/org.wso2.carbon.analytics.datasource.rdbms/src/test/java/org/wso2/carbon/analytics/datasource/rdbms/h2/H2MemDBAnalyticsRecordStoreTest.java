@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.rdbms;
+package org.wso2.carbon.analytics.datasource.rdbms.h2;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,33 +26,57 @@ import javax.naming.NamingException;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
-import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore;
+import org.wso2.carbon.analytics.datasource.rdbms.RDBMSQueryConfigurationEntry;
 
 /**
  * H2 implementation of analytics data source tests.
  */
 public class H2MemDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
-
-    @BeforeSuite
+    
+    private DataSource dataSource;
+    
+    private AnalyticsRecordStore ars;
+        
+    @BeforeClass
     public void setup() throws NamingException, AnalyticsException {
-        this.initDS("jdbc:h2:mem:bam_test_db", "wso2carbon", "wso2carbon");
-        RDBMSAnalyticsRecordStore ars = new RDBMSAnalyticsRecordStore(this.generateQueryConfiguration());
+        this.dataSource = this.createDataSource("jdbc:h2:mem:bam_test_ars_db", "wso2carbon", "wso2carbon");
+        new InitialContext().bind("DSRS", this.dataSource);
+        this.ars = new RDBMSAnalyticsRecordStore(this.generateQueryConfiguration());
         Map<String, String> props = new HashMap<String, String>();
-        props.put("datasource", "DS");
-        ars.init(props);
-        this.init("H2MemDBAnalyticsDataSource", ars);
+        props.put("datasource", "DSRS");
+        this.ars.init(props);
+        this.init("H2FileDBAnalyticsDataSource", ars);
     }
     
-    private void initDS(String url, String username, String password) throws NamingException {
+    public AnalyticsRecordStore getARS() {
+        return this.ars;
+    }
+    
+    @AfterClass
+    public void destroy() throws AnalyticsException {
+        this.cleanup();
+        try {
+            new InitialContext().unbind("DSRS");
+        } catch (NamingException ignore) { }
+        if (this.dataSource != null) {
+            this.dataSource.close(true);
+        }
+    }
+    
+    private DataSource createDataSource(String url, String username, String password) {
         PoolProperties pps = new PoolProperties();
         pps.setDriverClassName("org.h2.Driver");
         pps.setUrl(url);
         pps.setUsername(username);
         pps.setPassword(password);
-        DataSource dsx = new DataSource(pps);
-        new InitialContext().bind("DS", dsx);
+        pps.setDefaultAutoCommit(false);
+        return new DataSource(pps);
     }
     
     private RDBMSQueryConfigurationEntry generateQueryConfiguration() {

@@ -44,6 +44,11 @@ public class InMemoryICFactory implements InitialContextFactory {
                         throws NamingException {
                     this.bindings.put(name, obj);
                 }
+                
+                @Override
+                public void unbind(String name) {
+                    this.bindings.remove(name);
+                }
 
                 @Override
                 public Object lookup(String name) throws NamingException {

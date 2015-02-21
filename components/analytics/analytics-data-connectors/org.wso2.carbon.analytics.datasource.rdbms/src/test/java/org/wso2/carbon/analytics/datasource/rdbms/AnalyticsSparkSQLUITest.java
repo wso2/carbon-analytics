@@ -29,6 +29,8 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.Record;
+import org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsFileSystemTest;
+import org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionContext;
 import org.wso2.carbon.analytics.spark.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.spark.ui.client.SparkExecutionClient;
@@ -44,17 +46,27 @@ import java.util.List;
 public class AnalyticsSparkSQLUITest {
 
     private AnalyticsDataService service;
+    
+    private H2FileDBAnalyticsRecordStoreTest h2arstest;
+    
+    private H2FileDBAnalyticsFileSystemTest h2afstest;
 
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException, IOException {
-        AnalyticsRecordStore ars = H2FileDBAnalyticsRecordStoreTest.cleanupAndCreateARS();
-        AnalyticsFileSystem afs = H2FileDBAnalyticsFileSystemTest.cleanupAndCreateAFS();
+        this.h2arstest = new H2FileDBAnalyticsRecordStoreTest();
+        this.h2afstest = new H2FileDBAnalyticsFileSystemTest();
+        this.h2arstest.setup();
+        this.h2afstest.setup();
+        AnalyticsRecordStore ars = this.h2arstest.getARS();
+        AnalyticsFileSystem afs = this.h2afstest.getAFS();
         this.service = new AnalyticsDataServiceImpl(ars, afs, 5);
     }
 
     @AfterClass
     public void done() throws NamingException, AnalyticsException, IOException {
         this.service.destroy();
+        this.h2arstest.destroy();
+        this.h2afstest.destroy();
     }
 
     @Test

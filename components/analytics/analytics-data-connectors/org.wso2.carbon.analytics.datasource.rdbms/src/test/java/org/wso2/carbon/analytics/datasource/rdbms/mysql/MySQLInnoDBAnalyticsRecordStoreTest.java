@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.rdbms;
+package org.wso2.carbon.analytics.datasource.rdbms.mysql;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -32,6 +32,8 @@ import org.testng.annotations.Parameters;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore;
+import org.wso2.carbon.analytics.datasource.rdbms.RDBMSQueryConfigurationEntry;
 
 /**
  * MySQL implementation of analytics record store tests.
