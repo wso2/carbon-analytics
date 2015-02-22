@@ -18,6 +18,7 @@
  */
 package org.wso2.carbon.analytics.datasource.rdbms;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -495,10 +496,12 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
     /**
      * Test cluster message implementation.
      */
-    public static class ClusterGroupTestMessage implements Callable<Integer> {
+    public static class ClusterGroupTestMessage implements Callable<Integer>, Serializable {
 
-        private int data;
+        private static final long serialVersionUID = 3918252455368655212L;
         
+        private int data;
+                
         public ClusterGroupTestMessage(int data) {
             this.data = data;
         }

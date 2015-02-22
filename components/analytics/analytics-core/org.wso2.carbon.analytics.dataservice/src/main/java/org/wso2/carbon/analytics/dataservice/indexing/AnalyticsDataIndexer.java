@@ -981,7 +981,9 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     /**
      * This is executed to stop all indexing operations in the current node.
      */
-    public static class IndexingStopMessage implements Callable<String> {
+    public static class IndexingStopMessage implements Callable<String>, Serializable {
+
+        private static final long serialVersionUID = 2146438164013418569L;
 
         @Override
         public String call() throws Exception {
@@ -1002,7 +1004,9 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     /**
      * This is executed to start indexing operations in the current node.
      */
-    public static class IndexingScheduleMessage implements Callable<String> {
+    public static class IndexingScheduleMessage implements Callable<String>, Serializable {
+        
+        private static final long serialVersionUID = 7912933193977147465L;
         
         private List<Integer> shardIndices;
         

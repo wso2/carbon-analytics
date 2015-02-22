@@ -251,10 +251,12 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
     /**
      * This class represents the cluster message that notifies the cluster of a new member to the group.
      */
-    public static class LeaderMemberAddedNotification implements Callable<String> {
+    public static class LeaderMemberAddedNotification implements Callable<String>, Serializable {
+        
+        private static final long serialVersionUID = -3363760290841109792L;
         
         private String groupId;
-        
+                
         public LeaderMemberAddedNotification(String groupId) {
             this.groupId = groupId;
         }
@@ -278,10 +280,12 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
     /**
      * This class represents the cluster message that notifies the cluster of a new leader.
      */
-    public static class LeaderUpdateNotification implements Callable<String> {
+    public static class LeaderUpdateNotification implements Callable<String>, Serializable {
 
-        private String groupId;
+        private static final long serialVersionUID = -8378187556136928045L;
         
+        private String groupId;
+                
         public LeaderUpdateNotification(String groupId) {
             this.groupId = groupId;
         }
