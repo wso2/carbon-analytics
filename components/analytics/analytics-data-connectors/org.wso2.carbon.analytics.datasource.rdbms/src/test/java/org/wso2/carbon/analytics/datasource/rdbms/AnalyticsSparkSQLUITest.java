@@ -24,6 +24,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceImpl;
+import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerImpl;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStore;
@@ -32,7 +34,7 @@ import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsFileSystemTest;
 import org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionContext;
-import org.wso2.carbon.analytics.spark.core.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.spark.core.AnalyticsSparkServiceHolder;
 import org.wso2.carbon.analytics.spark.ui.client.SparkExecutionClient;
 
 import javax.naming.NamingException;
@@ -59,6 +61,8 @@ public class AnalyticsSparkSQLUITest {
         this.h2afstest.setup();
         AnalyticsRecordStore ars = this.h2arstest.getARS();
         AnalyticsFileSystem afs = this.h2afstest.getAFS();
+        AnalyticsServiceHolder.setHazelcastInstance(null);
+        AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
         this.service = new AnalyticsDataServiceImpl(ars, afs, 5);
     }
 
@@ -72,7 +76,7 @@ public class AnalyticsSparkSQLUITest {
     @Test
     public void testUIJsonStringGeneration() throws AnalyticsException {
         System.out.printf("***** AnalyticsSparkSQLUITest ***** ");
-        AnalyticsServiceHolder.setAnalyticsDataService(this.service);
+        AnalyticsSparkServiceHolder.setAnalyticsDataService(this.service);
         AnalyticsExecutionContext.init();
 
         List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 10, -1, -1);

@@ -65,7 +65,7 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
     public scala.collection.Iterator<Row> compute(Partition split, TaskContext context) {
         AnalyticsPartition partition = (AnalyticsPartition) split;
         try {
-            Iterator<Record> recordsItr = AnalyticsServiceHolder.getAnalyticsDataService().readRecords(partition.getRecordGroup());            
+            Iterator<Record> recordsItr = AnalyticsSparkServiceHolder.getAnalyticsDataService().readRecords(partition.getRecordGroup());            
             return new InterruptibleIterator(context, asScalaIterator(new RowRecordIteratorAdaptor(recordsItr)));
         } catch (AnalyticsException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -114,7 +114,7 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
     public Partition[] getPartitions() {
         RecordGroup[] rgs;
         try {
-            rgs = AnalyticsServiceHolder.getAnalyticsDataService().get(this.tenantId, this.tableName, 
+            rgs = AnalyticsSparkServiceHolder.getAnalyticsDataService().get(this.tenantId, this.tableName, 
                     this.columns, -1, -1, 0, Integer.MAX_VALUE);
         } catch (AnalyticsException e) {
             throw new RuntimeException(e.getMessage(), e);

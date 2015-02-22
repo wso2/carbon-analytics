@@ -34,7 +34,7 @@ import org.wso2.carbon.analytics.datasource.core.RecordGroup;
  * This interface represents the analytics data service operations.
  */
 public interface AnalyticsDataService {
-
+    
     /**
      * Creates a table, if not already there, where the columns are not defined here, but can contain any arbitrary number
      * of columns when data is added. The table names are not case sensitive.
@@ -78,8 +78,7 @@ public interface AnalyticsDataService {
      * @throws AnalyticsException
      * @throws AnalyticsTableNotAvailableException
      */
-    long getRecordCount(int tenantId, String tableName) 
-            throws AnalyticsException, AnalyticsTableNotAvailableException;
+    long getRecordCount(int tenantId, String tableName) throws AnalyticsTableNotAvailableException, AnalyticsException;
     
     /**
      * Adds a new record to the table. If the record id is mentioned, 
@@ -171,16 +170,18 @@ public interface AnalyticsDataService {
      * @param tableName The table name
      * @return List of indices of the table
      * @throws AnalyticsIndexException
+     * @throws AnalyticsException 
      */
-    Map<String, IndexType> getIndices(int tenantId, String tableName) throws AnalyticsIndexException;
+    Map<String, IndexType> getIndices(int tenantId, String tableName) throws AnalyticsIndexException, AnalyticsException;
     
     /**
      * Clears all the indices for the given table.
      * @param tenantId The tenant id
      * @param tableName The table name
      * @throws AnalyticsIndexException
+     * @throws AnalyticsException 
      */
-    void clearIndices(int tenantId, String tableName) throws AnalyticsIndexException;
+    void clearIndices(int tenantId, String tableName) throws AnalyticsIndexException, AnalyticsException;
     
     /**
      * Searches the data with a given search query.
@@ -192,9 +193,10 @@ public interface AnalyticsDataService {
      * @param count The maximum number of result entries to be returned
      * @return A list of {@link SearchResultEntry}s
      * @throws AnalyticsIndexException
+     * @throws AnalyticsException 
      */
     List<SearchResultEntry> search(int tenantId, String tableName, String language, 
-            String query, int start, int count) throws AnalyticsIndexException;
+            String query, int start, int count) throws AnalyticsIndexException, AnalyticsException;
     
     /**
      * Returns the search count of results of a given search query.
@@ -212,9 +214,10 @@ public interface AnalyticsDataService {
      * This method waits until the current indexing operations for the system is done.
      * @param maxWait Maximum amount of time in milliseconds, if the time is reached, 
      * an {@link AnalyticsTimeoutException} will be thrown, -1 for infinity
-     * @throws AnalyticsException
+     * @throws AnalyticsTimeoutException
+     * @throws AnalyticsException 
      */
-    public void waitForIndexing(long maxWait) throws AnalyticsException, AnalyticsTimeoutException;
+    public void waitForIndexing(long maxWait) throws AnalyticsTimeoutException, AnalyticsException;
     
     /**
      * Destroys and frees any resources taken up by the analytics data service implementation.

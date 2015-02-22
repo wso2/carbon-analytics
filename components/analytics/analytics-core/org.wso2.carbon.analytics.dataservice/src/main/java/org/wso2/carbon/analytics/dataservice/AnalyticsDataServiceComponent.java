@@ -59,7 +59,8 @@ public class AnalyticsDataServiceComponent {
         BundleContext bundleContext = ctx.getBundleContext();
         try {
             AnalyticsDataServiceConfiguration config = this.loadAnalyticsDataServiceConfig();
-            bundleContext.registerService(AnalyticsDataService.class, new AnalyticsDataServiceImpl(config), null);
+            AnalyticsDataService analyticsDataService = new AnalyticsDataServiceImpl(config);
+            bundleContext.registerService(AnalyticsDataService.class, analyticsDataService, null);
             this.loadHazelcast();
             AnalyticsClusterManager clusterManager = new AnalyticsClusterManagerImpl();
             bundleContext.registerService(AnalyticsClusterManager.class, clusterManager, null);            

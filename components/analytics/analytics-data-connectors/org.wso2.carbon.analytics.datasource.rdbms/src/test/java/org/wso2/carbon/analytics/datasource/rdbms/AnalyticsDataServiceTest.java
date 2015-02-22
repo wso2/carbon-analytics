@@ -459,9 +459,13 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         acm.joinGroup("G1", this);
         Assert.assertTrue(this.leaderUpdated);
         int value = 5;
-        List<Integer> result = acm.execute("G1", new ClusterGroupTestMessage(value));
+        List<Integer> result = acm.executeAll("G1", new ClusterGroupTestMessage(value));
         Assert.assertTrue(result.size() > 0);
         Assert.assertEquals((int) result.get(0), value + 1);
+        List<Object> members = acm.getMembers("G1");
+        Assert.assertTrue(members.size() > 0);
+        int result2 = acm.executeOne("G1", members.get(0), new ClusterGroupTestMessage(value + 1));
+        Assert.assertEquals(result2, value + 2);
         this.resetClusterTestResults();
     }
 
@@ -481,6 +485,11 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         Assert.assertEquals(location, "10.0.0.2");
         location = (String) AnalyticsServiceHolder.getAnalyticsClusterManager().getProperty("GX", "location");
         Assert.assertNull(location);
+    }
+
+    @Override
+    public void onMembersChangeForLeader() {
+        /* nothing to do */
     }
     
     /**

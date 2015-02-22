@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -57,9 +58,14 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.SingleInstanceLockFactory;
 import org.apache.lucene.util.Version;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDSUtils;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceImpl;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDirectory;
 import org.wso2.carbon.analytics.dataservice.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.AnalyticsQueryParser;
+import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
+import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataCorruptionException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem;
@@ -72,8 +78,10 @@ import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 /**
  * This class represents the indexing functionality.
  */
-public class AnalyticsDataIndexer {
+public class AnalyticsDataIndexer implements GroupEventListener {
     
+    private static final int INDEXING_SCHEDULE_PLAN_RETRY_COUNT = 3;
+
     private static final String DISABLE_INDEXING_ENV_PROP = "disableIndexing";
 
     private static final int WAIT_INDEX_TIME_INTERVAL = 1000;
@@ -83,6 +91,8 @@ public class AnalyticsDataIndexer {
     private static final String SHARD_INDEX_DATA_RECORD_TABLE_NAME = "__SHARD_INDEX_RECORDS__";
 
     private static final int SHARD_INDEX_DATA_RECORD_TENANT_ID = -1000;
+    
+    private static final String ANALYTICS_INDEXING_GROUP = "__ANALYTICS_INDEXING_GROUP__";
 
     private static final Log log = LogFactory.getLog(AnalyticsDataIndexer.class);
         
@@ -111,31 +121,63 @@ public class AnalyticsDataIndexer {
     private ExecutorService executor;
             
     public AnalyticsDataIndexer(AnalyticsRecordStore analyticsRecordStore, 
-            AnalyticsFileSystem analyticsFileSystem, int shardCount) {
+            AnalyticsFileSystem analyticsFileSystem, int shardCount) throws AnalyticsException {
     	this(analyticsRecordStore, analyticsFileSystem, shardCount, new StandardAnalyzer());
     }
     
     public AnalyticsDataIndexer(AnalyticsRecordStore analyticsRecordStore, 
-            AnalyticsFileSystem analyticsFileSystem, int shardCount, Analyzer analyzer){
+            AnalyticsFileSystem analyticsFileSystem, int shardCount, 
+            Analyzer analyzer) throws AnalyticsException {
     	this.luceneAnalyzer = analyzer;
         this.analyticsRecordStore = analyticsRecordStore;    	
     	this.analyticsFileSystem = analyticsFileSystem;
     	this.shardCount = shardCount;
         this.repository = new AnalyticsIndexDefinitionRepository(this.getFileSystem());
-        if (this.checkIfIndexingNode()) {
-            this.initializeWorkers();
-        }
+    }
+    
+    /**
+     * This method initializes the indexer, and must be called before any other operation in this class is called.
+     * @throws AnalyticsException
+     */
+    public void init() throws AnalyticsException {
+        this.initializeIndexingSchedules();
     }
     
     private boolean checkIfIndexingNode() {
         return System.getProperty(DISABLE_INDEXING_ENV_PROP) == null;
     }
     
-    private void initializeWorkers() {
-        this.executor = Executors.newFixedThreadPool(this.getShardCount());
-        for (int i = 0; i < this.getShardCount(); i++) {
-            this.executor.execute(new IndexWorker(i));
+    private void initializeIndexingSchedules() throws AnalyticsException {
+        if (!this.checkIfIndexingNode()) {
+            return;
         }
+        AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
+        if (acm.isClusteringEnabled()) {
+            acm.joinGroup(ANALYTICS_INDEXING_GROUP, this);
+        } else {
+            List<List<Integer>> indexingSchedule = this.generateIndexWorkerSchedulePlan(1);
+            this.scheduleWorkers(indexingSchedule.get(0));
+        }
+    }
+    
+    private List<List<Integer>> generateIndexWorkerSchedulePlan(int numWorkers) {
+        List<List<Integer>> result = new ArrayList<List<Integer>>(numWorkers);
+        for (int i = 0; i < numWorkers; i++) {
+            result.add(new ArrayList<Integer>());
+        }
+        for (int i = 0; i < this.getShardCount(); i++) {
+            result.get(i % numWorkers).add(i);
+        }
+        return result;
+    }
+    
+    public void scheduleWorkers(List<Integer> shardIndices) throws AnalyticsException {
+        this.stopAndCleanupIndexProcessing();
+        this.executor = Executors.newFixedThreadPool(shardIndices.size());
+        for (int shardIndex : shardIndices) {
+            this.executor.execute(new IndexWorker(shardIndex));
+        }
+        log.info("Scheduled Analytics Indexing Shards " + shardIndices);
     }
     
     public AnalyticsFileSystem getFileSystem() {
@@ -833,12 +875,17 @@ public class AnalyticsDataIndexer {
         }
     }
     
+    public void stopAndCleanupIndexProcessing() {
+        if (this.executor != null) {
+            this.executor.shutdownNow();
+            this.executor = null;
+        }
+    }
+    
     public void close() throws AnalyticsIndexException {
         this.indexDefs.clear();
         this.closeAndRemoveIndexDirs(new HashSet<String>(this.indexDirs.keySet()));
-        if (this.executor != null) {
-            this.executor.shutdownNow();
-        }
+        this.stopAndCleanupIndexProcessing();
     }
     
     private List<String> extractRecordIds(List<Record> records) {
@@ -877,6 +924,103 @@ public class AnalyticsDataIndexer {
                 this.getAnalyticsRecordStore().get(SHARD_INDEX_DATA_RECORD_TENANT_ID, 
                         SHARD_INDEX_DATA_RECORD_TABLE_NAME, null, ids));
         return records.size() > 0;
+    }
+    
+    private void planIndexingWorkersInCluster() throws AnalyticsException {
+        AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
+        int retryCount = 0;
+        while (retryCount < INDEXING_SCHEDULE_PLAN_RETRY_COUNT) {
+            try {
+                acm.executeAll(ANALYTICS_INDEXING_GROUP, new IndexingStopMessage());
+                List<Object> members = acm.getMembers(ANALYTICS_INDEXING_GROUP);
+                List<List<Integer>> schedulePlan = this.generateIndexWorkerSchedulePlan(members.size());
+                for (int i = 0; i < members.size(); i++) {
+                    acm.executeOne(ANALYTICS_INDEXING_GROUP, members.get(i), 
+                            new IndexingScheduleMessage(schedulePlan.get(i)));
+                }
+                break;
+            } catch (AnalyticsException e) {
+                e.printStackTrace();
+                retryCount++;
+                if (retryCount < INDEXING_SCHEDULE_PLAN_RETRY_COUNT) {
+                    log.warn("Retrying index schedule planning: " + 
+                            e.getMessage() + ": attempt " + (retryCount + 1) + "...", e);
+                } else {
+                    log.error("Giving up index schedule planning: " + e.getMessage(), e);
+                    throw new AnalyticsException("Error in index schedule planning: " + e.getMessage(), e);
+                }
+            }
+        }
+    }
+    
+    @Override
+    public void onBecomingLeader() {
+        try {
+            this.planIndexingWorkersInCluster();
+        } catch (AnalyticsException e) {
+            log.error("Error in planning indexing workers on becoming leader: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void onLeaderUpdate() {
+        /* nothing to do */
+    }
+
+    @Override
+    public void onMembersChangeForLeader() {
+        try {
+            this.planIndexingWorkersInCluster();
+        } catch (AnalyticsException e) {
+            log.error("Error in planning indexing workers on members change: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * This is executed to stop all indexing operations in the current node.
+     */
+    public static class IndexingStopMessage implements Callable<String> {
+
+        @Override
+        public String call() throws Exception {
+            AnalyticsDataService ads = AnalyticsServiceHolder.getAnalyticsDataService();
+            if (ads == null) {
+                throw new AnalyticsException("The analytics data service implementation is not registered");
+            }
+            /* these cluster messages are specific to AnalyticsDataServiceImpl */
+            if (ads instanceof AnalyticsDataServiceImpl) {
+                AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
+                adsImpl.getIndexer().stopAndCleanupIndexProcessing();
+            }
+            return "OK";
+        }
+        
+    }
+    
+    /**
+     * This is executed to start indexing operations in the current node.
+     */
+    public static class IndexingScheduleMessage implements Callable<String> {
+        
+        private List<Integer> shardIndices;
+        
+        public IndexingScheduleMessage(List<Integer> shardIndices) {
+            this.shardIndices = shardIndices;
+        }
+
+        @Override
+        public String call() throws Exception {
+            AnalyticsDataService ads = AnalyticsServiceHolder.getAnalyticsDataService();
+            if (ads == null) {
+                throw new AnalyticsException("The analytics data service implementation is not registered");
+            }
+            if (ads instanceof AnalyticsDataServiceImpl) {
+                AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
+                adsImpl.getIndexer().scheduleWorkers(this.shardIndices);
+            }
+            return "OK";
+        }
+        
     }
     
     /**

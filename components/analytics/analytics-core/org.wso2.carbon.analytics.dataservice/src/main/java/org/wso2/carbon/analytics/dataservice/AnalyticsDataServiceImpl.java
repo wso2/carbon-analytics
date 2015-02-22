@@ -46,11 +46,13 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private AnalyticsRecordStore analyticsRecordStore;
         
     private AnalyticsDataIndexer indexer;
-    
+        
     public AnalyticsDataServiceImpl(AnalyticsRecordStore analyticsRecordStore,
             AnalyticsFileSystem analyticsFileSystem, int shardCount) throws AnalyticsException {
         this.analyticsRecordStore = analyticsRecordStore;
         this.indexer = new AnalyticsDataIndexer(analyticsRecordStore, analyticsFileSystem, shardCount);
+        AnalyticsServiceHolder.setAnalyticsDataService(this);
+        this.indexer.init();
     }
     
     public AnalyticsDataServiceImpl(AnalyticsDataServiceConfiguration config) throws AnalyticsException {
@@ -112,8 +114,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     @Override
-    public long getRecordCount(int tenantId, String tableName) throws AnalyticsException,
-            AnalyticsTableNotAvailableException {
+    public long getRecordCount(int tenantId, 
+            String tableName) throws AnalyticsException, AnalyticsTableNotAvailableException {
         return this.getAnalyticsRecordStore().getRecordCount(tenantId, tableName);
     }
 
@@ -168,13 +170,14 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     @Override
-    public void setIndices(int tenantId, String tableName, Map<String, IndexType> columns) throws AnalyticsIndexException {
+    public void setIndices(int tenantId, String tableName, 
+            Map<String, IndexType> columns) throws AnalyticsIndexException {
         this.getIndexer().setIndices(tenantId, tableName, columns);
     }
 
     @Override
     public List<SearchResultEntry> search(int tenantId, String tableName, String language, String query,
-            int start, int count) throws AnalyticsIndexException {
+            int start, int count) throws AnalyticsIndexException, AnalyticsException {
         return this.getIndexer().search(tenantId, tableName, language, query, start, count);
     }
     
@@ -185,12 +188,13 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     @Override
-    public Map<String, IndexType> getIndices(int tenantId, String tableName) throws AnalyticsIndexException {
+    public Map<String, IndexType> getIndices(int tenantId, 
+            String tableName) throws AnalyticsIndexException, AnalyticsException {
         return this.getIndexer().lookupIndices(tenantId, tableName);
     }
 
     @Override
-    public void clearIndices(int tenantId, String tableName) throws AnalyticsIndexException {
+    public void clearIndices(int tenantId, String tableName) throws AnalyticsIndexException, AnalyticsException {
         this.getIndexer().clearIndices(tenantId, tableName);
     }
 
@@ -199,10 +203,12 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             AnalyticsTimeoutException {
         this.getIndexer().waitForIndexing(maxWait);
     }
-
+    
     @Override
     public void destroy() throws AnalyticsException {
-        this.indexer.close();
+        if (this.indexer != null) {
+            this.indexer.close();
+        }
     }
 
 }

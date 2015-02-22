@@ -61,8 +61,8 @@ public class AnalyticsDataServiceClusteredTest extends AnalyticsDataServiceTest 
     @AfterClass
     public void done() throws NamingException, AnalyticsException, IOException {
         this.service.destroy();
-        AnalyticsServiceHolder.setAnalyticsClusterManager(null);
         Hazelcast.shutdownAll();
+        AnalyticsServiceHolder.setHazelcastInstance(null);
         this.h2arstest.destroy();
         this.h2afstest.destroy();
     }

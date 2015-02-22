@@ -35,4 +35,11 @@ public interface GroupEventListener {
      */
     void onLeaderUpdate();
     
+    /**
+     * Called when the group members change by either a new member arriving or departing. This is executed
+     * only for the group leader. This is not called in the instance of myself becoming the leader, because
+     * of another node has departed.
+     */
+    void onMembersChangeForLeader();
+    
 }
