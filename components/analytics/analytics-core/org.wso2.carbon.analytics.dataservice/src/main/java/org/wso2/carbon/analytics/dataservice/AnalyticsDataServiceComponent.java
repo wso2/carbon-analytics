@@ -24,6 +24,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import org.apache.axis2.engine.ListenerManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
@@ -35,7 +36,6 @@ import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerI
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfiguration;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.utils.CarbonUtils;
 
 import com.hazelcast.core.HazelcastInstance;
@@ -43,8 +43,8 @@ import com.hazelcast.core.HazelcastInstance;
 /**
  * This class represents the analytics data service declarative services component.
  * @scr.component name="analytics.component" immediate="true"
- * @scr.reference name="registry.service" interface="org.wso2.carbon.registry.core.service.RegistryService"
- * cardinality="1..1" policy="dynamic"  bind="setRegistryService" unbind="unsetRegistryService"
+ * @scr.reference name="listener.manager.service" interface="org.apache.axis2.engine.ListenerManager"
+ * cardinality="1..1" policy="dynamic"  bind="setListenerManager" unbind="unsetListenerManager"
  */
 public class AnalyticsDataServiceComponent {
     
@@ -59,16 +59,16 @@ public class AnalyticsDataServiceComponent {
         BundleContext bundleContext = ctx.getBundleContext();
         try {
             AnalyticsDataServiceConfiguration config = this.loadAnalyticsDataServiceConfig();
-            AnalyticsDataService analyticsDataService = new AnalyticsDataServiceImpl(config);
-            bundleContext.registerService(AnalyticsDataService.class, analyticsDataService, null);
             this.loadHazelcast();
             AnalyticsClusterManager clusterManager = new AnalyticsClusterManagerImpl();
             bundleContext.registerService(AnalyticsClusterManager.class, clusterManager, null);            
             AnalyticsServiceHolder.setAnalyticsClusterManager(clusterManager);
+            AnalyticsDataService analyticsDataService = new AnalyticsDataServiceImpl(config);
+            bundleContext.registerService(AnalyticsDataService.class, analyticsDataService, null);            
             if (log.isDebugEnabled()) {
                 log.debug("Finished AnalyticsDataServiceComponent#activate");
             }
-        } catch(AnalyticsException e) {
+        } catch(Throwable e) {
             log.error("Error in activating analytics data service: " + e.getMessage(), e);
         }        
     }
@@ -101,11 +101,14 @@ public class AnalyticsDataServiceComponent {
         }
     }
     
-    protected void setRegistryService(RegistryService registryService) {
-        /* just to make sure this component is initialized later after data sources are available */
+    protected void setListenerManager(ListenerManager lm) {
+        /* we don't really need this, the listener manager service is acquired
+         * to make sure, as a workaround, that the task component is initialized 
+         * after the axis2 clustering agent is initialized */
     }
-
-    protected void unsetRegistryService(RegistryService registryService) {
+    
+    protected void unsetListenerManager(ListenerManager lm) {
+        /* empty */
     }
-
+    
 }

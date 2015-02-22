@@ -82,9 +82,20 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         List<Member> groupMembers = this.getGroupMembers(groupId);
         Member myself = this.hz.getCluster().getLocalMember();
         groupMembers.add(myself);
-        if (groupMembers.get(0).equals(myself)) {
+        if (this.getLeader(groupId).equals(myself)) {
             this.executeMyselfBecomingLeader(groupId);
+        } else {
+            this.sendMemberAddedNotificationToLeader(groupId);
         }
+    }
+    
+    private Member getLeader(String groupId) {
+        return this.getGroupMembers(groupId).get(0);
+    }
+    
+    private void sendMemberAddedNotificationToLeader(String groupId) throws AnalyticsClusterException {
+        Member member = this.getLeader(groupId);
+        this.executeOne(groupId, member, new LeaderMemberAddedNotification(groupId));
     }
     
     private boolean isLeader(String groupId) {
@@ -218,6 +229,13 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         }
     }
     
+    private void leaderMemberAdditionNotificationReceived(String groupId) {
+        GroupEventListener listener = this.groups.get(groupId);
+        if (listener != null) {
+            listener.onMembersChangeForLeader();
+        }
+    }
+    
     @Override
     public void memberRemoved(MembershipEvent event) {
         Set<String> groupIds = this.groups.keySet();
@@ -231,7 +249,34 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
     }
     
     /**
-     * This class represents the cluster message that notifies the cluster of a new leader
+     * This class represents the cluster message that notifies the cluster of a new member to the group.
+     */
+    public static class LeaderMemberAddedNotification implements Callable<String> {
+        
+        private String groupId;
+        
+        public LeaderMemberAddedNotification(String groupId) {
+            this.groupId = groupId;
+        }
+        
+        public String getGroupId() {
+            return groupId;
+        }
+
+        @Override
+        public String call() throws Exception {
+            AnalyticsClusterManager cm = AnalyticsServiceHolder.getAnalyticsClusterManager();
+            if (cm instanceof AnalyticsClusterManagerImpl) {
+                AnalyticsClusterManagerImpl cmImpl = (AnalyticsClusterManagerImpl) cm;
+                cmImpl.leaderMemberAdditionNotificationReceived(this.getGroupId());
+            }
+            return "OK";
+        }
+        
+    }
+    
+    /**
+     * This class represents the cluster message that notifies the cluster of a new leader.
      */
     public static class LeaderUpdateNotification implements Callable<String> {
 

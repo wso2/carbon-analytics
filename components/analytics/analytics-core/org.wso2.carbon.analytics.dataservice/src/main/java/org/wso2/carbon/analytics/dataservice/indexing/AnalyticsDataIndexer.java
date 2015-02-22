@@ -153,8 +153,10 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         if (acm.isClusteringEnabled()) {
+            log.info("Analytics Indexing Mode: CLUSTERED");
             acm.joinGroup(ANALYTICS_INDEXING_GROUP, this);
         } else {
+            log.info("Analytics Indexing Mode: STANDALONE");
             List<List<Integer>> indexingSchedule = this.generateIndexWorkerSchedulePlan(1);
             this.scheduleWorkers(indexingSchedule.get(0));
         }

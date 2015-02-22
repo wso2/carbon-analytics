@@ -74,6 +74,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         }
         this.analyticsRecordStore = ars;
         this.indexer = new AnalyticsDataIndexer(ars, afs, config.getShardCount(), luceneAnalyzer);
+        AnalyticsServiceHolder.setAnalyticsDataService(this);
+        this.indexer.init();
     }
     
     private Map<String, String> convertToMap(AnalyticsDataServiceConfigProperty[] props) {
