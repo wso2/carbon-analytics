@@ -419,12 +419,12 @@
             <dependency>
                 <groupId>org.apache.spark.wso2</groupId>
                 <artifactId>spark-core_2.10</artifactId>
-                <version>1.2.0.wso2v1</version>
+                <version>${spark.orbit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.spark.wso2</groupId>
                 <artifactId>spark-sql_2.10</artifactId>
-                <version>1.2.0.wso2v1</version>
+                <version>${spark.orbit.version}</version>
             </dependency>
 
             <dependency>
@@ -541,6 +541,18 @@
                 <version>${json4s.orbit.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.twitter.wso2</groupId>
+                <artifactId>chill_2.10</artifactId>
+                <version>${chill.orbit.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.clearspring.analytics.wso2</groupId>
+                <artifactId>stream</artifactId>
+                <version>${stream.orbit.version}</version>
+            </dependency>
+
             <!--child dependancies -->
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
@@ -616,6 +628,29 @@
                 <version>${uncommons.math.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.tomcat.wso2</groupId>
+                <artifactId>tomcat-servlet-api</artifactId>
+                <version>${servelet.api.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
@@ -831,9 +866,9 @@
         <wsdl4j.wso2.version>1.6.2.wso2v2</wsdl4j.wso2.version>
         <junit.version>4.9</junit.version>
         <cxf.wso2.version>2.6.1.wso2v2</cxf.wso2.version>
-        <slf4j.orbit.version>1.5.10.wso2v1</slf4j.orbit.version>
-        <slf4j.version>1.6.1</slf4j.version>
-        <log4j.version>1.2.14</log4j.version>
+        <!--<slf4j.orbit.version>1.5.10.wso2v1</slf4j.orbit.version>-->
+        <slf4j.version>1.7.5</slf4j.version>
+        <log4j.version>1.7.5</log4j.version>
         <version.equinox.osgi>3.8.1.v20120830-144521</version.equinox.osgi>
         <gson.version>2.2.4</gson.version>
 
@@ -871,6 +906,7 @@
 
 
         <!--analytics processors -->
+        <spark.orbit.version>1.2.1.wso2v1</spark.orbit.version>
         <hadoop.client.orbit.version>2.2.0.wso2v1</hadoop.client.orbit.version>
         <typesafe.version>1.2.0</typesafe.version>
         <akka.version>2.3.4-spark</akka.version>
@@ -884,11 +920,14 @@
         <commons-math3.version>3.1.1</commons-math3.version>
         <commons-lang3.version>3.3.2</commons-lang3.version>
         <compress.lzf.version>1.0.0</compress.lzf.version>
-
         <jetty.version>8.1.14.v20131031</jetty.version>
         <netty.version>3.8.0.Final</netty.version>
         <protobuf.version>2.5.0-spark</protobuf.version>
         <uncommons.math.version>1.2.2.wso2v1</uncommons.math.version>
+        <chill.orbit.version>0.5.0.wso2v1</chill.orbit.version>
+        <stream.orbit.version>2.2.0.wso2v1</stream.orbit.version>
+        <guava.version>14.0.1</guava.version>
+        <servelet.api.version>7.0.52.wso2v1</servelet.api.version>
     </properties>
 
     <pluginRepositories>

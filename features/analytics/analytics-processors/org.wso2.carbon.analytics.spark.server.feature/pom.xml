@@ -113,6 +113,15 @@
             <artifactId>json4s-jackson_2.10</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.twitter.wso2</groupId>
+            <artifactId>chill_2.10</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.clearspring.analytics.wso2</groupId>
+            <artifactId>stream</artifactId>
+        </dependency>
 
         <!--child deps -->
         <dependency>
@@ -173,6 +182,26 @@
         <dependency>
             <groupId>org.uncommons.maths.wso2</groupId>
             <artifactId>uncommons-maths</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.tomcat.wso2</groupId>
+            <artifactId>tomcat-servlet-api</artifactId>
         </dependency>
     </dependencies>
 
@@ -238,6 +267,12 @@
                                 <bundleDef>org.spark-project.protobuf:protobuf-java</bundleDef>
                                 <bundleDef>org.uncommons.maths.wso2:uncommons-maths</bundleDef>
                                 <bundleDef>com.ning:compress-lzf</bundleDef>
+                                <bundleDef>com.google.guava:guava</bundleDef>
+                                <bundleDef>org.slf4j:slf4j-api</bundleDef>
+                                <bundleDef>org.slf4j:slf4j-log4j12</bundleDef>
+                                <bundleDef>org.apache.tomcat.wso2:tomcat-servlet-api</bundleDef>
+                                <bundleDef>com.twitter.wso2:chill_2.10</bundleDef>
+                                <bundleDef>com.clearspring.analytics.wso2:stream</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}
