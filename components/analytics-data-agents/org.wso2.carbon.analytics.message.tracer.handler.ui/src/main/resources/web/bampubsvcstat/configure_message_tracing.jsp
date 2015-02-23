@@ -10,11 +10,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%!
-%><fmt:bundle basename="org.wso2.carbon.bam.message.tracer.handler.ui.i18n.Resources">
+%><fmt:bundle basename="org.wso2.carbon.analytics.message.tracer.handler.ui.i18n.Resources">
 
 <carbon:breadcrumb
         label="bam.statistics"
-        resourceBundle="org.wso2.carbon.bam.message.tracer.handler.ui.i18n.Resources"
+        resourceBundle="org.wso2.carbon.analytics.message.tracer.handler.ui.i18n.Resources"
         topPage="true"
         request="<%=request%>"/>
 <%

@@ -21,7 +21,7 @@
         <menu>
             <id>bam_message_tracer_handler_menu</id>
             <i18n-key>message.tracer.handler.menu</i18n-key>
-            <i18n-bundle>org.wso2.carbon.bam.message.tracer.handler.ui.i18n.Resources</i18n-bundle>
+            <i18n-bundle>org.wso2.carbon.analytics.message.tracer.handler.ui.i18n.Resources</i18n-bundle>
             <parent-menu>configure_menu</parent-menu>
             <link>../bampubsvcstat/configure_message_tracing.jsp</link>
             <region>region1</region>

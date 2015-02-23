@@ -42,6 +42,10 @@
             <artifactId>org.wso2.carbon.analytics.dataservice.restapi</artifactId>
             <type>war</type>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.analytics.oauth</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -132,6 +136,11 @@
                                     <propertyDef>org.eclipse.equinox.p2.type.group:false</propertyDef>
                                 </properties>
                             </adviceFile>
+                            <bundles>
+                                <bundleDef>
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.oauth:${carbon.analytics.version}
+                                </bundleDef>
+                            </bundles>
                             <importFeatures>
                                 <importFeatureDef>
                                     org.wso2.carbon.analytics.core:${carbon.analytics.version}

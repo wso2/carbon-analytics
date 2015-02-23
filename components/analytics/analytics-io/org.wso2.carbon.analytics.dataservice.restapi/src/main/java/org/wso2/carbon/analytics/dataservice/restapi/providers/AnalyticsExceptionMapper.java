@@ -26,7 +26,7 @@ import org.wso2.carbon.analytics.dataservice.restapi.beans.ResponseBean;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 
 /**
- * The Class AnalyticsExceptionMapper triggers when AnalyticsExcption occurred.
+ * The Class AnalyticsExceptionMapper triggers when AnalyticsException occurred.
  */
 @Provider
 public class AnalyticsExceptionMapper implements ExceptionMapper<AnalyticsException> {

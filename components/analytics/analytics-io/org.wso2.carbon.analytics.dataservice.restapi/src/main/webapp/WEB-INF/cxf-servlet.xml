@@ -2,8 +2,8 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:jaxrs="http://cxf.apache.org/jaxrs"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-		http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
 		http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
 	
 	<jaxrs:server id="analyticsServices" address="/">
@@ -16,6 +16,9 @@
 			<ref bean="analyticsIndexExceptionMapper"/>
 			<ref bean="analyticsTableNotFoundExceptionMapper"/>
 		</jaxrs:providers>
+        <!--<jaxrs:inInterceptors>-->
+            <!--<ref bean="analyticsAuthenticationInterceptor"/>-->
+        <!--</jaxrs:inInterceptors>-->
 	</jaxrs:server>
 	
 	<bean id="analyticsBean" class="org.wso2.carbon.analytics.dataservice.restapi.resources.AnalyticsResource"/>
@@ -25,5 +28,7 @@
 			class="org.wso2.carbon.analytics.dataservice.restapi.providers.AnalyticsIndexExceptionMapper"/>
 	<bean id="analyticsTableNotFoundExceptionMapper" 
 			class="org.wso2.carbon.analytics.dataservice.restapi.providers.AnalyticsTableNotFoundExceptionMapper"/>
+    <bean id="analyticsAuthenticationInterceptor"
+            class="org.wso2.carbon.analytics.dataservice.restapi.interceptor.AnalyticsAuthenticationInterceptor"/>
 	<bean id="jacksonJsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider"/>
 </beans>

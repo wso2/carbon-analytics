@@ -32,7 +32,7 @@ import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
 /**
- * @scr.component name="org.wso2.carbon.bam.message.tracer.handler " immediate="true"
+ * @scr.component name="org.wso2.carbon.analytics.message.tracer.handler " immediate="true"
  * @scr.reference name="config.context.service"
  * interface="org.wso2.carbon.utils.ConfigurationContextService" cardinality="1..1"
  * policy="dynamic" bind="setConfigurationContextService"
@@ -61,7 +61,7 @@ public class MessageTracerServiceComponent {
             msgTracerConfiguration = MessageTracerConfigurationManager.getMessageTracerConfiguration();
             // Engaging MessageTracerModule as a global module
             configurationContext.getAxisConfiguration().engageModule(
-                    MessageTracerConstants.BAM_SERVICE_MESSAGE_TRACER_MODULE_NAME);
+                    MessageTracerConstants.ANALYTICS_SERVICE_MESSAGE_TRACER_MODULE_NAME);
             BundleContext bundleContext = context.getBundleContext();
             bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(),
                                           new MessageTracerAxis2ConfigurationContextObserver(), null);

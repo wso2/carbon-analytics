@@ -48,4 +48,13 @@ public class Constants {
 		private Status() {
 		}
 	}
+
+    public static final class ResourcePath {
+
+        /**
+         * Token generator method name
+         */
+        public static final String GENERATE_TOKEN = "generate_token";
+
+    }
 }

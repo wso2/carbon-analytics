@@ -44,11 +44,11 @@ public class MessageTracerAxis2ConfigurationContextObserver extends
         setEventingConfigDataSpecificForTenant(tenantId);
 
         AxisModule messageTraceModule = axisConfiguration
-                .getModule(MessageTracerConstants.BAM_SERVICE_MESSAGE_TRACER_MODULE_NAME);
+                .getModule(MessageTracerConstants.ANALYTICS_SERVICE_MESSAGE_TRACER_MODULE_NAME);
         if (messageTraceModule != null) {
             try {
                 axisConfiguration
-                        .engageModule(MessageTracerConstants.BAM_SERVICE_MESSAGE_TRACER_MODULE_NAME);
+                        .engageModule(MessageTracerConstants.ANALYTICS_SERVICE_MESSAGE_TRACER_MODULE_NAME);
             } catch (AxisFault e) {
                 log.error("Cannot engage BAM MessageTracer module for the tenant :" + tenantId, e);
             }
