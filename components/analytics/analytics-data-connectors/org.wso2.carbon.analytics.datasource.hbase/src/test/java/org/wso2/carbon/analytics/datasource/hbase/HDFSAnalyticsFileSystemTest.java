@@ -38,7 +38,7 @@ public class HDFSAnalyticsFileSystemTest extends AnalyticsFileSystemTest {
     public void setup() throws IOException, NamingException, AnalyticsException {
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, InMemoryICFactory.class.getName());
         this.afs = new HDFSAnalyticsFileSystem(this.initFS("hdfs", "localhost", "9000"));
-        super.init("HDFSDataSource",afs);
+        super.init("HBaseDataSource",afs);
     }
 
     private FileSystem initFS(String protocol, String host, String port) throws IOException, NamingException {
