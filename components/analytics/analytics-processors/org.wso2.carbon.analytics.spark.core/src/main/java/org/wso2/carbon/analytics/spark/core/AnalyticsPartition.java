@@ -19,10 +19,8 @@
 package org.wso2.carbon.analytics.spark.core;
 
 import java.io.Serializable;
-import java.util.Arrays;
 
 import org.apache.spark.Partition;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.RecordGroup;
 
 /**
@@ -34,8 +32,11 @@ public class AnalyticsPartition implements Partition, Serializable {
     
     private RecordGroup recordGroup;
     
-    public AnalyticsPartition(RecordGroup recordGroup) {
+    private int index;
+    
+    public AnalyticsPartition(RecordGroup recordGroup, int index) {
         this.recordGroup = recordGroup;
+        this.index = index;
     }
     
     public RecordGroup getRecordGroup() {
@@ -44,11 +45,7 @@ public class AnalyticsPartition implements Partition, Serializable {
     
     @Override
     public int index() {
-        try {
-            return Arrays.asList(this.recordGroup.getLocations()).hashCode();
-        } catch (AnalyticsException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        return this.index;
     }
 
     @Override

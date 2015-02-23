@@ -123,7 +123,7 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
         } 
         Partition[] result = new Partition[rgs.length];
         for (int i = 0; i < result.length; i++) {
-            result[i] = new AnalyticsPartition(rgs[i]);
+            result[i] = new AnalyticsPartition(rgs[i], i);
         }
         return result;
     }
