@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
+
 <!--
 ~ Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 ~
@@ -17,7 +18,8 @@
 ~ under the License.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
@@ -29,40 +31,128 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.analytics.dataservice.restapi.feature</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon - Analytics REST API Feature</name>
-    <description>This feature contains the aggregate REST API bundles</description>
+    <name>WSO2 Carbon - Analytics REST API Server Feature</name>
+    <description>
+        This feature contains the bundles required for the REST API of the Analytics Data Service
+    </description>
 
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.analytics.dataservice.restapi.server.feature</artifactId>
-            <type>zip</type>
+            <artifactId>org.wso2.carbon.analytics.dataservice.restapi</artifactId>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.analytics.oauth</artifactId>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.wso2.carbon.analytics</groupId>
+                                    <artifactId>org.wso2.carbon.analytics.dataservice.restapi</artifactId>
+                                    <version>${carbon.analytics.version}</version>
+                                    <type>war</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${basedir}/src/main/resources/</outputDirectory>
+                                    <destFileName>analytics.war</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                            <!-- other configurations here -->
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>src</directory>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>src/main/resources</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>resources</directory>
+                                    <includes>
+                                        <include>analytics.war</include>
+                                        <include>p2.inf</include>
+                                        <include>build.properties</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.wso2.maven</groupId>
                 <artifactId>carbon-p2-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>4-p2-feature-generation</id>
+                        <id>p2-feature-generation</id>
                         <phase>package</phase>
                         <goals>
                             <goal>p2-feature-gen</goal>
                         </goals>
                         <configuration>
                             <id>org.wso2.carbon.analytics.dataservice.restapi</id>
-                            <includedFeatures>
-                                <includedFeatureDef>
-                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.dataservice.restapi.server.feature:${carbon.analytics.version}
-                                </includedFeatureDef>
-                            </includedFeatures>
+                            <adviceFile>
+                                <properties>
+                                    <propertyDef>org.wso2.carbon.p2.category.type:server</propertyDef>
+                                    <propertyDef>org.eclipse.equinox.p2.type.group:false</propertyDef>
+                                </properties>
+                            </adviceFile>
+                            <bundles>
+                                <bundleDef>
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.oauth:${carbon.analytics.version}
+                                </bundleDef>
+                            </bundles>
+                            <importFeatures>
+                                <importFeatureDef>
+                                    org.wso2.carbon.analytics.core:${carbon.analytics.version}
+                                </importFeatureDef>
+                            </importFeatures>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
+
+    <properties>
+    </properties>
+
 </project>
