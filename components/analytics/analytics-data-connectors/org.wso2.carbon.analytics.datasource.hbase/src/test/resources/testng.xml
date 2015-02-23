@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suite name="HDFS Analytics Data Source Test Suite" parallel="methods" thread-count="1">
+   <test name="Analytics HBase Implementation Tests">
+     <classes>
+         <class name="org.wso2.carbon.analytics.datasource.hbase.HDFSAnalyticsFileSystemTest"/>
+     </classes>
+   </test>
+</suite>
