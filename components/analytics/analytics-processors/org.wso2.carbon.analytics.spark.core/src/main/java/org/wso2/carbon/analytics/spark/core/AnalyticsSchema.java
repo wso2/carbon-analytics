@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.analytics.spark.core;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +31,7 @@ import scala.collection.Seq;
 /**
  * This class represents a Spark SQL table schema.
  */
-public class AnalyticsSchema extends StructType {
+public class AnalyticsSchema extends StructType implements Serializable {
 
     private static final long serialVersionUID = 4405181965742932573L;
 

@@ -30,6 +30,8 @@ public class AnalyticsServiceHolder {
     private static HazelcastInstance hazelcastInstance;
     
     private static AnalyticsClusterManager analyticsClusterManager;
+    
+    private static AnalyticsDataService analyticsDataService;
 
     public static void setHazelcastInstance(HazelcastInstance hazelcastInstance) {
         AnalyticsServiceHolder.hazelcastInstance = hazelcastInstance;
@@ -45,6 +47,14 @@ public class AnalyticsServiceHolder {
 
     public static void setAnalyticsClusterManager(AnalyticsClusterManager analyticsClusterManager) {
         AnalyticsServiceHolder.analyticsClusterManager = analyticsClusterManager;
+    }
+    
+    public static AnalyticsDataService getAnalyticsDataService() {
+        return analyticsDataService;
+    }
+    
+    public static void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {
+        AnalyticsServiceHolder.analyticsDataService = analyticsDataService;
     }
 
 }

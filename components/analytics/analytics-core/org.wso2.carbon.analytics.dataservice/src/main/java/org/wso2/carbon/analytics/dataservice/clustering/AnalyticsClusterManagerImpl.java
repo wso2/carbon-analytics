@@ -21,6 +21,7 @@ package org.wso2.carbon.analytics.dataservice.clustering;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +57,8 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
     
     private Map<String, GroupEventListener> groups = new HashMap<String, GroupEventListener>();
     
+    private Set<String> leaderInGroups = new HashSet<String>();
+    
     public AnalyticsClusterManagerImpl() {
         this.hz = AnalyticsServiceHolder.getHazelcastInstance();
         if (this.isClusteringEnabled()) {
@@ -79,14 +82,30 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         List<Member> groupMembers = this.getGroupMembers(groupId);
         Member myself = this.hz.getCluster().getLocalMember();
         groupMembers.add(myself);
-        if (groupMembers.get(0).equals(myself)) {
+        if (this.getLeader(groupId).equals(myself)) {
             this.executeMyselfBecomingLeader(groupId);
+        } else {
+            this.sendMemberAddedNotificationToLeader(groupId);
         }
     }
     
+    private Member getLeader(String groupId) {
+        return this.getGroupMembers(groupId).get(0);
+    }
+    
+    private void sendMemberAddedNotificationToLeader(String groupId) throws AnalyticsClusterException {
+        Member member = this.getLeader(groupId);
+        this.executeOne(groupId, member, new LeaderMemberAddedNotification(groupId));
+    }
+    
+    private boolean isLeader(String groupId) {
+        return this.leaderInGroups.contains(groupId);
+    }
+    
     private void executeMyselfBecomingLeader(String groupId) throws AnalyticsClusterException {
+        this.leaderInGroups.add(groupId);
         this.groups.get(groupId).onBecomingLeader();
-        this.execute(groupId, new LeaderUpdateNotification(groupId));
+        this.executeAll(groupId, new LeaderUpdateNotification(groupId));
     }
     
     private String generateGroupListId(String groupId) {
@@ -121,23 +140,38 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
             }
         }
     }
+    
+    @Override
+    public List<Object> getMembers(String groupId) throws AnalyticsClusterException {
+        return new ArrayList<Object>(this.getGroupMembers(groupId));
+    }
 
     @Override
-    public <T> List<T> execute(String groupId, Callable<T> callable) throws AnalyticsClusterException {
+    public <T> T executeOne(String groupId, Object member, Callable<T> callable) throws AnalyticsClusterException {
+        Future<T> result = this.hz.getExecutorService(
+                this.generateGroupExecutorId(groupId)).submitToMember(callable, (Member) member);
+        try {
+            return result.get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new AnalyticsClusterException("Error in cluster execute one: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public <T> List<T> executeAll(String groupId, Callable<T> callable) throws AnalyticsClusterException {
         if (!this.groups.containsKey(groupId)) {
             throw new AnalyticsClusterException("The node is required to join the group (" + 
                     groupId + ") before sending cluster messages");
         }
         List<Member> members = this.getGroupMembers(groupId);
         List<T> result = new ArrayList<T>();
-        Map<Member, Future<T>> executionResult;
-        executionResult = this.hz.getExecutorService(this.generateGroupExecutorId(groupId)).submitToMembers(
-                callable, members);
+        Map<Member, Future<T>> executionResult = this.hz.getExecutorService(
+                this.generateGroupExecutorId(groupId)).submitToMembers(callable, members);
         for (Map.Entry<Member, Future<T>> entry : executionResult.entrySet()) {
             try {
                 result.add(entry.getValue().get());
             } catch (InterruptedException | ExecutionException e) {
-                throw new AnalyticsClusterException("Error in cluster execute: " + e.getMessage(), e);
+                throw new AnalyticsClusterException("Error in cluster execute all: " + e.getMessage(), e);
             }
         }
         return result;
@@ -174,17 +208,31 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         List<Member> groupMembers = this.getGroupMembers(groupId);
         if (groupMembers.contains(member)) {
             groupMembers.remove(member);
+        } else {
+            /* member is not in our group */
+            return;
         }
         Member myself = this.hz.getCluster().getLocalMember();
-        if (groupMembers.get(0).equals(myself)) {
+        if (this.isLeader(groupId)) {
+            /* if I'm already the leader, notify of the membership change */
+            this.groups.get(groupId).onMembersChangeForLeader();
+        } else if (groupMembers.get(0).equals(myself)) {
+            /* check if I'm already not the leader, and if I just became the leader */
             this.executeMyselfBecomingLeader(groupId);
         }
     }
-    
+        
     private void leaderUpdateNotificationReceived(String groupId) {
         GroupEventListener listener = this.groups.get(groupId);
         if (listener != null) {
             listener.onLeaderUpdate();
+        }
+    }
+    
+    private void leaderMemberAdditionNotificationReceived(String groupId) {
+        GroupEventListener listener = this.groups.get(groupId);
+        if (listener != null) {
+            listener.onMembersChangeForLeader();
         }
     }
     
@@ -201,12 +249,43 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
     }
     
     /**
-     * This class represents the cluster message that notifies the cluster of a new leader
+     * This class represents the cluster message that notifies the cluster of a new member to the group.
      */
-    public static class LeaderUpdateNotification implements Callable<String> {
-
-        private String groupId;
+    public static class LeaderMemberAddedNotification implements Callable<String>, Serializable {
         
+        private static final long serialVersionUID = -3363760290841109792L;
+        
+        private String groupId;
+                
+        public LeaderMemberAddedNotification(String groupId) {
+            this.groupId = groupId;
+        }
+        
+        public String getGroupId() {
+            return groupId;
+        }
+
+        @Override
+        public String call() throws Exception {
+            AnalyticsClusterManager cm = AnalyticsServiceHolder.getAnalyticsClusterManager();
+            if (cm instanceof AnalyticsClusterManagerImpl) {
+                AnalyticsClusterManagerImpl cmImpl = (AnalyticsClusterManagerImpl) cm;
+                cmImpl.leaderMemberAdditionNotificationReceived(this.getGroupId());
+            }
+            return "OK";
+        }
+        
+    }
+    
+    /**
+     * This class represents the cluster message that notifies the cluster of a new leader.
+     */
+    public static class LeaderUpdateNotification implements Callable<String>, Serializable {
+
+        private static final long serialVersionUID = -8378187556136928045L;
+        
+        private String groupId;
+                
         public LeaderUpdateNotification(String groupId) {
             this.groupId = groupId;
         }

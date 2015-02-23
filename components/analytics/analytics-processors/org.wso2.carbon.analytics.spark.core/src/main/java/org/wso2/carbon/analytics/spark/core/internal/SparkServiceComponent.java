@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionContext;
-import org.wso2.carbon.analytics.spark.core.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.spark.core.AnalyticsSparkServiceHolder;
 
 /**
  * This class represents the analytics spark component.
@@ -48,11 +48,11 @@ public class SparkServiceComponent {
     }
     
     public static void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {
-        AnalyticsServiceHolder.setAnalyticsDataService(analyticsDataService);
+        AnalyticsSparkServiceHolder.setAnalyticsDataService(analyticsDataService);
     }
     
     public static void unsetAnalyticsDataService(AnalyticsDataService analyticsDataService) {
-        AnalyticsServiceHolder.clearAnalyticsDataService();
+        AnalyticsSparkServiceHolder.clearAnalyticsDataService();
     }
     
 }

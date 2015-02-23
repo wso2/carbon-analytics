@@ -28,14 +28,12 @@ import javax.naming.Context;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.testng.Assert;
-import org.testng.annotations.AfterTest;
 import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 /**
  * This class contains tests related to {@link AnalyticsRecordStore}.
  */
-@Test (singleThreaded = true)
 public class AnalyticsRecordStoreTest {
 
     private AnalyticsRecordStore analyticsRS;
@@ -46,10 +44,14 @@ public class AnalyticsRecordStoreTest {
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, InMemoryICFactory.class.getName());
     }
     
-    public void init(String implementationName, AnalyticsRecordStore analyticsRS) throws AnalyticsException {
+    protected void init(String implementationName, AnalyticsRecordStore analyticsRS) throws AnalyticsException {
         this.implementationName = implementationName;
         this.analyticsRS = analyticsRS;
-        this.analyticsRS.deleteTable(7, "mytable1");
+        this.cleanup();
+    }
+    
+    protected void cleanup() throws AnalyticsException {
+        this.analyticsRS.deleteTable(7, "MYTABLE1");
         this.analyticsRS.deleteTable(7, "T1");
     }
     
@@ -106,13 +108,6 @@ public class AnalyticsRecordStoreTest {
                     values, System.currentTimeMillis()));
         }
         return result;
-    }
-    
-    @AfterTest
-    @Test
-    public void cleanup() throws AnalyticsException {
-        this.analyticsRS.deleteTable(7, "MYTABLE1");
-        this.analyticsRS.deleteTable(7, "T1");
     }
     
     private void cleanupT1() throws AnalyticsException {

@@ -18,6 +18,7 @@
  */
 package org.wso2.carbon.analytics.datasource.rdbms;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -459,9 +460,13 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         acm.joinGroup("G1", this);
         Assert.assertTrue(this.leaderUpdated);
         int value = 5;
-        List<Integer> result = acm.execute("G1", new ClusterGroupTestMessage(value));
+        List<Integer> result = acm.executeAll("G1", new ClusterGroupTestMessage(value));
         Assert.assertTrue(result.size() > 0);
         Assert.assertEquals((int) result.get(0), value + 1);
+        List<Object> members = acm.getMembers("G1");
+        Assert.assertTrue(members.size() > 0);
+        int result2 = acm.executeOne("G1", members.get(0), new ClusterGroupTestMessage(value + 1));
+        Assert.assertEquals(result2, value + 2);
         this.resetClusterTestResults();
     }
 
@@ -482,14 +487,21 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         location = (String) AnalyticsServiceHolder.getAnalyticsClusterManager().getProperty("GX", "location");
         Assert.assertNull(location);
     }
+
+    @Override
+    public void onMembersChangeForLeader() {
+        /* nothing to do */
+    }
     
     /**
      * Test cluster message implementation.
      */
-    public static class ClusterGroupTestMessage implements Callable<Integer> {
+    public static class ClusterGroupTestMessage implements Callable<Integer>, Serializable {
 
-        private int data;
+        private static final long serialVersionUID = 3918252455368655212L;
         
+        private int data;
+                
         public ClusterGroupTestMessage(int data) {
             this.data = data;
         }

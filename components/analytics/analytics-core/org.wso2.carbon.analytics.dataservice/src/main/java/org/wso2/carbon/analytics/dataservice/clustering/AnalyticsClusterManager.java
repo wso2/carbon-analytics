@@ -36,15 +36,32 @@ public interface AnalyticsClusterManager {
     void joinGroup(String groupId, GroupEventListener groupEventListener) throws AnalyticsClusterException;
     
     /**
+     * Returns a list of members of the given group. The member object returned from this can be 
+     * used in other methods which expects this member object as a parameter, e.g. 'executeOne'
+     * @param groupId The group id of the group
+     * @return The list of object representing each member of the group.
+     * @throws AnalyticsClusterException
+     */
+    List<Object> getMembers(String groupId) throws AnalyticsClusterException;
+    
+    /**
      * Executes the given {@link Callable} in all the nodes in the group, including the current one.
-     * This method executes even if clustering is not enabled, where then it will simply execute it
-     * in the current node and return a single response.
      * @param groupId The group id of the group
      * @param callable The implementation to be executed
      * @return The aggregation of results from all the nodes
      * @throws AnalyticsClusterException
      */
-    <T> List<T> execute(String groupId, Callable<T> callable) throws AnalyticsClusterException;
+    <T> List<T> executeAll(String groupId, Callable<T> callable) throws AnalyticsClusterException;
+    
+    /**
+     * Executes the given {@link Callable} in the given member.
+     * @param groupId The group id of the group 
+     * @param member The target member, must be retrieved from a call such as 'getMembers'
+     * @param callable The implementation to be executed
+     * @return The result from the target member
+     * @throws AnalyticsClusterException
+     */
+    <T> T executeOne(String groupId, Object member, Callable<T> callable) throws AnalyticsClusterException;
 
     /**
      * Sets a property local to the given group.

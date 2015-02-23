@@ -30,16 +30,26 @@ import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerI
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStore;
+import org.wso2.carbon.analytics.datasource.rdbms.h2.H2MemDBAnalyticsFileSystemTest;
+import org.wso2.carbon.analytics.datasource.rdbms.h2.H2MemDBAnalyticsRecordStoreTest;
 
 /**
  * Standalone test implementation of {@link AnalyticsDataServiceTest}.
  */
 public class AnalyticsDataServiceStandaloneTest extends AnalyticsDataServiceTest {
 
+    private H2MemDBAnalyticsRecordStoreTest h2arstest;
+    
+    private H2MemDBAnalyticsFileSystemTest h2afstest;
+    
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException, IOException {
-        AnalyticsRecordStore ars = H2FileDBAnalyticsRecordStoreTest.cleanupAndCreateARS();
-        AnalyticsFileSystem afs = H2FileDBAnalyticsFileSystemTest.cleanupAndCreateAFS();
+        this.h2arstest = new H2MemDBAnalyticsRecordStoreTest();
+        this.h2afstest = new H2MemDBAnalyticsFileSystemTest();
+        this.h2arstest.setup();
+        this.h2afstest.setup();
+        AnalyticsRecordStore ars = this.h2arstest.getARS();
+        AnalyticsFileSystem afs = this.h2afstest.getAFS();
         AnalyticsServiceHolder.setHazelcastInstance(null);
         AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
         this.init(new AnalyticsDataServiceImpl(ars, afs, 5));
@@ -48,8 +58,8 @@ public class AnalyticsDataServiceStandaloneTest extends AnalyticsDataServiceTest
     @AfterClass
     public void done() throws NamingException, AnalyticsException, IOException {
         this.service.destroy();
-        AnalyticsServiceHolder.setAnalyticsClusterManager(null);
-        System.out.println("XXXXXXXXXXX: DONE CALLED *************");
+        this.h2arstest.destroy();
+        this.h2afstest.destroy();
     }
     
 }

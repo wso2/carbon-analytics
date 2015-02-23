@@ -54,7 +54,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
     /** One time set empty data chunk value */
     private byte[] FS_EMPTY_DATA_CHUNK;
     
-    private RDBMSQueryConfigurationEntry rDBMSQueryConfigurationEntry;
+    private RDBMSQueryConfigurationEntry rdbmsQueryConfigurationEntry;
     
     private DataSource dataSource;
     
@@ -73,8 +73,8 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
             throw new AnalyticsException("Error in looking up data source: " + 
                     e.getMessage(), e);
         }
-        if (this.rDBMSQueryConfigurationEntry == null) {
-            this.rDBMSQueryConfigurationEntry = RDBMSUtils.lookupCurrentQueryConfigurationEntry(this.dataSource);
+        if (this.rdbmsQueryConfigurationEntry == null) {
+            this.rdbmsQueryConfigurationEntry = RDBMSUtils.lookupCurrentQueryConfigurationEntry(this.dataSource);
         }
         this.FS_EMPTY_DATA_CHUNK = new byte[this.getQueryConfiguration().getFsDataChunkSize()];
         /* create the system tables */
@@ -82,11 +82,11 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
     }
     
     public RDBMSAnalyticsFileSystem() {
-        this.rDBMSQueryConfigurationEntry = null;
+        this.rdbmsQueryConfigurationEntry = null;
     }
     
     public RDBMSAnalyticsFileSystem(RDBMSQueryConfigurationEntry rDBMSQueryConfigurationEntry) throws IOException {
-        this.rDBMSQueryConfigurationEntry = rDBMSQueryConfigurationEntry;
+        this.rdbmsQueryConfigurationEntry = rDBMSQueryConfigurationEntry;
     }
     
     private void checkAndCreateSystemTables() throws AnalyticsException {
@@ -131,7 +131,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
     }
     
     public RDBMSQueryConfigurationEntry getQueryConfiguration() {
-        return rDBMSQueryConfigurationEntry;
+        return rdbmsQueryConfigurationEntry;
     }
     
     public DataSource getDataSource() {

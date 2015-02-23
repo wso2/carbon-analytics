@@ -23,16 +23,16 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 /**
  * This class represents the service holder for analytics spark module.
  */
-public class AnalyticsServiceHolder {
+public class AnalyticsSparkServiceHolder {
 
     private static AnalyticsDataService analyticsDataService;
     
     public static void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {
-        AnalyticsServiceHolder.analyticsDataService = analyticsDataService; 
+        AnalyticsSparkServiceHolder.analyticsDataService = analyticsDataService; 
     }
     
     public static void clearAnalyticsDataService() {
-        AnalyticsServiceHolder.analyticsDataService = null;
+        AnalyticsSparkServiceHolder.analyticsDataService = null;
     }
     
     public static AnalyticsDataService getAnalyticsDataService() {

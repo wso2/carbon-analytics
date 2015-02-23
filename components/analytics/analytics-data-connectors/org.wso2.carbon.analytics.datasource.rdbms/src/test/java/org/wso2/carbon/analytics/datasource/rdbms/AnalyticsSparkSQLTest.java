@@ -24,10 +24,14 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceImpl;
+import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerImpl;
 import org.wso2.carbon.analytics.datasource.core.*;
+import org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsFileSystemTest;
+import org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionContext;
 import org.wso2.carbon.analytics.spark.core.AnalyticsQueryResult;
-import org.wso2.carbon.analytics.spark.core.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.spark.core.AnalyticsSparkServiceHolder;
 
 import javax.naming.NamingException;
 
@@ -41,25 +45,34 @@ public class AnalyticsSparkSQLTest {
 
     private AnalyticsDataService service;
     
+    private H2FileDBAnalyticsRecordStoreTest h2arstest;
+    
+    private H2FileDBAnalyticsFileSystemTest h2afstest;
+    
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException, IOException {
-        AnalyticsRecordStore ars = H2FileDBAnalyticsRecordStoreTest.cleanupAndCreateARS();
-        AnalyticsFileSystem afs = H2FileDBAnalyticsFileSystemTest.cleanupAndCreateAFS();
+        this.h2arstest = new H2FileDBAnalyticsRecordStoreTest();
+        this.h2afstest = new H2FileDBAnalyticsFileSystemTest();
+        this.h2arstest.setup();
+        this.h2afstest.setup();
+        AnalyticsRecordStore ars = this.h2arstest.getARS();
+        AnalyticsFileSystem afs = this.h2afstest.getAFS();
+        AnalyticsServiceHolder.setHazelcastInstance(null);
+        AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
         this.service = new AnalyticsDataServiceImpl(ars, afs, 5);
+        AnalyticsSparkServiceHolder.setAnalyticsDataService(this.service);
+        AnalyticsExecutionContext.init();
     }
     
     @AfterClass
     public void done() throws NamingException, AnalyticsException, IOException {
         this.service.destroy();
+        this.h2arstest.destroy();
+        this.h2afstest.destroy();
+        AnalyticsExecutionContext.stop();
     }
     
     @Test
-    public void testExecutionContextInit() {
-        AnalyticsServiceHolder.setAnalyticsDataService(this.service);
-        AnalyticsExecutionContext.init();
-    }
-    
-    @Test (dependsOnMethods = "testExecutionContextInit")
     public void testExecutionSelectQuery() throws AnalyticsException {
         List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 10, -1, -1);
         this.service.deleteTable(1, "Log");
@@ -74,7 +87,24 @@ public class AnalyticsSparkSQLTest {
         Assert.assertEquals(result.getRows().size(), 10);
         System.out.println(result);
         this.service.deleteTable(1, "Log");
-        AnalyticsExecutionContext.stop();
+    }
+    
+    @Test
+    public void testExecutionInsertQuery() throws AnalyticsException {
+        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 10, -1, -1);
+        this.service.deleteTable(1, "Log");
+        this.service.createTable(1, "Log");
+        this.service.insert(records);
+        this.service.deleteTable(1, "Log2");
+        AnalyticsExecutionContext.executeQuery(1, "define table Log server_name STRING, "
+                + "ip STRING, tenant INTEGER, sequence LONG, summary STRING");
+        AnalyticsExecutionContext.executeQuery(1, "define table Log2 server_name STRING, "
+                + "ip STRING, tenant INTEGER, sequence LONG, summary STRING");
+        AnalyticsExecutionContext.executeQuery(1, "INSERT INTO Log2 SELECT ip FROM Log");
+        AnalyticsQueryResult result = AnalyticsExecutionContext.executeQuery(1, "SELECT * FROM Log2");
+        Assert.assertEquals(result.getRows().size(), 10);
+        this.service.deleteTable(1, "Log");
+        this.service.deleteTable(1, "Log2");
     }
     
 }

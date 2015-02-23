@@ -43,9 +43,9 @@ import static scala.collection.JavaConversions.asScalaIterator;
  * This class represents Spark analytics RDD implementation.
  */
 public class AnalyticsRDD extends RDD<Row> implements Serializable {
-
-    private static final long serialVersionUID = 1L;
     
+    private static final long serialVersionUID = 5948588299500227997L;
+
     private List<String> columns;
     
     private int tenantId;
@@ -65,7 +65,7 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
     public scala.collection.Iterator<Row> compute(Partition split, TaskContext context) {
         AnalyticsPartition partition = (AnalyticsPartition) split;
         try {
-            Iterator<Record> recordsItr = AnalyticsServiceHolder.getAnalyticsDataService().readRecords(partition.getRecordGroup());            
+            Iterator<Record> recordsItr = AnalyticsSparkServiceHolder.getAnalyticsDataService().readRecords(partition.getRecordGroup());            
             return new InterruptibleIterator(context, asScalaIterator(new RowRecordIteratorAdaptor(recordsItr)));
         } catch (AnalyticsException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -73,8 +73,10 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
         
     }
     
-    private class RowRecordIteratorAdaptor implements Iterator<Row> {
+    private  class RowRecordIteratorAdaptor implements Iterator<Row>, Serializable {
 
+        private static final long serialVersionUID = -8866801517386445810L;
+        
         private Iterator<Record> recordItr;
         
         public RowRecordIteratorAdaptor(Iterator<Record> recordItr) {
@@ -114,7 +116,7 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
     public Partition[] getPartitions() {
         RecordGroup[] rgs;
         try {
-            rgs = AnalyticsServiceHolder.getAnalyticsDataService().get(this.tenantId, this.tableName, 
+            rgs = AnalyticsSparkServiceHolder.getAnalyticsDataService().get(this.tenantId, this.tableName, 
                     this.columns, -1, -1, 0, Integer.MAX_VALUE);
         } catch (AnalyticsException e) {
             throw new RuntimeException(e.getMessage(), e);
