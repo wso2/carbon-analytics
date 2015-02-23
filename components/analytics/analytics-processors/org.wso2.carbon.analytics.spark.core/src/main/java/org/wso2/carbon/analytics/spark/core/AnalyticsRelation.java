@@ -25,6 +25,7 @@ import org.apache.spark.sql.catalyst.expressions.Row;
 import org.apache.spark.sql.catalyst.types.StructType;
 import org.apache.spark.sql.sources.TableScan;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import static scala.collection.JavaConversions.asJavaCollection;
@@ -33,7 +34,9 @@ import scala.reflect.ClassTag$;
 /**
  * This class represents a Spark SQL relation.
  */
-public class AnalyticsRelation extends TableScan {
+public class AnalyticsRelation extends TableScan implements Serializable {
+
+    private static final long serialVersionUID = -7773419083178608517L;
 
     private JavaSQLContext sqlContext;
     

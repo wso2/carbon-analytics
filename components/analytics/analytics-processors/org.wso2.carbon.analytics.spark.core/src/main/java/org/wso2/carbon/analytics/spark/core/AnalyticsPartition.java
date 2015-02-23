@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.analytics.spark.core;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 import org.apache.spark.Partition;
@@ -27,7 +28,7 @@ import org.wso2.carbon.analytics.datasource.core.RecordGroup;
 /**
  * Spark analytics partition implementation, based on {@link RecordGroup}.
  */
-public class AnalyticsPartition implements Partition {
+public class AnalyticsPartition implements Partition, Serializable {
     
     private static final long serialVersionUID = -5286081735740660738L;
     

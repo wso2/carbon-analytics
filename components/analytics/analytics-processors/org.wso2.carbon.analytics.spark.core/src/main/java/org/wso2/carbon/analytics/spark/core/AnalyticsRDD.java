@@ -43,9 +43,9 @@ import static scala.collection.JavaConversions.asScalaIterator;
  * This class represents Spark analytics RDD implementation.
  */
 public class AnalyticsRDD extends RDD<Row> implements Serializable {
-
-    private static final long serialVersionUID = 1L;
     
+    private static final long serialVersionUID = 5948588299500227997L;
+
     private List<String> columns;
     
     private int tenantId;
@@ -73,8 +73,10 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
         
     }
     
-    private class RowRecordIteratorAdaptor implements Iterator<Row> {
+    private  class RowRecordIteratorAdaptor implements Iterator<Row>, Serializable {
 
+        private static final long serialVersionUID = -8866801517386445810L;
+        
         private Iterator<Record> recordItr;
         
         public RowRecordIteratorAdaptor(Iterator<Record> recordItr) {

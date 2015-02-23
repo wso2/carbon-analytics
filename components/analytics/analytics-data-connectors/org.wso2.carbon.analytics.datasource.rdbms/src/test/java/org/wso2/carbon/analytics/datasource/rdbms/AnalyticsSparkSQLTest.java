@@ -60,6 +60,8 @@ public class AnalyticsSparkSQLTest {
         AnalyticsServiceHolder.setHazelcastInstance(null);
         AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
         this.service = new AnalyticsDataServiceImpl(ars, afs, 5);
+        AnalyticsSparkServiceHolder.setAnalyticsDataService(this.service);
+        AnalyticsExecutionContext.init();
     }
     
     @AfterClass
@@ -67,15 +69,10 @@ public class AnalyticsSparkSQLTest {
         this.service.destroy();
         this.h2arstest.destroy();
         this.h2afstest.destroy();
+        AnalyticsExecutionContext.stop();
     }
     
     @Test
-    public void testExecutionContextInit() {
-        AnalyticsSparkServiceHolder.setAnalyticsDataService(this.service);
-        AnalyticsExecutionContext.init();
-    }
-    
-    @Test (dependsOnMethods = "testExecutionContextInit")
     public void testExecutionSelectQuery() throws AnalyticsException {
         List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 10, -1, -1);
         this.service.deleteTable(1, "Log");
@@ -90,7 +87,24 @@ public class AnalyticsSparkSQLTest {
         Assert.assertEquals(result.getRows().size(), 10);
         System.out.println(result);
         this.service.deleteTable(1, "Log");
-        AnalyticsExecutionContext.stop();
+    }
+    
+    @Test
+    public void testExecutionInsertQuery() throws AnalyticsException {
+        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 10, -1, -1);
+        this.service.deleteTable(1, "Log");
+        this.service.createTable(1, "Log");
+        this.service.insert(records);
+        this.service.deleteTable(1, "Log2");
+        AnalyticsExecutionContext.executeQuery(1, "define table Log server_name STRING, "
+                + "ip STRING, tenant INTEGER, sequence LONG, summary STRING");
+        AnalyticsExecutionContext.executeQuery(1, "define table Log2 server_name STRING, "
+                + "ip STRING, tenant INTEGER, sequence LONG, summary STRING");
+        AnalyticsExecutionContext.executeQuery(1, "INSERT INTO Log2 SELECT ip FROM Log");
+        AnalyticsQueryResult result = AnalyticsExecutionContext.executeQuery(1, "SELECT * FROM Log2");
+        Assert.assertEquals(result.getRows().size(), 10);
+        this.service.deleteTable(1, "Log");
+        this.service.deleteTable(1, "Log2");
     }
     
 }
