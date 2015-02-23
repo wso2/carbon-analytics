@@ -55,13 +55,13 @@ import org.wso2.carbon.analytics.oauth.OAuthServiceClient;
  * The Class AnalyticsResource represents the REST APIs for
  * AnalyticsDataService.
  */
-@Path("/")
+@Path(Constants.ResourcePath.ROOT_CONTEXT)
 public class AnalyticsResource extends AbstractResource {
 
 	private static final int DEFAULT_START_INDEX = 0;
 	private static final int DEFAULT_INFINITY_INDEX = -1;
 	/** The logger. */
-	private Log logger = LogFactory.getLog(AnalyticsResource.class);
+	private static final Log logger = LogFactory.getLog(AnalyticsResource.class);
 
 	/**
 	 * Creates the table.
@@ -70,7 +70,7 @@ public class AnalyticsResource extends AbstractResource {
 	 * @throws AnalyticsException
 	 */
 	@POST
-	@Path("tables")
+	@Path(Constants.ResourcePath.TABLES)
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response createTable(TableBean tableBean) throws AnalyticsException {
@@ -96,7 +96,7 @@ public class AnalyticsResource extends AbstractResource {
 	 * @throws AnalyticsException
 	 */
 	@GET
-	@Path("table_exists")
+	@Path(Constants.ResourcePath.TABLE_EXISTS)
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response tableExists(@QueryParam("tableName")String tableName) throws AnalyticsException {
 		int tenantId = -1234;
@@ -122,7 +122,7 @@ public class AnalyticsResource extends AbstractResource {
 	 * @throws AnalyticsException
 	 */
 	@GET
-	@Path("tables")
+	@Path(Constants.ResourcePath.TABLES)
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response listTables() throws AnalyticsException {
 		int tenantId = -1234;
@@ -144,7 +144,7 @@ public class AnalyticsResource extends AbstractResource {
 	 * @throws AnalyticsException the analytics exception
 	 */
 	@DELETE
-	@Path("tables")
+	@Path(Constants.ResourcePath.TABLES)
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response deleteTable(TableBean tableBean) throws AnalyticsException {
@@ -371,7 +371,7 @@ public class AnalyticsResource extends AbstractResource {
 	@POST
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON })
-	@Path("records")
+	@Path(Constants.ResourcePath.RECORDS)
 	public Response insertRecords(List<RecordBean> recordBeans)
 	                                                           throws AnalyticsTableNotAvailableException,
 	                                                           AnalyticsException {
@@ -401,7 +401,7 @@ public class AnalyticsResource extends AbstractResource {
 	@PATCH
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON })
-	@Path("records")
+	@Path(Constants.ResourcePath.RECORDS)
 	public Response updateRecords(List<RecordBean> recordBeans) throws AnalyticsException,
 	                                                           AnalyticsTableNotAvailableException {
 		if (logger.isDebugEnabled()) {
@@ -453,8 +453,7 @@ public class AnalyticsResource extends AbstractResource {
 	 * Gets the indices.
 	 * @param tableName the table name
 	 * @return the indices
-	 * @throws AnalyticsException
-	 *             , AnalyticsIndexException
+	 * @throws AnalyticsException, AnalyticsIndexException
 	 */
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
@@ -502,13 +501,12 @@ public class AnalyticsResource extends AbstractResource {
 	 * Search records.
 	 * @param queryBean the query bean
 	 * @return the response
-	 * @throws AnalyticsException
-	 *             , AnalyticsIndexException
+	 * @throws AnalyticsException, AnalyticsIndexException
 	 */
 	@POST
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON })
-	@Path("search")
+	@Path(Constants.ResourcePath.SEARCH)
 	public Response search(QueryBean queryBean) throws AnalyticsException, AnalyticsIndexException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
@@ -544,7 +542,7 @@ public class AnalyticsResource extends AbstractResource {
 	@POST
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON })
-	@Path("search_count")
+	@Path(Constants.ResourcePath.SEARCH_COUNT)
 	public Response searchCount(QueryBean queryBean) throws AnalyticsException,
 	                                                AnalyticsIndexException {
 		int tenantId = -1234;

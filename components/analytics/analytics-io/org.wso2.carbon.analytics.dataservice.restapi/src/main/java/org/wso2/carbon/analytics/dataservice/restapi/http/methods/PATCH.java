@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
 import javax.ws.rs.HttpMethod;
 
 /**
- * The Interface PATCH represents the http method PATCH since it doesnt come out of the box in JAX RS 2.0
+ * The Interface PATCH represents the http method PATCH since it doesn't come out of the box in JAX RS 2.0
  */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

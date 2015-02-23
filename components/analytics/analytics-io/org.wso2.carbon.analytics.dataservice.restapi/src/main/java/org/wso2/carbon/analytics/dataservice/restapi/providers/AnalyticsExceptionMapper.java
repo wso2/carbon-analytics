@@ -32,7 +32,7 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 public class AnalyticsExceptionMapper implements ExceptionMapper<AnalyticsException> {
 	
 	/** The logger. */
-	Log logger = LogFactory.getLog(AnalyticsExceptionMapper.class);
+	private static final Log logger = LogFactory.getLog(AnalyticsExceptionMapper.class);
 
 	/* (non-Javadoc)
 	 * @see javax.ws.rs.ext.ExceptionMapper#toResponse(java.lang.Throwable)

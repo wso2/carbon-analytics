@@ -32,7 +32,7 @@ import org.wso2.carbon.analytics.dataservice.restapi.beans.ResponseBean;
 public class AnalyticsIndexExceptionMapper implements ExceptionMapper<AnalyticsIndexException> {
 	
 	/** The logger. */
-	Log logger = LogFactory.getLog(AnalyticsIndexExceptionMapper.class);
+	private static final Log logger = LogFactory.getLog(AnalyticsIndexExceptionMapper.class);
 
 	/* (non-Javadoc)
 	 * @see javax.ws.rs.ext.ExceptionMapper#toResponse(java.lang.Throwable)

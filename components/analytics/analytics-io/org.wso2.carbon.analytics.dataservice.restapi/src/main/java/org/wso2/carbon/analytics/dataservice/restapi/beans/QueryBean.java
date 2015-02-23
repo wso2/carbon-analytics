@@ -165,8 +165,7 @@ public class QueryBean {
 
 	/**
 	 * Sets the count.
-	 * @param count
-	 *            the new count
+	 * @param count the new count
 	 */
 	public void setCount(int count) {
 		this.count = count;

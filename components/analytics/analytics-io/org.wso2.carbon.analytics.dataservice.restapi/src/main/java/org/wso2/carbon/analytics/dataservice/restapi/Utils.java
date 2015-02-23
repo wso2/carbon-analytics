@@ -205,12 +205,12 @@ public class Utils {
 	 * @return the complete error message
 	 */
 	public static String getCompleteErrorMessage(String msg, Exception e) {
-		String message = null;
+		StringBuilder message = new StringBuilder(msg);
 		if (e.getCause() != null) { 
-			message = msg.concat(". (" + e.getCause().getMessage() + ")"); //TODO use stringbuilders
+			message.append(". (" + e.getCause().getMessage() + ")");
 		} else if (e.getMessage() != null) {
-			message = msg.concat(". (" + e.getMessage() + ")");
+			message.append(". (" + e.getMessage() + ")");
 		}
-		return message;
+		return message.toString();
 	}
 }

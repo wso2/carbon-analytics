@@ -49,8 +49,7 @@ public class RecordGroupBean {
 
 	/**
 	 * Sets the locations.
-	 * @param locations
-	 *            the new locations
+	 * @param locations the new locations
 	 */
 	public void setLocations(String[] locations) {
 		this.locations = locations;
@@ -66,8 +65,7 @@ public class RecordGroupBean {
 
 	/**
 	 * Sets the records.
-	 * @param records
-	 *            the new records
+	 * @param records the new records
 	 */
 	public void setRecords(List<RecordBean> records) {
 		this.records = records;

@@ -33,7 +33,7 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsTableNotAvailableExcep
 public class AnalyticsTableNotFoundExceptionMapper implements ExceptionMapper<AnalyticsTableNotAvailableException> {
 	
 	/** The logger. */
-	Log logger = LogFactory.getLog(AnalyticsTableNotFoundExceptionMapper.class);
+	private static final Log logger = LogFactory.getLog(AnalyticsTableNotFoundExceptionMapper.class);
 
 	/* (non-Javadoc)
 	 * @see javax.ws.rs.ext.ExceptionMapper#toResponse(java.lang.Throwable)

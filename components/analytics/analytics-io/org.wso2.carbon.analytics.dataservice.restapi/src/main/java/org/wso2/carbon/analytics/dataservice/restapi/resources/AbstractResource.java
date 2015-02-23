@@ -28,10 +28,8 @@ public abstract class AbstractResource {
 
 	/**
 	 * Handle response.
-	 * @param responseStatus
-	 *            the response status
-	 * @param message
-	 *            the message
+	 * @param responseStatus the response status
+	 * @param message the message
 	 * @return the response
 	 */
 	public Response handleResponse(ResponseStatus responseStatus, String message) {
@@ -76,10 +74,8 @@ public abstract class AbstractResource {
 
 	/**
 	 * Gets the response message.
-	 * @param status
-	 *            the status
-	 * @param message
-	 *            the message
+	 * @param status the status
+	 * @param message the message
 	 * @return the response message
 	 */
 	private ResponseBean getResponseMessage(String status, String message) {

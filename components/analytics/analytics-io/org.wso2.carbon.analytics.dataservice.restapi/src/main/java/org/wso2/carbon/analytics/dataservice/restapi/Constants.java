@@ -16,7 +16,7 @@
 package org.wso2.carbon.analytics.dataservice.restapi;
 
 /**
- * The Class Constants.
+ * The Class Constants Contains the constants used by rest apis.
  */
 public class Constants {
 
@@ -49,12 +49,31 @@ public class Constants {
 		}
 	}
 
+    /**
+     * The Class ResourcePath.
+     */
     public static final class ResourcePath {
 
-        /**
-         * Token generator method name
-         */
+        /** Token generator method name. */
         public static final String GENERATE_TOKEN = "generate_token";
+        
+        /** The Constant root context. */
+        public static final String ROOT_CONTEXT = "/";
+
+		/** The Constant tables. */
+		public static final String TABLES = "tables";
+
+		/** The Constant table_exists. */
+		public static final String TABLE_EXISTS = "table_exists";
+
+		/** The Constant records. */
+		public static final String RECORDS = "records";
+
+		/** The Constant search. */
+		public static final String SEARCH = "search";
+
+		/** The Constant search_count. */
+		public static final String SEARCH_COUNT = "search_count";
 
     }
 }

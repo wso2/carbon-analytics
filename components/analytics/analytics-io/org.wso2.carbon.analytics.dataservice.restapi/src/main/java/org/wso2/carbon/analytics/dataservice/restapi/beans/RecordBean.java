@@ -50,8 +50,7 @@ public class RecordBean {
 
 	/**
 	 * Sets the table name.
-	 * @param tableName
-	 *            the new table name
+	 * @param tableName the new table name
 	 */
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
@@ -59,8 +58,7 @@ public class RecordBean {
 
 	/**
 	 * Sets the values.
-	 * @param values
-	 *            the values
+	 * @param values the values
 	 */
 	public void setValues(Map<String, Object> values) {
 		this.values = values;
@@ -68,8 +66,7 @@ public class RecordBean {
 
 	/**
 	 * Sets the timestamp.
-	 * @param timestamp
-	 *            the new timestamp
+	 * @param timestamp the new timestamp
 	 */
 	public void setTimestamp(long timestamp) {
 		this.timestamp = new Long(timestamp);
@@ -77,8 +74,7 @@ public class RecordBean {
 
 	/**
 	 * Sets the id.
-	 * @param id
-	 *            the new id
+	 * @param id the new id
 	 */
 	public void setId(String id) {
 		this.id = id;
