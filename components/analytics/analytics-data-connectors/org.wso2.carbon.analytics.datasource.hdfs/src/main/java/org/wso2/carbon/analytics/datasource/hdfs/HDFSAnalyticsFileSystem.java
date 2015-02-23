@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Hadoop Distributed File System (HDFS) {@link AnalyticsFileSystem} - implementation.
+ * Hadoop Distributed File System (HDFS) {@link org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem} - implementation.
  */
 public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
 
@@ -45,7 +45,7 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
 
     private static final Log log = LogFactory.getLog(HDFSAnalyticsFileSystem.class);
 
-    HDFSAnalyticsFileSystem(FileSystem fs) throws AnalyticsException {
+    public HDFSAnalyticsFileSystem(FileSystem fs) throws AnalyticsException {
         this.fileSystem = fs;
     }
 
@@ -74,9 +74,9 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
     public List<String> list(String source) throws IOException {
         source = GenericUtils.normalizePath(source);
         Path path = new Path(source);
-        List<String> filePaths = new ArrayList<String>();
+        List<String> filePaths = new ArrayList<>();
         if (!(this.fileSystem.exists(path))) {
-            throw new IOException("Path specified (" + source + ") does not exist in the filesystem");
+            log.debug("Path specified (" + source + ") does not exist in the filesystem");
         } else {
             FileStatus[] files = this.fileSystem.listStatus(path);
             if (null == files) {
@@ -90,8 +90,8 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
                     }
                 }
             }
-            return filePaths;
         }
+        return filePaths;
     }
 
     @Override
@@ -151,8 +151,12 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
         return status.getLen();
     }
 
+    public void close() throws IOException {
+        this.fileSystem.close();
+    }
+
     /**
-     * HDFS Implementation of {@link DataInput}
+     * HDFS Implementation of {@link org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem.DataInput}
      */
     public class HDFSDataInput implements DataInput {
 
