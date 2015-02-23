@@ -52,7 +52,7 @@ public class H2MemDBAnalyticsFileSystemTest extends AnalyticsFileSystemTest {
         Map<String, String> props = new HashMap<String, String>();
         props.put("datasource", "DSFS");
         this.afs.init(props);
-        this.init("H2FileDBAnalyticsDataSource", this.afs);
+        this.init("H2InMemoryDBAnalyticsDataSource", this.afs);
     }
     
     public AnalyticsFileSystem getAFS() {

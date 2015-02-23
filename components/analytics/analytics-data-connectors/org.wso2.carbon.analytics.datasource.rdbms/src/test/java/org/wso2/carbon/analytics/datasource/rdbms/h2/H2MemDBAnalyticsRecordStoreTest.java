@@ -51,7 +51,7 @@ public class H2MemDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
         Map<String, String> props = new HashMap<String, String>();
         props.put("datasource", "DSRS");
         this.ars.init(props);
-        this.init("H2FileDBAnalyticsDataSource", ars);
+        this.init("H2InMemoryDBAnalyticsDataSource", ars);
     }
     
     public AnalyticsRecordStore getARS() {

@@ -64,6 +64,7 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsDirectory;
 import org.wso2.carbon.analytics.dataservice.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.AnalyticsQueryParser;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterException;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataCorruptionException;
@@ -118,7 +119,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     
     private int shardCount;
     
-    private ExecutorService executor;
+    private ExecutorService shardWorkerExecutor;
             
     public AnalyticsDataIndexer(AnalyticsRecordStore analyticsRecordStore, 
             AnalyticsFileSystem analyticsFileSystem, int shardCount) throws AnalyticsException {
@@ -175,9 +176,9 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     
     public void scheduleWorkers(List<Integer> shardIndices) throws AnalyticsException {
         this.stopAndCleanupIndexProcessing();
-        this.executor = Executors.newFixedThreadPool(shardIndices.size());
+        this.shardWorkerExecutor = Executors.newFixedThreadPool(shardIndices.size());
         for (int shardIndex : shardIndices) {
-            this.executor.execute(new IndexWorker(shardIndex));
+            this.shardWorkerExecutor.execute(new IndexWorker(shardIndex));
         }
         log.info("Scheduled Analytics Indexing Shards " + shardIndices);
     }
@@ -837,7 +838,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return tenantId + "_" + tableName.toLowerCase();
     }
     
-    public void clusterNoficationReceived(int tenantId, String tableName) throws AnalyticsIndexException {
+    private void clusterNoficationReceived(int tenantId, String tableName) throws AnalyticsIndexException {
         /* remove the entry from the cache, this will force the next index operations to load
          * the index definition from the back-end store, this makes sure, we have optimum cache cleanup
          * and improves memory usage for tenant partitioning */
@@ -846,8 +847,16 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         this.closeAndRemoveIndexDirs(tenantId, tableName);
     }
     
-    private void notifyClusterIndexChange(int tenantId, String tableName) throws AnalyticsIndexException {
-        
+    private void notifyClusterIndexChange(int tenantId, 
+            String tableName) throws AnalyticsIndexException {
+        AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
+        if (acm.isClusteringEnabled()) {
+            try {
+                acm.executeAll(ANALYTICS_INDEXING_GROUP, new IndexChangeMessage(tenantId, tableName));
+            } catch (AnalyticsClusterException e) {
+                throw new AnalyticsIndexException("Error in cluster index notification: " + e.getMessage(), e);
+            }
+        }
     }
     
     private void closeAndRemoveIndexDirs(int tenantId, String tableName) throws AnalyticsIndexException {
@@ -878,9 +887,9 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     }
     
     public void stopAndCleanupIndexProcessing() {
-        if (this.executor != null) {
-            this.executor.shutdownNow();
-            this.executor = null;
+        if (this.shardWorkerExecutor != null) {
+            this.shardWorkerExecutor.shutdownNow();
+            this.shardWorkerExecutor = null;
         }
     }
     
@@ -995,6 +1004,38 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             if (ads instanceof AnalyticsDataServiceImpl) {
                 AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
                 adsImpl.getIndexer().stopAndCleanupIndexProcessing();
+            }
+            return "OK";
+        }
+        
+    }
+    
+    /**
+     * This is executed to stop all indexing operations in the current node.
+     */
+    public static class IndexChangeMessage implements Callable<String>, Serializable {
+
+        private static final long serialVersionUID = -7722819207554840105L;
+
+        private int tenantId;
+        
+        private String tableName;
+        
+        public IndexChangeMessage(int tenantId, String tableName) {
+            this.tenantId = tenantId;
+            this.tableName = tableName;
+        }
+        
+        @Override
+        public String call() throws Exception {
+            AnalyticsDataService ads = AnalyticsServiceHolder.getAnalyticsDataService();
+            if (ads == null) {
+                throw new AnalyticsException("The analytics data service implementation is not registered");
+            }
+            /* these cluster messages are specific to AnalyticsDataServiceImpl */
+            if (ads instanceof AnalyticsDataServiceImpl) {
+                AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
+                adsImpl.getIndexer().clusterNoficationReceived(this.tenantId, this.tableName);
             }
             return "OK";
         }
