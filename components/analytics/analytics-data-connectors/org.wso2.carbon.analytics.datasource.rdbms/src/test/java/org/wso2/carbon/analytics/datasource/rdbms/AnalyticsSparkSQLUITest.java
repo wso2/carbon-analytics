@@ -34,6 +34,7 @@ import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsFileSystemTest;
 import org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionContext;
+import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.AnalyticsSparkServiceHolder;
 import org.wso2.carbon.analytics.spark.ui.client.SparkExecutionClient;
 
@@ -73,8 +74,8 @@ public class AnalyticsSparkSQLUITest {
         this.h2afstest.destroy();
     }
 
-    @Test
-    public void testUIJsonStringGeneration() throws AnalyticsException {
+    @Test(expectedExceptions = RuntimeException.class)
+    public void testUIJsonStringGeneration() throws Exception {
         System.out.printf("***** AnalyticsSparkSQLUITest ***** ");
         AnalyticsSparkServiceHolder.setAnalyticsDataService(this.service);
         AnalyticsExecutionContext.init();
@@ -97,10 +98,10 @@ public class AnalyticsSparkSQLUITest {
         Assert.assertEquals(result.charAt(result.length()-1), '}');
 
 //        example of a failing query...
-//        result = client.execute(1, "SELECT * from ABC");
-//        System.out.println(result);
-//        Assert.assertEquals(result.charAt(0), '{');
-//        Assert.assertEquals(result.charAt(result.length()-1), '}');
+        result = client.execute(1, "SELECT * from ABC");
+        System.out.println(result);
+        Assert.assertEquals(result.charAt(0), '{');
+        Assert.assertEquals(result.charAt(result.length()-1), '}');
 
         this.service.deleteTable(1, "Log");
         AnalyticsExecutionContext.stop();
