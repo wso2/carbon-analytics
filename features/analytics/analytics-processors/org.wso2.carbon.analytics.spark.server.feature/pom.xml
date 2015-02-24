@@ -203,6 +203,12 @@
             <groupId>org.apache.tomcat.wso2</groupId>
             <artifactId>tomcat-servlet-api</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>javax.servlet.jsp-api</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -251,6 +257,8 @@
                                 <bundleDef>com.esotericsoftware.kryo:kryo</bundleDef>
                                 <bundleDef>org.xerial.snappy:snappy-java</bundleDef>
                                 <bundleDef>io.netty.wso2:netty-all</bundleDef>
+                                <bundleDef>javax.servlet.jsp:javax.servlet.jsp-api</bundleDef>
+                                <bundleDef>org.apache.tomcat.wso2:tomcat-servlet-api</bundleDef>
                                 <bundleDef>org.apache.hadoop.wso2:hadoop-client</bundleDef>
                                 <bundleDef>org.json4s.wso2:json4s-jackson_2.10</bundleDef>
                                 <bundleDef>org.eclipse.jetty:jetty-continuation</bundleDef>
@@ -270,7 +278,6 @@
                                 <bundleDef>com.google.guava:guava</bundleDef>
                                 <bundleDef>org.slf4j:slf4j-api</bundleDef>
                                 <bundleDef>org.slf4j:slf4j-log4j12</bundleDef>
-                                <bundleDef>org.apache.tomcat.wso2:tomcat-servlet-api</bundleDef>
                                 <bundleDef>com.twitter.wso2:chill_2.10</bundleDef>
                                 <bundleDef>com.clearspring.analytics.wso2:stream</bundleDef>
                             </bundles>
