@@ -34,7 +34,6 @@ import org.wso2.carbon.analytics.datasource.core.Record;
 import org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsFileSystemTest;
 import org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionContext;
-import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.AnalyticsSparkServiceHolder;
 import org.wso2.carbon.analytics.spark.ui.client.SparkExecutionClient;
 
@@ -76,7 +75,7 @@ public class AnalyticsSparkSQLUITest {
 
     @Test(expectedExceptions = RuntimeException.class)
     public void testUIJsonStringGeneration() throws Exception {
-        System.out.printf("***** AnalyticsSparkSQLUITest ***** ");
+        System.out.printf("***** AnalyticsSparkSQLUITest ***** \n");
         AnalyticsSparkServiceHolder.setAnalyticsDataService(this.service);
         AnalyticsExecutionContext.init();
 
