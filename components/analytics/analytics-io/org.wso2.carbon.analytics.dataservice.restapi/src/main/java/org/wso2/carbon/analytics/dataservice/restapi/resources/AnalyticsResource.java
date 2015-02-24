@@ -76,7 +76,7 @@ public class AnalyticsResource extends AbstractResource {
 	public Response createTable(TableBean tableBean) throws AnalyticsException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
-			logger.debug("Invoking createTable for tenantId :" + -1234 + " tableName : " +
+			logger.debug("Invoking createTable for tenantId :" + tenantId + " tableName : " +
 			             tableBean.getTableName());
 		}
 		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
@@ -86,8 +86,7 @@ public class AnalyticsResource extends AbstractResource {
 		}
 		analyticsDataService.createTable(tenantId, tableBean.getTableName());
 		return handleResponse(ResponseStatus.CREATED,
-		                      "Successfully created table: " + tableBean.getTableName() +
-		                              " for tenantId: " + tenantId);
+		                      "Successfully created table: " + tableBean.getTableName());
 	}
 	
 	/**
@@ -157,8 +156,7 @@ public class AnalyticsResource extends AbstractResource {
 		if (analyticsDataService.tableExists(tenantId, tableBean.getTableName())) {
 			analyticsDataService.deleteTable(-1234, tableBean.getTableName());
 			return handleResponse(ResponseStatus.SUCCESS, "Successfully deleted table: " +
-			                                              tableBean.getTableName() +
-			                                              " for tenantId: " + -1234);
+			                                              tableBean.getTableName());
 		}
 		return handleResponse(ResponseStatus.NON_EXISTENT, "table: " + tableBean.getTableName() +
 		                                                   " does not exists.");
@@ -190,7 +188,7 @@ public class AnalyticsResource extends AbstractResource {
 		}
 		analyticsDataService.delete(tenantId, tableName, timeFrom, timeTo);
 		return handleResponse(ResponseStatus.SUCCESS, "Successfully deleted records in table: " +
-		                                              tableName + " for tenantId: " + tenantId);
+		                                              tableName);
 	}
 
 	/**
@@ -218,7 +216,7 @@ public class AnalyticsResource extends AbstractResource {
 		}
 		analyticsDataService.delete(tenantId, tableName, ids);
 		return handleResponse(ResponseStatus.SUCCESS, "Successfully deleted records in table: " +
-		                                              tableName + " for tenantId: " + tenantId);
+		                                              tableName);
 	}
 
 	/**
@@ -446,7 +444,7 @@ public class AnalyticsResource extends AbstractResource {
 		}
 		analyticsDataService.setIndices(tenantId, tableName, columns);
 		return handleResponse(ResponseStatus.CREATED, "Successfully set indices in table: " +
-		                                              tableName + " for tenantId: " + tenantId);
+		                                              tableName);
 	}
 
 	/**
@@ -494,7 +492,7 @@ public class AnalyticsResource extends AbstractResource {
 		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
 		analyticsDataService.clearIndices(tenantId, tableName);
 		return handleResponse(ResponseStatus.SUCCESS, "Successfully cleared indices in table: " +
-                                                      tableName + " for tenantId: " + tenantId);
+                                                      tableName);
 	}
 
 	/**
