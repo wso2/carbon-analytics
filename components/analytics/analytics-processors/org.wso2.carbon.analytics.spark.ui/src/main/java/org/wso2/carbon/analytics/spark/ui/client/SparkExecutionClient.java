@@ -23,7 +23,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.apache.spark.sql.api.java.StructField;
 import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionContext;
-import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.AnalyticsQueryResult;
 
 import java.util.List;
@@ -34,20 +33,18 @@ import java.util.List;
 public class SparkExecutionClient {
 
     public String execute(int tenantID, String query)
-            throws AnalyticsExecutionException, RuntimeException {
+            throws Exception {
         String resultString;
         try {
             AnalyticsQueryResult result = AnalyticsExecutionContext.executeQuery(tenantID, query);
             resultString = JsonResult(query, result);
-        } catch (AnalyticsExecutionException e) {
-            throw e;
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             throw e;
         }
         return resultString;
     }
 
-    private String JsonResult(String query, AnalyticsQueryResult res) {
+    private String JsonResult(String query, AnalyticsQueryResult res) throws Exception {
         JsonObject resObj = new JsonObject();
 
         JsonObject meta = new JsonObject();
@@ -55,7 +52,7 @@ public class SparkExecutionClient {
         meta.addProperty("responseMessage", "EXECUTED QUERY : " + query);
         JsonArray colArray = new JsonArray();
 
-        if (res != null ) {
+        if (res != null) {
             for (StructField col : res.getColumns()) {
                 colArray.add(new JsonPrimitive(col.getName()));
             }
@@ -65,15 +62,23 @@ public class SparkExecutionClient {
 
         JsonObject response = new JsonObject();
         JsonArray rows = new JsonArray();
-        if (res != null ) {
+
+        if (res != null) {
             for (List<Object> row : res.getRows()) {
                 JsonArray singleRow = new JsonArray();
+                int i=0;
                 for (Object elm : row) {
-                    singleRow.add(new JsonPrimitive(elm.toString()));
+                    try {
+                        singleRow.add(new JsonPrimitive(elm.toString()));
+                    } catch (NullPointerException e) {
+                        throw new Exception("Returned a null value for " + res.getColumns()[i].getName(), e);
+                    }
+                    i++;
                 }
                 rows.add(singleRow);
             }
         }
+
         response.add("items", rows);
         resObj.add("response", response);
 
