@@ -73,9 +73,9 @@ public class AnalyticsSparkSQLUITest {
         this.h2afstest.destroy();
     }
 
-    @Test
-    public void testUIJsonStringGeneration() throws AnalyticsException {
-        System.out.printf("***** AnalyticsSparkSQLUITest ***** ");
+    @Test(expectedExceptions = RuntimeException.class)
+    public void testUIJsonStringGeneration() throws Exception {
+        System.out.printf("***** AnalyticsSparkSQLUITest ***** \n");
         AnalyticsSparkServiceHolder.setAnalyticsDataService(this.service);
         AnalyticsExecutionContext.init();
 
@@ -97,10 +97,10 @@ public class AnalyticsSparkSQLUITest {
         Assert.assertEquals(result.charAt(result.length()-1), '}');
 
 //        example of a failing query...
-//        result = client.execute(1, "SELECT * from ABC");
-//        System.out.println(result);
-//        Assert.assertEquals(result.charAt(0), '{');
-//        Assert.assertEquals(result.charAt(result.length()-1), '}');
+        result = client.execute(1, "SELECT * from ABC");
+        System.out.println(result);
+        Assert.assertEquals(result.charAt(0), '{');
+        Assert.assertEquals(result.charAt(result.length()-1), '}');
 
         this.service.deleteTable(1, "Log");
         AnalyticsExecutionContext.stop();
