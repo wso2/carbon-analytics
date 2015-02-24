@@ -91,7 +91,7 @@ public class AnalyticsSparkSQLTest {
     
     @Test
     public void testExecutionInsertQuery() throws AnalyticsException {
-        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 10, -1, -1);
+        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 1000, -1, -1);
         this.service.deleteTable(1, "Log");
         this.service.createTable(1, "Log");
         this.service.insert(records);
@@ -105,14 +105,14 @@ public class AnalyticsSparkSQLTest {
         System.out.println("* Spark SQL define table time: " + (end - start) + " ms.");
         AnalyticsExecutionContext.executeQuery(1, "INSERT INTO Log2 SELECT * FROM Log");
         AnalyticsQueryResult result = AnalyticsExecutionContext.executeQuery(1, "SELECT * FROM Log2");
-        Assert.assertEquals(result.getRows().size(), 10);
+        Assert.assertEquals(result.getRows().size(), 1000);
         /* with the given composite primary key, it should just update the next insert */
         start = System.currentTimeMillis();
         AnalyticsExecutionContext.executeQuery(1, "INSERT INTO Log2 SELECT * FROM Log");
         end = System.currentTimeMillis();
         System.out.println("* Spark SQL insert/update table time: " + (end - start) + " ms.");
         result = AnalyticsExecutionContext.executeQuery(1, "SELECT * FROM Log2");
-        Assert.assertEquals(result.getRows().size(), 10);
+        Assert.assertEquals(result.getRows().size(), 1000);
         this.service.deleteTable(1, "Log");
         this.service.deleteTable(1, "Log2");
     }
