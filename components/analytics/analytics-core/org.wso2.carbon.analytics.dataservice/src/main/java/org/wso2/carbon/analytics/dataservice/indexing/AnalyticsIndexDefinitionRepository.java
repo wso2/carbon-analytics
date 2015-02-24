@@ -27,8 +27,8 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.AnalyticsIndexException;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem.DataInput;
+import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
+import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem.DataInput;
 
 /**
  * This class represents a repository for storing index definitions.

@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.core;
+package org.wso2.carbon.analytics.datasource.core.fs;
 
 import java.io.IOException;
 import java.util.List;
@@ -48,11 +48,11 @@ public abstract class ChunkedStream {
     /**
      * Reads in the nth chunk in the input, the chunk should contain the fully initialized 
      * buffer size, as mentioned in the chunk size of the stream. 
-     * @param n The 0 based index of the chunk
+     * @param index The 0 based index of the chunk
      * @return The the data chunk that was read
      * @throws IOException
      */
-    public abstract DataChunk readChunk(long n) throws IOException;
+    public abstract DataChunk readChunk(long index) throws IOException;
     
     public DataChunk readChunkForPosition(long position) throws IOException {
         return this.readChunk(this.getChunkNumber(position));

@@ -24,7 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.restapi.Constants;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.ResponseBean;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsTableNotAvailableException;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsTableNotAvailableException;
 
 /**
  * The Class AnalyticsTableNotFoundExceptionMapper triggers when an AnalyticsTableNotFoundException occurred.

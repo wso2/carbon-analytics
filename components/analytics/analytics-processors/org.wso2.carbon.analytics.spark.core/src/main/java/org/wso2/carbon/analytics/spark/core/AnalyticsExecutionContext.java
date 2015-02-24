@@ -29,8 +29,8 @@ import org.apache.spark.sql.api.java.StructField;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDSUtils;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsTableNotAvailableException;
-import org.wso2.carbon.analytics.datasource.core.Record;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsTableNotAvailableException;
+import org.wso2.carbon.analytics.datasource.core.rs.Record;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -101,7 +101,7 @@ public class AnalyticsExecutionContext {
             AnalyticsQueryResult data) throws AnalyticsTableNotAvailableException, AnalyticsException {
         AnalyticsDataService ads = AnalyticsSparkServiceHolder.getAnalyticsDataService();
         List<Record> records = generateInsertRecordsForTable(tenantId, tableName, data);
-        ads.insert(records);
+        ads.put(records);
     }
     
     private static Integer[] generateTableKeyIndices(String[] keys, StructField[] columns) {
@@ -261,10 +261,10 @@ public class AnalyticsExecutionContext {
         List<Record> records = new ArrayList<Record>(1);
         records.add(record);
         try {
-            ads.insert(records);
+            ads.put(records);
         } catch (AnalyticsTableNotAvailableException e) {
             ads.createTable(AnalyticsSparkConstants.TABLE_INFO_TENANT_ID, AnalyticsSparkConstants.TABLE_INFO_TABLE_NAME);
-            ads.insert(records);
+            ads.put(records);
         }
     }
     

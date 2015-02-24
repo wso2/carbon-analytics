@@ -31,12 +31,12 @@ import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsDataIndexer;
 import org.wso2.carbon.analytics.dataservice.indexing.IndexType;
 import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStore;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsTableNotAvailableException;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsTimeoutException;
-import org.wso2.carbon.analytics.datasource.core.Record;
-import org.wso2.carbon.analytics.datasource.core.RecordGroup;
+import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsTableNotAvailableException;
+import org.wso2.carbon.analytics.datasource.core.rs.Record;
+import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
 
 /**
  * The implementation of {@link AnalyticsDataService}.
@@ -122,8 +122,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     @Override
-    public void insert(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
-        this.getAnalyticsRecordStore().insert(records);
+    public void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
+        this.getAnalyticsRecordStore().put(records);
         this.getIndexer().insert(records);
     }
     

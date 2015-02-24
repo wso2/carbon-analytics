@@ -16,11 +16,13 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.core;
+package org.wso2.carbon.analytics.datasource.core.rs;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 
 /**
  * This interface represents all the analytic record related operations.
@@ -90,7 +92,7 @@ public interface AnalyticsRecordStore {
      * @throws AnalyticsException
      * @throws AnalyticsTableNotAvailableException
      */
-    void insert(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException;
+    void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException;
     
     /**
      * Retrieves data from a table.

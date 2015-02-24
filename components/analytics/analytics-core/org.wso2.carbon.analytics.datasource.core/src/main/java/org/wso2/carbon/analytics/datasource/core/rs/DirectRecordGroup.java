@@ -16,9 +16,11 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.core;
+package org.wso2.carbon.analytics.datasource.core.rs;
 
 import java.util.List;
+
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 
 /**
  * {@link RecordGroup} implementation for direct analytics data source.

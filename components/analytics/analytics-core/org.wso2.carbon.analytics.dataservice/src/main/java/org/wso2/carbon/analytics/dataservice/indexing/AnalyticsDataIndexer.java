@@ -72,11 +72,11 @@ import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataCorruptionException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStore;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsTimeoutException;
-import org.wso2.carbon.analytics.datasource.core.Record;
+import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsTableNotAvailableException;
+import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 /**
@@ -240,10 +240,10 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     private void insertIndexOperationRecords(int tenantId, String tableName, 
             List<Record> indexOpRecords) throws AnalyticsException {
         try {
-            this.getAnalyticsRecordStore().insert(indexOpRecords);
+            this.getAnalyticsRecordStore().put(indexOpRecords);
         } catch (AnalyticsTableNotAvailableException e) {
             this.getAnalyticsRecordStore().createTable(tenantId, tableName);
-            this.getAnalyticsRecordStore().insert(indexOpRecords);
+            this.getAnalyticsRecordStore().put(indexOpRecords);
         }
     }
     
@@ -276,12 +276,16 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             throw new AnalyticsException("Error in converting index ops to binary: " + e.getMessage(), e);
         } finally {
             try {
-                objOut.close();
+                if (objOut != null) {
+                    objOut.close();
+                }
             } catch (IOException e) {
                 log.error(e);
             }
             try {
-                byteOut.close();
+                if (byteOut != null) {
+                    byteOut.close();
+                }
             } catch (IOException e) {
                 log.error(e);
             }
@@ -301,12 +305,16 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                     e.getMessage(), e);
         } finally {
             try {
-                objIn.close();
+                if (objIn != null) {
+                    objIn.close();
+                }
             } catch (IOException e) {
                 log.error(e);
             }
             try {
-                byteIn.close();
+                if (byteIn != null) {
+                    byteIn.close();
+                }
             } catch (IOException e) {
                 log.error(e);
             }

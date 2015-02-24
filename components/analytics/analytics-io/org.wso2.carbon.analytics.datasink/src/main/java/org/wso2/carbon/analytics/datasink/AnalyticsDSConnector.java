@@ -18,7 +18,7 @@
 package org.wso2.carbon.analytics.datasink;
 
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.Record;
+import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.analytics.datasink.internal.util.AnalyticsDatasinkConstants;
 import org.wso2.carbon.analytics.datasink.internal.util.ServiceHolder;
 import org.wso2.carbon.databridge.commons.Attribute;
@@ -39,7 +39,7 @@ public class AnalyticsDSConnector {
 
     public void insertEvents(int tenantId, List<Event> events) throws StreamDefinitionStoreException,
             AnalyticsException {
-        ServiceHolder.getAnalyticsDataService().insert(convertEventsToRecord(tenantId, events));
+        ServiceHolder.getAnalyticsDataService().put(convertEventsToRecord(tenantId, events));
     }
 
     private String generateTableName(StreamDefinition streamDefinition) {

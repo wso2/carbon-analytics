@@ -39,10 +39,10 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStore;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsTableNotAvailableException;
-import org.wso2.carbon.analytics.datasource.core.DirectAnalyticsRecordStore;
-import org.wso2.carbon.analytics.datasource.core.Record;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsTableNotAvailableException;
+import org.wso2.carbon.analytics.datasource.core.rs.DirectAnalyticsRecordStore;
+import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 /**
@@ -152,7 +152,7 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
     }
     
     @Override
-    public void insert(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {        
+    public void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {        
         if (records.size() == 0) {
             return;
         }

@@ -20,8 +20,8 @@ import java.util.List;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.Record;
-import org.wso2.carbon.analytics.datasource.core.RecordGroup;
+import org.wso2.carbon.analytics.datasource.core.rs.Record;
+import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
 
 /**
  * This class contains utility methods for analytics data service.

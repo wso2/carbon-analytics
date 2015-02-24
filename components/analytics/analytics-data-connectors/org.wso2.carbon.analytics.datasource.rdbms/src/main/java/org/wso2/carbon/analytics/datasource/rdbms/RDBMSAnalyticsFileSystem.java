@@ -39,11 +39,11 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.ChunkedDataInput;
-import org.wso2.carbon.analytics.datasource.core.ChunkedDataOutput;
-import org.wso2.carbon.analytics.datasource.core.ChunkedStream;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem;
-import org.wso2.carbon.analytics.datasource.core.ChunkedStream.DataChunk;
+import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
+import org.wso2.carbon.analytics.datasource.core.fs.ChunkedDataInput;
+import org.wso2.carbon.analytics.datasource.core.fs.ChunkedDataOutput;
+import org.wso2.carbon.analytics.datasource.core.fs.ChunkedStream;
+import org.wso2.carbon.analytics.datasource.core.fs.ChunkedStream.DataChunk;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 /**
@@ -156,7 +156,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
             conn = this.getConnection();
             this.deleteImpl(conn, path);
         } catch (SQLException e) {
-            throw new IOException("Error in file delete: " + e.getMessage(), e);
+            throw new IOException("Error in file delete: " + path + ": " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
@@ -181,7 +181,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
             conn = this.getConnection();
             return this.existsImpl(conn, path);
         } catch (SQLException e) {
-            throw new IOException("Error in file exists: " + e.getMessage());
+            throw new IOException("Error in file exists: " + path + ": " + e.getMessage());
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
@@ -224,7 +224,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
             }
             return result;
         } catch (SQLException e) {
-            throw new IOException("Error in file exists: " + e.getMessage(), e);
+            throw new IOException("Error in file exists: " + path + ": " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(rs, stmt, conn);
         }
@@ -246,7 +246,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
             conn.commit();
         } catch (SQLException e) {
             RDBMSUtils.rollbackConnection(conn);
-            throw new IOException("Error in mkdir: " + e.getMessage(), e);
+            throw new IOException("Error in mkdir: " + path + ": " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
@@ -283,7 +283,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
             conn.commit();
         } catch (SQLException e) {
             RDBMSUtils.rollbackConnection(conn);
-            throw new IOException("Error in creating file: " + e.getMessage(), e);
+            throw new IOException("Error in creating file: " + path + ": " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
@@ -305,7 +305,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
             conn = this.getConnection();
             return this.lengthImpl(conn, path);
         } catch (SQLException e) {
-            throw new IOException("Error in file length: " + e.getMessage(), e);
+            throw new IOException("Error in file length: " + path + ": " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
@@ -335,7 +335,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
             stmt.setString(2, path);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new IOException("Error in file delete: " + e.getMessage());
+            throw new IOException("Error in file delete: " + path + ": " + e.getMessage());
         } finally {
             RDBMSUtils.cleanupConnection(null, stmt, conn);
         }
@@ -377,7 +377,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
                 return FS_EMPTY_DATA_CHUNK;
             }
         } catch (SQLException e) {
-            throw new IOException("Error in file read chunk: " + e.getMessage(), e);
+            throw new IOException("Error in file read chunk: " + path + ": " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(rs, stmt, conn);
         }
@@ -439,7 +439,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
                     stmt.execute();
                     conn.commit();
                 } catch (SQLException e1) {
-                    throw new IOException("Error in updating data chunk: " + e1.getMessage(), e1);
+                    throw new IOException("Error in updating data chunk: " + path + ": " + e1.getMessage(), e1);
                 }
             } finally {
                 if (stmt != null) {

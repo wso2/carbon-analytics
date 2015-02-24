@@ -16,12 +16,14 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.core;
+package org.wso2.carbon.analytics.datasource.core.fs;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
+
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 
 /**
  * Represents a virtual file system data operations, the path values can either terminate with "/" or not,

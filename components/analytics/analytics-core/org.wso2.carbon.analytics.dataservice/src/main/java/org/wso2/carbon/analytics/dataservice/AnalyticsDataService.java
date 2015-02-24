@@ -25,10 +25,10 @@ import java.util.Map;
 import org.wso2.carbon.analytics.dataservice.indexing.IndexType;
 import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsTimeoutException;
-import org.wso2.carbon.analytics.datasource.core.Record;
-import org.wso2.carbon.analytics.datasource.core.RecordGroup;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsTableNotAvailableException;
+import org.wso2.carbon.analytics.datasource.core.rs.Record;
+import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
 
 /**
  * This interface represents the analytics data service operations.
@@ -90,7 +90,7 @@ public interface AnalyticsDataService {
      * @throws AnalyticsException
      * @throws AnalyticsTableNotAvailableException
      */
-    void insert(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException;
+    void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException;
     
     /**
      * Retrieves data from a table.

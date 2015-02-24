@@ -16,12 +16,12 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.core;
+package org.wso2.carbon.analytics.datasource.core.fs;
 
 import java.io.IOException;
 
-import org.wso2.carbon.analytics.datasource.core.ChunkedStream.DataChunk;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem.DataInput;
+import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem.DataInput;
+import org.wso2.carbon.analytics.datasource.core.fs.ChunkedStream.DataChunk;
 
 /**
  * Chuncked data input implementation.

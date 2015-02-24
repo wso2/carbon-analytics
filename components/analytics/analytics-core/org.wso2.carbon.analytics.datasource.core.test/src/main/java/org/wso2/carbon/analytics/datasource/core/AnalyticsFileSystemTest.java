@@ -30,7 +30,8 @@ import javax.naming.Context;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem.DataInput;
+import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
+import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem.DataInput;
 
 /**
  * This class contains tests related to {@link AnalyticsFileSystem}.

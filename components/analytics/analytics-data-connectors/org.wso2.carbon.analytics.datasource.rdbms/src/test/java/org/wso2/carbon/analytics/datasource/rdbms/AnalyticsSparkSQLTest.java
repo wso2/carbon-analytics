@@ -27,6 +27,9 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceImpl;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerImpl;
 import org.wso2.carbon.analytics.datasource.core.*;
+import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
+import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsFileSystemTest;
 import org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionContext;
@@ -77,7 +80,7 @@ public class AnalyticsSparkSQLTest {
         List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 10, -1, -1);
         this.service.deleteTable(1, "Log");
         this.service.createTable(1, "Log");
-        this.service.insert(records);
+        this.service.put(records);
         AnalyticsExecutionContext.executeQuery(1, "define table Log (server_name STRING, "
                 + "ip STRING, tenant INTEGER, sequence LONG, summary STRING)");
         AnalyticsQueryResult result = AnalyticsExecutionContext.executeQuery(1, "SELECT ip FROM Log");
@@ -94,7 +97,7 @@ public class AnalyticsSparkSQLTest {
         List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 1000, -1, -1);
         this.service.deleteTable(1, "Log");
         this.service.createTable(1, "Log");
-        this.service.insert(records);
+        this.service.put(records);
         this.service.deleteTable(1, "Log2");
         AnalyticsExecutionContext.executeQuery(1, "define table Log (server_name STRING, "
                 + "ip STRING, tenant INTEGER, sequence LONG, summary STRING, log STRING)");

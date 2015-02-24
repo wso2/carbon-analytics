@@ -21,7 +21,7 @@ package org.wso2.carbon.analytics.spark.core;
 import java.io.Serializable;
 
 import org.apache.spark.Partition;
-import org.wso2.carbon.analytics.datasource.core.RecordGroup;
+import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
 
 /**
  * Spark analytics partition implementation, based on {@link RecordGroup}.

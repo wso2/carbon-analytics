@@ -46,9 +46,9 @@ import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.TableBean;
 import org.wso2.carbon.analytics.dataservice.restapi.http.methods.PATCH;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsTableNotAvailableException;
-import org.wso2.carbon.analytics.datasource.core.Record;
-import org.wso2.carbon.analytics.datasource.core.RecordGroup;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsTableNotAvailableException;
+import org.wso2.carbon.analytics.datasource.core.rs.Record;
+import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
 import org.wso2.carbon.analytics.oauth.OAuthServiceClient;
 
 /**
@@ -387,7 +387,7 @@ public class AnalyticsResource extends AbstractResource {
 			}
 		}
 		List<Record> records = Utils.getRecords(tenantId, recordBeans);
-		analyticsDataService.insert(records);
+		analyticsDataService.put(records);
 		return handleResponse(ResponseStatus.CREATED, "Successfully added records");
 	}
 
@@ -416,7 +416,7 @@ public class AnalyticsResource extends AbstractResource {
 			}
 		}
 		List<Record> records = Utils.getRecords(tenantId, recordBeans);
-		analyticsDataService.insert(records);
+		analyticsDataService.put(records);
 		return handleResponse(ResponseStatus.SUCCESS, "Successfully updated records");
 	}
 

@@ -16,10 +16,12 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.core;
+package org.wso2.carbon.analytics.datasource.core.rs;
 
 import java.util.Iterator;
 import java.util.List;
+
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 
 /**
  * Analytics record source implementation without data locality semantics. 

@@ -40,7 +40,7 @@ import org.wso2.carbon.analytics.dataservice.indexing.IndexType;
 import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.Record;
+import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.base.MultitenantConstants;
 
 /**
@@ -119,7 +119,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.createTable(tenantId, tableName);
         this.service.setIndices(tenantId, tableName, columns);
         List<Record> records = this.generateIndexRecords(tenantId, tableName, n, 0);
-        this.service.insert(records);
+        this.service.put(records);
         this.service.waitForIndexing(-1);
         List<SearchResultEntry> result = this.service.search(tenantId, tableName, "lucene", "STR1:STRING0", 0, 10);
         Assert.assertEquals(result.size(), 1);
@@ -181,7 +181,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.createTable(tenantId, tableName);
         this.service.setIndices(tenantId, tableName, columns);
         List<Record> records = this.generateIndexRecords(tenantId, tableName, 100, 0);
-        this.service.insert(records);
+        this.service.put(records);
         this.service.waitForIndexing(-1);
         int count = this.service.searchCount(tenantId, tableName, "lucene", "STR1:STRING55");
         Assert.assertEquals(count, 1);
@@ -211,7 +211,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         records.add(record);
         records.add(record2);
         this.service.setIndices(tenantId, tableName, columns);
-        this.service.insert(records);
+        this.service.put(records);
         this.service.waitForIndexing(-1);
         List<SearchResultEntry> result = this.service.search(tenantId, tableName, "lucene", "STR1:tea", 0, 10);
         Assert.assertEquals(result.size(), 1);
@@ -229,7 +229,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         records = new ArrayList<Record>();
         records.add(record);
         /* update */
-        this.service.insert(records);
+        this.service.put(records);
         this.service.waitForIndexing(-1);
         result = this.service.search(tenantId, tableName, "lucene", "STR1:tea", 0, 10);
         Assert.assertEquals(result.size(), 0);
@@ -258,7 +258,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.createTable(tenantId, tableName);
         this.service.setIndices(tenantId, tableName, columns);
         List<Record> records = this.generateIndexRecords(tenantId, tableName, 98, 0);
-        this.service.insert(records);
+        this.service.put(records);
         List<String> ids = new ArrayList<String>();
         ids.add(records.get(0).getId());
         ids.add(records.get(5).getId());
@@ -288,7 +288,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.createTable(tenantId, tableName);
         this.service.setIndices(tenantId, tableName, columns);
         List<Record> records = this.generateIndexRecords(tenantId, tableName, n, 1000);
-        this.service.insert(records);
+        this.service.put(records);
         List<Record> recordsIn = AnalyticsDSUtils.listRecords(this.service, 
                 this.service.get(tenantId, tableName, null, -1, -1, 0, -1));
         Assert.assertEquals(recordsIn.size(), n);
@@ -315,7 +315,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.createTable(50, "TableX");      
         for (int i = 0; i < 10; i++) {
             records = AnalyticsRecordStoreTest.generateRecords(50, "TableX", i, batch, -1, -1);
-            this.service.insert(records);
+            this.service.put(records);
         }
         this.cleanupTable(50, "TableX");
         
@@ -323,7 +323,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         long start = System.currentTimeMillis();
         for (int i = 0; i < n; i++) {
             records = AnalyticsRecordStoreTest.generateRecords(50, "TableX", i, batch, -1, -1);
-            this.service.insert(records);
+            this.service.put(records);
         }
         long end = System.currentTimeMillis();
         System.out.println("* Records: " + (n * batch));
@@ -342,7 +342,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         List<Record> records;
         for (int i = 0; i < n; i++) {
             records = AnalyticsRecordStoreTest.generateRecords(tenantId, tableName, i, batch, -1, -1);
-            this.service.insert(records);
+            this.service.put(records);
         }
     }
     
