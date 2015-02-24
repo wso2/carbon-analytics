@@ -30,5 +30,17 @@ public class AnalyticsSparkConstants {
     public static final String DOUBLE_TYPE = "double";
     public static final String FLOAT_TYPE = "float";
     public static final String LONG_TYPE = "long";
+    public static final String TERM_TABLE = "table";    
+    public static final String TERM_DEFINE = "define";    
+    public static final String TERM_INSERT = "insert";    
+    public static final String TERM_INTO = "into";
+    public static final String TERM_PRIMARY = "primary";
+    public static final String TERM_KEY = "key";
+    
+    public static final String TABLE_INFO_TABLE_NAME = "__TABLE_INFO__";
+    public static final int TABLE_INFO_TENANT_ID = -1000;
+    public static final String OBJECT = "OBJECT";
+    
+    public static final String DEFAULT_CHARSET = "UTF8";
     
 }

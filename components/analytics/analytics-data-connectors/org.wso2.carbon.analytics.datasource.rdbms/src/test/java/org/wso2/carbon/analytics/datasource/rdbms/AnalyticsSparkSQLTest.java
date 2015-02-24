@@ -78,8 +78,8 @@ public class AnalyticsSparkSQLTest {
         this.service.deleteTable(1, "Log");
         this.service.createTable(1, "Log");
         this.service.insert(records);
-        AnalyticsExecutionContext.executeQuery(1, "define table Log server_name STRING, "
-                + "ip STRING, tenant INTEGER, sequence LONG, summary STRING");
+        AnalyticsExecutionContext.executeQuery(1, "define table Log (server_name STRING, "
+                + "ip STRING, tenant INTEGER, sequence LONG, summary STRING)");
         AnalyticsQueryResult result = AnalyticsExecutionContext.executeQuery(1, "SELECT ip FROM Log");
         Assert.assertEquals(result.getRows().size(), 10);
         System.out.println(result);
@@ -96,12 +96,22 @@ public class AnalyticsSparkSQLTest {
         this.service.createTable(1, "Log");
         this.service.insert(records);
         this.service.deleteTable(1, "Log2");
-        AnalyticsExecutionContext.executeQuery(1, "define table Log server_name STRING, "
-                + "ip STRING, tenant INTEGER, sequence LONG, summary STRING");
-        AnalyticsExecutionContext.executeQuery(1, "define table Log2 server_name STRING, "
-                + "ip STRING, tenant INTEGER, sequence LONG, summary STRING");
-        AnalyticsExecutionContext.executeQuery(1, "INSERT INTO Log2 SELECT ip FROM Log");
+        AnalyticsExecutionContext.executeQuery(1, "define table Log (server_name STRING, "
+                + "ip STRING, tenant INTEGER, sequence LONG, summary STRING, log STRING)");
+        long start = System.currentTimeMillis();
+        AnalyticsExecutionContext.executeQuery(1, "define table Log2 (server_name STRING, "
+                + "ip STRING, tenant INTEGER, sequence LONG, summary STRING, log STRING, primary key(ip, log))");
+        long end = System.currentTimeMillis();
+        System.out.println("* Spark SQL define table time: " + (end - start) + " ms.");
+        AnalyticsExecutionContext.executeQuery(1, "INSERT INTO Log2 SELECT * FROM Log");
         AnalyticsQueryResult result = AnalyticsExecutionContext.executeQuery(1, "SELECT * FROM Log2");
+        Assert.assertEquals(result.getRows().size(), 10);
+        /* with the given composite primary key, it should just update the next insert */
+        start = System.currentTimeMillis();
+        AnalyticsExecutionContext.executeQuery(1, "INSERT INTO Log2 SELECT * FROM Log");
+        end = System.currentTimeMillis();
+        System.out.println("* Spark SQL insert/update table time: " + (end - start) + " ms.");
+        result = AnalyticsExecutionContext.executeQuery(1, "SELECT * FROM Log2");
         Assert.assertEquals(result.getRows().size(), 10);
         this.service.deleteTable(1, "Log");
         this.service.deleteTable(1, "Log2");

@@ -85,8 +85,8 @@ public class AnalyticsSparkSQLUITest {
         this.service.insert(records);
 
         SparkExecutionClient client = new SparkExecutionClient();
-        String result = client.execute(1, "define table Log server_name STRING, "
-                                          + "ip STRING, tenant INTEGER, sequence LONG, summary STRING");
+        String result = client.execute(1, "define table Log (server_name STRING, "
+                                          + "ip STRING, tenant INTEGER, sequence LONG, summary STRING)");
         Assert.assertEquals(result.charAt(0), '{');
         Assert.assertEquals(result.charAt(result.length()-1), '}');
         System.out.println(result);
