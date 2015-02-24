@@ -20,5 +20,7 @@ package org.wso2.carbon.analytics.datasource.hbase;
 public class HBaseAnalyticsDSConstants {
 
     public static final String DATASOURCE_NAME = "datasource";
+    public static final String ANALYTICS_USER_TABLE_PREFIX = "ANX";
+    public static final byte[] ANALYTICS_COLUMN_FAMILY_NAME = "carbon-analytics".getBytes();
 
 }
