@@ -25,8 +25,9 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem;
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
+import org.wso2.carbon.analytics.datasource.hbase.util.HBaseAnalyticsDSConstants;
+import org.wso2.carbon.analytics.datasource.hbase.util.HBaseUtils;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -37,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Hadoop Distributed File System (HDFS) {@link org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem} - implementation.
+ * Hadoop Distributed File System (HDFS) {@link org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem} - implementation.
  */
 public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
 
@@ -65,15 +66,12 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
 
     @Override
     public boolean exists(String source) throws IOException {
-        source = GenericUtils.normalizePath(source);
-        Path path = new Path(source);
-        return this.fileSystem.exists(path);
+        return this.fileSystem.exists(HBaseUtils.createPath(source));
     }
 
     @Override
     public List<String> list(String source) throws IOException {
-        source = GenericUtils.normalizePath(source);
-        Path path = new Path(source);
+        Path path = HBaseUtils.createPath(source);
         List<String> filePaths = new ArrayList<>();
         if (!(this.fileSystem.exists(path))) {
             log.debug("Path specified (" + source + ") does not exist in the filesystem");
@@ -96,20 +94,18 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
 
     @Override
     public void delete(String source) throws IOException {
-        source = GenericUtils.normalizePath(source);
-        Path path = new Path(source);
+        Path path = HBaseUtils.createPath(source);
         if (!(this.fileSystem.exists(path))) {
             log.debug("Path specified (" + source + ") does not exist in the filesystem");
         } else {
             /* Directory will be deleted regardless it being empty or not*/
-            this.fileSystem.delete(new Path(source), true);
+            this.fileSystem.delete(path, true);
         }
     }
 
     @Override
     public void mkdir(String source) throws IOException {
-        source = GenericUtils.normalizePath(source);
-        Path path = new Path(source);
+        Path path = HBaseUtils.createPath(source);
         if (this.fileSystem.exists(path)) {
             log.debug("Path specified (" + source + ") already exists in the filesystem");
         } else {
@@ -119,15 +115,12 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
 
     @Override
     public DataInput createInput(String source) throws IOException {
-        source = GenericUtils.normalizePath(source);
-        Path path = new Path(source);
-        return new HDFSDataInput(path, this.fileSystem);
+        return new HDFSDataInput(HBaseUtils.createPath(source), this.fileSystem);
     }
 
     @Override
     public OutputStream createOutput(String source) throws IOException {
-        source = GenericUtils.normalizePath(source);
-        Path path = new Path(source);
+        Path path = HBaseUtils.createPath(source);
         if (this.fileSystem.exists(path)) {
             log.debug("Specified path (" + source + ") already exists in filesystem and has been overwritten.");
             /* Overwriting target path */
@@ -139,15 +132,13 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
     }
 
     @Override
-    public void sync(String path) throws IOException {
+    public void sync(String source) throws IOException {
         /* Nothing to do here, since the hadoop filesystem itself is responsible for all sync operations.*/
     }
 
     @Override
     public long length(String source) throws IOException {
-        source = GenericUtils.normalizePath(source);
-        Path path = new Path(source);
-        FileStatus status = this.fileSystem.getFileStatus(path);
+        FileStatus status = this.fileSystem.getFileStatus(HBaseUtils.createPath(source));
         return status.getLen();
     }
 
@@ -156,7 +147,7 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
     }
 
     /**
-     * HDFS Implementation of {@link org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystem.DataInput}
+     * HDFS Implementation of {@link org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem.DataInput}
      */
     public class HDFSDataInput implements DataInput {
 
