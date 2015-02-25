@@ -65,14 +65,23 @@ public class MySQLInnoDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTes
     private RDBMSQueryConfigurationEntry generateQueryConfiguration() {
         RDBMSQueryConfigurationEntry conf = new RDBMSQueryConfigurationEntry();
         String[] recordTableInitQueries = new String[2];
-        recordTableInitQueries[0] = "CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data BLOB, PRIMARY KEY(record_id))";
-        recordTableInitQueries[1] = "CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}}(timestamp)";        
+        recordTableInitQueries[0] = "CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data BLOB," +
+                                    " PRIMARY KEY(record_id)) ENGINE=MYISAM";
+        recordTableInitQueries[1] = "CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)";
+        String[] recordTableDeleteQueries = new String[2];
+        recordTableDeleteQueries[0] = "DROP TABLE IF EXISTS {{TABLE_NAME}}";
+        recordTableDeleteQueries[1] = "DROP INDEX IF EXISTS {{TABLE_NAME}}_TIMESTAMP";
         conf.setRecordTableInitQueries(recordTableInitQueries);
-        conf.setRecordMergeQuery("INSERT INTO {{TABLE_NAME}} (record_id, timestamp, data) VALUES (?, ?, ?)");
+        conf.setRecordTableDeleteQueries(recordTableDeleteQueries);
+        conf.setRecordMergeQuery("INSERT INTO {{TABLE_NAME}} (timestamp, data, record_id) VALUES " +
+                                 "(?, ?, ?) ON DUPLICATE KEY UPDATE timestamp=VALUES(timestamp), data=VALUES(data)");
+        //INSERT INTO table (id, name, age) VALUES(1, "A", 19) ON DUPLICATE KEY UPDATE
+        //name=VALUES(name), age=VALUES(age)
         conf.setRecordRetrievalQuery("SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE timestamp >= ? AND timestamp < ? LIMIT ?,?");
-        conf.setRecordRetrievalWithIdsQuery("SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE AND record_id IN (:record_ids)");
-        conf.setRecordDeletionWithIdsQuery("DELETE FROM {{TABLE_NAME}} WHERE record_id IN (:record_ids)");
-        conf.setRecordDeletionQuery("DELETE FROM {{TABLE_NAME}} WHERE timestamp >= ? AND timestamp < ? AND record_id != ?");
+        conf.setRecordRetrievalWithIdsQuery("SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})");
+        conf.setRecordDeletionWithIdsQuery("DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})");
+        conf.setRecordDeletionQuery("DELETE FROM {{TABLE_NAME}} WHERE timestamp >= ? AND timestamp < ?");
+        conf.setRecordCountQuery("SELECT COUNT(*) FROM {{TABLE_NAME}}");
         conf.setPaginationFirstZeroIndexed(true);
         conf.setPaginationFirstInclusive(true);
         conf.setPaginationSecondLength(true);

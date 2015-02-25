@@ -18,35 +18,35 @@
  */
 package org.wso2.carbon.analytics.datasource.rdbms.mysql;
 
+import org.apache.tomcat.jdbc.pool.DataSource;
+import org.apache.tomcat.jdbc.pool.PoolProperties;
+import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.Parameters;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystemTest;
+import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
+import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsFileSystem;
+import org.wso2.carbon.analytics.datasource.rdbms.RDBMSQueryConfigurationEntry;
+
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
-import org.apache.tomcat.jdbc.pool.DataSource;
-import org.apache.tomcat.jdbc.pool.PoolProperties;
-import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.Parameters;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
-import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore;
-import org.wso2.carbon.analytics.datasource.rdbms.RDBMSQueryConfigurationEntry;
-
 /**
  * MySQL implementation of analytics file system tests.
  */
-public class MySQLInnoDBAnalyticsFileSystemTest extends AnalyticsRecordStoreTest {
+public class MySQLInnoDBAnalyticsFileSystemTest extends AnalyticsFileSystemTest {
 
     @BeforeSuite
     @Parameters({"mysql.url", "mysql.username", "mysql.password"})
     public void setup(String url, String username, 
-            String password) throws NamingException, AnalyticsException, SQLException {
+            String password) throws NamingException, AnalyticsException, SQLException, IOException {
         this.initDS(url, username, password);
-        AnalyticsRecordStore afs = new RDBMSAnalyticsRecordStore(this.generateQueryConfiguration());
+        AnalyticsFileSystem afs = new RDBMSAnalyticsFileSystem(this.generateQueryConfiguration());
         Map<String, String> props = new HashMap<String, String>();
         props.put("datasource", "DS");
         afs.init(props);
@@ -82,10 +82,14 @@ public class MySQLInnoDBAnalyticsFileSystemTest extends AnalyticsRecordStoreTest
     private RDBMSQueryConfigurationEntry generateQueryConfiguration() {
         RDBMSQueryConfigurationEntry conf = new RDBMSQueryConfigurationEntry();
         String[] fsTableInitQueries = new String[3];
-        fsTableInitQueries[0] = "CREATE TABLE AN_FS_PATH (path VARCHAR(256), is_directory BOOLEAN, length BIGINT, parent_path VARCHAR(256), PRIMARY KEY(path), FOREIGN KEY (parent_path) REFERENCES AN_FS_PATH(path) ON DELETE CASCADE)";
-        fsTableInitQueries[1] = "CREATE TABLE AN_FS_DATA (path VARCHAR(256), sequence BIGINT, data BLOB, PRIMARY KEY (path,sequence), FOREIGN KEY (path) REFERENCES AN_FS_PATH(path) ON DELETE CASCADE)";
-        fsTableInitQueries[2] = "CREATE INDEX index_parent_id ON AN_FS_PATH(parent_path)";        
-        conf.setFsTableInitQueries(fsTableInitQueries);        
+        fsTableInitQueries[0] = "CREATE TABLE AN_FS_PATH (path VARCHAR(256), is_directory BOOLEAN, length BIGINT, " +
+                                "parent_path VARCHAR(256), PRIMARY KEY(path), FOREIGN KEY (parent_path) REFERENCES " +
+                                "AN_FS_PATH(path) ON DELETE CASCADE) ENGINE='InnoDB'";
+        fsTableInitQueries[1] = "CREATE TABLE AN_FS_DATA (path VARCHAR(256), sequence BIGINT, data BLOB, " +
+                                "PRIMARY KEY (path,sequence), FOREIGN KEY (path) REFERENCES AN_FS_PATH(path) ON " +
+                                "DELETE CASCADE) ENGINE='InnoDB'";
+        fsTableInitQueries[2] = "CREATE INDEX index_parent_id ON AN_FS_PATH(parent_path)";
+        conf.setFsTableInitQueries(fsTableInitQueries);
         conf.setFsTablesCheckQuery("SELECT record_id FROM AN_FS_PATH WHERE path = '/'");
         conf.setFsPathRetrievalQuery("SELECT * FROM AN_FS_PATH WHERE path = ?");
         conf.setFsListFilesQuery("SELECT path FROM AN_FS_PATH WHERE parent_path = ?");

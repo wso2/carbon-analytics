@@ -115,7 +115,9 @@ public class AnalyticsRecordStoreTest {
     
     private void cleanupT1() throws AnalyticsException {
         this.analyticsRS.deleteTable(7, "T1");
+        this.analyticsRS.deleteTable(15, "T1");
         Assert.assertFalse(this.analyticsRS.tableExists(7, "T1"));
+        Assert.assertFalse(this.analyticsRS.tableExists(15, "T1"));
     }
     
     @Test
