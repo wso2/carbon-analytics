@@ -26,6 +26,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseAnalyticsDSConstants;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseUtils;
 
@@ -73,6 +74,8 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
     public List<String> list(String source) throws IOException {
         Path path = HBaseUtils.createPath(source);
         List<String> filePaths = new ArrayList<>();
+        /* maintaining normalized version of path string, because we'll be doing String operations on it later */
+        source = GenericUtils.normalizePath(source);
         if (!(this.fileSystem.exists(path))) {
             log.debug("Path specified (" + source + ") does not exist in the filesystem");
         } else {
@@ -80,7 +83,6 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
             if (null == files) {
                 throw new IOException("An error occurred while listing files from the specified path.");
             } else {
-                /* Expensive in-memory array iteration*/
                 for (FileStatus file : files) {
                     if (null != file) {
                         filePaths.add(file.getPath().toString().substring(file.getPath().toString().lastIndexOf(source) +
