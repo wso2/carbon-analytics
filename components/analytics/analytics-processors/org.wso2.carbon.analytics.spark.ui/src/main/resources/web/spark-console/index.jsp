@@ -30,10 +30,10 @@
 
     <link type="text/css" href="css/main.css" rel="stylesheet"/>
 
-    <script src="js/jquery-1.7.1.min.js"></script>
-    <script src="js/jquery.mousewheel-min.js"></script>
-    <script src="js/jquery.terminal-min.js"></script>
-    <link href="css/jquery.terminal.css" rel="stylesheet"/>
+    <%--<script src="js/jquery-1.7.1.min.js"></script>--%>
+    <%--<script src="js/jquery.mousewheel-min.js"></script>--%>
+    <%--<script src="js/jquery.terminal-min.js"></script>--%>
+    <%--<link href="css/jquery.terminal.css" rel="stylesheet"/>--%>
 
     <%--<link type="text/css" href="css/ui.all.css" rel="stylesheet"/>--%>
     <%--<script type="text/javascript" src="js/jquery-ui-1.6.custom.min.js"></script>--%>
@@ -47,7 +47,7 @@
 
             <div id="terminalArea">
 
-                <script>
+                <%--<script>
                     $(document).ready(function ($) {
                         var id = 1;
                         $('#terminalArea').terminal(function (command, term) {
@@ -116,7 +116,7 @@
                     })
                     ;
 
-                </script>
+                </script>--%>
             </div>
 
         </div>
