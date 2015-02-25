@@ -15,7 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.analytics.datasource.hbase;
+package org.wso2.carbon.analytics.datasource.hbase.util;
 
 public class HBaseAnalyticsDSConstants {
 
