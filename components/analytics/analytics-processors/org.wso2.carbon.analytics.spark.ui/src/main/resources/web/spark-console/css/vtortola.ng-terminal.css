@@ -8,11 +8,11 @@
 }
 .terminal {
     background-color:#000;
-    height: 500px;
+    height: 50em;
     color: #F6F6FF;
     font-family: monospace;
     overflow-x: hidden;
-    overflow-y:hidden;
+    overflow-y:auto;
     font-size: 12px;
     position:relative;
     padding:10px;

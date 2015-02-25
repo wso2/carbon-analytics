@@ -6,7 +6,7 @@
         var me = {};
         me.typeSoundUrl =null;
         me.startSoundUrl = null;
-        me.promptConfiguration = { end: ':>', user: 'anon', separator: '@', path: '\\' };
+        me.promptConfiguration = { end: '>', user: 'SparkSQL', separator: '', path: '' };
                
         me.getTypeEffect = null;
         me.getStartEffect = null;
@@ -89,15 +89,15 @@
         };
 
         me.resetUser = function () {
-            _user = config && config.user ? config.user : 'anon';
+            _user = config && config.user ? config.user : 'SparkSQL';
             build();
         }
 
         me.reset = function () {
-            _user = config && config.user!=null ? (config.user||'') : 'anon';
-            _path = config && config.path!=null ? (config.path||'') : '\\';
-            _userPathSeparator = config && config.separator!=null ? (config.separator||'') : '@';
-            _promptEnd = config && config.end!=null ? (config.end||'') : ':>';
+            _user = config && config.user!=null ? (config.user||'') : 'SparkSQL';
+            _path = config && config.path!=null ? (config.path||'') : '';
+            _userPathSeparator = config && config.separator!=null ? (config.separator||'') : '';
+            _promptEnd = config && config.end!=null ? (config.end||'') : '>';
             build();
         };
 
@@ -203,11 +203,11 @@
     });
        
     $scope.keypress= function (keyCode) {
-        if ($scope.commandLine.length < 80) {
+//        if ($scope.commandLine.length < 80) {
             commandIndex = -1;
             $scope.commandLine += String.fromCharCode(keyCode);
             $scope.$$phase || $scope.$apply();
-        }
+//        }
     };
 
     $scope.previousCommand = function () {

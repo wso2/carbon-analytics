@@ -24,9 +24,8 @@
 
 #terminalArea {
     height: 50em;
-    overflow: auto;
-
-    /*background: #000000;*/
+    /*overflow-y: auto;*/
+    background: #000;
     /*border: #3b3512 solid 1px;*/
     margin: 1px;
 }
