@@ -23,6 +23,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -161,7 +162,36 @@ public class AnalyticsResource extends AbstractResource {
 		return handleResponse(ResponseStatus.NON_EXISTENT, "table: " + tableBean.getTableName() +
 		                                                   " does not exists.");
 	}
-
+	
+	/**
+	 * Inserts or update a list of records to a table. updating happens only if there are matching record ids
+	 * @param recordBeans the list of the record beans
+	 * @return the response
+	 * @throws AnalyticsException
+	 * @throws AnalyticsTableNotAvailableException
+	 */
+	@POST
+	@Consumes({ MediaType.APPLICATION_JSON})
+	@Produces({ MediaType.APPLICATION_JSON })
+	@Path("tables/{tableName}")
+	public Response insertRecordsToTable(@PathParam("tableName")String tableName, List<RecordBean> recordBeans)
+	                                                           throws AnalyticsTableNotAvailableException,
+	                                                           AnalyticsException {
+		if (logger.isDebugEnabled()) {
+			logger.debug("Invoking insertRecordsToTable");
+		}
+		int tenantId = -1234;
+		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
+		if (logger.isDebugEnabled()) {
+			for (RecordBean recordBean : recordBeans) {
+				logger.debug(" inserting -- Record Id: " + recordBean.getId() + " values :" +
+				             recordBean.toString() + " to table :" + tableName);
+			}
+		}
+		List<Record> records = Utils.getRecordsForTable(tenantId, tableName, recordBeans);
+		analyticsDataService.put(records);
+		return handleResponse(ResponseStatus.SUCCESS, "Successfully inserted records to table:" + tableName);
+	}
 	/**
 	 * Delete records either the time range, but not both
 	 * @param tableName  the table name
@@ -360,7 +390,7 @@ public class AnalyticsResource extends AbstractResource {
 	}
 
 	/**
-	 * Inserts a list of records.
+	 * Inserts or update a list of records. Update only happens if there are matching record ids
 	 * @param recordBeans the list of the record beans
 	 * @return the response
 	 * @throws AnalyticsException
@@ -386,36 +416,7 @@ public class AnalyticsResource extends AbstractResource {
 		}
 		List<Record> records = Utils.getRecords(tenantId, recordBeans);
 		analyticsDataService.put(records);
-		return handleResponse(ResponseStatus.CREATED, "Successfully added records");
-	}
-
-	/**
-	 * Updates a list of records.
-	 * @param recordBeans  the record beans
-	 * @return the response
-	 * @throws AnalyticsException
-	 *             , AnalyticsTableNotAvailableException
-	 */
-	@PATCH
-	@Consumes({ MediaType.APPLICATION_JSON})
-	@Produces({ MediaType.APPLICATION_JSON })
-	@Path(Constants.ResourcePath.RECORDS)
-	public Response updateRecords(List<RecordBean> recordBeans) throws AnalyticsException,
-	                                                           AnalyticsTableNotAvailableException {
-		if (logger.isDebugEnabled()) {
-			logger.debug("Invoking updateRecords");
-		}
-		int tenantId = -1234;
-		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
-		if (logger.isDebugEnabled()) {
-			for (RecordBean recordBean : recordBeans) {
-				logger.debug(" updating -- Record Id: " + recordBean.getId() + " values :" +
-				             recordBean.toString());
-			}
-		}
-		List<Record> records = Utils.getRecords(tenantId, recordBeans);
-		analyticsDataService.put(records);
-		return handleResponse(ResponseStatus.SUCCESS, "Successfully updated records");
+		return handleResponse(ResponseStatus.SUCCESS, "Successfully inserted records");
 	}
 
 	/**
