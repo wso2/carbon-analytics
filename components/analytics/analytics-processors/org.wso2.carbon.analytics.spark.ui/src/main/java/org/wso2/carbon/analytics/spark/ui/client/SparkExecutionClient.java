@@ -68,9 +68,9 @@ public class SparkExecutionClient {
                 JsonArray singleRow = new JsonArray();
                 int i = 0;
                 for (Object elm : row) {
-                    try {
+                    if (elm != null) {
                         singleRow.add(new JsonPrimitive(elm.toString()));
-                    } catch (NullPointerException e) {
+                    } else {
                         singleRow.add(new JsonPrimitive("NULL"));
                     }
                     i++;
