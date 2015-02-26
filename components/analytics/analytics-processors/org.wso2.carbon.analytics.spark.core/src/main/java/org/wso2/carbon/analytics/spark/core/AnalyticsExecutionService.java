@@ -47,22 +47,25 @@ import java.util.UUID;
 /**
  * This class represents the analytics query execution context.
  */
-public class AnalyticsExecutionContext {
+public class AnalyticsExecutionService {
 
-    private static final Log log = LogFactory.getLog(AnalyticsExecutionContext.class);
+    private static final String CARBON_ANALYTICS_SPARK_APP_NAME = "CarbonAnalytics";
+
+    private static final Log log = LogFactory.getLog(AnalyticsExecutionService.class);
+    
+    private static JavaSparkContext sparkCtx;
     
     private static JavaSQLContext sqlCtx;
     
     public static void init() {
-        SparkConf sparkConf = new SparkConf()
-                .setMaster("local")
-                .setAppName("CarbonAnalytics");
-        JavaSparkContext ctx = new JavaSparkContext(sparkConf);
-        sqlCtx = new JavaSQLContext(ctx);
+        SparkConf sparkConf = new SparkConf().setMaster("local").setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
+        sparkCtx = new JavaSparkContext(sparkConf);
+        sqlCtx = new JavaSQLContext(sparkCtx);
     }
 
-    public static void stop(){
+    public static void stop() {
         sqlCtx.sqlContext().sparkContext().stop();
+        sparkCtx.close();
     }
     
     public static AnalyticsQueryResult executeQuery(int tenantId, String query) throws AnalyticsExecutionException {
@@ -140,13 +143,21 @@ public class AnalyticsExecutionContext {
     private static List<Record> generateInsertRecordsForTable(int tenantId, String tableName, 
             AnalyticsQueryResult data) throws AnalyticsException {
         String[] keys = loadTableKeys(tenantId, tableName);
+        boolean primaryKeysExists = keys.length > 0;
         List<List<Object>> rows = data.getRows();
         StructField[] columns = data.getColumns();
         Integer[] keyIndices = generateTableKeyIndices(keys, columns);
         List<Record> result = new ArrayList<Record>(rows.size());
+        Record record;
         for (List<Object> row : rows) {
-            result.add(new Record(generateInsertRecordId(row, keyIndices), tenantId, tableName, 
-                    extractValuesFromRow(row, columns), System.currentTimeMillis()));
+            if (primaryKeysExists) {
+                record = new Record(generateInsertRecordId(row, keyIndices), tenantId, tableName, 
+                        extractValuesFromRow(row, columns), System.currentTimeMillis());
+            } else {
+                record = new Record(tenantId, tableName, extractValuesFromRow(row, columns), 
+                        System.currentTimeMillis());
+            }
+            result.add(record);
         }
         return result;
     }

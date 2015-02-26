@@ -22,7 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
-import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionContext;
+import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionService;
 import org.wso2.carbon.analytics.spark.core.AnalyticsSparkServiceHolder;
 
 /**
@@ -40,11 +40,17 @@ public class SparkServiceComponent {
             if (log.isDebugEnabled()) {
                 log.debug("Starting 'SparkServiceComponent'");
             }
-
-            AnalyticsExecutionContext.init();
+            AnalyticsExecutionService.init();
+            if (log.isDebugEnabled()) {
+                log.debug("Done initializing 'SparkServiceComponent'");
+            }
         } catch (Throwable e) {
             log.error(e.getMessage(), e);
         }
+    }
+    
+    protected void deactivate(ComponentContext ctx) {
+        AnalyticsExecutionService.stop();
     }
     
     public static void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {

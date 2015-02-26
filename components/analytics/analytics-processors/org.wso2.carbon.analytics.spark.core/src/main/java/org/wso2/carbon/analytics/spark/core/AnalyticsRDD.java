@@ -73,7 +73,10 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
         
     }
     
-    private  class RowRecordIteratorAdaptor implements Iterator<Row>, Serializable {
+    /**
+     * Row iterator implementation to act as an adaptor for a record iterator.
+     */
+    private class RowRecordIteratorAdaptor implements Iterator<Row>, Serializable {
 
         private static final long serialVersionUID = -8866801517386445810L;
         

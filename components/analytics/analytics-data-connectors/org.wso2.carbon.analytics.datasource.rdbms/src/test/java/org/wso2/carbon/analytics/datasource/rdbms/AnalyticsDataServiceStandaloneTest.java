@@ -52,7 +52,7 @@ public class AnalyticsDataServiceStandaloneTest extends AnalyticsDataServiceTest
         AnalyticsFileSystem afs = this.h2afstest.getAFS();
         AnalyticsServiceHolder.setHazelcastInstance(null);
         AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
-        this.init(new AnalyticsDataServiceImpl(ars, afs, 5));
+        this.init(new AnalyticsDataServiceImpl(ars, afs, 6));
     }
     
     @AfterClass

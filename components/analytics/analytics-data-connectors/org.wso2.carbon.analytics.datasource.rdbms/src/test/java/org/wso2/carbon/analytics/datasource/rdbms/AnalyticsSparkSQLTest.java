@@ -32,7 +32,7 @@ import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsFileSystemTest;
 import org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsRecordStoreTest;
-import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionContext;
+import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionService;
 import org.wso2.carbon.analytics.spark.core.AnalyticsQueryResult;
 import org.wso2.carbon.analytics.spark.core.AnalyticsSparkServiceHolder;
 
@@ -62,9 +62,9 @@ public class AnalyticsSparkSQLTest {
         AnalyticsFileSystem afs = this.h2afstest.getAFS();
         AnalyticsServiceHolder.setHazelcastInstance(null);
         AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
-        this.service = new AnalyticsDataServiceImpl(ars, afs, 5);
+        this.service = new AnalyticsDataServiceImpl(ars, afs, 6);
         AnalyticsSparkServiceHolder.setAnalyticsDataService(this.service);
-        AnalyticsExecutionContext.init();
+        AnalyticsExecutionService.init();
     }
     
     @AfterClass
@@ -72,7 +72,7 @@ public class AnalyticsSparkSQLTest {
         this.service.destroy();
         this.h2arstest.destroy();
         this.h2afstest.destroy();
-        AnalyticsExecutionContext.stop();
+        AnalyticsExecutionService.stop();
     }
     
     @Test
@@ -81,12 +81,12 @@ public class AnalyticsSparkSQLTest {
         this.service.deleteTable(1, "Log");
         this.service.createTable(1, "Log");
         this.service.put(records);
-        AnalyticsExecutionContext.executeQuery(1, "define table Log (server_name STRING, "
+        AnalyticsExecutionService.executeQuery(1, "define table Log (server_name STRING, "
                 + "ip STRING, tenant INTEGER, sequence LONG, summary STRING)");
-        AnalyticsQueryResult result = AnalyticsExecutionContext.executeQuery(1, "SELECT ip FROM Log");
+        AnalyticsQueryResult result = AnalyticsExecutionService.executeQuery(1, "SELECT ip FROM Log");
         Assert.assertEquals(result.getRows().size(), 10);
         System.out.println(result);
-        result = AnalyticsExecutionContext.executeQuery(1, "SELECT * FROM Log");
+        result = AnalyticsExecutionService.executeQuery(1, "SELECT * FROM Log");
         Assert.assertEquals(result.getRows().size(), 10);
         System.out.println(result);
         this.service.deleteTable(1, "Log");
@@ -99,25 +99,34 @@ public class AnalyticsSparkSQLTest {
         this.service.createTable(1, "Log");
         this.service.put(records);
         this.service.deleteTable(1, "Log2");
-        AnalyticsExecutionContext.executeQuery(1, "define table Log (server_name STRING, "
+        this.service.deleteTable(1, "Log3");
+        AnalyticsExecutionService.executeQuery(1, "define table Log (server_name STRING, "
                 + "ip STRING, tenant INTEGER, sequence LONG, summary STRING, log STRING)");
         long start = System.currentTimeMillis();
-        AnalyticsExecutionContext.executeQuery(1, "define table Log2 (server_name STRING, "
+        AnalyticsExecutionService.executeQuery(1, "define table Log2 (server_name STRING, "
                 + "ip STRING, tenant INTEGER, sequence LONG, summary STRING, log STRING, primary key(ip, log))");
+        AnalyticsExecutionService.executeQuery(1, "define table Log3 (server_name STRING, "
+                + "ip STRING, tenant INTEGER, sequence LONG, summary STRING, log STRING)");
         long end = System.currentTimeMillis();
         System.out.println("* Spark SQL define table time: " + (end - start) + " ms.");
-        AnalyticsExecutionContext.executeQuery(1, "INSERT INTO Log2 SELECT * FROM Log");
-        AnalyticsQueryResult result = AnalyticsExecutionContext.executeQuery(1, "SELECT * FROM Log2");
+        AnalyticsExecutionService.executeQuery(1, "INSERT INTO Log2 SELECT * FROM Log");
+        AnalyticsQueryResult result = AnalyticsExecutionService.executeQuery(1, "SELECT * FROM Log2");
         Assert.assertEquals(result.getRows().size(), 1000);
         /* with the given composite primary key, it should just update the next insert */
         start = System.currentTimeMillis();
-        AnalyticsExecutionContext.executeQuery(1, "INSERT INTO Log2 SELECT * FROM Log");
+        AnalyticsExecutionService.executeQuery(1, "INSERT INTO Log2 SELECT * FROM Log");
         end = System.currentTimeMillis();
         System.out.println("* Spark SQL insert/update table time: " + (end - start) + " ms.");
-        result = AnalyticsExecutionContext.executeQuery(1, "SELECT * FROM Log2");
+        result = AnalyticsExecutionService.executeQuery(1, "SELECT * FROM Log2");
         Assert.assertEquals(result.getRows().size(), 1000);
+        
+        AnalyticsExecutionService.executeQuery(1, "INSERT INTO Log3 SELECT * FROM Log");
+        result = AnalyticsExecutionService.executeQuery(1, "SELECT * FROM Log3");
+        Assert.assertEquals(result.getRows().size(), 1000);
+        
         this.service.deleteTable(1, "Log");
         this.service.deleteTable(1, "Log2");
+        this.service.deleteTable(1, "Log3");
     }
     
 }

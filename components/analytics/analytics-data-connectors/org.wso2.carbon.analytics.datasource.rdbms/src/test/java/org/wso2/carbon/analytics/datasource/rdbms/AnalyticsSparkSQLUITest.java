@@ -33,7 +33,7 @@ import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsFileSystemTest;
 import org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsRecordStoreTest;
-import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionContext;
+import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionService;
 import org.wso2.carbon.analytics.spark.core.AnalyticsSparkServiceHolder;
 import org.wso2.carbon.analytics.spark.ui.client.SparkExecutionClient;
 
@@ -63,7 +63,7 @@ public class AnalyticsSparkSQLUITest {
         AnalyticsFileSystem afs = this.h2afstest.getAFS();
         AnalyticsServiceHolder.setHazelcastInstance(null);
         AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
-        this.service = new AnalyticsDataServiceImpl(ars, afs, 5);
+        this.service = new AnalyticsDataServiceImpl(ars, afs, 6);
     }
 
     @AfterClass
@@ -77,7 +77,7 @@ public class AnalyticsSparkSQLUITest {
     public void testUIJsonStringGeneration() throws Exception {
         System.out.printf("***** AnalyticsSparkSQLUITest ***** \n");
         AnalyticsSparkServiceHolder.setAnalyticsDataService(this.service);
-        AnalyticsExecutionContext.init();
+        AnalyticsExecutionService.init();
 
         List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 10, -1, -1);
         this.service.deleteTable(1, "Log");
@@ -103,7 +103,7 @@ public class AnalyticsSparkSQLUITest {
         Assert.assertEquals(result.charAt(result.length()-1), '}');
 
         this.service.deleteTable(1, "Log");
-        AnalyticsExecutionContext.stop();
+        AnalyticsExecutionService.stop();
     }
 
 }

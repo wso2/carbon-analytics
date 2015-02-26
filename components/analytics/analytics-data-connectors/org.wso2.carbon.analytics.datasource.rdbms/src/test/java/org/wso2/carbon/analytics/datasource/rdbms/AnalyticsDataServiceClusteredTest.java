@@ -55,7 +55,7 @@ public class AnalyticsDataServiceClusteredTest extends AnalyticsDataServiceTest 
         AnalyticsFileSystem afs = this.h2afstest.getAFS();
         AnalyticsServiceHolder.setHazelcastInstance(Hazelcast.newHazelcastInstance());
         AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
-        this.init(new AnalyticsDataServiceImpl(ars, afs, 5));
+        this.init(new AnalyticsDataServiceImpl(ars, afs, 6));
     }
     
     @AfterClass

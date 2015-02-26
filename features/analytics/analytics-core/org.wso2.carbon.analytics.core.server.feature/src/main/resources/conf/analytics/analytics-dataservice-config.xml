@@ -15,5 +15,5 @@
    <analytics-lucene-analyzer>
    		<implementation>org.apache.lucene.analysis.standard.StandardAnalyzer</implementation>
    </analytics-lucene-analyzer>
-   <shardCount>5</shardCount>
+   <shardCount>6</shardCount>
 </analytics-dataservice-configuration>

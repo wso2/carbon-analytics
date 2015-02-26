@@ -22,7 +22,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.apache.spark.sql.api.java.StructField;
-import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionContext;
+import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionService;
 import org.wso2.carbon.analytics.spark.core.AnalyticsQueryResult;
 
 import java.util.List;
@@ -36,7 +36,7 @@ public class SparkExecutionClient {
             throws Exception {
         String resultString;
         try {
-            AnalyticsQueryResult result = AnalyticsExecutionContext.executeQuery(tenantID, query);
+            AnalyticsQueryResult result = AnalyticsExecutionService.executeQuery(tenantID, query);
             resultString = JsonResult(query, result);
         } catch (Exception e) {
             throw e;
