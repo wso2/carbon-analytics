@@ -66,10 +66,10 @@ public class SparkExecutionClient {
         if (res != null) {
             for (List<Object> row : res.getRows()) {
                 JsonArray singleRow = new JsonArray();
-                int i=0;
+                int i = 0;
                 for (Object elm : row) {
                     try {
-                        singleRow.add(new JsonPrimitive(elm.toString()));
+                        singleRow.add(new JsonPrimitive(" " + elm.toString()));
                     } catch (NullPointerException e) {
                         throw new Exception("Returned a null value for " + res.getColumns()[i].getName(), e);
                     }
