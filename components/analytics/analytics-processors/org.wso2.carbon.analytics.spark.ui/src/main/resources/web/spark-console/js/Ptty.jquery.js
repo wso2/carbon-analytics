@@ -765,7 +765,7 @@
                 var save_to_history = (value.charAt(0) == ' ') ? false : true;
                 // Encode value by putting it in a fake container and fishing it out.
                 // Decode value using: return $('<div/>').html(value).text();
-                value = $.trim($('<div/>').text(value).html()).toLowerCase();
+                value = $.trim($('<div/>').text(value).html());
 
                 // Password input
                 if (psw_input.val().length) {
@@ -795,7 +795,7 @@
                 }
 
                 var tokens = value.split(/\s+/);
-                var key = tokens[0];
+                var key = tokens[0].toLowerCase();
 
                 // Add to history
                 if (settings.history && (typeof dispatch[key] !== 'undefined' || cdispatch)
