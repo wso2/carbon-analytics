@@ -65,12 +65,16 @@ public class AnalyticsDSConnector {
             populateTypedAttributes(AnalyticsDatasinkConstants.EVENT_CORRELATION_DATA_TYPE,
                     streamDefinition.getCorrelationData(),
                     event.getCorrelationData(), eventAttributes);
-            populateTypedAttributes(AnalyticsDatasinkConstants.EVENT_PAYLOAD_DATA_TYPE,
+            populateTypedAttributes(null,
                     streamDefinition.getPayloadData(),
                     event.getPayloadData(), eventAttributes);
 
             if (event.getArbitraryDataMap() != null && !event.getArbitraryDataMap().isEmpty()) {
-                eventAttributes.putAll(event.getArbitraryDataMap());
+                Iterator<String> eventArbitraryFieldsIterator = event.getArbitraryDataMap().keySet().iterator();
+                while (eventArbitraryFieldsIterator.hasNext()) {
+                    String attributeName = eventArbitraryFieldsIterator.next();
+                    eventAttributes.put("_" + attributeName, event.getArbitraryDataMap().get(attributeName));
+                }
             }
 
             if (event.getTimeStamp() != 0L) {
@@ -92,7 +96,12 @@ public class AnalyticsDSConnector {
         }
         int iteration = 0;
         for (Attribute attribute : attributes) {
-            String attributeKey = type + "_" + attribute.getName();
+            String attributeKey;
+            if (type == null) {
+                attributeKey = attribute.getName();
+            } else {
+                attributeKey = type + "_" + attribute.getName();
+            }
             eventAttribute.put(attributeKey, values[iteration]);
             iteration++;
         }
