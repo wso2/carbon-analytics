@@ -45,11 +45,11 @@
         </dependency>
 
         <dependency>
-            <groupId>org.wso2.apache.spark</groupId>
+            <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_2.10</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.apache.spark</groupId>
+            <groupId>org.apache.spark</groupId>
             <artifactId>spark-sql_2.10</artifactId>
         </dependency>
         <dependency>
