@@ -119,14 +119,38 @@ public class AnalyticsSparkSQLTest {
         System.out.println("* Spark SQL insert/update table time: " + (end - start) + " ms.");
         result = AnalyticsExecutionService.executeQuery(1, "SELECT * FROM Log2");
         Assert.assertEquals(result.getRows().size(), 1000);
-        
+        /* insert to a table without a primary key */
         AnalyticsExecutionService.executeQuery(1, "INSERT INTO Log3 SELECT * FROM Log");
         result = AnalyticsExecutionService.executeQuery(1, "SELECT * FROM Log3");
         Assert.assertEquals(result.getRows().size(), 1000);
+        AnalyticsExecutionService.executeQuery(1, "INSERT INTO Log3 SELECT * FROM Log");
+        result = AnalyticsExecutionService.executeQuery(1, "SELECT * FROM Log3");
+        Assert.assertEquals(result.getRows().size(), 2000);
         
         this.service.deleteTable(1, "Log");
         this.service.deleteTable(1, "Log2");
         this.service.deleteTable(1, "Log3");
+    }
+    
+    @Test
+    public void testExecutionTableAliasQuery() throws AnalyticsException {
+        this.service.deleteTable(1, "ESBLogs");
+        this.service.deleteTable(1, "ESBLogsBackup");
+        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "org_wso2_logs_esb_100", 0, 1200, -1, -1);
+        this.service.deleteTable(1, "org_wso2_logs_esb_100");
+        this.service.createTable(1, "org_wso2_logs_esb_100");
+        this.service.put(records);
+        AnalyticsExecutionService.executeQuery(1, "define table org_wso2_logs_esb_100 (server_name STRING, "
+                + "ip STRING, tenant INTEGER, sequence LONG, summary STRING, log STRING) as ESBLogs");
+        AnalyticsQueryResult result = AnalyticsExecutionService.executeQuery(1, "SELECT * FROM ESBLogs");
+        AnalyticsExecutionService.executeQuery(1, "define table ESBLogsBackup (server_name STRING, "
+                + "ip STRING, tenant INTEGER, sequence LONG, summary STRING, log STRING)");
+        AnalyticsExecutionService.executeQuery(1, "INSERT INTO ESBLogsBackup SELECT * FROM ESBLogs");
+        result = AnalyticsExecutionService.executeQuery(1, "SELECT * FROM ESBLogsBackup");
+        Assert.assertEquals(result.getRows().size(), 1200);        
+        this.service.deleteTable(1, "ESBLogs");
+        this.service.deleteTable(1, "ESBLogsBackup");
+        this.service.deleteTable(1, "org_wso2_logs_esb_100");
     }
     
 }

@@ -36,6 +36,7 @@ public class AnalyticsSparkConstants {
     public static final String TERM_INTO = "into";
     public static final String TERM_PRIMARY = "primary";
     public static final String TERM_KEY = "key";
+    public static final String TERM_AS = "as";
     
     public static final String TABLE_INFO_TABLE_NAME = "__TABLE_INFO__";
     public static final int TABLE_INFO_TENANT_ID = -1000;

@@ -68,6 +68,33 @@ public class AnalyticsExecutionService {
         sparkCtx.close();
     }
     
+    private static void processDefineTable(int tenantId, String query, 
+            String[] tokens) throws AnalyticsExecutionException {
+        String tableName = tokens[2].trim();
+        String alias = tableName;
+        if (tokens[tokens.length - 2].toLowerCase().equals(AnalyticsSparkConstants.TERM_AS)) {
+            alias = tokens[tokens.length - 1];
+            query = query.substring(0, query.lastIndexOf(tokens[tokens.length - 2]));
+        }
+        String schemaString = query.substring(query.indexOf(tableName) + tableName.length()).trim();
+        try {
+            registerTable(tenantId, tableName, alias, schemaString);
+        } catch (AnalyticsException e) {
+            throw new AnalyticsExecutionException("Error in registering analytics table: " + e.getMessage(), e);
+        }
+    }
+    
+    private static void processInsertInto(int tenantId, String query, 
+            String[] tokens) throws AnalyticsExecutionException {
+        String tableName = tokens[2].trim();
+        String selectQuery = query.substring(query.indexOf(tableName) + tableName.length()).trim();
+        try {
+            insertIntoTable(tenantId, tableName, toResult(sqlCtx.sql(selectQuery)));
+        } catch (AnalyticsException e) {
+            throw new AnalyticsExecutionException("Error in executing insert into query: " + e.getMessage(), e);
+        }
+    }
+    
     public static AnalyticsQueryResult executeQuery(int tenantId, String query) throws AnalyticsExecutionException {
         query = query.trim();
         if (query.endsWith(";")) {
@@ -77,24 +104,12 @@ public class AnalyticsExecutionService {
         if (tokens.length >= 3) {
             if (tokens[0].trim().equalsIgnoreCase(AnalyticsSparkConstants.TERM_DEFINE) &&
                     tokens[1].trim().equalsIgnoreCase(AnalyticsSparkConstants.TERM_TABLE)) {
-                String tableName = tokens[2].trim();
-                String schemaString = query.substring(query.indexOf(tableName) + tableName.length()).trim();
-                try {
-                    registerTable(tenantId, tableName, schemaString);
-                    return null;
-                } catch (AnalyticsException e) {
-                    throw new AnalyticsExecutionException("Error in registering analytics table: " + e.getMessage(), e);
-                }
+                processDefineTable(tenantId, query, tokens);
+                return null;
             } else if (tokens[0].trim().equalsIgnoreCase(AnalyticsSparkConstants.TERM_INSERT) &&
                     tokens[1].trim().equalsIgnoreCase(AnalyticsSparkConstants.TERM_INTO)) {
-                String tableName = tokens[2].trim();
-                String selectQuery = query.substring(query.indexOf(tableName) + tableName.length()).trim();
-                try {
-                    insertIntoTable(tenantId, tableName, toResult(sqlCtx.sql(selectQuery)));
-                    return null;
-                } catch (AnalyticsException e) {
-                    throw new AnalyticsExecutionException("Error in executing insert into query: " + e.getMessage(), e);
-                }
+                processInsertInto(tenantId, query, tokens);
+                return null;
             }
         }
         return toResult(sqlCtx.sql(query));
@@ -306,7 +321,8 @@ public class AnalyticsExecutionService {
         }
     }
     
-    private static void registerTable(int tenantId, String tableName, String schemaString) throws AnalyticsException {
+    private static void registerTable(int tenantId, String tableName, String alias,
+            String schemaString) throws AnalyticsException {
         if (!(schemaString.startsWith("(") && schemaString.endsWith(")"))) {
             throwInvalidDefineTableQueryException();
         }
@@ -318,7 +334,7 @@ public class AnalyticsExecutionService {
         }
         AnalyticsRelation table = new AnalyticsRelation(tenantId, tableName, sqlCtx, schemaString);
         JavaSchemaRDD schemaRDD = sqlCtx.baseRelationToSchemaRDD(table);
-        schemaRDD.registerTempTable(tableName);
+        schemaRDD.registerTempTable(alias);
     }
     
 }
