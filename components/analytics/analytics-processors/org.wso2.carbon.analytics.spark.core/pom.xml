@@ -30,11 +30,11 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.wso2.apache.spark</groupId>
+            <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_2.10</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.apache.spark</groupId>
+            <groupId>org.apache.spark</groupId>
             <artifactId>spark-sql_2.10</artifactId>
         </dependency>
         <dependency>
@@ -44,6 +44,10 @@
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.datasource.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
         </dependency>
         <dependency>
             <groupId>xerces</groupId>

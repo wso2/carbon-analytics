@@ -104,22 +104,22 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.hadoop.wso2</groupId>
+            <groupId>org.wso2.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.json4s.wso2</groupId>
+            <groupId>org.wso2.json4s</groupId>
             <artifactId>json4s-jackson_2.10</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>com.twitter.wso2</groupId>
+            <groupId>org.wso2.twitter</groupId>
             <artifactId>chill_2.10</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>com.clearspring.analytics.wso2</groupId>
+            <groupId>org.wso2.clearspring.analytics</groupId>
             <artifactId>stream</artifactId>
         </dependency>
 
@@ -180,7 +180,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.uncommons.maths.wso2</groupId>
+            <groupId>org.wso2.uncommons.maths</groupId>
             <artifactId>uncommons-maths</artifactId>
         </dependency>
 
@@ -241,8 +241,8 @@
                             </adviceFile>
                             <bundles>
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.core</bundleDef>
-                                <bundleDef>org.apache.spark.wso2:spark-core_2.10</bundleDef>
-                                <bundleDef>org.apache.spark.wso2:spark-sql_2.10</bundleDef>
+                                <bundleDef>org.wso2.apache.spark:spark-core_2.10</bundleDef>
+                                <bundleDef>org.wso2.apache.spark:spark-sql_2.10</bundleDef>
                                 <bundleDef>org.apache.commons:commons-lang3</bundleDef>
                                 <bundleDef>org.apache.commons:commons-math3</bundleDef>
                                 <bundleDef>org.scala-lang:scala-library</bundleDef>
@@ -259,8 +259,8 @@
                                 <bundleDef>io.netty.wso2:netty-all</bundleDef>
                                 <bundleDef>javax.servlet.jsp:javax.servlet.jsp-api</bundleDef>
                                 <bundleDef>org.apache.tomcat.wso2:tomcat-servlet-api</bundleDef>
-                                <bundleDef>org.apache.hadoop.wso2:hadoop-client</bundleDef>
-                                <bundleDef>org.json4s.wso2:json4s-jackson_2.10</bundleDef>
+                                <bundleDef>org.wso2.apache.hadoop:hadoop-client</bundleDef>
+                                <bundleDef>org.wso2.json4s:json4s-jackson_2.10</bundleDef>
                                 <bundleDef>org.eclipse.jetty:jetty-continuation</bundleDef>
                                 <bundleDef>org.eclipse.jetty:jetty-http</bundleDef>
                                 <bundleDef>org.eclipse.jetty:jetty-io</bundleDef>
@@ -273,13 +273,13 @@
                                 <bundleDef>org.eclipse.jetty:jetty-xml</bundleDef>
                                 <bundleDef>io.netty:netty</bundleDef>
                                 <bundleDef>org.spark-project.protobuf:protobuf-java</bundleDef>
-                                <bundleDef>org.uncommons.maths.wso2:uncommons-maths</bundleDef>
+                                <bundleDef>org.wso2.uncommons.maths:uncommons-maths</bundleDef>
                                 <bundleDef>com.ning:compress-lzf</bundleDef>
                                 <bundleDef>com.google.guava:guava</bundleDef>
                                 <bundleDef>org.slf4j:slf4j-api</bundleDef>
                                 <bundleDef>org.slf4j:slf4j-log4j12</bundleDef>
-                                <bundleDef>com.twitter.wso2:chill_2.10</bundleDef>
-                                <bundleDef>com.clearspring.analytics.wso2:stream</bundleDef>
+                                <bundleDef>org.wso2.twitter:chill_2.10</bundleDef>
+                                <bundleDef>org.wso2.clearspring.analytics:stream</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}
