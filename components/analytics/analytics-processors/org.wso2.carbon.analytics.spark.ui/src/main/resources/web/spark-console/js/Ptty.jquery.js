@@ -313,6 +313,10 @@
                 // End loading.
                 loading.fadeOut(300);
                 prompt.removeAttr('disabled').show();
+//                var elem = document.getElementById('terminal');
+//                elem.scrollTop = elem.scrollHeight;
+//                scroll_to_bottom();
+                $('#terminal').scrollTop = $('#terminal').scrollHeight;
             };
 
             /**
@@ -605,6 +609,9 @@
                         // End loading.
                         loading.fadeOut(300);
                         prompt.removeAttr('disabled').show();
+//                        var elem = document.getElementById('terminal');
+                       $('#terminal').scrollTop = $('#terminal').scrollHeight;
+//                        scroll_to_bottom();
                     } else {
                         update_content(cbk.ps, value, cbk.output);
                     }
@@ -644,11 +651,11 @@
                     if (old_height != new_height) {
                         // Env loaded
                         clearInterval(intervalId);
-                        element.animate({ scrollTop: new_height }, 'slow');
+                        element.animate({ scrollTop: new_height }, 'fast');
                     } else if (tries >= 30) {
                         // Give up (and scroll anyway)
                         clearInterval(intervalId);
-                        element.animate({ scrollTop: new_height }, 'slow');
+                        element.animate({ scrollTop: new_height }, 'fast');
                     } else {
                         new_height = content.height();
                         tries++;
