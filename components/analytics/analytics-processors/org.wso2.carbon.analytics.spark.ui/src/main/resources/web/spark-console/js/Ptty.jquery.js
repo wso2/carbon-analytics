@@ -548,6 +548,13 @@
                 }
 
                 // Check response for overrides
+                cmd_opts.cmd_ps = ( typeof data.ps    !== 'undefined' ) ? set_prompt(data.ps) : null;
+                if( typeof data.class !== 'undefined' ) cmd_opts.cmd_class = data.class;
+                if( typeof data.in    !== 'undefined' ) cmd_opts.cmd_in = data.in;
+                if( typeof data.out   !== 'undefined' ) cbk.output = cmd_opts.cmd_out = data.out;
+                if( typeof data.quiet !== 'undefined' ) cmd_opts.cmd_quiet = data.quiet;
+                if( typeof data.token !== 'undefined' ) cmd_opts.cmd_token = data.token
+                if( typeof data.query !== 'undefined' ) cmd_opts.cmd_query = data.query;
 
                 if (data.hasOwnProperty('meta')) {
                     cbk.output = cbk.output + data.meta.responseMessage + '<br>';

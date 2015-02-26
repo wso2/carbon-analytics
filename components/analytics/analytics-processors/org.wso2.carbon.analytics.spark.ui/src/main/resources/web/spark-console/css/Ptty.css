@@ -50,7 +50,7 @@
 .cmd_terminal form { 
     float: left; 
     margin: 0px; 
-    width: 95%;
+    width: 75%; 
 }
 .cmd_terminal input { 
     background: transparent; 
