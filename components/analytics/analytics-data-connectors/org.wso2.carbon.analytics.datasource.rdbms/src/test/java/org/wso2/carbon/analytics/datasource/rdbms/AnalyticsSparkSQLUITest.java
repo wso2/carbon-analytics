@@ -64,10 +64,13 @@ public class AnalyticsSparkSQLUITest {
         AnalyticsServiceHolder.setHazelcastInstance(null);
         AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
         this.service = new AnalyticsDataServiceImpl(ars, afs, 6);
+        AnalyticsSparkServiceHolder.setAnalyticsDataService(this.service);
+        AnalyticsExecutionService.init();
     }
 
     @AfterClass
     public void done() throws NamingException, AnalyticsException, IOException {
+        AnalyticsExecutionService.stop();
         this.service.destroy();
         this.h2arstest.destroy();
         this.h2afstest.destroy();
@@ -76,9 +79,7 @@ public class AnalyticsSparkSQLUITest {
     @Test(expectedExceptions = RuntimeException.class)
     public void testUIJsonStringGeneration() throws Exception {
         System.out.printf("***** AnalyticsSparkSQLUITest ***** \n");
-        AnalyticsSparkServiceHolder.setAnalyticsDataService(this.service);
-        AnalyticsExecutionService.init();
-
+        
         List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 10, -1, -1);
         this.service.deleteTable(1, "Log");
         this.service.createTable(1, "Log");
