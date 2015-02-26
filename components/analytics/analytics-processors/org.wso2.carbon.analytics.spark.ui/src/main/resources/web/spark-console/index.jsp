@@ -31,8 +31,8 @@
     <link type="text/css" href="css/main.css" rel="stylesheet"/>
     <link rel="stylesheet" type="text/css" href="css/Ptty.css">
     <link rel="stylesheet" type="text/css" href="css/jquery.dataTables.css">
-    <script src="js/jquery.dataTables.min.js"></script>
     <script src="js/jquery-2.1.1.min.js"></script>
+    <script src="js/jquery.dataTables.min.js"></script>
     <script src="js/Ptty.jquery.js"></script>
 
     <div id="middle">

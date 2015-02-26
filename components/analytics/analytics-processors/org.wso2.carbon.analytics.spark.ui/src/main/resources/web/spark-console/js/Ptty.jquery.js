@@ -279,6 +279,7 @@
              * @desc     : Updates the content section. Must be the last function called.
              * @args     : p, command, output
              **/
+            var update_count = 0;
             var update_content = function (p, command, output) {
                 // Override command options if any.
                 var command_class = cmd_opts.cmd_class;
@@ -307,7 +308,7 @@
                     p = '<span class="' + command_class + '"><span>' + p + '</span>&nbsp;' + command + '</span>';
                 }
 
-                content.append('<div>' + p + '<div>' + output + '</div></div>');
+                content.append('<div>' + p + '<div id = "out">' + output + '</div></div>');
 
                 // End loading.
                 loading.fadeOut(300);
@@ -548,43 +549,69 @@
                 }
 
                 // Check response for overrides
-                cmd_opts.cmd_ps = ( typeof data.ps    !== 'undefined' ) ? set_prompt(data.ps) : null;
-                if( typeof data.class !== 'undefined' ) cmd_opts.cmd_class = data.class;
-                if( typeof data.in    !== 'undefined' ) cmd_opts.cmd_in = data.in;
-                if( typeof data.out   !== 'undefined' ) cbk.output = cmd_opts.cmd_out = data.out;
-                if( typeof data.quiet !== 'undefined' ) cmd_opts.cmd_quiet = data.quiet;
-                if( typeof data.token !== 'undefined' ) cmd_opts.cmd_token = data.token
-                if( typeof data.query !== 'undefined' ) cmd_opts.cmd_query = data.query;
-
-                if (data.hasOwnProperty('meta')) {
-                    cbk.output = cbk.output + data.meta.responseMessage + '<br>';
-                    var results = data.response.items;
-
-                    if (results.length != 0) {
-                        cbk.output = cbk.output + results.length + ' rows returned!' + '<br>';
-                        var columns = data.meta.columns;
-                        var columnRow = "";
-                        for (var i = 0; i < columns.length; i++) {
-                            columnRow = columnRow + columns[i] + "\t|\t";
-                        }
-                        cbk.output = cbk.output + columnRow + '<br>';
-                        var row = "";
-                        for (i = 0; i < results.length; i++) {
-                            var element = results[i];
-                            row = "";
-                            for (var j = 0; j < columns.length; j++) {
-                                row = row + element[j] + "\t"
-                            }
-                            cbk.output = cbk.output + row + '<br>';
-                        }
-                    }
-                    else {
-                        cbk.output = cbk.output + ' NO RESULTS!' + '<br>';
-                    }
+                cmd_opts.cmd_ps = ( typeof data.ps !== 'undefined' ) ? set_prompt(data.ps) : null;
+                if (typeof data.class !== 'undefined') {
+                    cmd_opts.cmd_class = data.class;
+                }
+                if (typeof data.in !== 'undefined') {
+                    cmd_opts.cmd_in = data.in;
+                }
+                if (typeof data.out !== 'undefined') {
+                    cbk.output = cmd_opts.cmd_out = data.out;
+                }
+                if (typeof data.quiet !== 'undefined') {
+                    cmd_opts.cmd_quiet = data.quiet;
+                }
+                if (typeof data.token !== 'undefined') {
+                    cmd_opts.cmd_token = data.token
+                }
+                if (typeof data.query !== 'undefined') {
+                    cmd_opts.cmd_query = data.query;
                 }
 
-                // Update content accordingly
-                update_content(cbk.ps, value, cbk.output);
+
+                if (data.hasOwnProperty('meta')) {
+
+                    var results = data.response.items;
+                    var columns = data.meta.columns;
+
+                    cbk.output = cbk.output + data.meta.responseMessage + '<br>';
+
+                    if (columns.length != 0) {
+                        var col_arr = [];
+                        $.each(columns, function (index, value) {
+                            col_arr.push({"title": "" + value});
+                        });
+
+                        var out_str = 'out' + update_count.toString();
+                        var tbl_str = 'datatable' + update_count.toString();
+
+                        var command_class = cmd_opts.cmd_class;
+                        if (command_class === null) {
+                            command_class = (cdispatch) ? settings.tty_class + '_sub' : settings.tty_class + '_ps';
+                        }
+                        var p = '<span class="' + command_class + '"><span>' + cbk.ps + '</span>&nbsp;' + value + '</span>';
+                        content.append('<div>' + p + '<div id = "' + out_str + '"></div></div>');
+
+                        $(document.getElementById(out_str)).html('<table cellpadding="0" cellspacing="0" ' +
+                                                                 'border="0" class="display" id="' + tbl_str + '">' +
+                                                                 '</table>');
+
+                        $(document.getElementById(tbl_str)).dataTable({
+                                                                          "data": results,
+                                                                          "columns": col_arr
+                                                                      });
+                        update_count++;
+                        // End loading.
+                        loading.fadeOut(300);
+                        prompt.removeAttr('disabled').show();
+                    } else {
+                        update_content(cbk.ps, value, cbk.output);
+                    }
+                } else {
+                    // Update content accordingly
+                    update_content(cbk.ps, value, cbk.output);
+                }
 
                 // Must go after update_content
                 if (typeof data.exit !== 'undefined' && cdispatch) {
