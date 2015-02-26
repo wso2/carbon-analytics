@@ -18,7 +18,7 @@
     font-size: 12px;
     font-family: "Menlo Regular","Lucida Console",Monaco,monospace,"Courier New",Fixed;
     display: block;
-    overflow-x: none;
+    overflow-x: hidden;
     overflow-y: auto;
 }
 .cmd_terminal div { 
@@ -50,7 +50,7 @@
 .cmd_terminal form { 
     float: left; 
     margin: 0px; 
-    width: 75%; 
+    width: 95%;
 }
 .cmd_terminal input { 
     background: transparent; 
@@ -95,9 +95,9 @@
 
 /* boring theme */
 .cmd_terminal_theme_boring,
-.cmd_terminal_theme_boring input{ background-color: #0a0a0a; color: #ddd; letter-spacing: 1px; }
+.cmd_terminal_theme_boring input{ background-color: #000000; color: #ddd; letter-spacing: 1px; }
 .cmd_terminal_theme_boring .cmd_terminal_active { font-weight: bold; }
-.cmd_terminal_theme_boring .cmd_terminal_ps span::after { content: ">"; }
+.cmd_terminal_theme_boring .cmd_terminal_ps span::after { content: "SparkSQL>"; }
 .cmd_terminal_theme_boring .cmd_terminal_sub span::after { content: "\0000a0>"; }
 
 /* Loading */
