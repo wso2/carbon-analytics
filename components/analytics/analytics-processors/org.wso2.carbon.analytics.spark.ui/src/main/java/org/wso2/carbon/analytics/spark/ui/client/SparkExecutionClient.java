@@ -71,7 +71,7 @@ public class SparkExecutionClient {
                     try {
                         singleRow.add(new JsonPrimitive(elm.toString()));
                     } catch (NullPointerException e) {
-                        throw new Exception("Returned a null value for " + res.getColumns()[i].getName(), e);
+                        singleRow.add(new JsonPrimitive("NULL"));
                     }
                     i++;
                 }
