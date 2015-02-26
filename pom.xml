@@ -54,14 +54,14 @@
                 <version>2.4.2</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.spark</groupId>
+                <groupId>org.wso2.apache.spark</groupId>
                 <artifactId>spark-core_2.10</artifactId>
-                <version>1.2.0</version>
+                <version>${spark.orbit.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.spark</groupId>
+                <groupId>org.wso2.apache.spark</groupId>
                 <artifactId>spark-sql_2.10</artifactId>
-                <version>1.2.0</version>
+                <version>${spark.orbit.version}</version>
             </dependency>
             <dependency>
                 <groupId>xerces</groupId>
@@ -625,7 +625,7 @@
             <dependency>
                 <groupId>org.wso2.uncommons.maths</groupId>
                 <artifactId>uncommons-maths</artifactId>
-                <version>${uncommons.math.version}</version>
+                <version>${uncommons.math.orbit.version}</version>
             </dependency>
 
             <dependency>
@@ -658,6 +658,139 @@
                 <version>${servelet.jsp.version}</version>
             </dependency>
 
+
+            <!--spark dependencies added later--> <!--todo: clean these up-->
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-core_2.10</artifactId>
+                <version>${spark.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.servlet</groupId>
+                        <artifactId>servlet-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-network-common_2.10</artifactId>
+                <version>${spark.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-network-shuffle_2.10</artifactId>
+                <version>${spark.version}</version>
+            </dependency>
+
+            <!--private packages-->
+            <dependency>
+                <groupId>org.spark-project.akka</groupId>
+                <artifactId>akka-remote_2.10</artifactId>
+                <version>${akka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.spark-project.akka</groupId>
+                <artifactId>akka-actor_2.10</artifactId>
+                <version>${akka.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.typesafe</groupId>
+                <artifactId>config</artifactId>
+                <version>${typesafe.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-sql_2.10</artifactId>
+                <version>${spark.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-catalyst_2.10</artifactId>
+                <version>${spark.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.twitter</groupId>
+                <artifactId>chill-java</artifactId>
+                <version>${chill.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.twitter</groupId>
+                <artifactId>chill_2.10</artifactId>
+                <version>${chill.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-client</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-common</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-hdfs</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-annotations</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-mapreduce-client-core</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-mapreduce-client-app</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-yarn-api</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.json4s</groupId>
+                <artifactId>json4s-jackson_2.10</artifactId>
+                <version>${json4s.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.json4s</groupId>
+                <artifactId>json4s-core_2.10</artifactId>
+                <version>${json4s.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.clearspring.analytics</groupId>
+                <artifactId>stream</artifactId>
+                <version>${stream.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.uncommons.maths</groupId>
+                <artifactId>uncommons-maths</artifactId>
+                <version>${uncommons.math.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jfree</groupId>
+                <artifactId>jcommon</artifactId>
+                <version>${jcommon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jfree</groupId>
+                <artifactId>jfreechart</artifactId>
+                <version>${jfreechart.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
@@ -930,12 +1063,46 @@
         <jetty.version>8.1.14.v20131031</jetty.version>
         <netty.version>3.8.0.Final</netty.version>
         <protobuf.version>2.5.0-spark</protobuf.version>
-        <uncommons.math.version>1.2.2.wso2v1</uncommons.math.version>
+        <uncommons.math.orbit.version>1.2.2.wso2v1</uncommons.math.orbit.version>
         <chill.orbit.version>0.5.0.wso2v1</chill.orbit.version>
         <stream.orbit.version>2.2.0.wso2v1</stream.orbit.version>
         <guava.version>14.0.1</guava.version>
         <servelet.api.version>7.0.52.wso2v1</servelet.api.version>
         <servelet.jsp.version>2.2.1</servelet.jsp.version>
+
+        <!--spark additional dependencies --> <!--todo: clean these up-->
+        <exp.pkg.version.spark>1.2.1.wso2v1</exp.pkg.version.spark>
+        <spark.version>1.2.1</spark.version>
+        <spark.import.version>[1.2.1, 1.3.0)</spark.import.version>
+        <hadoop.client.import.version>[2.2.0, 2.3.0)</hadoop.client.import.version>
+        <typesafe.version>1.2.0</typesafe.version>
+        <typesafe.import.version>[1.2.0, 1.3.0)</typesafe.import.version>
+        <akka.version>2.3.4-spark</akka.version>
+        <codahale.metrics.import.version>[3.0.0, 3.1.0)</codahale.metrics.import.version>
+        <jackson.import.version>[2.3.1, 2.3.2)</jackson.import.version>
+        <json4s.import.version>[3.2.10, 3.2.11)</json4s.import.version>
+        <kryo.import.version>[2.21,3.0)</kryo.import.version>
+        <snappy.import.version>[1.1.1.6, 1.1.1.7)</snappy.import.version>
+        <netty-all.import.version>[4.0.23, 4.0.24.Final)</netty-all.import.version>
+        <scala.import.version>[2.10.4, 2.11.0)</scala.import.version>
+        <commons-math3.import.version>[3.1.1, 3.1.2)</commons-math3.import.version>
+        <commons-lang3.import.version>[3.3.2, 3.3.3)</commons-lang3.import.version>
+        <compress.lzf.import.version>[1.0.0, 1.0.1)</compress.lzf.import.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <guava.import.version>[14.0.0,15.0.0)</guava.import.version>
+        <slf4j.import.version>[1.7.0, 1.8.0)</slf4j.import.version>
+        <servlet-api.import.version>[2.5, 3.0)</servlet-api.import.version>
+        <chill.import.version>[0.5.0, 0.6.0)</chill.import.version>
+        <stream.import.version>[2.2.0, 2.3.0)</stream.import.version>
+        <chill.version>0.5.0</chill.version>
+        <hadoop.version>2.2.0</hadoop.version>
+        <json4s.version>3.2.10</json4s.version>
+        <stream.version>2.2.0</stream.version>
+        <uncommons.math.version>1.2.2</uncommons.math.version>
+        <jcommon.version>1.0.12</jcommon.version>
+        <jfreechart.version>1.0.13</jfreechart.version>
+
+
     </properties>
 
     <pluginRepositories>

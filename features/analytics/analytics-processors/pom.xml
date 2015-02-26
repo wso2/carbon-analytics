@@ -32,8 +32,8 @@
     <name>WSO2 Carbon - Analytics Processors Feature Aggregator Module</name>
 
     <modules>
-       <module>org.wso2.carbon.analytics.spark.feature</module>
-       <module>org.wso2.carbon.analytics.spark.ui.feature</module>
-       <module>org.wso2.carbon.analytics.spark.server.feature</module>
+        <module>org.wso2.carbon.analytics.spark.server.feature</module>
+        <module>org.wso2.carbon.analytics.spark.ui.feature</module>
+        <module>org.wso2.carbon.analytics.spark.feature</module>
     </modules>
 </project>
