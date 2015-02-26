@@ -1042,8 +1042,6 @@
         <carbon.identity.version>4.3.3</carbon.identity.version>
 
         <carbon.analytics.version>1.0.2-SNAPSHOT</carbon.analytics.version>
-        <project.scm.id>my-scm-server</project.scm.id>
-
 
         <!--analytics processors -->
         <spark.orbit.version>1.2.1.wso2v1</spark.orbit.version>
