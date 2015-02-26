@@ -1,6 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>org.wso2</groupId>
@@ -12,7 +10,7 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>carbon-analytics</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2</version>
     <name>WSO2 Carbon - Analytics Platform Aggregator Pom</name>
     <url>http://wso2.org</url>
 
@@ -800,7 +798,7 @@
         <developerConnection>scm:git:https://github.com/wso2/carbon-analytics.git
         </developerConnection>
         <connection>scm:git:https://github.com/wso2/carbon-analytics.git</connection>
-        <tag>HEAD</tag>
+        <tag>v1.0.2</tag>
     </scm>
 
     <build>
@@ -1041,7 +1039,7 @@
         <carbon.event-processing.version>2.0.2</carbon.event-processing.version>
         <carbon.identity.version>4.3.3</carbon.identity.version>
 
-        <carbon.analytics.version>1.0.2-SNAPSHOT</carbon.analytics.version>
+        <carbon.analytics.version>1.0.2</carbon.analytics.version>
 
         <!--analytics processors -->
         <spark.orbit.version>1.2.1.wso2v1</spark.orbit.version>
