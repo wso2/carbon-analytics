@@ -600,7 +600,8 @@
 
                         $(document.getElementById(tbl_str)).dataTable({
                                                                           "data": results,
-                                                                          "columns": col_arr
+                                                                          "columns": col_arr,
+                                                                          "searching": false
                                                                       });
                         update_count++;
                         // End loading.
