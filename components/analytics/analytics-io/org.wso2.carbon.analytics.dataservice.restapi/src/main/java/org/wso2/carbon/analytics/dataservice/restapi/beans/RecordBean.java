@@ -33,7 +33,7 @@ import java.util.Map.Entry;
 public class RecordBean {
 
 	/** The table name. */
-	@XmlElement(required = true)
+	@XmlElement(required = false)
 	private String tableName;
 
 	/** The values. */

@@ -58,11 +58,35 @@ public class Utils {
 	 * @param recordBeans
 	 *            the record beans
 	 * @return the records from record beans
+	 * @throws AnalyticsRESTException if the tableName is not specified
 	 */
-	public static List<Record> getRecords(int tenantId, List<RecordBean> recordBeans) {
+	public static List<Record> getRecords(int tenantId, List<RecordBean> recordBeans) throws AnalyticsException {
+		List<Record> records = new ArrayList<Record>();
+		try{
+			for (RecordBean recordBean : recordBeans) {
+				if(recordBean.getTableName().isEmpty()){
+					throw new AnalyticsException("TableName cannot be empty!");
+				}
+			records.add(new Record(recordBean.getId(), tenantId, recordBean.getTableName(),
+		                           recordBean.getValues(), recordBean.getTimestamp()));
+			}
+		}catch(NullPointerException e){
+			throw new AnalyticsException("TableName cannot be null");
+		}
+		return records;
+	}
+	
+	/**
+	 * Gets the records from record beans belongs to a specific table.
+	 * @param recordBeans
+	 *            the record beans
+	 * @return the records from record beans
+	 * @throws AnalyticsRESTException if the tableName is not specified
+	 */
+	public static List<Record> getRecordsForTable(int tenantId,String tableName, List<RecordBean> recordBeans) {
 		List<Record> records = new ArrayList<Record>();
 		for (RecordBean recordBean : recordBeans) {
-			records.add(new Record(recordBean.getId(), tenantId, recordBean.getTableName(),
+			records.add(new Record(recordBean.getId(), tenantId, tableName,
 		                           recordBean.getValues(), recordBean.getTimestamp()));
 		}
 		return records;
