@@ -27,6 +27,7 @@ import javax.naming.NamingException;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Parameters;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
@@ -40,26 +41,45 @@ import org.wso2.carbon.analytics.datasource.rdbms.RDBMSQueryConfigurationEntry;
  */
 public class MySQLInnoDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
 
+    private DataSource dataSource;
+
+    private AnalyticsRecordStore ars;
+
     @BeforeSuite
     @Parameters({"mysql.url", "mysql.username", "mysql.password"})
     public void setup(String url, String username, 
             String password) throws NamingException, AnalyticsException, SQLException {
-        this.initDS(url, username, password);
-        AnalyticsRecordStore ars = new RDBMSAnalyticsRecordStore(this.generateQueryConfiguration());
+        this.dataSource = createDataSource(url, username, password);
+        new InitialContext().bind("DSRS", this.dataSource);
+        this.ars = new RDBMSAnalyticsRecordStore(this.generateQueryConfiguration());
         Map<String, String> props = new HashMap<String, String>();
-        props.put("datasource", "DS");
-        ars.init(props);
+        props.put("datasource", "DSRS");
+        this.ars.init(props);
         this.init("MySQLInnoDBAnalyticsDataSource", ars);
     }
-    
-    private void initDS(String url, String username, String password) throws NamingException, SQLException {
+
+    public AnalyticsRecordStore getARS() {
+        return this.ars;
+    }
+
+    private DataSource createDataSource(String url, String username, String password) {
         PoolProperties pps = new PoolProperties();
         pps.setDriverClassName("com.mysql.jdbc.Driver");
         pps.setUrl(url);
         pps.setUsername(username);
         pps.setPassword(password);
-        DataSource dsx = new DataSource(pps);
-        new InitialContext().bind("DS", dsx);
+        pps.setDefaultAutoCommit(false);
+        return new DataSource(pps);
+    }
+
+    @AfterClass
+    public void destroy() {
+        try {
+            new InitialContext().unbind("DSRS");
+        } catch (NamingException ignore) { }
+        if (this.dataSource != null) {
+            this.dataSource.close(true);
+        }
     }
     
     private RDBMSQueryConfigurationEntry generateQueryConfiguration() {
@@ -75,8 +95,6 @@ public class MySQLInnoDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTes
         conf.setRecordTableDeleteQueries(recordTableDeleteQueries);
         conf.setRecordMergeQuery("INSERT INTO {{TABLE_NAME}} (timestamp, data, record_id) VALUES " +
                                  "(?, ?, ?) ON DUPLICATE KEY UPDATE timestamp=VALUES(timestamp), data=VALUES(data)");
-        //INSERT INTO table (id, name, age) VALUES(1, "A", 19) ON DUPLICATE KEY UPDATE
-        //name=VALUES(name), age=VALUES(age)
         conf.setRecordRetrievalQuery("SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE timestamp >= ? AND timestamp < ? LIMIT ?,?");
         conf.setRecordRetrievalWithIdsQuery("SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})");
         conf.setRecordDeletionWithIdsQuery("DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})");

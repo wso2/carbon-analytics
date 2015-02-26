@@ -353,6 +353,9 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
     @Override
     public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns,
             List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
+        if (ids.isEmpty()) {
+            return new ArrayList<Record>(0).iterator();
+        }
         String recordGetSQL = this.generateGetRecordRetrievalWithIdQuery(tenantId, tableName, ids.size());
         Connection conn = null;
         PreparedStatement stmt = null;

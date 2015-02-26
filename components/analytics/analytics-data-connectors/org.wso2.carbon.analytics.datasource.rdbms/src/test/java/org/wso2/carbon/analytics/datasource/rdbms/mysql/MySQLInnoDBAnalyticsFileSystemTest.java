@@ -20,6 +20,7 @@ package org.wso2.carbon.analytics.datasource.rdbms.mysql;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Parameters;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
@@ -41,33 +42,54 @@ import java.util.Map;
  */
 public class MySQLInnoDBAnalyticsFileSystemTest extends AnalyticsFileSystemTest {
 
+    private DataSource dataSource;
+
+    private AnalyticsFileSystem afs;
+
+    public AnalyticsFileSystem getAFS() {
+        return this.afs;
+    }
+
     @BeforeSuite
     @Parameters({"mysql.url", "mysql.username", "mysql.password"})
-    public void setup(String url, String username, 
-            String password) throws NamingException, AnalyticsException, SQLException, IOException {
-        this.initDS(url, username, password);
-        AnalyticsFileSystem afs = new RDBMSAnalyticsFileSystem(this.generateQueryConfiguration());
+    public void setup(String url, String username, String password)
+            throws NamingException, AnalyticsException, SQLException, IOException {
+
+        this.dataSource = createDataSource(url, username, password);
+        this.dropSystemTables();
+        new InitialContext().bind("DSFS", this.dataSource);
+        this.afs = new RDBMSAnalyticsFileSystem(this.generateQueryConfiguration());
         Map<String, String> props = new HashMap<String, String>();
-        props.put("datasource", "DS");
-        afs.init(props);
+        props.put("datasource", "DSFS");
+        this.afs.init(props);
         this.init("MySQLInnoDBAnalyticsDataSource", afs);
     }
-    
-    private void initDS(String url, String username, String password) throws NamingException, SQLException {
+
+    @AfterClass
+    public void destroy() throws AnalyticsException, SQLException {
+        try {
+            new InitialContext().unbind("DSFS");
+        } catch (NamingException ignore) { }
+        if (this.dataSource != null) {
+            this.dataSource.close(true);
+        }
+        this.dropSystemTables();
+    }
+
+    private DataSource createDataSource(String url, String username, String password) {
         PoolProperties pps = new PoolProperties();
         pps.setDriverClassName("com.mysql.jdbc.Driver");
         pps.setUrl(url);
         pps.setUsername(username);
         pps.setPassword(password);
-        DataSource dsx = new DataSource(pps);
-        new InitialContext().bind("DS", dsx);
-        this.dropSystemTables(dsx);
+        pps.setDefaultAutoCommit(false);
+        return new DataSource(pps);
     }
     
-    private void dropSystemTables(javax.sql.DataSource ds) throws SQLException {
+    private void dropSystemTables() throws SQLException {
         Connection conn = null;
         try {
-            conn = ds.getConnection();
+            conn = this.dataSource.getConnection();
             conn.prepareStatement("DROP TABLE IF EXISTS AN_FS_DATA").executeUpdate();
             conn.prepareStatement("DROP TABLE IF EXISTS AN_FS_PATH").executeUpdate();
         } finally {
