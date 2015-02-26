@@ -69,7 +69,7 @@ public class SparkExecutionClient {
                 int i = 0;
                 for (Object elm : row) {
                     try {
-                        singleRow.add(new JsonPrimitive(" " + elm.toString()));
+                        singleRow.add(new JsonPrimitive(elm.toString()));
                     } catch (NullPointerException e) {
                         throw new Exception("Returned a null value for " + res.getColumns()[i].getName(), e);
                     }
