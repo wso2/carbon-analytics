@@ -29,16 +29,11 @@
                        topPage="true" request="<%=request%>"/>
 
     <link type="text/css" href="css/main.css" rel="stylesheet"/>
-
-    <script src="js/jquery-1.7.1.min.js"></script>
-    <script src="js/jquery.mousewheel-min.js"></script>
-    <script src="js/jquery.terminal-min.js"></script>
-    <link href="css/jquery.terminal.css" rel="stylesheet"/>
-
-    <%--<link type="text/css" href="css/ui.all.css" rel="stylesheet"/>--%>
-    <%--<script type="text/javascript" src="js/jquery-ui-1.6.custom.min.js"></script>--%>
-    <%--<script type="text/javascript" src="js/jquery.hoverIntent.js"></script>--%>
-    <%--<script type="text/javascript" src="js/jquery.cluetip.js"></script>--%>
+    <link rel="stylesheet" type="text/css" href="css/Ptty.css">
+    <link rel="stylesheet" type="text/css" href="css/jquery.dataTables.css">
+    <script src="js/jquery-2.1.1.min.js"></script>
+    <script src="js/jquery.dataTables.min.js"></script>
+    <script src="js/Ptty.jquery.js"></script>
 
     <div id="middle">
         <h2>Interactive Spark Console</h2>
@@ -46,80 +41,95 @@
         <div id="workArea">
 
             <div id="terminalArea">
+                <section>
+                    <div id="terminal"></div>
+                </section>
 
                 <script>
-                    $(document).ready(function ($) {
-                        var id = 1;
-                        $('#terminalArea').terminal(function (command, term) {
-                            $('#terminalArea').addClass('terminalArea');
-                            if ($.trim(command) == "") {
-                                term.resume();
+                    $(document).ready(function () {
+                        /* Start Ptty terminal */
+                        $('#terminal').Ptty();
+
+                        $.register_command(
+                                'define',
+                                'Defines the schema of a table',
+                                'DEFINE TABLE [table]',
+                                '../spark-console/execute_spark_ajaxprocessor.jsp'
+                        );
+
+                        $.register_command(
+                                'select',
+                                'Execute a Spark SELECT query',
+                                'SELECT [query]',
+                                '../spark-console/execute_spark_ajaxprocessor.jsp'
+                        );
+
+                        $.register_command(
+                                'insert',
+                                'Inserts data into tables',
+                                'INSERT INTO [query]',
+                                '../spark-console/execute_spark_ajaxprocessor.jsp'
+                        );
+
+                        $.register_command(
+                                'about',
+                                'Interactive Spark SQL shell',
+                                'about [no options]',
+                                function () {
+                                    var about = '<p>This interactive shell lets you execute Spark SQL commands against a local Spark cluster.<br>' +
+                                                'Running on Spark v 1.2.1</p>';
+
+                                    return {
+                                        type: 'print',
+                                        out: about
+                                    };
+                                }
+                        );
+
+                        /* Register Commands and Callbacks*/
+                        $.register_command(
+                                'date',
+                                'returns the current date',
+                                'date [no options]',
+                                function () {
+                                    var now = new Date();
+                                    return {
+                                        type: 'print',
+                                        out: now + ' '
+                                    };
+                                }
+                        );
+
+                        // Typewriter effect callback
+                        $.register_callback('typewriter', function (data) {
+                            var text_input = $('.cmd_terminal_prompt');
+                            text_input.hide();
+                            if (typeof data.write === 'string') {
+                                // decode special entities.
+                                var str = $('<div/>').html(data.write + ' ').text(),
+                                        typebox = $('<div></div>').appendTo('.cmd_terminal_content'),
+                                        i = 0,
+                                        isTag,
+                                        text;
+                                (function typewriter() {
+                                    text = str.slice(0, ++i);
+                                    if (text === str) return text_input.show();
+
+                                    typebox.html(text);
+
+                                    var char = text.slice(-1);
+                                    if (char === '<') isTag = true;
+                                    if (char === '>') isTag = false;
+
+                                    if (isTag) return typewriter();
+                                    setTimeout(typewriter, 40);
+                                }());
                             }
-                            else if ($.trim(command) == 'help') {
-                                term.echo("Please refer documentation!");
-                            } else {
-                                term.pause();
-                                jQuery.ajax({
-                                                url: '../spark-console/execute_spark_ajaxprocessor.jsp',
-                                                type: 'POST',
-                                                data: {
-                                                    'query': command
-                                                },
-                                                dataType: 'json',
-                                                success: function (data) {
-                                                    // alert('Data: '+data.response.items.length);
-                                                    console.log(data);
-                                                    term.resume();
-                                                    term.echo(data.meta.responseMessage);
+                        });
 
-                                                    var results = data.response.items;
-                                                    if (results.length != 0) {
-                                                        term.echo(results.length + " results returned!");
-                                                        var columns = data.meta.columns;
-                                                        var columnRow = "";
-                                                        for (var i = 0; i < columns.length; i++) {
-                                                            columnRow = columnRow + columns[i] + "\t|\t";
-                                                        }
-                                                        term.echo(columnRow);
-
-                                                        var row = "";
-                                                        for (var i = 0; i < results.length; i++) {
-                                                            var element = results[i];
-                                                            row = "";
-                                                            for (var j = 0; j < columns.length; j++) {
-                                                                row = row + element[j] + "\t"
-                                                            }
-                                                            ;
-                                                            term.echo(row);
-                                                        }
-                                                    }
-                                                },
-                                                error: function (xhr, error, errorThrown) {
-                                                    console.log($(xhr.responseText)[3].innerHTML);
-                                                    term.error('ERROR : ' + $(xhr.responseText)[3].innerHTML);
-                                                    term.resume();
-                                                }
-                                            }); //end of ajax
-
-                            }
-                            ;
-                        }, {
-                                                        greetings: "Welcome to interactive Spark SQL shell\n" +
-                                                                   "This interactive shell lets you execute Spark SQL commands against a local Spark cluster \n" +
-                                                                   "Initializing Spark client...",
-                                                        prompt: "SparkSQL>",
-                                                        onBlur: function () {
-                                                            // prevent loosing focus
-                                                            return false;
-                                                        }
-                                                    });
-                    })
-                    ;
-
+                    });
                 </script>
             </div>
-
         </div>
     </div>
-
 </fmt:bundle>

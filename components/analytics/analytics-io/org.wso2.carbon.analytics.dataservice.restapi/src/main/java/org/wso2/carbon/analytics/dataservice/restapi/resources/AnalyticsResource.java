@@ -21,6 +21,7 @@ import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -45,6 +46,7 @@ import org.wso2.carbon.analytics.dataservice.restapi.beans.QueryBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.TableBean;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsTimeoutException;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
@@ -507,7 +509,7 @@ public class AnalyticsResource extends AbstractResource {
 	public Response search(QueryBean queryBean) throws AnalyticsException, AnalyticsIndexException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
-			logger.debug("Invoking search for tenantId :" + queryBean.getTenantId() +
+			logger.debug("Invoking search for tenantId :" + tenantId +
 			             " tableName : " + queryBean.getTableName());
 		}
 		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
@@ -544,7 +546,7 @@ public class AnalyticsResource extends AbstractResource {
 	                                                AnalyticsIndexException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
-			logger.debug("Invoking search count for tenantId :" + queryBean.getTenantId() +
+			logger.debug("Invoking search count for tenantId :" + tenantId +
 			             " tableName : " + queryBean.getTableName());
 		}
 		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
@@ -554,6 +556,28 @@ public class AnalyticsResource extends AbstractResource {
 			logger.debug("Search count : " + result);
 		}
 		return Response.ok(result).build();
+	}
+	
+	/**
+	 * waits till indexing finishes
+	 * @param seconds tthe timeout for waiting till response returns
+	 * @return the {@link Response}response
+	 * @throws AnalyticsException, AnalyticsTimeoutException 
+	 */
+	@GET
+	@Consumes({ MediaType.APPLICATION_JSON})
+	@Produces({ MediaType.APPLICATION_JSON })
+	@Path(Constants.ResourcePath.INDEXING_DONE)
+	public Response waitForIndexing(@QueryParam("timeout") @DefaultValue(value="-1") long seconds) 
+			throws AnalyticsException, AnalyticsTimeoutException {
+		int tenantId = -1234;
+		if (logger.isDebugEnabled()) {
+			logger.debug("Invoking waiting for indexing for tenantId :" + tenantId +
+			             " timeout : " + seconds + " seconds");
+		}
+		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
+		analyticsDataService.waitForIndexing(seconds * Constants.MILLISECONDSPERSECOND);
+		return handleResponse(ResponseStatus.SUCCESS, "Indexing Completed successfully");
 	}
 
     @POST

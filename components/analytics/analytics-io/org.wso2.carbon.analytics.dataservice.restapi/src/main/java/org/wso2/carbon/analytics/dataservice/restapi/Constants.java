@@ -20,6 +20,8 @@ package org.wso2.carbon.analytics.dataservice.restapi;
  */
 public class Constants {
 
+	public static final long MILLISECONDSPERSECOND = 1000;
+
 	/**
 	 * Instantiates a new constants.
 	 */
@@ -74,6 +76,8 @@ public class Constants {
 
 		/** The Constant search_count. */
 		public static final String SEARCH_COUNT = "search_count";
+
+		public static final String INDEXING_DONE = "indexing_done";
 
     }
 }
