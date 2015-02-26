@@ -72,7 +72,7 @@ public class AnalyticsExecutionService {
             String[] tokens) throws AnalyticsExecutionException {
         String tableName = tokens[2].trim();
         String alias = tableName;
-        if (tokens[tokens.length - 2].toLowerCase().equals(AnalyticsSparkConstants.TERM_AS)) {
+        if (tokens[tokens.length - 2].equalsIgnoreCase(AnalyticsSparkConstants.TERM_AS)) {
             alias = tokens[tokens.length - 1];
             query = query.substring(0, query.lastIndexOf(tokens[tokens.length - 2]));
         }
@@ -296,7 +296,7 @@ public class AnalyticsExecutionService {
     
     private static String processPrimaryKeyAndReturnSchema(int tenantId, String tableName, 
             String schemaString) throws AnalyticsException {
-        int index = schemaString.lastIndexOf(AnalyticsSparkConstants.TERM_PRIMARY);
+        int index = schemaString.toLowerCase().lastIndexOf(AnalyticsSparkConstants.TERM_PRIMARY);
         String lastSection = "";
         if (index != -1) {
             index = schemaString.lastIndexOf(',', index);
@@ -304,7 +304,8 @@ public class AnalyticsExecutionService {
         }
         String[] lastTokens = lastSection.split(" ");
         if (lastTokens.length >= 2 && lastTokens[1].trim().toLowerCase().startsWith(AnalyticsSparkConstants.TERM_KEY)) {
-            String keysSection = lastSection.substring(lastSection.indexOf(AnalyticsSparkConstants.TERM_KEY) + 3).trim();
+            String keysSection = lastSection.substring(lastSection.toLowerCase().indexOf(
+                    AnalyticsSparkConstants.TERM_KEY) + 3).trim();
             if (!(keysSection.startsWith("(") && keysSection.endsWith(")"))) {
                 throwInvalidDefineTableQueryException();
             }
