@@ -1034,7 +1034,7 @@
         <carbon.commons.version>4.3.4</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.3.4, 4.4.0)</carbon.commons.imp.pkg.version>
         <carbon.event-processing.version>2.0.2</carbon.event-processing.version>
-        <carbon.identity.version>4.3.3</carbon.identity.version>
+        <carbon.identity.version>4.3.4-SNAPSHOT</carbon.identity.version>
 
         <carbon.analytics.version>1.0.3-SNAPSHOT</carbon.analytics.version>
 
