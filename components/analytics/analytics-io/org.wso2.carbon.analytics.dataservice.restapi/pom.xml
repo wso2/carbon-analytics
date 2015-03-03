@@ -38,8 +38,8 @@
 			<artifactId>jackson-jaxrs-json-provider</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-		<dependency>
-            <groupId>org.apache.cxf.wso2</groupId>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-bundle</artifactId>
             <scope>provided</scope>
         </dependency>

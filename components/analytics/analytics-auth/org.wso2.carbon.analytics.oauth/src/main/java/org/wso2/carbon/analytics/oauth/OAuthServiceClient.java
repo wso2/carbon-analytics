@@ -19,60 +19,44 @@ package org.wso2.carbon.analytics.oauth;
 */
 
 
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.ConfigurationContextFactory;
-import org.wso2.carbon.identity.oauth2.stub.OAuth2TokenValidationServiceStub;
-import org.wso2.carbon.identity.oauth2.stub.dto.OAuth2ClientApplicationDTO;
-import org.wso2.carbon.identity.oauth2.stub.dto.OAuth2TokenValidationRequestDTO;
-import org.wso2.carbon.identity.oauth2.stub.dto.OAuth2TokenValidationRequestDTO_OAuth2AccessToken;
-import org.wso2.carbon.utils.CarbonUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.analytics.oauth.internal.ServiceHolder;
+import org.wso2.carbon.identity.oauth.OAuthAdminService;
+import org.wso2.carbon.identity.oauth.common.exception.InvalidOAuthClientException;
+import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
+import org.wso2.carbon.identity.oauth2.OAuth2Service;
+import org.wso2.carbon.identity.oauth2.OAuth2TokenValidationService;
+import org.wso2.carbon.identity.oauth2.dto.OAuth2AccessTokenReqDTO;
+import org.wso2.carbon.identity.oauth2.dto.OAuth2AccessTokenRespDTO;
+import org.wso2.carbon.identity.oauth2.dto.OAuth2ClientApplicationDTO;
+import org.wso2.carbon.identity.oauth2.dto.OAuth2TokenValidationRequestDTO;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.amber.oauth2.client.OAuthClient;
-import org.apache.amber.oauth2.client.URLConnectionClient;
-import org.apache.amber.oauth2.client.request.OAuthClientRequest;
-import org.apache.amber.oauth2.client.response.OAuthClientResponse;
-import org.apache.amber.oauth2.common.exception.OAuthProblemException;
-import org.apache.amber.oauth2.common.exception.OAuthSystemException;
-import org.apache.amber.oauth2.common.message.types.GrantType;
-
-
-import org.wso2.carbon.identity.application.common.model.xsd.InboundAuthenticationRequestConfig;
-import org.wso2.carbon.identity.application.common.model.xsd.OutboundProvisioningConfig;
-import org.wso2.carbon.identity.application.common.model.xsd.Property;
-import org.wso2.carbon.identity.application.common.model.xsd.ServiceProvider;
-import org.wso2.carbon.identity.application.mgt.stub.IdentityApplicationManagementServiceIdentityApplicationManagementException;
-import org.wso2.carbon.identity.application.mgt.stub.IdentityApplicationManagementServiceStub;
-import org.wso2.carbon.identity.oauth.OAuthAdminService;
-import org.wso2.carbon.identity.oauth.stub.OAuthAdminServiceException;
-import org.wso2.carbon.identity.oauth.stub.OAuthAdminServiceStub;
-import org.wso2.carbon.identity.oauth.stub.dto.OAuthConsumerAppDTO;
-import org.wso2.carbon.identity.oauth2.OAuth2Service;
-import org.wso2.carbon.identity.oauth2.dto.OAuth2AccessTokenReqDTO;
 
 public class OAuthServiceClient {
 
+    private static final Log logger = LogFactory.getLog(OAuthServiceClient.class);
+
     static final String BEARER_TOKEN_TYPE = "bearer";
 
-    public static OAuth2ClientApplicationDTO validateToken(String tokenString) throws Exception {
+    public OAuthServiceClient() {
+    }
 
-        ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(null, null);
-        OAuth2TokenValidationServiceStub stub = new OAuth2TokenValidationServiceStub(configContext, "https://localhost:9444/services/OAuth2TokenValidationService");
-        CarbonUtils.setBasicAccessSecurityHeaders("admin", "admin", true, stub._getServiceClient());
-        org.wso2.carbon.identity.oauth2.stub.dto.OAuth2ClientApplicationDTO validationResponse;
+    public OAuth2ClientApplicationDTO validateToken(String tokenString) throws Exception {
+
+        OAuth2TokenValidationService stub = new OAuth2TokenValidationService();
+        org.wso2.carbon.identity.oauth2.dto.OAuth2ClientApplicationDTO validationResponse;
 
         OAuth2TokenValidationRequestDTO oauthReq = new OAuth2TokenValidationRequestDTO();
-        OAuth2TokenValidationRequestDTO_OAuth2AccessToken accessToken =
-                new OAuth2TokenValidationRequestDTO_OAuth2AccessToken();
+        OAuth2TokenValidationRequestDTO.OAuth2AccessToken accessToken = new OAuth2TokenValidationRequestDTO().new OAuth2AccessToken();
         accessToken.setTokenType(BEARER_TOKEN_TYPE);
         accessToken.setIdentifier(tokenString.substring(7));
         oauthReq.setAccessToken(accessToken);
         validationResponse = stub.findOAuthConsumerIfTokenIsValid(oauthReq);
 
-        System.out.println("validationResponse.getAccessTokenValidationResponse().getValid() = " + validationResponse.getAccessTokenValidationResponse().getValid());
+        System.out.println("validationResponse.getAccessTokenValidationResponse().getValid() = " + validationResponse
+                .getAccessTokenValidationResponse().isValid());
 
         System.out.println("validationResponse.getConsumerKey() = " + validationResponse.getConsumerKey());
         System.out.println("validationResponse.getAccessTokenValidationResponse().getAuthorizedUser() = " + validationResponse.getAccessTokenValidationResponse().getAuthorizedUser());
@@ -81,23 +65,21 @@ public class OAuthServiceClient {
         return validationResponse;
     }
 
-    public static String createToken(String username, String password) {
-        OAuthAdminServiceStub serviceClient;
-        IdentityApplicationManagementServiceStub stub;
-        String appName = String.valueOf(Math.ceil(Math.random() * 1000));
+    public String createToken(String username, String password) throws Exception {
+
+        OAuth2Service ss = ServiceHolder.getoAuth2Service();
+//        IdentityApplicationManagementService stub;
+        String appName = "BAM-Dashboard";
 
         try {
-            serviceClient = new OAuthAdminServiceStub("https://localhost:9444/services/OAuthAdminService");
-            CarbonUtils.setBasicAccessSecurityHeaders("admin", "admin", true, serviceClient._getServiceClient());
+            OAuthAdminService serviceClient = new OAuthAdminService();
 
-            stub = new IdentityApplicationManagementServiceStub
+            /*stub = new IdentityApplicationManagementServiceStub
                     ("https://localhost:9444/services/IdentityApplicationManagementService");
-            CarbonUtils.setBasicAccessSecurityHeaders("admin", "admin", true, stub._getServiceClient());
+            CarbonUtils.setBasicAccessSecurityHeaders("admin", "admin", true, stub._getServiceClient());*/
 
-            OAuthConsumerAppDTO oAuthApplication;
+            OAuthConsumerAppDTO oAuthApplication = null;
             try {
-                oAuthApplication = serviceClient.getOAuthApplicationDataByAppName(appName);
-            } catch (RemoteException e) {
                 OAuthConsumerAppDTO oAuthConsumerDTO = new OAuthConsumerAppDTO();
                 oAuthConsumerDTO.setApplicationName(appName);
                 oAuthConsumerDTO.setOAuthVersion("oauth-2.0");
@@ -105,6 +87,17 @@ public class OAuthServiceClient {
 
                 serviceClient.registerOAuthApplicationData(oAuthConsumerDTO);
                 oAuthApplication = serviceClient.getOAuthApplicationDataByAppName(appName);
+            } catch (InvalidOAuthClientException e) {
+
+                OAuthConsumerAppDTO oAuthConsumerDTO = new OAuthConsumerAppDTO();
+                oAuthConsumerDTO.setApplicationName(appName);
+                oAuthConsumerDTO.setOAuthVersion("oauth-2.0");
+                oAuthConsumerDTO.setGrantTypes("password");
+
+                serviceClient.registerOAuthApplicationData(oAuthConsumerDTO);
+                oAuthApplication = serviceClient.getOAuthApplicationDataByAppName(appName);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
             if (oAuthApplication == null) {
@@ -201,7 +194,17 @@ public class OAuthServiceClient {
                 throw new RuntimeException(e);
             }
 */
-            OAuthClientRequest accessRequest = OAuthClientRequest.tokenLocation("https://localhost:9444/oauth2/token")
+            OAuth2AccessTokenReqDTO oAuth2AccessTokenReqDTO = new OAuth2AccessTokenReqDTO();
+            oAuth2AccessTokenReqDTO.setGrantType("password");
+            oAuth2AccessTokenReqDTO.setClientId(consumerKey);
+            oAuth2AccessTokenReqDTO.setClientSecret(consumerSecret);
+            oAuth2AccessTokenReqDTO.setResourceOwnerUsername(username);
+            oAuth2AccessTokenReqDTO.setResourceOwnerPassword(password);
+            oAuth2AccessTokenReqDTO.setScope(new String[]{appName});
+            OAuth2AccessTokenRespDTO oAuth2AccessTokenRespDTO = ss.issueAccessToken(oAuth2AccessTokenReqDTO);
+
+                    /*OAuthClientRequest
+            accessRequest = OAuthClientRequest.tokenLocation("https://localhost:9444/oauth2/token")
                     .setGrantType(GrantType.PASSWORD)
                     .setClientId(consumerKey)
                     .setClientSecret(consumerSecret)
@@ -211,11 +214,12 @@ public class OAuthServiceClient {
                     .buildBodyMessage();
             OAuthClient oAuthClient = new OAuthClient(new URLConnectionClient());
 
-            OAuthClientResponse oAuthResponse = oAuthClient.accessToken(accessRequest);
-            System.out.println("oAuthResponse.getParam(\"access_token\") = " + oAuthResponse.getParam("access_token"));
-            return oAuthResponse.getParam("access_token");
+            OAuthClientResponse oAuthResponse = oAuthClient.accessToken(accessRequest);*/
 
-        } catch (RemoteException | OAuthAdminServiceException | OAuthProblemException | OAuthSystemException e) {
+            System.out.println("oAuth2AccessTokenRespDTO.getAccessToken() = " + oAuth2AccessTokenRespDTO.getAccessToken());
+            return oAuth2AccessTokenRespDTO.getAccessToken();
+
+        } catch (RemoteException e) {
             e.printStackTrace();
         }
         return null;

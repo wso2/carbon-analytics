@@ -40,27 +40,23 @@
                     <groupId>org.apache.tomcat</groupId>
                     <artifactId>tomcat-catalina-ha</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.apache.amber.wso2</groupId>
+                    <artifactId>amber</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.axis2.transport</groupId>
+                    <artifactId>axis2-transport-mail</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>libthrift.wso2</groupId>
+                    <artifactId>libthrift</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.wso2.securevault</groupId>
+                    <artifactId>org.wso2.securevault</artifactId>
+                </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.identity</groupId>
-            <artifactId>org.wso2.carbon.identity.oauth.stub</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.identity</groupId>
-            <artifactId>org.wso2.carbon.identity.application.mgt.stub</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.amber</groupId>
-            <artifactId>oauth2-client</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.axis2.wso2</groupId>
-            <artifactId>axis2</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.axis2.wso2</groupId>
-            <artifactId>axis2-client</artifactId>
         </dependency>
     </dependencies>
 
@@ -73,12 +69,12 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>1.4.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <!--<Private-Package>org.wso2.carbon.analytics.oauth.internal.*</Private-Package>-->
                         <Export-Package>
                             org.wso2.carbon.analytics.oauth.*
                         </Export-Package>

@@ -589,7 +589,14 @@ public class AnalyticsResource extends AbstractResource {
         if (logger.isDebugEnabled()) {
             logger.debug("Request received to create OAuth access token to user:" + credentialBean.getUsername());
         }
-        String token = OAuthServiceClient.createToken(credentialBean.getUsername(), credentialBean.getPassword());
+        String token = null;
+        try {
+            OAuthServiceClient oAuthServiceClient = Utils.getOAuthServiceClient();
+            token = oAuthServiceClient.createToken(credentialBean.getUsername(), credentialBean.getPassword());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return handleResponse(ResponseStatus.SUCCESS, token);
     }
 }

@@ -32,6 +32,6 @@
 	<bean id="analyticsTimeoutExceptionMapper" 
 			class="org.wso2.carbon.analytics.dataservice.restapi.providers.AnalyticsTimeoutExceptionMapper"/>	
     <bean id="analyticsAuthenticationInterceptor"
-            class="org.wso2.carbon.analytics.dataservice.restapi.interceptor.AnalyticsAuthenticationInterceptor"/>
+            class="org.wso2.carbon.analytics.dataservice.restapi.interceptors.AnalyticsAuthenticationInterceptor"/>
 	<bean id="jacksonJsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider"/>
 </beans>

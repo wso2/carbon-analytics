@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-~ Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+~ Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 ~
 ~ WSO2 Inc. licenses this file to you under the Apache License,
 ~ Version 2.0 (the "License"); you may not use this file except
@@ -17,29 +17,23 @@
 ~ under the License.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
-        <artifactId>carbon-analytics</artifactId>
         <groupId>org.wso2.carbon.analytics</groupId>
+        <artifactId>analytics-feature</artifactId>
         <version>1.0.3-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>analytics-feature</artifactId>
+    <artifactId>analytics-auth-feature</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon - Analytics Feature Aggregator Module</name>
+    <name>WSO2 Carbon - Analytics Auth Feature Aggregator Module</name>
 
     <modules>
-        <module>analytics-auth</module>
-        <module>analytics-core</module>
-        <module>analytics-data-connectors</module>
-        <module>analytics-processors</module>
-        <module>analytics-io</module>
-        <module>analytics-lite</module>
-        <!--module>analytics-spark-core</module-->
+        <module>org.wso2.carbon.analytics.oauth.feature</module>
     </modules>
-
 
 </project>

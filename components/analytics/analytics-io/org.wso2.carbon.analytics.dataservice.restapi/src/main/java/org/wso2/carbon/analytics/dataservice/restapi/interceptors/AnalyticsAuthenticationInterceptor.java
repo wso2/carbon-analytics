@@ -1,4 +1,4 @@
-package org.wso2.carbon.analytics.dataservice.restapi.interceptor;
+package org.wso2.carbon.analytics.dataservice.restapi.interceptors;
 
 /*
 * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -38,7 +38,7 @@ import javax.ws.rs.core.Response;
 
 public class AnalyticsAuthenticationInterceptor extends JAXRSInInterceptor {
 
-    Log logger = LogFactory.getLog(AnalyticsAuthenticationInterceptor.class);
+    private static final Log logger = LogFactory.getLog(AnalyticsAuthenticationInterceptor.class);
 
     private static final String AUTHORIZATION = "Authorization";
     private static final String GENERATE_TOKEN_PATH = "/".concat(Constants.ResourcePath.GENERATE_TOKEN);
@@ -60,11 +60,11 @@ public class AnalyticsAuthenticationInterceptor extends JAXRSInInterceptor {
             String authorizationHeader = request.getHeader(AUTHORIZATION);
 
             if ((authorizationHeader != null) && (!authorizationHeader.isEmpty())) {
-                try {
+                /*try {
                     OAuthServiceClient.validateToken(authorizationHeader);
                 } catch (Exception e) {
                     e.printStackTrace();
-                }
+                }*/
             } else {
                 String warnMsg = "Authorization header missing or empty in the request for resource:" + request.getPathInfo();
                 logger.warn(warnMsg);
