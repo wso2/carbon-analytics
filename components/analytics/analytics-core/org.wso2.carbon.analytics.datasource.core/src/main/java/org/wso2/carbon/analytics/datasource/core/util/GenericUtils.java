@@ -18,19 +18,15 @@
  */
 package org.wso2.carbon.analytics.datasource.core.util;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.collections.IteratorUtils;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
+
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.util.*;
 
 /**
  * Generic utility methods for analytics data source implementations.
@@ -92,88 +88,101 @@ public class GenericUtils {
         for (Map.Entry<String, Object> entry : values.entrySet()) {
             name = entry.getKey();
             value = entry.getValue();
-            /* column name length value + data type (including null) */
-            count += Integer.SIZE / 8 + 1;
-            /* column name */
-            count += name.getBytes().length;
-            if (value instanceof String) {
-                /* string length + value */
-                count += Integer.SIZE / 8;
-                count += ((String) value).getBytes().length;
-            } else if (value instanceof Long) {
-                count += Long.SIZE / 8;
-            } else if (value instanceof Double) {
-                count += Double.SIZE / 8;
-            } else if (value instanceof Boolean) {
-                count += Byte.SIZE / 8;
-            } else if (value instanceof Integer) {
-                count += Integer.SIZE / 8;
-            } else if (value instanceof Float) {
-                count += Float.SIZE / 8;
-            } else if (value instanceof byte[]) {
-                count += Integer.SIZE / 8;
-                count += ((byte[]) value).length;
-            } else if (value != null) {
-                throw new AnalyticsException("Invalid column value type in calculating column "
-                        + "values length: " + value.getClass());
-            }
+            count += calculateBufferSizePerElement(name, value);
         }
         return count;
     }
     
     public static byte[] encodeRecordValues(Map<String, Object> values) throws AnalyticsException {
-        ByteBuffer buffer = ByteBuffer.allocate(calculateRecordValuesBufferSize(values));
-        String name, strVal;
-        boolean boolVal;
+        ByteBuffer secondaryBuffer = ByteBuffer.allocate(calculateRecordValuesBufferSize(values));
+        String name;
         Object value;
-        byte[] binData;
         for (Map.Entry<String, Object> entry : values.entrySet()) {
-            try {
-                name = entry.getKey();
-                value = entry.getValue();
-                buffer.putInt(name.length());
-                buffer.put(name.getBytes(DEFAULT_CHARSET));
-                if (value instanceof String) {
-                    buffer.put(DATA_TYPE_STRING);
-                    strVal = (String) value;
-                    buffer.putInt(strVal.length());
-                    buffer.put(strVal.getBytes(DEFAULT_CHARSET));
-                } else if (value instanceof Long) {
-                    buffer.put(DATA_TYPE_LONG);
-                    buffer.putLong((Long) value);
-                } else if (value instanceof Double) {
-                    buffer.put(DATA_TYPE_DOUBLE);
-                    buffer.putDouble((Double) value);
-                } else if (value instanceof Boolean) {
-                    buffer.put(DATA_TYPE_BOOLEAN);
-                    boolVal = (Boolean) value;
-                    if (boolVal) {
-                        buffer.put(BOOLEAN_TRUE);
-                    } else {
-                        buffer.put(BOOLEAN_FALSE);
-                    }
-                } else if (value instanceof Integer) {
-                    buffer.put(DATA_TYPE_INTEGER);
-                    buffer.putInt((Integer) value);
-                } else if (value instanceof Float) {
-                    buffer.put(DATA_TYPE_FLOAT);
-                    buffer.putFloat((Float) value);
-                } else if (value instanceof byte[]) {
-                    buffer.put(DATA_TYPE_BINARY);
-                    binData = (byte[]) value;
-                    buffer.putInt(binData.length);
-                    buffer.put(binData);
-                } else if (value == null) {
-                    buffer.put(DATA_TYPE_NULL);
+            name = entry.getKey();
+            value = entry.getValue();
+            secondaryBuffer.put(encodeElement(name, value));
+        }
+        return secondaryBuffer.array();
+    }
+
+    public static byte[] encodeElement(String name, Object value) throws AnalyticsException {
+        ByteBuffer buffer = ByteBuffer.allocate(calculateBufferSizePerElement(name, value));
+        String strVal;
+        boolean boolVal;
+        byte[] binData;
+        try {
+            buffer.putInt(name.length());
+            buffer.put(name.getBytes(DEFAULT_CHARSET));
+            if (value instanceof String) {
+                buffer.put(DATA_TYPE_STRING);
+                strVal = (String) value;
+                buffer.putInt(strVal.length());
+                buffer.put(strVal.getBytes(DEFAULT_CHARSET));
+            } else if (value instanceof Long) {
+                buffer.put(DATA_TYPE_LONG);
+                buffer.putLong((Long) value);
+            } else if (value instanceof Double) {
+                buffer.put(DATA_TYPE_DOUBLE);
+                buffer.putDouble((Double) value);
+            } else if (value instanceof Boolean) {
+                buffer.put(DATA_TYPE_BOOLEAN);
+                boolVal = (Boolean) value;
+                if (boolVal) {
+                    buffer.put(BOOLEAN_TRUE);
                 } else {
-                    throw new AnalyticsException("Invalid column value type in encoding "
-                            + "column value: " + value.getClass());
+                    buffer.put(BOOLEAN_FALSE);
                 }
-            } catch (UnsupportedEncodingException e) {
-                throw new AnalyticsException("Error in encoding record values: " + e.getMessage());
+            } else if (value instanceof Integer) {
+                buffer.put(DATA_TYPE_INTEGER);
+                buffer.putInt((Integer) value);
+            } else if (value instanceof Float) {
+                buffer.put(DATA_TYPE_FLOAT);
+                buffer.putFloat((Float) value);
+            } else if (value instanceof byte[]) {
+                buffer.put(DATA_TYPE_BINARY);
+                binData = (byte[]) value;
+                buffer.putInt(binData.length);
+                buffer.put(binData);
+            } else if (value == null) {
+                buffer.put(DATA_TYPE_NULL);
+            } else {
+                throw new AnalyticsException("Invalid column value type in encoding "
+                        + "column value: " + value.getClass());
             }
+        } catch (UnsupportedEncodingException e) {
+            throw new AnalyticsException("Error in encoding record values: " + e.getMessage());
         }
         return buffer.array();
+    }
+
+    private static int calculateBufferSizePerElement(String name, Object value) throws AnalyticsException {
+        int count = 0;
+         /* column name length value + data type (including null) */
+        count += Integer.SIZE / 8 + 1;
+            /* column name */
+        count += name.getBytes().length;
+        if (value instanceof String) {
+                /* string length + value */
+            count += Integer.SIZE / 8;
+            count += ((String) value).getBytes().length;
+        } else if (value instanceof Long) {
+            count += Long.SIZE / 8;
+        } else if (value instanceof Double) {
+            count += Double.SIZE / 8;
+        } else if (value instanceof Boolean) {
+            count += Byte.SIZE / 8;
+        } else if (value instanceof Integer) {
+            count += Integer.SIZE / 8;
+        } else if (value instanceof Float) {
+            count += Float.SIZE / 8;
+        } else if (value instanceof byte[]) {
+            count += Integer.SIZE / 8;
+            count += ((byte[]) value).length;
+        } else if (value != null) {
+            throw new AnalyticsException("Invalid column value type in calculating column "
+                    + "values length: " + value.getClass());
+        }
+        return count;
     }
     
     public static Map<String, Object> decodeRecordValues(byte[] data, 
