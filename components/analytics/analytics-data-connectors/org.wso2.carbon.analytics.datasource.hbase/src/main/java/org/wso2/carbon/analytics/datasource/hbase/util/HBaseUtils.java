@@ -18,12 +18,16 @@
 package org.wso2.carbon.analytics.datasource.hbase.util;
 
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hbase.TableName;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 public class HBaseUtils {
 
-    private static String generateTablePrefix(int tenantId) {
+    public static String normalizeTableName(String tableName) {
+        return tableName.toUpperCase();
+    }
+
+
+    public static String generateAnalyticsTablePrefix(int tenantId) {
         if (tenantId < 0) {
             return HBaseAnalyticsDSConstants.ANALYTICS_USER_TABLE_PREFIX + "_X" + Math.abs(tenantId) + "_";
         } else {
@@ -31,12 +35,20 @@ public class HBaseUtils {
         }
     }
 
-    private static String normalizeTableName(String tableName) {
-        return tableName.toUpperCase();
+    public static String generateAnalyticsTableName(int tenantId, String tableName) {
+        return HBaseUtils.generateAnalyticsTablePrefix(tenantId) + HBaseUtils.normalizeTableName(tableName);
     }
 
-    public static TableName generateTableName(int tenantId, String tableName) {
-        return TableName.valueOf(generateTablePrefix(tenantId) + normalizeTableName(tableName));
+    public static String generateIndexTablePrefix(int tenantId) {
+        if (tenantId < 0) {
+            return HBaseAnalyticsDSConstants.ANALYTICS_INDEX_TABLE_PREFIX + "_X" + Math.abs(tenantId) + "_";
+        } else {
+            return HBaseAnalyticsDSConstants.ANALYTICS_INDEX_TABLE_PREFIX + "_" + tenantId + "_";
+        }
+    }
+
+    public static String generateIndexTableName(int tenantId, String tableName) {
+        return HBaseUtils.generateIndexTablePrefix(tenantId) + HBaseUtils.normalizeTableName(tableName);
     }
 
     public static Path createPath(String source){
