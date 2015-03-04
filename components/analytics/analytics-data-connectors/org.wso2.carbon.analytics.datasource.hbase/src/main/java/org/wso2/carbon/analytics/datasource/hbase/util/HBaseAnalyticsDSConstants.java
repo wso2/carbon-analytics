@@ -24,6 +24,7 @@ public class HBaseAnalyticsDSConstants {
     public static final String ANALYTICS_INDEX_TABLE_PREFIX = "IDX";
     public static final byte[] ANALYTICS_COLUMN_FAMILY_NAME = "carbon-analytics-data".getBytes();
     public static final byte[] ANALYTICS_TS_COLUMN_FAMILY_NAME = "carbon-analytics-timestamp".getBytes();
+    public static final byte[] INDEX_QUALIFIER_NAME = "recordid".getBytes();
     public static final byte[] INDEX_COLUMN_FAMILY_NAME = "carbon-analytics-index".getBytes();
     public static final String DEFAULT_ENCODING_TYPE = "UTF-8";
 
