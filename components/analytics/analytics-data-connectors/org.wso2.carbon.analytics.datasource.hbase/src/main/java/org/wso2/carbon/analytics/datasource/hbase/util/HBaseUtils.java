@@ -36,7 +36,7 @@ public class HBaseUtils {
     }
 
     public static String generateAnalyticsTableName(int tenantId, String tableName) {
-        return HBaseUtils.generateAnalyticsTablePrefix(tenantId) + HBaseUtils.normalizeTableName(tableName);
+        return generateAnalyticsTablePrefix(tenantId) + normalizeTableName(tableName);
     }
 
     public static String generateIndexTablePrefix(int tenantId) {
@@ -48,7 +48,12 @@ public class HBaseUtils {
     }
 
     public static String generateIndexTableName(int tenantId, String tableName) {
-        return HBaseUtils.generateIndexTablePrefix(tenantId) + HBaseUtils.normalizeTableName(tableName);
+        return generateIndexTablePrefix(tenantId) + normalizeTableName(tableName);
+    }
+
+    public static String convertUserToIndexTable(String userTable) {
+        return userTable.replaceFirst(HBaseAnalyticsDSConstants.ANALYTICS_USER_TABLE_PREFIX,
+                HBaseAnalyticsDSConstants.ANALYTICS_INDEX_TABLE_PREFIX);
     }
 
     public static Path createPath(String source){
