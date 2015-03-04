@@ -32,27 +32,27 @@ import java.util.*;
  * Generic utility methods for analytics data source implementations.
  */
 public class GenericUtils {
-    
+
     private static final byte BOOLEAN_TRUE = 1;
 
     private static final byte BOOLEAN_FALSE = 0;
 
     private static final byte DATA_TYPE_NULL = 0x00;
-    
+
     private static final byte DATA_TYPE_STRING = 0x01;
-    
+
     private static final byte DATA_TYPE_INTEGER = 0x02;
-    
+
     private static final byte DATA_TYPE_LONG = 0x03;
-    
+
     private static final byte DATA_TYPE_FLOAT = 0x04;
-    
+
     private static final byte DATA_TYPE_DOUBLE = 0x05;
-    
+
     private static final byte DATA_TYPE_BOOLEAN = 0x06;
-    
+
     private static final byte DATA_TYPE_BINARY = 0x07;
-    
+
     private static final String DEFAULT_CHARSET = "UTF8";
 
     public static String getParentPath(String path) {
@@ -65,7 +65,7 @@ public class GenericUtils {
         }
         return parent;
     }
-    
+
     /**
      * Normalizes the path to make every path not end with "/".
      * @param path The path
@@ -80,7 +80,7 @@ public class GenericUtils {
         }
         return path;
     }
-    
+
     private static int calculateRecordValuesBufferSize(Map<String, Object> values) throws AnalyticsException {
         int count = 0;
         String name;
@@ -92,7 +92,7 @@ public class GenericUtils {
         }
         return count;
     }
-    
+
     public static byte[] encodeRecordValues(Map<String, Object> values) throws AnalyticsException {
         ByteBuffer secondaryBuffer = ByteBuffer.allocate(calculateRecordValuesBufferSize(values));
         String name;
@@ -184,8 +184,8 @@ public class GenericUtils {
         }
         return count;
     }
-    
-    public static Map<String, Object> decodeRecordValues(byte[] data, 
+
+    public static Map<String, Object> decodeRecordValues(byte[] data,
             Set<String> columns) throws AnalyticsException {
         /* using LinkedHashMap to retain the column order */
         Map<String, Object> result = new LinkedHashMap<String, Object>();
@@ -253,15 +253,36 @@ public class GenericUtils {
         }
         return result;
     }
-    
+
     @SuppressWarnings("unchecked")
-    public static List<Record> listRecords(AnalyticsRecordStore rs, 
+    public static List<Record> listRecords(AnalyticsRecordStore rs,
             RecordGroup[] rgs) throws AnalyticsException {
         List<Record> result = new ArrayList<Record>();
         for (RecordGroup rg : rgs) {
             result.addAll(IteratorUtils.toList(rs.readRecords(rg)));
         }
         return result;
-    }    
-    
+    }
+
+    public static byte[] encodeLong(long value) {
+        return new byte[]{
+                (byte) (value >> 56),
+                (byte) (value >> 48),
+                (byte) (value >> 40),
+                (byte) (value >> 32),
+                (byte) (value >> 24),
+                (byte) (value >> 16),
+                (byte) (value >> 8),
+                (byte) value
+        };
+    }
+
+    public static long decodeLong(byte[] arr) {
+        long value = 0;
+        for (byte b : arr) {
+            value = (value << 8) + (b & 0xff);
+        }
+        return value;
+    }
+
 }
