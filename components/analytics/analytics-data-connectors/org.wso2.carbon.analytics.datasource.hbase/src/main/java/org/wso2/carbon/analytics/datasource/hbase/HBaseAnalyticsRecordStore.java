@@ -19,20 +19,13 @@ package org.wso2.carbon.analytics.datasource.hbase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.HColumnDescriptor;
-import org.apache.hadoop.hbase.HTableDescriptor;
-import org.apache.hadoop.hbase.TableName;
+import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
-
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
-import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsTableNotAvailableException;
+import org.wso2.carbon.analytics.datasource.core.rs.DirectAnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
-import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
-
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseAnalyticsDSConstants;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseUtils;
 
@@ -41,7 +34,7 @@ import javax.naming.NamingException;
 import java.io.IOException;
 import java.util.*;
 
-public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
+public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
 
     private Admin admin;
     private Connection conn;
@@ -73,12 +66,14 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
 
         /* creating table with standard column families "carbon-analytics-data" and "carbon-analytics-timestamp" */
         htd.addFamily(new HColumnDescriptor(HBaseAnalyticsDSConstants.ANALYTICS_COLUMN_FAMILY_NAME))
-                .addFamily(new HColumnDescriptor(HBaseAnalyticsDSConstants.ANALYTICS_TS_COLUMN_FAMILY_NAME));
+                .addFamily(new HColumnDescriptor(HBaseAnalyticsDSConstants.ANALYTICS_TS_COLUMN_FAMILY_NAME)
+                        .setMaxVersions(1));
 
         HTableDescriptor htd_idx = new HTableDescriptor(TableName.valueOf(
                 HBaseUtils.generateIndexTableName(tenantId, tableName)));
         /* creating table with standard column family "carbon-analytics-index" */
-        htd_idx.addFamily(new HColumnDescriptor(HBaseAnalyticsDSConstants.ANALYTICS_COLUMN_FAMILY_NAME));
+        htd_idx.addFamily(new HColumnDescriptor(HBaseAnalyticsDSConstants.ANALYTICS_COLUMN_FAMILY_NAME)
+                .setMaxVersions(1));
 
         /* Table creation should fail if index cannot be created, so attempting to create index table first. */
         try {
@@ -102,7 +97,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
 
     @Override
     public void deleteTable(int tenantId, String tableName) throws AnalyticsException {
-        if(this.tableExists(tenantId, tableName)){
+        if (this.tableExists(tenantId, tableName)) {
             try {
                 this.admin.deleteTable(TableName.valueOf(HBaseUtils.generateAnalyticsTableName(tenantId, tableName)));
                 this.admin.deleteTable(TableName.valueOf(HBaseUtils.generateIndexTableName(tenantId, tableName)));
@@ -110,7 +105,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
                 throw new AnalyticsException("Error deleting table " + tableName, e);
             }
         } else {
-            log.debug("Deletion of table "+tableName+" can not be carried out since said table does not exist.");
+            log.debug("Deletion of table " + tableName + " can not be carried out since said table does not exist.");
         }
     }
 
@@ -167,17 +162,17 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             /* iterating over record batches */
             for (String formattedTableName : recordBatches.keySet()) {
                 if ((formattedTableName != null) && !(formattedTableName.isEmpty())) {
-                    table = conn.getTable(TableName.valueOf(formattedTableName));
+                    table = this.conn.getTable(TableName.valueOf(formattedTableName));
                     /* Converting data table name to index table name directly since record-level information
                     * which is required for normal table name construction is not available at this stage. */
                     indexTableName = HBaseUtils.convertUserToIndexTable(formattedTableName);
-                    indexTable = conn.getTable(TableName.valueOf(indexTableName));
+                    indexTable = this.conn.getTable(TableName.valueOf(indexTableName));
                     List<Record> recordList = recordBatches.get(formattedTableName);
                     puts = new ArrayList<>();
                     indexPuts = new ArrayList<>();
                     /* iterating over single records in a batch */
                     for (Record record : recordList) {
-                        if(record != null){
+                        if (record != null) {
                             recordId = record.getId();
                             timestamp = record.getTimestamp();
                             columns = record.getValues();
@@ -186,13 +181,14 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
                             for (String key : columns.keySet()) {
                                 /* encoding column data to bytes.
                                 * Note: the encoded column value also contains the column name. */
+                                // TODO: change long encoding to respect HBase lexical ordering
                                 columnData = GenericUtils.encodeElement(key, columns.get(key));
-                                if(columnData.length != 0){
+                                if (columnData.length != 0) {
                                     put.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_COLUMN_FAMILY_NAME,
                                             key.getBytes(), timestamp, columnData);
                                 }
                             }
-                            indexPuts.add(putIndexData(record));
+                            indexPuts.add(this.putIndexData(record));
                             puts.add(put);
                         }
                     }
@@ -208,8 +204,10 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
 
     private Put putIndexData(Record record) {
         Put indexPut = new Put(GenericUtils.encodeLong(record.getTimestamp()));
-        indexPut.addColumn(HBaseAnalyticsDSConstants.INDEX_COLUMN_FAMILY_NAME,
-                HBaseAnalyticsDSConstants.INDEX_QUALIFIER_NAME, record.getId().getBytes());
+        /* Setting the column qualifier the same as the column value to enable multiple columns per row with
+        * unique qualifiers, since we will anyway not use the qualifier during index read */
+        indexPut.addColumn(HBaseAnalyticsDSConstants.INDEX_COLUMN_FAMILY_NAME, record.getId().getBytes(),
+                record.getId().getBytes());
         return indexPut;
     }
 
@@ -232,32 +230,57 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
     }
 
     @Override
-    public RecordGroup[] get(int tenantId, String tableName, List<String> columns, long timeFrom,
-                             long timeTo, int recordsFrom, int recordsCount)
-            throws AnalyticsException, AnalyticsTableNotAvailableException {
-        return new RecordGroup[0];
-    }
-
-    @Override
-    public RecordGroup[] get(int tenantId, String tableName, List<String> columns, List<String> ids)
-            throws AnalyticsException, AnalyticsTableNotAvailableException {
-        return new RecordGroup[0];
-    }
-
-    @Override
-    public Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException {
+    public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns, long timeFrom,
+                                       long timeTo, int recordsFrom, int recordsCount) throws AnalyticsException {
+        List<byte[]> records = this.lookupIndex(tenantId, tableName, timeFrom, timeTo);
+        // TODO
         return null;
     }
 
     @Override
+    public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns, List<String> ids)
+            throws AnalyticsException {
+        return null;
+    }
+
+    private List<byte[]> lookupIndex(int tenantId, String tableName, long startTime, long endTime)
+            throws AnalyticsException {
+        List<byte[]> recordIds = new ArrayList<>();
+        String formattedTableName = HBaseUtils.generateIndexTableName(tenantId, tableName);
+        Table indexTable;
+        Cell[] cells;
+        try {
+            indexTable = this.conn.getTable(TableName.valueOf(formattedTableName));
+        } catch (IOException e) {
+            throw new AnalyticsException("Index for table " + tableName + " could not be initialized", e);
+        }
+        /* Setting (end-time)+1L because end-time is exclusive (which is not what we want) */
+        Scan indexScan = new Scan(GenericUtils.encodeLong(startTime), GenericUtils.encodeLong(endTime + 1L));
+        indexScan.addFamily(HBaseAnalyticsDSConstants.INDEX_COLUMN_FAMILY_NAME);
+        ResultScanner resultScanner;
+        try {
+            resultScanner = indexTable.getScanner(indexScan);
+            for (Result rowResult: resultScanner) {
+                cells = rowResult.rawCells();
+                for (Cell cell : cells) {
+                    recordIds.add(CellUtil.cloneValue(cell));
+                }
+            }
+        } catch (IOException e) {
+            throw new AnalyticsException("Index for table " + tableName + " could not be read", e);
+        }
+        return recordIds;
+    }
+
+    @Override
     public void delete(int tenantId, String tableName, long timeFrom, long timeTo)
-            throws AnalyticsException, AnalyticsTableNotAvailableException {
+            throws AnalyticsException {
 
     }
 
     @Override
     public void delete(int tenantId, String tableName, List<String> ids)
-            throws AnalyticsException, AnalyticsTableNotAvailableException {
+            throws AnalyticsException {
 
     }
 
