@@ -92,9 +92,9 @@ public class AnalyticsDataIndexer implements GroupEventListener {
 
     private static final String INDEX_OP_DATA_ATTRIBUTE = "__INDEX_OP_DATA__";
 
-    private static final String SHARD_INDEX_DATA_UPDATE_RECORDS_TABLE_NAME = "__SHARD_INDEX_UPDATE_RECORDS__";
+    private static final String SHARD_INDEX_DATA_UPDATE_RECORDS_TABLE_PREFIX = "__SHARD_INDEX_UPDATE_RECORDS__";
     
-    private static final String SHARD_INDEX_DATA_DELETE_RECORDS_TABLE_NAME = "__SHARD_INDEX_DELETE_RECORDS__";
+    private static final String SHARD_INDEX_DATA_DELETE_RECORDS_TABLE_PREFIX = "__SHARD_INDEX_DELETE_RECORDS__";
 
     private static final int SHARD_INDEX_DATA_RECORD_TENANT_ID = -1000;
     
@@ -179,7 +179,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return result;
     }
     
-    public void scheduleWorkers(List<Integer> shardIndices) throws AnalyticsException {
+    private void scheduleWorkers(List<Integer> shardIndices) throws AnalyticsException {
         this.stopAndCleanupIndexProcessing();
         this.shardWorkerExecutor = Executors.newFixedThreadPool(shardIndices.size());
         for (int shardIndex : shardIndices) {
@@ -204,64 +204,34 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return repository;
     }
     
-    /**
-     * This class represents an indexing operation for a record.
-     */
-    public static class IndexOperation implements Serializable {
-        
-        private static final long serialVersionUID = -5071679492708482851L;
-
-        private int tenantId;
-        
-        private String tableName;
-        
-        private String id;
-        
-        public IndexOperation(int tenantId, String tableName, String id) {
-            this.tenantId = tenantId;
-            this.tableName = tableName;
-            this.id = id;
-        }
-        
-        public int getTenantId() {
-            return tenantId;
-        }
-        
-        public String getTableName() {
-            return tableName;
-        }
-
-        public String getId() {
-            return id;
-        }
-        
-    }
-    
-    private void insertIndexOperationRecords(int tenantId, String tableName, 
-            List<Record> indexOpRecords) throws AnalyticsException {
-        try {
-            this.getAnalyticsRecordStore().put(indexOpRecords);
-        } catch (AnalyticsTableNotAvailableException e) {
-            this.getAnalyticsRecordStore().createTable(tenantId, tableName);
-            this.getAnalyticsRecordStore().put(indexOpRecords);
+    private void insertIndexOperationRecords(List<Record> indexOpRecords) throws AnalyticsException {
+        /* each record will be in its own table */
+        List<Record> records = new ArrayList<Record>(1);
+        for (Record record : indexOpRecords) {
+            records.clear();
+            records.add(record);
+            try {
+                this.getAnalyticsRecordStore().put(records);
+            } catch (AnalyticsTableNotAvailableException e) {
+                this.getAnalyticsRecordStore().createTable(record.getTenantId(), record.getTableName());
+                this.getAnalyticsRecordStore().put(records);
+            }
         }
     }
     
     private void scheduleIndexUpdate(List<Record> records) throws AnalyticsException {
         Map<Integer, List<IndexOperation>> shardedIndexOpBatches = this.groupRecordsIdsByShardIndex(records);
         List<Record> indexOpRecords = this.generateIndexOperationRecords(SHARD_INDEX_DATA_RECORD_TENANT_ID,
-                SHARD_INDEX_DATA_UPDATE_RECORDS_TABLE_NAME, shardedIndexOpBatches);
-        this.insertIndexOperationRecords(SHARD_INDEX_DATA_RECORD_TENANT_ID, 
-                SHARD_INDEX_DATA_UPDATE_RECORDS_TABLE_NAME, indexOpRecords);
+                SHARD_INDEX_DATA_UPDATE_RECORDS_TABLE_PREFIX, shardedIndexOpBatches);
+        this.insertIndexOperationRecords(indexOpRecords);
     }
     
     private void scheduleIndexDelete(int tenantId, String tableName, List<String> ids) throws AnalyticsException {
         Map<Integer, List<IndexOperation>> shardedRecordIdBatches = this.groupRecordIdsByShardIndex(
                 tenantId, tableName, ids);
         List<Record> indexOpRecords = this.generateIndexOperationRecords(SHARD_INDEX_DATA_RECORD_TENANT_ID,
-                SHARD_INDEX_DATA_DELETE_RECORDS_TABLE_NAME, shardedRecordIdBatches);
-        this.insertIndexOperationRecords(SHARD_INDEX_DATA_RECORD_TENANT_ID, 
-                SHARD_INDEX_DATA_DELETE_RECORDS_TABLE_NAME, indexOpRecords);
+                SHARD_INDEX_DATA_DELETE_RECORDS_TABLE_PREFIX, shardedRecordIdBatches);
+        this.insertIndexOperationRecords(indexOpRecords);
     }
     
     private byte[] indexOpsToBinary(List<IndexOperation> indexOps) throws AnalyticsException {
@@ -321,18 +291,19 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
     
-    private Record generateIndexOperationRecord(int tenantId, String tableName, int shardIndex, 
+    private Record generateIndexOperationRecord(int tenantId, String tableNamePrefix, int shardIndex, 
             List<IndexOperation> indexOps) throws AnalyticsException {
         Map<String, Object> values = new HashMap<String, Object>(1);
         values.put(INDEX_OP_DATA_ATTRIBUTE, this.indexOpsToBinary(indexOps));
-        return new Record(tenantId, tableName, values, shardIndex);
+        return new Record(tenantId, this.generateShardedIndexDataTableName(tableNamePrefix, shardIndex), 
+                values, System.currentTimeMillis());
     }
     
-    private List<Record> generateIndexOperationRecords(int tenantId, String tableName,
+    private List<Record> generateIndexOperationRecords(int tenantId, String tableNamePrefix,
             Map<Integer, List<IndexOperation>> shardedIndexOpBatches) throws AnalyticsException {
         List<Record> result = new ArrayList<Record>(shardedIndexOpBatches.size());
         for (Map.Entry<Integer, List<IndexOperation>> entry : shardedIndexOpBatches.entrySet()) {
-            result.add(this.generateIndexOperationRecord(tenantId, tableName, entry.getKey(), entry.getValue()));
+            result.add(this.generateIndexOperationRecord(tenantId, tableNamePrefix, entry.getKey(), entry.getValue()));
         }
         return result;
     }
@@ -348,7 +319,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             try {
                 indexOps.addAll(this.extractIndexOperations(indexOpRecord));
             } catch (AnalyticsDataCorruptionException e) {
-                this.removeIndexOperationDeleteRecords(indexOpRecord.getId());
+                this.removeIndexOperationRecord(indexOpRecord);
                 log.error("Corrupted index operation record deleted, id: " + indexOpRecord.getId() + 
                         " shard index: " + indexOpRecord.getTimestamp());
             }
@@ -446,7 +417,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         List<IndexOperation> indexUpdateOps = this.checkAndExtractIndexOperations(indexUpdateOpRecords);
         Collection<List<IndexOperation>> indexUpdateOpBatches = this.extractIndexOpBatches(indexUpdateOps);
         this.processIndexUpdateOpBatches(shardIndex, indexUpdateOpBatches);
-        this.removeIndexOperationUpdateRecords(this.extractRecordIds(indexUpdateOpRecords));
+        this.removeIndexOperationRecords(indexUpdateOpRecords);
     }
     
     private void processIndexDeleteOperations(int shardIndex) throws AnalyticsException {
@@ -454,7 +425,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         List<IndexOperation> indexDeleteOps = this.checkAndExtractIndexOperations(indexDeleteOpRecords);
         Collection<List<IndexOperation>> indexDeleteOpBatches = this.extractIndexOpBatches(indexDeleteOps);
         this.processIndexDeleteOpBatches(shardIndex, indexDeleteOpBatches);
-        this.removeIndexOperationDeleteRecords(this.extractRecordIds(indexDeleteOpRecords));
+        this.removeIndexOperationRecords(indexDeleteOpRecords);
     }
     
     private void processIndexOperations(int shardIndex) throws AnalyticsException {
@@ -462,45 +433,55 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         this.processIndexDeleteOperations(shardIndex);
     }
     
-    private void removeIndexOperationUpdateRecords(List<String> ids) throws AnalyticsException {
-        this.getAnalyticsRecordStore().delete(SHARD_INDEX_DATA_RECORD_TENANT_ID, 
-                SHARD_INDEX_DATA_UPDATE_RECORDS_TABLE_NAME, ids);
+    private void removeIndexOperationRecords(List<Record> records) throws AnalyticsException {
+        if (records.size() == 0) {
+            return;
+        }
+        Record firstRecord = records.get(0);
+        List<String> ids = this.extractRecordIds(records);
+        this.getAnalyticsRecordStore().delete(firstRecord.getTenantId(), firstRecord.getTableName(), ids);
     }
     
-    private void removeIndexOperationDeleteRecords(List<String> ids) throws AnalyticsException {
-        this.getAnalyticsRecordStore().delete(SHARD_INDEX_DATA_RECORD_TENANT_ID, 
-                SHARD_INDEX_DATA_DELETE_RECORDS_TABLE_NAME, ids);
+    private void removeIndexOperationRecord(Record record) throws AnalyticsException {
+        List<Record> records = new ArrayList<Record>(1);
+        records.add(record);
+        this.removeIndexOperationRecords(records);
     }
     
-    private void removeIndexOperationDeleteRecords(String id) throws AnalyticsException {
-        List<String> ids = new ArrayList<String>(1);
-        ids.add(id);
-        this.removeIndexOperationDeleteRecords(ids);
+    private String generateShardedIndexDataTableName(String tableNamePrefix, int shardIndex) {
+        return tableNamePrefix + shardIndex;
     }
     
     private List<Record> loadIndexOperationUpdateRecords(int shardIndex) throws AnalyticsException {
-        return this.loadIndexOperationUpdateRecords(shardIndex, shardIndex + 1);
+        return this.loadIndexOperationRecords(SHARD_INDEX_DATA_RECORD_TENANT_ID, 
+                this.generateShardedIndexDataTableName(SHARD_INDEX_DATA_UPDATE_RECORDS_TABLE_PREFIX, shardIndex));
     }
         
     private List<Record> loadIndexOperationDeleteRecords(int shardIndex) throws AnalyticsException {
-        return this.loadIndexOperationDeleteRecords(shardIndex, shardIndex + 1);
+        return this.loadIndexOperationRecords(SHARD_INDEX_DATA_RECORD_TENANT_ID, 
+                this.generateShardedIndexDataTableName(SHARD_INDEX_DATA_DELETE_RECORDS_TABLE_PREFIX, shardIndex));
     }
     
-    private List<Record> loadIndexOperationUpdateRecords(int start, int end) throws AnalyticsException {
-        return this.loadIndexOperationRecords(SHARD_INDEX_DATA_RECORD_TENANT_ID, SHARD_INDEX_DATA_UPDATE_RECORDS_TABLE_NAME,
-                start, end);
+    private List<Record> loadAllIndexOperationUpdateRecords() throws AnalyticsException {
+        List<Record> result = new ArrayList<Record>();
+        for (int i = 0; i < this.getShardCount(); i++) {
+            result.addAll(this.loadIndexOperationUpdateRecords(i));
+        }
+        return result;
     }
     
-    private List<Record> loadIndexOperationDeleteRecords(int start, int end) throws AnalyticsException {
-        return this.loadIndexOperationRecords(SHARD_INDEX_DATA_RECORD_TENANT_ID, SHARD_INDEX_DATA_DELETE_RECORDS_TABLE_NAME,
-                start, end);
+    private List<Record> loadAllIndexOperationDeleteRecords() throws AnalyticsException {
+        List<Record> result = new ArrayList<Record>();
+        for (int i = 0; i < this.getShardCount(); i++) {
+            result.addAll(this.loadIndexOperationDeleteRecords(i));
+        }
+        return result;
     }
     
-    private List<Record> loadIndexOperationRecords(int tenantId, String tableName,
-            int start, int end) throws AnalyticsException {
+    private List<Record> loadIndexOperationRecords(int tenantId, String tableName) throws AnalyticsException {
         try {
             return GenericUtils.listRecords(this.getAnalyticsRecordStore(), 
-                    this.getAnalyticsRecordStore().get(tenantId, tableName, null, start, end, 0, -1));
+                    this.getAnalyticsRecordStore().get(tenantId, tableName, null, -1, -1, 0, -1));
         } catch (AnalyticsTableNotAvailableException e) {
             /* ignore this scenario, before any indexes, this will happen */
             return new ArrayList<Record>();
@@ -655,7 +636,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
      * @param records The records to be indexed
      * @throws AnalyticsException
      */
-    public void insert(List<Record> records) throws AnalyticsException {
+    public void put(List<Record> records) throws AnalyticsException {
         this.scheduleIndexUpdate(records);
     }
     
@@ -992,17 +973,15 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         if (maxWait < 0) {
             maxWait = Long.MAX_VALUE;
         }
-        List<Record> updateRecords = this.loadIndexOperationUpdateRecords(Integer.MIN_VALUE, Integer.MAX_VALUE);
-        List<Record> deleteRecords = this.loadIndexOperationDeleteRecords(Integer.MIN_VALUE, Integer.MAX_VALUE);
-        List<String> updateIds = this.extractRecordIds(updateRecords);
-        List<String> deleteIds = this.extractRecordIds(deleteRecords);
+        List<Record> updateRecords = this.loadAllIndexOperationUpdateRecords();
+        List<Record> deleteRecords = this.loadAllIndexOperationDeleteRecords();
         long start = System.currentTimeMillis(), end;
         boolean updateDone = false, deleteDone = false;
         while (true) {
-            if (!updateDone && !this.checkUpdateIndexRecordsExists(updateIds)) {
+            if (!updateDone && this.checkRecordsEmpty(updateRecords)) {
                 updateDone = true;
             }
-            if (!deleteDone && !this.checkDeleteIndexRecordsExists(deleteIds)) {
+            if (!deleteDone && this.checkRecordsEmpty(deleteRecords)) {
                 deleteDone = true;
             }
             if (updateDone && deleteDone) {
@@ -1020,26 +999,39 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
     
-    private boolean checkUpdateIndexRecordsExists(List<String> ids) throws AnalyticsException {
-        try {
-            List<Record> records = GenericUtils.listRecords(this.getAnalyticsRecordStore(), 
-                    this.getAnalyticsRecordStore().get(SHARD_INDEX_DATA_RECORD_TENANT_ID, 
-                            SHARD_INDEX_DATA_UPDATE_RECORDS_TABLE_NAME, null, ids));
-            return records.size() > 0;
-        } catch (AnalyticsTableNotAvailableException e) {
-            return false;
+    private Collection<List<Record>> groupRecordsByTable(List<Record> records) {
+        Map<String, List<Record>> result = new HashMap<String, List<Record>>();
+        String identity;
+        List<Record> group;
+        for (Record record : records) {
+            identity = record.getTenantId() + "_" + record.getTableName();
+            group = result.get(identity);
+            if (group == null) {
+                group = new ArrayList<Record>();
+                result.put(identity, group);
+            }
+            group.add(record);
         }
+        return result.values();
     }
     
-    private boolean checkDeleteIndexRecordsExists(List<String> ids) throws AnalyticsException {
-        try {
-            List<Record> records = GenericUtils.listRecords(this.getAnalyticsRecordStore(), 
-                    this.getAnalyticsRecordStore().get(SHARD_INDEX_DATA_RECORD_TENANT_ID, 
-                            SHARD_INDEX_DATA_DELETE_RECORDS_TABLE_NAME, null, ids));
-            return records.size() > 0;
-        } catch (AnalyticsTableNotAvailableException e) {
-            return false;
-        }
+    private boolean checkRecordsEmpty(List<Record> records) throws AnalyticsException {
+        Collection<List<Record>> groups = this.groupRecordsByTable(records);
+        Record firstRecord;
+        for (List<Record> group : groups) {
+            firstRecord = group.get(0);
+            try {
+                if (GenericUtils.listRecords(this.getAnalyticsRecordStore(), 
+                        this.getAnalyticsRecordStore().get(firstRecord.getTenantId(), 
+                        firstRecord.getTableName(), null, 
+                        this.extractRecordIds(group))).size() > 0) {
+                    return false;
+                }
+            } catch (AnalyticsTableNotAvailableException e) {
+                /* ignore */
+            }
+        }            
+        return true;        
     }
     
     private void planIndexingWorkersInCluster() throws AnalyticsException {
@@ -1056,7 +1048,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 }
                 break;
             } catch (AnalyticsException e) {
-                e.printStackTrace();
                 retryCount++;
                 if (retryCount < INDEXING_SCHEDULE_PLAN_RETRY_COUNT) {
                     log.warn("Retrying index schedule planning: " + 
@@ -1171,6 +1162,39 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 adsImpl.getIndexer().scheduleWorkers(this.shardIndices);
             }
             return "OK";
+        }
+        
+    }
+    
+    /**
+     * This class represents an indexing operation for a record.
+     */
+    public static class IndexOperation implements Serializable {
+        
+        private static final long serialVersionUID = -5071679492708482851L;
+
+        private int tenantId;
+        
+        private String tableName;
+        
+        private String id;
+        
+        public IndexOperation(int tenantId, String tableName, String id) {
+            this.tenantId = tenantId;
+            this.tableName = tableName;
+            this.id = id;
+        }
+        
+        public int getTenantId() {
+            return tenantId;
+        }
+        
+        public String getTableName() {
+            return tableName;
+        }
+
+        public String getId() {
+            return id;
         }
         
     }

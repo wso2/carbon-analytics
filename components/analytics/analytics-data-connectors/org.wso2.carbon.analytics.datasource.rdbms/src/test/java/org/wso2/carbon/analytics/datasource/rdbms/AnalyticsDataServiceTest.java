@@ -48,6 +48,8 @@ import org.wso2.carbon.base.MultitenantConstants;
  */
 public class AnalyticsDataServiceTest implements GroupEventListener {
 
+    private static final int DEFAULT_WAIT_TIME = 60000;
+
     protected AnalyticsDataService service;
     
     private boolean becameLeader, leaderUpdated;
@@ -120,7 +122,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.setIndices(tenantId, tableName, columns);
         List<Record> records = this.generateIndexRecords(tenantId, tableName, n, 0);
         this.service.put(records);
-        this.service.waitForIndexing(-1);
+        this.service.waitForIndexing(DEFAULT_WAIT_TIME);
         List<SearchResultEntry> result = this.service.search(tenantId, tableName, "lucene", "STR1:STRING0", 0, 10);
         Assert.assertEquals(result.size(), 1);
         result = this.service.search(tenantId, tableName, "lucene", "str2:string0", 0, 10);
@@ -182,7 +184,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.setIndices(tenantId, tableName, columns);
         List<Record> records = this.generateIndexRecords(tenantId, tableName, 100, 0);
         this.service.put(records);
-        this.service.waitForIndexing(-1);
+        this.service.waitForIndexing(DEFAULT_WAIT_TIME);
         int count = this.service.searchCount(tenantId, tableName, "lucene", "STR1:STRING55");
         Assert.assertEquals(count, 1);
         count = this.service.searchCount(tenantId, tableName, "lucene", "TXT1:name");
@@ -212,7 +214,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         records.add(record2);
         this.service.setIndices(tenantId, tableName, columns);
         this.service.put(records);
-        this.service.waitForIndexing(-1);
+        this.service.waitForIndexing(DEFAULT_WAIT_TIME);
         List<SearchResultEntry> result = this.service.search(tenantId, tableName, "lucene", "STR1:tea", 0, 10);
         Assert.assertEquals(result.size(), 1);
         String id = record.getId();
@@ -230,7 +232,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         records.add(record);
         /* update */
         this.service.put(records);
-        this.service.waitForIndexing(-1);
+        this.service.waitForIndexing(DEFAULT_WAIT_TIME);
         result = this.service.search(tenantId, tableName, "lucene", "STR1:tea", 0, 10);
         Assert.assertEquals(result.size(), 0);
         result = this.service.search(tenantId, tableName, "lucene", "STR2:cricket", 0, 10);
@@ -265,11 +267,11 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         ids.add(records.get(50).getId());
         ids.add(records.get(97).getId());
         Assert.assertEquals(AnalyticsDSUtils.listRecords(this.service, this.service.get(tenantId, tableName, null, ids)).size(), 4);
-        this.service.waitForIndexing(-1);
+        this.service.waitForIndexing(DEFAULT_WAIT_TIME);
         List<SearchResultEntry> result = this.service.search(tenantId, tableName, "lucene", "STR1:S*", 0, 150);
         Assert.assertEquals(result.size(), 98);
         this.service.delete(tenantId, tableName, ids);
-        this.service.waitForIndexing(-1);
+        this.service.waitForIndexing(DEFAULT_WAIT_TIME);
         result = this.service.search(tenantId, tableName, "lucene", "STR1:S*", 0, 150);
         Assert.assertEquals(result.size(), 94);
         Assert.assertEquals(AnalyticsDSUtils.listRecords(this.service, this.service.get(tenantId, tableName, null, ids)).size(), 0);
@@ -297,7 +299,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
                 this.service.get(tenantId, tableName, null, -1, -1, 0, -1));
         Assert.assertEquals(recordsIn.size(), n - 3);
         /* lets test table name case-insensitiveness too */
-        this.service.waitForIndexing(-1);
+        this.service.waitForIndexing(DEFAULT_WAIT_TIME);
         List<SearchResultEntry> results = this.service.search(tenantId, 
                 tableName.toUpperCase(), "lucene", "STR1:s*", 0, n);
         Assert.assertEquals(results.size(), n - 3);
@@ -363,7 +365,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         
         long start = System.currentTimeMillis();
         this.writeIndexRecords(tenantId, tableName, n, batch);
-        this.service.waitForIndexing(-1);
+        this.service.waitForIndexing(DEFAULT_WAIT_TIME);
         long end = System.currentTimeMillis();
         System.out.println("* Records: " + (n * batch));
         System.out.println("* Write Time: " + (end - start) + " ms.");
@@ -424,7 +426,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         
         long start = System.currentTimeMillis();
         this.writeIndexRecords(tenantId, tableName, n, batch, nThreads);
-        this.service.waitForIndexing(-1);
+        this.service.waitForIndexing(DEFAULT_WAIT_TIME);
         long end = System.currentTimeMillis();
         System.out.println("* Records: " + (n * batch * nThreads));
         System.out.println("* Write Time: " + (end - start) + " ms.");
