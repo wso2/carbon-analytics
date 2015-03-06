@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.rs.DirectAnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
@@ -72,7 +73,7 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         HTableDescriptor htd_idx = new HTableDescriptor(TableName.valueOf(
                 HBaseUtils.generateIndexTableName(tenantId, tableName)));
         /* creating table with standard column family "carbon-analytics-index" */
-        htd_idx.addFamily(new HColumnDescriptor(HBaseAnalyticsDSConstants.ANALYTICS_COLUMN_FAMILY_NAME)
+        htd_idx.addFamily(new HColumnDescriptor(HBaseAnalyticsDSConstants.INDEX_COLUMN_FAMILY_NAME)
                 .setMaxVersions(1));
 
         /* Table creation should fail if index cannot be created, so attempting to create index table first. */
@@ -147,7 +148,7 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
     public void put(List<Record> records) throws AnalyticsException {
         Table table;
         Table indexTable;
-        Put put;
+        Put put, timestampPut;
         String recordId, indexTableName;
         long timestamp;
         byte[] columnData;
@@ -189,6 +190,10 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
                                 }
                             }
                             indexPuts.add(this.putIndexData(record));
+                            /* Adding timestamp under a separate column family to be used for index deletion*/
+                            put.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_TS_COLUMN_FAMILY_NAME,
+                                    HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME, timestamp,
+                                    GenericUtils.encodeLong(timestamp));
                             puts.add(put);
                         }
                     }
@@ -232,20 +237,18 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
     @Override
     public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns, long timeFrom,
                                        long timeTo, int recordsFrom, int recordsCount) throws AnalyticsException {
-        List<byte[]> records = this.lookupIndex(tenantId, tableName, timeFrom, timeTo);
-        // TODO
-        return null;
+        return this.getRecords(tenantId, tableName, columns, this.lookupIndex(tenantId, tableName, timeFrom, timeTo));
     }
 
     @Override
     public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns, List<String> ids)
             throws AnalyticsException {
-        return null;
+        return new HBaseResultIterator(tenantId, tableName, ids, columns, this.conn);
     }
 
-    private List<byte[]> lookupIndex(int tenantId, String tableName, long startTime, long endTime)
+    private List<String> lookupIndex(int tenantId, String tableName, long startTime, long endTime)
             throws AnalyticsException {
-        List<byte[]> recordIds = new ArrayList<>();
+        List<String> recordIds = new ArrayList<>();
         String formattedTableName = HBaseUtils.generateIndexTableName(tenantId, tableName);
         Table indexTable;
         Cell[] cells;
@@ -260,12 +263,13 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         ResultScanner resultScanner;
         try {
             resultScanner = indexTable.getScanner(indexScan);
-            for (Result rowResult: resultScanner) {
+            for (Result rowResult : resultScanner) {
                 cells = rowResult.rawCells();
                 for (Cell cell : cells) {
-                    recordIds.add(CellUtil.cloneValue(cell));
+                    recordIds.add(Bytes.toString(CellUtil.cloneValue(cell)));
                 }
             }
+            resultScanner.close();
         } catch (IOException e) {
             throw new AnalyticsException("Index for table " + tableName + " could not be read", e);
         }
@@ -273,15 +277,127 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
     }
 
     @Override
-    public void delete(int tenantId, String tableName, long timeFrom, long timeTo)
-            throws AnalyticsException {
-
+    public void delete(int tenantId, String tableName, long timeFrom, long timeTo) throws AnalyticsException {
+        this.delete(tenantId, tableName, this.lookupIndex(tenantId, tableName, timeFrom, timeTo));
     }
 
     @Override
-    public void delete(int tenantId, String tableName, List<String> ids)
-            throws AnalyticsException {
+    public void delete(int tenantId, String tableName, List<String> ids) throws AnalyticsException {
+        //TODO
+    }
 
+    private long lookupTimestamp(Table dataTable, String rowId, int tenantId, String tableName)
+            throws AnalyticsException {
+        long timestamp = 0L;
+       Get timestampGet = new Get(Bytes.toBytes(rowId));
+        timestampGet.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_TS_COLUMN_FAMILY_NAME,
+                HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
+        try {
+            Result res = dataTable.get(timestampGet);
+            timestamp = GenericUtils.decodeLong(res.value());
+        } catch (IOException e) {
+            throw new AnalyticsException("The table " + tableName + " for tenant " + tenantId +
+                    " could not be initialized for deletion: " + e.getMessage(), e);
+        }
+        return timestamp;
+    }
+
+    private class HBaseResultIterator implements Iterator<Record> {
+
+        private static final int BATCH_SIZE = 1000;
+
+        private boolean preFetched;
+        private Record nextRecord;
+
+        private Connection conn;
+
+        private String tableName, currentId;
+        private int tenantId, ids, currentIndex;
+        private long timestamp;
+
+        private List<String> recordIds, columns;
+
+        private Table table;
+
+        HBaseResultIterator(int tenantId, String tableName, List<String> recordIds, List<String> columns, Connection conn) throws AnalyticsException {
+            this.tenantId = tenantId;
+            this.tableName = tableName;
+            this.recordIds = recordIds;
+            this.columns = columns;
+            this.conn = conn;
+            this.ids = recordIds.size();
+            this.currentId = null;
+
+            try {
+                this.table = this.conn.getTable(TableName.valueOf(HBaseUtils.generateAnalyticsTableName(tenantId, tableName)));
+            } catch (IOException e) {
+                throw new AnalyticsException("The table " + tableName + " for tenant " + tenantId +
+                        " could not be initialized for reading: " + e.getMessage(), e);
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (!this.preFetched) {
+                this.nextRecord = this.next();
+                this.preFetched = true;
+            }
+            return nextRecord != null;
+        }
+
+        @Override
+        public Record next() {
+            if (this.preFetched) {
+                this.preFetched = false;
+                Record record = this.nextRecord;
+                this.nextRecord = null;
+                return record;
+            }
+
+            if (this.currentIndex < this.ids) {
+                this.currentId = recordIds.get(this.currentIndex);
+            } else {
+                this.cleanup();
+                return null;
+            }
+
+            Get get = new Get(Bytes.toBytes(this.currentId));
+            for (String column : this.columns) {
+                if (column != null && !(column.isEmpty())) {
+                    get.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_COLUMN_FAMILY_NAME, column.getBytes());
+                }
+            }
+            try {
+                Result currentResult = this.table.get(get);
+                Cell[] cells = currentResult.rawCells();
+                Map<String, Object> values = null;
+                if (cells.length > 0) {
+                    this.timestamp = cells[0].getTimestamp();
+                    values = HBaseUtils.decodeElementValue(cells);
+                }
+                this.currentIndex++;
+                return new Record(this.tenantId, this.tableName, values, this.timestamp);
+            } catch (Exception e) {
+                this.cleanup();
+                throw new HBaseRuntimeException("Error reading data from table " + this.tableName + " for tenant " + this.tenantId, e);
+            }
+
+        }
+
+        private void cleanup() {
+            try {
+                this.table.close();
+                this.conn.close();
+            } catch (IOException ignore) {
+                /* do nothing, the connection is dead anyway */
+            }
+        }
+    }
+
+    public class HBaseRuntimeException extends RuntimeException {
+        HBaseRuntimeException(String s, Throwable t) {
+            super(s, t);
+        }
     }
 
 }
