@@ -755,7 +755,11 @@
                 <artifactId>jfreechart</artifactId>
                 <version>${jfreechart.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.messageconsole.ui</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
