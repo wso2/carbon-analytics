@@ -30,7 +30,6 @@ import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.SearchResultEntryBean;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
-import org.wso2.carbon.analytics.oauth.OAuthServiceClient;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 
 /**
@@ -53,11 +52,6 @@ public class Utils {
 		}
 		return analyticsDataService;
 	}
-
-    public static OAuthServiceClient getOAuthServiceClient() {
-        return (OAuthServiceClient) PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                .getOSGiService(OAuthServiceClient.class, null);
-    }
 
 	/**
 	 * Gets the records from record beans.

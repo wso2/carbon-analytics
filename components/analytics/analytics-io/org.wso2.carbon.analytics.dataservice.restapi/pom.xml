@@ -48,11 +48,6 @@
 			<artifactId>org.wso2.carbon.analytics.dataservice</artifactId>
 			<scope>provided</scope>
 		</dependency>
-        <dependency>
-			<groupId>org.wso2.carbon.analytics</groupId>
-			<artifactId>org.wso2.carbon.analytics.oauth</artifactId>
-			<scope>provided</scope>
-		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

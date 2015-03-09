@@ -1,0 +1,12 @@
+<serviceGroup>
+    <service name="MessageConsole" scope="transportsession">
+        <transports>
+            <transport>https</transport>
+        </transports>
+        <parameter name="ServiceClass">wso2.carbon.analytics.messageconsole.web.MessageConsoleService</parameter>
+    </service>
+
+    <parameter name="adminService" locked="true">true</parameter>
+    <parameter name="hiddenService" locked="true">true</parameter>
+    <parameter name="AuthorizationAction" locked="true">/permission/admin/protected</parameter>
+</serviceGroup>

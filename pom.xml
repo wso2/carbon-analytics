@@ -178,11 +178,6 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.analytics.oauth</artifactId>
-                <version>${carbon.analytics.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.datasource.rdbms</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
@@ -383,35 +378,6 @@
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
-
-            <dependency>
-                <groupId>org.wso2.carbon.identity</groupId>
-                <artifactId>org.wso2.carbon.identity.oauth</artifactId>
-                <version>${carbon.identity.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.apache.tomcat</groupId>
-                        <artifactId>tomcat-catalina-ha</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.identity</groupId>
-                <artifactId>org.wso2.carbon.identity.oauth.stub</artifactId>
-                <version>${carbon.identity.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.identity</groupId>
-                <artifactId>org.wso2.carbon.identity.application.mgt.stub</artifactId>
-                <version>${carbon.identity.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.amber</groupId>
-                <artifactId>oauth2-client</artifactId>
-                <version>0.22.1358727-wso2v1</version>
-            </dependency>
-
-
             <!--analytics processors dependancies -->
 
             <dependency>
@@ -1034,7 +1000,6 @@
         <carbon.commons.version>4.3.4</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.3.4, 4.4.0)</carbon.commons.imp.pkg.version>
         <carbon.event-processing.version>2.0.2</carbon.event-processing.version>
-        <carbon.identity.version>4.3.4-SNAPSHOT</carbon.identity.version>
 
         <carbon.analytics.version>1.0.3-SNAPSHOT</carbon.analytics.version>
 

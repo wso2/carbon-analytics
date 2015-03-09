@@ -17,9 +17,6 @@
 			<ref bean="analyticsTableNotFoundExceptionMapper"/>
 			<ref bean="analyticsTimeoutExceptionMapper"/>				
 		</jaxrs:providers>
-        <!--<jaxrs:inInterceptors>-->
-            <!--<ref bean="analyticsAuthenticationInterceptor"/>-->
-        <!--</jaxrs:inInterceptors>-->
 	</jaxrs:server>
 	
 	<bean id="analyticsBean" class="org.wso2.carbon.analytics.dataservice.restapi.resources.AnalyticsResource"/>
@@ -30,8 +27,6 @@
 	<bean id="analyticsTableNotFoundExceptionMapper" 
 			class="org.wso2.carbon.analytics.dataservice.restapi.providers.AnalyticsTableNotFoundExceptionMapper"/>
 	<bean id="analyticsTimeoutExceptionMapper" 
-			class="org.wso2.carbon.analytics.dataservice.restapi.providers.AnalyticsTimeoutExceptionMapper"/>	
-    <bean id="analyticsAuthenticationInterceptor"
-            class="org.wso2.carbon.analytics.dataservice.restapi.interceptors.AnalyticsAuthenticationInterceptor"/>
+			class="org.wso2.carbon.analytics.dataservice.restapi.providers.AnalyticsTimeoutExceptionMapper"/>
 	<bean id="jacksonJsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider"/>
 </beans>

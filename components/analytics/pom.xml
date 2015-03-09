@@ -35,7 +35,6 @@
         <module>analytics-io</module>
         <module>analytics-processors</module>
         <module>analytics-data-connectors</module>
-        <module>analytics-auth</module>
     </modules>
 
 </project>
