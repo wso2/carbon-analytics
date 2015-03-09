@@ -22,6 +22,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.deploy.master.Master;
+import org.apache.spark.deploy.worker.Worker;
 import org.apache.spark.sql.api.java.JavaSQLContext;
 import org.apache.spark.sql.api.java.JavaSchemaRDD;
 import org.apache.spark.sql.api.java.Row;
@@ -31,13 +33,23 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
+import scala.Option;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsRelation;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * This class represents the analytics query execution context.
@@ -49,11 +61,50 @@ public class SparkAnalyticsExecutor {
     private static final Log log = LogFactory.getLog(SparkAnalyticsExecutor.class);
     
     private static JavaSparkContext sparkCtx;
-    
+
     private static JavaSQLContext sqlCtx;
-    
+
     public static void init() {
-        SparkConf sparkConf = new SparkConf().setMaster("local").setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
+        SparkConf sparkConf = new SparkConf();
+
+        //conf master
+        Master.startSystemAndActor("localhost", 4500, 8081, sparkConf);
+
+        //conf worker
+        Worker.startSystemAndActor("localhost", 4501, 8090, 1, 1000000,
+                                   new String[]{"spark://localhost:4500"}, null, new Option<Object>() {
+                    @Override
+                    public boolean isEmpty() {
+                        return false;
+                    }
+
+                    @Override
+                    public Object get() {
+                        return new Integer(1);
+                    }
+
+                    @Override
+                    public Object productElement(int n) {
+                        return null;
+                    }
+
+                    @Override
+                    public int productArity() {
+                        return 0;
+                    }
+
+                    @Override
+                    public boolean canEqual(Object that) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean equals(Object that) {
+                        return false;
+                    }
+                });
+
+        sparkConf.setMaster("spark://localhost:4500").setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
         sparkCtx = new JavaSparkContext(sparkConf);
         sqlCtx = new JavaSQLContext(sparkCtx);
     }
