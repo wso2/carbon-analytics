@@ -265,7 +265,7 @@ public class GenericUtils {
     }
 
     public static byte[] encodeLong(long value) {
-        return new byte[]{
+        return new byte[] {
                 (byte) (value >> 56),
                 (byte) (value >> 48),
                 (byte) (value >> 40),

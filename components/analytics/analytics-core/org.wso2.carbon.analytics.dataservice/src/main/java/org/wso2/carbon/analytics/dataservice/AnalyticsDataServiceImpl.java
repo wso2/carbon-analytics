@@ -123,11 +123,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     @Override
     public void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
-        /* the following ordering is important to keep data consistency, even if record store insert
-         * fails, the indexing will not ultimately happen, since there is no actual data in the record
-         * store to index, so the final scenario is consistent with record store and the index */
-        this.getIndexer().put(records);
         this.getAnalyticsRecordStore().put(records);
+        this.getIndexer().put(records);
     }
     
     @Override

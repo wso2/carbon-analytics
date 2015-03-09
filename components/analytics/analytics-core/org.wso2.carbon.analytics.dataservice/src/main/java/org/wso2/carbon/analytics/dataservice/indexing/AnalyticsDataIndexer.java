@@ -373,7 +373,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         for (List<IndexOperation> indexOpBatch : indexUpdateOpBatches) {
             records = this.lookupRecordBatch(indexOpBatch);
             if (records.size() == 0) {
-                break;
+                continue;
             }
             firstRecord = records.get(0);
             indices = this.lookupIndices(firstRecord.getTenantId(), firstRecord.getTableName());
@@ -484,7 +484,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                     this.getAnalyticsRecordStore().get(tenantId, tableName, null, -1, -1, 0, -1));
         } catch (AnalyticsTableNotAvailableException e) {
             /* ignore this scenario, before any indexes, this will happen */
-            return new ArrayList<Record>();
+            return new ArrayList<Record>(0);
         }
     }
     
@@ -589,7 +589,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             for (ScoreDoc doc : hits) {
                 indexDoc = searcher.doc(doc.doc);
                 result.add(new SearchResultEntry(indexDoc.get(INDEX_ID_INTERNAL_FIELD), doc.score));
-            }            
+            }
             return result;
         } catch (Exception e) {
             throw new AnalyticsIndexException("Error in index search, shard table id: '" + 
@@ -1222,7 +1222,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 try {
                     processIndexOperations(this.getShardIndex());
                     Thread.sleep(INDEX_WORKER_SLEEP_TIME);
-                } catch (AnalyticsException e) { 
+                } catch (AnalyticsException e) {
                     log.error("Error in processing index batch operations: " + e.getMessage(), e);
                 } catch (InterruptedException e) { 
                     break;
