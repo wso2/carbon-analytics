@@ -19,7 +19,6 @@ package org.wso2.carbon.analytics.datasource.hbase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -44,6 +43,11 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
 
     private static final Log log = LogFactory.getLog(HBaseAnalyticsRecordStore.class);
 
+    public HBaseAnalyticsRecordStore(Connection conn) throws IOException {
+        this.conn = conn;
+        this.admin = conn.getAdmin();
+    }
+
     @Override
     public void init(Map<String, String> properties) throws AnalyticsException {
         //this.queryConfig = HBaseUtils.lookupConfiguration();
@@ -53,8 +57,7 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
                     "' is required");
         }
         try {
-            Configuration config = (Configuration) InitialContext.doLookup(dsName);
-            this.conn = ConnectionFactory.createConnection(config);
+            this.conn = (Connection) InitialContext.doLookup(dsName);
             this.admin = conn.getAdmin();
         } catch (NamingException e) {
             throw new AnalyticsException("Error in looking up data source: " + e.getMessage(), e);
@@ -65,6 +68,12 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
 
     @Override
     public void createTable(int tenantId, String tableName) throws AnalyticsException {
+
+        /* If the table we're proposing to create already exists, return in silence */
+        if(this.tableExists(tenantId, tableName)){
+            return;
+        }
+
         HTableDescriptor dataDescriptor = new HTableDescriptor(TableName.valueOf(
                 HBaseUtils.generateAnalyticsTableName(tenantId, tableName)));
 
@@ -103,9 +112,15 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
     @Override
     public void deleteTable(int tenantId, String tableName) throws AnalyticsException {
         if (this.tableExists(tenantId, tableName)) {
+            TableName dataTable = TableName.valueOf(HBaseUtils.generateAnalyticsTableName(tenantId, tableName));
+            TableName indexTable = TableName.valueOf(HBaseUtils.generateIndexTableName(tenantId, tableName));
             try {
-                this.admin.deleteTable(TableName.valueOf(HBaseUtils.generateAnalyticsTableName(tenantId, tableName)));
-                this.admin.deleteTable(TableName.valueOf(HBaseUtils.generateIndexTableName(tenantId, tableName)));
+                /* delete the data table first */
+                this.admin.disableTable(dataTable);
+                this.admin.deleteTable(dataTable);
+                /* then delete the index table */
+                this.admin.disableTable(indexTable);
+                this.admin.deleteTable(indexTable);
             } catch (IOException e) {
                 throw new AnalyticsException("Error deleting table " + tableName, e);
             }
@@ -123,7 +138,7 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
                 /* do nothing, the connection is dead anyway */
         }
         log.debug("Closed HBase connection transients successfully.");
-}
+    }
 
     @Override
     public List<String> listTables(int tenantId) throws AnalyticsException {
@@ -143,7 +158,7 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
                 }
             }
         } catch (IOException e) {
-            throw new AnalyticsException("Error listing tables for tenant "+ tenantId +" :" + e.getMessage(), e);
+            throw new AnalyticsException("Error listing tables for tenant " + tenantId + " :" + e.getMessage(), e);
         }
         return tables;
     }
@@ -404,10 +419,14 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
             Get get = new Get(Bytes.toBytes(this.currentId));
             get.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_META_COLUMN_FAMILY_NAME,
                     HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
-            for (String column : this.columns) {
-                if (column != null && !(column.isEmpty())) {
-                    get.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_COLUMN_FAMILY_NAME,
-                            HBaseUtils.generateColumnQualifier(column));
+
+            /* if the list of columns to be retrieved is null, retrieve ALL columns. */
+            if (this.columns != null) {
+                for (String column : this.columns) {
+                    if (column != null && !(column.isEmpty())) {
+                        get.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_COLUMN_FAMILY_NAME,
+                                HBaseUtils.generateColumnQualifier(column));
+                    }
                 }
             }
             try {
@@ -456,7 +475,7 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         }
     }
 
-    public class HBaseUnsupportedOperationException extends AnalyticsException{
+    public class HBaseUnsupportedOperationException extends AnalyticsException {
 
         public HBaseUnsupportedOperationException(String s) {
             super(s);
