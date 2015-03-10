@@ -23,9 +23,11 @@ public class HBaseAnalyticsDSConstants {
     public static final String ANALYTICS_USER_TABLE_PREFIX = "ANX";
     public static final String ANALYTICS_INDEX_TABLE_PREFIX = "IDX";
     public static final byte[] ANALYTICS_COLUMN_FAMILY_NAME = "carbon-analytics-data".getBytes();
-    public static final byte[] ANALYTICS_TS_COLUMN_FAMILY_NAME = "carbon-analytics-timestamp".getBytes();
+    public static final byte[] ANALYTICS_META_COLUMN_FAMILY_NAME = "carbon-analytics-meta".getBytes();
     public static final byte[] ANALYTICS_TS_QUALIFIER_NAME = "timestamp".getBytes();
     public static final byte[] INDEX_COLUMN_FAMILY_NAME = "carbon-analytics-index".getBytes();
     public static final String DEFAULT_ENCODING_TYPE = "UTF-8";
+    public static final int DEFAULT_QUERY_BATCH_SIZE = 9000;
+    public static final String HBASE_ANALYTICS_CONFIG_FILE = "hbase-analytics-config.xml";
 
 }
