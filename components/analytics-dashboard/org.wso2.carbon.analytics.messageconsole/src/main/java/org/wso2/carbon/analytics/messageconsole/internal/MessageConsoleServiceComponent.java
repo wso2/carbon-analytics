@@ -1,4 +1,4 @@
-package wso2.carbon.analytics.messageconsole.internal;
+package org.wso2.carbon.analytics.messageconsole.internal;
 
 /*
 * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -23,9 +23,10 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.messageconsole.MessageConsoleService;
 
 /**
- * This class represents the analytics oauth service declarative services component.
+ * This class represents the analytics message console service declarative services component.
  *
  * @scr.component name="messageconsole.component" immediate="true"
  * @scr.reference name="analytics.component" interface="org.wso2.carbon.analytics.dataservice.AnalyticsDataService"
@@ -41,7 +42,7 @@ public class MessageConsoleServiceComponent {
             logger.debug("Activating Analytics MessageConsoleServiceComponent module.");
         }
         BundleContext bundleContext = ctx.getBundleContext();
-//        bundleContext.registerService(OAuthServiceClient.class, new OAuthServiceClient(), null);
+        bundleContext.registerService(MessageConsoleService.class, new MessageConsoleService(), null);
     }
 
     protected void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {

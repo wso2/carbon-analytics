@@ -1,4 +1,4 @@
-package wso2.carbon.analytics.messageconsole.web;
+package org.wso2.carbon.analytics.messageconsole.exception;
 
 /*
 * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -18,5 +18,15 @@ package wso2.carbon.analytics.messageconsole.web;
 * under the License.
 */
 
-public class MessageConsoleService {
+public class MessageConsoleException extends Exception {
+
+    private static final long serialVersionUID = -5572070535908392204L;
+
+    public MessageConsoleException(String message) {
+        super(message);
+    }
+
+    public MessageConsoleException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

@@ -18,7 +18,7 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>analytics-dashboards-ui-feature</artifactId>
+        <artifactId>analytics-dashboards-feature</artifactId>
         <groupId>org.wso2.carbon.analytics</groupId>
         <version>1.0.3-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
@@ -34,7 +34,6 @@
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.dashboard.ui</artifactId>
-            <version>1.0.3-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

@@ -1,4 +1,4 @@
-package wso2.carbon.analytics.messageconsole.internal;
+package org.wso2.carbon.analytics.messageconsole.internal;
 
 /*
 * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.

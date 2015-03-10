@@ -36,9 +36,9 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Private-Package>org.wso2.carbon.analytics.messageconsole.internal</Private-Package>
+                        <Private-Package>org.org.wso2.carbon.analytics.messageconsole.internal</Private-Package>
                         <Export-Package>
-                            !org.wso2.carbon.analytics.messageconsole.internal,
+                            !org.org.wso2.carbon.analytics.messageconsole.internal,
                             org.wso2.carbon.analytics.messageconsole.*
                         </Export-Package>
                         <Import-Package>

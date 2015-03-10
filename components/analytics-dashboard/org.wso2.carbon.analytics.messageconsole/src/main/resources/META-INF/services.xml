@@ -3,7 +3,7 @@
         <transports>
             <transport>https</transport>
         </transports>
-        <parameter name="ServiceClass">wso2.carbon.analytics.messageconsole.web.MessageConsoleService</parameter>
+        <parameter name="ServiceClass">org.wso2.carbon.analytics.messageconsole.MessageConsoleService</parameter>
     </service>
 
     <parameter name="adminService" locked="true">true</parameter>

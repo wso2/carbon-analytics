@@ -1,3 +1,10 @@
+<%@ page import="org.apache.axis2.context.ConfigurationContext" %>
+<%@ page import="org.wso2.carbon.CarbonConstants" %>
+<%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
+<%@ page import="org.wso2.carbon.utils.ServerConstants" %>
+<%@ page import="org.wso2.carbon.messageconsole.ui.MessageConsoleConnector" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -7,6 +14,16 @@
     <script src="js/jquery-ui.min-messageconsole.js" type="text/javascript"></script>
     <script src="js/jquery.jtable.min.js" type="text/javascript"></script>
     <link href="themes/metro/blue/jtable.min.css" rel="stylesheet" type="text/css"/>
+
+    <%
+        String serverURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);
+        ConfigurationContext configContext = (ConfigurationContext) config.getServletContext().
+                getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
+        String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
+
+        MessageConsoleConnector connector = new MessageConsoleConnector(configContext, serverURL, cookie);
+
+    %>
 
     <script type="text/javascript">
         function listActionMethod(postData) {
@@ -118,6 +135,16 @@
                                               });
 
             $('#PersonTableContainer').jtable('load');
+
+            var myList = "";
+            <%
+            for(String tableName: connector.getTableList()) {
+            %>
+                myList += "<option value='<%= tableName%>'>" + <%= tableName%> +"</option>";
+            <%
+            }
+            %>
+            $("#tableSelect").append(myList);
         });
 
         function createMainJTable(fields) {
@@ -211,15 +238,13 @@
 
 </head>
 <body>
-<h2>
-    <label> Select:
-        <select onchange="if (this.selectedIndex) createJTable(this.value);">
-            <option value="a">a</option>
-            <option value="b">b</option>
-            <option value="audi">Audi</option>
-        </select>
-    </label>
-</h2>
+<label> Select:
+    <%--<select onchange="if (this.selectedIndex) createJTable(this.value);">--%>
+    <select id="tableSelect">
+        <option value="-1">Please select a table</option>
+    </select>
+</label>
+
 <div id="PersonTableContainer"></div>
 
 </body>
