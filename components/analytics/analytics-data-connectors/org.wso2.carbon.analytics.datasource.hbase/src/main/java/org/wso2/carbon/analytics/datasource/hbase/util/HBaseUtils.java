@@ -20,9 +20,16 @@ package org.wso2.carbon.analytics.datasource.hbase.util;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CellUtil;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.analytics.datasource.hbase.HBaseAnalyticsConfigurationEntry;
+import org.wso2.carbon.utils.CarbonUtils;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -85,12 +92,24 @@ public class HBaseUtils {
                 HBaseAnalyticsDSConstants.ANALYTICS_INDEX_TABLE_PREFIX);
     }
 
-    public static Path createPath(String source){
+    public static Path createPath(String source) {
         source = GenericUtils.normalizePath(source);
         return new Path(source);
     }
 
-    public static Map<String,Object> decodeElementValue(Cell[] cells) throws AnalyticsException {
+    public static byte[] generateColumnQualifier(String columnKey) {
+        return (HBaseAnalyticsDSConstants.ANALYTICS_USER_TABLE_PREFIX + "_" + columnKey).getBytes();
+    }
+
+    public static byte[] encodeLong(long value) {
+        return Long.toString(value).getBytes();
+    }
+
+    public static long decodeLong(byte[] arr) {
+        return Long.valueOf(new String(arr));
+    }
+
+    public static Map<String, Object> decodeElementValue(Cell[] cells) throws AnalyticsException {
         /* using LinkedHashMap to retain the column order */
         Map<String, Object> values = new LinkedHashMap<>();
         ByteBuffer buffer;
@@ -101,7 +120,7 @@ public class HBaseUtils {
         byte boolVal;
         byte[] binData;
 
-        for(Cell cell : cells){
+        for (Cell cell : cells) {
             try {
                 buffer = ByteBuffer.wrap(CellUtil.cloneValue(cell));
                 size = buffer.getInt();
@@ -129,7 +148,8 @@ public class HBaseUtils {
                         } else if (boolVal == BOOLEAN_FALSE) {
                             value = false;
                         } else {
-                            throw new AnalyticsException("Invalid encoded boolean value " + boolVal+ " for column "+colName);
+                            throw new AnalyticsException("Invalid encoded boolean value " + boolVal + " for column " +
+                                    colName);
                         }
                         break;
                     case DATA_TYPE_INTEGER:
@@ -148,7 +168,8 @@ public class HBaseUtils {
                         value = null;
                         break;
                     default:
-                        throw new AnalyticsException("Unknown encoded data source type: " + type+ " for column "+colName);
+                        throw new AnalyticsException("Unknown encoded data source type: " + type + " for column " +
+                                colName);
                 }
                 values.put(colName, value);
 
@@ -157,6 +178,24 @@ public class HBaseUtils {
             }
         }
         return values;
+    }
+
+    public static HBaseAnalyticsConfigurationEntry lookupConfiguration() throws AnalyticsException {
+        try {
+            File confFile = new File(CarbonUtils.getCarbonConfigDirPath() +
+                    File.separator + AnalyticsDataSourceConstants.ANALYTICS_CONF_DIR + File.separator +
+                    HBaseAnalyticsDSConstants.HBASE_ANALYTICS_CONFIG_FILE);
+            if (!confFile.exists()) {
+                throw new AnalyticsException("Cannot initialize HBase analytics data source "
+                        + "the configuration file cannot be found at: " + confFile.getPath());
+            }
+            JAXBContext ctx = JAXBContext.newInstance(HBaseAnalyticsConfigurationEntry.class);
+            Unmarshaller unmarshaller = ctx.createUnmarshaller();
+            return (HBaseAnalyticsConfigurationEntry) unmarshaller.unmarshal(confFile);
+        } catch (JAXBException e) {
+            throw new AnalyticsException(
+                    "Error in processing RDBMS query configuration: " + e.getMessage(), e);
+        }
     }
 
 }
