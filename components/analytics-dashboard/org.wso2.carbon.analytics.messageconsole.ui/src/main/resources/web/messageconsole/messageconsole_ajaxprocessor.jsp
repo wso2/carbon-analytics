@@ -12,4 +12,9 @@
 
     MessageConsoleConnector connector = new MessageConsoleConnector(configContext, serverURL, cookie);
 
+    String tableName = request.getParameter("tableName");
+
+    if (tableName != null && !tableName.isEmpty()) {
+        out.print(connector.getRecords(tableName));
+    }
 %>

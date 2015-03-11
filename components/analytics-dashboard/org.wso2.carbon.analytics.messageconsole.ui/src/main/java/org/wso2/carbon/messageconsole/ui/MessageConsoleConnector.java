@@ -18,6 +18,8 @@ package org.wso2.carbon.messageconsole.ui;
 * under the License.
 */
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
@@ -25,6 +27,13 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.messageconsole.stub.MessageConsoleStub;
+import org.wso2.carbon.analytics.messageconsole.stub.beans.EntityBean;
+import org.wso2.carbon.analytics.messageconsole.stub.beans.RecordBean;
+import org.wso2.carbon.messageconsole.ui.beans.Entity;
+import org.wso2.carbon.messageconsole.ui.beans.Record;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MessageConsoleConnector {
 
@@ -55,9 +64,35 @@ public class MessageConsoleConnector {
         }
 
         if (tableList == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Receiving a empty table name list!");
+            }
             tableList = new String[0];
         }
 
         return tableList;
+    }
+
+    public String getRecords(String tableName) {
+        List<Record> records = new ArrayList<>();
+        Gson gson = new GsonBuilder().serializeNulls().create();
+        try {
+            RecordBean[] recordBeans = stub.getRecords(tableName);
+            if (recordBeans != null) {
+                for (RecordBean recordBean : recordBeans) {
+                    Record record = new Record();
+                    record.setRecordId(recordBean.getRecordId());
+                    record.setTimestamp(recordBean.getTimestamp());
+                    for (EntityBean entityBean : recordBean.getEntityBeans()) {
+                        record.getEntities().add(new Entity(entityBean.getColumnName(), entityBean.getValue()));
+                    }
+                    records.add(record);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return gson.toJson(records);
     }
 }
