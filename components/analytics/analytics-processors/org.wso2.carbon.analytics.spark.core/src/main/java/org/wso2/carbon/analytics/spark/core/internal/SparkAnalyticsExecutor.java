@@ -67,7 +67,7 @@ public class SparkAnalyticsExecutor {
     public static void init() {
         SparkConf sparkConf = new SparkConf();
 
-        //conf master
+/*        //conf master
         Master.startSystemAndActor("localhost", 4500, 8081, sparkConf);
 
         //conf worker
@@ -104,7 +104,8 @@ public class SparkAnalyticsExecutor {
                     }
                 });
 
-        sparkConf.setMaster("spark://localhost:4500").setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
+        sparkConf.setMaster("spark://localhost:4500").setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);*/
+        sparkConf.setMaster("local[2]").setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
         sparkCtx = new JavaSparkContext(sparkConf);
         sqlCtx = new JavaSQLContext(sparkCtx);
     }
