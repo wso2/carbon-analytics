@@ -106,7 +106,7 @@ public class HBaseUtils {
     }
 
     public static long decodeLong(byte[] arr) {
-        return Long.valueOf(new String(arr));
+        return Long.parseLong(new String(arr));
     }
 
     public static Map<String, Object> decodeElementValue(Cell[] cells) throws AnalyticsException {

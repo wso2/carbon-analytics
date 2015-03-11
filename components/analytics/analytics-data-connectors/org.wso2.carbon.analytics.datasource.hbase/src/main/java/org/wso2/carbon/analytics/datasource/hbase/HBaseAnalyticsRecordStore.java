@@ -455,7 +455,7 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
                     get.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_META_COLUMN_FAMILY_NAME,
                             HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
                     Result timestampResult = this.table.get(get);
-                    this.timestamp = Long.parseLong(new String(timestampResult.value()));
+                    this.timestamp = HBaseUtils.decodeLong(timestampResult.value());
                     values = new HashMap<>();
                 }
                 this.currentIndex++;
