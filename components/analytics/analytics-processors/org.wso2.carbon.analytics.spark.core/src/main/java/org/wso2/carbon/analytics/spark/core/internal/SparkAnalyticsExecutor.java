@@ -71,7 +71,7 @@ public class SparkAnalyticsExecutor {
         Master.startSystemAndActor("localhost", 4500, 8081, sparkConf);
 
         //conf worker
-        Worker.startSystemAndActor("localhost", 4501, 8090, 1, 1000000,
+        Worker.startSystemAndActor("localhost", 4501, 8090, 2, 1000000,
                                    new String[]{"spark://localhost:4500"}, null, new Option<Object>() {
                     @Override
                     public boolean isEmpty() {
