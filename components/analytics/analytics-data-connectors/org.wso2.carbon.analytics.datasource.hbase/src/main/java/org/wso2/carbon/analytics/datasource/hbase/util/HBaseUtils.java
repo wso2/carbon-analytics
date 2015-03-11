@@ -193,8 +193,8 @@ public class HBaseUtils {
             Unmarshaller unmarshaller = ctx.createUnmarshaller();
             return (HBaseAnalyticsConfigurationEntry) unmarshaller.unmarshal(confFile);
         } catch (JAXBException e) {
-            throw new AnalyticsException(
-                    "Error in processing RDBMS query configuration: " + e.getMessage(), e);
+            throw new AnalyticsException("Error in processing HBase analytics data source configuration: " +
+                    e.getMessage(), e);
         }
     }
 

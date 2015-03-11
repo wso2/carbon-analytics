@@ -27,7 +27,7 @@ public class HBaseAnalyticsConfigurationEntry {
 
     private int batchSize = HBaseAnalyticsDSConstants.DEFAULT_QUERY_BATCH_SIZE;
 
-    @XmlElement(name = "batch-size")
+    @XmlElement(name = "query-batch-size")
     public int getBatchSize() {
         return batchSize;
     }
