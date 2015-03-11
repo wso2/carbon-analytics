@@ -174,7 +174,7 @@ public class HBaseUtils {
                 values.put(colName, value);
 
             } catch (Exception e) {
-                throw new AnalyticsException("Error in decoding cell values: " + e.getMessage());
+                throw new AnalyticsException("Error in decoding cell values: " + e.getMessage(), e);
             }
         }
         return values;
