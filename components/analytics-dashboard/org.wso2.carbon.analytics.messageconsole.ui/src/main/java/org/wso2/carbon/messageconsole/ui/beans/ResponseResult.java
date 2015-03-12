@@ -18,8 +18,6 @@ package org.wso2.carbon.messageconsole.ui.beans;
 * under the License.
 */
 
-import com.google.gson.annotations.SerializedName;
-
 import java.util.ArrayList;
 import java.util.List;
 

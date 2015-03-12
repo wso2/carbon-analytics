@@ -19,15 +19,13 @@ package org.wso2.carbon.analytics.messageconsole.beans;
 */
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 public class TableBean implements Serializable {
 
     private static final long serialVersionUID = 5363807857116507258L;
 
     private String name;
-    private List<ColumnBean> columnList = new ArrayList<>();
+    private ColumnBean[] columns = new ColumnBean[0];
 
     public TableBean() {
     }
@@ -40,11 +38,11 @@ public class TableBean implements Serializable {
         this.name = name;
     }
 
-    public List<ColumnBean> getColumnList() {
-        return columnList;
+    public ColumnBean[] getColumns() {
+        return columns;
     }
 
-    public void setColumnList(List<ColumnBean> columnList) {
-        this.columnList = columnList;
+    public void setColumns(ColumnBean[] columns) {
+        this.columns = columns;
     }
 }

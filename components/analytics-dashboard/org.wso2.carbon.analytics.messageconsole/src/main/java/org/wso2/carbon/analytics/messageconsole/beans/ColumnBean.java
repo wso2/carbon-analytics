@@ -26,8 +26,8 @@ public class ColumnBean implements Serializable {
 
     private String name;
     private String type;
-    private boolean primary;
-    private boolean display;
+    private boolean primary = false;
+    private boolean display = true;
 
     public ColumnBean() {
     }

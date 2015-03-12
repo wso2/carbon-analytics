@@ -20,7 +20,7 @@
     <menus>
         <menu>
             <id>message_console</id>
-            <i18n-key>MenuName</i18n-key>
+            <i18n-key>Message Console</i18n-key>
             <i18n-bundle>org.wso2.carbon.analytics.messageconsole.ui.i18n.Resources</i18n-bundle>
             <parent-menu>dashboard_main_menu</parent-menu>
             <link>../messageconsole/index.jsp</link>

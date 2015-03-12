@@ -25,6 +25,7 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
+import org.wso2.carbon.analytics.messageconsole.beans.ColumnBean;
 import org.wso2.carbon.analytics.messageconsole.beans.EntityBean;
 import org.wso2.carbon.analytics.messageconsole.beans.RecordBean;
 import org.wso2.carbon.analytics.messageconsole.beans.TableBean;
@@ -102,6 +103,56 @@ public class MessageConsoleService {
     }
 
     public TableBean getTableInfo(String tableName) {
-        return new TableBean();
+
+        TableBean table = new TableBean();
+        table.setName("JMX_AGENT_TOOLBOX");
+
+        ColumnBean[] columns = new ColumnBean[7];
+
+        ColumnBean column1 = new ColumnBean();
+        column1.setName("heap_mem_init");
+        column1.setType("String");
+        column1.setPrimary(true);
+        columns[0] = column1;
+
+        ColumnBean column2 = new ColumnBean();
+        column2.setName("non_heap_mem_used");
+        column2.setType("String");
+        column2.setPrimary(false);
+        columns[1] = column2;
+
+        ColumnBean column3 = new ColumnBean();
+        column3.setName("peakThreadCount");
+        column3.setType("String");
+        column3.setPrimary(false);
+        columns[2] = column3;
+
+        ColumnBean column4 = new ColumnBean();
+        column4.setName("heap_mem_max");
+        column4.setType("String");
+        column4.setPrimary(false);
+        columns[3] = column4;
+
+        ColumnBean column5 = new ColumnBean();
+        column5.setName("heap_mem_used");
+        column5.setType("String");
+        column5.setPrimary(false);
+        columns[4] = column5;
+
+        ColumnBean column6 = new ColumnBean();
+        column6.setName("meta_host");
+        column6.setType("String");
+        column6.setPrimary(false);
+        columns[5] = column6;
+
+        ColumnBean column7 = new ColumnBean();
+        column7.setName("non_heap_mem_max");
+        column7.setType("String");
+        column7.setPrimary(false);
+        columns[6] = column7;
+
+        table.setColumns(columns);
+
+        return table;
     }
 }

@@ -27,12 +27,16 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.messageconsole.stub.MessageConsoleStub;
+import org.wso2.carbon.analytics.messageconsole.stub.beans.ColumnBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.EntityBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.RecordBean;
+import org.wso2.carbon.analytics.messageconsole.stub.beans.TableBean;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseColumn;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseRecord;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseResult;
+import org.wso2.carbon.messageconsole.ui.beans.ResponseTable;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,7 +50,8 @@ public class MessageConsoleConnector {
     private static final String ERROR = "ERROR";
 
     private MessageConsoleStub stub;
-    private static Gson GSON;
+    private static GsonBuilder RESPONSE_RESULT_BUILDER = new GsonBuilder().registerTypeAdapter(ResponseResult.class,
+                                                                                               new ResponseResultSerializer());
 
     public MessageConsoleConnector(ConfigurationContext configCtx, String backendServerURL, String cookie) {
         String serviceURL = backendServerURL + MESSAGE_CONSOLE;
@@ -56,22 +61,9 @@ public class MessageConsoleConnector {
             Options options = client.getOptions();
             options.setManageSession(true);
             options.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING, cookie);
-
-            GSON = getGsonInstance();
-
         } catch (AxisFault axisFault) {
             log.error("Unable to create MessageConsoleStub.", axisFault);
         }
-    }
-
-    private static Gson getGsonInstance() {
-
-        if (GSON == null) {
-            GsonBuilder gsonBuilder = new GsonBuilder();
-            gsonBuilder.registerTypeAdapter(ResponseResult.class, new ResponseResultSerializer());
-            GSON = gsonBuilder.serializeNulls().create();
-        }
-        return GSON;
     }
 
     public String[] getTableList() {
@@ -95,6 +87,7 @@ public class MessageConsoleConnector {
     public String getRecords(String tableName) {
 
         ResponseResult responseResult = new ResponseResult();
+        Gson gson = RESPONSE_RESULT_BUILDER.serializeNulls().create();
 
         try {
             RecordBean[] recordBeans = stub.getRecords(tableName);
@@ -123,6 +116,33 @@ public class MessageConsoleConnector {
             responseResult.setMessage(e.getMessage());
         }
 
-        return GSON.toJson(responseResult);
+        return gson.toJson(responseResult);
+    }
+
+    public String getTableInfo(String tableName) {
+
+        Gson gson = new GsonBuilder().serializeNulls().create();
+        TableBean tableInfo = null;
+        ResponseTable table = new ResponseTable();
+        try {
+            tableInfo = stub.getTableInfo(tableName);
+
+            table.setName(tableInfo.getName());
+            List<ResponseTable.Column> columns = new ArrayList<>();
+            for (ColumnBean resultColumn : tableInfo.getColumns()) {
+                ResponseTable.Column column = new ResponseTable().new Column();
+                column.setName(resultColumn.getName());
+                column.setPrimary(resultColumn.getPrimary());
+                column.setType(resultColumn.getType());
+                column.setDisplay(resultColumn.getDisplay());
+                columns.add(column);
+            }
+            table.setColumns(columns);
+
+        } catch (RemoteException e) {
+            log.error("Unable to get table information for table:" + tableName, e);
+        }
+
+        return gson.toJson(table);
     }
 }

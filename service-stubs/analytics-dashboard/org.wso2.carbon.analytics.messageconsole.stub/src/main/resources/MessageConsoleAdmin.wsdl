@@ -18,8 +18,16 @@
             </xs:complexType>
             <xs:complexType name="TableBean">
                 <xs:sequence>
-                    <xs:element minOccurs="0" name="columnList" nillable="true" type="xs:anyType"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="ax211:ColumnBean"></xs:element>
                     <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ColumnBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="display" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="primary" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"></xs:element>
                 </xs:sequence>
             </xs:complexType>
         </xs:schema>

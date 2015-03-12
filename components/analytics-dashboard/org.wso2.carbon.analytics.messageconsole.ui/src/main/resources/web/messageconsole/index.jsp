@@ -28,98 +28,9 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
-            $('#AnalyticsTableContainer').jtable({
-                                                  title: 'Table of people',
-                                                  paging: true, //Enable paging
-                                                  pageSize: 10, //Set page size (default: 10)
-//                                                  sorting: true, //Enable sorting
-                                                  actions: {
-                                                      // For Details: http://jtable.org/Demo/FunctionsAsActions
-                                                      listAction: function (postData, jtParams) {
-                                                          return listActionMethod(postData);
-                                                      },
-//                                                      listAction: 'https://192.168.1.5:9443/analytics/getppl',
-//                                                      createAction: '/GettingStarted/CreatePerson',
-//                                                      updateAction: '/GettingStarted/UpdatePerson',
-                                                      deleteAction: '/GettingStarted/DeletePerson'
-                                                  },
-                                                  fields: {
-                                                      "PersonId": {
-                                                          "key": true,
-                                                          "list": false
-                                                      },
-                                                      "Name": {
-                                                          "title": "Author Name",
-                                                          "width": "40%"
-                                                      },
-                                                      Age: {
-                                                          title: 'Age',
-                                                          width: '20%'
-                                                      },
-                                                      RecordDate: {
-                                                          title: 'Record date',
-                                                          width: '30%',
-                                                          type: 'date',
-                                                          create: false,
-                                                          edit: false
-                                                      },
-                                                      ArbitraryFields: {
-                                                          title: '',
-                                                          width: '1%',
-                                                          sorting: false,
-                                                          edit: false,
-                                                          create: false,
-                                                          display: function (studentData) {
-                                                              //Create an image that will be used to open child table
-                                                              var $img =
-                                                                      $('<img src="/carbon/messageconsole/themes/metro/list_metro.png" title="Edit exam results" />');
-                                                              //Open child table when user clicks the image
-                                                              $img.click(function () {
-                                                                  $('#AnalyticsTableContainer').jtable('openChildTable',
-                                                                                                    $img.closest('tr'), //Parent row
-                                                                                                    {
-                                                                                                        title: 'Arbitrary Fields',
-                                                                                                        actions: {
-                                                                                                            listAction: function (postData,
-                                                                                                                                  jtParams) {
-                                                                                                                return listActionMethod(postData);
-                                                                                                            },
-                                                                                                            deleteAction: '/Demo/DeleteExam'
-//                                                                                                updateAction: '/Demo/UpdateExam',
-//                                                                                                createAction: '/Demo/CreateExam'
-                                                                                                        },
-                                                                                                        fields: {
-                                                                                                            PersonId: {
-                                                                                                                key: true,
-                                                                                                                list: false
-                                                                                                            },
-                                                                                                            Name: {
-                                                                                                                title: 'Name'
-                                                                                                            },
-                                                                                                            Value: {
-                                                                                                                title: 'Value'
-                                                                                                            },
-                                                                                                            Type: {
-                                                                                                                title: 'Type',
-                                                                                                                options: ["String", "boolean", "int", "long"]
-                                                                                                            }
-                                                                                                        }
-                                                                                                    }, function (data) { //opened handler
-                                                                              data.childTable.jtable('load');
-                                                                          });
-                                                              });
-                                                              //Return image to show on the person row
-                                                              return $img;
-                                                          }
-                                                      }
-                                                  }
-                                              });
-
-            $('#AnalyticsTableContainer').jtable('load');
-
             var tableNames = "";
             <c:forEach var='tableName' items='${connector.getTableList()}'>
-                tableNames += "<option value='${tableName}'>" + '${tableName}' +"</option>";
+                tableNames += "<option value='${tableName}'>" + '${tableName}' + "</option>";
             </c:forEach>
             $("#tableSelect").append(tableNames);
         });
