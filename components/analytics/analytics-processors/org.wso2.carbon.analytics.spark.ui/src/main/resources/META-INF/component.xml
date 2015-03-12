@@ -49,7 +49,7 @@
             <region>region1</region>
             <order>20</order>
             <style-class>tools</style-class>
-            <icon>../spark-management/images/list.gif</icon>
+            <icon>../spark-management/images/terminal.png</icon>
              <require-permission>/permission/admin/manage/analytics</require-permission>
         </menu>
 
@@ -62,7 +62,7 @@
             <region>region1</region>
             <order>20</order>
             <style-class>tools</style-class>
-            <icon>../spark-management/images/list.gif</icon>
+            <icon>../spark-management/images/script.png</icon>
              <require-permission>/permission/admin/manage/analytics</require-permission>
         </menu>
 
