@@ -24,6 +24,10 @@
             <artifactId>org.wso2.carbon.analytics.datasource.core.test</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.dataservice</artifactId>
             <scope>test</scope>
