@@ -21,36 +21,18 @@ package org.wso2.carbon.messageconsole.ui.beans;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Record {
+public class ResponseRecord {
 
-    private String recordId;
-    private long timestamp;
-    private List<Entity> entities = new ArrayList<>();
+    private List<ResponseColumn> columns = new ArrayList<>();
 
-    public Record() {
+    public ResponseRecord() {
     }
 
-    public String getRecordId() {
-        return recordId;
+    public List<ResponseColumn> getColumns() {
+        return columns;
     }
 
-    public void setRecordId(String recordId) {
-        this.recordId = recordId;
-    }
-
-    public long getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public List<Entity> getEntities() {
-        return entities;
-    }
-
-    public void setEntities(List<Entity> entities) {
-        this.entities = entities;
+    public void setColumns(List<ResponseColumn> columns) {
+        this.columns = columns;
     }
 }

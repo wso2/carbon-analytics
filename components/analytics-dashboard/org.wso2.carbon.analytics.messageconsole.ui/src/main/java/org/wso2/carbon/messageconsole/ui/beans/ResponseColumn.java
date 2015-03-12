@@ -18,22 +18,22 @@ package org.wso2.carbon.messageconsole.ui.beans;
 * under the License.
 */
 
-public class Entity {
+public class ResponseColumn {
 
-    private String columnName;
+    private String key;
     private String value;
 
-    public Entity(String columnName, String value) {
-        this.columnName = columnName;
+    public ResponseColumn(String key, String value) {
+        this.key = key;
         this.value = value;
     }
 
-    public String getColumnName() {
-        return columnName;
+    public String getKey() {
+        return key;
     }
 
-    public void setColumnName(String columnName) {
-        this.columnName = columnName;
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public String getValue() {

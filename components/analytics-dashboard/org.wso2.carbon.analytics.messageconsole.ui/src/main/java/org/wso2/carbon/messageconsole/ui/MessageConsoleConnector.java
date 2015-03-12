@@ -29,8 +29,9 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.messageconsole.stub.MessageConsoleStub;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.EntityBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.RecordBean;
-import org.wso2.carbon.messageconsole.ui.beans.Entity;
-import org.wso2.carbon.messageconsole.ui.beans.Record;
+import org.wso2.carbon.messageconsole.ui.beans.ResponseColumn;
+import org.wso2.carbon.messageconsole.ui.beans.ResponseRecord;
+import org.wso2.carbon.messageconsole.ui.beans.ResponseResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,8 +40,13 @@ public class MessageConsoleConnector {
 
     private static final Log log = LogFactory.getLog(MessageConsoleConnector.class);
     private static final String MESSAGE_CONSOLE = "MessageConsole";
+    private static final String RECORD_ID = "recordId";
+    private static final String TIMESTAMP = "timestamp";
+    private static final String OK = "OK";
+    private static final String ERROR = "ERROR";
 
     private MessageConsoleStub stub;
+    private static Gson GSON;
 
     public MessageConsoleConnector(ConfigurationContext configCtx, String backendServerURL, String cookie) {
         String serviceURL = backendServerURL + MESSAGE_CONSOLE;
@@ -50,9 +56,22 @@ public class MessageConsoleConnector {
             Options options = client.getOptions();
             options.setManageSession(true);
             options.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING, cookie);
+
+            GSON = getGsonInstance();
+
         } catch (AxisFault axisFault) {
             log.error("Unable to create MessageConsoleStub.", axisFault);
         }
+    }
+
+    private static Gson getGsonInstance() {
+
+        if (GSON == null) {
+            GsonBuilder gsonBuilder = new GsonBuilder();
+            gsonBuilder.registerTypeAdapter(ResponseResult.class, new ResponseResultSerializer());
+            GSON = gsonBuilder.serializeNulls().create();
+        }
+        return GSON;
     }
 
     public String[] getTableList() {
@@ -74,25 +93,36 @@ public class MessageConsoleConnector {
     }
 
     public String getRecords(String tableName) {
-        List<Record> records = new ArrayList<>();
-        Gson gson = new GsonBuilder().serializeNulls().create();
+
+        ResponseResult responseResult = new ResponseResult();
+
         try {
             RecordBean[] recordBeans = stub.getRecords(tableName);
+            responseResult.setResult(OK);
             if (recordBeans != null) {
+                List<ResponseRecord> records = new ArrayList<>(recordBeans.length);
                 for (RecordBean recordBean : recordBeans) {
-                    Record record = new Record();
-                    record.setRecordId(recordBean.getRecordId());
-                    record.setTimestamp(recordBean.getTimestamp());
-                    for (EntityBean entityBean : recordBean.getEntityBeans()) {
-                        record.getEntities().add(new Entity(entityBean.getColumnName(), entityBean.getValue()));
+                    ResponseRecord record = new ResponseRecord();
+                    if (recordBean != null) {
+                        List<ResponseColumn> columns = new ArrayList<>(recordBean.getEntityBeans().length + 2);
+                        columns.add(new ResponseColumn(RECORD_ID, recordBean.getRecordId()));
+                        columns.add(new ResponseColumn(TIMESTAMP, String.valueOf(recordBean.getTimestamp())));
+                        for (EntityBean entityBean : recordBean.getEntityBeans()) {
+                            columns.add(new ResponseColumn(entityBean.getColumnName(), entityBean.getValue()));
+                        }
+                        record.setColumns(columns);
                     }
                     records.add(record);
                 }
+                responseResult.setRecords(records);
+                responseResult.setTotalRecordCount(records.size());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Unable to get records for table:" + tableName, e);
+            responseResult.setResult(ERROR);
+            responseResult.setMessage(e.getMessage());
         }
 
-        return gson.toJson(records);
+        return GSON.toJson(responseResult);
     }
 }
