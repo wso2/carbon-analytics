@@ -19,6 +19,11 @@
 package org.wso2.carbon.analytics.datasource.rdbms;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -30,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,34 +46,35 @@ import javax.sql.DataSource;
 
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsTableNotAvailableException;
-import org.wso2.carbon.analytics.datasource.core.rs.DirectAnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
+import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 /**
  * Abstract RDBMS database backed implementation of {@link AnalyticsRecordStore}.
  */
-public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
+public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     
     private static final String ANALYTICS_USER_TABLE_PREFIX = "ANX";
 
     private static final String RECORD_IDS_PLACEHOLDER = "{{RECORD_IDS}}";
 
     private static final String TABLE_NAME_PLACEHOLDER = "{{TABLE_NAME}}";
-
+    
     private DataSource dataSource;
     
     private Map<String, String> properties;
     
-    private RDBMSQueryConfigurationEntry rDBMSQueryConfigurationEntry;
+    private RDBMSQueryConfigurationEntry rdbmsQueryConfigurationEntry;
     
     public RDBMSAnalyticsRecordStore() throws AnalyticsException {
-        this.rDBMSQueryConfigurationEntry = null;
+        this.rdbmsQueryConfigurationEntry = null;
     }
     
     public RDBMSAnalyticsRecordStore(RDBMSQueryConfigurationEntry rDBMSQueryConfigurationEntry) {
-        this.rDBMSQueryConfigurationEntry = rDBMSQueryConfigurationEntry;
+        this.rdbmsQueryConfigurationEntry = rDBMSQueryConfigurationEntry;
     }
     
     @Override
@@ -85,13 +92,41 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
             throw new AnalyticsException("Error in looking up data source: " + 
                     e.getMessage(), e);
         }
-        if (this.rDBMSQueryConfigurationEntry == null) {
-            this.rDBMSQueryConfigurationEntry = RDBMSUtils.lookupCurrentQueryConfigurationEntry(this.dataSource);
+        if (this.rdbmsQueryConfigurationEntry == null) {
+            this.rdbmsQueryConfigurationEntry = RDBMSUtils.lookupCurrentQueryConfigurationEntry(this.dataSource);
+        }
+        this.checkAndCreateSystemTables();
+    }
+    
+    private void checkAndCreateSystemTables() throws AnalyticsException {
+        Connection conn = null;
+        try {
+            conn = this.getConnection();
+            if (!this.checkSystemTables(conn)) {
+                RDBMSUtils.executeAllUpdateQueries(conn, 
+                        RDBMSUtils.generateNoParamQueryMap(this.getRecordMetaTableInitQueries()));
+            }
+        } catch (SQLException e) {
+            throw new AnalyticsException("Error in creating system tables: " + e.getMessage(), e);
+        } finally {
+            RDBMSUtils.cleanupConnection(null, null, conn);
+        }
+    }
+    
+    private boolean checkSystemTables(Connection conn) {
+        Statement stmt = null;
+        try {
+            stmt = conn.createStatement();
+            stmt.execute(this.getRecordMetaTableCheckSQL());
+            return true;
+        } catch (SQLException ignore) {
+            RDBMSUtils.cleanupConnection(null, stmt, null);
+            return false;
         }
     }
     
     public RDBMSQueryConfigurationEntry getQueryConfiguration() {
-        return rDBMSQueryConfigurationEntry;
+        return rdbmsQueryConfigurationEntry;
     }
     
     private String[] getRecordTableInitQueries(int tenantId, String tableName) {
@@ -275,6 +310,14 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         }
     }
     
+    private String getRecordMetaTableCheckSQL() {
+        return this.getQueryConfiguration().getRecordMetaTableCheckQuery();
+    }
+    
+    private String[] getRecordMetaTableInitQueries() {
+        return this.getQueryConfiguration().getRecordMetaTableInitQueries();
+    }
+    
     private String getRecordMergeSQL(int tenantId, String tableName) {
     	String query = this.getQueryConfiguration().getRecordMergeQuery();
     	return translateQueryWithTableInfo(query, tenantId, tableName);
@@ -291,6 +334,126 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
     }
 
     @Override
+    public RecordGroup[] get(int tenantId, String tableName, List<String> columns, 
+            List<String> ids) throws AnalyticsException,
+            AnalyticsTableNotAvailableException {
+        return new RDBMSIDsRecordGroup[] { new RDBMSIDsRecordGroup(tenantId, tableName, columns, ids) };
+    }
+
+    @Override
+    public RecordGroup[] get(int tenantId, String tableName, List<String> columns, long timeFrom, 
+            long timeTo, int recordsFrom, int recordsCount)
+            throws AnalyticsException, AnalyticsTableNotAvailableException {
+        return new RDBMSRangeRecordGroup[] { new RDBMSRangeRecordGroup(tenantId, tableName, columns, 
+                timeFrom, timeTo, recordsFrom, recordsCount) };
+    }
+
+    @Override
+    public Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException {
+        if (recordGroup instanceof RDBMSRangeRecordGroup) {
+            RDBMSRangeRecordGroup recordRangeGroup = (RDBMSRangeRecordGroup) recordGroup;
+            return this.getRecords(recordRangeGroup.getTenantId(), recordRangeGroup.getTableName(), 
+                    recordRangeGroup.getColumns(), recordRangeGroup.getTimeFrom(), 
+                    recordRangeGroup.getTimeTo(), recordRangeGroup.getRecordsFrom(), 
+                    recordRangeGroup.getRecordsCount());
+        } else if (recordGroup instanceof RDBMSIDsRecordGroup) {
+            RDBMSIDsRecordGroup recordIdGroup = (RDBMSIDsRecordGroup) recordGroup;
+            return this.getRecords(recordIdGroup.getTenantId(), recordIdGroup.getTableName(), 
+                    recordIdGroup.getColumns(), recordIdGroup.getIds());
+        } else {
+            throw new AnalyticsException("Invalid RDBMS RecordGroup implementation: " + recordGroup.getClass());
+        }
+    }
+
+    private String getRecordMetaTableUpdateQuery() {
+        return this.getQueryConfiguration().getRecordMetaTableUpdateQuery();
+    }
+    
+    private String getRecordMetaTableSelectQuery() {
+        return this.getQueryConfiguration().getRecordMetaTableSelectQuery();
+    }
+    
+    private InputStream schemaToStream(AnalyticsSchema schema) throws AnalyticsException {
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        try {
+            ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
+            objOut.writeObject(schema);
+            objOut.close();
+            byteOut.close();
+            return new ByteArrayInputStream(byteOut.toByteArray());
+        } catch (IOException e) {
+            throw new AnalyticsException("Error in schema -> stream: " + e.getMessage(), e);
+        }
+    }
+    
+    private AnalyticsSchema streamToSchema(InputStream in) throws AnalyticsException {
+        ObjectInputStream objIn = null;
+        try {
+            objIn = new ObjectInputStream(in);
+            return (AnalyticsSchema) objIn.readObject();
+        } catch (ClassNotFoundException | IOException e) {
+            throw new AnalyticsException("Error in stram -> schema: " + e.getMessage(), e);
+        } finally {
+            try {
+                objIn.close();
+            } catch (IOException e) {
+                /* ignore */
+            }
+        }
+    }
+    
+    @Override
+    public void setTableSchema(int tenantId, String tableName, 
+            AnalyticsSchema schema) throws AnalyticsTableNotAvailableException, AnalyticsException {
+        tableName = this.normalizeTableName(tableName);
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        try {
+            conn = this.getConnection();
+            stmt = conn.prepareStatement(this.getRecordMetaTableUpdateQuery());
+            stmt.setBinaryStream(1, this.schemaToStream(schema));
+            stmt.setInt(2, tenantId);
+            stmt.setString(3, tableName);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            if (!this.tableExists(tenantId, tableName)) {
+                throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+            }
+            throw new AnalyticsException("Error in setting table schema: " + e.getMessage(), e);
+        } finally {
+            RDBMSUtils.cleanupConnection(null, stmt, conn);
+        }
+    }
+    
+    @Override
+    public AnalyticsSchema getTableSchema(int tenantId, String tableName) 
+            throws AnalyticsTableNotAvailableException, AnalyticsException {
+        tableName = this.normalizeTableName(tableName);
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            conn = this.getConnection();
+            stmt = conn.prepareStatement(this.getRecordMetaTableSelectQuery());
+            stmt.setInt(1, tenantId);
+            stmt.setString(2, tableName);
+            rs = stmt.executeQuery();
+            if (rs.first()) {
+                return this.streamToSchema(rs.getBinaryStream(3));
+            } else {
+                if (!this.tableExists(tenantId, tableName)) {
+                    throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+                }
+                throw new AnalyticsException("Table schema cannot be found for "
+                        + "tenant: " + tenantId + " table: " + tableName);
+            }
+        } catch (SQLException e) {
+            throw new AnalyticsException("Error in setting table schema: " + e.getMessage(), e);
+        } finally {
+            RDBMSUtils.cleanupConnection(rs, stmt, conn);
+        }
+    }
+    
     public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns,
             long timeFrom, long timeTo, int recordsFrom, 
             int recordsCount) throws AnalyticsException, AnalyticsTableNotAvailableException {
@@ -350,7 +513,6 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         return recordsCount;
     }
 
-    @Override
     public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns,
             List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
         if (ids.isEmpty()) {
@@ -503,40 +665,55 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         String query = this.getQueryConfiguration().getRecordDeletionQuery();
         return this.translateQueryWithTableInfo(query, tenantId, tableName);
     }
+    
+    private Map<String, Object[]> getRecordTableMetaInsertQuery(int tenantId, String tableName) {
+        tableName = this.normalizeTableName(tableName);
+        String query = this.getQueryConfiguration().getRecordMetaTableInsertQuery();
+        Object[] params = new Object[] { tenantId, tableName };
+        Map<String, Object[]> result = new LinkedHashMap<String, Object[]>(1);
+        result.put(query, params);
+        return result;
+    }
+    
+    private String getRecordTableMetaSelectQuery() {
+        return this.getQueryConfiguration().getRecordMetaTableSelectQuery();
+    }
+    
+    private Map<String, Object[]> getRecordTableMetaDeleteQuery(int tenantId, String tableName) {
+        tableName = this.normalizeTableName(tableName);
+        String query = this.getQueryConfiguration().getRecordMetaTableDeleteQuery();
+        Object[] params = new Object[] { tenantId, tableName };
+        Map<String, Object[]> result = new LinkedHashMap<String, Object[]>(1);
+        result.put(query, params);
+        return result;
+    }
 
     @Override
     public void deleteTable(int tenantId, String tableName) throws AnalyticsException {
         Connection conn = null;
         try {
-            conn = this.getConnection(false);
+            conn = this.getConnection();
+            Map<String, Object[]> queries = this.getRecordTableMetaDeleteQuery(tenantId, tableName);
             String[] tableInitQueries = this.getRecordTableDeleteQueries(tenantId, tableName);
-            for (String query : tableInitQueries) {
-                query = this.translateQueryWithTableInfo(query, tenantId, tableName);
-                this.executeUpdate(conn, query);
-            }
-            conn.commit();
-        } catch (SQLException e) {
-            RDBMSUtils.rollbackConnection(conn);
-            if (this.tableExists(tenantId, tableName)) {
-                throw new AnalyticsException("Error in deleting table: " + e.getMessage(), e);
-            }
+            queries.putAll(RDBMSUtils.generateNoParamQueryMap(tableInitQueries));
+            RDBMSUtils.executeAllUpdateQueries(conn, queries);
+        } catch (SQLException | AnalyticsException e) {
+            throw new AnalyticsException("Error in deleting table: " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
     }
-    
+        
     @Override
     public void createTable(int tenantId, String tableName) throws AnalyticsException {
         Connection conn = null;
         try {
-            conn = this.getConnection(false);
+            conn = this.getConnection();
             String[] tableInitQueries = this.getRecordTableInitQueries(tenantId, tableName);
-            for (String query : tableInitQueries) {
-                this.executeUpdate(conn, query);
-            }
-            conn.commit();
-        } catch (SQLException e) {
-            RDBMSUtils.rollbackConnection(conn);
+            Map<String, Object[]> queries = RDBMSUtils.generateNoParamQueryMap(tableInitQueries);
+            queries.putAll(this.getRecordTableMetaInsertQuery(tenantId, tableName));
+            RDBMSUtils.executeAllUpdateQueries(conn, queries);
+        } catch (SQLException | AnalyticsException e) {
             if (!this.tableExists(tenantId, tableName)) {
                 throw new AnalyticsException("Error in creating table: " + e.getMessage(), e);
             }
@@ -545,17 +722,6 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         }
     }
     
-    private void executeUpdate(Connection conn, String query) throws SQLException {
-        Statement stmt = null;
-        try {
-            stmt = conn.createStatement();
-            stmt.executeUpdate(query);
-        } finally {
-            RDBMSUtils.cleanupConnection(null, stmt, null);
-        }
-    }
-    
-    @SuppressWarnings("resource")
     @Override
     public boolean tableExists(int tenantId, String tableName) throws AnalyticsException {
         tableName = this.normalizeTableName(tableName);
@@ -563,21 +729,12 @@ public class RDBMSAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         ResultSet rs = null;
         try {
             conn = this.getConnection();
-            DatabaseMetaData dbm = conn.getMetaData();
-            String prefix = this.normalizeTableName(this.generateTablePrefix(tenantId));
-            String srcTable;
-            rs = dbm.getTables(null, null, "%", null);
-            while (rs.next()) {
-                srcTable = rs.getString("TABLE_NAME");
-                if (srcTable.startsWith(prefix)) {
-                    srcTable = srcTable.substring(prefix.length());
-                    srcTable = this.normalizeTableName(srcTable);
-                }
-                if (tableName.equals(srcTable)) {
-                    return true;
-                }
-            }
-            return false;
+            String query = this.getRecordTableMetaSelectQuery();
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setInt(1, tenantId);
+            stmt.setString(2, tableName);
+            rs = stmt.executeQuery();
+            return rs.first();
         } catch (SQLException e) {
             throw new AnalyticsException("Error in checking table existence: " + e.getMessage(), e);
         } finally {

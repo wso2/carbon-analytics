@@ -81,6 +81,14 @@ public class H2MemDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
     
     private RDBMSQueryConfigurationEntry generateQueryConfiguration() {
         RDBMSQueryConfigurationEntry conf = new RDBMSQueryConfigurationEntry();
+        String[] recordMetaTableInitQueries = new String[1];
+        recordMetaTableInitQueries[0] = "CREATE TABLE AN_TABLE_META (tenantId INTEGER, tableName VARCHAR(256), schema BINARY, PRIMARY KEY(tenantId, tableName))";
+        conf.setRecordMetaTableInitQueries(recordMetaTableInitQueries);
+        conf.setRecordMetaTableSelectQuery("SELECT tenantId, tableName, schema FROM AN_TABLE_META WHERE tenantId = ? AND tableName = ?");
+        conf.setRecordMetaTableInsertQuery("INSERT INTO AN_TABLE_META (tenantId, tableName) VALUES (?, ?)");
+        conf.setRecordMetaTableUpdateQuery("UPDATE AN_TABLE_META SET schema = ? WHERE tenantId = ? AND tableName = ?");
+        conf.setRecordMetaTableDeleteQuery("DELETE AN_TABLE_META WHERE tenantId = ? AND tableName = ?");
+        conf.setRecordMetaTableCheckQuery("SELECT * FROM AN_TABLE_META WHERE tenantId = -1 AND tableName = '_X_'");
         String[] recordTableInitQueries = new String[2];
         recordTableInitQueries[0] = "CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data BLOB, PRIMARY KEY(record_id))";
         recordTableInitQueries[1] = "CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)";
@@ -89,8 +97,7 @@ public class H2MemDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
         recordTableDeleteQueries[1] = "DROP INDEX IF EXISTS {{TABLE_NAME}}_TIMESTAMP";        
         conf.setRecordTableInitQueries(recordTableInitQueries);
         conf.setRecordTableDeleteQueries(recordTableDeleteQueries);
-        conf.setRecordInsertQuery("INSERT INTO {{TABLE_NAME}} (timestamp, data, record_id) VALUES (?, ?, ?)");
-        conf.setRecordUpdateQuery("UPDATE {{TABLE_NAME}} SET timestamp = ?, data = ? WHERE record_id = ?");
+        conf.setRecordMergeQuery("MERGE INTO {{TABLE_NAME}} (timestamp, data, record_id) KEY (record_id) VALUES (?, ?, ?)");
         conf.setRecordRetrievalQuery("SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE timestamp >= ? AND timestamp < ? LIMIT ?,?");
         conf.setRecordRetrievalWithIdsQuery("SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})");
         conf.setRecordDeletionWithIdsQuery("DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})");

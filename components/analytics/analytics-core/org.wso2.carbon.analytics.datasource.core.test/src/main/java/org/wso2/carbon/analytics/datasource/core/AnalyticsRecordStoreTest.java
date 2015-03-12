@@ -30,8 +30,11 @@ import org.apache.commons.collections.IteratorUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsSchema;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsSchema.ColumnType;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 /**
@@ -141,6 +144,35 @@ public class AnalyticsRecordStoreTest {
         this.analyticsRS.deleteTable(8830, "TABLEX");
         Assert.assertEquals(this.analyticsRS.listTables(250035).size(), 0);
         Assert.assertEquals(this.analyticsRS.listTables(8830).size(), 0);
+    }
+    
+    @Test
+    public void testTableSetGetSchema() throws AnalyticsException {
+        int tenantId = 105;
+        String tableName = "T1";
+        this.analyticsRS.deleteTable(tenantId, tableName);
+        this.analyticsRS.createTable(tenantId, tableName);
+        Map<String, AnalyticsSchema.ColumnType> columns = new HashMap<String, AnalyticsSchema.ColumnType>();
+        columns.put("name", ColumnType.STRING);
+        columns.put("age", ColumnType.INT);
+        columns.put("weight", ColumnType.LONG);
+        columns.put("something1", ColumnType.FLOAT);
+        columns.put("something2", ColumnType.DOUBLE);
+        columns.put("something3", ColumnType.BOOLEAN);
+        List<String> primaryKeys = new ArrayList<String>();
+        primaryKeys.add("name");
+        primaryKeys.add("age");
+        AnalyticsSchema schema = new AnalyticsSchema(columns, primaryKeys);
+        this.analyticsRS.setTableSchema(tenantId, tableName, schema);
+        AnalyticsSchema schemaIn = this.analyticsRS.getTableSchema(tenantId, tableName);
+        Assert.assertEquals(schema, schemaIn);
+        this.analyticsRS.deleteTable(tenantId, tableName);
+    }
+    
+    @Test (expectedExceptions = AnalyticsTableNotAvailableException.class)
+    public void testTableGetNoSchema() throws AnalyticsTableNotAvailableException, AnalyticsException {
+        this.analyticsRS.deleteTable(105, "T1");
+        this.analyticsRS.getTableSchema(105, "T1");
     }
     
     @Test

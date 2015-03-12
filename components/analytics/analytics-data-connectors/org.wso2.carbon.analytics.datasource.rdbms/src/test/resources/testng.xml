@@ -6,7 +6,7 @@
    <test name="Analytics Core Tests">
      <classes>     
        <!--class name="org.wso2.carbon.analytics.datasource.rdbms.mysql.MySQLInnoDBAnalyticsRecordStoreTest"/-->
-       <!--class name="org.wso2.carbon.analytics.datasource.rdbms.MySQLMyISAMAnalyticsDataSourceTest"/-->
+       <!--class name="org.wso2.carbon.analytics.datasource.rdbms.mysql.MySQLInnoDBAnalyticsDataSourceTest"/-->
        <class name="org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsRecordStoreTest"/>
        <class name="org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsFileSystemTest"/>
        <class name="org.wso2.carbon.analytics.datasource.rdbms.h2.H2MemDBAnalyticsRecordStoreTest"/>
