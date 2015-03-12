@@ -25,6 +25,10 @@ import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.service.TaskService;
+import org.wso2.carbon.registry.core.exceptions.RegistryException;
+import org.wso2.carbon.registry.core.service.RegistryService;
+import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 /**
  * @scr.component name="analytics.core" immediate="true"
@@ -32,6 +36,10 @@ import org.wso2.carbon.ntask.core.service.TaskService;
  * cardinality="1..1" policy="dynamic" bind="setTaskService" unbind="unsetTaskService"
  * @scr.reference name="analytics.dataservice" interface="org.wso2.carbon.analytics.dataservice.AnalyticsDataService"
  * cardinality="1..1" policy="dynamic"  bind="setAnalyticsDataService" unbind="unsetAnalyticsDataService"
+ * @scr.reference name="registry.service" interface="org.wso2.carbon.registry.core.service.RegistryService"
+ * cardinality="1..1" policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
+ * @scr.reference name="tenant.registryloader" interface="org.wso2.carbon.registry.core.service.TenantRegistryLoader"
+ * cardinality="1..1" policy="dynamic" bind="setTenantRegistryLoader" unbind="unsetTenantRegistryLoader"
  */
 
 public class AnalyticsComponent {
@@ -43,13 +51,17 @@ public class AnalyticsComponent {
         AnalyticsProcessorService analyticsProcessorService = new AnalyticsProcessorService();
         ctx.getBundleContext().registerService(AnalyticsProcessorService.class, analyticsProcessorService, null);
         ServiceHolder.setAnalyticsProcessorService(analyticsProcessorService);
+        try {
+            AnalyticsPersistenceManager.getInstance().initialize(MultitenantConstants.SUPER_TENANT_ID);
+        } catch (RegistryException e) {
+            log.error("Error while initializing the analytics spark component. " + e.getMessage(), e);
+        }
     }
 
     protected void setTaskService(TaskService taskService) {
         ServiceHolder.setTaskService(taskService);
         try {
             ServiceHolder.getTaskService().registerTaskType(AnalyticsConstants.SCRIPT_TASK_TYPE);
-            AnalyticsDeployerManager.getInstance().cleanupPausedDeployments();
         } catch (TaskException e) {
             log.error("Error while registering the task type : " + AnalyticsConstants.SCRIPT_TASK_TYPE, e);
         }
@@ -59,11 +71,27 @@ public class AnalyticsComponent {
         ServiceHolder.setTaskService(null);
     }
 
-    public static void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {
+    protected void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {
         ServiceHolder.setAnalyticsDataService(analyticsDataService);
     }
 
-    public static void unsetAnalyticsDataService(AnalyticsDataService analyticsDataService) {
+    protected void unsetAnalyticsDataService(AnalyticsDataService analyticsDataService) {
         ServiceHolder.setAnalyticsDataService(null);
+    }
+
+    protected void setRegistryService(RegistryService registryService) {
+        ServiceHolder.setRegistryService(registryService);
+    }
+
+    protected void unsetRegistryService(RegistryService registryService) {
+        ServiceHolder.setRegistryService(null);
+    }
+
+    protected void setTenantRegistryLoader(TenantRegistryLoader tenantRegistryLoader) {
+        ServiceHolder.setTenantRegistryLoader(tenantRegistryLoader);
+    }
+
+    protected void unsetTenantRegistryLoader(TenantRegistryLoader tenantRegistryLoader) {
+        ServiceHolder.setTenantRegistryLoader(null);
     }
 }

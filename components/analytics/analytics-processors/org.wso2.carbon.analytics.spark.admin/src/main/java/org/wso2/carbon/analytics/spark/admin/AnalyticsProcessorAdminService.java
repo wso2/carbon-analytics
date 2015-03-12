@@ -21,7 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.spark.admin.dto.AnalyticsScriptDto;
 import org.wso2.carbon.analytics.spark.admin.internal.ServiceHolder;
-import org.wso2.carbon.analytics.spark.core.exception.AnalyticsProcessorException;
+import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsPersistenceException;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.admin.dto.AnalyticsQueryResultDto;
@@ -43,8 +43,9 @@ public class AnalyticsProcessorAdminService extends AbstractAdmin {
         try {
             ServiceHolder.getAnalyticsProcessorService().saveScript(tenantId, scriptName, scriptContent, cronExpression);
         } catch (AnalyticsPersistenceException e) {
-            log.error("Error occurred when persisting the script. " + e.getErrorMessage(), e);
-            throw new AnalyticsProcessorAdminException("Error occurred when persisting the script. " + e.getErrorMessage(), e);
+            log.error("Error occurred when persisting the script. " + e.getMessage(), e);
+            throw new AnalyticsProcessorAdminException("Error occurred when persisting the script. "
+                    + e.getMessage(), e);
         }
     }
 
@@ -81,14 +82,19 @@ public class AnalyticsProcessorAdminService extends AbstractAdmin {
         }
     }
 
-    public String[] getAllScriptNames() {
+    public String[] getAllScriptNames() throws AnalyticsProcessorAdminException {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        List<AnalyticsScript> analyticsScripts = ServiceHolder.getAnalyticsProcessorService().getAllScripts(tenantId);
-        List<String> analyticsNames = new ArrayList<>();
-        for (AnalyticsScript analyticsScript : analyticsScripts) {
-            analyticsNames.add(analyticsScript.getName());
+        try {
+            List<AnalyticsScript> analyticsScripts = ServiceHolder.getAnalyticsProcessorService().getAllScripts(tenantId);
+            List<String> analyticsNames = new ArrayList<>();
+            for (AnalyticsScript analyticsScript : analyticsScripts) {
+                analyticsNames.add(analyticsScript.getName());
+            }
+            return analyticsNames.toArray(new String[analyticsNames.size()]);
+        } catch (AnalyticsPersistenceException e) {
+            log.error("Error while retrieving all scripts for tenant Id : "+ tenantId, e);
+            throw new AnalyticsProcessorAdminException("Error while retrieving all scripts for tenant Id : "+ tenantId);
         }
-        return analyticsNames.toArray(new String[analyticsNames.size()]);
     }
 
     public AnalyticsScriptDto getScript(String name) throws AnalyticsProcessorAdminException {
@@ -99,7 +105,7 @@ public class AnalyticsProcessorAdminService extends AbstractAdmin {
             scriptDto.setScriptContent(script.getScriptContent());
             scriptDto.setCronExpression(script.getCronExpression());
             return scriptDto;
-        } catch (AnalyticsProcessorException ex) {
+        } catch (AnalyticsPersistenceException ex) {
             log.error("Error while retrieving the script : " + name, ex);
             throw new AnalyticsProcessorAdminException("Error while retrieving the script : " + name, ex);
         }
@@ -110,7 +116,7 @@ public class AnalyticsProcessorAdminService extends AbstractAdmin {
         try {
             AnalyticsScript script = ServiceHolder.getAnalyticsProcessorService().getScript(tenantId, scriptName);
             return execute(script.getScriptContent());
-        } catch (AnalyticsProcessorException e) {
+        } catch (AnalyticsPersistenceException e) {
             log.error("Error while running the script : " + scriptName, e);
             throw new AnalyticsProcessorAdminException("Error while running the script : " + scriptName, e);
         }
@@ -143,7 +149,7 @@ public class AnalyticsProcessorAdminService extends AbstractAdmin {
                         convertResults(ServiceHolder.getAnalyticsProcessorService().executeQuery(tenantId, query));
                 if (queryResult != null) queryResult.setQuery(query);
                 return queryResult;
-            } catch (AnalyticsProcessorException e) {
+            } catch (AnalyticsExecutionException e) {
                 log.error("Error while executing query : " + query, e);
                 throw new AnalyticsProcessorAdminException("Error while executing query : " + query, e);
             }

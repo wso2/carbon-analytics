@@ -19,10 +19,7 @@ package org.wso2.carbon.analytics.spark.core;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.spark.core.exception.AnalyticsDeploymentException;
-import org.wso2.carbon.analytics.spark.core.exception.AnalyticsProcessorException;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsPersistenceException;
-import org.wso2.carbon.analytics.spark.core.internal.AnalyticsDeployerManager;
 import org.wso2.carbon.analytics.spark.core.internal.AnalyticsPersistenceManager;
 import org.wso2.carbon.analytics.spark.core.internal.SparkAnalyticsExecutor;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
@@ -44,7 +41,7 @@ public class AnalyticsProcessorService {
         try {
             AnalyticsPersistenceManager.getInstance().saveScript(tenantId, scriptName, scriptContent, cronExpression);
         } catch (AnalyticsPersistenceException e) {
-            log.error("Error occurred when persisting the script. " + e.getErrorMessage(), e);
+            log.error("Error occurred when persisting the script. " + e.getMessage(), e);
             throw e;
         }
     }
@@ -68,25 +65,27 @@ public class AnalyticsProcessorService {
         }
     }
 
-    public List<AnalyticsScript> getAllScripts(int tenantId) {
-        return AnalyticsDeployerManager.getInstance().getAnalyticScripts(tenantId);
+    public List<AnalyticsScript> getAllScripts(int tenantId) throws AnalyticsPersistenceException {
+        return AnalyticsPersistenceManager.getInstance().getAllAnalyticsScripts(tenantId);
     }
 
-    public AnalyticsScript getScript(int tenantId, String name) throws AnalyticsProcessorException {
+    public AnalyticsScript getScript(int tenantId, String name) throws AnalyticsPersistenceException {
         try {
-            return AnalyticsDeployerManager.getInstance().getAnalyticsScript(tenantId, name);
-        } catch (AnalyticsDeploymentException ex) {
+            return AnalyticsPersistenceManager.getInstance().getAnalyticsScript(tenantId, name);
+        } catch (AnalyticsPersistenceException ex) {
             log.error("Error while retrieving the script : " + name, ex);
-            throw new AnalyticsProcessorException("Error while retrieving the script : " + name, ex);
+            throw ex;
         }
     }
 
-    public AnalyticsQueryResult[] executeScript(int tenantId, String scriptName) throws AnalyticsProcessorException {
+    public AnalyticsQueryResult[] executeScript(int tenantId, String scriptName) throws AnalyticsExecutionException,
+            AnalyticsPersistenceException {
         try {
-            AnalyticsScript script = AnalyticsDeployerManager.getInstance().getAnalyticsScript(tenantId, scriptName);
+            AnalyticsScript script = AnalyticsPersistenceManager.getInstance().getAnalyticsScript(tenantId, scriptName);
             String[] queries = getQueries(script.getScriptContent());
             if (queries == null) {
-                throw new AnalyticsProcessorException("No complete queries provided in the script. " + script.getScriptContent());
+                throw new AnalyticsExecutionException("No complete queries provided in the script. "
+                        + script.getScriptContent());
             }
             AnalyticsQueryResult[] results = new AnalyticsQueryResult[queries.length];
             int queryIndex = 0;
@@ -95,9 +94,9 @@ public class AnalyticsProcessorService {
                 queryIndex++;
             }
             return results;
-        } catch (AnalyticsDeploymentException e) {
+        } catch (AnalyticsPersistenceException e) {
             log.error("Error while retrieving the script : " + scriptName, e);
-            throw new AnalyticsProcessorException("Error while retrieving the script : " + scriptName, e);
+            throw e;
         }
     }
 
@@ -115,17 +114,17 @@ public class AnalyticsProcessorService {
         return null;
     }
 
-    public AnalyticsQueryResult executeQuery(int tenantId, String query) throws AnalyticsProcessorException {
+    public AnalyticsQueryResult executeQuery(int tenantId, String query) throws AnalyticsExecutionException {
         if (query != null && !query.trim().isEmpty()) {
             try {
                 return SparkAnalyticsExecutor.executeQuery(tenantId, query);
             } catch (AnalyticsExecutionException e) {
                 log.error("Error while executing query : " + query, e);
-                throw new AnalyticsProcessorException("Error while executing query : " + query, e);
+                throw e;
             }
         } else {
             log.error("No queries provided to execute at tenant id :" + tenantId);
-            throw new AnalyticsProcessorException("No queries provided to execute.");
+            throw new AnalyticsExecutionException("No queries provided to execute.");
         }
     }
 }

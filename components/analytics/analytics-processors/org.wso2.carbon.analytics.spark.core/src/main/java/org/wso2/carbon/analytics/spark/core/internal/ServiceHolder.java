@@ -23,11 +23,18 @@ import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.TaskManager;
 import org.wso2.carbon.ntask.core.service.TaskService;
+import org.wso2.carbon.registry.core.exceptions.RegistryException;
+import org.wso2.carbon.registry.core.service.RegistryService;
+import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
+import org.wso2.carbon.registry.core.session.UserRegistry;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 public class ServiceHolder {
     private static TaskService taskService;
     private static AnalyticsDataService analyticsDataService;
     private static AnalyticsProcessorService analyticsProcessorService;
+    private static RegistryService registryService;
+    private static TenantRegistryLoader tenantRegistryLoader;
 
     public static void setTaskService(TaskService taskService) {
         ServiceHolder.taskService = taskService;
@@ -55,5 +62,30 @@ public class ServiceHolder {
 
     public static void setAnalyticsProcessorService(AnalyticsProcessorService analyticsProcessorService) {
         ServiceHolder.analyticsProcessorService = analyticsProcessorService;
+    }
+
+    public static void setRegistryService(RegistryService registryService) {
+        ServiceHolder.registryService = registryService;
+    }
+
+    public static RegistryService getRegistryService() {
+        return registryService;
+    }
+
+    public static TenantRegistryLoader getTenantRegistryLoader() {
+        return tenantRegistryLoader;
+    }
+
+    public static void setTenantRegistryLoader(TenantRegistryLoader tenantRegistryLoader) {
+        ServiceHolder.tenantRegistryLoader = tenantRegistryLoader;
+    }
+
+    public static UserRegistry getTenantConfigRegistry(int tenantId) throws RegistryException {
+        if (tenantId == MultitenantConstants.SUPER_TENANT_ID) {
+            return ServiceHolder.registryService.getConfigSystemRegistry();
+        } else {
+            ServiceHolder.tenantRegistryLoader.loadTenantRegistry(tenantId);
+            return ServiceHolder.registryService.getConfigSystemRegistry(tenantId);
+        }
     }
 }

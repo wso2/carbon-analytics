@@ -65,7 +65,6 @@
                         <Export-Package>org.wso2.carbon.analytics.spark.core.*;version="${carbon.analytics.version}"</Export-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                         <Private-Package>org.wso2.carbon.analytics.spark.core.internal.*</Private-Package>
-                        <Axis2Deployer>AnalyticsDeployer</Axis2Deployer>
                     </instructions>
                 </configuration>
             </plugin>

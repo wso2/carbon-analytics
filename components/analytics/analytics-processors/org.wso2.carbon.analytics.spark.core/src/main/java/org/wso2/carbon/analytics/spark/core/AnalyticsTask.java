@@ -19,12 +19,10 @@ package org.wso2.carbon.analytics.spark.core;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.spark.core.exception.AnalyticsDeploymentException;
-import org.wso2.carbon.analytics.spark.core.exception.AnalyticsProcessorException;
-import org.wso2.carbon.analytics.spark.core.internal.AnalyticsDeployerManager;
+import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
+import org.wso2.carbon.analytics.spark.core.exception.AnalyticsPersistenceException;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
-import org.wso2.carbon.analytics.spark.core.util.AnalyticsScript;
 import org.wso2.carbon.ntask.core.Task;
 
 import java.util.Map;
@@ -60,7 +58,9 @@ public class AnalyticsTask implements Task {
             } else {
                 log.warn("Analytics Processor inactive now, and hence ignoring the triggered execution");
             }
-        } catch (AnalyticsProcessorException e) {
+        } catch (AnalyticsExecutionException e) {
+            log.error("Error while executing the scheduled task for the script : " + scriptName, e);
+        } catch (AnalyticsPersistenceException e) {
             log.error("Error while executing the scheduled task for the script : " + scriptName, e);
         }
     }

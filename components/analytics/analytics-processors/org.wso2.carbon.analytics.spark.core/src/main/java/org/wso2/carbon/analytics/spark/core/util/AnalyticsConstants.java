@@ -17,6 +17,8 @@
 */
 package org.wso2.carbon.analytics.spark.core.util;
 
+import org.wso2.carbon.registry.core.RegistryConstants;
+
 public class AnalyticsConstants {
 
     private AnalyticsConstants(){
@@ -31,6 +33,10 @@ public class AnalyticsConstants {
     public static final String SCRIPT_TASK_TYPE = "ANALYTICS_SPARK";
     public static final String TASK_TENANT_ID_PROPERTY = "TENANT_ID";
     public static final String TASK_SCRIPT_NAME_PROPERTY = "SCRIPT_NAME";
+    public static final String ANALYTICS_SCRIPTS_LOCATION = "repository"+ RegistryConstants.PATH_SEPARATOR
+            +"components"+RegistryConstants.PATH_SEPARATOR +RegistryConstants.PATH_SEPARATOR
+            +"org.wso2.carbon.analytics.spark";
+    public static final String ANALYTICS_MEDIA_TYPE = "application/xml";
 
     public static final String STRING_TYPE = "string";
     public static final String INT_TYPE = "int";

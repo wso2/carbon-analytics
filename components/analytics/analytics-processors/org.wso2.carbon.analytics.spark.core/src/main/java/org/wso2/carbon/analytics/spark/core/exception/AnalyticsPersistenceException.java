@@ -17,8 +17,9 @@
 */
 package org.wso2.carbon.analytics.spark.core.exception;
 
-public class AnalyticsPersistenceException extends AnalyticsProcessorException {
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 
+public class AnalyticsPersistenceException extends AnalyticsException {
 
     public AnalyticsPersistenceException(String message) {
         super(message);
@@ -26,10 +27,6 @@ public class AnalyticsPersistenceException extends AnalyticsProcessorException {
 
     public AnalyticsPersistenceException(String message, Throwable cause) {
         super(message, cause);
-    }
-
-    public AnalyticsPersistenceException(Throwable cause) {
-        super(cause);
     }
 
 }
