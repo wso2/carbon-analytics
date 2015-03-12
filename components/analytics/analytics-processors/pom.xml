@@ -33,6 +33,7 @@
 
     <modules>
         <module>org.wso2.carbon.analytics.spark.core</module>
+        <module>org.wso2.carbon.analytics.spark.admin</module>
         <module>org.wso2.carbon.analytics.spark.ui</module>
     </modules>
 
