@@ -51,6 +51,10 @@ public class AnalyticsExecutionClient {
         option.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING, cookie);
     }
 
+    public AnalyticsExecutionClient(){
+
+    }
+
     public String execute(String query) throws RemoteException, AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
         String resultString;
         AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto queryResult = stub.executeQuery(query);
@@ -97,7 +101,7 @@ public class AnalyticsExecutionClient {
         }
     }
 
-    private String toJsonResult(String query, AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto res) {
+    public String toJsonResult(String query, AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto res) {
         JsonObject resObj = new JsonObject();
 
         JsonObject meta = new JsonObject();
