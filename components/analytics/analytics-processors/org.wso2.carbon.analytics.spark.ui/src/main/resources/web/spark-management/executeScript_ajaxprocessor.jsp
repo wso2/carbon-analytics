@@ -32,10 +32,16 @@
     String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
 
     String scriptName = request.getParameter("scriptName");
+    String scriptContent = request.getParameter("scriptContent");
+    AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto[] results = null;
     try {
         AnalyticsExecutionClient client = new AnalyticsExecutionClient(cookie, serverURL, configContext);
         if (null != scriptName && !scriptName.trim().isEmpty()) {
-            AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto[] results = client.executeScript(scriptName);
+
+            results = client.executeScript(scriptName);
+        }else if (null != scriptContent && !scriptContent.trim().isEmpty()) {
+            results = client.executeScriptContent(scriptContent);
+        }
 %>
 <div id="returnedResults">
 
@@ -104,9 +110,6 @@
             }
         %>
 </div>
-<%
-    } //else {
-%>
 <%--<div id="returnedResults">--%>
 <%--<span class="errorView"> <b>WARNING: </b> Scheduled task for the script : <%=scriptName%> is already running.--%>
 <%--Please try again after the scheduled task is completed.</span>--%>

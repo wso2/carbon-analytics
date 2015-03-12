@@ -63,10 +63,10 @@
                 <table class="styledLeft">
                     <thead>
                     <tr>
-                        <th style="width:200px"><span style="float: left; position: relative; margin-top: 2px;">
-                            <fmt:message key="spark.scripts"/></span>
+                        <th class="leftCol-med">
+                            <fmt:message key="spark.scripts"/>
                         </th>
-                        <th>Actions</th>
+                        <th lass="leftCol-med">Actions</th>
                     </tr>
                     </thead>
                     <tbody>

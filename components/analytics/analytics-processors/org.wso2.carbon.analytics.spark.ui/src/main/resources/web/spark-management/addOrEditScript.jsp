@@ -30,6 +30,7 @@
 <fmt:bundle basename="org.wso2.carbon.analytics.spark.ui.i18n.Resources">
     <script src="../editarea/edit_area_full.js" type="text/javascript"></script>
     <script type="text/javascript" src="../ajax/js/prototype.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/spark-explorer-styles.css">
     <script type="text/javascript">
         YAHOO.util.Event.onDOMReady(function () {
             editAreaLoader.init({
@@ -69,25 +70,50 @@
 
     <script type="text/javascript">
 
-        //        function executeScript() {
-        //            var scriptContent = editAreaLoader.getValue("allcommands");
-        //            if (scriptContent == null || scriptContent == "") {
-        //                CARBON.showErrorDialog("No spark script provided to execute! Please enter some spark SQL queries and try again!");
-        //            } else {
-        //                new Ajax.Request('../spark-management/executeScript.jsp', {
-        //                    method: 'post',
-        //                    parameters: {
-        //                        queries: scriptContent
-        //                    },
-        //                    onSuccess: function (transport) {
-        //                        CARBON.showInfoDialog("Successfully submitted the spark script to execute");
-        //                    },
-        //                    onFailure: function (transport) {
-        //                        CARBON.showErrorDialog(transport.responseText);
-        //                    }
-        //                });
-        //            }
-        //        }
+        function executeQuery() {
+            var scriptContent = editAreaLoader.getValue("allcommands");
+            if(scriptContent == null || scriptContent == ''){
+                CARBON.showErrorDialog("No queries enteren in the window! Please enter some queries and try again!");
+            }else {
+                document.getElementById('middle').style.cursor = 'wait';
+                openProgressBar();
+                new Ajax.Request('executeScript_ajaxprocessor.jsp', {
+                    method: 'post',
+                    parameters: {scriptContent: scriptContent},
+                    onSuccess: function (transport) {
+                        closeProgrsssBar();
+                        document.getElementById('middle').style.cursor = '';
+                        var allPage = transport.responseText;
+                        var divText = '<div id="returnedResults">';
+                        var closeDivText = '</div>';
+                        var temp = allPage.indexOf(divText, 0);
+                        var startIndex = temp + divText.length;
+                        var endIndex = allPage.indexOf(closeDivText, temp);
+                        var queryResults = allPage.substring(startIndex, endIndex);
+                        document.getElementById('analyticsResult').innerHTML = queryResults;
+                    },
+                    onFailure: function (transport) {
+                        closeProgrsssBar();
+                        document.getElementById('middle').style.cursor = '';
+                        CARBON.showErrorDialog(transport.responseText);
+                    }
+                });
+            }
+        }
+
+        function openProgressBar() {
+            var content = '<div id="overlay"><div id="box"><div class="ui-dialog-title-bar">' +
+                    'Executing Spark Queries<a href="#" title="Close" class="ui-dialog-titlebar-close" onclick="closeProgrsssBar();">' +
+                    '<span style="display: none">x</span></a>' +
+                    '</div><div class="dialog-content"><img src="../resources/images/ajax-loader.gif" />' +
+                    ' Executing Spark Queries...</div></div></div>';
+            document.getElementById('dynamic').innerHTML = content;
+        }
+
+        function closeProgrsssBar() {
+            document.getElementById('dynamic').innerHTML = '';
+        }
+
 
         function saveScript() {
             var scriptName = '';
@@ -199,7 +225,7 @@
                         </td>
                         <td>
 
-    <textarea id="allcommands" name="allcommands" rows="25"
+    <textarea id="allcommands" name="allcommands" rows="20"
               style="width:99%" class="required"><%=scriptContent%>
     </textarea>
                         </td>
@@ -226,19 +252,24 @@
                         </td>
                     </tr>
                 </table>
-
-
             </div>
             <div class="buttonRow">
-                    <%--<input class="button" type="button" onclick="executeScript()"--%>
-                    <%--value="<fmt:message key="spark.script.execute"/>"/>--%>
                 <input class="button" type="button" onclick="saveScript()"
                        value="<%if (!isExistingScript){ %><fmt:message key="spark.script.save"/><% }else{ %> <fmt:message key="spark.script.update"/><%}%>"/>
+                <input class="button" type="button" onclick="executeQuery()"
+                       value="<fmt:message key="spark.script.execute"/>"/>
                 <input type="button"
                        value="<fmt:message key="spark.script.cancel"/>"
                        onclick="cancelScript()"
                        class="button"/>
             </div>
 
+            <br/><br/>
+
+            <div><b><i><fmt:message key="spark.script.exec.results"/></i></b></div>
+            <br/>
+            <div id="analyticsResult" class="scrollable" style="width:99%">
+                    <%--the results goes here...--%>
+            </div>
         </div>
 </fmt:bundle>

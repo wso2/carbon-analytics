@@ -62,9 +62,9 @@ public class AnalyticsExecutionClient {
         return resultString;
     }
 
-    public void executeScriptContent(String scriptContent) throws RemoteException,
+    public AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto[] executeScriptContent(String scriptContent) throws RemoteException,
             AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
-        AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto[] queryResult = stub.execute(scriptContent);
+        return stub.execute(scriptContent);
     }
 
     public AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto[] executeScript(String scriptName)
