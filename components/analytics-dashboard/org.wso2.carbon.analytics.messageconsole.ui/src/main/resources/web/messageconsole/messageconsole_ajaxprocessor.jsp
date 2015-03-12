@@ -19,5 +19,7 @@
         out.print(connector.getTableInfo(tableName));
     } else if ("getRecords".equals(type) && tableName != null && !tableName.isEmpty()) {
         out.print(connector.getRecords(tableName));
+    } else if ("deleteRecords".equals(type)) {
+
     }
 %>

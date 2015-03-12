@@ -107,7 +107,7 @@ public class MessageConsoleService {
         TableBean table = new TableBean();
         table.setName("JMX_AGENT_TOOLBOX");
 
-        ColumnBean[] columns = new ColumnBean[7];
+        ColumnBean[] columns = new ColumnBean[8];
 
         ColumnBean column1 = new ColumnBean();
         column1.setName("heap_mem_init");
@@ -150,6 +150,12 @@ public class MessageConsoleService {
         column7.setType("String");
         column7.setPrimary(false);
         columns[6] = column7;
+
+        ColumnBean column8 = new ColumnBean();
+        column8.setName("recordId");
+        column8.setType("String");
+        column8.setPrimary(false);
+        columns[7] = column8;
 
         table.setColumns(columns);
 
