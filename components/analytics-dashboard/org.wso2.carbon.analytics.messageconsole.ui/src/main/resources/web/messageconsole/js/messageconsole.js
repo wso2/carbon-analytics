@@ -39,7 +39,7 @@ function createMainJTable(fields) {
 
 function getArbitraryFields(rowData) {
     var $img =
-            $('<img src="/carbon/messageconsole/themes/metro/list_metro.png" title="Show Arbitrary Fields" align="ce"/>');
+            $('<img src="/carbon/messageconsole/themes/metro/list_metro.png" title="Show Arbitrary Fields"/>');
     $img.click(function () {
         $('#AnalyticsTableContainer').jtable('openChildTable',
                                              $img.closest('tr'), //Parent row
