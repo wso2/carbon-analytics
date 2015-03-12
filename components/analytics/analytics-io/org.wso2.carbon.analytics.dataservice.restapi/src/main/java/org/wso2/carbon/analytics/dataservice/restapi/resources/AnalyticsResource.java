@@ -50,7 +50,6 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsTimeoutException;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
-import org.wso2.carbon.analytics.oauth.OAuthServiceClient;
 
 /**
  * The Class AnalyticsResource represents the REST APIs for
@@ -581,22 +580,31 @@ public class AnalyticsResource extends AbstractResource {
 	}
 
     @POST
-    @Consumes({MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_JSON})
-    @Path(Constants.ResourcePath.GENERATE_TOKEN)
-    public Response getAccessToken(CredentialBean credentialBean) {
+    @Consumes({ MediaType.APPLICATION_JSON})
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path("getppl")
+    public Response getPeople() {
+        return Response.ok("{ \"Result\":\"OK\", \"Records\":[ {\"PersonId\":1,\"Name\":\"Benjamin Button\"," +
+                           "\"Age\":17,\"RecordDate\":\"\\/Date(1320259705710)\\/\"}, {\"PersonId\":2," +
+                           "\"Name\":\"Douglas Adams\",\"Age\":42,\"RecordDate\":\"\\/Date(1320259705710)\\/\"}, " +
+                           "{\"PersonId\":3,\"Name\":\"Isaac Asimov\",\"Age\":26,\"RecordDate\":\"\\/Date" +
+                           "(1320259705710)\\/\",\"no\":26}, {\"PersonId\":4,\"Name\":\"Thomas More\",\"Age\":65," +
+                           "\"RecordDate\":\"\\/Date(1320259705710)\\/\"} ], \"TotalRecordCount\": 33 }", MediaType.APPLICATION_JSON).build();
+    }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Request received to create OAuth access token to user:" + credentialBean.getUsername());
-        }
-        String token = null;
-        try {
-            OAuthServiceClient oAuthServiceClient = Utils.getOAuthServiceClient();
-            token = oAuthServiceClient.createToken(credentialBean.getUsername(), credentialBean.getPassword());
+    @GET
+    @Consumes({ MediaType.APPLICATION_JSON})
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path("getSchema/{tableName}")
+    public Response schema(@PathParam("tableName")  String tableName) {
+        System.out.println("tableName = " + tableName);
+        if (tableName.equals("a")) {
+            return Response.ok("[ { \"column\": \"Name\", \"type\": \"String\" }, { \"column\": \"Address\", \"type\": \"String\" }, { \"column\": \"phone\", \"type\": \"String\" }, { \"column\": \"age\", \"type\": \"int\" }, { \"column\": \"time\", \"type\": \"long\" } ]", MediaType.APPLICATION_JSON_TYPE).build();
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } else if (tableName.equals("b")) {
+            return Response.ok("[ { \"column\": \"Name\", \"type\": \"String\" }, { \"column\": \"Address\", \"type\": \"String\" }, { \"column\": \"phone\", \"type\": \"String\" }, { \"column\": \"age\", \"type\": \"int\" }, { \"column\": \"time\", \"type\": \"long\" }, { \"column\": \"school\", \"type\": \"Stirng\" }, { \"column\": \"exam\", \"type\": \"int\" }, { \"column\": \"url\", \"type\": \"boolean\" } ]", MediaType.APPLICATION_JSON_TYPE).build();
+        } else {
+            return Response.ok("[ { \"column\": \"Name\", \"type\": \"String\" }, { \"column\": \"Address\", \"type\": \"String\" }, { \"column\": \"phone\", \"type\": \"String\" }, { \"column\": \"age\", \"type\": \"int\" }, { \"column\": \"time\", \"type\": \"long\" }, { \"column\": \"school\", \"type\": \"Stirng\" }, { \"column\": \"exam\", \"type\": \"int\" }, { \"column\": \"url\", \"type\": \"boolean\" }, { \"column\": \"job\", \"type\": \"boolean\" } ]", MediaType.APPLICATION_JSON_TYPE).build();
         }
-        return handleResponse(ResponseStatus.SUCCESS, token);
     }
 }

@@ -134,9 +134,6 @@
                                 <importFeatureDef>
                                     org.wso2.carbon.analytics.core:${carbon.analytics.version}
                                 </importFeatureDef>
-                                <importFeatureDef>
-                                    org.wso2.carbon.analytics.oauth:${carbon.analytics.version}
-                                </importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>

@@ -32,7 +32,6 @@
     <name>WSO2 Carbon - Analytics Feature Aggregator Module</name>
 
     <modules>
-        <module>analytics-auth</module>
         <module>analytics-core</module>
         <module>analytics-data-connectors</module>
         <module>analytics-processors</module>
