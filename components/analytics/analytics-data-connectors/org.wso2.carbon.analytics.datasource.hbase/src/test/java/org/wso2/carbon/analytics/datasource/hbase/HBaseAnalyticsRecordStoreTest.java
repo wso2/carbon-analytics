@@ -37,7 +37,7 @@ public class HBaseAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException, IOException {
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, InMemoryICFactory.class.getName());
-        this.store = new HBaseAnalyticsRecordStore(this.init());
+        this.store = new HBaseAnalyticsRecordStore(this.init(), this.createConfig());
         super.init("HBaseAnalyticsRecordStore", store);
     }
 
@@ -45,6 +45,12 @@ public class HBaseAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
         Configuration config = new Configuration();
         config.set("hbase.master", "localhost:60000");
         return ConnectionFactory.createConnection(config);
+    }
+
+    private HBaseAnalyticsConfigurationEntry createConfig(){
+        HBaseAnalyticsConfigurationEntry entry = new HBaseAnalyticsConfigurationEntry();
+        entry.setBatchSize(20);
+        return entry;
     }
 
     @AfterClass
