@@ -5,6 +5,9 @@ function createMainJTable(fields) {
                                              title: $("#tableSelect").val(),
                                              paging: true,
                                              pageSize: 10,
+                                             selecting: true, //Enable selecting
+                                             multiselect: true, //Allow multiple selecting
+                                             selectingCheckboxes: true, //Show checkboxes on first column
                                              actions: {
                                                  // For Details: http://jtable.org/Demo/FunctionsAsActions
                                                  listAction: function (postData, jtParams) {
@@ -12,17 +15,31 @@ function createMainJTable(fields) {
                                                  },
                                                  createAction: '/GettingStarted/CreatePerson',
                                                  updateAction: '/GettingStarted/UpdatePerson',
-                                                 deleteAction: '/GettingStarted/DeletePerson'
+                                                 deleteAction: function (postData) {
+                                                     return deleteActionMethod(postData);
+                                                 }
                                              },
                                              fields: fields
+
                                          });
     $('#AnalyticsTableContainer').jtable('load');
+
+    $("#DeleteAllButton").show();
+    $('#DeleteAllButton').button().click(function () {
+        var $selectedRows = $('#AnalyticsTableContainer').jtable('selectedRows');
+        //$('#AnalyticsTableContainer').jtable('deleteRows', $selectedRows);
+        $selectedRows.each(function () {
+            var record = $(this).data('record');
+            console.log(record.recordId);
+        });
+
+    });
     tableLoaded = true;
 }
 
 function getArbitraryFields(rowData) {
     var $img =
-            $('<img src="/carbon/messageconsole/themes/metro/list_metro.png" title="Show Arbitrary Fields" />');
+            $('<img src="/carbon/messageconsole/themes/metro/list_metro.png" title="Show Arbitrary Fields" align="ce"/>');
     $img.click(function () {
         $('#AnalyticsTableContainer').jtable('openChildTable',
                                              $img.closest('tr'), //Parent row
@@ -66,7 +83,7 @@ function createJTable(table) {
                       var fields = {
                           ArbitraryFields: {
                               title: '',
-                              width: '1%',
+                              width: '2%',
                               sorting: false,
                               edit: false,
                               create: false,
@@ -77,7 +94,9 @@ function createJTable(table) {
                       };
                       $.each(data.columns, function (key, val) {
                           fields[val.name] = {
-                              title: val.name
+                              title: val.name,
+                              list: val.display,
+                              key: val.key
                           };
                       });
 
@@ -96,6 +115,24 @@ function listActionMethod(postData) {
         $.ajax({
                    url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=getRecords&tableName=' + $("#tableSelect").val(),
                    type: 'GET',
+                   dataType: 'json',
+                   data: postData,
+                   success: function (data) {
+                       $dfd.resolve(data);
+                   },
+                   error: function () {
+                       $dfd.reject();
+                   }
+               });
+    });
+}
+
+function deleteActionMethod(postData) {
+    console.log(postData);
+    return $.Deferred(function ($dfd) {
+        $.ajax({
+                   url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=deleteRecords',
+                   type: 'POST',
                    dataType: 'json',
                    data: postData,
                    success: function (data) {
