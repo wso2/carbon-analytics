@@ -29,6 +29,11 @@ import org.wso2.carbon.ntask.core.Task;
 
 import java.util.Map;
 
+/**
+ * This is the task implementation to execute the tasks registered
+ * to trigger the spark script execution.
+ */
+
 public class AnalyticsTask implements Task {
     private static final Log log = LogFactory.getLog(AnalyticsTask.class);
 
@@ -50,15 +55,11 @@ public class AnalyticsTask implements Task {
     public void execute() {
         try {
             log.info("Executing the schedule task for :" + scriptName + " for tenant id :" + tenantId);
-            AnalyticsScript analyticsScript = AnalyticsDeployerManager.getInstance().
-                    getAnalyticsScript(this.tenantId, this.scriptName);
             if (ServiceHolder.getAnalyticsProcessorService() != null) {
-                ServiceHolder.getAnalyticsProcessorService().executeScript(tenantId, analyticsScript.getScriptContent());
+                ServiceHolder.getAnalyticsProcessorService().executeScript(tenantId, this.scriptName);
             } else {
                 log.warn("Analytics Processor inactive now, and hence ignoring the triggered execution");
             }
-        } catch (AnalyticsDeploymentException e) {
-            log.error("Error while executing the scheduled task for script :" + scriptName, e);
         } catch (AnalyticsProcessorException e) {
             log.error("Error while executing the scheduled task for the script : " + scriptName, e);
         }

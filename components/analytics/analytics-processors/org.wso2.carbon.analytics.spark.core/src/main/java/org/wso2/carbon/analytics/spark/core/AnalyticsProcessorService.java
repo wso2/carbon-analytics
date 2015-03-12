@@ -32,6 +32,10 @@ import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionExceptio
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * OSGI service exposed to do analytics related operations such as executing query,
+ * storing the script, etc.
+ */
 public class AnalyticsProcessorService {
     private static final Log log = LogFactory.getLog(AnalyticsProcessorService.class);
 

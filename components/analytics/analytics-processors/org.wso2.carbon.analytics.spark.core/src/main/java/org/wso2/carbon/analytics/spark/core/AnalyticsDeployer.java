@@ -35,6 +35,11 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 
+/**
+ * This class is a deployer implementation to deploy the scripts files
+ * from the hot deployment directory.
+ */
+
 public class AnalyticsDeployer extends AbstractDeployer {
     private static final Log log = LogFactory.getLog(AnalyticsDeployer.class);
 

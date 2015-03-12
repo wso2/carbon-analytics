@@ -38,21 +38,21 @@ public class AnalyticsComponent {
     private static final Log log = LogFactory.getLog(AnalyticsComponent.class);
 
     protected void activate(ComponentContext ctx) {
-        try {
-            log.info("Activating Analytics Spark Core");
-            SparkAnalyticsExecutor.init();
-            ServiceHolder.getTaskService().registerTaskType(AnalyticsConstants.SCRIPT_TASK_TYPE);
-            AnalyticsProcessorService analyticsProcessorService = new AnalyticsProcessorService();
-            ctx.getBundleContext().registerService(AnalyticsProcessorService.class, analyticsProcessorService, null);
-            ServiceHolder.setAnalyticsProcessorService(analyticsProcessorService);
-        } catch (TaskException e) {
-            log.error("Error while initializing the analytics script component. " + e.getMessage(), e);
-        }
+        if (log.isDebugEnabled()) log.debug("Activating Analytics Spark Core");
+        SparkAnalyticsExecutor.init();
+        AnalyticsProcessorService analyticsProcessorService = new AnalyticsProcessorService();
+        ctx.getBundleContext().registerService(AnalyticsProcessorService.class, analyticsProcessorService, null);
+        ServiceHolder.setAnalyticsProcessorService(analyticsProcessorService);
     }
 
     protected void setTaskService(TaskService taskService) {
         ServiceHolder.setTaskService(taskService);
-        AnalyticsDeployerManager.getInstance().cleanupPausedDeployments();
+        try {
+            ServiceHolder.getTaskService().registerTaskType(AnalyticsConstants.SCRIPT_TASK_TYPE);
+            AnalyticsDeployerManager.getInstance().cleanupPausedDeployments();
+        } catch (TaskException e) {
+            log.error("Error while registering the task type : " + AnalyticsConstants.SCRIPT_TASK_TYPE, e);
+        }
     }
 
     protected void unsetTaskService(TaskService taskService) {

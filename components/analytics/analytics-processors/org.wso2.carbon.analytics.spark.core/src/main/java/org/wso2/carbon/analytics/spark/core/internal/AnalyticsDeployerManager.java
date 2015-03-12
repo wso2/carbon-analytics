@@ -61,6 +61,7 @@ public class AnalyticsDeployerManager {
                     properties, triggerInfo);
             try {
                 ServiceHolder.getTaskManager().registerTask(taskInfo);
+                ServiceHolder.getTaskManager().rescheduleTask(taskInfo.getName());
             } catch (TaskException e) {
                 removeAnalyticsScriptIfExists(tenantId, analyticsScript.getName());
                 throw new AnalyticsDeploymentException("Error while trying to schedule task for script : "
