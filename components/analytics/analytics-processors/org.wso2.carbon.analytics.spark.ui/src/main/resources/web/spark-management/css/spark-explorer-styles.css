@@ -13,6 +13,11 @@ table.result {
     background-color: white;
 }
 
+.resultCol {
+    align-content: center;
+    text-align: center;
+}
+
 table.allResult {
     border-width: 1px;
     border-style: solid;

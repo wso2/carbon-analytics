@@ -49,7 +49,10 @@
         if (null != rows && rows.length > 0 && !(rows.length == 1 && rows[0] == null)) {
             String[] columnNames = result.getColumnNames();
     %>
-    <b>Results:
+    <br/>
+    <br/>
+    <b>Results:</b>
+    <br/><br/>
         <table class="result">
             <tbody>
 
@@ -57,9 +60,9 @@
                 <% for (String aColumnName : columnNames) {
                 %>
 
-                <td class="resultCol"><b><%=aColumnName%>
+                <th class="resultCol"><b><%=aColumnName%>
                 </b>
-                </td>
+                </th>
 
                 <% }
 
@@ -74,7 +77,7 @@
                     String[] colValues = aRow.getColumnValues();
                     for (String aValue : colValues) {
                 %>
-                <td class="resultCol"><%=aValue%>
+                <td><%=aValue%>
                 </td>
 
                 <% }
@@ -85,7 +88,6 @@
             %>
             </tbody>
         </table>
-        <br/>
         <br/>
         <span class="queryInfo"><%=rows.length%> rows returned.</span><br/>
             <% } else {
@@ -103,11 +105,11 @@
         %>
 </div>
 <%
-} //else {
+    } //else {
 %>
 <%--<div id="returnedResults">--%>
-    <%--<span class="errorView"> <b>WARNING: </b> Scheduled task for the script : <%=scriptName%> is already running.--%>
-        <%--Please try again after the scheduled task is completed.</span>--%>
+<%--<span class="errorView"> <b>WARNING: </b> Scheduled task for the script : <%=scriptName%> is already running.--%>
+<%--Please try again after the scheduled task is completed.</span>--%>
 <%--</div>--%>
 <% //}
 } catch (Exception e) {

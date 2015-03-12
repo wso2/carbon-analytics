@@ -43,7 +43,7 @@ public class AnalyticsPersistenceManager {
         String scriptLocation = getScriptLocation(tenantId, scriptName);
         if (!new File(scriptLocation).exists()) {
             AnalyticsScript analyticsScript = new AnalyticsScript(scriptName);
-            analyticsScript.setCronExpression(cron);
+            if (cron != null && !cron.trim().isEmpty()) analyticsScript.setCronExpression(cron);
             analyticsScript.setScriptContent(scriptContent);
             try {
                 JAXBContext context = JAXBContext.newInstance(AnalyticsScript.class);
@@ -96,9 +96,10 @@ public class AnalyticsPersistenceManager {
 
     public void updateScript(int tenantId, String scriptName, String scriptContent, String cron)
             throws AnalyticsPersistenceException {
+        if (cron != null && cron.trim().isEmpty()) cron = null;
         AnalyticsScript script = getScript(tenantId, scriptName);
         if (scriptContent != null && !scriptContent.trim().isEmpty()) script.setScriptContent(scriptContent);
-        if (cron == null || !cron.equals(AnalyticsConstants.DEFAULT_CRON))
+        if ((cron == null || !cron.equals(AnalyticsConstants.DEFAULT_CRON)))
             script.setCronExpression(cron);
         try {
             JAXBContext context = JAXBContext.newInstance(AnalyticsScript.class);

@@ -45,6 +45,7 @@ public class AnalyticsQueryResult {
         int colIndex = 0;
         for (StructField col : columns){
             colNames[colIndex] = col.getName();
+            colIndex++;
         }
         return colNames;
     }

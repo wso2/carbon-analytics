@@ -1,7 +1,3 @@
-<%@ page import="org.apache.axis2.context.ConfigurationContext" %>
-<%@ page import="org.wso2.carbon.CarbonConstants" %>
-<%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
-<%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <!--
 ~ Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 ~
@@ -54,21 +50,21 @@
                                 'define',
                                 'Defines the schema of a table',
                                 'DEFINE TABLE [table]',
-                                '../spark-console/execute_spark_ajaxprocessor.jsp'
+                                '../spark-management/execute_sparkquery_ajaxprocessor.jsp'
                         );
 
                         $.register_command(
                                 'select',
                                 'Execute a Spark SELECT query',
                                 'SELECT [query]',
-                                '../spark-console/execute_spark_ajaxprocessor.jsp'
+                                '../spark-management/execute_sparkquery_ajaxprocessor.jsp'
                         );
 
                         $.register_command(
                                 'insert',
                                 'Inserts data into tables',
                                 'INSERT INTO [query]',
-                                '../spark-console/execute_spark_ajaxprocessor.jsp'
+                                '../spark-management/execute_sparkquery_ajaxprocessor.jsp'
                         );
 
                         $.register_command(

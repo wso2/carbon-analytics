@@ -54,23 +54,27 @@ public class AnalyticsExecutionClient {
     public String execute(String query) throws RemoteException, AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
         String resultString;
         AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto queryResult = stub.executeQuery(query);
-        resultString = JsonResult(query, queryResult);
+        resultString = toJsonResult(query, queryResult);
         return resultString;
     }
 
-    public void executeScriptContent(String scriptContent) throws RemoteException, AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
+    public void executeScriptContent(String scriptContent) throws RemoteException,
+            AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
         AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto[] queryResult = stub.execute(scriptContent);
     }
 
-    public AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto[] executeScript(String scriptName) throws RemoteException, AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
+    public AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto[] executeScript(String scriptName)
+            throws RemoteException, AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
         return stub.executeScript(scriptName);
     }
 
-    public void deleteScript(String scriptName) throws RemoteException, AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
+    public void deleteScript(String scriptName) throws RemoteException,
+            AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
         stub.deleteScript(scriptName);
     }
 
-    public void saveScript(String scriptName, String scriptContent, String cron) throws RemoteException, AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
+    public void saveScript(String scriptName, String scriptContent, String cron) throws RemoteException,
+            AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
         stub.saveScript(scriptName, scriptContent, cron);
     }
 
@@ -78,7 +82,8 @@ public class AnalyticsExecutionClient {
         return stub.getAllScriptNames();
     }
 
-    public AnalyticsProcessorAdminServiceStub.AnalyticsScriptDto getScriptContent(String scriptName) throws RemoteException, AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
+    public AnalyticsProcessorAdminServiceStub.AnalyticsScriptDto getScriptContent(String scriptName)
+            throws RemoteException, AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
         return stub.getScript(scriptName);
     }
 
@@ -92,7 +97,7 @@ public class AnalyticsExecutionClient {
         }
     }
 
-    private String JsonResult(String query, AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto res) {
+    private String toJsonResult(String query, AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto res) {
         JsonObject resObj = new JsonObject();
 
         JsonObject meta = new JsonObject();
@@ -102,7 +107,9 @@ public class AnalyticsExecutionClient {
 
         if (res != null) {
             for (String col : res.getColumnNames()) {
-                colArray.add(new JsonPrimitive(col));
+                if (col != null) {
+                    colArray.add(new JsonPrimitive(col));
+                }
             }
         }
         meta.add("columns", colArray);
@@ -113,17 +120,19 @@ public class AnalyticsExecutionClient {
 
         if (res != null) {
             for (AnalyticsProcessorAdminServiceStub.AnalyticsRowResultDto row : res.getRowsResults()) {
-                JsonArray singleRow = new JsonArray();
-                int i = 0;
-                for (String elm : row.getColumnValues()) {
-                    if (elm != null) {
-                        singleRow.add(new JsonPrimitive(elm.toString()));
-                    } else {
-                        singleRow.add(new JsonPrimitive("NULL"));
+                if (row != null) {
+                    JsonArray singleRow = new JsonArray();
+                    int i = 0;
+                    for (String elm : row.getColumnValues()) {
+                        if (elm != null) {
+                            singleRow.add(new JsonPrimitive(elm.toString()));
+                        } else {
+                            singleRow.add(new JsonPrimitive("NULL"));
+                        }
+                        i++;
                     }
-                    i++;
+                    rows.add(singleRow);
                 }
-                rows.add(singleRow);
             }
         }
 

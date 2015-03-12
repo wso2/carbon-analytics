@@ -19,6 +19,8 @@
     } catch (AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException e) {
         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getFaultMessage().
                 getAnalyticsProcessorAdminException().getMessage());
+    }catch (Exception ex){
+        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage());
     }
 %>
 <%=jsonResult%>
