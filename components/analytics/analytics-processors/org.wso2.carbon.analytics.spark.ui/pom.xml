@@ -35,31 +35,35 @@
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.ui</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.utils</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.wso2.carbon</groupId>-->
+            <!--<artifactId>org.wso2.carbon.core</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.wso2.carbon</groupId>-->
+            <!--<artifactId>org.wso2.carbon.utils</artifactId>-->
+        <!--</dependency>-->
 
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-core_2.10</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-sql_2.10</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.apache.spark</groupId>-->
+            <!--<artifactId>spark-core_2.10</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.apache.spark</groupId>-->
+            <!--<artifactId>spark-sql_2.10</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.wso2.carbon.analytics</groupId>-->
+            <!--<artifactId>org.wso2.carbon.analytics.spark.core</artifactId>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.analytics.spark.core</artifactId>
+            <artifactId>org.wso2.carbon.analytics.spark.stub</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.analytics.datasource.core</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.wso2.carbon.analytics</groupId>-->
+            <!--<artifactId>org.wso2.carbon.analytics.datasource.core</artifactId>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>com.google.code.gson</groupId>

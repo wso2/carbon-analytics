@@ -19,7 +19,10 @@
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.spark.core</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.analytics.spark.admin</artifactId>
+        </dependency>
         <!--spark -->
         <dependency>
             <groupId>org.wso2.apache.spark</groupId>
@@ -239,6 +242,7 @@
                             </adviceFile>
                             <bundles>
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.core</bundleDef>
+                                <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.admin</bundleDef>
                                 <bundleDef>org.wso2.apache.spark:spark-core_2.10</bundleDef>
                                 <bundleDef>org.wso2.apache.spark:spark-sql_2.10</bundleDef>
                                 <bundleDef>org.apache.commons:commons-lang3</bundleDef>

@@ -51,6 +51,7 @@ public class ResponseTable {
         private String type;
         private boolean primary;
         private boolean display;
+        private boolean key;
 
         public Column() {
         }
@@ -85,6 +86,14 @@ public class ResponseTable {
 
         public void setDisplay(boolean display) {
             this.display = display;
+        }
+
+        public boolean isKey() {
+            return key;
+        }
+
+        public void setKey(boolean key) {
+            this.key = key;
         }
     }
 }

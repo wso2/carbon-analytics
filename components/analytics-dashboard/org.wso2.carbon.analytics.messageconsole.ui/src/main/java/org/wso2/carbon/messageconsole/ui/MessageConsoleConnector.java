@@ -135,6 +135,9 @@ public class MessageConsoleConnector {
                 column.setPrimary(resultColumn.getPrimary());
                 column.setType(resultColumn.getType());
                 column.setDisplay(resultColumn.getDisplay());
+                if ("recordId".equals(resultColumn.getName())) {
+                    column.setKey(true);
+                }
                 columns.add(column);
             }
             table.setColumns(columns);

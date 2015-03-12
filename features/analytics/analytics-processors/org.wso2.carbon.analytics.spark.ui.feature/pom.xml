@@ -37,6 +37,10 @@
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.spark.ui</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.analytics.spark.stub</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -64,10 +68,12 @@
                                 <bundleDef>
                                     org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.ui:${carbon.analytics.version}
                                 </bundleDef>
+                                <bundleDef>
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.stub:${carbon.analytics.version}
+                                </bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.ui:${carbon.kernel.version}</importFeatureDef>
-                                org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.server.feature:${carbon.analytics.version}
                             </importFeatures>
                         </configuration>
                     </execution>

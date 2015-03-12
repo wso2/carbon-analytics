@@ -30,9 +30,10 @@
         $(document).ready(function () {
             var tableNames = "";
             <c:forEach var='tableName' items='${connector.getTableList()}'>
-                tableNames += "<option value='${tableName}'>" + '${tableName}' + "</option>";
+            tableNames += "<option value='${tableName}'>" + '${tableName}' + "</option>";
             </c:forEach>
             $("#tableSelect").append(tableNames);
+            $("#DeleteAllButton").hide();
         });
     </script>
 
@@ -45,6 +46,7 @@
 </label>
 
 <div id="AnalyticsTableContainer"></div>
+<button id="DeleteAllButton"> Delete all selected records</button>
 
 </body>
 </html>
