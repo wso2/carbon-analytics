@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.spark.core;
+package org.wso2.carbon.analytics.spark.core.exception;
 
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 
