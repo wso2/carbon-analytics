@@ -56,10 +56,8 @@ public class AnalyticsExecutionClient {
     }
 
     public String execute(String query) throws RemoteException, AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
-        String resultString;
         AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto queryResult = stub.executeQuery(query);
-        resultString = toJsonResult(query, queryResult);
-        return resultString;
+        return toJsonResult(query, queryResult);
     }
 
     public AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto[] executeScriptContent(String scriptContent) throws RemoteException,
@@ -122,7 +120,7 @@ public class AnalyticsExecutionClient {
         JsonObject response = new JsonObject();
         JsonArray rows = new JsonArray();
 
-        if (res != null) {
+        if (res != null && res.getRowsResults() != null) {
             for (AnalyticsProcessorAdminServiceStub.AnalyticsRowResultDto row : res.getRowsResults()) {
                 if (row != null) {
                     JsonArray singleRow = new JsonArray();
