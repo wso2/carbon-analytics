@@ -18,7 +18,11 @@
 
 package org.wso2.carbon.analytics.spark.core.util;
 
-import org.apache.spark.*;
+import org.apache.spark.Dependency;
+import org.apache.spark.InterruptibleIterator;
+import org.apache.spark.Partition;
+import org.apache.spark.SparkContext;
+import org.apache.spark.TaskContext;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.catalyst.expressions.Row;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
@@ -29,8 +33,8 @@ import scala.collection.Seq;
 import scala.reflect.ClassTag;
 
 import java.io.Serializable;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 
 import static scala.collection.JavaConversions.asScalaIterator;

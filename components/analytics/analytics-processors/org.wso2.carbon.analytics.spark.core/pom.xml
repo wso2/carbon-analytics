@@ -64,7 +64,10 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Export-Package>org.wso2.carbon.analytics.spark.core.*;version="${carbon.analytics.version}"</Export-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
-                        <Private-Package>org.wso2.carbon.analytics.spark.core.internal.*</Private-Package>
+                        <Private-Package>
+                            org.wso2.carbon.analytics.spark.core.internal.*,
+                            org.apache.spark.executor.CoarseGrainedExecutorBackend
+                        </Private-Package>
                     </instructions>
                 </configuration>
             </plugin>

@@ -114,11 +114,6 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.analytics.spark.core</artifactId>
-                <version>${carbon.analytics.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.core</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
@@ -506,6 +501,13 @@
                 <version>${compress.lzf.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>${google.protobuf.version}</version>
+            </dependency>
+
+
             <!--wso2 orbit bundles -->
             <dependency>
                 <groupId>io.netty.wso2</groupId>
@@ -535,6 +537,12 @@
                 <groupId>org.wso2.clearspring.analytics</groupId>
                 <artifactId>stream</artifactId>
                 <version>${stream.orbit.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.wso2.orbit.org.apache.mesos</groupId>
+                <artifactId>mesos</artifactId>
+                <version>${mesos.orbit.version}</version>
             </dependency>
 
             <!--child dependancies -->
@@ -995,6 +1003,8 @@
         <uncommons.math.version>1.2.2</uncommons.math.version>
         <jcommon.version>1.0.12</jcommon.version>
         <jfreechart.version>1.0.13</jfreechart.version>
+        <mesos.orbit.version>0.18.1.wso2v1</mesos.orbit.version>
+        <google.protobuf.version>2.5.0</google.protobuf.version>
 
 
     </properties>
