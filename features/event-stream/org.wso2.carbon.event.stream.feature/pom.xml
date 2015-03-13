@@ -67,10 +67,10 @@
                             </importFeatures>
                             <includedFeatures>
                                 <includedFeatureDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.stream.server.feature:${carbon.analytics.commons.version}
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.stream.server.feature:${carbon.analytics-common.version}
                                 </includedFeatureDef>
                                 <includedFeatureDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.stream.ui.feature:${carbon.analytics.commons.version}
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.stream.ui.feature:${carbon.analytics-common.version}
                                 </includedFeatureDef>
                             </includedFeatures>
                         </configuration>

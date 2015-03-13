@@ -19,9 +19,7 @@ package org.wso2.carbon.event.stream.core;
 
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
-import org.wso2.carbon.event.stream.core.internal.EventStreamRuntime;
 
-import java.util.Collection;
 import java.util.List;
 
 public interface EventStreamService {
@@ -79,5 +77,24 @@ public interface EventStreamService {
     public String generateSampleEvent(String streamId, String eventType)
             throws EventStreamConfigurationException;
 
-    EventStreamRuntime getEventStreamRuntime();
+    public void subscribe(SiddhiEventConsumer siddhiEventConsumer) throws EventStreamConfigurationException;
+
+    public void subscribe(RawEventConsumer rawEventConsumer) throws EventStreamConfigurationException;
+
+    public void subscribe(EventProducer eventProducer) throws EventStreamConfigurationException;
+
+    public void subscribe(WSO2EventConsumer wso2EventConsumer) throws EventStreamConfigurationException;
+
+    public void subscribe(WSO2EventListConsumer wso2EventListConsumer) throws EventStreamConfigurationException;
+
+    public void unsubscribe(SiddhiEventConsumer siddhiEventConsumer);
+
+    public void unsubscribe(RawEventConsumer rawEventConsumer);
+
+    public void unsubscribe(EventProducer eventProducer);
+
+    public void unsubscribe(WSO2EventConsumer wso2EventConsumer);
+
+    public void unsubscribe(WSO2EventListConsumer wso2EventConsumer);
+
 }

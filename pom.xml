@@ -150,22 +150,22 @@
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.event.stream.admin</artifactId>
-                <version>${carbon.analytics.commons.version}</version>
+                <version>${carbon.analytics-common.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.event.stream.core</artifactId>
-                <version>${carbon.analytics.commons.version}</version>
+                <version>${carbon.analytics-common.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.event.stream.stub</artifactId>
-                <version>${carbon.analytics.commons.version}</version>
+                <version>${carbon.analytics-common.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.event.stream.ui</artifactId>
-                <version>${carbon.analytics.commons.version}</version>
+                <version>${carbon.analytics-common.version}</version>
             </dependency>
             <!--carbon analytics common dependencies stop-->
 
@@ -173,13 +173,13 @@
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.event.stream.server.feature</artifactId>
-                <version>${carbon.analytics.commons.version}</version>
+                <version>${carbon.analytics-common.version}</version>
                 <type>zip</type>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.event.stream.ui.feature</artifactId>
-                <version>${carbon.analytics.commons.version}</version>
+                <version>${carbon.analytics-common.version}</version>
                 <type>zip</type>
             </dependency>
             <!--features end-->
@@ -409,7 +409,7 @@
     </repositories>
 
     <properties>
-        <carbon.analytics.commons.version>1.0.0-SNAPSHOT</carbon.analytics.commons.version>
+        <carbon.analytics-common.version>1.0.0-SNAPSHOT</carbon.analytics-common.version>
 
         <!-- Carbon kernel version -->
         <carbon.kernel.version>4.3.0</carbon.kernel.version>

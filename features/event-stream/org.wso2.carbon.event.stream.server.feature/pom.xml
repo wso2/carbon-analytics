@@ -92,10 +92,10 @@
                             </adviceFile>
                             <bundles>
                                 <bundleDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.stream.core:${carbon.analytics.commons.version}
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.stream.core:${carbon.analytics-common.version}
                                 </bundleDef>
                                 <bundleDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.stream.admin:${carbon.analytics.commons.version}
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.stream.admin:${carbon.analytics-common.version}
                                 </bundleDef>
                             </bundles>
                             <importFeatures>
