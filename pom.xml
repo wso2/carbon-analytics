@@ -33,6 +33,7 @@
 
     <modules>
         <module>service-stubs</module>
+        <module>components/analytics-dashboard</module>
         <!--<module>components/event-stream</module>-->
         <!--<module>features/event-stream</module>-->
     </modules>

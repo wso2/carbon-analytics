@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WSO2 Business Activity Monitor - Dshboard</title>
+  <link rel="stylesheet" href="assets/lib/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/keen-dashboards.css">
+  <link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body class="application">
+
+  <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../">
+          <span class="glyphicon glyphicon-stats"></span>
+        </a>
+        <a class="navbar-brand" href="./">Gadget Generation Wizard</a>
+      </div>
+      <div class="navbar-collapse collapse">
+        <ul class="nav navbar-nav navbar-left">
+          <li><a href="http://localhost/dashboard">Home</a></li>
+          <li><a href="http://localhost/dashboard">Documentation</a></li>
+          <li><a href="http://localhost/dashboard">Support</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <div class="row">
+      
+      <div class="col-md-3">
+          <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">
+                  <span class="glyphicon glyphicon-inbox"></span>
+                  <a href="http://localhost/dashboard">My Datasources</a> 
+                </h3>
+              </div>
+                <!-- List group -->
+                <ul class="list-group">
+                 <li class="list-group-item"><a href="http://localhost/dashboard/index.php/dashboard/view">WeatherData</a></li>
+                 <li class="list-group-item"><a href="http://localhost/dashboard/index.php/dashboard/view">SalesByRegion</a></li>
+                 <li class="list-group-item"><a href="http://localhost/dashboard/index.php/dashboard/index">ClickStream</a></li>
+               </ul>
+          </div>
+          <h4>Need Help?</h4>
+          <p>Give feedback or ask for help at our Support Center.</a>
+               </p>
+      </div>
+
+      <div class="col-md-9">
+
+          <!-- <div class="alert alert-danger alert-dismissable">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <strong>Reminder!</strong> This payment will due within 2 days
+          </div> -->
+
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title"><span class="glyphicon glyphicon-stats"></span>
+                <a href="http://localhost/dashboard/gadgets">Create Visualization - Step 3: Configure Chart</a> 
+              </h3>
+            </div>
+            <div class="panel-body">
+             
+             <ul class="nav nav-pills">
+               <li role="presentation" ><a href="flow-ds.html">Datasources</a></li>
+               <li role="presentation"><a href="flow-chart-types.html">Chart Type</a></li>
+               <li role="presentation" class="active"><a href="flow-chart-configure.html">Configure Chart</a></li>
+             </ul>
+
+             <hr>
+             <h4>Configure Single Metric</h4>
+
+
+             <!-- preview -->
+             <div class="row">
+                <div class="col-md-12">
+                  <div class="panel panel-default">
+                    <div class="panel-heading">
+                      <h3 class="panel-title">Preview</h3>
+                    </div>
+                    <div class="panel-body">
+                      <div id="singleNumber"></div>
+                      <form action="" id="singleNumForm">
+                      </form>
+                      <input type="button" class="btn btn-primary" onclick="redrawClicked('singleNumForm', '#singleNumber'); redrawClicked('singleNumForm', '#normalizationCurve');" value="Redraw">
+                    </div>
+                  </div>
+                </div>
+             </div>
+
+
+
+            
+                      
+            </div>  <!-- /panel-body -->
+          
+          </div>  <!-- /panel -->
+
+
+
+        </div>
+      <!-- /col-md-9 -->
+
+    </div>
+     <!-- /.row -->
+
+
+    <hr>
+    <p class="small text-muted">Built with &#9829; by <a href="https://wso2.com">WSO2</a></p>
+
+  </div>
+
+  <script src="assets/lib/jquery/dist/jquery.min.js"></script>
+  <script src="assets/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+
+  <script src="assets/lib/holderjs/holder.js"></script>
+  <script>
+    Holder.add_theme("white", { background:"#fff", foreground:"#a7a7a7", size:10 });
+  </script>
+
+  <script src="assets/lib/keen-js/dist/keen.min.js"></script>
+  <script src="assets/js/meta.js"></script>
+  <script type="text/javascript" src="assets/js/d3.min.js"></script>
+  <script type="text/javascript" src="assets/js/jsapi.js"></script>
+  <script type="text/javascript" src="assets/js/generic_plot.js"></script>
+  <script type="text/javascript" src="assets/js/functions.js"></script>
+
+  <script type="text/javascript">
+    
+
+    var dataTable = {
+      "metadata":{
+        "names":["Country","Area","GDP","Inflation","Life.expect","Military","Pop.growth","Unemployment"],
+        "types":['C', 'N', 'N', 'N', 'N', 'N', 'N','N']
+      },
+      "data": [
+        ["Austria",83871,41600,3.5,79.91,0.8,0.03,4.2],
+        ["Belgium",30528,37800,3.5,79.65,1.3,0.06,7.2],
+        ["Bulgaria",110879,13800,4.2,73.84,2.6,-0.8,9.6],
+        ["Croatia",56594,18000,2.3,75.99,2.39,-0.09,17.7],
+        ["Czech Republic",78867,27100,1.9,77.38,1.15,-0.13,8.5],
+        ["Denmark",43094,37000,2.8,78.78,1.3,0.24,6.1],
+        ["Estonia",45228,20400,5,73.58,2,-0.65,12.5],
+        ["Finland",338145,36000,3.3,79.41,2,0.07,7.8],
+        ["Germany",357022,38100,2.5,80.19,1.5,-0.2,6],
+        ["Greece",131957,26300,3.3,80.05,4.3,0.06,17.4],
+        ["Hungary",93028,19600,3.9,75.02,1.75,-0.18,10.9],
+        ["Iceland",103000,38100,4,81,0,0.67,7.4],
+        ["Ireland",70273,40800,2.6,80.32,0.9,1.11,14.4],
+        ["Italy",301340,30500,2.9,81.86,1.8,0.38,8.4],
+        ["Latvia",64589,16800,4.4,72.93,1.1,-0.6,12.8]
+
+      ]
+    }
+
+    igViz.setDataTable(dataTable);
+
+    createForm(dataTable, '#scatterForm', "scatter");
+    createForm(dataTable, '#barForm', "bar");
+    createForm(dataTable, '#singleNumForm', "singleNumber");
+    createForm(dataTable, '#tableForm', "tableChart");
+    createForm(dataTable,'#lineChartForm',"lineChart");
+    createForm(dataTable, '#mapForm', "map"); 
+    createForm(dataTable, '#groupbarForm', "groupBar");
+
+  </script>
+
+</body>
+</html>

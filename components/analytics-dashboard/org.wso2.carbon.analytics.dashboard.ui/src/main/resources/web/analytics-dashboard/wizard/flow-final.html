@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WSO2 Business Activity Monitor - Dshboard</title>
+  <link rel="stylesheet" href="assets/lib/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/keen-dashboards.css">
+  <link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body class="application">
+
+  <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../">
+          <span class="glyphicon glyphicon-stats"></span>
+        </a>
+        <a class="navbar-brand" href="./">Gadget Generation Wizard</a>
+      </div>
+      <div class="navbar-collapse collapse">
+        <ul class="nav navbar-nav navbar-left">
+          <li><a href="http://localhost/dashboard">Home</a></li>
+          <li><a href="http://localhost/dashboard">Documentation</a></li>
+          <li><a href="http://localhost/dashboard">Support</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <div class="row">
+      
+      <div class="col-md-3">
+          <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">
+                  <span class="glyphicon glyphicon-inbox"></span>
+                  <a href="http://localhost/dashboard">My Datasources</a> 
+                </h3>
+              </div>
+                <!-- List group -->
+                <ul class="list-group">
+                 <li class="list-group-item"><a href="http://localhost/dashboard/index.php/dashboard/view">WeatherData</a></li>
+                 <li class="list-group-item"><a href="http://localhost/dashboard/index.php/dashboard/view">SalesByRegion</a></li>
+                 <li class="list-group-item"><a href="http://localhost/dashboard/index.php/dashboard/index">ClickStream</a></li>
+               </ul>
+          </div>
+          <h4>Need Help?</h4>
+          <p>Give feedback or ask for help at our Support Center.</a>
+               </p>
+      </div>
+
+      <div class="col-md-9">
+
+          <!-- <div class="alert alert-danger alert-dismissable">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <strong>Reminder!</strong> This payment will due within 2 days
+          </div> -->
+
+          <div class="chart-wrapper">
+            <div class="chart-title">
+              Pageviews by browser (past 24 hours)
+              <small class="pull-right"><a href="flow-chart-configure.html">Configure</a></small>
+            </div>
+            <div class="chart-stage">
+              <div id="chart-03"><div style="position: relative;"><div dir="ltr" style="position: relative; width: 699px; height: 175px;"><div aria-label="A chart." style="position: absolute; left: 0px; top: 0px; width: 100%; height: 100%;"><svg width="699" height="175" aria-label="A chart." style="overflow: hidden;"><defs id="defs"><clipPath id="_ABSTRACT_RENDERER_ID_1"><rect x="35" y="9" width="650" height="149"></rect></clipPath></defs><rect x="0" y="0" width="699" height="175" stroke="none" stroke-width="0" fill="#ffffff"></rect><g><rect x="35" y="9" width="650" height="149" stroke="none" stroke-width="0" fill-opacity="0" fill="#ffffff"></rect><g clip-path="url(#_ABSTRACT_RENDERER_ID_1)"><g><rect x="35" y="157" width="650" height="1" stroke="none" stroke-width="0" fill="#cccccc"></rect><rect x="35" y="120" width="650" height="1" stroke="none" stroke-width="0" fill="#cccccc"></rect><rect x="35" y="83" width="650" height="1" stroke="none" stroke-width="0" fill="#cccccc"></rect><rect x="35" y="46" width="650" height="1" stroke="none" stroke-width="0" fill="#cccccc"></rect><rect x="35" y="9" width="650" height="1" stroke="none" stroke-width="0" fill="#cccccc"></rect></g><g><rect x="38" y="153" width="22" height="4" stroke="none" stroke-width="0" fill="#00bbde"></rect><rect x="65" y="155.724" width="22" height="1.7760000000000105" stroke="none" stroke-width="0" fill="#00bbde"></rect><rect x="92" y="148" width="22" height="9" stroke="none" stroke-width="0" fill="#00bbde"></rect><rect x="119" y="145" width="22" height="12" stroke="none" stroke-width="0" fill="#00bbde"></rect><rect x="146" y="148" width="22" height="9" stroke="none" stroke-width="0" fill="#00bbde"></rect><rect x="173" y="151" width="22" height="6" stroke="none" stroke-width="0" fill="#00bbde"></rect><rect x="200" y="155" width="22" height="2" stroke="none" stroke-width="0" fill="#00bbde"></rect><rect x="227" y="157" width="22" height="0.5" stroke="none" stroke-width="0" fill="#00bbde"></rect><rect x="254" y="153" width="22" height="4" stroke="none" stroke-width="0" fill="#00bbde"></rect><rect x="281" y="156.316" width="22" height="1.1839999999999975" stroke="none" stroke-width="0" fill="#00bbde"></rect><rect x="308" y="155" width="22" height="2" stroke="none" stroke-width="0" fill="#00bbde"></rect><rect x="335" y="148" width="22" height="9" stroke="none" stroke-width="0" fill="#00bbde"></rect><rect x="362" y="153.948" width="22" height="3.5519999999999925" stroke="none" stroke-width="0" fill="#00bbde"></rect><rect x="389" y="155" width="22" height="2" stroke="none" stroke-width="0" fill="#00bbde"></rect><rect x="416" y="146" width="22" height="11" stroke="none" stroke-width="0" fill="#00bbde"></rect><rect x="443" y="152" width="22" height="5" stroke="none" stroke-width="0" fill="#00bbde"></rect><rect x="470" y="146" width="22" height="11" stroke="none" stroke-width="0" fill="#00bbde"></rect><rect x="497" y="152" width="22" height="5" stroke="none" stroke-width="0" fill="#00bbde"></rect><rect x="524" y="148" width="22" height="9" stroke="none" stroke-width="0" fill="#00bbde"></rect><rect x="551" y="152" width="22" height="5" stroke="none" stroke-width="0" fill="#00bbde"></rect><rect x="578" y="148" width="22" height="9" stroke="none" stroke-width="0" fill="#00bbde"></rect><rect x="605" y="148" width="22" height="9" stroke="none" stroke-width="0" fill="#00bbde"></rect><rect x="632" y="153" width="22" height="4" stroke="none" stroke-width="0" fill="#00bbde"></rect><rect x="659" y="148" width="22" height="9" stroke="none" stroke-width="0" fill="#00bbde"></rect><rect x="38" y="131" width="22" height="21" stroke="none" stroke-width="0" fill="#fe6672"></rect><rect x="65" y="138" width="22" height="17" stroke="none" stroke-width="0" fill="#fe6672"></rect><rect x="92" y="127" width="22" height="20" stroke="none" stroke-width="0" fill="#fe6672"></rect><rect x="119" y="137" width="22" height="7" stroke="none" stroke-width="0" fill="#fe6672"></rect><rect x="146" y="134" width="22" height="13" stroke="none" stroke-width="0" fill="#fe6672"></rect><rect x="173" y="136" width="22" height="14" stroke="none" stroke-width="0" fill="#fe6672"></rect><rect x="200" y="147" width="22" height="7" stroke="none" stroke-width="0" fill="#fe6672"></rect><rect x="227" y="157" width="22" height="0.5" stroke="none" stroke-width="0" fill="#fe6672"></rect><rect x="254" y="140" width="22" height="12" stroke="none" stroke-width="0" fill="#fe6672"></rect><rect x="281" y="147" width="22" height="9" stroke="none" stroke-width="0" fill="#fe6672"></rect><rect x="308" y="138" width="22" height="16" stroke="none" stroke-width="0" fill="#fe6672"></rect><rect x="335" y="134" width="22" height="13" stroke="none" stroke-width="0" fill="#fe6672"></rect><rect x="362" y="131" width="22" height="22" stroke="none" stroke-width="0" fill="#fe6672"></rect><rect x="389" y="142" width="22" height="12" stroke="none" stroke-width="0" fill="#fe6672"></rect><rect x="416" y="124" width="22" height="21" stroke="none" stroke-width="0" fill="#fe6672"></rect><rect x="443" y="130" width="22" height="21" stroke="none" stroke-width="0" fill="#fe6672"></rect><rect x="470" y="125" width="22" height="20" stroke="none" stroke-width="0" fill="#fe6672"></rect><rect x="497" y="122" width="22" height="29" stroke="none" stroke-width="0" fill="#fe6672"></rect><rect x="524" y="122" width="22" height="25" stroke="none" stroke-width="0" fill="#fe6672"></rect><rect x="551" y="125" width="22" height="26" stroke="none" stroke-width="0" fill="#fe6672"></rect><rect x="578" y="126" width="22" height="21" stroke="none" stroke-width="0" fill="#fe6672"></rect><rect x="605" y="120" width="22" height="27" stroke="none" stroke-width="0" fill="#fe6672"></rect><rect x="632" y="130" width="22" height="22" stroke="none" stroke-width="0" fill="#fe6672"></rect><rect x="659" y="129" width="22" height="18" stroke="none" stroke-width="0" fill="#fe6672"></rect><rect x="38" y="85" width="22" height="45" stroke="none" stroke-width="0" fill="#eeb058"></rect><rect x="65" y="91" width="22" height="46" stroke="none" stroke-width="0" fill="#eeb058"></rect><rect x="92" y="86" width="22" height="40" stroke="none" stroke-width="0" fill="#eeb058"></rect><rect x="119" y="88" width="22" height="48" stroke="none" stroke-width="0" fill="#eeb058"></rect><rect x="146" y="103" width="22" height="30" stroke="none" stroke-width="0" fill="#eeb058"></rect><rect x="173" y="104" width="22" height="31" stroke="none" stroke-width="0" fill="#eeb058"></rect><rect x="200" y="111" width="22" height="35" stroke="none" stroke-width="0" fill="#eeb058"></rect><rect x="227" y="157" width="22" height="0.5" stroke="none" stroke-width="0" fill="#eeb058"></rect><rect x="254" y="110" width="22" height="29" stroke="none" stroke-width="0" fill="#eeb058"></rect><rect x="281" y="122" width="22" height="24" stroke="none" stroke-width="0" fill="#eeb058"></rect><rect x="308" y="114" width="22" height="23" stroke="none" stroke-width="0" fill="#eeb058"></rect><rect x="335" y="113" width="22" height="20" stroke="none" stroke-width="0" fill="#eeb058"></rect><rect x="362" y="90" width="22" height="40" stroke="none" stroke-width="0" fill="#eeb058"></rect><rect x="389" y="97" width="22" height="44" stroke="none" stroke-width="0" fill="#eeb058"></rect><rect x="416" y="85" width="22" height="38" stroke="none" stroke-width="0" fill="#eeb058"></rect><rect x="443" y="77" width="22" height="52" stroke="none" stroke-width="0" fill="#eeb058"></rect><rect x="470" y="71" width="22" height="53" stroke="none" stroke-width="0" fill="#eeb058"></rect><rect x="497" y="68" width="22" height="53" stroke="none" stroke-width="0" fill="#eeb058"></rect><rect x="524" y="61" width="22" height="60" stroke="none" stroke-width="0" fill="#eeb058"></rect><rect x="551" y="57" width="22" height="67" stroke="none" stroke-width="0" fill="#eeb058"></rect><rect x="578" y="70" width="22" height="55" stroke="none" stroke-width="0" fill="#eeb058"></rect><rect x="605" y="45" width="22" height="74" stroke="none" stroke-width="0" fill="#eeb058"></rect><rect x="632" y="64" width="22" height="65" stroke="none" stroke-width="0" fill="#eeb058"></rect><rect x="659" y="69" width="22" height="59" stroke="none" stroke-width="0" fill="#eeb058"></rect><rect x="38" y="83" width="22" height="1" stroke="none" stroke-width="0" fill="#8a8ad6"></rect><rect x="65" y="90.30799999999999" width="22" height="0.592000000000013" stroke="none" stroke-width="0" fill="#8a8ad6"></rect><rect x="92" y="80" width="22" height="5" stroke="none" stroke-width="0" fill="#8a8ad6"></rect><rect x="119" y="86" width="22" height="1" stroke="none" stroke-width="0" fill="#8a8ad6"></rect><rect x="146" y="101.556" width="22" height="1.1840000000000117" stroke="none" stroke-width="0" fill="#8a8ad6"></rect><rect x="173" y="157" width="22" height="0.5" stroke="none" stroke-width="0" fill="#8a8ad6"></rect><rect x="200" y="109" width="22" height="1" stroke="none" stroke-width="0" fill="#8a8ad6"></rect><rect x="227" y="157" width="22" height="0.5" stroke="none" stroke-width="0" fill="#8a8ad6"></rect><rect x="254" y="157" width="22" height="0.5" stroke="none" stroke-width="0" fill="#8a8ad6"></rect><rect x="281" y="157" width="22" height="0.5" stroke="none" stroke-width="0" fill="#8a8ad6"></rect><rect x="308" y="112" width="22" height="1" stroke="none" stroke-width="0" fill="#8a8ad6"></rect><rect x="335" y="157" width="22" height="0.5" stroke="none" stroke-width="0" fill="#8a8ad6"></rect><rect x="362" y="88" width="22" height="1" stroke="none" stroke-width="0" fill="#8a8ad6"></rect><rect x="389" y="94.896" width="22" height="1.1839999999999975" stroke="none" stroke-width="0" fill="#8a8ad6"></rect><rect x="416" y="81" width="22" height="3" stroke="none" stroke-width="0" fill="#8a8ad6"></rect><rect x="443" y="73" width="22" height="3" stroke="none" stroke-width="0" fill="#8a8ad6"></rect><rect x="470" y="66" width="22" height="4" stroke="none" stroke-width="0" fill="#8a8ad6"></rect><rect x="497" y="63" width="22" height="4" stroke="none" stroke-width="0" fill="#8a8ad6"></rect><rect x="524" y="54" width="22" height="6" stroke="none" stroke-width="0" fill="#8a8ad6"></rect><rect x="551" y="54.936" width="22" height="1.1840000000000046" stroke="none" stroke-width="0" fill="#8a8ad6"></rect><rect x="578" y="63" width="22" height="6" stroke="none" stroke-width="0" fill="#8a8ad6"></rect><rect x="605" y="42.504000000000005" width="22" height="1.7759999999999962" stroke="none" stroke-width="0" fill="#8a8ad6"></rect><rect x="632" y="61.744" width="22" height="1.7759999999999962" stroke="none" stroke-width="0" fill="#8a8ad6"></rect><rect x="659" y="65.74" width="22" height="2.960000000000008" stroke="none" stroke-width="0" fill="#8a8ad6"></rect></g><g><rect x="35" y="157" width="650" height="1" stroke="none" stroke-width="0" fill="#333333"></rect></g></g><g></g><g><g><text text-anchor="middle" x="116.625" y="170.7" font-family="Arial" font-size="12" stroke="none" stroke-width="0" fill="#444444">8:00 AM</text></g><g><text text-anchor="middle" x="224.79166666666666" y="170.7" font-family="Arial" font-size="12" stroke="none" stroke-width="0" fill="#444444">12:00 PM</text></g><g><text text-anchor="middle" x="332.9583333333333" y="170.7" font-family="Arial" font-size="12" stroke="none" stroke-width="0" fill="#444444">4:00 PM</text></g><g><text text-anchor="middle" x="441.125" y="170.7" font-family="Arial" font-size="12" stroke="none" stroke-width="0" fill="#444444">8:00 PM</text></g><g><text text-anchor="middle" x="549.2916666666666" y="170.7" font-family="Arial" font-size="12" stroke="none" stroke-width="0" fill="#444444">12:00 AM</text></g><g><text text-anchor="middle" x="657.4583333333334" y="170.7" font-family="Arial" font-size="12" stroke="none" stroke-width="0" fill="#444444">4:00 AM</text></g><g><text text-anchor="end" x="27.5" y="161.7" font-family="Arial" font-size="12" stroke="none" stroke-width="0" fill="#444444">0</text></g><g><text text-anchor="end" x="27.5" y="124.7" font-family="Arial" font-size="12" stroke="none" stroke-width="0" fill="#444444">50</text></g><g><text text-anchor="end" x="27.5" y="87.7" font-family="Arial" font-size="12" stroke="none" stroke-width="0" fill="#444444">100</text></g><g><text text-anchor="end" x="27.5" y="50.7" font-family="Arial" font-size="12" stroke="none" stroke-width="0" fill="#444444">150</text></g><g><text text-anchor="end" x="27.5" y="13.7" font-family="Arial" font-size="12" stroke="none" stroke-width="0" fill="#444444">200</text></g></g></g><g></g></svg><div aria-label="A tabular representation of the data in the chart." style="position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden;"><table><thead><tr><th>start</th><th>Acme, Inc.</th><th>Bluth Company</th><th>Dunder Mifflin</th><th>Initech</th></tr></thead><tbody><tr><td>May 4, 2014, 5:30:00 AM</td><td>7</td><td>30</td><td>62</td><td>2</td></tr><tr><td>May 4, 2014, 6:30:00 AM</td><td>3</td><td>24</td><td>63</td><td>1</td></tr><tr><td>May 4, 2014, 7:30:00 AM</td><td>13</td><td>29</td><td>55</td><td>9</td></tr><tr><td>May 4, 2014, 8:30:00 AM</td><td>18</td><td>11</td><td>65</td><td>3</td></tr><tr><td>May 4, 2014, 9:30:00 AM</td><td>14</td><td>18</td><td>42</td><td>2</td></tr><tr><td>May 4, 2014, 10:30:00 AM</td><td>10</td><td>20</td><td>43</td><td>0</td></tr><tr><td>May 4, 2014, 11:30:00 AM</td><td>4</td><td>11</td><td>48</td><td>3</td></tr><tr><td>May 4, 2014, 12:30:00 PM</td><td>0</td><td>0</td><td>0</td><td>0</td></tr><tr><td>May 4, 2014, 1:30:00 PM</td><td>7</td><td>17</td><td>41</td><td>0</td></tr><tr><td>May 4, 2014, 2:30:00 PM</td><td>2</td><td>13</td><td>34</td><td>0</td></tr><tr><td>May 4, 2014, 3:30:00 PM</td><td>4</td><td>23</td><td>32</td><td>3</td></tr><tr><td>May 4, 2014, 4:30:00 PM</td><td>14</td><td>18</td><td>29</td><td>0</td></tr><tr><td>May 4, 2014, 5:30:00 PM</td><td>6</td><td>31</td><td>55</td><td>2</td></tr><tr><td>May 4, 2014, 6:30:00 PM</td><td>4</td><td>17</td><td>62</td><td>2</td></tr><tr><td>May 4, 2014, 7:30:00 PM</td><td>16</td><td>30</td><td>52</td><td>6</td></tr><tr><td>May 4, 2014, 8:30:00 PM</td><td>8</td><td>30</td><td>71</td><td>6</td></tr><tr><td>May 4, 2014, 9:30:00 PM</td><td>16</td><td>29</td><td>73</td><td>6</td></tr><tr><td>May 4, 2014, 10:30:00 PM</td><td>8</td><td>41</td><td>72</td><td>8</td></tr><tr><td>May 4, 2014, 11:30:00 PM</td><td>13</td><td>35</td><td>83</td><td>9</td></tr><tr><td>May 5, 2014, 12:30:00 AM</td><td>8</td><td>37</td><td>92</td><td>2</td></tr><tr><td>May 5, 2014, 1:30:00 AM</td><td>14</td><td>29</td><td>76</td><td>9</td></tr><tr><td>May 5, 2014, 2:30:00 AM</td><td>14</td><td>38</td><td>101</td><td>3</td></tr><tr><td>May 5, 2014, 3:30:00 AM</td><td>7</td><td>31</td><td>89</td><td>3</td></tr><tr><td>May 5, 2014, 4:30:00 AM</td><td>13</td><td>26</td><td>81</td><td>5</td></tr></tbody></table></div></div></div><div aria-hidden="true" style="display: none; position: absolute; top: 185px; left: 709px; white-space: nowrap; font-family: Arial; font-size: 12px; font-weight: bold;">Count - impressions</div><div></div></div></div>
+            </div>
+            <div class="chart-notes">
+              This is a sample text region to describe this chart.
+            </div>
+          </div>
+          
+        </div>
+      <!-- /col-md-9 -->
+
+    </div>
+     <!-- /.row -->
+
+
+
+
+
+
+    <hr>
+
+    <p class="small text-muted">Built with &#9829; by <a href="https://wso2.com">WSO2</a></p>
+
+  </div>
+
+  <script src="assets/lib/jquery/dist/jquery.min.js"></script>
+  <script src="assets/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+
+  <script src="assets/lib/holderjs/holder.js"></script>
+  <script>
+    Holder.add_theme("white", { background:"#fff", foreground:"#a7a7a7", size:10 });
+  </script>
+
+  <script src="assets/lib/keen-js/dist/keen.min.js"></script>
+  <script src="assets/js/meta.js"></script>
+
+</body>
+</html>
