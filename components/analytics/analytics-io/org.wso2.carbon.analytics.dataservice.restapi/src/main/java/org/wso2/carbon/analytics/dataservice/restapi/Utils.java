@@ -16,12 +16,6 @@
 
 package org.wso2.carbon.analytics.dataservice.restapi;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.indexing.IndexType;
 import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
@@ -30,7 +24,15 @@ import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.SearchResultEntryBean;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
+import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This class represents a set of utility functionalities for the analytics REST API.
@@ -40,7 +42,7 @@ public class Utils {
 	/**
 	 * Gets the analytics data service.
 	 * @return the analytics data service
-	 * @throws AnalyticsRESTException 
+	 * @throws AnalyticsException
 	 */
 	public static AnalyticsDataService getAnalyticsDataService() throws AnalyticsException {
 		AnalyticsDataService analyticsDataService;
@@ -58,7 +60,7 @@ public class Utils {
 	 * @param recordBeans
 	 *            the record beans
 	 * @return the records from record beans
-	 * @throws AnalyticsRESTException if the tableName is not specified
+	 * @throws AnalyticsException if the tableName is not specified
 	 */
 	public static List<Record> getRecords(int tenantId, List<RecordBean> recordBeans) throws AnalyticsException {
 		List<Record> records = new ArrayList<Record>();
@@ -81,7 +83,6 @@ public class Utils {
 	 * @param recordBeans
 	 *            the record beans
 	 * @return the records from record beans
-	 * @throws AnalyticsRESTException if the tableName is not specified
 	 */
 	public static List<Record> getRecordsForTable(int tenantId,String tableName, List<RecordBean> recordBeans) {
 		List<Record> records = new ArrayList<Record>();
@@ -100,15 +101,25 @@ public class Utils {
 	public static List<RecordBean> createRecordBeans(List<Record> records) {
 		List<RecordBean> recordBeans = new ArrayList<RecordBean>();
 		for(Record record : records) {
-			RecordBean recordBean = new RecordBean();
-			recordBean.setId(record.getId());
-			recordBean.setTableName(record.getTableName());
-			recordBean.setTimestamp(record.getTimestamp());
-			recordBean.setValues(record.getValues());
+			RecordBean recordBean = createRecordBean(record);
 			recordBeans.add(recordBean);
 		}
 		return recordBeans;
 	}
+
+    /**
+     * Create a RecordBean object out of a Record object
+     * @param record the record object
+     * @return RecordBean object
+     */
+    public static RecordBean createRecordBean(Record record) {
+        RecordBean recordBean = new RecordBean();
+        recordBean.setId(record.getId());
+        recordBean.setTableName(record.getTableName());
+        recordBean.setTimestamp(record.getTimestamp());
+        recordBean.setValues(record.getValues());
+        return recordBean;
+    }
 	
 	/**
 	 * Creates the search result beans from search results.
@@ -231,10 +242,34 @@ public class Utils {
 	public static String getCompleteErrorMessage(String msg, Exception e) {
 		StringBuilder message = new StringBuilder(msg);
 		if (e.getCause() != null) { 
-			message.append(". (" + e.getCause().getMessage() + ")");
+			message.append(". (");
+            message.append(e.getCause().getMessage());
+            message.append(")");
 		} else if (e.getMessage() != null) {
-			message.append(". (" + e.getMessage() + ")");
+			message.append(". (");
+            message.append(e.getMessage());
+            message.append(")");
 		}
 		return message.toString();
 	}
+
+    /**
+     * Returns the list of iterators given RecordGroups as a parameter
+     * @param recordGroups the recordGroup array of which the iterators to be returned
+     * @param analyticsDataService the AnalyticsDataService instance
+     * @return list of Iterators of Records
+     * @throws AnalyticsException
+     */
+    public static List<Iterator<Record>> getRecordIterators(RecordGroup[] recordGroups,
+                                                      AnalyticsDataService analyticsDataService)
+            throws AnalyticsException {
+
+        List<Iterator<Record>> iterators = new ArrayList<Iterator<Record>>();
+        for (RecordGroup recordGroup : recordGroups) {
+            iterators.add(analyticsDataService.readRecords(recordGroup));
+        }
+
+        return iterators;
+    }
+
 }

@@ -16,8 +16,22 @@
 
 package org.wso2.carbon.analytics.dataservice.restapi.resources;
 
-import java.util.List;
-import java.util.Map;
+import com.google.gson.Gson;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDSUtils;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.indexing.IndexType;
+import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.restapi.Constants;
+import org.wso2.carbon.analytics.dataservice.restapi.Utils;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.IndexTypeBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.QueryBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.TableBean;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.rs.Record;
+import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -28,28 +42,18 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDSUtils;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
-import org.wso2.carbon.analytics.dataservice.AnalyticsIndexException;
-import org.wso2.carbon.analytics.dataservice.indexing.IndexType;
-import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
-import org.wso2.carbon.analytics.dataservice.restapi.Constants;
-import org.wso2.carbon.analytics.dataservice.restapi.Utils;
-import org.wso2.carbon.analytics.dataservice.restapi.beans.CredentialBean;
-import org.wso2.carbon.analytics.dataservice.restapi.beans.IndexTypeBean;
-import org.wso2.carbon.analytics.dataservice.restapi.beans.QueryBean;
-import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordBean;
-import org.wso2.carbon.analytics.dataservice.restapi.beans.TableBean;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsTimeoutException;
-import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsTableNotAvailableException;
-import org.wso2.carbon.analytics.datasource.core.rs.Record;
-import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
+import javax.ws.rs.core.StreamingOutput;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The Class AnalyticsResource represents the REST APIs for
@@ -58,12 +62,16 @@ import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
 @Path(Constants.ResourcePath.ROOT_CONTEXT)
 public class AnalyticsResource extends AbstractResource {
 
-	private static final int DEFAULT_START_INDEX = 0;
+    private static final int DEFAULT_START_INDEX = 0;
 	private static final int DEFAULT_INFINITY_INDEX = -1;
+    private static final Gson gson = new Gson();
 	/** The logger. */
 	private static final Log logger = LogFactory.getLog(AnalyticsResource.class);
+    public static final String STR_JSON_ARRAY_OPEN_SQUARE_BRACKET = "[";
+    public static final String STR_JSON_COMMA = ",";
+    public static final String STR_JSON_ARRAY_CLOSING_SQUARE_BRACKET = "]";
 
-	/**
+    /**
 	 * Creates the table.
 	 * @param tableBean the table name as a json object
 	 * @return the response
@@ -167,15 +175,13 @@ public class AnalyticsResource extends AbstractResource {
 	 * @param recordBeans the list of the record beans
 	 * @return the response
 	 * @throws AnalyticsException
-	 * @throws AnalyticsTableNotAvailableException
 	 */
 	@POST
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}")
 	public Response insertRecordsToTable(@PathParam("tableName")String tableName, List<RecordBean> recordBeans)
-	                                                           throws AnalyticsTableNotAvailableException,
-	                                                           AnalyticsException {
+	                                                           throws AnalyticsException {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking insertRecordsToTable");
 		}
@@ -204,8 +210,7 @@ public class AnalyticsResource extends AbstractResource {
 	@Path("tables/{tableName}/{timeFrom}/{timeTo}")
 	public Response deleteRecords(@PathParam("tableName") String tableName,
 	                              @PathParam("timeFrom") long timeFrom,
-	                              @PathParam("timeTo") long timeTo) throws AnalyticsException,
-	                                                               AnalyticsTableNotAvailableException {
+	                              @PathParam("timeTo") long timeTo) throws AnalyticsException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking deleteRecords for tenantId :" + tenantId + " tableName : " +
@@ -226,14 +231,13 @@ public class AnalyticsResource extends AbstractResource {
 	 * @param ids the ids
 	 * @return the response
 	 * @throws AnalyticsException
-	 * @throws AnalyticsTableNotAvailableException
 	 */
 	@DELETE
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}")
 	public Response deleteRecordsByIds(@PathParam("tableName") String tableName, List<String> ids)
-	                                          throws AnalyticsException, AnalyticsTableNotAvailableException {
+	                                          throws AnalyticsException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking deleteRecords for tenantId :" + tenantId + " tableName : " +
@@ -253,14 +257,12 @@ public class AnalyticsResource extends AbstractResource {
 	 * @param tableName the table name
 	 * @return the record count
 	 * @throws AnalyticsException
-	 * @throws AnalyticsTableNotAvailableException
 	 */
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}/recordcount")
 	public Response getRecordCount(@PathParam("tableName") String tableName)
-	                                                                        throws AnalyticsTableNotAvailableException,
-	                                                                        AnalyticsException {
+	                                                                        throws AnalyticsException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking getRecordCount for tableName: " + tableName + " tenantId :" +
@@ -283,35 +285,49 @@ public class AnalyticsResource extends AbstractResource {
 	 * @param count the count
 	 * @return the record groups
 	 * @throws AnalyticsException
-	 * @throws AnalyticsTableNotAvailableException
 	 */
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}/{from}/{to}/{start}/{count}")
-	public Response getRecords(@PathParam("tableName") String tableName,
+	public StreamingOutput getRecords(@PathParam("tableName") String tableName,
 	                           @PathParam("from") long timeFrom, @PathParam("to") long timeTo,
 	                           @PathParam("start") int recordsFrom, @PathParam("count") int count)
-	                                          throws AnalyticsTableNotAvailableException, AnalyticsException {
+	                                          throws AnalyticsException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking getRecordGroups for tableName: " + tableName + " tenantId :" +
 			             tenantId);
 		}
 		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
-		RecordGroup[] recordGroups;
+		final RecordGroup[] recordGroups;
 		recordGroups =
 		               analyticsDataService.get(tenantId, tableName, null, timeFrom, timeTo,
 		                                        recordsFrom, count);
-		List<RecordBean> recordBeans =
-		                               Utils.createRecordBeans(AnalyticsDSUtils.listRecords(analyticsDataService,
-		                                                                                    recordGroups));
-		if (logger.isDebugEnabled()) {
-			for (RecordBean recordBean : recordBeans) {
-				logger.debug("Retrieved -- Record Id: " + recordBean.getId() + " values :" +
-				             recordBean.toString());
-			}
-		}
-		return Response.ok(recordBeans).build();
+
+        final List<Iterator<Record>> iterators = Utils.getRecordIterators(recordGroups, analyticsDataService);
+        return new StreamingOutput() {
+            @Override
+            public void write(OutputStream outputStream)
+                    throws IOException, WebApplicationException {
+                Writer recordWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+                recordWriter.write(STR_JSON_ARRAY_OPEN_SQUARE_BRACKET);
+                for(Iterator<Record> iterator : iterators) {
+                    while (iterator.hasNext()) {
+                        RecordBean recordBean = Utils.createRecordBean(iterator.next());
+                        recordWriter.write(gson.toJson(recordBean));
+                        if (iterator.hasNext()) {
+                            recordWriter.write(STR_JSON_COMMA);
+                        }
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Retrieved -- Record Id: " + recordBean.getId() + " values :" +
+                                         recordBean.toString());
+                        }
+                    }
+                }
+                recordWriter.write(STR_JSON_ARRAY_CLOSING_SQUARE_BRACKET);
+                recordWriter.flush();
+            }
+        };
 	}
 
 	/**
@@ -321,16 +337,14 @@ public class AnalyticsResource extends AbstractResource {
 	 * @param timeTo  the time to
 	 * @return the records
 	 * @throws AnalyticsException
-	 * @throws AnalyticsTableNotAvailableException
 	 */
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}/{from}/{to}/{start}")
-	public Response getRecords(@PathParam("tableName") String tableName,
+	public StreamingOutput getRecords(@PathParam("tableName") String tableName,
 	                           @PathParam("from") long timeFrom, @PathParam("to") long timeTo,
 	                           @PathParam("start") int start)
-	                                                         throws AnalyticsTableNotAvailableException,
-	                                                         AnalyticsException {
+	                                                         throws AnalyticsException {
 		return getRecords(tableName, timeFrom, timeTo, start, DEFAULT_INFINITY_INDEX);
 	}
 
@@ -341,14 +355,13 @@ public class AnalyticsResource extends AbstractResource {
 	 * @param timeTo the time to
 	 * @return the records
 	 * @throws AnalyticsException
-	 * @throws AnalyticsTableNotAvailableException
 	 */
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}/{from}/{to}")
-	public Response getRecords(@PathParam("tableName") String tableName,
+	public StreamingOutput getRecords(@PathParam("tableName") String tableName,
 	                           @PathParam("from") long timeFrom, @PathParam("to") long timeTo)
-	                  throws AnalyticsTableNotAvailableException, AnalyticsException {
+	                  throws AnalyticsException {
 		return getRecords(tableName, timeFrom, timeTo, DEFAULT_START_INDEX, DEFAULT_INFINITY_INDEX);
 	}
 
@@ -358,15 +371,13 @@ public class AnalyticsResource extends AbstractResource {
 	 * @param timeFrom the time from
 	 * @return the records
 	 * @throws AnalyticsException
-	 * @throws AnalyticsTableNotAvailableException
 	 */
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}/{from}")
-	public Response getRecords(@PathParam("tableName") String tableName,
+	public StreamingOutput getRecords(@PathParam("tableName") String tableName,
 	                           @PathParam("from") long timeFrom)
-	                                                            throws AnalyticsTableNotAvailableException,
-	                                                            AnalyticsException {
+	                                                            throws AnalyticsException {
 		return getRecords(tableName, timeFrom, DEFAULT_INFINITY_INDEX, DEFAULT_START_INDEX,
 		                  DEFAULT_INFINITY_INDEX);
 	}
@@ -376,14 +387,12 @@ public class AnalyticsResource extends AbstractResource {
 	 * @param tableName the table name
 	 * @return the records
 	 * @throws AnalyticsException
-	 * @throws AnalyticsTableNotAvailableException
 	 */
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}")
-	public Response getRecords(@PathParam("tableName") String tableName)
-	                                                                    throws AnalyticsTableNotAvailableException,
-	                                                                    AnalyticsException {
+	public StreamingOutput getRecords(@PathParam("tableName") String tableName)
+	                                                                    throws AnalyticsException {
 		return getRecords(tableName, DEFAULT_INFINITY_INDEX, DEFAULT_INFINITY_INDEX,
 		                  DEFAULT_START_INDEX, DEFAULT_INFINITY_INDEX);
 	}
@@ -393,15 +402,13 @@ public class AnalyticsResource extends AbstractResource {
 	 * @param recordBeans the list of the record beans
 	 * @return the response
 	 * @throws AnalyticsException
-	 * @throws AnalyticsTableNotAvailableException
 	 */
 	@POST
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path(Constants.ResourcePath.RECORDS)
 	public Response insertRecords(List<RecordBean> recordBeans)
-	                                                           throws AnalyticsTableNotAvailableException,
-	                                                           AnalyticsException {
+	                                                           throws AnalyticsException {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking insertRecords");
 		}
@@ -430,8 +437,7 @@ public class AnalyticsResource extends AbstractResource {
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}/indices")
 	public Response setIndices(@PathParam("tableName") String tableName,
-	                           Map<String, IndexTypeBean> columnsBean) throws AnalyticsException,
-	                                                                  AnalyticsIndexException {
+	                           Map<String, IndexTypeBean> columnsBean) throws AnalyticsException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking setIndices for tenantId :" + tenantId + " tableName : " +
@@ -451,13 +457,12 @@ public class AnalyticsResource extends AbstractResource {
 	 * Gets the indices.
 	 * @param tableName the table name
 	 * @return the indices
-	 * @throws AnalyticsException, AnalyticsIndexException
+	 * @throws AnalyticsException
 	 */
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}/indices")
-	public Response getIndices(@PathParam("tableName") String tableName) throws AnalyticsException,
-	                                                                    AnalyticsIndexException {
+	public Response getIndices(@PathParam("tableName") String tableName) throws AnalyticsException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking getIndices for tenantId :" + tenantId + " tableName : " +
@@ -482,8 +487,7 @@ public class AnalyticsResource extends AbstractResource {
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}/indices")
 	public Response clearIndices(@PathParam("tableName") String tableName)
-	                                                                      throws AnalyticsException,
-	                                                                      AnalyticsIndexException {
+	                                                                      throws AnalyticsException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking clearIndices for tenantId :" + tenantId + " tableName : " +
@@ -499,13 +503,13 @@ public class AnalyticsResource extends AbstractResource {
 	 * Search records.
 	 * @param queryBean the query bean
 	 * @return the response
-	 * @throws AnalyticsException, AnalyticsIndexException
+	 * @throws AnalyticsException
 	 */
 	@POST
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path(Constants.ResourcePath.SEARCH)
-	public Response search(QueryBean queryBean) throws AnalyticsException, AnalyticsIndexException {
+	public Response search(QueryBean queryBean) throws AnalyticsException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking search for tenantId :" + tenantId +
@@ -541,8 +545,7 @@ public class AnalyticsResource extends AbstractResource {
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path(Constants.ResourcePath.SEARCH_COUNT)
-	public Response searchCount(QueryBean queryBean) throws AnalyticsException,
-	                                                AnalyticsIndexException {
+	public Response searchCount(QueryBean queryBean) throws AnalyticsException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking search count for tenantId :" + tenantId +
@@ -556,19 +559,19 @@ public class AnalyticsResource extends AbstractResource {
 		}
 		return Response.ok(result).build();
 	}
-	
+
 	/**
 	 * waits till indexing finishes
 	 * @param seconds tthe timeout for waiting till response returns
 	 * @return the {@link Response}response
-	 * @throws AnalyticsException, AnalyticsTimeoutException 
+	 * @throws AnalyticsException
 	 */
 	@GET
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path(Constants.ResourcePath.INDEXING_DONE)
 	public Response waitForIndexing(@QueryParam("timeout") @DefaultValue(value="-1") long seconds) 
-			throws AnalyticsException, AnalyticsTimeoutException {
+			throws AnalyticsException {
 		int tenantId = -1234;
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking waiting for indexing for tenantId :" + tenantId +
