@@ -23,6 +23,10 @@
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.spark.admin</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.analytics.spark.utils</artifactId>
+        </dependency>
         <!--spark -->
         <dependency>
             <groupId>org.wso2.apache.spark</groupId>
@@ -124,10 +128,10 @@
             <artifactId>stream</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.wso2.orbit.org.apache.mesos</groupId>
-            <artifactId>mesos</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.wso2.orbit.org.apache.mesos</groupId>-->
+            <!--<artifactId>mesos</artifactId>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>com.google.protobuf</groupId>
@@ -278,6 +282,7 @@
                             <bundles>
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.core</bundleDef>
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.admin</bundleDef>
+                                <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.utils</bundleDef>
                                 <bundleDef>org.wso2.apache.spark:spark-core_2.10</bundleDef>
                                 <bundleDef>org.wso2.apache.spark:spark-sql_2.10</bundleDef>
                                 <bundleDef>org.apache.commons:commons-lang3</bundleDef>
@@ -317,7 +322,7 @@
                                 <bundleDef>org.slf4j:slf4j-log4j12</bundleDef>
                                 <bundleDef>org.wso2.twitter:chill_2.10</bundleDef>
                                 <bundleDef>org.wso2.clearspring.analytics:stream</bundleDef>
-                                <bundleDef>org.wso2.orbit.org.apache.mesos:mesos</bundleDef>
+                                <!--<bundleDef>org.wso2.orbit.org.apache.mesos:mesos</bundleDef>-->
                                 <bundleDef>com.google.protobuf:protobuf-java</bundleDef>
                             </bundles>
                             <importFeatures>
