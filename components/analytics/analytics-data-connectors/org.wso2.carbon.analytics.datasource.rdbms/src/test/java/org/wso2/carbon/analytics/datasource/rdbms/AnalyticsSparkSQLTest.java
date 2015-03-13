@@ -64,7 +64,7 @@ public class AnalyticsSparkSQLTest {
         AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
         this.service = new AnalyticsDataServiceImpl(ars, afs, 6);
         ServiceHolder.setAnalyticsDataService(this.service);
-        SparkAnalyticsExecutor.init();
+        SparkAnalyticsExecutor.initUsingLocal();
     }
     
     @AfterClass

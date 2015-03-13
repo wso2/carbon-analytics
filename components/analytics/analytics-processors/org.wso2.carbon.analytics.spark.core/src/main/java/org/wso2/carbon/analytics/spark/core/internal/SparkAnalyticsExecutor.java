@@ -148,6 +148,13 @@ public class SparkAnalyticsExecutor {
         sqlCtx = new JavaSQLContext(sparkCtx);
     }
 
+    public static void initUsingLocal() {
+        SparkConf sparkConf = new SparkConf();
+        sparkConf.setMaster("local").setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
+        sparkCtx = new JavaSparkContext(sparkConf);
+        sqlCtx = new JavaSQLContext(sparkCtx);
+    }
+
     private static void startMaster(String host, int port, int webUIport, SparkConf sConf){
         Master.startSystemAndActor(host, port, webUIport, sConf);
     }
