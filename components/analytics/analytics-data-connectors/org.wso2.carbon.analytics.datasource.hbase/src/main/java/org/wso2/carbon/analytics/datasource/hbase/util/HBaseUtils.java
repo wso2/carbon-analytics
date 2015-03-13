@@ -37,25 +37,15 @@ import java.util.Map;
 public class HBaseUtils {
 
     private static final byte BOOLEAN_TRUE = 1;
-
     private static final byte BOOLEAN_FALSE = 0;
-
     private static final byte DATA_TYPE_NULL = 0x00;
-
     private static final byte DATA_TYPE_STRING = 0x01;
-
     private static final byte DATA_TYPE_INTEGER = 0x02;
-
     private static final byte DATA_TYPE_LONG = 0x03;
-
     private static final byte DATA_TYPE_FLOAT = 0x04;
-
     private static final byte DATA_TYPE_DOUBLE = 0x05;
-
     private static final byte DATA_TYPE_BOOLEAN = 0x06;
-
     private static final byte DATA_TYPE_BINARY = 0x07;
-
     private static final String DEFAULT_CHARSET = "UTF8";
 
     public static String normalizeTableName(String tableName) {
@@ -63,28 +53,37 @@ public class HBaseUtils {
     }
 
 
-    public static String generateAnalyticsTablePrefix(int tenantId) {
-        if (tenantId < 0) {
-            return HBaseAnalyticsDSConstants.ANALYTICS_USER_TABLE_PREFIX + "_X" + Math.abs(tenantId) + "_";
-        } else {
-            return HBaseAnalyticsDSConstants.ANALYTICS_USER_TABLE_PREFIX + "_" + tenantId + "_";
+    public static String generateTablePrefix(int tenantId, int type) {
+        String output = "";
+        switch (type) {
+            case HBaseAnalyticsDSConstants.DATA:
+                if (tenantId < 0) {
+                    output = HBaseAnalyticsDSConstants.ANALYTICS_USER_TABLE_PREFIX + "_X" + Math.abs(tenantId) + "_";
+                } else {
+                    output = HBaseAnalyticsDSConstants.ANALYTICS_USER_TABLE_PREFIX + "_" + tenantId + "_";
+                }
+                break;
+            case HBaseAnalyticsDSConstants.INDEX:
+                if (tenantId < 0) {
+                    output = HBaseAnalyticsDSConstants.ANALYTICS_INDEX_TABLE_PREFIX + "_X" + Math.abs(tenantId) + "_";
+                } else {
+                    output = HBaseAnalyticsDSConstants.ANALYTICS_INDEX_TABLE_PREFIX + "_" + tenantId + "_";
+                }
+                break;
+            case HBaseAnalyticsDSConstants.META:
+                if (tenantId < 0) {
+                    output = HBaseAnalyticsDSConstants.ANALYTICS_META_TABLE_PREFIX + "_X" + Math.abs(tenantId) + "_";
+                } else {
+                    output = HBaseAnalyticsDSConstants.ANALYTICS_META_TABLE_PREFIX + "_" + tenantId + "_";
+                }
+                break;
         }
+        return output;
+
     }
 
-    public static String generateAnalyticsTableName(int tenantId, String tableName) {
-        return generateAnalyticsTablePrefix(tenantId) + normalizeTableName(tableName);
-    }
-
-    public static String generateIndexTablePrefix(int tenantId) {
-        if (tenantId < 0) {
-            return HBaseAnalyticsDSConstants.ANALYTICS_INDEX_TABLE_PREFIX + "_X" + Math.abs(tenantId) + "_";
-        } else {
-            return HBaseAnalyticsDSConstants.ANALYTICS_INDEX_TABLE_PREFIX + "_" + tenantId + "_";
-        }
-    }
-
-    public static String generateIndexTableName(int tenantId, String tableName) {
-        return generateIndexTablePrefix(tenantId) + normalizeTableName(tableName);
+    public static String generateTableName(int tenantId, String tableName, int type) {
+        return generateTablePrefix(tenantId, type) + normalizeTableName(tableName);
     }
 
     public static String convertUserToIndexTable(String userTable) {

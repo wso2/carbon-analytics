@@ -155,7 +155,7 @@ class BatchedHBaseResultIterator implements Iterator<Record> {
         this.columns = columns;
         try {
             this.table = conn.getTable(TableName.valueOf(
-                    HBaseUtils.generateAnalyticsTableName(tenantId, tableName)));
+                    HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.DATA)));
         } catch (IOException e) {
             throw new AnalyticsException("The table " + tableName + " for tenant " + tenantId +
                     " could not be initialized for reading: " + e.getMessage(), e);

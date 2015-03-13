@@ -33,7 +33,9 @@ import org.wso2.carbon.analytics.datasource.hbase.util.HBaseUtils;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.*;
 
 public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
@@ -79,7 +81,7 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         }
 
         HTableDescriptor dataDescriptor = new HTableDescriptor(TableName.valueOf(
-                HBaseUtils.generateAnalyticsTableName(tenantId, tableName)));
+                HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.DATA)));
 
         /* creating table with standard column families "carbon-analytics-data" and "carbon-analytics-timestamp" */
         dataDescriptor.addFamily(new HColumnDescriptor(HBaseAnalyticsDSConstants.ANALYTICS_COLUMN_FAMILY_NAME))
@@ -87,7 +89,7 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
                         .setMaxVersions(1));
 
         HTableDescriptor indexDescriptor = new HTableDescriptor(TableName.valueOf(
-                HBaseUtils.generateIndexTableName(tenantId, tableName)));
+                HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.INDEX)));
         /* creating table with standard column family "carbon-analytics-index" */
         indexDescriptor.addFamily(new HColumnDescriptor(HBaseAnalyticsDSConstants.INDEX_COLUMN_FAMILY_NAME)
                 .setMaxVersions(1));
@@ -112,12 +114,26 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         return null;
     }
 
+    private byte[] serializeSchema(AnalyticsSchema schema) throws AnalyticsException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(schema);
+            oos.close();
+            byte[] output = baos.toByteArray();
+            baos.close();
+            return output;
+        } catch (IOException e) {
+            throw new AnalyticsException("Error serializing schema: " + e.getMessage(), e);
+        }
+    }
+
     @Override
     public boolean tableExists(int tenantId, String tableName) throws AnalyticsException {
         boolean isExist;
         try {
             isExist = this.admin.tableExists(TableName.valueOf(
-                    HBaseUtils.generateAnalyticsTableName(tenantId, tableName)));
+                    HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.DATA)));
         } catch (IOException e) {
             throw new AnalyticsException("Error checking existence of table " + tableName + " for tenant " + tenantId, e);
         }
@@ -132,8 +148,8 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
                     " could not be carried out since said table did not exist.");
             return;
         }
-        TableName dataTable = TableName.valueOf(HBaseUtils.generateAnalyticsTableName(tenantId, tableName));
-        TableName indexTable = TableName.valueOf(HBaseUtils.generateIndexTableName(tenantId, tableName));
+        TableName dataTable = TableName.valueOf(HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.DATA));
+        TableName indexTable = TableName.valueOf(HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.INDEX));
         try {
                 /* delete the data table first */
             this.admin.disableTable(dataTable);
@@ -162,7 +178,7 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         List<String> tables = new ArrayList<>();
         /* Handling the existence of analytics tables only, not index.
          * a caveat: the generated prefix is never null.                 */
-        String prefix = HBaseUtils.generateAnalyticsTablePrefix(tenantId);
+        String prefix = HBaseUtils.generateTablePrefix(tenantId, HBaseAnalyticsDSConstants.DATA);
         try {
             HTableDescriptor[] tableDesc = this.admin.listTables();
             String tableName;
@@ -275,7 +291,7 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
     }
 
     private String inferRecordIdentity(Record record) {
-        return HBaseUtils.generateAnalyticsTableName(record.getTenantId(), record.getTableName());
+        return HBaseUtils.generateTableName(record.getTenantId(), record.getTableName(), HBaseAnalyticsDSConstants.DATA);
     }
 
     @Override
@@ -297,7 +313,7 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
     private List<String> lookupIndex(int tenantId, String tableName, long startTime, long endTime)
             throws AnalyticsException {
         List<String> recordIds = new ArrayList<>();
-        String formattedTableName = HBaseUtils.generateIndexTableName(tenantId, tableName);
+        String formattedTableName = HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.INDEX);
         Table indexTable;
         Cell[] cells;
 
@@ -333,7 +349,7 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
     public void delete(int tenantId, String tableName, List<String> ids) throws AnalyticsException {
         Table dataTable;
         List<Delete> dataDeletes = new ArrayList<>();
-        String dataTableName = HBaseUtils.generateAnalyticsTableName(tenantId, tableName);
+        String dataTableName = HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.DATA);
         for (String recordId : ids) {
             dataDeletes.add(new Delete(recordId.getBytes()));
         }
@@ -349,7 +365,7 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
     private void deleteIndexEntries(int tenantId, String tableName, List<Long> timestamps) throws AnalyticsException {
         Table indexTable;
         List<Delete> indexDeletes = new ArrayList<>();
-        String indexTableName = HBaseUtils.generateIndexTableName(tenantId, tableName);
+        String indexTableName = HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.INDEX);
         for (Long timestamp : timestamps) {
             indexDeletes.add(new Delete(HBaseUtils.encodeLong(timestamp)));
         }
