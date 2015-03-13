@@ -45,30 +45,6 @@
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>src/main/resources</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>resources</directory>
-                                    <includes>
-                                        <include>build.properties</include>
-                                        <include>p2.inf</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.wso2.maven</groupId>
                 <artifactId>carbon-p2-plugin</artifactId>
                 <version>${carbon.p2.plugin.version}</version>
@@ -92,10 +68,10 @@
                             </adviceFile>
                             <bundles>
                                 <bundleDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.stream.core:${carbon.analytics-common.version}
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.stream.core:${carbon.analytics.common.version}
                                 </bundleDef>
                                 <bundleDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.stream.admin:${carbon.analytics-common.version}
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.stream.admin:${carbon.analytics.common.version}
                                 </bundleDef>
                             </bundles>
                             <importFeatures>

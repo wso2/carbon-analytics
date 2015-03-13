@@ -90,7 +90,7 @@
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Carbon-Component>UIBundle</Carbon-Component>
                         <Export-Package>
-                            org.wso2.carbon.event.stream.stub.*;version="${carbon.analytics-common.version}",
+                            org.wso2.carbon.event.stream.stub.*;version="${carbon.analytics.common.version}",
                         </Export-Package>
                         <Import-Package>
                             !javax.xml.namespace,
