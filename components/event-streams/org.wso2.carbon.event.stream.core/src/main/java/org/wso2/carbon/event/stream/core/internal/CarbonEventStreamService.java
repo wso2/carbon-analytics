@@ -1,0 +1,252 @@
+/*
+*  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*
+*  WSO2 Inc. licenses this file to you under the Apache License,
+*  Version 2.0 (the "License"); you may not use this file except
+*  in compliance with the License.
+*  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+* KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations
+* under the License.
+*/
+package org.wso2.carbon.event.stream.core.internal;
+
+import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.base.MultitenantConstants;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
+import org.wso2.carbon.databridge.commons.StreamDefinition;
+import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
+import org.wso2.carbon.event.stream.core.*;
+import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
+import org.wso2.carbon.event.stream.core.exception.StreamDefinitionAlreadyDefinedException;
+import org.wso2.carbon.event.stream.core.internal.ds.EventStreamServiceValueHolder;
+import org.wso2.carbon.event.stream.core.internal.util.EventStreamConstants;
+import org.wso2.carbon.event.stream.core.internal.util.SampleEventGenerator;
+import org.wso2.carbon.event.stream.core.internal.util.helper.EventStreamConfigurationFileSystemInvoker;
+
+import java.io.File;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class CarbonEventStreamService implements EventStreamService {
+
+    private static final Log log = LogFactory.getLog(CarbonEventStreamService.class);
+    private Map<Integer, Map<String, EventStreamConfiguration>> tenantSpecificEventStreamConfigs = new ConcurrentHashMap<Integer, Map<String, EventStreamConfiguration>>();
+    private EventStreamRuntime eventStreamRuntime;
+
+    public CarbonEventStreamService() {
+        eventStreamRuntime = EventStreamServiceValueHolder.getEventStreamRuntime();
+    }
+
+    public void removeEventStreamConfigurationFromMap(String fileName) {
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        Map<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
+        String streamId = null;
+        if(eventStreamConfigs != null ) {
+            for( EventStreamConfiguration eventStreamConfiguration : eventStreamConfigs.values()) {
+                if(eventStreamConfiguration.getFileName().equals(fileName)) {
+                    streamId = eventStreamConfiguration.getStreamDefinition().getStreamId();
+                    break;
+                }
+            }
+        }
+        if(streamId != null) {
+            eventStreamConfigs.remove(streamId);
+            for(EventStreamListener eventStreamListener: EventStreamServiceValueHolder.getEventStreamListenerList()) {
+                eventStreamListener.removedEventStream(tenantId,
+                        DataBridgeCommonsUtils.getStreamNameFromStreamId(streamId),
+                        DataBridgeCommonsUtils.getStreamVersionFromStreamId(streamId));
+            }
+        }
+    }
+
+    /**
+     * @param name
+     * @param version
+     * @return
+     */
+    @Override
+    public StreamDefinition getStreamDefinition(String name, String version) throws EventStreamConfigurationException {
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        Map<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
+        if(eventStreamConfigs != null && eventStreamConfigs.containsKey(name+":"+version)) {
+            return eventStreamConfigs.get(name+":"+version).getStreamDefinition();
+        }
+        return null;
+    }
+
+    /**
+     * @param streamId
+     * @return StreamDefinition and returns null if ont exist
+     */
+    @Override
+    public StreamDefinition getStreamDefinition(String streamId) throws EventStreamConfigurationException {
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        Map<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
+        if( eventStreamConfigs != null && eventStreamConfigs.containsKey(streamId)) {
+            return eventStreamConfigs.get(streamId).getStreamDefinition();
+        }
+        return null;
+    }
+
+    public EventStreamConfiguration getEventStreamConfiguration(String streamId) {
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        Map<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
+        if( eventStreamConfigs != null && eventStreamConfigs.containsKey(streamId)) {
+            return eventStreamConfigs.get(streamId);
+        }
+        return null;
+    }
+
+    @Override
+    public List<StreamDefinition> getAllStreamDefinitions() throws EventStreamConfigurationException {
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        Map<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
+        List<StreamDefinition> collection = new ArrayList<StreamDefinition>();
+        if(eventStreamConfigs == null) {
+            return collection;
+        }
+        for(EventStreamConfiguration eventStreamConfiguration : eventStreamConfigs.values()) {
+            collection.add(eventStreamConfiguration.getStreamDefinition());
+        }
+        return collection;
+    }
+
+    @Override
+    public List<EventStreamConfiguration> getAllEventStreamConfigurations() throws EventStreamConfigurationException {
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        Map<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
+        if(eventStreamConfigs == null) {
+            return new ArrayList<EventStreamConfiguration>();
+        }
+        return (List<EventStreamConfiguration>) eventStreamConfigs.values();
+    }
+
+    public void addEventStreamConfig(EventStreamConfiguration eventStreamConfiguration)
+            throws EventStreamConfigurationException {
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        Map<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
+        if (eventStreamConfigs == null) {
+            eventStreamConfigs = new HashMap<String, EventStreamConfiguration>();
+            tenantSpecificEventStreamConfigs.put(tenantId, eventStreamConfigs);
+        }
+        eventStreamConfigs.put(eventStreamConfiguration.getStreamDefinition().getStreamId(), eventStreamConfiguration);
+        for(EventStreamListener eventStreamListener: EventStreamServiceValueHolder.getEventStreamListenerList()) {
+            eventStreamListener.addedEventStream(tenantId,
+                    eventStreamConfiguration.getStreamDefinition().getName(),
+                    eventStreamConfiguration.getStreamDefinition().getVersion());
+        }
+    }
+
+    @Override
+    public void addEventStreamDefinition(StreamDefinition streamDefinition) throws
+            EventStreamConfigurationException {
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        AxisConfiguration axisConfig = getAxisConfiguration();
+        String directoryPath =  new File(axisConfig.getRepository().getPath())
+                .getAbsolutePath() + File.separator + "eventstreams";
+        File directory = new File(directoryPath);
+        if (!directory.exists()) {
+            if (!directory.mkdir()) {
+                throw new EventStreamConfigurationException("Cannot create directory to add tenant specific Event Stream : " + streamDefinition.getStreamId());
+            }
+        }
+        String filePath =  directoryPath + File.separator +
+                streamDefinition.getName() + "_"+ streamDefinition.getVersion() + ".json";
+        StreamDefinition streamDefinitionOld = getStreamDefinition(streamDefinition.getStreamId());
+        if(streamDefinitionOld != null) {
+            if(!(streamDefinitionOld.equals(streamDefinition))) {
+                throw new StreamDefinitionAlreadyDefinedException("Different stream definition with same stream id "
+                        + streamDefinition.getStreamId() +" already exist " + streamDefinitionOld.toString() +", cannot add stream definition " + streamDefinition.toString() );
+            } else {
+                return;
+            }
+        }
+        EventStreamConfigurationFileSystemInvoker.save(streamDefinition,filePath, axisConfig);
+    }
+
+    private AxisConfiguration getAxisConfiguration() {
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        AxisConfiguration axisConfig;
+        if(tenantId == MultitenantConstants.SUPER_TENANT_ID) {
+            axisConfig = EventStreamServiceValueHolder.getConfigurationContextService().getServerConfigContext().getAxisConfiguration();
+        } else {
+            axisConfig = TenantAxisUtils.getTenantAxisConfiguration(Integer.toString(tenantId),
+                    EventStreamServiceValueHolder.getConfigurationContextService().getServerConfigContext());
+        }
+        return axisConfig;
+    }
+
+    public void removeEventStreamDefinition(String streamId) throws EventStreamConfigurationException {
+        String name = null, version = null;
+        if(streamId != null && streamId.contains(StreamdefinitionStoreConstants.STREAM_ID_SPLITTER)) {
+            name = streamId.split(StreamdefinitionStoreConstants.STREAM_ID_SPLITTER)[0];
+            version = streamId.split(StreamdefinitionStoreConstants.STREAM_ID_SPLITTER)[1];
+        }
+        removeEventStreamDefinition(name,version);
+    }
+
+    @Override
+    public void removeEventStreamDefinition(String streamName, String streamVersion)
+            throws EventStreamConfigurationException {
+        AxisConfiguration axisConfig = getAxisConfiguration();
+        EventStreamConfigurationFileSystemInvoker.delete(streamName + "_"+ streamVersion + ".json", axisConfig);
+
+        log.info("Stream definition - " + streamName + ":" + streamVersion + " removed successfully");
+    }
+
+    @Override
+    public List<String> getStreamIds() throws EventStreamConfigurationException {
+        Collection<StreamDefinition> eventStreamConfigs = getAllStreamDefinitions();
+        List<String> streamDefinitionsIds = new ArrayList<String>(eventStreamConfigs.size());
+        for (StreamDefinition streamDefinition : eventStreamConfigs) {
+            streamDefinitionsIds.add(streamDefinition.getStreamId());
+        }
+
+        return streamDefinitionsIds;
+    }
+
+
+    @Override
+    public String generateSampleEvent(String streamId, String eventType)
+            throws EventStreamConfigurationException {
+
+        StreamDefinition streamDefinition = getStreamDefinition(streamId);
+
+        if (eventType.equals(EventStreamConstants.XML_EVENT)) {
+            return SampleEventGenerator.generateXMLEvent(streamDefinition);
+        } else if (eventType.equals(EventStreamConstants.JSON_EVENT)) {
+            return SampleEventGenerator.generateJSONEvent(streamDefinition);
+        } else if (eventType.equals(EventStreamConstants.TEXT_EVENT)) {
+            return SampleEventGenerator.generateTextEvent(streamDefinition);
+        }
+        return null;
+    }
+
+    public boolean isEventStreamExist(String eventStreamFileName) {
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        Map<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
+        if(eventStreamConfigs!=null) {
+            for(EventStreamConfiguration eventStreamConfiguration : eventStreamConfigs.values()) {
+                if(eventStreamConfiguration.getFileName().equals(eventStreamFileName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public EventStreamRuntime getEventStreamRuntime() {
+        return eventStreamRuntime;
+    }
+}

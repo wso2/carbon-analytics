@@ -16,25 +16,30 @@
  ~ specific language governing permissions and limitations
  ~ under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>carbon-analytics-common</artifactId>
-        <relativePath>../pom.xml</relativePath>
         <version>2.0.4-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>service-stubs</artifactId>
+    <artifactId>event-streams</artifactId>
+    <version>2.0.4-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon - Carbon Analytics Common Stubs Parent Module</name>
-    <description>WSO2 Carbon analytics common stubs</description>
+    <name>WSO2 Carbon - Event Streams</name>
+    <description>This is a Carbon bundle that represent the event stream admin module.
+    </description>
     <url>http://wso2.org</url>
 
     <modules>
-        <module>org.wso2.carbon.event.stream.stub</module>
-    </modules>
 
+        <module>org.wso2.carbon.event.stream.core</module>
+        <module>org.wso2.carbon.event.stream.admin</module>
+        <module>org.wso2.carbon.event.stream.ui</module>
+    </modules>
+    
 </project>
