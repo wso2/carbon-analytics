@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WSO2 Business Activity Monitor - Dshboard</title>
+  <link rel="stylesheet" href="assets/lib/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/keen-dashboards.css">
+  <link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body class="application">
+
+  <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../">
+          <span class="glyphicon glyphicon-stats"></span>
+        </a>
+        <a class="navbar-brand" href="./">Gadget Generation Wizard</a>
+      </div>
+      <div class="navbar-collapse collapse">
+        <ul class="nav navbar-nav navbar-left">
+          <li><a href="http://localhost/dashboard">Home</a></li>
+          <li><a href="http://localhost/dashboard">Documentation</a></li>
+          <li><a href="http://localhost/dashboard">Support</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <div class="row">
+      
+      <div class="col-md-3">
+          <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">
+                  <span class="glyphicon glyphicon-inbox"></span>
+                  <a href="http://localhost/dashboard">My Datasources</a> 
+                </h3>
+              </div>
+                <!-- List group -->
+                <ul class="list-group">
+                 <li class="list-group-item"><a href="http://localhost/dashboard/index.php/dashboard/view">WeatherData</a></li>
+                 <li class="list-group-item"><a href="http://localhost/dashboard/index.php/dashboard/view">SalesByRegion</a></li>
+                 <li class="list-group-item"><a href="http://localhost/dashboard/index.php/dashboard/index">ClickStream</a></li>
+               </ul>
+          </div>
+          <h4>Need Help?</h4>
+          <p>Give feedback or ask for help at our Support Center.</a>
+               </p>
+      </div>
+
+      <div class="col-md-9">
+
+          <!-- <div class="alert alert-danger alert-dismissable">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <strong>Reminder!</strong> This payment will due within 2 days
+          </div> -->
+
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title"><span class="glyphicon glyphicon-stats"></span>
+                <a href="http://localhost/dashboard/gadgets">Create Visualization - Step 3: Configure Chart</a> 
+              </h3>
+            </div>
+            <div class="panel-body">
+             
+             <ul class="nav nav-pills">
+               <li role="presentation" ><a href="flow-ds.html">Datasources</a></li>
+               <li role="presentation"><a href="flow-chart-types.html">Chart Type</a></li>
+               <li role="presentation" class="active"><a href="flow-chart-configure.html">Configure Chart</a></li>
+             </ul>
+
+             <hr>
+             <h4>Configure Chart</h4>
+
+              <div class="form">
+               
+               <div class="row">
+
+                  <div class="col-md-6">
+                    <div class="panel panel-default">
+                      <div class="panel-heading">
+                        <h3 class="panel-title">Rows</h3>
+                      </div>
+                      <div class="panel-body">
+                        
+                        <div class="input-group input-row-group-multiple-select col-xs-12 rowuniqueNum">
+                            <select id="selectRowsId" class="form-control" name="values[]">
+                                <option value="">Select</option>
+                            </select>
+
+                                <span class="input-group-addon input-row-group-addon-remove">
+                                <span class="glyphicon glyphicon-remove"></span>
+                                </span>
+                        </div>
+
+
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                      <div class="panel panel-default">
+                        <div class="panel-heading">
+                          <h3 class="panel-title">Columns</h3>
+                        </div>
+                        <div class="panel-body">
+                          <div class="input-group input-column-group-multiple-select col-xs-12 columnuniqueNum">
+                              <select id="selectColumnsId" class="form-control" name="values[]">
+                                  <option value="">Select</option>
+
+                              </select>
+
+                             <span class="input-group-addon input-column-group-addon-remove">
+                                  <span class="glyphicon glyphicon-remove"></span>
+                              </span>
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+                  
+             </div>
+             <!-- /row cols+rows -->
+
+             <div class="row">
+                <div class="col-md-12">
+                  <div class="panel panel-default">
+                    <div class="panel-heading">
+                      <h3 class="panel-title">Preview</h3>
+                    </div>
+                    <div class="panel-body">
+                      <div id="chart"></div>
+                    </div>
+                  </div>
+                </div>
+             </div>
+
+
+
+             <div class="row">
+               <div class="col-md-12">
+                <div class="form-group">
+                   <label for="exampleInputEmail1">Visualization Name</label>
+                   <input type="email" class="form-control" id="exampleInputEmail1" placeholder="">
+                 </div>
+                 <div class="form-group">
+                    <label for="exampleInputEmail1">Tooltip</label>
+                    <input type="email" class="form-control" id="exampleInputEmail1" placeholder="">
+                  </div>
+                  <div class="form-group">
+                    <label for="exampleInputPassword1">Label</label>
+                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="">
+                  </div>
+                 
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox"> Check me out
+                    </label>
+                  </div>
+                  <a href="flow-final.html"><button type="button" class="btn btn-success pull-right">Save Changes</button></a>
+                </div> 
+             </div>
+
+              </div>
+                <!-- /form -->
+                      
+            </div>  <!-- /panel-body -->
+          
+          </div>  <!-- /panel -->
+
+
+
+        </div>
+      <!-- /col-md-9 -->
+
+    </div>
+     <!-- /.row -->
+
+
+     <!-- Modal -->
+     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+       <div class="modal-dialog">
+         <div class="modal-content">
+           <div class="modal-header">
+             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+             <h4 class="modal-title" id="myModalLabel">Create New Dataset</h4>
+           </div>
+           <div class="modal-body">
+             <div class="well"><p class="lead blank-slate-message">Drop your data files here</p></div>
+             
+             <div class="blank-slate-message"><button type="button" class="btn btn-default">OR Upload a File Here</button></div>
+             <p>Supported Data sources are: CSV, MySQL</p>
+           </div>
+           <div class="modal-footer">
+             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+             <button type="button" class="btn btn-primary">Save changes</button>
+           </div>
+         </div>
+       </div>
+     </div>
+
+
+
+    <hr>
+    <p class="small text-muted">Built with &#9829; by <a href="https://wso2.com">WSO2</a></p>
+
+  </div>
+
+  <script src="assets/lib/jquery/dist/jquery.min.js"></script>
+  <script src="assets/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+
+  <script src="assets/lib/holderjs/holder.js"></script>
+  <script>
+    Holder.add_theme("white", { background:"#fff", foreground:"#a7a7a7", size:10 });
+  </script>
+
+  <script src="assets/lib/keen-js/dist/keen.min.js"></script>
+  <script src="assets/js/meta.js"></script>
+  <script type="text/javascript" src="assets/js/d3.min.js"></script>
+  <script type="text/javascript" src="assets/js/generic_draw.js"></script>
+
+</body>
+</html>

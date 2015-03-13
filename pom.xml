@@ -27,13 +27,15 @@
     <groupId>org.wso2.carbon.analytics-common</groupId>
     <artifactId>carbon-analytics-common</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.4-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <name>WSO2 Carbon - Carbon Analytics Common Aggregator Module</name>
     <url>http://wso2.org</url>
 
     <modules>
         <module>service-stubs</module>
-        <module>components/event-streams</module>
+        <module>components/analytics-dashboard</module>
+        <module>components/event-stream</module>
+        <!--<module>features/event-stream</module>-->
     </modules>
 
     <dependencyManagement>
@@ -104,18 +106,6 @@
             </dependency>
             <!--carbon-kernel dependencies stop-->
 
-
-            <dependency>
-                <groupId>org.wso2.siddhi</groupId>
-                <artifactId>siddhi-core</artifactId>
-                <version>${siddhi.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.event.stream.stub</artifactId>
-                <version>${carbon.event.processing.version}</version>
-            </dependency>
-
             <!--carbon-commons dependencies start-->
             <dependency>
                 <groupId>org.wso2.carbon.commons</groupId>
@@ -143,31 +133,25 @@
             </dependency>
             <!--third party dependencies stop-->
 
-            <dependency>
-                <groupId>org.wso2.carbon.commons</groupId>
-                <artifactId>org.wso2.carbon.databridge.commons</artifactId>
-                <version>${carbon.commons.version}</version>
-            </dependency>
-
             <!--carbon analytics common dependencies start-->
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.event.stream.admin</artifactId>
+                <artifactId>org.wso2.carbon.event.stream.manager.admin</artifactId>
                 <version>${carbon.event.processing.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.event.stream.core</artifactId>
+                <artifactId>org.wso2.carbon.event.stream.manager.core</artifactId>
                 <version>${carbon.event.processing.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.event.stream.stub</artifactId>
+                <artifactId>org.wso2.carbon.event.stream.manager.stub</artifactId>
                 <version>${carbon.event.processing.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.event.stream.ui</artifactId>
+                <artifactId>org.wso2.carbon.event.stream.manager.ui</artifactId>
                 <version>${carbon.event.processing.version}</version>
             </dependency>
             <!--carbon analytics common dependencies stop-->
@@ -423,7 +407,7 @@
 
         <!--CEP versions-->
         <siddhi.version>3.0.0-SNAPSHOT</siddhi.version>
-        <carbon.event.processing.version>2.0.4-SNAPSHOT</carbon.event.processing.version>
+        <carbon.event.processing.version>1.0.0-SNAPSHOT</carbon.event.processing.version>
         <storm.version>0.9.2-incubating.wso2v1</storm.version>
 
         <carbon.p2.plugin.version>1.5.3</carbon.p2.plugin.version>
