@@ -89,7 +89,7 @@ class BatchedHBaseResultIterator implements Iterator<Record> {
 
     @Override
     public void remove() {
-            /* nothing to do here */
+            /* nothing to do here, since this is a read-only iterator */
     }
 
     private void preFetch() {
@@ -106,12 +106,12 @@ class BatchedHBaseResultIterator implements Iterator<Record> {
             if (this.columns != null) {
                 for (String column : this.columns) {
                     if (column != null && !(column.isEmpty())) {
-                        get.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_COLUMN_FAMILY_NAME,
+                        get.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
                                 HBaseUtils.generateColumnQualifier(column));
                     }
                 }
             } else {
-                get.addFamily(HBaseAnalyticsDSConstants.ANALYTICS_COLUMN_FAMILY_NAME);
+                get.addFamily(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME);
             }
             gets.add(get);
         }
@@ -166,7 +166,7 @@ class BatchedHBaseResultIterator implements Iterator<Record> {
         try {
             this.table.close();
         } catch (IOException ignore) {
-                /* do nothing, the connection is dead anyway */
+            /* do nothing, the connection is dead anyway */
         }
     }
 
