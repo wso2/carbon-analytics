@@ -33,9 +33,7 @@ import org.wso2.carbon.analytics.datasource.hbase.util.HBaseUtils;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.*;
 
 public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
@@ -83,48 +81,31 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         HTableDescriptor dataDescriptor = new HTableDescriptor(TableName.valueOf(
                 HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.DATA)));
 
-        /* creating table with standard column families "carbon-analytics-data" and "carbon-analytics-timestamp" */
-        dataDescriptor.addFamily(new HColumnDescriptor(HBaseAnalyticsDSConstants.ANALYTICS_COLUMN_FAMILY_NAME))
+        /* creating table with standard column families "carbon-analytics-data" and "carbon-analytics-meta".
+         *  the meta column family name is the same as the one used in the meta table                       */
+        dataDescriptor.addFamily(new HColumnDescriptor(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME))
                 .addFamily(new HColumnDescriptor(HBaseAnalyticsDSConstants.ANALYTICS_META_COLUMN_FAMILY_NAME)
                         .setMaxVersions(1));
 
         HTableDescriptor indexDescriptor = new HTableDescriptor(TableName.valueOf(
                 HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.INDEX)));
         /* creating table with standard column family "carbon-analytics-index" */
-        indexDescriptor.addFamily(new HColumnDescriptor(HBaseAnalyticsDSConstants.INDEX_COLUMN_FAMILY_NAME)
+        indexDescriptor.addFamily(new HColumnDescriptor(HBaseAnalyticsDSConstants.ANALYTICS_INDEX_COLUMN_FAMILY_NAME)
+                .setMaxVersions(1));
+
+        HTableDescriptor metaDescriptor = new HTableDescriptor(TableName.valueOf(
+                HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.META)));
+        /* creating table with standard column family "carbon-analytics-index" */
+        metaDescriptor.addFamily(new HColumnDescriptor(HBaseAnalyticsDSConstants.ANALYTICS_META_COLUMN_FAMILY_NAME)
                 .setMaxVersions(1));
 
         /* Table creation should fail if index cannot be created, so attempting to create index table first. */
         try {
             admin.createTable(indexDescriptor);
+            admin.createTable(metaDescriptor);
             admin.createTable(dataDescriptor);
         } catch (IOException e) {
             throw new AnalyticsException("Error creating table " + tableName + " for tenant " + tenantId, e);
-        }
-    }
-
-    @Override
-    public void setTableSchema(int tenantId, String tableName, AnalyticsSchema schema) throws AnalyticsTableNotAvailableException, AnalyticsException {
-        //TODO
-    }
-
-    @Override
-    public AnalyticsSchema getTableSchema(int tenantId, String tableName) throws AnalyticsTableNotAvailableException, AnalyticsException {
-        //TODO
-        return null;
-    }
-
-    private byte[] serializeSchema(AnalyticsSchema schema) throws AnalyticsException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(schema);
-            oos.close();
-            byte[] output = baos.toByteArray();
-            baos.close();
-            return output;
-        } catch (IOException e) {
-            throw new AnalyticsException("Error serializing schema: " + e.getMessage(), e);
         }
     }
 
@@ -150,11 +131,15 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         }
         TableName dataTable = TableName.valueOf(HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.DATA));
         TableName indexTable = TableName.valueOf(HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.INDEX));
+        TableName metaTable = TableName.valueOf(HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.META));
         try {
-                /* delete the data table first */
+            /* delete the data table first */
             this.admin.disableTable(dataTable);
             this.admin.deleteTable(dataTable);
-                /* then delete the index table */
+            /* then delete the meta table  */
+            this.admin.disableTable(metaTable);
+            this.admin.deleteTable(metaTable);
+            /* finally, delete the index table */
             this.admin.disableTable(indexTable);
             this.admin.deleteTable(indexTable);
         } catch (IOException e) {
@@ -243,7 +228,7 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
                                 // TODO: change long encoding to respect HBase lexical ordering
                                 columnData = GenericUtils.encodeElement(key, columns.get(key));
                                 if (columnData.length != 0) {
-                                    put.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_COLUMN_FAMILY_NAME,
+                                    put.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
                                             HBaseUtils.generateColumnQualifier(key), timestamp, columnData);
                                 }
                             }
@@ -271,7 +256,7 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         Put indexPut = new Put(HBaseUtils.encodeLong(record.getTimestamp()));
         /* Setting the column qualifier the same as the column value to enable multiple columns per row with
         * unique qualifiers, since we will anyway not use the qualifier during index read */
-        indexPut.addColumn(HBaseAnalyticsDSConstants.INDEX_COLUMN_FAMILY_NAME, record.getId().getBytes(),
+        indexPut.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_INDEX_COLUMN_FAMILY_NAME, record.getId().getBytes(),
                 record.getId().getBytes());
         return indexPut;
     }
@@ -292,6 +277,87 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
 
     private String inferRecordIdentity(Record record) {
         return HBaseUtils.generateTableName(record.getTenantId(), record.getTableName(), HBaseAnalyticsDSConstants.DATA);
+    }
+
+    @Override
+    public void setTableSchema(int tenantId, String tableName, AnalyticsSchema schema) throws AnalyticsException {
+        byte[] encodedSchema = this.serializeSchema(schema);
+        String formattedTableName = HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.META);
+        Table metaTable;
+        try {
+            metaTable = this.conn.getTable(TableName.valueOf(formattedTableName));
+        } catch (IOException e) {
+            throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+        }
+         /* Using the table name itself as the row key, since it will be helpful in direct retrieval (well known key),
+            * and there will only ever be a single row for the schema information which we will directly retrieve,
+            * eliminating any future issue when other rows get added (if required) to the meta table.  */
+        Put put = new Put(formattedTableName.getBytes());
+        put.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_META_COLUMN_FAMILY_NAME,
+                HBaseAnalyticsDSConstants.ANALYTICS_SCHEMA_QUALIFIER_NAME, encodedSchema);
+        try{
+            metaTable.put(put);
+            metaTable.close();
+        } catch (IOException e) {
+            throw new AnalyticsException("Error setting schema to table " + tableName + " for tenant " + tenantId +
+                    " : " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public AnalyticsSchema getTableSchema(int tenantId, String tableName) throws AnalyticsException {
+        byte[] resultSchema;
+        String formattedTableName = HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.META);
+        Table metaTable;
+        try {
+            metaTable = this.conn.getTable(TableName.valueOf(formattedTableName));
+        } catch (IOException e) {
+            throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+        }
+        Get get = new Get(formattedTableName.getBytes());
+        get.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_META_COLUMN_FAMILY_NAME,
+                HBaseAnalyticsDSConstants.ANALYTICS_SCHEMA_QUALIFIER_NAME);
+        try{
+            resultSchema = metaTable.get(get).value();
+            metaTable.close();
+        } catch (IOException e) {
+            throw new AnalyticsException("Error setting schema to table " + tableName + " for tenant " + tenantId +
+                    " : " + e.getMessage(), e);
+        }
+        return this.deserializeSchema(resultSchema);
+    }
+
+    private byte[] serializeSchema(AnalyticsSchema schema) throws AnalyticsException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = null;
+        byte[] output;
+        try {
+            oos = new ObjectOutputStream(baos);
+            oos.writeObject(schema);
+            output = baos.toByteArray();
+        } catch (IOException e) {
+            throw new AnalyticsException("Error serializing schema: " + e.getMessage(), e);
+        } finally {
+            GenericUtils.closeQuietly(oos);
+            GenericUtils.closeQuietly(baos);
+        }
+        return output;
+    }
+
+    private AnalyticsSchema deserializeSchema(byte[] source) throws AnalyticsException {
+        ByteArrayInputStream bais = new ByteArrayInputStream(source);
+        ObjectInputStream ois = null;
+        AnalyticsSchema output;
+        try {
+            ois = new ObjectInputStream(bais);
+            output = (AnalyticsSchema) ois.readObject();
+        } catch (ClassNotFoundException | IOException e) {
+            throw new AnalyticsException("Error de-serializing schema: " + e.getMessage(), e);
+        } finally {
+            GenericUtils.closeQuietly(bais);
+            GenericUtils.closeQuietly(ois);
+        }
+        return output;
     }
 
     @Override
@@ -321,7 +387,7 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
 
         /* Setting (end-time)+1L because end-time is exclusive (which is not what we want) */
         Scan indexScan = new Scan(HBaseUtils.encodeLong(startTime), HBaseUtils.encodeLong(endTime + 1L));
-        indexScan.addFamily(HBaseAnalyticsDSConstants.INDEX_COLUMN_FAMILY_NAME);
+        indexScan.addFamily(HBaseAnalyticsDSConstants.ANALYTICS_INDEX_COLUMN_FAMILY_NAME);
         ResultScanner resultScanner;
         try {
             indexTable = this.conn.getTable(TableName.valueOf(formattedTableName));
