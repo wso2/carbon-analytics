@@ -308,35 +308,37 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
     
     @Test
     public void testDataRecordAddReadPerformanceNonIndex() throws AnalyticsException {
-        this.cleanupTable(50, "TableX");
+        int tenantId = 51;
+        String tableName = "TableX";
+        this.cleanupTable(tenantId, tableName);
         System.out.println("\n************** START ANALYTICS DS (WITHOUT INDEXING, H2-FILE) PERF TEST **************");
         int n = 100, batch = 200;
         List<Record> records;
         
         /* warm-up */
-        this.service.createTable(50, "TableX");      
+        this.service.createTable(tenantId, tableName);      
         for (int i = 0; i < 10; i++) {
-            records = AnalyticsRecordStoreTest.generateRecords(50, "TableX", i, batch, -1, -1);
+            records = AnalyticsRecordStoreTest.generateRecords(tenantId, tableName, i, batch, -1, -1);
             this.service.put(records);
         }
-        this.cleanupTable(50, "TableX");
+        this.cleanupTable(tenantId, tableName);
         
-        this.service.createTable(50, "TableX");
+        this.service.createTable(tenantId, tableName);
         long start = System.currentTimeMillis();
         for (int i = 0; i < n; i++) {
-            records = AnalyticsRecordStoreTest.generateRecords(50, "TableX", i, batch, -1, -1);
+            records = AnalyticsRecordStoreTest.generateRecords(tenantId, tableName, i, batch, -1, -1);
             this.service.put(records);
         }
         long end = System.currentTimeMillis();
         System.out.println("* Records: " + (n * batch));
         System.out.println("* Write Time: " + (end - start) + " ms.");
         System.out.println("* Write Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
-        List<Record> recordsIn = AnalyticsDSUtils.listRecords(this.service, this.service.get(50, "TableX", null, -1, -1, 0, -1));
+        List<Record> recordsIn = AnalyticsDSUtils.listRecords(this.service, this.service.get(tenantId, tableName, null, -1, -1, 0, -1));
         Assert.assertEquals(recordsIn.size(), (n * batch));
         end = System.currentTimeMillis();
         System.out.println("* Read Time: " + (end - start) + " ms.");
         System.out.println("* Read Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
-        this.cleanupTable(50, "TableX");
+        this.cleanupTable(tenantId, tableName);
         System.out.println("\n************** END ANALYTICS DS (WITHOUT INDEXING, H2-FILE) PERF TEST **************");
     }
     

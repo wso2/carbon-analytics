@@ -46,6 +46,29 @@ public interface AnalyticsRecordStore {
     void createTable(int tenantId, String tableName) throws AnalyticsException;
     
     /**
+     * Sets the schema for the target analytics table, if there is already one assigned, it will be 
+     * overwritten.
+     * @param tenantId The tenant id
+     * @param tableName The table name
+     * @param schema The schema to be applied to the table
+     * @throws AnalyticsTableNotAvailableException
+     * @throws AnalyticsException
+     */
+    void setTableSchema(int tenantId, String tableName, 
+            AnalyticsSchema schema) throws AnalyticsTableNotAvailableException, AnalyticsException;
+    
+    /**
+     * Retrieves the table schema for the given table.
+     * @param tenantId The tenant id
+     * @param tableName The table name
+     * @return The schema of the table
+     * @throws AnalyticsTableNotAvailableException
+     * @throws AnalyticsException
+     */
+    AnalyticsSchema getTableSchema(int tenantId, String tableName) 
+            throws AnalyticsTableNotAvailableException, AnalyticsException;
+    
+    /**
      * Checks if the specified table with the given category and name exists.
      * @param tenantId The tenant which this table belongs to
      * @param tableName The table name

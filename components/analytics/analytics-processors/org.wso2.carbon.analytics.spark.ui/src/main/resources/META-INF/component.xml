@@ -18,32 +18,78 @@
 
 
 <component xmlns="http://products.wso2.org/carbon">
-    
-
+    <servlets>
+        <servlet id="SaveSparkScriptProcessor">
+            <servlet-name>SaveSparkScriptProcessor</servlet-name>
+            <url-pattern>/carbon/spark-management/SaveSparkScriptProcessor</url-pattern>
+            <display-name>SaveSparkScriptProcessor</display-name>
+            <servlet-class>org.wso2.carbon.analytics.spark.ui.servlet.SaveSparkScriptProcessor
+            </servlet-class>
+        </servlet>
+    </servlets>
     <menus>
-     <menu>
-         <id>spark_console_parent</id>
-         <i18n-key>spark.console.menu.parent</i18n-key>
-         <i18n-bundle>org.wso2.carbon.analytics.spark.ui.i18n.Resources</i18n-bundle>
-         <parent-menu>manage_menu</parent-menu>
-         <link>#</link>
-         <region>region1</region>
-         <order>19</order>
-         <style-class>tools</style-class>
-         <icon>../spark-console/images/analyzerFramework.png</icon>
-         <!-- <require-permission>/permission/admin/manage/analytics</require-permission> -->
-     </menu>
-     <menu>
-         <id>spark_console</id>
-         <i18n-key>spark.console.menu</i18n-key>
-         <i18n-bundle>org.wso2.carbon.analytics.spark.ui.i18n.Resources</i18n-bundle>
-         <parent-menu>spark_console_parent</parent-menu>
-         <link>../spark-console/index.jsp</link>
-         <region>region1</region>
-         <order>20</order>
-         <style-class>tools</style-class>
-         <icon>../spark-console/images/list.gif</icon>
-         <!-- <require-permission>/permission/admin/manage/analytics</require-permission> -->
-     </menu>
+        <menu>
+            <id>spark_console_parent</id>
+            <i18n-key>spark.console.menu.parent</i18n-key>
+            <i18n-bundle>org.wso2.carbon.analytics.spark.ui.i18n.Resources</i18n-bundle>
+            <parent-menu>manage_menu</parent-menu>
+            <link>#</link>
+            <region>region1</region>
+            <order>19</order>
+            <style-class>tools</style-class>
+            <icon>../spark-management/images/analyzerFramework.png</icon>
+             <require-permission>/permission/admin/manage/analytics</require-permission>
+        </menu>
+        <menu>
+            <id>spark_console</id>
+            <i18n-key>spark.console.menu</i18n-key>
+            <i18n-bundle>org.wso2.carbon.analytics.spark.ui.i18n.Resources</i18n-bundle>
+            <parent-menu>spark_console_parent</parent-menu>
+            <link>../spark-management/index.jsp</link>
+            <region>region1</region>
+            <order>20</order>
+            <style-class>tools</style-class>
+            <icon>../spark-management/images/terminal.png</icon>
+             <require-permission>/permission/admin/manage/analytics</require-permission>
+        </menu>
+
+        <menu>
+            <id>spark_script</id>
+            <i18n-key>spark.script.menu</i18n-key>
+            <i18n-bundle>org.wso2.carbon.analytics.spark.ui.i18n.Resources</i18n-bundle>
+            <parent-menu>spark_console_parent</parent-menu>
+            <link>#</link>
+            <region>region1</region>
+            <order>20</order>
+            <style-class>tools</style-class>
+            <icon>../spark-management/images/script.png</icon>
+             <require-permission>/permission/admin/manage/analytics</require-permission>
+        </menu>
+
+        <menu>
+            <id>spark_script_list</id>
+            <i18n-key>spark.script.list.menu</i18n-key>
+            <i18n-bundle>org.wso2.carbon.analytics.spark.ui.i18n.Resources</i18n-bundle>
+            <parent-menu>spark_script</parent-menu>
+            <link>../spark-management/listScripts.jsp</link>
+            <region>region1</region>
+            <order>20</order>
+            <style-class>tools</style-class>
+            <icon>../spark-management/images/list.gif</icon>
+             <require-permission>/permission/admin/manage/analytics</require-permission>
+        </menu>
+
+        <menu>
+            <id>spark_script_add</id>
+            <i18n-key>spark.script.add.menu</i18n-key>
+            <i18n-bundle>org.wso2.carbon.analytics.spark.ui.i18n.Resources</i18n-bundle>
+            <parent-menu>spark_script</parent-menu>
+            <link>../spark-management/addOrEditScript.jsp</link>
+            <region>region1</region>
+            <order>20</order>
+            <style-class>tools</style-class>
+            <icon>../spark-management/images/add.gif</icon>
+             <require-permission>/permission/admin/manage/analytics</require-permission>
+        </menu>
     </menus>
 </component>

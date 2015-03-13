@@ -33,9 +33,15 @@ import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsFileSystemTest;
 import org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsRecordStoreTest;
-import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionService;
-import org.wso2.carbon.analytics.spark.core.AnalyticsSparkServiceHolder;
-import org.wso2.carbon.analytics.spark.ui.client.SparkExecutionClient;
+import org.wso2.carbon.analytics.spark.admin.dto.AnalyticsQueryResultDto;
+import org.wso2.carbon.analytics.spark.admin.dto.AnalyticsRowResultDto;
+import org.wso2.carbon.analytics.spark.admin.internal.AnalyticsResultConverter;
+import org.wso2.carbon.analytics.spark.admin.stub.AnalyticsProcessorAdminServiceStub;
+import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
+import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
+import org.wso2.carbon.analytics.spark.core.internal.SparkAnalyticsExecutor;
+import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
+import org.wso2.carbon.analytics.spark.ui.client.AnalyticsExecutionClient;
 
 import javax.naming.NamingException;
 
@@ -48,9 +54,9 @@ import java.util.List;
 public class AnalyticsSparkSQLUITest {
 
     private AnalyticsDataService service;
-    
+
     private H2FileDBAnalyticsRecordStoreTest h2arstest;
-    
+
     private H2FileDBAnalyticsFileSystemTest h2afstest;
 
     @BeforeClass
@@ -64,13 +70,13 @@ public class AnalyticsSparkSQLUITest {
         AnalyticsServiceHolder.setHazelcastInstance(null);
         AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
         this.service = new AnalyticsDataServiceImpl(ars, afs, 6);
-        AnalyticsSparkServiceHolder.setAnalyticsDataService(this.service);
-        AnalyticsExecutionService.init();
+        ServiceHolder.setAnalyticsDataService(this.service);
+        SparkAnalyticsExecutor.init();
     }
 
     @AfterClass
     public void done() throws NamingException, AnalyticsException, IOException {
-        AnalyticsExecutionService.stop();
+        SparkAnalyticsExecutor.stop();
         this.service.destroy();
         this.h2arstest.destroy();
         this.h2afstest.destroy();
@@ -79,32 +85,69 @@ public class AnalyticsSparkSQLUITest {
     @Test(expectedExceptions = RuntimeException.class)
     public void testUIJsonStringGeneration() throws Exception {
         System.out.printf("***** AnalyticsSparkSQLUITest ***** \n");
-        
+
         List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 10, -1, -1);
         this.service.deleteTable(1, "Log");
         this.service.createTable(1, "Log");
         this.service.put(records);
 
-        SparkExecutionClient client = new SparkExecutionClient();
-        String result = client.execute(1, "define table Log (server_name STRING, "
-                                          + "ip STRING, tenant INTEGER, sequence LONG, summary STRING)");
+        AnalyticsProcessorService processorService = new AnalyticsProcessorService();
+        AnalyticsExecutionClient client = new AnalyticsExecutionClient();
+
+        String query = "define table Log (server_name STRING, "
+                + "ip STRING, tenant INTEGER, sequence LONG, summary STRING)";
+        AnalyticsQueryResult queryResult = processorService.executeQuery(1, query);
+        AnalyticsQueryResultDto queryResultDto = AnalyticsResultConverter.convertResults(queryResult);
+        AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto stubDto = getResult(queryResultDto);
+        String result = client.toJsonResult(query, stubDto);
         Assert.assertEquals(result.charAt(0), '{');
-        Assert.assertEquals(result.charAt(result.length()-1), '}');
+        Assert.assertEquals(result.charAt(result.length() - 1), '}');
         System.out.println(result);
 
-        result = client.execute(1, "SELECT * FROM Log");
+        query = "SELECT * FROM Log";
+        queryResult = processorService.executeQuery(1, query);
+        queryResultDto = AnalyticsResultConverter.convertResults(queryResult);
+        stubDto = getResult(queryResultDto);
+        result = client.toJsonResult(query, stubDto);
         System.out.println(result);
         Assert.assertEquals(result.charAt(0), '{');
-        Assert.assertEquals(result.charAt(result.length()-1), '}');
+        Assert.assertEquals(result.charAt(result.length() - 1), '}');
 
 //        example of a failing query...
-        result = client.execute(1, "SELECT * from ABC");
+        query = "SELECT * from ABC";
+        queryResult = processorService.executeQuery(1, query);
+        queryResultDto = AnalyticsResultConverter.convertResults(queryResult);
+        stubDto = getResult(queryResultDto);
+        result = client.toJsonResult(query, stubDto);
         System.out.println(result);
         Assert.assertEquals(result.charAt(0), '{');
-        Assert.assertEquals(result.charAt(result.length()-1), '}');
+        Assert.assertEquals(result.charAt(result.length() - 1), '}');
 
         this.service.deleteTable(1, "Log");
-        AnalyticsExecutionService.stop();
+        SparkAnalyticsExecutor.stop();
+    }
+
+    private AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto getResult(AnalyticsQueryResultDto queryResultDto) {
+        AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto stubDto = new AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto();
+        stubDto.setColumnNames(queryResultDto.getColumnNames());
+        stubDto.setQuery(queryResultDto.getQuery());
+        stubDto.setRowsResults(getRowStubDtoResult(queryResultDto.getRowsResults()));
+        return stubDto;
+    }
+
+    private AnalyticsProcessorAdminServiceStub.AnalyticsRowResultDto[] getRowStubDtoResult(AnalyticsRowResultDto[] rowResultDto) {
+        if (rowResultDto != null) {
+            AnalyticsProcessorAdminServiceStub.AnalyticsRowResultDto[] result = new AnalyticsProcessorAdminServiceStub
+                    .AnalyticsRowResultDto[rowResultDto.length];
+            int dtoIndex = 0;
+            for (AnalyticsRowResultDto dto : rowResultDto) {
+                result[dtoIndex] = new AnalyticsProcessorAdminServiceStub.AnalyticsRowResultDto();
+                result[dtoIndex].setColumnValues(dto.getColumnValues());
+                dtoIndex++;
+            }
+            return result;
+        }
+        return null;
     }
 
 }

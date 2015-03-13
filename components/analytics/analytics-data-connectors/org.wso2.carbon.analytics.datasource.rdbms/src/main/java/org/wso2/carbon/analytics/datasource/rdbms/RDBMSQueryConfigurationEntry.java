@@ -31,6 +31,18 @@ public class RDBMSQueryConfigurationEntry {
 
     private String databaseName;
     
+    private String[] recordMetaTableInitQueries;
+    
+    private String recordMetaTableCheckQuery;
+    
+    private String recordMetaTableSelectQuery;
+    
+    private String recordMetaTableInsertQuery;
+    
+    private String recordMetaTableUpdateQuery;
+    
+    private String recordMetaTableDeleteQuery;
+    
     private String[] recordTableInitQueries;
     
     private String[] recordTableDeleteQueries;
@@ -104,6 +116,56 @@ public class RDBMSQueryConfigurationEntry {
         this.recordTableInitQueries = recordTableInitQueries;
     }
     
+    @XmlElementWrapper (name = "recordMetaTableInitQueries")
+    @XmlElement (name = "query")
+    public String[] getRecordMetaTableInitQueries() {
+        return recordMetaTableInitQueries;
+    }
+  
+    public void setRecordMetaTableInitQueries(String[] recordMetaTableInitQueries) {
+        this.recordMetaTableInitQueries = recordMetaTableInitQueries;
+    }
+    
+    public String getRecordMetaTableInsertQuery() {
+        return recordMetaTableInsertQuery;
+    }
+    
+    public void setRecordMetaTableCheckQuery(String recordMetaTableCheckQuery) {
+        this.recordMetaTableCheckQuery = recordMetaTableCheckQuery;
+    }
+    
+    public String getRecordMetaTableCheckQuery() {
+        return recordMetaTableCheckQuery;
+    }
+    
+    public void setRecordMetaTableInsertQuery(String recordMetaTableInsertQuery) {
+        this.recordMetaTableInsertQuery = recordMetaTableInsertQuery;
+    }
+    
+    public String getRecordMetaTableSelectQuery() {
+        return recordMetaTableSelectQuery;
+    }
+    
+    public void setRecordMetaTableSelectQuery(String recordMetaTableSelectQuery) {
+        this.recordMetaTableSelectQuery = recordMetaTableSelectQuery;
+    }
+    
+    public String getRecordMetaTableUpdateQuery() {
+        return recordMetaTableUpdateQuery;
+    }
+    
+    public void setRecordMetaTableUpdateQuery(String recordMetaTableUpdateQuery) {
+        this.recordMetaTableUpdateQuery = recordMetaTableUpdateQuery;
+    }
+    
+    public String getRecordMetaTableDeleteQuery() {
+        return recordMetaTableDeleteQuery;
+    }
+    
+    public void setRecordMetaTableDeleteQuery(String recordMetaTableDeleteQuery) {
+        this.recordMetaTableDeleteQuery = recordMetaTableDeleteQuery;
+    }
+
     @XmlElementWrapper (name = "recordTableDeleteQueries")
     @XmlElement (name = "query")
     public String[] getRecordTableDeleteQueries() {

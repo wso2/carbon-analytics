@@ -32,6 +32,8 @@
 
     <modules>
         <module>analytics-data-agents</module>
+        <module>analytics-processors</module>
+        <module>analytics-dashboard</module>
     </modules>
 
 </project>

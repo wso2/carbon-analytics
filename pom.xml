@@ -48,6 +48,11 @@
                 <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.spark.admin</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.fasterxml.jackson.jaxrs</groupId>
                 <artifactId>jackson-jaxrs-json-provider</artifactId>
                 <version>2.4.2</version>
@@ -105,6 +110,16 @@
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.spark.ui</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.spark.core</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.core</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
@@ -302,6 +317,11 @@
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.message.tracer.handler.stub</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.spark.stub</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
@@ -645,131 +665,43 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <dependency>
-                <groupId>org.apache.spark</groupId>
-                <artifactId>spark-network-common_2.10</artifactId>
-                <version>${spark.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.spark</groupId>
-                <artifactId>spark-network-shuffle_2.10</artifactId>
-                <version>${spark.version}</version>
-            </dependency>
 
-            <!--private packages-->
-            <dependency>
-                <groupId>org.spark-project.akka</groupId>
-                <artifactId>akka-remote_2.10</artifactId>
-                <version>${akka.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.spark-project.akka</groupId>
-                <artifactId>akka-actor_2.10</artifactId>
-                <version>${akka.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>com.typesafe</groupId>
-                <artifactId>config</artifactId>
-                <version>${typesafe.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>org.apache.spark</groupId>
                 <artifactId>spark-sql_2.10</artifactId>
                 <version>${spark.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.apache.spark</groupId>
-                <artifactId>spark-catalyst_2.10</artifactId>
-                <version>${spark.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>com.twitter</groupId>
-                <artifactId>chill-java</artifactId>
-                <version>${chill.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.twitter</groupId>
-                <artifactId>chill_2.10</artifactId>
-                <version>${chill.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-client</artifactId>
-                <version>${hadoop.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-common</artifactId>
-                <version>${hadoop.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-hdfs</artifactId>
-                <version>${hadoop.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-annotations</artifactId>
-                <version>${hadoop.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-mapreduce-client-core</artifactId>
-                <version>${hadoop.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-mapreduce-client-app</artifactId>
-                <version>${hadoop.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
-                <version>${hadoop.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-yarn-api</artifactId>
-                <version>${hadoop.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.json4s</groupId>
-                <artifactId>json4s-jackson_2.10</artifactId>
-                <version>${json4s.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.json4s</groupId>
-                <artifactId>json4s-core_2.10</artifactId>
-                <version>${json4s.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.clearspring.analytics</groupId>
-                <artifactId>stream</artifactId>
-                <version>${stream.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.uncommons.maths</groupId>
-                <artifactId>uncommons-maths</artifactId>
-                <version>${uncommons.math.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>jfree</groupId>
-                <artifactId>jcommon</artifactId>
-                <version>${jcommon.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>jfree</groupId>
-                <artifactId>jfreechart</artifactId>
-                <version>${jfreechart.version}</version>
-            </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.messageconsole.ui</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.messageconsole</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.messageconsole.server.feature</artifactId>
+                <type>zip</type>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.messageconsole.ui.feature</artifactId>
+                <type>zip</type>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.messageconsole.stub</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

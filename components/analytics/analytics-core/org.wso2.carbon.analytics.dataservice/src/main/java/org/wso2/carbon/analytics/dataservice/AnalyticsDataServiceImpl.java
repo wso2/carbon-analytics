@@ -34,6 +34,7 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsTimeoutException;
 import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
@@ -97,6 +98,18 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public void createTable(int tenantId, String tableName) throws AnalyticsException {
         this.getAnalyticsRecordStore().createTable(tenantId, tableName);
+    }
+    
+    @Override
+    public void setTableSchema(int tenantId, String tableName, AnalyticsSchema schema)
+            throws AnalyticsTableNotAvailableException, AnalyticsException {
+        this.getAnalyticsRecordStore().setTableSchema(tenantId, tableName, schema);
+    }
+    
+    @Override
+    public AnalyticsSchema getTableSchema(int tenantId, String tableName) throws AnalyticsTableNotAvailableException,
+            AnalyticsException {
+        return this.getAnalyticsRecordStore().getTableSchema(tenantId, tableName);
     }
 
     @Override
