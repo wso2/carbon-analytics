@@ -17,13 +17,14 @@
 */
 package org.wso2.carbon.analytics.datasource.hbase;
 
-import com.google.common.collect.Lists;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsSchema;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.rs.DirectAnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
@@ -98,6 +99,17 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         } catch (IOException e) {
             throw new AnalyticsException("Error creating table " + tableName + " for tenant " + tenantId, e);
         }
+    }
+
+    @Override
+    public void setTableSchema(int tenantId, String tableName, AnalyticsSchema schema) throws AnalyticsTableNotAvailableException, AnalyticsException {
+        //TODO
+    }
+
+    @Override
+    public AnalyticsSchema getTableSchema(int tenantId, String tableName) throws AnalyticsTableNotAvailableException, AnalyticsException {
+        //TODO
+        return null;
     }
 
     @Override
@@ -275,12 +287,11 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
     @Override
     public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns, List<String> ids)
             throws AnalyticsException {
-        if (this.queryConfig.getBatchSize() > ids.size()) {
-            log.debug("Utilising non-batching querying mechanism");
-            return new HBaseResultIterator(tenantId, tableName, columns, ids, this.conn);
+        int batchSize = this.queryConfig.getBatchSize();
+        if (batchSize > ids.size()) {
+            batchSize = ids.size();
         }
-        log.debug("Utilising batching-enabled querying mechanism");
-        return new BatchedHBaseResultIterator(tenantId, tableName, columns, ids, this.conn, this.queryConfig.getBatchSize());
+        return new BatchedHBaseResultIterator(tenantId, tableName, columns, ids, this.conn, batchSize);
     }
 
     private List<String> lookupIndex(int tenantId, String tableName, long startTime, long endTime)
@@ -370,256 +381,6 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
                     " could not be initialized for deletion of rows: " + e.getMessage(), e);
         }
         return timestamps;
-    }
-
-    private class HBaseResultIterator implements Iterator<Record> {
-
-        private boolean preFetched;
-        private Record nextRecord;
-
-        private Connection conn;
-
-        private String tableName, currentId;
-        private int tenantId, ids, currentIndex;
-        private long timestamp;
-
-        private List<String> recordIds, columns;
-
-        private Table table;
-
-        HBaseResultIterator(int tenantId, String tableName, List<String> columns, List<String> recordIds,
-                            Connection conn) throws AnalyticsException {
-            this.tenantId = tenantId;
-            this.tableName = tableName;
-            this.recordIds = recordIds;
-            this.columns = columns;
-            this.conn = conn;
-            this.ids = recordIds.size();
-            this.currentId = null;
-
-            try {
-                this.table = this.conn.getTable(TableName.valueOf(
-                        HBaseUtils.generateAnalyticsTableName(tenantId, tableName)));
-            } catch (IOException e) {
-                throw new AnalyticsException("The table " + tableName + " for tenant " + tenantId +
-                        " could not be initialized for reading: " + e.getMessage(), e);
-            }
-        }
-
-        @Override
-        public boolean hasNext() {
-            if (!this.preFetched) {
-                this.nextRecord = this.next();
-                this.preFetched = true;
-            }
-            boolean isFinished = (nextRecord != null);
-            if (isFinished) {
-                this.cleanup();
-            }
-            return isFinished;
-        }
-
-        @Override
-        public Record next() {
-            if (this.preFetched) {
-                this.preFetched = false;
-                Record record = this.nextRecord;
-                this.nextRecord = null;
-                return record;
-            }
-
-            if (this.currentIndex < this.ids) {
-                this.currentId = recordIds.get(this.currentIndex);
-            } else {
-                this.cleanup();
-                return null;
-            }
-
-            Get get = new Get(Bytes.toBytes(this.currentId));
-
-            /* if the list of columns to be retrieved is null, retrieve ALL columns. */
-            if (this.columns != null) {
-                for (String column : this.columns) {
-                    if (column != null && !(column.isEmpty())) {
-                        get.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_COLUMN_FAMILY_NAME,
-                                HBaseUtils.generateColumnQualifier(column));
-                    }
-                }
-            } else {
-                get.addFamily(HBaseAnalyticsDSConstants.ANALYTICS_COLUMN_FAMILY_NAME);
-            }
-            try {
-                Result currentResult = this.table.get(get);
-                Cell[] cells = currentResult.rawCells();
-                Map<String, Object> values;
-                if (cells.length > 0) {
-                    values = HBaseUtils.decodeElementValue(cells);
-                    this.timestamp = cells[0].getTimestamp();
-                    values.remove(HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
-                } else {
-                    get = new Get(Bytes.toBytes(this.currentId));
-                    get.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_META_COLUMN_FAMILY_NAME,
-                            HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
-                    Result timestampResult = this.table.get(get);
-                    this.timestamp = HBaseUtils.decodeLong(timestampResult.value());
-                    values = new HashMap<>();
-                }
-                this.currentIndex++;
-                return new Record(this.currentId, this.tenantId, this.tableName, values, this.timestamp);
-            } catch (Exception e) {
-                this.cleanup();
-                throw new HBaseRuntimeException("Error reading data from table " + this.tableName + " for tenant " +
-                        this.tenantId, e);
-            }
-        }
-
-        @Override
-        public void remove() {
-            /* do nothing, since this iterator is read-only */
-        }
-
-        private void cleanup() {
-            try {
-                this.table.close();
-                //this.conn.close();
-            } catch (IOException ignore) {
-                /* do nothing, the connection is dead anyway */
-            }
-        }
-    }
-
-    private class BatchedHBaseResultIterator implements Iterator<Record> {
-
-        private List<String> columns;
-        private List<List<String>> batchedIds;
-
-        private int tenantId, totalBatches, currentBatchIndex;
-
-        private boolean fullyFetched;
-        private long timestamp;
-        private String tableName;
-        private Table table;
-        private Connection conn;
-        private Iterator<Record> subIterator;
-
-        BatchedHBaseResultIterator(int tenantId, String tableName, List<String> columns, List<String> recordIds,
-                                   Connection conn, int batchSize) throws AnalyticsException {
-            this.tenantId = tenantId;
-            this.tableName = tableName;
-            this.columns = columns;
-            this.conn = conn;
-            try {
-                this.table = this.conn.getTable(TableName.valueOf(
-                        HBaseUtils.generateAnalyticsTableName(tenantId, tableName)));
-            } catch (IOException e) {
-                throw new AnalyticsException("The table " + tableName + " for tenant " + tenantId +
-                        " could not be initialized for reading: " + e.getMessage(), e);
-            }
-            if (batchSize <= 0) {
-                throw new AnalyticsException("Error batching records: the batch size should be a positive integer");
-            } else {
-                this.batchedIds = Lists.partition(recordIds, batchSize);
-                this.totalBatches = this.batchedIds.size();
-                /* pre-fetching from HBase and populating records for the first time */
-                this.preFetch();
-            }
-        }
-
-        @Override
-        public boolean hasNext() {
-            boolean hasMore = this.subIterator.hasNext();
-            if (!hasMore) {
-                this.preFetch();
-            }
-            return this.subIterator.hasNext();
-        }
-
-        @Override
-        public Record next() {
-            if (this.hasNext()) {
-                return this.subIterator.next();
-            } else {
-                this.cleanup();
-                throw new NoSuchElementException("No further elements exist in iterator");
-            }
-        }
-
-        @Override
-        public void remove() {
-            /* nothing to do here */
-        }
-
-        private void preFetch() {
-            if (fullyFetched || this.totalBatches == 0) {
-                return;
-            }
-            List<String> currentBatch = this.batchedIds.get(this.currentBatchIndex);
-            List<Record> fetchedRecords = new ArrayList<>();
-            List<Get> gets = new ArrayList<>();
-            for (String currentId : currentBatch) {
-                Get get = new Get(Bytes.toBytes(currentId));
-
-            /* if the list of columns to be retrieved is null, retrieve ALL columns. */
-                if (this.columns != null) {
-                    for (String column : this.columns) {
-                        if (column != null && !(column.isEmpty())) {
-                            get.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_COLUMN_FAMILY_NAME,
-                                    HBaseUtils.generateColumnQualifier(column));
-                        }
-                    }
-                } else {
-                    get.addFamily(HBaseAnalyticsDSConstants.ANALYTICS_COLUMN_FAMILY_NAME);
-                }
-                gets.add(get);
-            }
-            try {
-                Result[] results = this.table.get(gets);
-                for (Result currentResult : results) {
-                    Cell[] cells = currentResult.rawCells();
-                    byte[] rowId = currentResult.getRow();
-                    Map<String, Object> values;
-                    if (cells.length > 0) {
-                        values = HBaseUtils.decodeElementValue(cells);
-                        this.timestamp = cells[0].getTimestamp();
-                        values.remove(HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
-                    } else {
-                        Get get = new Get(rowId);
-                        get.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_META_COLUMN_FAMILY_NAME,
-                                HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
-                        Result timestampResult = this.table.get(get);
-                        this.timestamp = HBaseUtils.decodeLong(timestampResult.value());
-                        values = new HashMap<>();
-                    }
-                    fetchedRecords.add(new Record(new String(rowId), this.tenantId, this.tableName, values, this.timestamp));
-                }
-                this.subIterator = fetchedRecords.iterator();
-            } catch (Exception e) {
-                //this.cleanup();
-                throw new HBaseRuntimeException("Error reading data from table " + this.tableName + " for tenant " +
-                        this.tenantId, e);
-            }
-
-            this.currentBatchIndex++;
-            if ((this.totalBatches == 1) || this.currentBatchIndex == this.totalBatches - 1) {
-                this.fullyFetched = true;
-            }
-        }
-
-        private void cleanup() {
-            try {
-                this.table.close();
-                //this.conn.close();
-            } catch (IOException ignore) {
-                /* do nothing, the connection is dead anyway */
-            }
-        }
-    }
-
-
-    public class HBaseRuntimeException extends RuntimeException {
-        public HBaseRuntimeException(String s, Throwable t) {
-            super(s, t);
-        }
     }
 
     public class HBaseUnsupportedOperationException extends AnalyticsException {
