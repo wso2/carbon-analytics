@@ -19,10 +19,13 @@ package org.wso2.carbon.analytics.dataservice.restapi;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.indexing.IndexType;
 import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.ColumnTypeBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.IndexTypeBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.SearchResultEntryBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -272,4 +275,82 @@ public class Utils {
         return iterators;
     }
 
+    /**
+     * Create a Analytics schema from a bean class
+     * @param analyticsSchemaBean bean table schema to be convereted to Analytics Schema.
+     * @return Analytics schema
+     */
+    public static AnalyticsSchema createAnalyticsSchema(AnalyticsSchemaBean analyticsSchemaBean) {
+        Map<String, AnalyticsSchema.ColumnType> columnTypes = new HashMap<String, AnalyticsSchema.ColumnType>();
+        for (Map.Entry<String, ColumnTypeBean> columnEntry : analyticsSchemaBean.getColumns().entrySet()) {
+            columnTypes.put(columnEntry.getKey(), getColumnType(columnEntry.getValue()));
+        }
+        return new AnalyticsSchema(columnTypes, analyticsSchemaBean.getPrimaryKeys());
+    }
+
+    /**
+     * Create table schema bean from a analytics schema
+     * @param analyticsSchema Analytics schema to be converted to table schema bean
+     * @return Table schema bean
+     */
+    public static AnalyticsSchemaBean createTableSchemaBean(AnalyticsSchema analyticsSchema) {
+        Map<String, ColumnTypeBean> columnTypeBeanTypes = new HashMap<String, ColumnTypeBean>();
+        for (Map.Entry<String, AnalyticsSchema.ColumnType> columnTypeEntry :
+                analyticsSchema.getColumns().entrySet()) {
+            columnTypeBeanTypes.put(columnTypeEntry.getKey(), getColumnTypeBean(columnTypeEntry.getValue()));
+        }
+        return new AnalyticsSchemaBean(columnTypeBeanTypes,analyticsSchema.getPrimaryKeys());
+    }
+
+    /**
+     * convert a column type bean to ColumnType
+     * @param columnTypeBean ColumnType Bean to be converted to ColumnType
+     * @return ColumnType instance
+     */
+    private static AnalyticsSchema.ColumnType getColumnType(ColumnTypeBean columnTypeBean) {
+        switch (columnTypeBean) {
+            case STRING:
+                return AnalyticsSchema.ColumnType.STRING;
+            case INT:
+                return AnalyticsSchema.ColumnType.INT;
+            case LONG:
+                return AnalyticsSchema.ColumnType.LONG;
+            case FLOAT:
+                return AnalyticsSchema.ColumnType.FLOAT;
+            case DOUBLE:
+                return AnalyticsSchema.ColumnType.DOUBLE;
+            case BOOLEAN:
+                return AnalyticsSchema.ColumnType.BOOLEAN;
+            case BINARY:
+                return AnalyticsSchema.ColumnType.BINARY;
+            default:
+                return AnalyticsSchema.ColumnType.STRING;
+        }
+    }
+
+    /**
+     * convert a column type to bean type
+     * @param columnType the ColumnType to be converted to bean type
+     * @return ColumnTypeBean instance
+     */
+    private static ColumnTypeBean getColumnTypeBean(AnalyticsSchema.ColumnType columnType) {
+        switch (columnType) {
+            case STRING:
+                return ColumnTypeBean.STRING;
+            case INT:
+                return ColumnTypeBean.INT;
+            case LONG:
+                return ColumnTypeBean.LONG;
+            case FLOAT:
+                return ColumnTypeBean.FLOAT;
+            case DOUBLE:
+                return ColumnTypeBean.DOUBLE;
+            case BOOLEAN:
+                return ColumnTypeBean.BOOLEAN;
+            case BINARY:
+                return ColumnTypeBean.BINARY;
+            default:
+                return ColumnTypeBean.STRING;
+        }
+    }
 }
