@@ -21,9 +21,12 @@ package org.wso2.carbon.analytics.datasource.rdbms;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBContext;
@@ -125,5 +128,36 @@ public class RDBMSUtils {
             } catch (SQLException ignore) { /* ignore */ }
         }
     }
+    
+    public static void executeAllUpdateQueries(Connection conn, Map<String, Object[]> queries) throws AnalyticsException {
+        StringBuilder messages = new StringBuilder();
+        PreparedStatement stmt = null;
+        for (Map.Entry<String, Object[]> entry : queries.entrySet()) {
+            try {
+                stmt = conn.prepareStatement(entry.getKey());
+                for (int i = 0; i < entry.getValue().length; i++) {
+                    stmt.setObject(i + 1, entry.getValue()[i]);
+                }
+                stmt.execute();
+            } catch (SQLException e) {
+                messages.append(e.getMessage() + "\n");
+            } finally {
+                RDBMSUtils.cleanupConnection(null, stmt, null);
+            }
+        }
+        String exs = messages.toString();
+        if (exs.length() > 0) {
+            throw new AnalyticsException("Error in executing SQL queries: " + exs);
+        }
+    }
+    
+    public static Map<String, Object[]> generateNoParamQueryMap(String[] queries) {
+        Map<String, Object[]> result = new LinkedHashMap<String, Object[]>(queries.length);
+        for (String query : queries) {
+            result.put(query, new Object[0]);
+        }
+        return result;
+    }
+
         
 }

@@ -90,6 +90,14 @@ public class H2FileDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
     
     private RDBMSQueryConfigurationEntry generateQueryConfiguration() {
         RDBMSQueryConfigurationEntry conf = new RDBMSQueryConfigurationEntry();
+        String[] recordMetaTableInitQueries = new String[1];
+        recordMetaTableInitQueries[0] = "CREATE TABLE AN_TABLE_META (tenantId INTEGER, tableName VARCHAR(256), schema BINARY, PRIMARY KEY(tenantId, tableName))";
+        conf.setRecordMetaTableInitQueries(recordMetaTableInitQueries);
+        conf.setRecordMetaTableSelectQuery("SELECT tenantId, tableName, schema FROM AN_TABLE_META WHERE tenantId = ? AND tableName = ?");
+        conf.setRecordMetaTableInsertQuery("INSERT INTO AN_TABLE_META (tenantId, tableName) VALUES (?, ?)");
+        conf.setRecordMetaTableUpdateQuery("UPDATE AN_TABLE_META SET schema = ? WHERE tenantId = ? AND tableName = ?");
+        conf.setRecordMetaTableDeleteQuery("DELETE AN_TABLE_META WHERE tenantId = ? AND tableName = ?");
+        conf.setRecordMetaTableCheckQuery("SELECT * FROM AN_TABLE_META WHERE tenantId = -1 AND tableName = '_X_'");
         String[] recordTableInitQueries = new String[2];
         recordTableInitQueries[0] = "CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data BLOB, PRIMARY KEY(record_id))";
         recordTableInitQueries[1] = "CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)";

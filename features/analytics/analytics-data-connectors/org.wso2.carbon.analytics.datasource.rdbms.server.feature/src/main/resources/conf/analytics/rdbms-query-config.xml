@@ -18,6 +18,14 @@
             <query>DROP TABLE IF EXISTS {{TABLE_NAME}}</query>
             <query>DROP INDEX IF EXISTS {{TABLE_NAME}}_TIMESTAMP</query>
         </recordTableDeleteQueries>
+        <recordMetaTableInitQueries>
+            <query>CREATE TABLE AN_TABLE_META (tenantId INTEGER, tableName VARCHAR(256), schema BINARY, PRIMARY KEY(tenantId, tableName))</query>
+        </recordMetaTableInitQueries>
+        <recordMetaTableSelectQuery>SELECT tenantId, tableName, schema FROM AN_TABLE_META WHERE tenantId = ? AND tableName = ?</recordMetaTableSelectQuery>
+        <recordMetaTableInsertQuery>INSERT INTO AN_TABLE_META (tenantId, tableName) VALUES (?, ?)</recordMetaTableInsertQuery>
+        <recordMetaTableUpdateQuery>UPDATE AN_TABLE_META SET schema = ? WHERE tenantId = ? AND tableName = ?</recordMetaTableUpdateQuery>
+        <recordMetaTableDeleteQuery>DELETE AN_TABLE_META WHERE tenantId = ? AND tableName = ?</recordMetaTableDeleteQuery>
+        <recordMetaTableCheckQuery>SELECT * FROM AN_TABLE_META WHERE tenantId = -1 AND tableName = '_X_'</recordMetaTableCheckQuery>
         <recordTableInitQueries>
             <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data BLOB, PRIMARY KEY(record_id))</query>
             <query>CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)</query>
@@ -57,6 +65,14 @@
             <query>DROP TABLE IF EXISTS {{TABLE_NAME}}</query>
             <query>DROP INDEX IF EXISTS {{TABLE_NAME}}_TIMESTAMP</query>
         </recordTableDeleteQueries>
+        <recordMetaTableInitQueries>
+            <query>CREATE TABLE AN_TABLE_META (tenantId INTEGER, tableName VARCHAR(256), schema BINARY, PRIMARY KEY(tenantId, tableName))</query>
+        </recordMetaTableInitQueries>
+        <recordMetaTableSelectQuery>SELECT tenantId, tableName, schema FROM AN_TABLE_META WHERE tenantId = ? AND tableName = ?</recordMetaTableSelectQuery>
+        <recordMetaTableInsertQuery>INSERT INTO AN_TABLE_META (tenantId, tableName) VALUES (?, ?)</recordMetaTableInsertQuery>
+        <recordMetaTableUpdateQuery>UPDATE AN_TABLE_META SET schema = ? WHERE tenantId = ? AND tableName = ?</recordMetaTableUpdateQuery>
+        <recordMetaTableDeleteQuery>DELETE AN_TABLE_META WHERE tenantId = ? AND tableName = ?</recordMetaTableDeleteQuery>
+        <recordMetaTableCheckQuery>SELECT * FROM AN_TABLE_META WHERE tenantId = -1 AND tableName = '_X_'</recordMetaTableCheckQuery>
         <recordTableInitQueries>
             <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data BLOB, PRIMARY KEY(record_id))</query>
             <query>CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)</query>
