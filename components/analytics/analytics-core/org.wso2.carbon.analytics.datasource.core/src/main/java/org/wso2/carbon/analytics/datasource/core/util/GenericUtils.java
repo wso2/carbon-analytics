@@ -24,6 +24,8 @@ import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -68,6 +70,7 @@ public class GenericUtils {
 
     /**
      * Normalizes the path to make every path not end with "/".
+     *
      * @param path The path
      * @return The normalized path string
      */
@@ -186,7 +189,7 @@ public class GenericUtils {
     }
 
     public static Map<String, Object> decodeRecordValues(byte[] data,
-            Set<String> columns) throws AnalyticsException {
+                                                         Set<String> columns) throws AnalyticsException {
         /* using LinkedHashMap to retain the column order */
         Map<String, Object> result = new LinkedHashMap<String, Object>();
         ByteBuffer buffer = ByteBuffer.wrap(data);
@@ -204,45 +207,45 @@ public class GenericUtils {
                 colName = new String(buff, DEFAULT_CHARSET);
                 type = buffer.get();
                 switch (type) {
-                case DATA_TYPE_STRING:
-                    size = buffer.getInt();
-                    buff = new byte[size];
-                    buffer.get(buff, 0, size);
-                    value = new String(buff, DEFAULT_CHARSET);
-                    break;
-                case DATA_TYPE_LONG:
-                    value = buffer.getLong();
-                    break;
-                case DATA_TYPE_DOUBLE:
-                    value = buffer.getDouble();
-                    break;
-                case DATA_TYPE_BOOLEAN:
-                    boolVal = buffer.get();
-                    if (boolVal == BOOLEAN_TRUE) {
-                        value = true;
-                    } else if (boolVal == BOOLEAN_FALSE) {
-                        value = false;
-                    } else {
-                        throw new AnalyticsException("Invalid encoded boolean value: " + boolVal);
-                    }
-                    break;
-                case DATA_TYPE_INTEGER:
-                    value = buffer.getInt();
-                    break;
-                case DATA_TYPE_FLOAT:
-                    value = buffer.getFloat();
-                    break;
-                case DATA_TYPE_BINARY:
-                    size = buffer.getInt();
-                    binData = new byte[size];
-                    buffer.get(binData);
-                    value = binData;
-                    break;
-                case DATA_TYPE_NULL:
-                    value = null;
-                    break;
-                default:
-                    throw new AnalyticsException("Unknown encoded data source type : " + type);
+                    case DATA_TYPE_STRING:
+                        size = buffer.getInt();
+                        buff = new byte[size];
+                        buffer.get(buff, 0, size);
+                        value = new String(buff, DEFAULT_CHARSET);
+                        break;
+                    case DATA_TYPE_LONG:
+                        value = buffer.getLong();
+                        break;
+                    case DATA_TYPE_DOUBLE:
+                        value = buffer.getDouble();
+                        break;
+                    case DATA_TYPE_BOOLEAN:
+                        boolVal = buffer.get();
+                        if (boolVal == BOOLEAN_TRUE) {
+                            value = true;
+                        } else if (boolVal == BOOLEAN_FALSE) {
+                            value = false;
+                        } else {
+                            throw new AnalyticsException("Invalid encoded boolean value: " + boolVal);
+                        }
+                        break;
+                    case DATA_TYPE_INTEGER:
+                        value = buffer.getInt();
+                        break;
+                    case DATA_TYPE_FLOAT:
+                        value = buffer.getFloat();
+                        break;
+                    case DATA_TYPE_BINARY:
+                        size = buffer.getInt();
+                        binData = new byte[size];
+                        buffer.get(binData);
+                        value = binData;
+                        break;
+                    case DATA_TYPE_NULL:
+                        value = null;
+                        break;
+                    default:
+                        throw new AnalyticsException("Unknown encoded data source type : " + type);
                 }
                 if (columns == null || columns.contains(colName)) {
                     result.put(colName, value);
@@ -256,7 +259,7 @@ public class GenericUtils {
 
     @SuppressWarnings("unchecked")
     public static List<Record> listRecords(AnalyticsRecordStore rs,
-            RecordGroup[] rgs) throws AnalyticsException {
+                                           RecordGroup[] rgs) throws AnalyticsException {
         List<Record> result = new ArrayList<Record>();
         for (RecordGroup rg : rgs) {
             result.addAll(IteratorUtils.toList(rs.readRecords(rg)));
@@ -264,25 +267,15 @@ public class GenericUtils {
         return result;
     }
 
-    public static byte[] encodeLong(long value) {
-        return new byte[] {
-                (byte) (value >> 56),
-                (byte) (value >> 48),
-                (byte) (value >> 40),
-                (byte) (value >> 32),
-                (byte) (value >> 24),
-                (byte) (value >> 16),
-                (byte) (value >> 8),
-                (byte) value
-        };
-    }
-
-    public static long decodeLong(byte[] arr) {
-        long value = 0;
-        for (byte b : arr) {
-            value = (value << 8) + (b & 0xff);
+    public static void closeQuietly(Closeable closeable) {
+        try {
+            if (closeable != null) {
+                closeable.close();
+            }
+        } catch (IOException ignore) {
+            /* ignore */
         }
-        return value;
+
     }
 
 }
