@@ -51,11 +51,6 @@ public class AnalyticsComponent {
         AnalyticsProcessorService analyticsProcessorService = new AnalyticsProcessorService();
         ctx.getBundleContext().registerService(AnalyticsProcessorService.class, analyticsProcessorService, null);
         ServiceHolder.setAnalyticsProcessorService(analyticsProcessorService);
-        try {
-            AnalyticsPersistenceManager.getInstance().initialize(MultitenantConstants.SUPER_TENANT_ID);
-        } catch (RegistryException e) {
-            log.error("Error while initializing the analytics spark component. " + e.getMessage(), e);
-        }
     }
 
     protected void setTaskService(TaskService taskService) {

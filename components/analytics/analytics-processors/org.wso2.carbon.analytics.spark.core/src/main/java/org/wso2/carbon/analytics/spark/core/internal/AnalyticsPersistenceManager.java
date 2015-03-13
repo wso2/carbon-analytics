@@ -51,8 +51,7 @@ public class AnalyticsPersistenceManager {
         return instance;
     }
 
-    public void initialize(int tenantId) throws RegistryException {
-        UserRegistry registry = ServiceHolder.getTenantConfigRegistry(tenantId);
+    public void createScriptsCollectionIfNotExists(UserRegistry registry) throws RegistryException {
         if (!registry.resourceExists(AnalyticsConstants.ANALYTICS_SCRIPTS_LOCATION)) {
             Collection collection = registry.newCollection();
             registry.put(AnalyticsConstants.ANALYTICS_SCRIPTS_LOCATION, collection);
@@ -63,6 +62,7 @@ public class AnalyticsPersistenceManager {
             throws AnalyticsPersistenceException {
         try {
             UserRegistry userRegistry = ServiceHolder.getTenantConfigRegistry(tenantId);
+            createScriptsCollectionIfNotExists(userRegistry);
             String scriptLocation = getScriptLocation(scriptName);
             if (!userRegistry.resourceExists(scriptLocation)) {
                 AnalyticsScript script = processAndGetAnalyticsScript(scriptName, scriptContent, cron, null);
@@ -204,6 +204,7 @@ public class AnalyticsPersistenceManager {
     public List<AnalyticsScript> getAllAnalyticsScripts(int tenantId) throws AnalyticsPersistenceException {
         try {
             UserRegistry registry = ServiceHolder.getTenantConfigRegistry(tenantId);
+            createScriptsCollectionIfNotExists(registry);
             Collection scriptsCollection = (Collection) registry.get(AnalyticsConstants.ANALYTICS_SCRIPTS_LOCATION);
             String[] scripts = scriptsCollection.getChildren();
             if (scripts != null) {

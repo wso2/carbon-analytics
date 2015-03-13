@@ -18,6 +18,7 @@
 package org.wso2.carbon.analytics.datasink;
 
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.analytics.datasink.internal.util.AnalyticsDatasinkConstants;
 import org.wso2.carbon.analytics.datasink.internal.util.ServiceHolder;
@@ -34,12 +35,24 @@ import java.util.*;
 public class AnalyticsDSConnector {
 
     public void addStream(int tenantId, StreamDefinition streamDefinition) throws AnalyticsException {
-        ServiceHolder.getAnalyticsDataService().createTable(tenantId, generateTableName(streamDefinition));
+        String tableName = generateTableName(streamDefinition);
+        ServiceHolder.getAnalyticsDataService().createTable(tenantId, tableName);
+        ServiceHolder.getAnalyticsDataService().setTableSchema(tenantId, tableName, getSchema(streamDefinition));
     }
 
     public void insertEvents(int tenantId, List<Event> events) throws StreamDefinitionStoreException,
             AnalyticsException {
         ServiceHolder.getAnalyticsDataService().put(convertEventsToRecord(tenantId, events));
+    }
+
+    private AnalyticsSchema getSchema(StreamDefinition streamDefinition) {
+        Map<String, AnalyticsSchema.ColumnType> columns = new HashMap<>();
+        populateColumnSchema(AnalyticsDatasinkConstants.EVENT_META_DATA_TYPE,
+                streamDefinition.getMetaData(), columns);
+        populateColumnSchema(AnalyticsDatasinkConstants.EVENT_CORRELATION_DATA_TYPE,
+                streamDefinition.getCorrelationData(), columns);
+        populateColumnSchema(null, streamDefinition.getPayloadData(), columns);
+        return new AnalyticsSchema(columns, new ArrayList<String>());
     }
 
     private String generateTableName(StreamDefinition streamDefinition) {
@@ -52,12 +65,12 @@ public class AnalyticsDSConnector {
 
     private List<Record> convertEventsToRecord(int tenantId, List<Event> events)
             throws StreamDefinitionStoreException {
-        List<Record> records = new ArrayList<Record>();
+        List<Record> records = new ArrayList<>();
         for (Event event : events) {
             long timestamp;
             StreamDefinition streamDefinition = ServiceHolder.getStreamDefinitionStoreService().
                     getStreamDefinition(event.getStreamId(), tenantId);
-            Map<String, Object> eventAttributes = new HashMap<String, Object>();
+            Map<String, Object> eventAttributes = new HashMap<>();
             populateCommonAttributes(streamDefinition, eventAttributes);
             populateTypedAttributes(AnalyticsDatasinkConstants.EVENT_META_DATA_TYPE,
                     streamDefinition.getMetaData(),
@@ -70,13 +83,10 @@ public class AnalyticsDSConnector {
                     event.getPayloadData(), eventAttributes);
 
             if (event.getArbitraryDataMap() != null && !event.getArbitraryDataMap().isEmpty()) {
-                Iterator<String> eventArbitraryFieldsIterator = event.getArbitraryDataMap().keySet().iterator();
-                while (eventArbitraryFieldsIterator.hasNext()) {
-                    String attributeName = eventArbitraryFieldsIterator.next();
+                for (String attributeName : event.getArbitraryDataMap().keySet()) {
                     eventAttributes.put("_" + attributeName, event.getArbitraryDataMap().get(attributeName));
                 }
             }
-
             if (event.getTimeStamp() != 0L) {
                 timestamp = event.getTimeStamp();
             } else {
@@ -96,14 +106,51 @@ public class AnalyticsDSConnector {
         }
         int iteration = 0;
         for (Attribute attribute : attributes) {
-            String attributeKey;
-            if (type == null) {
-                attributeKey = attribute.getName();
-            } else {
-                attributeKey = type + "_" + attribute.getName();
-            }
+            String attributeKey = getAttributeKey(type, attribute.getName());
             eventAttribute.put(attributeKey, values[iteration]);
             iteration++;
+        }
+    }
+
+    private String getAttributeKey(String type, String attributeName) {
+        if (type == null) {
+            return attributeName;
+        } else {
+            return type + "_" + attributeName;
+        }
+    }
+
+    private void populateColumnSchema(String type, List<Attribute> attributes, Map<String, AnalyticsSchema.ColumnType> schema) {
+        if (attributes == null) {
+            return;
+        }
+        AnalyticsSchema.ColumnType columnType;
+        String columnName;
+        for (Attribute attribute : attributes) {
+            columnName = getAttributeKey(type, attribute.getName());
+            switch (attribute.getType()) {
+                case STRING:
+                    columnType = AnalyticsSchema.ColumnType.STRING;
+                    break;
+                case BOOL:
+                    columnType = AnalyticsSchema.ColumnType.BOOLEAN;
+                    break;
+                case DOUBLE:
+                    columnType = AnalyticsSchema.ColumnType.DOUBLE;
+                    break;
+                case FLOAT:
+                    columnType = AnalyticsSchema.ColumnType.FLOAT;
+                    break;
+                case INT:
+                    columnType = AnalyticsSchema.ColumnType.INT;
+                    break;
+                case LONG:
+                    columnType = AnalyticsSchema.ColumnType.LONG;
+                    break;
+                default:
+                    columnType = AnalyticsSchema.ColumnType.BINARY;
+            }
+            schema.put(columnName, columnType);
         }
     }
 
