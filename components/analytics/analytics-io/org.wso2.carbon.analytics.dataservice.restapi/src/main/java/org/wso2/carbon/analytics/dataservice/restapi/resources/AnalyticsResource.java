@@ -25,11 +25,13 @@ import org.wso2.carbon.analytics.dataservice.indexing.IndexType;
 import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.restapi.Constants;
 import org.wso2.carbon.analytics.dataservice.restapi.Utils;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.IndexTypeBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.QueryBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.TableBean;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
 
@@ -582,32 +584,49 @@ public class AnalyticsResource extends AbstractResource {
 		return handleResponse(ResponseStatus.SUCCESS, "Indexing Completed successfully");
 	}
 
+    /**
+     * Sets a analytics Schema for a table
+     * @param tableName table Name of which the analytics schema to be set
+     * @param analyticsSchemaBean table schema which represents the analytics schema
+     * @return the {@link Response} response
+     * @throws AnalyticsException
+     */
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON})
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Path("getppl")
-    public Response getPeople() {
-        return Response.ok("{ \"Result\":\"OK\", \"Records\":[ {\"PersonId\":1,\"Name\":\"Benjamin Button\"," +
-                           "\"Age\":17,\"RecordDate\":\"\\/Date(1320259705710)\\/\"}, {\"PersonId\":2," +
-                           "\"Name\":\"Douglas Adams\",\"Age\":42,\"RecordDate\":\"\\/Date(1320259705710)\\/\"}, " +
-                           "{\"PersonId\":3,\"Name\":\"Isaac Asimov\",\"Age\":26,\"RecordDate\":\"\\/Date" +
-                           "(1320259705710)\\/\",\"no\":26}, {\"PersonId\":4,\"Name\":\"Thomas More\",\"Age\":65," +
-                           "\"RecordDate\":\"\\/Date(1320259705710)\\/\"} ], \"TotalRecordCount\": 33 }", MediaType.APPLICATION_JSON).build();
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    @Path("tables/{tableName}/schema")
+    public Response setTableSchema(@PathParam("tableName") String tableName, AnalyticsSchemaBean analyticsSchemaBean)
+            throws AnalyticsException {
+        int tenantId = -1234;
+        if (logger.isDebugEnabled()) {
+            logger.debug("Invoking setTableSchema for tenantId :" + tenantId +
+                         " tableName : " + tableName);
+        }
+        AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
+        AnalyticsSchema analyticsSchema =Utils.createAnalyticsSchema(analyticsSchemaBean);
+        analyticsDataService.setTableSchema(tenantId, tableName, analyticsSchema);
+        return handleResponse(ResponseStatus.SUCCESS,"Successfully set table schema for table: " + tableName);
     }
 
+    /**
+     * Gets the analytics schema of a table
+     * @param tableName the table name of which the schema to be retreived
+     * @return Response containing the analytics schema
+     * @throws AnalyticsException
+     */
     @GET
-    @Consumes({ MediaType.APPLICATION_JSON})
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Path("getSchema/{tableName}")
-    public Response schema(@PathParam("tableName")  String tableName) {
-        System.out.println("tableName = " + tableName);
-        if (tableName.equals("a")) {
-            return Response.ok("[ { \"column\": \"Name\", \"type\": \"String\" }, { \"column\": \"Address\", \"type\": \"String\" }, { \"column\": \"phone\", \"type\": \"String\" }, { \"column\": \"age\", \"type\": \"int\" }, { \"column\": \"time\", \"type\": \"long\" } ]", MediaType.APPLICATION_JSON_TYPE).build();
-
-        } else if (tableName.equals("b")) {
-            return Response.ok("[ { \"column\": \"Name\", \"type\": \"String\" }, { \"column\": \"Address\", \"type\": \"String\" }, { \"column\": \"phone\", \"type\": \"String\" }, { \"column\": \"age\", \"type\": \"int\" }, { \"column\": \"time\", \"type\": \"long\" }, { \"column\": \"school\", \"type\": \"Stirng\" }, { \"column\": \"exam\", \"type\": \"int\" }, { \"column\": \"url\", \"type\": \"boolean\" } ]", MediaType.APPLICATION_JSON_TYPE).build();
-        } else {
-            return Response.ok("[ { \"column\": \"Name\", \"type\": \"String\" }, { \"column\": \"Address\", \"type\": \"String\" }, { \"column\": \"phone\", \"type\": \"String\" }, { \"column\": \"age\", \"type\": \"int\" }, { \"column\": \"time\", \"type\": \"long\" }, { \"column\": \"school\", \"type\": \"Stirng\" }, { \"column\": \"exam\", \"type\": \"int\" }, { \"column\": \"url\", \"type\": \"boolean\" }, { \"column\": \"job\", \"type\": \"boolean\" } ]", MediaType.APPLICATION_JSON_TYPE).build();
+    @Produces({MediaType.APPLICATION_JSON})
+    @Path("tables/{tableName}/schema")
+    public Response getTableSchema(@PathParam("tableName") String tableName)
+            throws AnalyticsException{
+        int tenantId = -1234;
+        if (logger.isDebugEnabled()) {
+            logger.debug("Invoking getTableSchema for tenantId :" + tenantId +
+                         " table : " + tableName);
         }
+        AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
+        AnalyticsSchema analyticsSchema = analyticsDataService.getTableSchema(tenantId, tableName);
+        AnalyticsSchemaBean analyticsSchemaBean = Utils.createTableSchemaBean(analyticsSchema);
+        return Response.ok(analyticsSchemaBean).build();
     }
 }
