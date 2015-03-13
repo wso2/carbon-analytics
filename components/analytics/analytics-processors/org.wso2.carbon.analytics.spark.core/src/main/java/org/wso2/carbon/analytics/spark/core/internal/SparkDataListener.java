@@ -36,11 +36,11 @@ import java.util.List;
 /**
  * Created by niranda on 3/12/15.
  */
-public class SparkDataListener /*implements Runnable */ {
+public class SparkDataListener implements Runnable  {
 
-    public static void main(String[] args) {
-        run();
-    }
+//    public static void main(String[] args) {
+//        run();
+//    }
 
 
     /**
@@ -54,10 +54,10 @@ public class SparkDataListener /*implements Runnable */ {
      *
      * @see Thread#run()
      */
-//    @Override
-    public static void run() {
-//    public void run() {
-        String destFolderPath = "/home/niranda/wso2/bam-m1/wso2bam-3.0.0-SNAPSHOT/repository/data/spark-data";
+    @Override
+    public void run() {
+//    public static void run() {
+    String destFolderPath = "/home/niranda/wso2/bam-m1/wso2bam-3.0.0-SNAPSHOT/repository/data/spark-data";
 
         //define a folder root
         Path dir = Paths.get(destFolderPath);

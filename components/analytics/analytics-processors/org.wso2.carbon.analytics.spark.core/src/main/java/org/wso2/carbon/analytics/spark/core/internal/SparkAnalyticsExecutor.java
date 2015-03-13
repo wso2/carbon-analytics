@@ -120,7 +120,7 @@ public class SparkAnalyticsExecutor {
         ExecutorService executor =
                 Executors.newFixedThreadPool(1);
         SparkDataListener listener = new SparkDataListener();
-//        executor.execute(listener);
+        executor.execute(listener);
     }
 
     public static void stop() {
