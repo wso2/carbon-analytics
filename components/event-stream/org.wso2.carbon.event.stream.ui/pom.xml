@@ -16,53 +16,50 @@
  ~ specific language governing permissions and limitations
  ~ under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
-        <artifactId>event-streams</artifactId>
-        <version>2.0.4-SNAPSHOT</version>
+        <artifactId>event-stream</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>org.wso2.carbon.event.stream.admin</artifactId>
-    <version>2.0.4-SNAPSHOT</version>
+    <artifactId>org.wso2.carbon.event.stream.ui</artifactId>
     <packaging>bundle</packaging>
-    <name>WSO2 Carbon - Event Stream Admin</name>
-    <description>This is a Carbon bundle that represent the event stream admin module.
+    <name>WSO2 Carbon - Event Stream UI</name>
+    <description>This is a Carbon bundle that represent the event stream ui module.
     </description>
     <url>http://wso2.org</url>
 
+
     <dependencies>
         <dependency>
-            <groupId>org.wso2.carbon.analytics-common</groupId>
-            <artifactId>org.wso2.carbon.event.stream.core</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.core</artifactId>
+            <artifactId>org.wso2.carbon.ui</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.utils</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.event.stream.stub</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
     </dependencies>
+
 
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.felix</groupId>
-                <artifactId>maven-scr-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -70,11 +67,13 @@
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Carbon-Component>UIBundle</Carbon-Component>
                         <Export-Package>
-                            org.wso2.carbon.event.stream.admin.*,
+                            org.wso2.carbon.event.stream.ui.*,
                         </Export-Package>
                         <Import-Package>
-                            org.wso2.carbon.event.stream.core.*,
+                            org.wso2.carbon.event.stream.stub.*,
                             org.wso2.carbon.utils,
+                            org.apache.axis2.*,
+                            org.apache.axiom.*,
                             *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
@@ -83,5 +82,5 @@
             </plugin>
         </plugins>
     </build>
-    
 </project>
+
