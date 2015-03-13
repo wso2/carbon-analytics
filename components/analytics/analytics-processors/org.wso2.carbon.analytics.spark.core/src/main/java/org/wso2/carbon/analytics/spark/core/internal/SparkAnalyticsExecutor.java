@@ -33,6 +33,7 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
+import org.wso2.carbon.analytics.spark.core.internal.SparkDataListener;
 import scala.Option;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
@@ -50,6 +51,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * This class represents the analytics query execution context.
@@ -65,9 +68,12 @@ public class SparkAnalyticsExecutor {
     private static JavaSQLContext sqlCtx;
 
     public static void init() {
+
+        initSparkDataListener();
+
         SparkConf sparkConf = new SparkConf();
 
-/*        //conf master
+        //conf master
         Master.startSystemAndActor("localhost", 4500, 8081, sparkConf);
 
         //conf worker
@@ -104,10 +110,17 @@ public class SparkAnalyticsExecutor {
                     }
                 });
 
-        sparkConf.setMaster("spark://localhost:4500").setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);*/
-        sparkConf.setMaster("local[2]").setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
+        sparkConf.setMaster("spark://localhost:4500").setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
+//        sparkConf.setMaster("local[2]").setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
         sparkCtx = new JavaSparkContext(sparkConf);
         sqlCtx = new JavaSQLContext(sparkCtx);
+    }
+
+    private static void initSparkDataListener() {
+        ExecutorService executor =
+                Executors.newFixedThreadPool(1);
+        SparkDataListener listener = new SparkDataListener();
+//        executor.execute(listener);
     }
 
     public static void stop() {
