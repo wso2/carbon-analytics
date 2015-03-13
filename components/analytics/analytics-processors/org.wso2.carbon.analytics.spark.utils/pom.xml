@@ -31,14 +31,6 @@
     <name>WSO2 Carbon - Analytics Spark Utils</name>
     <packaging>bundle</packaging>
 
-    <dependencies>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.0</version>
-        </dependency>
-    </dependencies>
-
     <build>
         <plugins>
             <plugin>

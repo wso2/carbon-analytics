@@ -17,8 +17,6 @@ package org.apache.spark.executor;
  * under the License.
  */
 
-import org.apache.commons.io.FileUtils;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -28,17 +26,17 @@ import java.util.UUID;
  * a proxy class to mimic the CoarseGrainedExecutorBackend class in spark
  */
 public class CoarseGrainedExecutorBackend {
+    private static final String DIR_RELATIVE_PATH = "../../../repository/data/spark-data";;
+
     public static void main(String[] args) {
         BufferedWriter writer = null;
         try {
             UUID uuid = UUID.randomUUID();
-            String destFolderPath = "/home/niranda/wso2/bam-m1/wso2bam-3.0.0-SNAPSHOT/repository/data/spark-data";
-            File destDir = new File(destFolderPath);
-            if (destDir.exists() && destDir.isDirectory()) {
-                FileUtils.cleanDirectory(destDir);
-            } else {
+            File destDir = new File(DIR_RELATIVE_PATH);
+            if (!destDir.exists()){
                 destDir.mkdirs();
             }
+
             File file = new File(destDir.getPath() + "/" + uuid.toString());
             writer = new BufferedWriter(new FileWriter(file));
             for (String line : args) {

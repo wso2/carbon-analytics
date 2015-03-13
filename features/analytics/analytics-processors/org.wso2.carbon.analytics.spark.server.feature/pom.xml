@@ -124,6 +124,16 @@
             <artifactId>stream</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.wso2.orbit.org.apache.mesos</groupId>
+            <artifactId>mesos</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+        </dependency>
+
         <!--child deps -->
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
@@ -220,6 +230,31 @@
         </resources>
         <plugins>
             <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>src/main/resources</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>resources</directory>
+                                    <includes>
+                                        <include>analytics.war</include>
+                                        <include>p2.inf</include>
+                                        <include>build.properties</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.wso2.maven</groupId>
                 <artifactId>carbon-p2-plugin</artifactId>
                 <executions>
@@ -282,6 +317,8 @@
                                 <bundleDef>org.slf4j:slf4j-log4j12</bundleDef>
                                 <bundleDef>org.wso2.twitter:chill_2.10</bundleDef>
                                 <bundleDef>org.wso2.clearspring.analytics:stream</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.apache.mesos:mesos</bundleDef>
+                                <bundleDef>com.google.protobuf:protobuf-java</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}

@@ -18,8 +18,11 @@
 
 package org.wso2.carbon.analytics.spark.core.internal;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.spark.executor.CoarseGrainedExecutorBackend;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
@@ -32,77 +35,67 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.List;
 
+import org.wso2.carbon.utils.CarbonUtils;
 
 /**
- * Created by niranda on 3/12/15.
+ * This class listens to the repository/data/spark-data directory for spark data changes
  */
-public class SparkDataListener implements Runnable  {
+public class SparkDataListener implements Runnable {
 
-//    public static void main(String[] args) {
-//        run();
-//    }
+    private static final String DIR_RELATIVE_PATH = "repository/data/spark-data";
+    private static final Log log = LogFactory.getLog(SparkDataListener.class);
 
-
-    /**
-     * When an object implementing interface <code>Runnable</code> is used
-     * to create a thread, starting the thread causes the object's
-     * <code>run</code> method to be called in that separately executing
-     * thread.
-     * <p/>
-     * The general contract of the method <code>run</code> is that it may
-     * take any action whatsoever.
-     *
-     * @see Thread#run()
-     */
     @Override
     public void run() {
-//    public static void run() {
-    String destFolderPath = "/home/niranda/wso2/bam-m1/wso2bam-3.0.0-SNAPSHOT/repository/data/spark-data";
 
-        //define a folder root
+        String destFolderPath = CarbonUtils.getCarbonHome() + "/" + DIR_RELATIVE_PATH;
         Path dir = Paths.get(destFolderPath);
-
 
         try {
             WatchService watcher = FileSystems.getDefault().newWatchService();
-            dir.register(watcher, StandardWatchEventKinds.ENTRY_CREATE,
-                         StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
+            dir.register(watcher, StandardWatchEventKinds.ENTRY_CREATE
+                    , StandardWatchEventKinds.ENTRY_MODIFY);
 
             for (; ; ) {
                 WatchKey watckKey = watcher.take();
                 List<WatchEvent<?>> events = watckKey.pollEvents();
                 for (WatchEvent event : events) {
-                    if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE
-//                        || event.kind() == StandardWatchEventKinds.ENTRY_DELETE
-                        || event.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
-
+                    if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
                         String fileName = event.context().toString();
-                        System.out.println("changed: " + fileName);
+                        final String[] argArray = getArgArray(Paths.get(destFolderPath, fileName));
+                        System.out.println("file: " + fileName);
+                        for (String str : argArray) {
+                            System.out.println(str);
+                        }
+                        if (new File(destFolderPath+"/"+fileName).delete()){
+                            System.out.println("deleted file: "+ fileName);
+                        }
 
-                        String[] argArray = getArgArray(Paths.get(destFolderPath, fileName));
-//                        for (String line : argArray) {
-//                            System.out.println(line);
-//                        }
-                        CoarseGrainedExecutorBackend.main(argArray);
-                        break;
+                        //todo: spawn this in a new thread
+//                        CoarseGrainedExecutorBackend.main(argArray);
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                CoarseGrainedExecutorBackend.main(argArray);
+                            }
+                        }).start();
+
+//                        break;
                     }
                 }
+
                 boolean valid = watckKey.reset();
                 if (!valid) {
                     break;
                 }
             }
-
         } catch (Exception e) {
-            System.out.println("Error: " + e.toString());
+            log.error(e.toString());
         }
-
-
     }
 
     private static String[] getArgArray(Path filePath) throws IOException {
         List<String> lines = Files.readAllLines(filePath, Charset.defaultCharset());
         return lines.toArray(new String[lines.size()]);
-
     }
 }

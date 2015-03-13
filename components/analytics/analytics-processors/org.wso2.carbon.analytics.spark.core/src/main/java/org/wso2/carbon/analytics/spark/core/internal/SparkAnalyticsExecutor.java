@@ -73,12 +73,12 @@ public class SparkAnalyticsExecutor {
 
         SparkConf sparkConf = new SparkConf();
 
-        //conf master
-        Master.startSystemAndActor("localhost", 4500, 8081, sparkConf);
+        //master
+        startMaster("localhost",7077,8081, sparkConf);
 
-        //conf worker
+        //workers
         Worker.startSystemAndActor("localhost", 4501, 8090, 2, 1000000,
-                                   new String[]{"spark://localhost:4500"}, null, new Option<Object>() {
+                                   new String[]{"spark://localhost:7077"}, null, new Option<Object>() {
                     @Override
                     public boolean isEmpty() {
                         return false;
@@ -110,15 +110,50 @@ public class SparkAnalyticsExecutor {
                     }
                 });
 
-        sparkConf.setMaster("spark://localhost:4500").setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
-//        sparkConf.setMaster("local[2]").setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
+//        Worker.startSystemAndActor("localhost", 4502, 8091, 2, 1000000,
+//                                   new String[]{"spark://localhost:7077"}, null, new Option<Object>() {
+//                    @Override
+//                    public boolean isEmpty() {
+//                        return false;
+//                    }
+//
+//                    @Override
+//                    public Object get() {
+//                        return new Integer(2);
+//                    }
+//
+//                    @Override
+//                    public Object productElement(int n) {
+//                        return null;
+//                    }
+//
+//                    @Override
+//                    public int productArity() {
+//                        return 0;
+//                    }
+//
+//                    @Override
+//                    public boolean canEqual(Object that) {
+//                        return false;
+//                    }
+//
+//                    @Override
+//                    public boolean equals(Object that) {
+//                        return false;
+//                    }
+//                });
+
+        sparkConf.setMaster("spark://localhost:7077").setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
         sparkCtx = new JavaSparkContext(sparkConf);
         sqlCtx = new JavaSQLContext(sparkCtx);
     }
 
+    private static void startMaster(String host, int port, int webUIport, SparkConf sConf){
+        Master.startSystemAndActor(host, port, webUIport, sConf);
+    }
+
     private static void initSparkDataListener() {
-        ExecutorService executor =
-                Executors.newFixedThreadPool(1);
+        ExecutorService executor = Executors.newFixedThreadPool(1);
         SparkDataListener listener = new SparkDataListener();
         executor.execute(listener);
     }
