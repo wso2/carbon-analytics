@@ -49,6 +49,7 @@ public class SparkDataListener implements Runnable {
     public void run() {
 
         String destFolderPath = CarbonUtils.getCarbonHome() + "/" + DIR_RELATIVE_PATH;
+        if (! new File(destFolderPath).exists()) new File(destFolderPath).mkdirs();
         Path dir = Paths.get(destFolderPath);
 
         try {
@@ -72,13 +73,13 @@ public class SparkDataListener implements Runnable {
                         }
 
                         //todo: spawn this in a new thread
-//                        CoarseGrainedExecutorBackend.main(argArray);
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                CoarseGrainedExecutorBackend.main(argArray);
-                            }
-                        }).start();
+                        CoarseGrainedExecutorBackend.main(argArray);
+//                        new Thread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                CoarseGrainedExecutorBackend.main(argArray);
+//                            }
+//                        }).start();
 
 //                        break;
                     }
