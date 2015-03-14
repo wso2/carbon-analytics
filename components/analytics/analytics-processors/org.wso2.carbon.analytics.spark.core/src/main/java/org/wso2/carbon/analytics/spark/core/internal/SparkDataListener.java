@@ -49,6 +49,7 @@ public class SparkDataListener implements Runnable {
     public void run() {
 
         String destFolderPath = CarbonUtils.getCarbonHome() + "/" + DIR_RELATIVE_PATH;
+        if (! new File(destFolderPath).exists()) new File(destFolderPath).mkdirs();
         Path dir = Paths.get(destFolderPath);
 
         try {
