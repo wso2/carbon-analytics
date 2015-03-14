@@ -544,11 +544,11 @@
                 <version>${stream.orbit.version}</version>
             </dependency>
 
-            <!--<dependency>-->
-                <!--<groupId>org.wso2.orbit.org.apache.mesos</groupId>-->
-                <!--<artifactId>mesos</artifactId>-->
-                <!--<version>${mesos.orbit.version}</version>-->
-            <!--</dependency>-->
+            <dependency>
+                <groupId>org.wso2.orbit.org.apache.mesos</groupId>
+                <artifactId>mesos</artifactId>
+                <version>${mesos.orbit.version}</version>
+            </dependency>
 
             <!--child dependancies -->
             <dependency>
