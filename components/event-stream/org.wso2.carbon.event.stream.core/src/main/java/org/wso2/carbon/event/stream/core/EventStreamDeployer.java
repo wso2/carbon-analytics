@@ -23,14 +23,15 @@ import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.deployment.repository.util.DeploymentFileData;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.databridge.commons.StreamDefinition;
+ import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
+import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 import org.wso2.carbon.event.stream.core.internal.CarbonEventStreamService;
 import org.wso2.carbon.event.stream.core.internal.ds.EventStreamServiceValueHolder;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Collections;
 import java.util.Scanner;
 import java.util.Set;
@@ -56,18 +57,13 @@ public class EventStreamDeployer extends AbstractDeployer {
      *
      * @param deploymentFileData information about query plan
      * @throws org.apache.axis2.deployment.DeploymentException
-     *
      */
     public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {
         try {
             String path = deploymentFileData.getAbsolutePath();
 
             if (!deployedEventStreamFilePaths.contains(path)) {
-                try {
-                    processDeployment(deploymentFileData);
-                } catch (MalformedStreamDefinitionException e) {
-                    throw new DeploymentException("Execution plan not deployed properly.", e);
-                }
+                processDeployment(deploymentFileData);
             } else {
                 log.debug("Event stream file is already deployed :" + path);
                 deployedEventStreamFilePaths.remove(path);
@@ -104,30 +100,35 @@ public class EventStreamDeployer extends AbstractDeployer {
 
     }
 
-    public synchronized void processDeployment(DeploymentFileData deploymentFileData) throws Exception {
+    public synchronized void processDeployment(DeploymentFileData deploymentFileData) throws EventStreamConfigurationException {
         CarbonEventStreamService carbonEventStreamService = EventStreamServiceValueHolder.getCarbonEventStreamService();
         File eventStreamFile = deploymentFileData.getFile();
-        boolean isEditable = !eventStreamFile.getAbsolutePath().contains(File.separator+ "carbonapps" + File.separator);
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        String content = new Scanner(new File(eventStreamFile.getAbsolutePath())).useDelimiter("\\Z").next();
-        StreamDefinition streamDefinition = EventDefinitionConverterUtils.convertFromJson(content);
-        if(carbonEventStreamService.isEventStreamExist(eventStreamFile.getName())) {
-            EventStreamConfiguration eventStreamConfiguration = new EventStreamConfiguration();
-            eventStreamConfiguration.setStreamDefinition(streamDefinition);
-            eventStreamConfiguration.setEditable(isEditable);
-            eventStreamConfiguration.setFileName(eventStreamFile.getName());
-            carbonEventStreamService.addEventStreamConfig(eventStreamConfiguration);
-            log.info("Stream definition is deployed successfully  : " + streamDefinition.getStreamId());
-        } else {
-            log.info("Event stream " + streamDefinition.getStreamId() + " is already exist");
+        boolean isEditable = !eventStreamFile.getAbsolutePath().contains(File.separator + "carbonapps" + File.separator);
+        try {
+            String content = new Scanner(new File(eventStreamFile.getAbsolutePath())).useDelimiter("\\Z").next();
+            StreamDefinition streamDefinition = EventDefinitionConverterUtils.convertFromJson(content);
+
+            if (carbonEventStreamService.isEventStreamExist(eventStreamFile.getName())) {
+                EventStreamConfiguration eventStreamConfiguration = new EventStreamConfiguration();
+                eventStreamConfiguration.setStreamDefinition(streamDefinition);
+                eventStreamConfiguration.setEditable(isEditable);
+                eventStreamConfiguration.setFileName(eventStreamFile.getName());
+                carbonEventStreamService.addEventStreamConfig(eventStreamConfiguration);
+                log.info("Stream definition is deployed successfully  : " + streamDefinition.getStreamId());
+            } else {
+                log.info("Event stream definition " + streamDefinition.getStreamId() + " already exist");
+            }
+        } catch (MalformedStreamDefinitionException e) {
+            throw new EventStreamConfigurationException("Error in constructing Stream Definition Object from JSON " + e.getMessage(), e);
+        } catch (FileNotFoundException e) {
+            throw new EventStreamConfigurationException("Stream Definition file not found " + eventStreamFile.getAbsolutePath() + "," + e.getMessage(), e);
         }
     }
 
-    public synchronized void processUndeployment(String filePath) throws Exception{
+    public synchronized void processUndeployment(String filePath) throws EventStreamConfigurationException {
 
         String fileName = new File(filePath).getName();
         log.info("Stream Definition was undeployed successfully : " + fileName);
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         CarbonEventStreamService carbonEventStreamService = EventStreamServiceValueHolder.getCarbonEventStreamService();
         carbonEventStreamService.removeEventStreamConfigurationFromMap(fileName);
     }
@@ -140,11 +141,11 @@ public class EventStreamDeployer extends AbstractDeployer {
         return unDeployedEventStreamFilePaths;
     }
 
-    public void executeManualDeployement(String filePath) throws Exception {
+    public void executeManualDeployment(String filePath) throws EventStreamConfigurationException {
         processDeployment(new DeploymentFileData(new File(filePath)));
     }
 
-    public void executeManualUndeployement(String filePath) throws Exception {
+    public void executeManualUndeployment(String filePath) throws EventStreamConfigurationException {
         processUndeployment(new File(filePath).getName());
     }
 }

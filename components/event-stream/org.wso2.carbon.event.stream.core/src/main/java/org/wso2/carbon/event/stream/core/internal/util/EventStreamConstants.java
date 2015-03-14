@@ -26,23 +26,10 @@ import java.util.Map;
 public interface EventStreamConstants {
 
 
-    String SM_CONF = "stream-manager-config.xml";
-    String SM_CONF_NS = "http://wso2.org/carbon/streammanager";
-
-    String SM_ELE_ROOT_ELEMENT = "streamManagerConfiguration";
-    String SM_ELE_STREAM_CONFIGURATION = "streamDefinition";
-    String SM_ELE_PROPERTY = "property";
-    String SM_ELE_STREAM_DESCRIPTION = "description";
-    String SM_ELE_STREAM_NICKNAME = "nickName";
-
-
-    String SM_ATTR_NAME = "name";
-    String SM_ATTR_VERSION = "version";
-    String SM_ATTR_TYPE = "type";
-
-    String SM_ELE_META_DATA = "metaData";
-    String SM_ELE_CORRELATION_DATA = "correlationData";
-    String SM_ELE_PAYLOAD_DATA = "payloadData";
+    public static final  String EVENT_STREAMS="eventstreams";
+    public static final  String EVENT_STREAMS_FILE_EXTENSION=".json";
+    public static final  String EVENT_STREAMS_FILE_EXTENSION_TYPE="json";
+    public static final  String EVENT_STREAMS_FILE_DELIMITER="_";
 
     public static final String ATTR_TYPE_FLOAT = "float";
     public static final String ATTR_TYPE_DOUBLE = "double";

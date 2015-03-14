@@ -111,14 +111,14 @@ public class CarbonEventStreamService implements EventStreamService {
     public List<StreamDefinition> getAllStreamDefinitions() throws EventStreamConfigurationException {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         Map<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
-        List<StreamDefinition> collection = new ArrayList<StreamDefinition>();
+        List<StreamDefinition> list = new ArrayList<StreamDefinition>();
         if (eventStreamConfigs == null) {
-            return collection;
+            return list;
         }
         for (EventStreamConfiguration eventStreamConfiguration : eventStreamConfigs.values()) {
-            collection.add(eventStreamConfiguration.getStreamDefinition());
+            list.add(eventStreamConfiguration.getStreamDefinition());
         }
-        return collection;
+        return list;
     }
 
     @Override
@@ -128,7 +128,7 @@ public class CarbonEventStreamService implements EventStreamService {
         if (eventStreamConfigs == null) {
             return new ArrayList<EventStreamConfiguration>();
         }
-        return (List<EventStreamConfiguration>) eventStreamConfigs.values();
+        return new ArrayList<EventStreamConfiguration>(eventStreamConfigs.values());
     }
 
     public void addEventStreamConfig(EventStreamConfiguration eventStreamConfiguration)
@@ -153,7 +153,7 @@ public class CarbonEventStreamService implements EventStreamService {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         AxisConfiguration axisConfig = getAxisConfiguration();
         String directoryPath = new File(axisConfig.getRepository().getPath())
-                .getAbsolutePath() + File.separator + "eventstreams";
+                .getAbsolutePath() + File.separator + EventStreamConstants.EVENT_STREAMS;
         File directory = new File(directoryPath);
         if (!directory.exists()) {
             if (!directory.mkdir()) {
@@ -161,7 +161,7 @@ public class CarbonEventStreamService implements EventStreamService {
             }
         }
         String filePath = directoryPath + File.separator +
-                streamDefinition.getName() + "_" + streamDefinition.getVersion() + ".json";
+                streamDefinition.getName() + "_" + streamDefinition.getVersion() + EventStreamConstants.EVENT_STREAMS_FILE_EXTENSION;
         StreamDefinition streamDefinitionOld = getStreamDefinition(streamDefinition.getStreamId());
         if (streamDefinitionOld != null) {
             if (!(streamDefinitionOld.equals(streamDefinition))) {
@@ -199,7 +199,7 @@ public class CarbonEventStreamService implements EventStreamService {
     public void removeEventStreamDefinition(String streamName, String streamVersion)
             throws EventStreamConfigurationException {
         AxisConfiguration axisConfig = getAxisConfiguration();
-        EventStreamConfigurationFileSystemInvoker.delete(streamName + "_" + streamVersion + ".json", axisConfig);
+        EventStreamConfigurationFileSystemInvoker.delete(streamName + EventStreamConstants.EVENT_STREAMS_FILE_DELIMITER+ streamVersion + EventStreamConstants.EVENT_STREAMS_FILE_EXTENSION, axisConfig);
 
         log.info("Stream definition - " + streamName + ":" + streamVersion + " removed successfully");
     }
