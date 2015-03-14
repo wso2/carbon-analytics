@@ -26,10 +26,11 @@ import java.util.Map;
 public interface EventStreamConstants {
 
 
-    public static final  String EVENT_STREAMS="eventstreams";
-    public static final  String EVENT_STREAMS_FILE_EXTENSION=".json";
-    public static final  String EVENT_STREAMS_FILE_EXTENSION_TYPE="json";
-    public static final  String EVENT_STREAMS_FILE_DELIMITER="_";
+    public static final String EVENT_STREAMS = "eventstreams";
+    public static final String STREAM_DEFINITION_FILE_EXTENSION = ".json";
+    public static final String STREAM_DEFINITION_FILE_EXTENSION_TYPE = "json";
+    public static final String STREAM_DEFINITION_FILE_DELIMITER = "_";
+    public static final String STREAM_DEFINITION_DELIMITER = ":";
 
     public static final String ATTR_TYPE_FLOAT = "float";
     public static final String ATTR_TYPE_DOUBLE = "double";

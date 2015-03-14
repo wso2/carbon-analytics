@@ -19,7 +19,7 @@ public class EventStreamConfigurationFileSystemInvoker {
 
     public static void save(StreamDefinition streamDefinition, String filePath, AxisConfiguration axisConfig) throws EventStreamConfigurationException{
         EventStreamDeployer eventStreamDeployer = (EventStreamDeployer)((DeploymentEngine) axisConfig.getConfigurator()).
-                getDeployer(EventStreamConstants.EVENT_STREAMS, EventStreamConstants.EVENT_STREAMS_FILE_EXTENSION_TYPE);
+                getDeployer(EventStreamConstants.EVENT_STREAMS, EventStreamConstants.STREAM_DEFINITION_FILE_EXTENSION_TYPE);
         try {
             OutputStreamWriter writer = null;
             try {
@@ -54,7 +54,7 @@ public class EventStreamConfigurationFileSystemInvoker {
             File file = new File(filePath);
             if (file.exists()) {
                 EventStreamDeployer deployer = (EventStreamDeployer)((DeploymentEngine) axisConfig.getConfigurator()).
-                        getDeployer(EventStreamConstants.EVENT_STREAMS, EventStreamConstants.EVENT_STREAMS_FILE_EXTENSION_TYPE);
+                        getDeployer(EventStreamConstants.EVENT_STREAMS, EventStreamConstants.STREAM_DEFINITION_FILE_EXTENSION_TYPE);
                 deployer.getUnDeployedEventStreamFilePaths().add(filePath);
                 boolean fileDeleted = file.delete();
                 if (!fileDeleted) {

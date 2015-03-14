@@ -157,16 +157,19 @@ public class CarbonEventStreamService implements EventStreamService {
         File directory = new File(directoryPath);
         if (!directory.exists()) {
             if (!directory.mkdir()) {
-                throw new EventStreamConfigurationException("Cannot create directory to add tenant specific Event Stream : " + streamDefinition.getStreamId());
+                throw new EventStreamConfigurationException("Cannot create directory to add tenant specific Event Stream : "
+                        + streamDefinition.getStreamId());
             }
         }
         String filePath = directoryPath + File.separator +
-                streamDefinition.getName() + "_" + streamDefinition.getVersion() + EventStreamConstants.EVENT_STREAMS_FILE_EXTENSION;
+                streamDefinition.getName() + EventStreamConstants.STREAM_DEFINITION_FILE_DELIMITER + streamDefinition.getVersion()
+                + EventStreamConstants.STREAM_DEFINITION_FILE_EXTENSION;
         StreamDefinition streamDefinitionOld = getStreamDefinition(streamDefinition.getStreamId());
         if (streamDefinitionOld != null) {
             if (!(streamDefinitionOld.equals(streamDefinition))) {
                 throw new StreamDefinitionAlreadyDefinedException("Different stream definition with same stream id "
-                        + streamDefinition.getStreamId() + " already exist " + streamDefinitionOld.toString() + ", cannot add stream definition " + streamDefinition.toString());
+                        + streamDefinition.getStreamId() + " already exist " + streamDefinitionOld.toString()
+                        + ", cannot add stream definition " + streamDefinition.toString());
             } else {
                 return;
             }
@@ -199,9 +202,11 @@ public class CarbonEventStreamService implements EventStreamService {
     public void removeEventStreamDefinition(String streamName, String streamVersion)
             throws EventStreamConfigurationException {
         AxisConfiguration axisConfig = getAxisConfiguration();
-        EventStreamConfigurationFileSystemInvoker.delete(streamName + EventStreamConstants.EVENT_STREAMS_FILE_DELIMITER+ streamVersion + EventStreamConstants.EVENT_STREAMS_FILE_EXTENSION, axisConfig);
+        EventStreamConfigurationFileSystemInvoker.delete(streamName + EventStreamConstants.STREAM_DEFINITION_FILE_DELIMITER
+                + streamVersion + EventStreamConstants.STREAM_DEFINITION_FILE_EXTENSION, axisConfig);
 
-        log.info("Stream definition - " + streamName + ":" + streamVersion + " removed successfully");
+        log.info("Stream definition - " + streamName + EventStreamConstants.STREAM_DEFINITION_DELIMITER + streamVersion
+                + " removed successfully");
     }
 
     @Override
