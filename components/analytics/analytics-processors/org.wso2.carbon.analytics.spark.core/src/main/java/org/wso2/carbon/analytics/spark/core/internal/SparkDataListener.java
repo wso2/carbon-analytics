@@ -73,13 +73,13 @@ public class SparkDataListener implements Runnable {
                         }
 
                         //todo: spawn this in a new thread
-//                        CoarseGrainedExecutorBackend.main(argArray);
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                CoarseGrainedExecutorBackend.main(argArray);
-                            }
-                        }).start();
+                        CoarseGrainedExecutorBackend.main(argArray);
+//                        new Thread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                CoarseGrainedExecutorBackend.main(argArray);
+//                            }
+//                        }).start();
 
 //                        break;
                     }
