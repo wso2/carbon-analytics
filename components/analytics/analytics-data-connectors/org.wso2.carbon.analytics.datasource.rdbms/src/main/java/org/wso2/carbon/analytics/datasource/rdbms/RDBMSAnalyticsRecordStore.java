@@ -227,7 +227,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     private void populateStatementForAdd(PreparedStatement stmt, 
             Record record) throws SQLException, AnalyticsException {        
         stmt.setLong(1, record.getTimestamp());
-        stmt.setBlob(2, new ByteArrayInputStream(GenericUtils.encodeRecordValues(record.getValues())));
+        stmt.setBinaryStream(2, new ByteArrayInputStream(GenericUtils.encodeRecordValues(record.getValues())));
         stmt.setString(3, record.getId());
     }
     
