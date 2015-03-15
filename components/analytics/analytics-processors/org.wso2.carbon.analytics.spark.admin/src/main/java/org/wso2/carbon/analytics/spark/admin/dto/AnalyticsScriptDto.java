@@ -17,12 +17,12 @@
 */
 package org.wso2.carbon.analytics.spark.admin.dto;
 
-
-import org.wso2.carbon.analytics.spark.core.util.AnalyticsScript;
-
 public class AnalyticsScriptDto {
+    
     private String name;
+    
     private String scriptContent;
+    
     private String cronExpression;
 
     public AnalyticsScriptDto(String name) {
@@ -56,4 +56,5 @@ public class AnalyticsScriptDto {
     public boolean isTaskScheduled() {
         return cronExpression != null && !cronExpression.isEmpty();
     }
+    
 }

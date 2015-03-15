@@ -141,16 +141,18 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
     
     @Override
-    public RecordGroup[] get(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo,
-            int recordsFrom, int recordsCount) throws AnalyticsException, AnalyticsTableNotAvailableException {
-        return this.getAnalyticsRecordStore().get(tenantId, tableName, columns, timeFrom, 
+    public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, 
+            long timeFrom, long timeTo, int recordsFrom, 
+            int recordsCount) throws AnalyticsException, AnalyticsTableNotAvailableException {
+        return this.getAnalyticsRecordStore().get(tenantId, tableName, numPartitionsHint, columns, timeFrom, 
                 timeTo, recordsFrom, recordsCount);
     }
 
     @Override
-    public RecordGroup[] get(int tenantId, String tableName, List<String> columns, List<String> ids)
+    public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint,
+            List<String> columns, List<String> ids)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
-        return this.getAnalyticsRecordStore().get(tenantId, tableName, columns, ids);
+        return this.getAnalyticsRecordStore().get(tenantId, tableName, numPartitionsHint, columns, ids);
     }
     
     @Override
@@ -169,7 +171,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private List<String> getRecordIdsFromTimeRange(int tenantId, String tableName, long timeFrom, 
             long timeTo) throws AnalyticsException {
         List<Record> records = AnalyticsDSUtils.listRecords(this, 
-                this.get(tenantId, tableName, null, timeFrom, timeTo, 0, -1));
+                this.get(tenantId, tableName, 1, null, timeFrom, timeTo, 0, -1));
         List<String> result = new ArrayList<>(records.size());
         for (Record record : records) {
             result.add(record.getId());

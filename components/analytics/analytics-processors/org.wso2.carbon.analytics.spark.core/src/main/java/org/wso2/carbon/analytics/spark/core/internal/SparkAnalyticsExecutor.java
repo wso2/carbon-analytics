@@ -186,6 +186,10 @@ public class SparkAnalyticsExecutor {
         }
     }
     
+    public static int getNumPartitionsHint() {
+        return 4;
+    }
+    
     private static void processInsertInto(int tenantId, String query, 
             String[] tokens) throws AnalyticsExecutionException {
         String tableName = tokens[2].trim();
@@ -366,7 +370,7 @@ public class SparkAnalyticsExecutor {
         ids.add(generateTableKeysId(tenantId, tableName));
         List<Record> records = AnalyticsDSUtils.listRecords(ads, ads.get(
                 AnalyticsConstants.TABLE_INFO_TENANT_ID,
-                AnalyticsConstants.TABLE_INFO_TABLE_NAME, null, ids));
+                AnalyticsConstants.TABLE_INFO_TABLE_NAME, 1, null, ids));
         if (records.size() == 0) {
             throw new AnalyticsException("Table keys cannot be found for tenant: " + tenantId + " table: " + tableName);
         }

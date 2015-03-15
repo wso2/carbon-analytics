@@ -66,7 +66,8 @@ public class MessageConsoleService {
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
         List<RecordBean> recordBeanList = new ArrayList<>();
         try {
-            RecordGroup[] results = analyticsDataService.get(tenantId, tableName, null, -1, -1, 0, -1);
+            RecordGroup[] results = analyticsDataService.get(tenantId, tableName, 1, null, 
+                    Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
             if (results != null) {
                 List<Record> records = AnalyticsDSUtils.listRecords(analyticsDataService, results);
                 if (records != null && !records.isEmpty()) {

@@ -333,20 +333,51 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         String query = this.getQueryConfiguration().getRecordUpdateQuery();
         return translateQueryWithTableInfo(query, tenantId, tableName);
     }
-
+    
     @Override
-    public RecordGroup[] get(int tenantId, String tableName, List<String> columns, 
+    public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, 
             List<String> ids) throws AnalyticsException,
             AnalyticsTableNotAvailableException {
         return new RDBMSIDsRecordGroup[] { new RDBMSIDsRecordGroup(tenantId, tableName, columns, ids) };
     }
-
+    
+    private List<Integer[]> generatePartitionPlan(int tenantId, String tableName, 
+            int numPartitionsHint, int recordsFrom, int recordsCount) throws AnalyticsException, 
+            AnalyticsTableNotAvailableException {
+        List<Integer[]> result = new ArrayList<Integer[]>();
+        int recordsCountAll = (int) this.getRecordCount(tenantId, tableName);
+        if (recordsCount == -1) {
+            recordsCount = recordsCountAll;
+        } else if (recordsCount > recordsCountAll) {
+            recordsCount = recordsCountAll;
+        }
+        if (recordsCount == 0 || numPartitionsHint < 1) {
+            return new ArrayList<Integer[]>(0);
+        }
+        int batchSize = (int) Math.ceil(recordsCount / (double) numPartitionsHint);
+        int i;
+        for (long l = 0; l < recordsCount; l += batchSize) {
+            /* this is to avoid integer overflow and getting minus values for counter */
+            i = (int) l;
+            result.add(new Integer[] { recordsFrom + i, 
+                    (i + batchSize) > recordsCount ? recordsCount - i : batchSize });
+        }
+        return result;
+    }
+    
     @Override
-    public RecordGroup[] get(int tenantId, String tableName, List<String> columns, long timeFrom, 
-            long timeTo, int recordsFrom, int recordsCount)
+    public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns,
+            long timeFrom, long timeTo, int recordsFrom, int recordsCount)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
-        return new RDBMSRangeRecordGroup[] { new RDBMSRangeRecordGroup(tenantId, tableName, columns, 
-                timeFrom, timeTo, recordsFrom, recordsCount) };
+        List<Integer[]> params = this.generatePartitionPlan(tenantId, tableName, numPartitionsHint, 
+                recordsFrom, recordsCount);
+        RDBMSRangeRecordGroup[] result = new RDBMSRangeRecordGroup[params.size()];
+        Integer[] param;
+        for (int i = 0; i < result.length; i++) {
+            param = params.get(i);
+            result[i] = new RDBMSRangeRecordGroup(tenantId, tableName, columns, timeFrom, timeTo, param[0], param[1]);
+        }
+        return result;
     }
 
     @Override
@@ -468,15 +499,6 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         try {
             conn = this.getConnection();
             stmt = conn.prepareStatement(this.getRecordRetrievalQuery(tenantId, tableName));
-            if (timeFrom == -1) {
-                timeFrom = Long.MIN_VALUE;
-            }
-            if (timeTo == -1) {
-                timeTo = Long.MAX_VALUE;
-            }
-            if (recordsFrom == -1) {
-                recordsFrom = 0;
-            }
             if (recordsCount == -1) {
                 recordsCount = Integer.MAX_VALUE;
             }
@@ -554,12 +576,6 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         try {
             conn = this.getConnection();
             stmt = conn.prepareStatement(sql);
-            if (timeFrom == -1) {
-                timeFrom = Long.MIN_VALUE;
-            }
-            if (timeTo == -1) {
-                timeTo = Long.MAX_VALUE;
-            }
             stmt.setLong(1, timeFrom);
             stmt.setLong(2, timeTo);
             stmt.executeUpdate();

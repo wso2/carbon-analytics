@@ -302,9 +302,7 @@ public class AnalyticsResource extends AbstractResource {
 		}
 		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
 		final RecordGroup[] recordGroups;
-		recordGroups =
-		               analyticsDataService.get(tenantId, tableName, null, timeFrom, timeTo,
-		                                        recordsFrom, count);
+		recordGroups = analyticsDataService.get(tenantId, tableName, 1, null, timeFrom, timeTo, recordsFrom, count);
 
         final List<Iterator<Record>> iterators = Utils.getRecordIterators(recordGroups, analyticsDataService);
         return new StreamingOutput() {
@@ -525,7 +523,7 @@ public class AnalyticsResource extends AbstractResource {
 		                                                                    queryBean.getStart(),
 		                                                                    queryBean.getCount());
 		List<String> ids = Utils.getRecordIds(searchResults);
-		RecordGroup[] recordGroups = analyticsDataService.get(-1234, queryBean.getTableName(), null, ids);
+		RecordGroup[] recordGroups = analyticsDataService.get(-1234, queryBean.getTableName(), 1, null, ids);
 		List<RecordBean> recordBeans = Utils.createRecordBeans(AnalyticsDSUtils.listRecords(analyticsDataService,
 		                                                                                    recordGroups));
 		if (logger.isDebugEnabled()) {

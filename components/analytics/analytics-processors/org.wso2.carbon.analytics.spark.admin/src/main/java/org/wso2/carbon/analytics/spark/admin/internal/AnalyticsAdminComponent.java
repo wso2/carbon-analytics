@@ -17,9 +17,6 @@
 */
 package org.wso2.carbon.analytics.spark.admin.internal;
 
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
 
@@ -28,9 +25,7 @@ import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
  * @scr.reference name="analytics.core" interface="org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService"
  * cardinality="1..1" policy="dynamic" bind="setAnalyticsProcessorService" unbind="unsetAnalyticsProcessorService"
  */
-
 public class AnalyticsAdminComponent {
-    private static final Log log = LogFactory.getLog(AnalyticsAdminComponent.class);
 
     protected void activate(ComponentContext ctx) {
     }
@@ -42,4 +37,5 @@ public class AnalyticsAdminComponent {
     protected void unsetAnalyticsProcessorService(AnalyticsProcessorService analyticsService) {
         ServiceHolder.setAnalyticsProcessorService(null);
     }
+    
 }

@@ -18,6 +18,9 @@
 package org.wso2.carbon.analytics.spark.admin;
 
 public class AnalyticsProcessorAdminException extends Exception {
+
+    private static final long serialVersionUID = -6808272977048874719L;
+    
     private String message;
 
     public AnalyticsProcessorAdminException() {
@@ -41,4 +44,5 @@ public class AnalyticsProcessorAdminException extends Exception {
     public String getMessage(){
         return message;
     }
+    
 }

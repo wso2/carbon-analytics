@@ -21,6 +21,8 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 
 public class AnalyticsPersistenceException extends AnalyticsException {
 
+    private static final long serialVersionUID = -6597854758966220445L;
+
     public AnalyticsPersistenceException(String message) {
         super(message);
     }
