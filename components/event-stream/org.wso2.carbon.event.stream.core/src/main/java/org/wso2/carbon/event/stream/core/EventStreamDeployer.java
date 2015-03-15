@@ -108,7 +108,7 @@ public class EventStreamDeployer extends AbstractDeployer {
             String content = new Scanner(new File(eventStreamFile.getAbsolutePath())).useDelimiter("\\Z").next();
             StreamDefinition streamDefinition = EventDefinitionConverterUtils.convertFromJson(content);
 
-            if (carbonEventStreamService.isEventStreamExist(eventStreamFile.getName())) {
+            if (!carbonEventStreamService.isEventStreamExist(eventStreamFile.getName())) {
                 EventStreamConfiguration eventStreamConfiguration = new EventStreamConfiguration();
                 eventStreamConfiguration.setStreamDefinition(streamDefinition);
                 eventStreamConfiguration.setEditable(isEditable);
