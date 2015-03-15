@@ -9,10 +9,8 @@ import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import org.wso2.carbon.event.stream.core.*;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 import org.wso2.carbon.event.stream.core.internal.ds.EventStreamServiceValueHolder;
-import org.wso2.carbon.event.stream.core.internal.stream.EventJunction;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,20 +18,13 @@ public class EventStreamRuntime {
 
     private static final Log log = LogFactory.getLog(EventStreamRuntime.class);
 
-    private final CarbonEventStreamService carbonEventStreamService;
     private Map<Integer, Map<String, EventJunction>> tenantSpecificEventJunctions =
             new HashMap<Integer, Map<String, EventJunction>>();
-    private List<EventStreamListener> eventStreamListenerList;
-
-    public EventStreamRuntime() {
-        this.eventStreamListenerList = EventStreamServiceValueHolder.getEventStreamListenerList();
-        this.carbonEventStreamService = EventStreamServiceValueHolder.getCarbonEventStreamService();
-    }
 
     public void loadEventStream(String streamId)
             throws EventStreamConfigurationException {
 
-        StreamDefinition streamDefinition = carbonEventStreamService.getStreamDefinition(
+        StreamDefinition streamDefinition = EventStreamServiceValueHolder.getCarbonEventStreamService().getStreamDefinition(
                 DataBridgeCommonsUtils.getStreamNameFromStreamId(streamId),
                 DataBridgeCommonsUtils.getStreamVersionFromStreamId(streamId));
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
@@ -46,7 +37,7 @@ public class EventStreamRuntime {
             EventJunction junction = new EventJunction(streamDefinition);
             eventJunctionMap.put(streamDefinition.getStreamId(), junction);
 
-            for (EventStreamListener eventStreamListener : eventStreamListenerList) {
+            for (EventStreamListener eventStreamListener : EventStreamServiceValueHolder.getEventStreamListenerList()) {
                 eventStreamListener.addedEventStream(tenantId, streamDefinition.getName(),
                         streamDefinition.getVersion());
             }
@@ -56,7 +47,7 @@ public class EventStreamRuntime {
     public void unloadEventStream(String streamId)
             throws EventStreamConfigurationException {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        StreamDefinition streamDefinition = carbonEventStreamService.getStreamDefinition(
+        StreamDefinition streamDefinition = EventStreamServiceValueHolder.getCarbonEventStreamService().getStreamDefinition(
                 DataBridgeCommonsUtils.getStreamNameFromStreamId(streamId),
                 DataBridgeCommonsUtils.getStreamVersionFromStreamId(streamId));
 
@@ -66,7 +57,7 @@ public class EventStreamRuntime {
                 eventJunctionMap.remove(streamId);
             }
 
-            for (EventStreamListener eventStreamListener : eventStreamListenerList) {
+            for (EventStreamListener eventStreamListener : EventStreamServiceValueHolder.getEventStreamListenerList()) {
                 eventStreamListener.removedEventStream(tenantId, DataBridgeCommonsUtils.getStreamNameFromStreamId(streamId), DataBridgeCommonsUtils.getStreamVersionFromStreamId(streamId));
             }
         }
@@ -84,7 +75,7 @@ public class EventStreamRuntime {
         if (eventJunction == null) {
             StreamDefinition streamDefinition = null;
             try {
-                streamDefinition = carbonEventStreamService.getStreamDefinition(streamId);
+                streamDefinition = EventStreamServiceValueHolder.getCarbonEventStreamService().getStreamDefinition(streamId);
             } catch (Exception e) {
                 throw new EventStreamConfigurationException("Cannot retrieve Stream " + streamId + " for tenant " + tenantId);
             }

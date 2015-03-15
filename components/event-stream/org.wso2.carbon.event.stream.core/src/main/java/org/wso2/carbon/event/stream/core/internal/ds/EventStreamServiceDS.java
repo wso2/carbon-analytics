@@ -22,11 +22,8 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.event.stream.core.EventStreamListener;
 import org.wso2.carbon.event.stream.core.EventStreamService;
-import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 import org.wso2.carbon.event.stream.core.internal.CarbonEventStreamService;
 import org.wso2.carbon.event.stream.core.internal.EventStreamRuntime;
-import org.wso2.carbon.event.stream.core.internal.util.helper.TenantMgtListenerImpl;
-import org.wso2.carbon.stratos.common.listeners.TenantMgtListener;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
 /**
@@ -43,33 +40,16 @@ public class EventStreamServiceDS {
 
     protected void activate(ComponentContext context) {
         try {
-
-            CarbonEventStreamService carbonEventStreamService = createEventStreamService();
-            setEventStreamRuntime(new EventStreamRuntime());
+            EventStreamServiceValueHolder.registerEventStreamRuntime(new EventStreamRuntime());
+            CarbonEventStreamService carbonEventStreamService = new CarbonEventStreamService();
+            EventStreamServiceValueHolder.setCarbonEventStreamService(carbonEventStreamService);
             context.getBundleContext().registerService(EventStreamService.class.getName(), carbonEventStreamService, null);
             if (log.isDebugEnabled()) {
                 log.debug("Successfully deployed EventStreamService");
             }
-
-            TenantMgtListenerImpl tenantMgtListenerImpl = new TenantMgtListenerImpl();
-            context.getBundleContext().registerService(TenantMgtListener.class.getName(), tenantMgtListenerImpl, null);
-
-        } catch (RuntimeException e) {
-            log.error("Could not create EventStreamService : " + e.getMessage(), e);
-        } catch (EventStreamConfigurationException e) {
+        } catch (Throwable e) {
             log.error("Could not create EventStreamService : " + e.getMessage(), e);
         }
-    }
-
-    private void setEventStreamRuntime(EventStreamRuntime eventStreamRuntime) {
-        EventStreamServiceValueHolder.registerEventStreamRuntime(eventStreamRuntime);
-    }
-
-    private CarbonEventStreamService createEventStreamService()
-            throws EventStreamConfigurationException {
-        CarbonEventStreamService carbonEventStreamService = new CarbonEventStreamService();
-        EventStreamServiceValueHolder.setCarbonEventStreamService(carbonEventStreamService);
-        return carbonEventStreamService;
     }
 
     protected void setConfigurationContextService(ConfigurationContextService configurationContextService) {

@@ -17,15 +17,9 @@
 */
 package org.wso2.carbon.event.stream.core.internal.ds;
 
-import com.hazelcast.core.HazelcastInstance;
 import org.wso2.carbon.event.stream.core.EventStreamListener;
-import org.wso2.carbon.event.stream.core.StreamDefinitionStore;
 import org.wso2.carbon.event.stream.core.internal.CarbonEventStreamService;
 import org.wso2.carbon.event.stream.core.internal.EventStreamRuntime;
-import org.wso2.carbon.registry.core.Registry;
-import org.wso2.carbon.registry.core.exceptions.RegistryException;
-import org.wso2.carbon.registry.core.service.RegistryService;
-import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
 import java.util.List;

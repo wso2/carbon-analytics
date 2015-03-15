@@ -41,11 +41,6 @@ public class CarbonEventStreamService implements EventStreamService {
 
     private static final Log log = LogFactory.getLog(CarbonEventStreamService.class);
     private Map<Integer, Map<String, EventStreamConfiguration>> tenantSpecificEventStreamConfigs = new ConcurrentHashMap<Integer, Map<String, EventStreamConfiguration>>();
-    private EventStreamRuntime eventStreamRuntime;
-
-    public CarbonEventStreamService() {
-        eventStreamRuntime = EventStreamServiceValueHolder.getEventStreamRuntime();
-    }
 
     public void removeEventStreamConfigurationFromMap(String fileName) {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
@@ -239,52 +234,52 @@ public class CarbonEventStreamService implements EventStreamService {
 
     @Override
     public void subscribe(SiddhiEventConsumer siddhiEventConsumer) throws EventStreamConfigurationException {
-        eventStreamRuntime.subscribe(siddhiEventConsumer);
+        EventStreamServiceValueHolder.getEventStreamRuntime().subscribe(siddhiEventConsumer);
     }
 
     @Override
     public void subscribe(RawEventConsumer rawEventConsumer) throws EventStreamConfigurationException {
-        eventStreamRuntime.subscribe(rawEventConsumer);
+        EventStreamServiceValueHolder.getEventStreamRuntime().subscribe(rawEventConsumer);
     }
 
     @Override
     public void subscribe(EventProducer eventProducer) throws EventStreamConfigurationException {
-        eventStreamRuntime.subscribe(eventProducer);
+        EventStreamServiceValueHolder.getEventStreamRuntime().subscribe(eventProducer);
     }
 
     @Override
     public void subscribe(WSO2EventConsumer wso2EventConsumer) throws EventStreamConfigurationException {
-        eventStreamRuntime.subscribe(wso2EventConsumer);
+        EventStreamServiceValueHolder.getEventStreamRuntime().subscribe(wso2EventConsumer);
     }
 
     @Override
     public void subscribe(WSO2EventListConsumer wso2EventListConsumer) throws EventStreamConfigurationException {
-        eventStreamRuntime.subscribe(wso2EventListConsumer);
+        EventStreamServiceValueHolder.getEventStreamRuntime().subscribe(wso2EventListConsumer);
     }
 
     @Override
     public void unsubscribe(SiddhiEventConsumer siddhiEventConsumer) {
-        eventStreamRuntime.unsubscribe(siddhiEventConsumer);
+        EventStreamServiceValueHolder.getEventStreamRuntime().unsubscribe(siddhiEventConsumer);
     }
 
     @Override
     public void unsubscribe(RawEventConsumer rawEventConsumer) {
-        eventStreamRuntime.unsubscribe(rawEventConsumer);
+        EventStreamServiceValueHolder.getEventStreamRuntime().unsubscribe(rawEventConsumer);
     }
 
     @Override
     public void unsubscribe(EventProducer eventProducer) {
-        eventStreamRuntime.unsubscribe(eventProducer);
+        EventStreamServiceValueHolder.getEventStreamRuntime().unsubscribe(eventProducer);
     }
 
     @Override
     public void unsubscribe(WSO2EventConsumer wso2EventConsumer) {
-        eventStreamRuntime.unsubscribe(wso2EventConsumer);
+        EventStreamServiceValueHolder.getEventStreamRuntime().unsubscribe(wso2EventConsumer);
     }
 
     @Override
     public void unsubscribe(WSO2EventListConsumer wso2EventConsumer) {
-        eventStreamRuntime.unsubscribe(wso2EventConsumer);
+        EventStreamServiceValueHolder.getEventStreamRuntime().unsubscribe(wso2EventConsumer);
     }
 
 
@@ -301,7 +296,4 @@ public class CarbonEventStreamService implements EventStreamService {
         return false;
     }
 
-    public EventStreamRuntime getEventStreamRuntime() {
-        return eventStreamRuntime;
-    }
 }
