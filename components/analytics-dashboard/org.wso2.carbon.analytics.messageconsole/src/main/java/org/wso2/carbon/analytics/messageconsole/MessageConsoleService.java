@@ -22,24 +22,30 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDSUtils;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
 import org.wso2.carbon.analytics.messageconsole.beans.ColumnBean;
 import org.wso2.carbon.analytics.messageconsole.beans.EntityBean;
 import org.wso2.carbon.analytics.messageconsole.beans.RecordBean;
+import org.wso2.carbon.analytics.messageconsole.beans.RecordResultBean;
 import org.wso2.carbon.analytics.messageconsole.beans.TableBean;
 import org.wso2.carbon.analytics.messageconsole.exception.MessageConsoleException;
 import org.wso2.carbon.analytics.messageconsole.internal.ServiceHolder;
 import org.wso2.carbon.context.CarbonContext;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class MessageConsoleService {
 
     private static final Log logger = LogFactory.getLog(MessageConsoleService.class);
+    private static final String LUCENE = "lucene";
 
     private AnalyticsDataService analyticsDataService;
 
@@ -55,37 +61,81 @@ public class MessageConsoleService {
         }
         try {
             return analyticsDataService.listTables(tenantId);
-        } catch (AnalyticsException e) {
+        } catch (Exception e) {
             logger.error("Unable to get table list from Analytics data layer for tenant: " + tenantId, e);
             throw new MessageConsoleException("Unable to get table list from Analytics data layer for tenant: " +
                                               tenantId, e);
         }
     }
 
-    public RecordBean[] getRecords(String tableName) throws MessageConsoleException {
-        int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
-        List<RecordBean> recordBeanList = new ArrayList<>();
-        try {
-            RecordGroup[] results = analyticsDataService.get(tenantId, tableName, 1, null, 
-                    Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
-            if (results != null) {
-                List<Record> records = AnalyticsDSUtils.listRecords(analyticsDataService, results);
-                if (records != null && !records.isEmpty()) {
-                    for (Record record : records) {
-                        recordBeanList.add(createRecordBean(record));
-                    }
-                }
-            }
-        } catch (AnalyticsException e) {
-            logger.error("Unable to get records from Analytics data layer for tenant: " + tenantId + " and for " +
-                         "table:" + tableName, e);
-            throw new MessageConsoleException("Unable to get records from Analytics data layer for tenant: " + tenantId + " and for " +
-                                              "table:" + tableName, e);
+    public RecordResultBean getRecords(String tableName, long timeFrom, long timeTo, int startIndex, int recordCount,
+                                       String searchQuery)
+            throws MessageConsoleException {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Search Query: " + searchQuery);
+            logger.debug("timeFrom: " + timeFrom);
+            logger.debug("timeTo: " + timeTo);
+            logger.debug("Start Index: " + startIndex);
+            logger.debug("Page Size: " + recordCount);
         }
 
-        RecordBean[] recordBeans = new RecordBean[recordBeanList.size()];
+        int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
 
-        return recordBeanList.toArray(recordBeans);
+        RecordResultBean recordResult = new RecordResultBean();
+        RecordGroup[] results = null;
+        int searchCount = 0;
+
+        if (searchQuery != null && !searchQuery.isEmpty()) {
+            try {
+                List<SearchResultEntry> searchResults = analyticsDataService.search(tenantId, tableName, LUCENE,
+                                                                                    searchQuery, startIndex, recordCount);
+                List<String> ids = getRecordIds(searchResults);
+                results = analyticsDataService.get(tenantId, tableName, 1, null, ids);
+                searchCount = analyticsDataService.searchCount(tenantId, tableName, LUCENE, searchQuery);
+
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Query satisfied result count: " + searchResults.size());
+                }
+            } catch (Exception e) {
+                logger.error("Unable to get search indices from Analytics data layer for tenant: " + tenantId +
+                             " and for table:" + tableName, e);
+                throw new MessageConsoleException("Unable to get indices from Analytics data layer for tenant: " + tenantId +
+                                                  " and for table:" + tableName, e);
+            }
+        } else {
+            try {
+                results = analyticsDataService.get(tenantId, tableName, 1, null, timeFrom, timeTo, startIndex, recordCount);
+            } catch (AnalyticsException e) {
+                logger.error("Unable to get records from Analytics data layer for tenant: " + tenantId +
+                             " and for table:" + tableName, e);
+                throw new MessageConsoleException("Unable to get records from Analytics data layer for tenant: " + tenantId +
+                                                  " and for table:" + tableName, e);
+            }
+        }
+
+        if (results != null) {
+            List<RecordBean> recordBeanList = new ArrayList<>();
+            List<Record> records;
+            try {
+                records = AnalyticsDSUtils.listRecords(analyticsDataService, results);
+            } catch (Exception e) {
+                logger.error("Unable to convert result to record for tenant: " + tenantId +
+                             " and for table:" + tableName, e);
+                throw new MessageConsoleException("Unable to convert result to record for tenant: " + tenantId +
+                                                  " and for table:" + tableName, e);
+            }
+            if (records != null && !records.isEmpty()) {
+                for (Record record : records) {
+                    recordBeanList.add(createRecordBean(record));
+                }
+            }
+            RecordBean[] recordBeans = new RecordBean[recordBeanList.size()];
+            recordResult.setRecords(recordBeanList.toArray(recordBeans));
+            recordResult.setTotalResultCount(searchCount);
+        }
+
+        return recordResult;
     }
 
     private RecordBean createRecordBean(Record record) {
@@ -101,6 +151,14 @@ public class MessageConsoleService {
         recordBean.setEntityBeans(entityBeans);
 
         return recordBean;
+    }
+
+    private List<String> getRecordIds(List<SearchResultEntry> searchResults) {
+        List<String> ids = new ArrayList<String>(searchResults.size());
+        for (SearchResultEntry searchResult : searchResults) {
+            ids.add(searchResult.getId());
+        }
+        return ids;
     }
 
     public TableBean getTableInfo(String tableName) {
@@ -153,7 +211,7 @@ public class MessageConsoleService {
         columns[6] = column7;
 
         ColumnBean column8 = new ColumnBean();
-        column8.setName("recordId");
+        column8.setName("bam_unique_rec_id");
         column8.setType("String");
         column8.setPrimary(false);
         columns[7] = column8;
@@ -161,5 +219,72 @@ public class MessageConsoleService {
         table.setColumns(columns);
 
         return table;
+    }
+
+    public void deleteRecords(String table, String[] recordIds) throws MessageConsoleException {
+
+        int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+
+        String ids = Arrays.toString(recordIds);
+        if (logger.isDebugEnabled()) {
+            logger.debug(ids + " are going to delete from " + table + " in tenant:" + tenantId);
+        }
+        try {
+            analyticsDataService.delete(tenantId, table, Arrays.asList(recordIds));
+        } catch (Exception e) {
+            logger.error("Unable to delete records" + ids + " from table :" + table, e);
+            throw new MessageConsoleException("Unable to delete records" + ids + " from table :" + table, e);
+        }
+    }
+
+    public void addRecord(String table, String[] columns, String[] values) throws MessageConsoleException {
+
+        int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+
+        if (logger.isDebugEnabled()) {
+            logger.info("New record going to add to" + table);
+        }
+        try {
+            AnalyticsSchema schema = analyticsDataService.getTableSchema(tenantId, table);
+            Map<String, AnalyticsSchema.ColumnType> columnsMetaInfo = schema.getColumns();
+
+            Map<String, Object> objectMap = new HashMap<>(columns.length);
+            for (int i = 0; i < columns.length; i++) {
+                String columnName = columns[i];
+                String stringValue = values[i];
+                if (columnName != null) {
+                    AnalyticsSchema.ColumnType columnType = columnsMetaInfo.get(columnName);
+                    Object value = stringValue;
+                    switch (columnType) {
+                        case STRING:
+                            break;
+                        case INT:
+                            value = Integer.valueOf(stringValue);
+                            break;
+                        case LONG:
+                            value = Long.valueOf(stringValue);
+                            break;
+                        case BOOLEAN:
+                            value = Boolean.valueOf(stringValue);
+                            break;
+                        case FLOAT:
+                            value = Float.valueOf(stringValue);
+                            break;
+                        case DOUBLE:
+                            value = Double.valueOf(stringValue);
+                            break;
+                    }
+                    objectMap.put(columnName, value);
+                }
+            }
+
+            Record record = new Record(tenantId, table, objectMap, System.currentTimeMillis());
+            List<Record> records = new ArrayList<Record>(1);
+            records.add(record);
+            analyticsDataService.put(records);
+        } catch (Exception e) {
+            logger.error("Unable to add record to table :" + table, e);
+            throw new MessageConsoleException("Unable to add record to table :" + table, e);
+        }
     }
 }

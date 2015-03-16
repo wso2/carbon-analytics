@@ -30,6 +30,7 @@ import org.wso2.carbon.analytics.messageconsole.stub.MessageConsoleStub;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.ColumnBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.EntityBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.RecordBean;
+import org.wso2.carbon.analytics.messageconsole.stub.beans.RecordResultBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.TableBean;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseColumn;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseRecord;
@@ -38,16 +39,23 @@ import org.wso2.carbon.messageconsole.ui.beans.ResponseTable;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MessageConsoleConnector {
 
     private static final Log log = LogFactory.getLog(MessageConsoleConnector.class);
     private static final String MESSAGE_CONSOLE = "MessageConsole";
-    private static final String RECORD_ID = "recordId";
     private static final String TIMESTAMP = "timestamp";
     private static final String OK = "OK";
     private static final String ERROR = "ERROR";
+    public static final String RECORD_ID = "bam_unique_rec_id";
+
+    public static final int TYPE_LIST_RECORD = 1;
+    public static final int TYPE_CREATE_RECORD = 2;
+    public static final int TYPE_UPDATE_RECORD = 3;
+    public static final int TYPE_DELETE_RECORD = 4;
+    public static final int TYPE_TABLE_INFO = 5;
 
     private MessageConsoleStub stub;
     private static GsonBuilder RESPONSE_RESULT_BUILDER = new GsonBuilder().registerTypeAdapter(ResponseResult.class,
@@ -84,31 +92,34 @@ public class MessageConsoleConnector {
         return tableList;
     }
 
-    public String getRecords(String tableName) {
+    public String getRecords(String tableName, long timeFrom, long timeTo, int startIndex, int pageSize, String
+            searchQuery) {
 
         ResponseResult responseResult = new ResponseResult();
         Gson gson = RESPONSE_RESULT_BUILDER.serializeNulls().create();
 
         try {
-            RecordBean[] recordBeans = stub.getRecords(tableName);
+            RecordResultBean recordBeans = stub.getRecords(tableName, timeFrom, timeTo, startIndex, pageSize, searchQuery);
             responseResult.setResult(OK);
+            List<ResponseRecord> records = new ArrayList<>();
             if (recordBeans != null) {
-                List<ResponseRecord> records = new ArrayList<>(recordBeans.length);
-                for (RecordBean recordBean : recordBeans) {
-                    ResponseRecord record = new ResponseRecord();
-                    if (recordBean != null) {
-                        List<ResponseColumn> columns = new ArrayList<>(recordBean.getEntityBeans().length + 2);
-                        columns.add(new ResponseColumn(RECORD_ID, recordBean.getRecordId()));
-                        columns.add(new ResponseColumn(TIMESTAMP, String.valueOf(recordBean.getTimestamp())));
-                        for (EntityBean entityBean : recordBean.getEntityBeans()) {
-                            columns.add(new ResponseColumn(entityBean.getColumnName(), entityBean.getValue()));
+                if (recordBeans.getRecords() != null) {
+                    for (RecordBean recordBean : recordBeans.getRecords()) {
+                        ResponseRecord record = new ResponseRecord();
+                        if (recordBean != null) {
+                            List<ResponseColumn> columns = new ArrayList<>(recordBean.getEntityBeans().length + 2);
+                            columns.add(new ResponseColumn(RECORD_ID, recordBean.getRecordId()));
+                            columns.add(new ResponseColumn(TIMESTAMP, String.valueOf(recordBean.getTimestamp())));
+                            for (EntityBean entityBean : recordBean.getEntityBeans()) {
+                                columns.add(new ResponseColumn(entityBean.getColumnName(), entityBean.getValue()));
+                            }
+                            record.setColumns(columns);
                         }
-                        record.setColumns(columns);
+                        records.add(record);
                     }
-                    records.add(record);
+                    responseResult.setRecords(records);
                 }
-                responseResult.setRecords(records);
-                responseResult.setTotalRecordCount(records.size());
+                responseResult.setTotalRecordCount(recordBeans.getTotalResultCount());
             }
         } catch (Exception e) {
             log.error("Unable to get records for table:" + tableName, e);
@@ -135,8 +146,9 @@ public class MessageConsoleConnector {
                 column.setPrimary(resultColumn.getPrimary());
                 column.setType(resultColumn.getType());
                 column.setDisplay(resultColumn.getDisplay());
-                if ("recordId".equals(resultColumn.getName())) {
+                if (RECORD_ID.equals(resultColumn.getName())) {
                     column.setKey(true);
+                    column.setDisplay(false);
                 }
                 columns.add(column);
             }
@@ -147,5 +159,35 @@ public class MessageConsoleConnector {
         }
 
         return gson.toJson(table);
+    }
+
+    public String deleteRecords(String table, String[] recordIds) {
+
+        ResponseResult responseResult = new ResponseResult();
+        Gson gson = RESPONSE_RESULT_BUILDER.serializeNulls().create();
+        responseResult.setResult(OK);
+        try {
+            stub.deleteRecords(table, recordIds);
+        } catch (Exception e) {
+            log.error("Unable to delete records" + Arrays.toString(recordIds) + " from table :" + table, e);
+            responseResult.setResult(ERROR);
+            responseResult.setMessage(e.getMessage());
+        }
+
+        return gson.toJson(responseResult);
+    }
+
+    public String addRecord(String table, String[] columns, String[] values) {
+        ResponseResult responseResult = new ResponseResult();
+        Gson gson = RESPONSE_RESULT_BUILDER.serializeNulls().create();
+        responseResult.setResult(OK);
+        try {
+            stub.addRecord(table, columns, values);
+        } catch (Exception e) {
+            log.error("Unable to add record to table :" + table, e);
+            responseResult.setResult(ERROR);
+            responseResult.setMessage(e.getMessage());
+        }
+        return gson.toJson(responseResult);
     }
 }

@@ -20,40 +20,28 @@ package org.wso2.carbon.analytics.messageconsole.beans;
 
 import java.io.Serializable;
 
-public class EntityBean implements Serializable {
+public class RecordResultBean implements Serializable {
+    private static final long serialVersionUID = -90610112748238438L;
 
-    private static final long serialVersionUID = 1928077277570009600L;
+    private long totalResultCount;
+    private RecordBean[] records = new RecordBean[0];
 
-    private String columnName;
-    private String value;
-    private String type;
-
-    public EntityBean(String columnName, String value) {
-        this.columnName = columnName;
-        this.value = value;
+    public RecordResultBean() {
     }
 
-    public String getColumnName() {
-        return columnName;
+    public long getTotalResultCount() {
+        return totalResultCount;
     }
 
-    public void setColumnName(String columnName) {
-        this.columnName = columnName;
+    public void setTotalResultCount(long totalResultCount) {
+        this.totalResultCount = totalResultCount;
     }
 
-    public String getValue() {
-        return value;
+    public RecordBean[] getRecords() {
+        return records;
     }
 
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
+    public void setRecords(RecordBean[] records) {
+        this.records = records;
     }
 }
