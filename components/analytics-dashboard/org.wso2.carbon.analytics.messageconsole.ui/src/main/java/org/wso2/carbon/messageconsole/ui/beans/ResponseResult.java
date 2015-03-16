@@ -27,7 +27,7 @@ public class ResponseResult {
 
     private String message;
 
-    private int totalRecordCount;
+    private long totalRecordCount;
 
     private List<ResponseRecord> records = new ArrayList<>();
 
@@ -50,11 +50,11 @@ public class ResponseResult {
         this.message = message;
     }
 
-    public int getTotalRecordCount() {
+    public long getTotalRecordCount() {
         return totalRecordCount;
     }
 
-    public void setTotalRecordCount(int totalRecordCount) {
+    public void setTotalRecordCount(long totalRecordCount) {
         this.totalRecordCount = totalRecordCount;
     }
 
