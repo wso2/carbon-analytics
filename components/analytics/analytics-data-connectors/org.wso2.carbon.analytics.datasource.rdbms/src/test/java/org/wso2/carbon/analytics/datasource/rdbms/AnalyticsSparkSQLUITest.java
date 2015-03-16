@@ -38,6 +38,7 @@ import org.wso2.carbon.analytics.spark.admin.dto.AnalyticsRowResultDto;
 import org.wso2.carbon.analytics.spark.admin.internal.AnalyticsResultConverter;
 import org.wso2.carbon.analytics.spark.admin.stub.AnalyticsProcessorAdminServiceStub;
 import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
+import org.wso2.carbon.analytics.spark.core.CarbonAnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.spark.core.internal.SparkAnalyticsExecutor;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
@@ -91,7 +92,7 @@ public class AnalyticsSparkSQLUITest {
         this.service.createTable(1, "Log");
         this.service.put(records);
 
-        AnalyticsProcessorService processorService = new AnalyticsProcessorService();
+        AnalyticsProcessorService processorService = new CarbonAnalyticsProcessorService();
         AnalyticsExecutionClient client = new AnalyticsExecutionClient();
 
         String query = "define table Log (server_name STRING, "
