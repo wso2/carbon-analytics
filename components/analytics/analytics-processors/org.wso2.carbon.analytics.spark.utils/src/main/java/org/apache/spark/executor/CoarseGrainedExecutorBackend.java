@@ -26,7 +26,7 @@ import java.util.UUID;
  * a proxy class to mimic the CoarseGrainedExecutorBackend class in spark
  */
 public class CoarseGrainedExecutorBackend {
-    private static final String DIR_RELATIVE_PATH = "../../../repository/data/spark-data";;
+    private static final String DIR_RELATIVE_PATH = "../../../repository/data/spark-data";
 
     public static void main(String[] args) {
         BufferedWriter writer = null;
