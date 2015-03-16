@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.spark.admin.dto.AnalyticsRowResultDto;
 import org.wso2.carbon.analytics.spark.admin.dto.AnalyticsScriptDto;
+import org.wso2.carbon.analytics.spark.admin.internal.AnalyticsResultConverter;
 import org.wso2.carbon.analytics.spark.admin.internal.ServiceHolder;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsPersistenceException;
@@ -227,7 +228,7 @@ public class AnalyticsProcessorAdminService extends AbstractAdmin {
         if (query != null && !query.trim().isEmpty()) {
             try {
                 int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-                AnalyticsQueryResultDto queryResult = convertResults(ServiceHolder.getAnalyticsProcessorService().
+                AnalyticsQueryResultDto queryResult = AnalyticsResultConverter.convertResults(ServiceHolder.getAnalyticsProcessorService().
                         executeQuery(tenantId, query));
                 if (queryResult != null) queryResult.setQuery(query);
                 return queryResult;
@@ -239,29 +240,6 @@ public class AnalyticsProcessorAdminService extends AbstractAdmin {
             log.error("No queries provided to execute at tenant id :" + PrivilegedCarbonContext.
                     getThreadLocalCarbonContext().getTenantId());
             throw new AnalyticsProcessorAdminException("No queries provided to execute.");
-        }
-    }
-
-    private AnalyticsQueryResultDto convertResults(AnalyticsQueryResult analyticsQueryResult) {
-        if (analyticsQueryResult != null) {
-            List<List<Object>> rows = analyticsQueryResult.getRows();
-            AnalyticsRowResultDto[] rowResults = new AnalyticsRowResultDto[rows.size()];
-            int rowIndex = 0;
-            for (List<Object> row : rows) {
-                String[] columnValues = new String[row.size()];
-                int colIndex = 0;
-                for (Object aColValue : row) {
-                    if (aColValue != null) {
-                        columnValues[colIndex] = aColValue.toString();
-                    }
-                    colIndex++;
-                }
-                rowResults[rowIndex] = new AnalyticsRowResultDto(columnValues);
-                rowIndex++;
-            }
-            return new AnalyticsQueryResultDto(analyticsQueryResult.getColumnNames(), rowResults);
-        } else {
-            return null;
         }
     }
 }
