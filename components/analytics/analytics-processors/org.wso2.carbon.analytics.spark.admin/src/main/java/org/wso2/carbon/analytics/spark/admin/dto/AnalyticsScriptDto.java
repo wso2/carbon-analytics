@@ -17,12 +17,16 @@
 */
 package org.wso2.carbon.analytics.spark.admin.dto;
 
+/**
+ * DTO of analytics script information which transferred between
+ * the admin service and client.
+ */
 public class AnalyticsScriptDto {
-    
+
     private String name;
-    
+
     private String scriptContent;
-    
+
     private String cronExpression;
 
     public AnalyticsScriptDto(String name) {
@@ -56,5 +60,5 @@ public class AnalyticsScriptDto {
     public boolean isTaskScheduled() {
         return cronExpression != null && !cronExpression.isEmpty();
     }
-    
+
 }

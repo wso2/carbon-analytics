@@ -29,11 +29,25 @@ import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
+/**
+ * This class holds the OSGI services registered with Declarative service component.
+ */
 public class ServiceHolder {
+
+    private ServiceHolder() {
+        /**
+         * Avoid instantiation of this class.
+         */
+    }
+
     private static TaskService taskService;
+
     private static AnalyticsDataService analyticsDataService;
+
     private static AnalyticsProcessorService analyticsProcessorService;
+
     private static RegistryService registryService;
+
     private static TenantRegistryLoader tenantRegistryLoader;
 
     public static void setTaskService(TaskService taskService) {
@@ -66,14 +80,6 @@ public class ServiceHolder {
 
     public static void setRegistryService(RegistryService registryService) {
         ServiceHolder.registryService = registryService;
-    }
-
-    public static RegistryService getRegistryService() {
-        return registryService;
-    }
-
-    public static TenantRegistryLoader getTenantRegistryLoader() {
-        return tenantRegistryLoader;
     }
 
     public static void setTenantRegistryLoader(TenantRegistryLoader tenantRegistryLoader) {

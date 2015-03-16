@@ -19,9 +19,15 @@ package org.wso2.carbon.analytics.spark.admin.internal;
 
 import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
 
+/**
+ * Class to hold the osgi service registration instances.
+ */
 public class ServiceHolder {
 
     private ServiceHolder() {
+        /**
+         * Avoid instantiation
+         */
     }
 
     private static AnalyticsProcessorService analyticsProcessorService;

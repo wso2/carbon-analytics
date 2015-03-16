@@ -58,9 +58,7 @@ public class AnalyticsTask implements Task {
             } else {
                 log.warn("Analytics Processor inactive now, and hence ignoring the triggered execution");
             }
-        } catch (AnalyticsExecutionException e) {
-            log.error("Error while executing the scheduled task for the script : " + scriptName, e);
-        } catch (AnalyticsPersistenceException e) {
+        } catch (AnalyticsExecutionException | AnalyticsPersistenceException e) {
             log.error("Error while executing the scheduled task for the script : " + scriptName, e);
         }
     }

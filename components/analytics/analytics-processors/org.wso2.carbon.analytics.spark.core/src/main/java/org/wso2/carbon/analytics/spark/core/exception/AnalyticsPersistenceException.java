@@ -19,6 +19,11 @@ package org.wso2.carbon.analytics.spark.core.exception;
 
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 
+/**
+ * This is an exception thrown when there is an error occured while it's trying to read/write f
+ * rom the analytics persistence store.
+ */
+
 public class AnalyticsPersistenceException extends AnalyticsException {
 
     private static final long serialVersionUID = -6597854758966220445L;

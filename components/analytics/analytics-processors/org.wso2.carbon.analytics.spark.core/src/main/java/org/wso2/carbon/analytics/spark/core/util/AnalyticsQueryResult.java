@@ -70,5 +70,4 @@ public class AnalyticsQueryResult {
         builder.append("\n");
         return builder.toString();
     }
-    
 }

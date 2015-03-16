@@ -443,5 +443,4 @@ public class SparkAnalyticsExecutor {
         JavaSchemaRDD schemaRDD = sqlCtx.baseRelationToSchemaRDD(table);
         schemaRDD.registerTempTable(alias);
     }
-    
 }
