@@ -32,11 +32,12 @@
     <url>http://wso2.org</url>
 
     <modules>
-        <!--<module>service-stubs</module>-->
-        <!--<module>components/analytics-dashboard</module>-->
+        <module>service-stubs</module>
+        <module>components/analytics-dashboard</module>
         <module>components/data-bridge</module>
-        <!--<module>components/event-stream</module>-->
-        <!--<module>features/event-stream</module>-->
+        <module>components/event-stream</module>
+        <module>features/event-stream</module>
+        <module>features/data-bridge</module>
     </modules>
 
     <dependencyManagement>
@@ -166,6 +167,11 @@
                 <version>${slf4j.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>commons-pool.wso2</groupId>
                 <artifactId>commons-pool</artifactId>
                 <version>${commons.pool.version}</version>
@@ -174,6 +180,11 @@
                 <groupId>org.apache.httpcomponents.wso2</groupId>
                 <artifactId>httpclient</artifactId>
                 <version>${httpclient.httpcomponents.wso2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents.wso2</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>${httpcore.httpcomponents.wso2.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.osgi</groupId>
@@ -287,6 +298,48 @@
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.event.stream.ui.feature</artifactId>
                 <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.databridge.commons.server.feature</artifactId>
+                <version>${carbon.analytics.commons.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.databridge.commons.thrift.server.feature</artifactId>
+                <version>${carbon.analytics.commons.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.databridge.commons.binary.server.feature</artifactId>
+                <version>${carbon.analytics.commons.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.databridge.agent.thrift.server.feature</artifactId>
+                <version>${carbon.analytics.commons.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.databridge.core.server.feature</artifactId>
+                <version>${carbon.analytics.commons.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.databridge.receiver.binary.server.feature</artifactId>
+                <version>${carbon.analytics.commons.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.databridge.receiver.thrift.server.feature</artifactId>
+                <version>${carbon.analytics.commons.version}</version>
                 <type>zip</type>
             </dependency>
             <!--features end-->
@@ -568,6 +621,7 @@
         <orbit.version.distruptor>2.10.4-wso2v2</orbit.version.distruptor>
         <commons.pool.version>1.5.0.wso2v1</commons.pool.version>
         <httpclient.httpcomponents.wso2.version>4.2.5.wso2v1</httpclient.httpcomponents.wso2.version>
+        <httpcore.httpcomponents.wso2.version>4.3.3.wso2v1</httpcore.httpcomponents.wso2.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.scm.id>my-scm-server</project.scm.id>
     </properties>
