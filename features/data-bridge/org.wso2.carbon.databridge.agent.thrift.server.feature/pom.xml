@@ -107,7 +107,7 @@
                                 </properties>
                             </adviceFile>
                             <bundles>
-                                <bundleDef>org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.agent.thrift:${carbon.analytics.commons.version}
+                                <bundleDef>org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.agent.thrift:${carbon.analytics.common.version}
                                 </bundleDef>
                                 <bundleDef>commons-pool.wso2:commons-pool:1.5.6.wso2v1</bundleDef>
                                 <bundleDef>org.apache.httpcomponents.wso2:httpclient</bundleDef>
@@ -116,10 +116,10 @@
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}</importFeatureDef>
                                 <importFeatureDef>
-                                    org.wso2.carbon.databridge.commons.server:${carbon.analytics.commons.version}
+                                    org.wso2.carbon.databridge.commons.server:${carbon.analytics.common.version}
                                 </importFeatureDef>
                                 <importFeatureDef>
-                                    org.wso2.carbon.databridge.commons.thrift.server:${carbon.analytics.commons.version}
+                                    org.wso2.carbon.databridge.commons.thrift.server:${carbon.analytics.common.version}
                                 </importFeatureDef>
                             </importFeatures>
                         </configuration>

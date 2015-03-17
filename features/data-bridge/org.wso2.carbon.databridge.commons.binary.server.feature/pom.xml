@@ -73,7 +73,7 @@
                             </adviceFile>
                             <bundles>
                                 <bundleDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.commons.binary:${carbon.analytics.commons.version}
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.commons.binary:${carbon.analytics.common.version}
                                 </bundleDef>
                             </bundles>
                             <importFeatures>

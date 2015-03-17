@@ -108,13 +108,13 @@
                                 </properties>
                             </adviceFile>
                             <bundles>
-                                <bundleDef>org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.core:${carbon.analytics.commons.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.core:${carbon.analytics.common.version}</bundleDef>
                                 <bundleDef>com.google.guava:guava</bundleDef>
                                 <bundleDef>org.wso2.carbon.commons:org.wso2.carbon.identity.authentication</bundleDef>
                             </bundles>
                             <importFeatures>
                                  <importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}</importFeatureDef>
-                                 <importFeatureDef>org.wso2.carbon.databridge.commons.server:${carbon.analytics.commons.version}</importFeatureDef>
+                                 <importFeatureDef>org.wso2.carbon.databridge.commons.server:${carbon.analytics.common.version}</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>

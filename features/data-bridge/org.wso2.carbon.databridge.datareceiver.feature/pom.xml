@@ -80,22 +80,22 @@
                             <propertiesFile>../../../etc/feature.properties</propertiesFile>
                             <includedFeatures>
                                 <includedFeatureDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.core.server.feature:${carbon.analytics.commons.version}
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.core.server.feature:${carbon.analytics.common.version}
                                 </includedFeatureDef>
                                 <includedFeatureDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.commons.server.feature:${carbon.analytics.commons.version}
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.commons.server.feature:${carbon.analytics.common.version}
                                 </includedFeatureDef>
                                 <includedFeatureDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.commons.thrift.server.feature:${carbon.analytics.commons.version}
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.commons.thrift.server.feature:${carbon.analytics.common.version}
                                 </includedFeatureDef>
                                 <includedFeatureDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.commons.binary.server.feature:${carbon.analytics.commons.version}
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.commons.binary.server.feature:${carbon.analytics.common.version}
                                 </includedFeatureDef>
                                 <includedFeatureDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.receiver.thrift.server.feature:${carbon.analytics.commons.version}
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.receiver.thrift.server.feature:${carbon.analytics.common.version}
                                 </includedFeatureDef>
                                 <includedFeatureDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.receiver.binary.server.feature:${carbon.analytics.commons.version}
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.receiver.binary.server.feature:${carbon.analytics.common.version}
                                 </includedFeatureDef>
                             </includedFeatures>
                             <importFeatures>

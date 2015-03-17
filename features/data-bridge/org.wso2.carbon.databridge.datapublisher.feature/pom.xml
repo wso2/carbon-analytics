@@ -69,13 +69,13 @@
                             </importFeatures>
                             <includedFeatures>
                                 <includedFeatureDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.commons.server.feature:${carbon.analytics.commons.version}
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.commons.server.feature:${carbon.analytics.common.version}
                                 </includedFeatureDef>
                                 <includedFeatureDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.commons.thrift.server.feature:${carbon.analytics.commons.version}
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.commons.thrift.server.feature:${carbon.analytics.common.version}
                                 </includedFeatureDef>
                                 <includedFeatureDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.agent.thrift.server.feature:${carbon.analytics.commons.version}
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.agent.thrift.server.feature:${carbon.analytics.common.version}
                                 </includedFeatureDef>
                             </includedFeatures>
                         </configuration>

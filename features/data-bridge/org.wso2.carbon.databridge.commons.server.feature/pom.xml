@@ -79,7 +79,7 @@
                                 </properties>
                             </adviceFile>
                             <bundles>
-                                <bundleDef>org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.commons:${carbon.analytics.commons.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.commons:${carbon.analytics.common.version}</bundleDef>
                                 <bundleDef>org.json.wso2:json</bundleDef>
                                 <bundleDef>com.google.code.gson:gson</bundleDef>
                             </bundles>
