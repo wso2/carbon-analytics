@@ -29,7 +29,7 @@ public class ResponseResult {
 
     private long totalRecordCount;
 
-    private List<ResponseRecord> records = new ArrayList<>();
+    private List<Record> records = new ArrayList<>();
 
     public ResponseResult() {
     }
@@ -58,11 +58,11 @@ public class ResponseResult {
         this.totalRecordCount = totalRecordCount;
     }
 
-    public List<ResponseRecord> getRecords() {
+    public List<Record> getRecords() {
         return records;
     }
 
-    public void setRecords(List<ResponseRecord> records) {
+    public void setRecords(List<Record> records) {
         this.records = records;
     }
 }

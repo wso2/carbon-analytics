@@ -3,6 +3,20 @@
     <wsdl:documentation>MessageConsole</wsdl:documentation>
     <wsdl:types>
         <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://beans.messageconsole.analytics.carbon.wso2.org/xsd">
+            <xs:complexType name="TableBean">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="ax211:ColumnBean"></xs:element>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ColumnBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="display" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="primary" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
             <xs:complexType name="RecordResultBean">
                 <xs:sequence>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="records" nillable="true" type="ax211:RecordBean"></xs:element>
@@ -21,20 +35,6 @@
                     <xs:element minOccurs="0" name="columnName" nillable="true" type="xs:string"></xs:element>
                     <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"></xs:element>
                     <xs:element minOccurs="0" name="value" nillable="true" type="xs:string"></xs:element>
-                </xs:sequence>
-            </xs:complexType>
-            <xs:complexType name="TableBean">
-                <xs:sequence>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="ax211:ColumnBean"></xs:element>
-                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
-                </xs:sequence>
-            </xs:complexType>
-            <xs:complexType name="ColumnBean">
-                <xs:sequence>
-                    <xs:element minOccurs="0" name="display" type="xs:boolean"></xs:element>
-                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
-                    <xs:element minOccurs="0" name="primary" type="xs:boolean"></xs:element>
-                    <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"></xs:element>
                 </xs:sequence>
             </xs:complexType>
         </xs:schema>
@@ -60,6 +60,20 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="getTableInfo">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTableInfoResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax212:TableBean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="getRecords">
                 <xs:complexType>
                     <xs:sequence>
@@ -76,20 +90,6 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" nillable="true" type="ax212:RecordResultBean"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getTableInfo">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getTableInfoResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax212:TableBean"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -110,6 +110,13 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="addRecordResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax212:RecordBean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
         </xs:schema>
         <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://exception.messageconsole.analytics.carbon.wso2.org/xsd">
             <xs:complexType name="MessageConsoleException">
@@ -123,17 +130,20 @@
     <wsdl:message name="getTableInfoResponse">
         <wsdl:part name="parameters" element="ns:getTableInfoResponse"></wsdl:part>
     </wsdl:message>
+    <wsdl:message name="MessageConsoleMessageConsoleException">
+        <wsdl:part name="parameters" element="ns:MessageConsoleMessageConsoleException"></wsdl:part>
+    </wsdl:message>
     <wsdl:message name="listTablesRequest">
         <wsdl:part name="parameters" element="ns:listTables"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="listTablesResponse">
         <wsdl:part name="parameters" element="ns:listTablesResponse"></wsdl:part>
     </wsdl:message>
-    <wsdl:message name="MessageConsoleMessageConsoleException">
-        <wsdl:part name="parameters" element="ns:MessageConsoleMessageConsoleException"></wsdl:part>
-    </wsdl:message>
     <wsdl:message name="addRecordRequest">
         <wsdl:part name="parameters" element="ns:addRecord"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="addRecordResponse">
+        <wsdl:part name="parameters" element="ns:addRecordResponse"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="deleteRecordsRequest">
         <wsdl:part name="parameters" element="ns:deleteRecords"></wsdl:part>
@@ -148,6 +158,7 @@
         <wsdl:operation name="getTableInfo">
             <wsdl:input message="ns:getTableInfoRequest" wsaw:Action="urn:getTableInfo"></wsdl:input>
             <wsdl:output message="ns:getTableInfoResponse" wsaw:Action="urn:getTableInfoResponse"></wsdl:output>
+            <wsdl:fault message="ns:MessageConsoleMessageConsoleException" name="MessageConsoleMessageConsoleException" wsaw:Action="urn:getTableInfoMessageConsoleMessageConsoleException"></wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="listTables">
             <wsdl:input message="ns:listTablesRequest" wsaw:Action="urn:listTables"></wsdl:input>
@@ -156,6 +167,7 @@
         </wsdl:operation>
         <wsdl:operation name="addRecord">
             <wsdl:input message="ns:addRecordRequest" wsaw:Action="urn:addRecord"></wsdl:input>
+            <wsdl:output message="ns:addRecordResponse" wsaw:Action="urn:addRecordResponse"></wsdl:output>
             <wsdl:fault message="ns:MessageConsoleMessageConsoleException" name="MessageConsoleMessageConsoleException" wsaw:Action="urn:addRecordMessageConsoleMessageConsoleException"></wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="deleteRecords">
@@ -178,6 +190,9 @@
             <wsdl:output>
                 <soap:body use="literal"></soap:body>
             </wsdl:output>
+            <wsdl:fault name="MessageConsoleMessageConsoleException">
+                <soap:fault use="literal" name="MessageConsoleMessageConsoleException"></soap:fault>
+            </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="listTables">
             <soap:operation soapAction="urn:listTables" style="document"></soap:operation>
@@ -196,6 +211,9 @@
             <wsdl:input>
                 <soap:body use="literal"></soap:body>
             </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
             <wsdl:fault name="MessageConsoleMessageConsoleException">
                 <soap:fault use="literal" name="MessageConsoleMessageConsoleException"></soap:fault>
             </wsdl:fault>
@@ -232,6 +250,9 @@
             <wsdl:output>
                 <soap12:body use="literal"></soap12:body>
             </wsdl:output>
+            <wsdl:fault name="MessageConsoleMessageConsoleException">
+                <soap12:fault use="literal" name="MessageConsoleMessageConsoleException"></soap12:fault>
+            </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="listTables">
             <soap12:operation soapAction="urn:listTables" style="document"></soap12:operation>
@@ -250,6 +271,9 @@
             <wsdl:input>
                 <soap12:body use="literal"></soap12:body>
             </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
             <wsdl:fault name="MessageConsoleMessageConsoleException">
                 <soap12:fault use="literal" name="MessageConsoleMessageConsoleException"></soap12:fault>
             </wsdl:fault>
@@ -301,6 +325,9 @@
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"></mime:content>
             </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="deleteRecords">
             <http:operation location="deleteRecords"></http:operation>

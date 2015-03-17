@@ -23,7 +23,6 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDSUtils;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
@@ -83,7 +82,7 @@ public class MessageConsoleService {
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         RecordResultBean recordResult = new RecordResultBean();
-        RecordGroup[] results = null;
+        RecordGroup[] results;
         int searchCount = 0;
 
         if (searchQuery != null && !searchQuery.isEmpty()) {
@@ -106,7 +105,7 @@ public class MessageConsoleService {
         } else {
             try {
                 results = analyticsDataService.get(tenantId, tableName, 1, null, timeFrom, timeTo, startIndex, recordCount);
-            } catch (AnalyticsException e) {
+            } catch (Exception e) {
                 logger.error("Unable to get records from Analytics data layer for tenant: " + tenantId +
                              " and for table:" + tableName, e);
                 throw new MessageConsoleException("Unable to get records from Analytics data layer for tenant: " + tenantId +
@@ -132,6 +131,7 @@ public class MessageConsoleService {
             }
             RecordBean[] recordBeans = new RecordBean[recordBeanList.size()];
             recordResult.setRecords(recordBeanList.toArray(recordBeans));
+            searchCount = recordBeanList.size();
             recordResult.setTotalResultCount(searchCount);
         }
 
@@ -161,62 +161,29 @@ public class MessageConsoleService {
         return ids;
     }
 
-    public TableBean getTableInfo(String tableName) {
+    public TableBean getTableInfo(String tableName) throws MessageConsoleException {
 
+        int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
         TableBean table = new TableBean();
-        table.setName("JMX_AGENT_TOOLBOX");
+        table.setName(tableName);
+        try {
+            AnalyticsSchema schema = analyticsDataService.getTableSchema(tenantId, tableName);
+            ColumnBean[] columns = new ColumnBean[schema.getColumns().size()];
 
-        ColumnBean[] columns = new ColumnBean[8];
-
-        ColumnBean column1 = new ColumnBean();
-        column1.setName("heap_mem_init");
-        column1.setType("String");
-        column1.setPrimary(true);
-        columns[0] = column1;
-
-        ColumnBean column2 = new ColumnBean();
-        column2.setName("non_heap_mem_used");
-        column2.setType("String");
-        column2.setPrimary(false);
-        columns[1] = column2;
-
-        ColumnBean column3 = new ColumnBean();
-        column3.setName("peakThreadCount");
-        column3.setType("String");
-        column3.setPrimary(false);
-        columns[2] = column3;
-
-        ColumnBean column4 = new ColumnBean();
-        column4.setName("heap_mem_max");
-        column4.setType("String");
-        column4.setPrimary(false);
-        columns[3] = column4;
-
-        ColumnBean column5 = new ColumnBean();
-        column5.setName("heap_mem_used");
-        column5.setType("String");
-        column5.setPrimary(false);
-        columns[4] = column5;
-
-        ColumnBean column6 = new ColumnBean();
-        column6.setName("meta_host");
-        column6.setType("String");
-        column6.setPrimary(false);
-        columns[5] = column6;
-
-        ColumnBean column7 = new ColumnBean();
-        column7.setName("non_heap_mem_max");
-        column7.setType("String");
-        column7.setPrimary(false);
-        columns[6] = column7;
-
-        ColumnBean column8 = new ColumnBean();
-        column8.setName("bam_unique_rec_id");
-        column8.setType("String");
-        column8.setPrimary(false);
-        columns[7] = column8;
-
-        table.setColumns(columns);
+            Map<String, AnalyticsSchema.ColumnType> columnTypeMap = schema.getColumns();
+            int i = 0;
+            for (Map.Entry<String, AnalyticsSchema.ColumnType> stringColumnTypeEntry : columnTypeMap.entrySet()) {
+                ColumnBean column = new ColumnBean();
+                column.setName(stringColumnTypeEntry.getKey());
+                column.setType(stringColumnTypeEntry.getValue().name());
+                column.setPrimary(schema.getPrimaryKeys().contains(stringColumnTypeEntry.getKey()));
+                columns[i++] = column;
+            }
+            table.setColumns(columns);
+        } catch (Exception e) {
+            logger.error("Unable to get schema information for table :" + tableName, e);
+            throw new MessageConsoleException("Unable to get schema information for table :" + tableName, e);
+        }
 
         return table;
     }
@@ -237,13 +204,16 @@ public class MessageConsoleService {
         }
     }
 
-    public void addRecord(String table, String[] columns, String[] values) throws MessageConsoleException {
+    public RecordBean addRecord(String table, String[] columns, String[] values) throws MessageConsoleException {
 
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         if (logger.isDebugEnabled()) {
-            logger.info("New record going to add to" + table);
+            logger.debug("New record {column: " + Arrays.toString(columns) + ", values: " + Arrays.toString(values) +
+                         "} going to add to" + table);
         }
+
+        RecordBean recordBean;
         try {
             AnalyticsSchema schema = analyticsDataService.getTableSchema(tenantId, table);
             Map<String, AnalyticsSchema.ColumnType> columnsMetaInfo = schema.getColumns();
@@ -279,12 +249,16 @@ public class MessageConsoleService {
             }
 
             Record record = new Record(tenantId, table, objectMap, System.currentTimeMillis());
-            List<Record> records = new ArrayList<Record>(1);
+            recordBean = createRecordBean(record);
+
+            List<Record> records = new ArrayList<>(1);
             records.add(record);
             analyticsDataService.put(records);
         } catch (Exception e) {
-            logger.error("Unable to add record to table :" + table, e);
-            throw new MessageConsoleException("Unable to add record to table :" + table, e);
+            logger.error("Unable to add record {column: " + Arrays.toString(columns) + ", values: " + Arrays.toString(values) + " } to table :" + table, e);
+            throw new MessageConsoleException("Unable to add record {column: " + Arrays.toString(columns) + ", values: " + Arrays.toString(values) + " } to table :" + table, e);
         }
+
+        return recordBean;
     }
 }

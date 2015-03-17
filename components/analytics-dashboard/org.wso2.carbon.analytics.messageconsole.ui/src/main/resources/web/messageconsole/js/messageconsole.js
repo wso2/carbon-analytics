@@ -104,8 +104,11 @@ function createJTable() {
                               list: val.display,
                               key: val.key
                           };
-                          if (val.type == 'String') {
+                          if (val.type == 'STRING') {
                               fields[val.name].type = 'textarea';
+                          }
+                          if (val.name == 'bam_unique_rec_id' || val.name == 'bam_rec_timestamp') {
+                              fields[val.name].edit = false;
                           }
                       });
 

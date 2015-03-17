@@ -32,12 +32,11 @@ import org.wso2.carbon.analytics.messageconsole.stub.beans.EntityBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.RecordBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.RecordResultBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.TableBean;
-import org.wso2.carbon.messageconsole.ui.beans.ResponseColumn;
-import org.wso2.carbon.messageconsole.ui.beans.ResponseRecord;
+import org.wso2.carbon.messageconsole.ui.beans.Column;
+import org.wso2.carbon.messageconsole.ui.beans.Record;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseResult;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseTable;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,7 +45,7 @@ public class MessageConsoleConnector {
 
     private static final Log log = LogFactory.getLog(MessageConsoleConnector.class);
     private static final String MESSAGE_CONSOLE = "MessageConsole";
-    private static final String TIMESTAMP = "timestamp";
+    private static final String TIMESTAMP = "bam_rec_timestamp";
     private static final String OK = "OK";
     private static final String ERROR = "ERROR";
     public static final String RECORD_ID = "bam_unique_rec_id";
@@ -84,7 +83,7 @@ public class MessageConsoleConnector {
 
         if (tableList == null) {
             if (log.isDebugEnabled()) {
-                log.debug("Receiving a empty table name list!");
+                log.debug("Received an empty table name list!");
             }
             tableList = new String[0];
         }
@@ -95,23 +94,32 @@ public class MessageConsoleConnector {
     public String getRecords(String tableName, long timeFrom, long timeTo, int startIndex, int pageSize, String
             searchQuery) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Search Query: " + searchQuery);
+            log.debug("timeFrom: " + timeFrom);
+            log.debug("timeTo: " + timeTo);
+            log.debug("Start Index: " + startIndex);
+            log.debug("Page Size: " + pageSize);
+        }
         ResponseResult responseResult = new ResponseResult();
         Gson gson = RESPONSE_RESULT_BUILDER.serializeNulls().create();
-
         try {
             RecordResultBean recordBeans = stub.getRecords(tableName, timeFrom, timeTo, startIndex, pageSize, searchQuery);
             responseResult.setResult(OK);
-            List<ResponseRecord> records = new ArrayList<>();
+            List<Record> records = new ArrayList<>();
             if (recordBeans != null) {
                 if (recordBeans.getRecords() != null) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Result size: " + recordBeans.getRecords().length);
+                    }
                     for (RecordBean recordBean : recordBeans.getRecords()) {
-                        ResponseRecord record = new ResponseRecord();
+                        Record record = new Record();
                         if (recordBean != null) {
-                            List<ResponseColumn> columns = new ArrayList<>(recordBean.getEntityBeans().length + 2);
-                            columns.add(new ResponseColumn(RECORD_ID, recordBean.getRecordId()));
-                            columns.add(new ResponseColumn(TIMESTAMP, String.valueOf(recordBean.getTimestamp())));
+                            List<Column> columns = new ArrayList<>(recordBean.getEntityBeans().length + 2);
+                            columns.add(new Column(RECORD_ID, recordBean.getRecordId()));
+                            columns.add(new Column(TIMESTAMP, String.valueOf(recordBean.getTimestamp())));
                             for (EntityBean entityBean : recordBean.getEntityBeans()) {
-                                columns.add(new ResponseColumn(entityBean.getColumnName(), entityBean.getValue()));
+                                columns.add(new Column(entityBean.getColumnName(), entityBean.getValue()));
                             }
                             record.setColumns(columns);
                         }
@@ -133,7 +141,7 @@ public class MessageConsoleConnector {
     public String getTableInfo(String tableName) {
 
         Gson gson = new GsonBuilder().serializeNulls().create();
-        TableBean tableInfo = null;
+        TableBean tableInfo;
         ResponseTable table = new ResponseTable();
         try {
             tableInfo = stub.getTableInfo(tableName);
@@ -146,15 +154,27 @@ public class MessageConsoleConnector {
                 column.setPrimary(resultColumn.getPrimary());
                 column.setType(resultColumn.getType());
                 column.setDisplay(resultColumn.getDisplay());
-                if (RECORD_ID.equals(resultColumn.getName())) {
-                    column.setKey(true);
-                    column.setDisplay(false);
-                }
                 columns.add(column);
             }
+
+            // Adding recordId column as a hidden field
+            ResponseTable.Column recordId = new ResponseTable().new Column();
+            recordId.setName(RECORD_ID);
+            recordId.setPrimary(false);
+            recordId.setType("STRING");
+            recordId.setDisplay(false);
+            columns.add(recordId);
+
+            ResponseTable.Column timestamp = new ResponseTable().new Column();
+            timestamp.setName(TIMESTAMP);
+            timestamp.setPrimary(false);
+            timestamp.setType("LONG");
+            timestamp.setDisplay(true);
+            columns.add(timestamp);
+
             table.setColumns(columns);
 
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             log.error("Unable to get table information for table:" + tableName, e);
         }
 
@@ -163,6 +183,9 @@ public class MessageConsoleConnector {
 
     public String deleteRecords(String table, String[] recordIds) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Records[" + Arrays.toString(recordIds) + "] going to delete from" + table);
+        }
         ResponseResult responseResult = new ResponseResult();
         Gson gson = RESPONSE_RESULT_BUILDER.serializeNulls().create();
         responseResult.setResult(OK);
@@ -178,13 +201,18 @@ public class MessageConsoleConnector {
     }
 
     public String addRecord(String table, String[] columns, String[] values) {
+
+        if (log.isDebugEnabled()) {
+            log.debug("New record {column: " + Arrays.toString(columns) + ", values: " + Arrays.toString(values) +
+                      "} going to add to" + table);
+        }
         ResponseResult responseResult = new ResponseResult();
         Gson gson = RESPONSE_RESULT_BUILDER.serializeNulls().create();
         responseResult.setResult(OK);
         try {
-            stub.addRecord(table, columns, values);
+            RecordBean recordBean = stub.addRecord(table, columns, values);
         } catch (Exception e) {
-            log.error("Unable to add record to table :" + table, e);
+            log.error("Unable to add record {column: " + Arrays.toString(columns) + ", values: " + Arrays.toString(values) + " } to table :" + table, e);
             responseResult.setResult(ERROR);
             responseResult.setMessage(e.getMessage());
         }

@@ -18,29 +18,21 @@ package org.wso2.carbon.messageconsole.ui.beans;
 * under the License.
 */
 
-public class ResponseColumn {
+import java.util.ArrayList;
+import java.util.List;
 
-    private String key;
-    private String value;
+public class Record {
 
-    public ResponseColumn(String key, String value) {
-        this.key = key;
-        this.value = value;
+    private List<Column> columns = new ArrayList<>();
+
+    public Record() {
     }
 
-    public String getKey() {
-        return key;
+    public List<Column> getColumns() {
+        return columns;
     }
 
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
+    public void setColumns(List<Column> columns) {
+        this.columns = columns;
     }
 }
