@@ -18,36 +18,24 @@
  */
 package org.wso2.carbon.analytics.dataservice.indexing;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleField;
+import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.FloatField;
 import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
-import org.apache.lucene.document.Field.Store;
+import org.apache.lucene.facet.FacetField;
+import org.apache.lucene.facet.FacetsConfig;
+import org.apache.lucene.facet.taxonomy.FloatAssociationFacetField;
+import org.apache.lucene.facet.taxonomy.IntAssociationFacetField;
+import org.apache.lucene.facet.taxonomy.TaxonomyWriter;
+import org.apache.lucene.facet.taxonomy.directory.DirectoryTaxonomyWriter;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
@@ -70,6 +58,10 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterException;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
+import org.wso2.carbon.analytics.dataservice.indexing.facets.models.AnalyticsCategories;
+import org.wso2.carbon.analytics.dataservice.indexing.facets.models.AnalyticsFacetField;
+import org.wso2.carbon.analytics.dataservice.indexing.facets.models.AnalyticsFloatAssociationFacetField;
+import org.wso2.carbon.analytics.dataservice.indexing.facets.models.AnalyticsIntAssociationFacetField;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataCorruptionException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsTimeoutException;
@@ -78,6 +70,24 @@ import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * This class represents the indexing functionality.
@@ -104,6 +114,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         
     private static final String INDEX_DATA_FS_BASE_PATH = "/_data/index/";
 
+    private static final String TAXONOMY_INDEX_DATA_FS_BASE_PATH ="/_data/taxonomy/index/" ;
+
     public static final String INDEX_ID_INTERNAL_FIELD = "_id";
 
     public static final String INDEX_INTERNAL_TIMESTAMP_FIELD = "_timestamp";
@@ -115,6 +127,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     private Map<String, Map<String, IndexType>> indexDefs = new HashMap<String, Map<String, IndexType>>();
     
     private Map<String, Directory> indexDirs = new HashMap<String, Directory>();
+    private Map<String, Directory> indexTaxonomyDirs = new HashMap<String, Directory>();
     
     private Analyzer luceneAnalyzer;
     
@@ -125,7 +138,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     private int shardCount;
     
     private ExecutorService shardWorkerExecutor;
-            
+
     public AnalyticsDataIndexer(AnalyticsRecordStore analyticsRecordStore, 
             AnalyticsFileSystem analyticsFileSystem, int shardCount) throws AnalyticsException {
     	this(analyticsRecordStore, analyticsFileSystem, shardCount, new StandardAnalyzer());
@@ -676,16 +689,17 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     }
     
     private void updateIndex(int shardIndex, List<Record> recordBatch, 
-            Map<String, IndexType> columns) throws AnalyticsIndexException {
+            Map<String, IndexType> columns) throws AnalyticsException {
         Record firstRecord = recordBatch.get(0);
         int tenantId = firstRecord.getTenantId();
         String tableName = firstRecord.getTableName();
         String shardedTableId = this.generateShardedTableId(tenantId, tableName, Integer.toString(shardIndex));
         IndexWriter indexWriter = this.createIndexWriter(shardedTableId);
+        TaxonomyWriter taxonomyWriter = this.createTaxonomyIndexWriter(shardedTableId);
         try {
             for (Record record : recordBatch) {
-                indexWriter.updateDocument(new Term(INDEX_ID_INTERNAL_FIELD, record.getId()), 
-                        this.generateIndexDoc(record, columns).getFields());
+                indexWriter.updateDocument(new Term(INDEX_ID_INTERNAL_FIELD, record.getId()),
+                                           this.generateIndexDoc(record, columns, taxonomyWriter).getFields());
             }
             indexWriter.commit();
         } catch (IOException e) {
@@ -693,6 +707,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         } finally {
             try {
                 indexWriter.close();
+                taxonomyWriter.close();
             } catch (IOException e) {
                 log.error("Error closing index writer: " + e.getMessage(), e);
             }
@@ -765,9 +780,51 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             break;
         }
     }
-    
-    private Document generateIndexDoc(Record record, Map<String, IndexType> columns) 
-            throws IOException, AnalyticsIndexException {
+
+    private void checkAndAddTaxonomyDocEntries(Document doc, IndexType type,
+                                               Object obj, TaxonomyWriter taxonomyWriter)
+            throws AnalyticsIndexException{
+        if (obj == null) return;
+        switch (type) {
+            case FACET:
+                FacetsConfig facetsConfig = new FacetsConfig();
+                if (obj instanceof AnalyticsCategories){
+                    for(AnalyticsFacetField analyticsFacetField : ((AnalyticsCategories) obj).getAnalyticsFacetFields()){
+
+                        String dimension = analyticsFacetField.getDimension();
+                        //the field name for dimensions will be "$ + {dimension}"
+                        facetsConfig.setIndexFieldName(dimension, new StringBuilder("$").append(dimension).toString());
+                        facetsConfig.setMultiValued(dimension, true);
+                        facetsConfig.setHierarchical(dimension, true);
+
+                        if (analyticsFacetField instanceof AnalyticsIntAssociationFacetField) {
+                            AnalyticsIntAssociationFacetField associationFacetField =
+                                    (AnalyticsIntAssociationFacetField)analyticsFacetField;
+                            doc.add(new IntAssociationFacetField(associationFacetField.getAssociationValue(),
+                                                                 dimension,
+                                                                 associationFacetField.getPath()));
+                        } else if (analyticsFacetField instanceof AnalyticsFloatAssociationFacetField) {
+                            AnalyticsFloatAssociationFacetField associationFacetField =
+                                    (AnalyticsFloatAssociationFacetField)analyticsFacetField;
+                            doc.add(new FloatAssociationFacetField(associationFacetField.getAssociationValue(),
+                                                                 dimension,
+                                                                 associationFacetField.getPath()));
+                        } else if (analyticsFacetField instanceof AnalyticsFacetField) {
+                            doc.add(new FacetField(dimension, analyticsFacetField.getPath()));
+                        }
+                        try {
+                            doc = facetsConfig.build(taxonomyWriter, doc);
+                        }catch (IOException e){
+                            throw new AnalyticsIndexException("Error while adding Taxonomy entry", e);
+                        }
+                    }
+                }
+                break;
+        }
+    }
+
+    private Document generateIndexDoc(Record record, Map<String, IndexType> columns, TaxonomyWriter taxonomyWriter)
+            throws AnalyticsIndexException {
         Document doc = new Document();
         doc.add(new StringField(INDEX_ID_INTERNAL_FIELD, record.getId(), Store.YES));
         doc.add(new LongField(INDEX_INTERNAL_TIMESTAMP_FIELD, record.getTimestamp(), Store.NO));
@@ -777,6 +834,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         for (Map.Entry<String, IndexType> entry : columns.entrySet()) {
             name = entry.getKey();
             this.checkAndAddDocEntry(doc, entry.getValue(), name, record.getValue(name));
+            this.checkAndAddTaxonomyDocEntries(doc, entry.getValue(), record.getValue(name),
+                                               taxonomyWriter);
         }
         return doc;
     }
@@ -819,9 +878,13 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     private String generateDirPath(String tableId) {
         return INDEX_DATA_FS_BASE_PATH + tableId;
     }
-    
-    private Directory createDirectory(String tableId) throws AnalyticsIndexException {
-        String path = this.generateDirPath(tableId);
+
+    private String generateDirPath(String tableId, String basePath) {
+        return basePath + tableId;
+    }
+
+    private Directory createDirectory(String tableId, String basePath) throws AnalyticsIndexException {
+        String path = this.generateDirPath(tableId, basePath);
         try {
             return new AnalyticsDirectory(this.getFileSystem(), new SingleInstanceLockFactory(), path);
         } catch (AnalyticsException e) {
@@ -835,12 +898,26 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             synchronized (this.indexDirs) {
                 indexDir = this.indexDirs.get(tableId);
                 if (indexDir == null) {
-                    indexDir = this.createDirectory(tableId);
+                    indexDir = this.createDirectory(tableId, INDEX_DATA_FS_BASE_PATH);
                     this.indexDirs.put(tableId, indexDir);
                 }
             }
         }
         return indexDir;
+    }
+
+    private Directory lookupTaxonomyIndexDir(String tableId) throws AnalyticsIndexException {
+        Directory indexTaxonomyDir = this.indexTaxonomyDirs.get(tableId);
+        if (indexTaxonomyDir == null) {
+            synchronized (this.indexTaxonomyDirs) {
+                indexTaxonomyDir = this.indexTaxonomyDirs.get(tableId);
+                if (indexTaxonomyDir == null) {
+                    indexTaxonomyDir = this.createDirectory(tableId, TAXONOMY_INDEX_DATA_FS_BASE_PATH);
+                    this.indexTaxonomyDirs.put(tableId, indexTaxonomyDir);
+                }
+            }
+        }
+        return indexTaxonomyDir;
     }
     
     private IndexWriter createIndexWriter(String tableId) throws AnalyticsIndexException {
@@ -848,6 +925,15 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_4_10_3, this.luceneAnalyzer);
         try {
             return new IndexWriter(indexDir, conf);
+        } catch (IOException e) {
+            throw new AnalyticsIndexException("Error in creating index writer: " + e.getMessage(), e);
+        }
+    }
+
+    private TaxonomyWriter createTaxonomyIndexWriter(String tableId) throws AnalyticsIndexException {
+        Directory indexDir = this.lookupTaxonomyIndexDir(tableId);
+        try {
+            return new DirectoryTaxonomyWriter(indexDir, IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
         } catch (IOException e) {
             throw new AnalyticsIndexException("Error in creating index writer: " + e.getMessage(), e);
         }
