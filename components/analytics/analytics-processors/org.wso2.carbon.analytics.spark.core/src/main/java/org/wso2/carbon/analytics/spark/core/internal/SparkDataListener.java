@@ -20,7 +20,7 @@ package org.wso2.carbon.analytics.spark.core.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.spark.executor.CoarseGrainedExecutorBackend;
+import org.wso2.carbon.utils.CarbonUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,8 +34,8 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.List;
-
-import org.wso2.carbon.utils.CarbonUtils;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * This class listens to the repository/data/spark-data directory for spark data changes
@@ -64,16 +64,21 @@ public class SparkDataListener implements Runnable {
                     if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
                         String fileName = event.context().toString();
                         final String[] argArray = getArgArray(Paths.get(destFolderPath, fileName));
-                        System.out.println("file: " + fileName);
+                        log.info("Created file : " + fileName);
+
                         for (String str : argArray) {
                             System.out.println(str);
                         }
                         if (new File(destFolderPath+"/"+fileName).delete()){
-                            System.out.println("deleted file: "+ fileName);
+                            log.info("Deleted file : "+ fileName);
                         }
 
                         //todo: spawn this in a new thread
-                        CoarseGrainedExecutorBackend.main(argArray);
+//                        CoarseGrainedExecutorBackend.main(argArray);
+
+                        ExecutorService executor = Executors.newCachedThreadPool();
+                        executor.execute(new SparkBackendExecutor(argArray));
+
 //                        new Thread(new Runnable() {
 //                            @Override
 //                            public void run() {
