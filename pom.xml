@@ -177,6 +177,16 @@
                 <version>${lucene.regex.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-facet</artifactId>
+                <version>${lucene.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-expressions</artifactId>
+                <version>${lucene.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.datasource.core</artifactId>
                 <version>${carbon.analytics.version}</version>
