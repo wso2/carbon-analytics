@@ -34,6 +34,7 @@ import org.wso2.carbon.analytics.messageconsole.stub.beans.RecordResultBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.TableBean;
 import org.wso2.carbon.messageconsole.ui.beans.Column;
 import org.wso2.carbon.messageconsole.ui.beans.Record;
+import org.wso2.carbon.messageconsole.ui.beans.ResponseRecord;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseResult;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseTable;
 
@@ -45,10 +46,11 @@ public class MessageConsoleConnector {
 
     private static final Log log = LogFactory.getLog(MessageConsoleConnector.class);
     private static final String MESSAGE_CONSOLE = "MessageConsole";
-    private static final String TIMESTAMP = "bam_rec_timestamp";
     private static final String OK = "OK";
     private static final String ERROR = "ERROR";
+
     public static final String RECORD_ID = "bam_unique_rec_id";
+    public static final String TIMESTAMP = "bam_rec_timestamp";
 
     public static final int TYPE_LIST_RECORD = 1;
     public static final int TYPE_CREATE_RECORD = 2;
@@ -59,6 +61,8 @@ public class MessageConsoleConnector {
     private MessageConsoleStub stub;
     private static GsonBuilder RESPONSE_RESULT_BUILDER = new GsonBuilder().registerTypeAdapter(ResponseResult.class,
                                                                                                new ResponseResultSerializer());
+    private static GsonBuilder RESPONSE_RECORD_BUILDER = new GsonBuilder().registerTypeAdapter(ResponseRecord.class,
+                                                                                               new ResponseRecordSerializer());
 
     public MessageConsoleConnector(ConfigurationContext configCtx, String backendServerURL, String cookie) {
         String serviceURL = backendServerURL + MESSAGE_CONSOLE;
@@ -113,16 +117,7 @@ public class MessageConsoleConnector {
                         log.debug("Result size: " + recordBeans.getRecords().length);
                     }
                     for (RecordBean recordBean : recordBeans.getRecords()) {
-                        Record record = new Record();
-                        if (recordBean != null) {
-                            List<Column> columns = new ArrayList<>(recordBean.getEntityBeans().length + 2);
-                            columns.add(new Column(RECORD_ID, recordBean.getRecordId()));
-                            columns.add(new Column(TIMESTAMP, String.valueOf(recordBean.getTimestamp())));
-                            for (EntityBean entityBean : recordBean.getEntityBeans()) {
-                                columns.add(new Column(entityBean.getColumnName(), entityBean.getValue()));
-                            }
-                            record.setColumns(columns);
-                        }
+                        Record record = getRecord(recordBean);
                         records.add(record);
                     }
                     responseResult.setRecords(records);
@@ -136,6 +131,20 @@ public class MessageConsoleConnector {
         }
 
         return gson.toJson(responseResult);
+    }
+
+    private Record getRecord(RecordBean recordBean) {
+        Record record = new Record();
+        if (recordBean != null) {
+            List<Column> columns = new ArrayList<>(recordBean.getEntityBeans().length + 2);
+            columns.add(new Column(RECORD_ID, recordBean.getRecordId()));
+            columns.add(new Column(TIMESTAMP, String.valueOf(recordBean.getTimestamp())));
+            for (EntityBean entityBean : recordBean.getEntityBeans()) {
+                columns.add(new Column(entityBean.getColumnName(), entityBean.getValue()));
+            }
+            record.setColumns(columns);
+        }
+        return record;
     }
 
     public String getTableInfo(String tableName) {
@@ -163,6 +172,7 @@ public class MessageConsoleConnector {
             recordId.setPrimary(false);
             recordId.setType("STRING");
             recordId.setDisplay(false);
+            recordId.setKey(true);
             columns.add(recordId);
 
             ResponseTable.Column timestamp = new ResponseTable().new Column();
@@ -206,16 +216,39 @@ public class MessageConsoleConnector {
             log.debug("New record {column: " + Arrays.toString(columns) + ", values: " + Arrays.toString(values) +
                       "} going to add to" + table);
         }
-        ResponseResult responseResult = new ResponseResult();
-        Gson gson = RESPONSE_RESULT_BUILDER.serializeNulls().create();
-        responseResult.setResult(OK);
+        ResponseRecord responseRecord = new ResponseRecord();
+        Gson gson = RESPONSE_RECORD_BUILDER.serializeNulls().create();
+        responseRecord.setResult(OK);
         try {
             RecordBean recordBean = stub.addRecord(table, columns, values);
+            responseRecord.setRecord(getRecord(recordBean));
         } catch (Exception e) {
             log.error("Unable to add record {column: " + Arrays.toString(columns) + ", values: " + Arrays.toString(values) + " } to table :" + table, e);
-            responseResult.setResult(ERROR);
-            responseResult.setMessage(e.getMessage());
+            responseRecord.setResult(ERROR);
+            responseRecord.setMessage(e.getMessage());
         }
-        return gson.toJson(responseResult);
+        return gson.toJson(responseRecord);
+    }
+
+
+    public String updateRecord(String table, String[] columns, String[] values, String recordId, String timestamp) {
+        if (log.isDebugEnabled()) {
+            log.debug("Record {id: " + recordId + ", column: " + Arrays.toString(columns) + ", values: " + Arrays.toString(values) + "} going to update to" + table);
+        }
+
+        ResponseRecord responseRecord = new ResponseRecord();
+        Gson gson = RESPONSE_RECORD_BUILDER.serializeNulls().create();
+        responseRecord.setResult(OK);
+        try {
+            RecordBean recordBean = stub.updateRecord(table, recordId, columns, values, Long.parseLong(timestamp));
+            responseRecord.setRecord(getRecord(recordBean));
+        } catch (Exception e) {
+            log.error("Unable to update record {id: " + recordId + ", column: " + Arrays.toString(columns) + ", " +
+                      "values: " + Arrays.toString(values) + " } to table :" + table, e);
+
+            responseRecord.setResult(ERROR);
+            responseRecord.setMessage(e.getMessage());
+        }
+        return gson.toJson(responseRecord);
     }
 }
