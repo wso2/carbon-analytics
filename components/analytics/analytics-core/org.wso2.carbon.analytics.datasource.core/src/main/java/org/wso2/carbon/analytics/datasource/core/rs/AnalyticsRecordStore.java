@@ -118,19 +118,22 @@ public interface AnalyticsRecordStore {
     void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException;
     
     /**
-     * Retrieves data from a table.
+     * Retrieves data from a table, with a given range.
      * @param tenantId The tenant which this table belongs to
      * @param tableName The name of the table to search on
+     * @param numPartitionsHint The best effort number of splits this should return
      * @param columns The list of columns to required in results, null if all needs to be returned
-     * @param timeFrom The starting time to get records from, inclusive, -1 for beginning of time
-     * @param timeTo The ending time to get records to, non-inclusive, -1 for infinity
+     * @param timeFrom The starting time to get records from, inclusive, relatively to epoch,
+     * Long.MIN_VALUE should signal, this restriction to be disregarded
+     * @param timeTo The ending time to get records to, non-inclusive, relatively to epoch,
+     * Long.MAX_VALUE should signal, this restriction to be disregarded
      * @param recordsFrom The paginated index from value, zero based, inclusive
      * @param recordsCount The paginated records count to be read, -1 for infinity
      * @return An array of {@link RecordGroup} objects, which represents individual data sets in their local location
      * @throws AnalyticsException
      * @throws AnalyticsTableNotAvailableException
      */
-    RecordGroup[] get(int tenantId, String tableName, List<String> columns, long timeFrom, 
+    RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, long timeFrom, 
             long timeTo, int recordsFrom, int recordsCount) 
             throws AnalyticsException, AnalyticsTableNotAvailableException;
     
@@ -138,13 +141,14 @@ public interface AnalyticsRecordStore {
      * Retrieves data from a table with given ids.
      * @param tenantId The tenant which this table belongs to
      * @param tableName The name of the table to search on
+     * @param numPartitionsHint The best effort number of splits this should return
      * @param columns The list of columns to required in results, null if all needs to be returned
      * @param ids The list of ids of the records to be read
      * @return An array of {@link RecordGroup} objects, which contains individual data sets in their local location
      * @throws AnalyticsException
      * @throws AnalyticsTableNotAvailableException
      */
-    RecordGroup[] get(int tenantId, String tableName, List<String> columns, 
+    RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, 
             List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException;
     
     /**

@@ -20,13 +20,24 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-    <script src="js/jquery-1.11.2.min-messageconsole.js" type="text/javascript"></script>
-    <script src="js/jquery-ui.min-messageconsole.js" type="text/javascript"></script>
+    <link href="js/jquery-ui.min.css" rel="stylesheet" type="text/css"/>
+    <link href="js/jquery.datetimepicker.css" rel="stylesheet" type="text/css"/>
+    <link href="themes/metro/blue/jtable.css" rel="stylesheet" type="text/css"/>
+
+    <script src="js/jquery-1.11.2.min.js" type="text/javascript"></script>
+    <script src="js/jquery-ui.min.js" type="text/javascript"></script>
     <script src="js/jquery.jtable.min.js" type="text/javascript"></script>
+    <script src="js/jquery.datetimepicker.js"></script>
     <script src="js/messageconsole.js" type="text/javascript"></script>
-    <link href="themes/metro/blue/jtable.min.css" rel="stylesheet" type="text/css"/>
 
     <script type="text/javascript">
+        var typeCreateRecord = '<%= MessageConsoleConnector.TYPE_CREATE_RECORD%>';
+        var typeListRecord = '<%= MessageConsoleConnector.TYPE_LIST_RECORD%>';
+        var typeDeleteRecord = '<%= MessageConsoleConnector.TYPE_DELETE_RECORD%>';
+        var typeUpdateRecord = '<%= MessageConsoleConnector.TYPE_UPDATE_RECORD%>';
+        var typeUpdateRecord = '<%= MessageConsoleConnector.TYPE_UPDATE_RECORD%>';
+        var typeTableInfo = '<%= MessageConsoleConnector.TYPE_TABLE_INFO%>';
+
         $(document).ready(function () {
             var tableNames = "";
             <c:forEach var='tableName' items='${connector.getTableList()}'>
@@ -34,17 +45,44 @@
             </c:forEach>
             $("#tableSelect").append(tableNames);
             $("#DeleteAllButton").hide();
+            jQuery('#timeFrom').datetimepicker({
+                                                   format: 'unixtime',
+                                                   onShow: function (ct) {
+                                                       this.setOptions({
+                                                                           maxDate: jQuery('#timeTo').val() ? jQuery('#timeTo').val() : false
+                                                                       })
+                                                   }
+                                               });
+            jQuery('#timeTo').datetimepicker({
+                                                 format: 'unixtime',
+                                                 onShow: function (ct) {
+                                                     this.setOptions({
+                                                                         minDate: jQuery('#timeFrom').val() ? jQuery('#timeFrom').val() : false
+                                                                     })
+                                                 }
+                                             });
         });
     </script>
 
 </head>
 <body>
-<label> Table Name:
-    <select id="tableSelect" onchange="if (this.selectedIndex) createJTable(this.value);">
-        <option value="-1">Select a table</option>
-    </select>
-</label>
+<fieldset>
+    <legend>Search:</legend>
+    <label> Table Name*:
+        <select id="tableSelect">
+            <option value="-1">Select a table</option>
+        </select>
+    </label>
+    <label> From: <input id="timeFrom" type="text"> </label>
+    <label> To: <input id="timeTo" type="text"> </label>
+    <br>
+    <label> Search Query:
+        <textarea id="query" rows="4" cols="50"></textarea>
+    </label>
+    <input id="search" type="submit" value="Search" onclick="createJTable();">
+</fieldset>
 
+</body>
 <div id="AnalyticsTableContainer"></div>
 <button id="DeleteAllButton"> Delete all selected records</button>
 

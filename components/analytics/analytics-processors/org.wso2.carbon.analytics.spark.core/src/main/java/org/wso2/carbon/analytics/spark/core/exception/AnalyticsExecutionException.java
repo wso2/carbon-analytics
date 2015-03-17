@@ -21,7 +21,7 @@ package org.wso2.carbon.analytics.spark.core.exception;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 
 /**
- * This class represents executions occuring in Spark query execution.
+ * This class represents exceptions occuring in Spark query execution.
  */
 public class AnalyticsExecutionException extends AnalyticsException {
     

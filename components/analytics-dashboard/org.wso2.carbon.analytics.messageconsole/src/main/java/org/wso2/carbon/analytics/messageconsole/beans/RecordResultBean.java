@@ -1,4 +1,4 @@
-package org.wso2.carbon.messageconsole.ui.beans;
+package org.wso2.carbon.analytics.messageconsole.beans;
 
 /*
 * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -18,29 +18,30 @@ package org.wso2.carbon.messageconsole.ui.beans;
 * under the License.
 */
 
-public class ResponseColumn {
+import java.io.Serializable;
 
-    private String key;
-    private String value;
+public class RecordResultBean implements Serializable {
+    private static final long serialVersionUID = -90610112748238438L;
 
-    public ResponseColumn(String key, String value) {
-        this.key = key;
-        this.value = value;
+    private long totalResultCount;
+    private RecordBean[] records = new RecordBean[0];
+
+    public RecordResultBean() {
     }
 
-    public String getKey() {
-        return key;
+    public long getTotalResultCount() {
+        return totalResultCount;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setTotalResultCount(long totalResultCount) {
+        this.totalResultCount = totalResultCount;
     }
 
-    public String getValue() {
-        return value;
+    public RecordBean[] getRecords() {
+        return records;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setRecords(RecordBean[] records) {
+        this.records = records;
     }
 }

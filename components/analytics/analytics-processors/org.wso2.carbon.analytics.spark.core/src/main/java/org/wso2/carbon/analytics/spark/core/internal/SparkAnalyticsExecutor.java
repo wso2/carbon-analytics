@@ -22,6 +22,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.deploy.master.Master;
+import org.apache.spark.deploy.worker.Worker;
 import org.apache.spark.sql.api.java.JavaSQLContext;
 import org.apache.spark.sql.api.java.JavaSchemaRDD;
 import org.apache.spark.sql.api.java.Row;
@@ -31,13 +33,26 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
+import org.wso2.carbon.analytics.spark.core.internal.SparkDataListener;
+import scala.Option;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsRelation;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * This class represents the analytics query execution context.
@@ -49,13 +64,105 @@ public class SparkAnalyticsExecutor {
     private static final Log log = LogFactory.getLog(SparkAnalyticsExecutor.class);
     
     private static JavaSparkContext sparkCtx;
-    
+
     private static JavaSQLContext sqlCtx;
-    
+
     public static void init() {
-        SparkConf sparkConf = new SparkConf().setMaster("local").setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
+
+        initSparkDataListener();
+
+        SparkConf sparkConf = new SparkConf();
+
+        //master
+        startMaster("localhost",7077,8081, sparkConf);
+
+        //workers
+        Worker.startSystemAndActor("localhost", 4501, 8090, 2, 1000000,
+                                   new String[]{"spark://localhost:7077"}, null, new Option<Object>() {
+                    @Override
+                    public boolean isEmpty() {
+                        return false;
+                    }
+
+                    @Override
+                    public Object get() {
+                        return new Integer(1);
+                    }
+
+                    @Override
+                    public Object productElement(int n) {
+                        return null;
+                    }
+
+                    @Override
+                    public int productArity() {
+                        return 0;
+                    }
+
+                    @Override
+                    public boolean canEqual(Object that) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean equals(Object that) {
+                        return false;
+                    }
+                });
+
+//        Worker.startSystemAndActor("localhost", 4502, 8091, 2, 1000000,
+//                                   new String[]{"spark://localhost:7077"}, null, new Option<Object>() {
+//                    @Override
+//                    public boolean isEmpty() {
+//                        return false;
+//                    }
+//
+//                    @Override
+//                    public Object get() {
+//                        return new Integer(2);
+//                    }
+//
+//                    @Override
+//                    public Object productElement(int n) {
+//                        return null;
+//                    }
+//
+//                    @Override
+//                    public int productArity() {
+//                        return 0;
+//                    }
+//
+//                    @Override
+//                    public boolean canEqual(Object that) {
+//                        return false;
+//                    }
+//
+//                    @Override
+//                    public boolean equals(Object that) {
+//                        return false;
+//                    }
+//                });
+
+        sparkConf.setMaster("spark://localhost:7077").setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
         sparkCtx = new JavaSparkContext(sparkConf);
         sqlCtx = new JavaSQLContext(sparkCtx);
+    }
+
+    public static void initUsingLocal() {
+        SparkConf sparkConf = new SparkConf();
+        sparkConf.setMaster("local").setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
+        sparkCtx = new JavaSparkContext(sparkConf);
+        sqlCtx = new JavaSQLContext(sparkCtx);
+    }
+
+    private static void startMaster(String host, int port, int webUIport, SparkConf sConf){
+        Master.startSystemAndActor(host, port, webUIport, sConf);
+    }
+
+    private static void initSparkDataListener() {
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        SparkDataListener listener = new SparkDataListener();
+        executor.execute(listener);
     }
 
     public static void stop() {
@@ -77,6 +184,10 @@ public class SparkAnalyticsExecutor {
         } catch (AnalyticsException e) {
             throw new AnalyticsExecutionException("Error in registering analytics table: " + e.getMessage(), e);
         }
+    }
+    
+    public static int getNumPartitionsHint() {
+        return 4;
     }
     
     private static void processInsertInto(int tenantId, String query, 
@@ -259,7 +370,7 @@ public class SparkAnalyticsExecutor {
         ids.add(generateTableKeysId(tenantId, tableName));
         List<Record> records = AnalyticsDSUtils.listRecords(ads, ads.get(
                 AnalyticsConstants.TABLE_INFO_TENANT_ID,
-                AnalyticsConstants.TABLE_INFO_TABLE_NAME, null, ids));
+                AnalyticsConstants.TABLE_INFO_TABLE_NAME, 1, null, ids));
         if (records.size() == 0) {
             throw new AnalyticsException("Table keys cannot be found for tenant: " + tenantId + " table: " + tableName);
         }
@@ -332,5 +443,4 @@ public class SparkAnalyticsExecutor {
         JavaSchemaRDD schemaRDD = sqlCtx.baseRelationToSchemaRDD(table);
         schemaRDD.registerTempTable(alias);
     }
-    
 }

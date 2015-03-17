@@ -41,23 +41,47 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Persistence manager to do actual read/write from registry space for
+ * the analytics scripts.
+ */
 public class AnalyticsPersistenceManager {
     private static AnalyticsPersistenceManager instance = new AnalyticsPersistenceManager();
 
     private AnalyticsPersistenceManager() {
+        /**
+         * Avoid instantiation.
+         */
     }
 
+    /**
+     * Singleton implementation, and hence always returns the same manager instance.
+     *
+     * @return Instance of the manager.
+     */
     public static AnalyticsPersistenceManager getInstance() {
         return instance;
     }
 
-    public void createScriptsCollectionIfNotExists(UserRegistry registry) throws RegistryException {
+    private void createScriptsCollectionIfNotExists(UserRegistry registry) throws RegistryException {
         if (!registry.resourceExists(AnalyticsConstants.ANALYTICS_SCRIPTS_LOCATION)) {
             Collection collection = registry.newCollection();
             registry.put(AnalyticsConstants.ANALYTICS_SCRIPTS_LOCATION, collection);
         }
     }
 
+    /**
+     * Validates whether there is already existing a script with same in the registry,
+     * if such resource is existing in the registry then it'll throw and exception.
+     * It also converts the all the given information about the script
+     * to an xml content and store it in the registry.
+     *
+     * @param tenantId      Id of the tenant the operation belongs to.
+     * @param scriptName    Name of the script which needs to be stored.
+     * @param scriptContent Queries content provided to be saved on registry.
+     * @param cron          Cron expression for the rate of the script execution task.
+     * @throws AnalyticsPersistenceException
+     */
     public void saveScript(int tenantId, String scriptName, String scriptContent, String cron)
             throws AnalyticsPersistenceException {
         try {
@@ -83,6 +107,17 @@ public class AnalyticsPersistenceManager {
         }
     }
 
+    /**
+     * Building the object of the analytics script based on the information being passed.
+     *
+     * @param scriptName    Name of the script.
+     * @param scriptContent Script content of the analytics script object,
+     * @param cron          Cron expression of the analytics script.If this is with 'DEFAULT',
+     *                      then it won't modify the cron information of the script passed in.
+     * @param script        Analytics Script object which needs to be populated with passed content.
+     *                      If this is null, and new object will be created with passed information.
+     * @return New populated analytics script with provided information.
+     */
     private AnalyticsScript processAndGetAnalyticsScript(String scriptName, String scriptContent, String cron,
                                                          AnalyticsScript script) {
         if (script == null) {
@@ -97,6 +132,13 @@ public class AnalyticsPersistenceManager {
         return script;
     }
 
+    /**
+     * Get the XML configuration of the analytics script object passed in.
+     *
+     * @param script Analytics script object which needs to be converted as XML.
+     * @return XML configuration representation for the analytics script.
+     * @throws JAXBException
+     */
     private String getConfiguration(AnalyticsScript script) throws JAXBException {
         JAXBContext context = JAXBContext.newInstance(AnalyticsScript.class);
         Marshaller marshaller = context.createMarshaller();
@@ -106,6 +148,14 @@ public class AnalyticsPersistenceManager {
         return stringWriter.toString();
     }
 
+    /**
+     * Based on the information provided in the analytics script object schedule/reschedule/delete t
+     * he task associated with the script.
+     *
+     * @param tenantId Id of the tenant for which this operation belongs to.
+     * @param script   Analytics script object which needs to be evaluated.
+     * @throws AnalyticsPersistenceException
+     */
     private void scheduleTask(int tenantId, AnalyticsScript script) throws AnalyticsPersistenceException {
         if (script.getCronExpression() != null) {
             Map<String, String> properties = new HashMap<>();
@@ -132,11 +182,25 @@ public class AnalyticsPersistenceManager {
         }
     }
 
+    /**
+     * An utility method used to find the scripts location in the registry space.
+     *
+     * @param scriptName Name of the script.
+     * @return Actual resource location path in the registry.
+     * @throws AnalyticsPersistenceException
+     */
     private String getScriptLocation(String scriptName) throws AnalyticsPersistenceException {
         return AnalyticsConstants.ANALYTICS_SCRIPTS_LOCATION + RegistryConstants.PATH_SEPARATOR + scriptName +
                 AnalyticsConstants.SCRIPT_EXTENSION;
     }
 
+    /**
+     * Delete the script information stored in registry.
+     *
+     * @param tenantId   Id of the tenant.
+     * @param scriptName Name of the script.
+     * @throws AnalyticsPersistenceException
+     */
     public void deleteScript(int tenantId, String scriptName) throws AnalyticsPersistenceException {
         try {
             UserRegistry userRegistry = ServiceHolder.getTenantConfigRegistry(tenantId);
@@ -153,12 +217,28 @@ public class AnalyticsPersistenceManager {
         }
     }
 
+    /**
+     * Builds the analytics script object based on the XML configuration passed.
+     *
+     * @param config XML configuration representation for the script.
+     * @return Analytics Script object for the configuration.
+     * @throws JAXBException
+     */
     private AnalyticsScript getAnalyticsScript(String config) throws JAXBException {
         JAXBContext context = JAXBContext.newInstance(AnalyticsScript.class);
         Unmarshaller un = context.createUnmarshaller();
         return (AnalyticsScript) un.unmarshal(new StringReader(config));
     }
 
+    /**
+     * Update the script with given details at the tenant registry space.
+     *
+     * @param tenantId      Id of the tenant.
+     * @param scriptName    Name of the script.
+     * @param scriptContent Queries content of the script.
+     * @param cron          New cron expression of the script.
+     * @throws AnalyticsPersistenceException
+     */
     public void updateScript(int tenantId, String scriptName, String scriptContent, String cron)
             throws AnalyticsPersistenceException {
         try {
@@ -184,6 +264,14 @@ public class AnalyticsPersistenceManager {
         }
     }
 
+    /**
+     * Get the acutal analytics script object for the given script name in the tenant registry space.
+     *
+     * @param tenantId   Id of the tenant.
+     * @param scriptName Name of the script.
+     * @return Analytics Script object.
+     * @throws AnalyticsPersistenceException
+     */
     public AnalyticsScript getAnalyticsScript(int tenantId, String scriptName) throws AnalyticsPersistenceException {
         try {
             UserRegistry registry = ServiceHolder.getTenantConfigRegistry(tenantId);
@@ -201,6 +289,13 @@ public class AnalyticsPersistenceManager {
         }
     }
 
+    /**
+     * Return all the scripts in the tenant registry space.
+     *
+     * @param tenantId Id of the tenant.
+     * @return List of analytics scripts.
+     * @throws AnalyticsPersistenceException
+     */
     public List<AnalyticsScript> getAllAnalyticsScripts(int tenantId) throws AnalyticsPersistenceException {
         try {
             UserRegistry registry = ServiceHolder.getTenantConfigRegistry(tenantId);

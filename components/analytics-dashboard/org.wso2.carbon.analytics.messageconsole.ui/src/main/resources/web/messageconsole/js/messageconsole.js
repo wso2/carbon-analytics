@@ -5,34 +5,35 @@ function createMainJTable(fields) {
                                              title: $("#tableSelect").val(),
                                              paging: true,
                                              pageSize: 10,
-                                             selecting: true, //Enable selecting
-                                             multiselect: true, //Allow multiple selecting
-                                             selectingCheckboxes: true, //Show checkboxes on first column
+                                             selecting: true,
+                                             multiselect: true,
+                                             selectingCheckboxes: true,
                                              actions: {
                                                  // For Details: http://jtable.org/Demo/FunctionsAsActions
                                                  listAction: function (postData, jtParams) {
-                                                     return listActionMethod(postData);
+                                                     return listActionMethod(jtParams);
                                                  },
-                                                 createAction: '/GettingStarted/CreatePerson',
-                                                 updateAction: '/GettingStarted/UpdatePerson',
+                                                 createAction: function (postData) {
+                                                     return createActionMethod(postData);
+                                                 },
+                                                 updateAction: function (postData) {
+                                                     return updateActionMethod(postData);
+                                                 },
                                                  deleteAction: function (postData) {
                                                      return deleteActionMethod(postData);
                                                  }
+                                             },
+                                             formSubmitting: function (event, data) {
+                                                 $('#AnalyticsTableContainer').jtable('reload');
                                              },
                                              fields: fields
 
                                          });
     $('#AnalyticsTableContainer').jtable('load');
-
     $("#DeleteAllButton").show();
     $('#DeleteAllButton').button().click(function () {
         var $selectedRows = $('#AnalyticsTableContainer').jtable('selectedRows');
-        //$('#AnalyticsTableContainer').jtable('deleteRows', $selectedRows);
-        $selectedRows.each(function () {
-            var record = $(this).data('record');
-            console.log(record.recordId);
-        });
-
+        $('#AnalyticsTableContainer').jtable('deleteRows', $selectedRows);
     });
     tableLoaded = true;
 }
@@ -45,9 +46,12 @@ function getArbitraryFields(rowData) {
                                              $img.closest('tr'), //Parent row
                                              {
                                                  title: 'Arbitrary Fields',
+                                                 messages: {
+                                                     addNewRecord: 'Add new arbitrary field'
+                                                 },
                                                  actions: {
                                                      listAction: function (postData, jtParams) {
-                                                         return listActionMethod(postData);
+                                                         return listActionMethod(jtParams);
                                                      },
                                                      deleteAction: '/Demo/DeleteExam',
                                                      updateAction: '/Demo/UpdateExam',
@@ -71,14 +75,16 @@ function getArbitraryFields(rowData) {
                                                  }
                                              }, function (data) { //opened handler
                     data.childTable.jtable('load');
-                });
+                }
+        );
     });
     return $img;
 }
 
-function createJTable(table) {
+function createJTable() {
+    var table = $("#tableSelect").val();
     if (table != '-1') {
-        $.getJSON("/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=tableInfo&tableName=" + table,
+        $.getJSON("/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=" + typeTableInfo + "&tableName=" + table,
                   function (data, status) {
                       var fields = {
                           ArbitraryFields: {
@@ -98,6 +104,12 @@ function createJTable(table) {
                               list: val.display,
                               key: val.key
                           };
+                          if (val.type == 'STRING') {
+                              fields[val.name].type = 'textarea';
+                          }
+                          if (val.name == 'bam_unique_rec_id' || val.name == 'bam_rec_timestamp') {
+                              fields[val.name].edit = false;
+                          }
                       });
 
                       if (data) {
@@ -106,15 +118,23 @@ function createJTable(table) {
                           }
                           createMainJTable(fields);
                       }
-                  });
+                  }
+        );
     }
 }
 
-function listActionMethod(postData) {
+function listActionMethod(jtParams) {
+    var postData = {};
+    postData["jtStartIndex"] = jtParams.jtStartIndex;
+    postData["jtPageSize"] = jtParams.jtPageSize;
+    postData["tableName"] = $("#tableSelect").val();
+    postData["timeFrom"] = $("#timeFrom").val();
+    postData["timeTo"] = $("#timeTo").val();
+    postData["query"] = $("#query").val();
     return $.Deferred(function ($dfd) {
         $.ajax({
-                   url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=getRecords&tableName=' + $("#tableSelect").val(),
-                   type: 'GET',
+                   url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeListRecord,
+                   type: 'POST',
                    dataType: 'json',
                    data: postData,
                    success: function (data) {
@@ -123,15 +143,15 @@ function listActionMethod(postData) {
                    error: function () {
                        $dfd.reject();
                    }
-               });
+               }
+        );
     });
 }
 
-function deleteActionMethod(postData) {
-    console.log(postData);
+function createActionMethod(postData) {
     return $.Deferred(function ($dfd) {
         $.ajax({
-                   url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=deleteRecords',
+                   url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeCreateRecord + '&tableName=' + $("#tableSelect").val(),
                    type: 'POST',
                    dataType: 'json',
                    data: postData,
@@ -143,4 +163,44 @@ function deleteActionMethod(postData) {
                    }
                });
     });
+}
+
+function updateActionMethod(postData) {
+    return $.Deferred(function ($dfd) {
+        $.ajax({
+                   url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeUpdateRecord,
+                   type: 'POST',
+                   dataType: 'json',
+                   data: postData,
+                   success: function (data) {
+                       $dfd.resolve(data);
+                   },
+                   error: function () {
+                       $dfd.reject();
+                   }
+               });
+    });
+}
+
+function deleteRecords(postData) {
+    postData["tableName"] = $("#tableSelect").val();
+    return $.Deferred(function ($dfd) {
+        $.ajax({
+                   url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeDeleteRecord,
+                   type: 'POST',
+                   dataType: 'json',
+                   data: postData,
+                   success: function (data) {
+                       $dfd.resolve(data);
+                   },
+                   error: function () {
+                       $dfd.reject();
+                   }
+               }
+        );
+    });
+}
+
+function deleteActionMethod(postData) {
+    return deleteRecords(postData);
 }

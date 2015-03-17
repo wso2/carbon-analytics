@@ -19,6 +19,9 @@ package org.wso2.carbon.analytics.spark.core.util;
 
 import org.wso2.carbon.registry.core.RegistryConstants;
 
+/**
+ * Holds the constants associated with analytics scripts processing, and execution.
+ */
 public class AnalyticsConstants {
 
     private AnalyticsConstants(){
@@ -27,7 +30,6 @@ public class AnalyticsConstants {
          */
     }
 
-    public static final String SCRIPT_STORE_DIR_NAME = "analytics";
     public static final String SCRIPT_EXTENSION = ".ql";
     public static final String DEFAULT_CRON = "DEFAULT";
     public static final String SCRIPT_TASK_TYPE = "ANALYTICS_SPARK";

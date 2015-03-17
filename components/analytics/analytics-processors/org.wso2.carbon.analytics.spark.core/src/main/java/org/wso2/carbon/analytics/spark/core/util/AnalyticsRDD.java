@@ -18,19 +18,29 @@
 
 package org.wso2.carbon.analytics.spark.core.util;
 
-import org.apache.spark.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.spark.Dependency;
+import org.apache.spark.InterruptibleIterator;
+import org.apache.spark.Partition;
+import org.apache.spark.SparkContext;
+import org.apache.spark.TaskContext;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.catalyst.expressions.Row;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
+import org.wso2.carbon.analytics.spark.core.internal.SparkAnalyticsExecutor;
+
+import scala.collection.JavaConversions;
 import scala.collection.Seq;
 import scala.reflect.ClassTag;
 
 import java.io.Serializable;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 
 import static scala.collection.JavaConversions.asScalaIterator;
@@ -39,6 +49,8 @@ import static scala.collection.JavaConversions.asScalaIterator;
  * This class represents Spark analytics RDD implementation.
  */
 public class AnalyticsRDD extends RDD<Row> implements Serializable {
+    
+    private static final Log log = LogFactory.getLog(AnalyticsRDD.class);
     
     private static final long serialVersionUID = 5948588299500227997L;
 
@@ -69,6 +81,39 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
         
     }
     
+    @Override
+    public Seq<String> getPreferredLocations(Partition split) {
+        if (split instanceof AnalyticsPartition) {
+            AnalyticsPartition ap = (AnalyticsPartition) split;
+            try {
+                return JavaConversions.asScalaBuffer(Arrays.asList(ap.getRecordGroup().getLocations())).toList();
+            } catch (AnalyticsException e) {
+                log.error("Error in getting preffered location: " + e.getMessage() + 
+                        " falling back to default impl.", e);
+                return super.getPreferredLocations(split);
+            }
+        } else {
+            return super.getPreferredLocations(split);
+        }
+    }
+
+    @Override
+    public Partition[] getPartitions() {
+        RecordGroup[] rgs;
+        try {
+            rgs = ServiceHolder.getAnalyticsDataService().get(this.tenantId, this.tableName, 
+                    SparkAnalyticsExecutor.getNumPartitionsHint(),
+                    this.columns, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
+        } catch (AnalyticsException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        } 
+        Partition[] result = new Partition[rgs.length];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = new AnalyticsPartition(rgs[i], i);
+        }
+        return result;
+    }
+
     /**
      * Row iterator implementation to act as an adaptor for a record iterator.
      */
@@ -109,22 +154,6 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
             this.recordItr.remove();
         }
         
-    }
-
-    @Override
-    public Partition[] getPartitions() {
-        RecordGroup[] rgs;
-        try {
-            rgs = ServiceHolder.getAnalyticsDataService().get(this.tenantId, this.tableName,
-                    this.columns, -1, -1, 0, Integer.MAX_VALUE);
-        } catch (AnalyticsException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        } 
-        Partition[] result = new Partition[rgs.length];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = new AnalyticsPartition(rgs[i], i);
-        }
-        return result;
     }
 
 }

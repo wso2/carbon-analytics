@@ -37,6 +37,8 @@ public class RDBMSQueryConfigurationEntry {
     
     private String recordMetaTableSelectQuery;
     
+    private String recordMetaTablesSelectByTenantQuery;
+    
     private String recordMetaTableInsertQuery;
     
     private String recordMetaTableUpdateQuery;
@@ -148,6 +150,14 @@ public class RDBMSQueryConfigurationEntry {
     
     public void setRecordMetaTableSelectQuery(String recordMetaTableSelectQuery) {
         this.recordMetaTableSelectQuery = recordMetaTableSelectQuery;
+    }
+    
+    public String getRecordMetaTablesSelectByTenantQuery() {
+        return recordMetaTablesSelectByTenantQuery;
+    }
+    
+    public void setRecordMetaTablesSelectByTenantQuery(String recordMetaTablesSelectByTenantQuery) {
+        this.recordMetaTablesSelectByTenantQuery = recordMetaTablesSelectByTenantQuery;
     }
     
     public String getRecordMetaTableUpdateQuery() {

@@ -17,7 +17,14 @@
 */
 package org.wso2.carbon.analytics.spark.admin;
 
+/**
+ * Exception thrown when processing some requests came to the
+ * admin operations of AnalyticsProcessorAdminService.
+ */
 public class AnalyticsProcessorAdminException extends Exception {
+
+    private static final long serialVersionUID = -6808272977048874719L;
+
     private String message;
 
     public AnalyticsProcessorAdminException() {
@@ -38,7 +45,8 @@ public class AnalyticsProcessorAdminException extends Exception {
         this.message = cause.getMessage();
     }
 
-    public String getMessage(){
+    public String getMessage() {
         return message;
     }
+
 }

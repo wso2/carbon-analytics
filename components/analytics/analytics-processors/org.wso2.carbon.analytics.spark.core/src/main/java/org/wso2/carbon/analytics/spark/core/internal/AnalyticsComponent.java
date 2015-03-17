@@ -22,13 +22,12 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
+import org.wso2.carbon.analytics.spark.core.CarbonAnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.service.TaskService;
-import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 /**
  * @scr.component name="analytics.core" immediate="true"
@@ -48,7 +47,7 @@ public class AnalyticsComponent {
     protected void activate(ComponentContext ctx) {
         if (log.isDebugEnabled()) log.debug("Activating Analytics Spark Core");
         SparkAnalyticsExecutor.init();
-        AnalyticsProcessorService analyticsProcessorService = new AnalyticsProcessorService();
+        AnalyticsProcessorService analyticsProcessorService = new CarbonAnalyticsProcessorService();
         ctx.getBundleContext().registerService(AnalyticsProcessorService.class, analyticsProcessorService, null);
         ServiceHolder.setAnalyticsProcessorService(analyticsProcessorService);
     }

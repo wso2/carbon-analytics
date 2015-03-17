@@ -21,7 +21,8 @@
         <recordMetaTableInitQueries>
             <query>CREATE TABLE AN_TABLE_META (tenantId INTEGER, tableName VARCHAR(256), schema BINARY, PRIMARY KEY(tenantId, tableName))</query>
         </recordMetaTableInitQueries>
-        <recordMetaTableSelectQuery>SELECT tenantId, tableName, schema FROM AN_TABLE_META WHERE tenantId = ? AND tableName = ?</recordMetaTableSelectQuery>
+        <recordMetaTableSelectQuery>SELECT schema FROM AN_TABLE_META WHERE tenantId = ? AND tableName = ?</recordMetaTableSelectQuery>
+        <recordMetaTablesSelectByTenantQuery>SELECT tableName FROM AN_TABLE_META WHERE tenantId = ?</recordMetaTablesSelectByTenantQuery>
         <recordMetaTableInsertQuery>INSERT INTO AN_TABLE_META (tenantId, tableName) VALUES (?, ?)</recordMetaTableInsertQuery>
         <recordMetaTableUpdateQuery>UPDATE AN_TABLE_META SET schema = ? WHERE tenantId = ? AND tableName = ?</recordMetaTableUpdateQuery>
         <recordMetaTableDeleteQuery>DELETE AN_TABLE_META WHERE tenantId = ? AND tableName = ?</recordMetaTableDeleteQuery>
@@ -68,7 +69,8 @@
         <recordMetaTableInitQueries>
             <query>CREATE TABLE AN_TABLE_META (tenantId INTEGER, tableName VARCHAR(256), schema BINARY, PRIMARY KEY(tenantId, tableName))</query>
         </recordMetaTableInitQueries>
-        <recordMetaTableSelectQuery>SELECT tenantId, tableName, schema FROM AN_TABLE_META WHERE tenantId = ? AND tableName = ?</recordMetaTableSelectQuery>
+        <recordMetaTableSelectQuery>SELECT schema FROM AN_TABLE_META WHERE tenantId = ? AND tableName = ?</recordMetaTableSelectQuery>
+        <recordMetaTablesSelectByTenantQuery>SELECT tableName FROM AN_TABLE_META WHERE tenantId = ?</recordMetaTablesSelectByTenantQuery>
         <recordMetaTableInsertQuery>INSERT INTO AN_TABLE_META (tenantId, tableName) VALUES (?, ?)</recordMetaTableInsertQuery>
         <recordMetaTableUpdateQuery>UPDATE AN_TABLE_META SET schema = ? WHERE tenantId = ? AND tableName = ?</recordMetaTableUpdateQuery>
         <recordMetaTableDeleteQuery>DELETE AN_TABLE_META WHERE tenantId = ? AND tableName = ?</recordMetaTableDeleteQuery>

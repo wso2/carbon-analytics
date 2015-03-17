@@ -17,17 +17,23 @@
 */
 package org.wso2.carbon.analytics.spark.admin.dto;
 
+/**
+ * DTO which transfers the result of execution query between the admin service and the client.
+ */
 public class AnalyticsQueryResultDto {
+
     private String query;
+
     private String[] columnNames;
+
     private AnalyticsRowResultDto[] rowsResults;
 
-    public AnalyticsQueryResultDto(String[] columnNames, AnalyticsRowResultDto[] results){
+    public AnalyticsQueryResultDto(String[] columnNames, AnalyticsRowResultDto[] results) {
         this.columnNames = columnNames;
-        this.rowsResults  = results;
+        this.rowsResults = results;
     }
 
-    public AnalyticsQueryResultDto(String query){
+    public AnalyticsQueryResultDto(String query) {
         this.query = query;
     }
 

@@ -21,18 +21,18 @@ package org.wso2.carbon.messageconsole.ui.beans;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ResponseRecord {
+public class Record {
 
-    private List<ResponseColumn> columns = new ArrayList<>();
+    private List<Column> columns = new ArrayList<>();
 
-    public ResponseRecord() {
+    public Record() {
     }
 
-    public List<ResponseColumn> getColumns() {
+    public List<Column> getColumns() {
         return columns;
     }
 
-    public void setColumns(List<ResponseColumn> columns) {
+    public void setColumns(List<Column> columns) {
         this.columns = columns;
     }
 }

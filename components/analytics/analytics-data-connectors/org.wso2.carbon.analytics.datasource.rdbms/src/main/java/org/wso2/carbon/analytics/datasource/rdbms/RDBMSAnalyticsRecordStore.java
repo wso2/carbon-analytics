@@ -20,13 +20,13 @@ package org.wso2.carbon.analytics.datasource.rdbms;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.sql.Blob;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -44,6 +44,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import org.apache.axiom.om.util.Base64;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsSchema;
@@ -73,8 +74,8 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         this.rdbmsQueryConfigurationEntry = null;
     }
     
-    public RDBMSAnalyticsRecordStore(RDBMSQueryConfigurationEntry rDBMSQueryConfigurationEntry) {
-        this.rdbmsQueryConfigurationEntry = rDBMSQueryConfigurationEntry;
+    public RDBMSAnalyticsRecordStore(RDBMSQueryConfigurationEntry rdbmsQueryConfigurationEntry) {
+        this.rdbmsQueryConfigurationEntry = rdbmsQueryConfigurationEntry;
     }
     
     @Override
@@ -226,7 +227,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     private void populateStatementForAdd(PreparedStatement stmt, 
             Record record) throws SQLException, AnalyticsException {        
         stmt.setLong(1, record.getTimestamp());
-        stmt.setBlob(2, new ByteArrayInputStream(GenericUtils.encodeRecordValues(record.getValues())));
+        stmt.setBinaryStream(2, new ByteArrayInputStream(GenericUtils.encodeRecordValues(record.getValues())));
         stmt.setString(3, record.getId());
     }
     
@@ -332,20 +333,51 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         String query = this.getQueryConfiguration().getRecordUpdateQuery();
         return translateQueryWithTableInfo(query, tenantId, tableName);
     }
-
+    
     @Override
-    public RecordGroup[] get(int tenantId, String tableName, List<String> columns, 
+    public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, 
             List<String> ids) throws AnalyticsException,
             AnalyticsTableNotAvailableException {
         return new RDBMSIDsRecordGroup[] { new RDBMSIDsRecordGroup(tenantId, tableName, columns, ids) };
     }
-
+    
+    private List<Integer[]> generatePartitionPlan(int tenantId, String tableName, 
+            int numPartitionsHint, int recordsFrom, int recordsCount) throws AnalyticsException, 
+            AnalyticsTableNotAvailableException {
+        List<Integer[]> result = new ArrayList<Integer[]>();
+        int recordsCountAll = (int) this.getRecordCount(tenantId, tableName);
+        if (recordsCount == -1) {
+            recordsCount = recordsCountAll;
+        } else if (recordsCount > recordsCountAll) {
+            recordsCount = recordsCountAll;
+        }
+        if (recordsCount == 0 || numPartitionsHint < 1) {
+            return new ArrayList<Integer[]>(0);
+        }
+        int batchSize = (int) Math.ceil(recordsCount / (double) numPartitionsHint);
+        int i;
+        for (long l = 0; l < recordsCount; l += batchSize) {
+            /* this is to avoid integer overflow and getting minus values for counter */
+            i = (int) l;
+            result.add(new Integer[] { recordsFrom + i, 
+                    (i + batchSize) > recordsCount ? recordsCount - i : batchSize });
+        }
+        return result;
+    }
+    
     @Override
-    public RecordGroup[] get(int tenantId, String tableName, List<String> columns, long timeFrom, 
-            long timeTo, int recordsFrom, int recordsCount)
+    public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns,
+            long timeFrom, long timeTo, int recordsFrom, int recordsCount)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
-        return new RDBMSRangeRecordGroup[] { new RDBMSRangeRecordGroup(tenantId, tableName, columns, 
-                timeFrom, timeTo, recordsFrom, recordsCount) };
+        List<Integer[]> params = this.generatePartitionPlan(tenantId, tableName, numPartitionsHint, 
+                recordsFrom, recordsCount);
+        RDBMSRangeRecordGroup[] result = new RDBMSRangeRecordGroup[params.size()];
+        Integer[] param;
+        for (int i = 0; i < result.length; i++) {
+            param = params.get(i);
+            result[i] = new RDBMSRangeRecordGroup(tenantId, tableName, columns, timeFrom, timeTo, param[0], param[1]);
+        }
+        return result;
     }
 
     @Override
@@ -371,6 +403,10 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     
     private String getRecordMetaTableSelectQuery() {
         return this.getQueryConfiguration().getRecordMetaTableSelectQuery();
+    }
+    
+    private String getRecordMetaTablesSelectByTenantQuery() {
+        return this.getQueryConfiguration().getRecordMetaTablesSelectByTenantQuery();
     }
     
     private InputStream schemaToStream(AnalyticsSchema schema) throws AnalyticsException {
@@ -439,7 +475,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             stmt.setString(2, tableName);
             rs = stmt.executeQuery();
             if (rs.first()) {
-                return this.streamToSchema(rs.getBinaryStream(3));
+                return this.streamToSchema(rs.getBinaryStream(1));
             } else {
                 if (!this.tableExists(tenantId, tableName)) {
                     throw new AnalyticsTableNotAvailableException(tenantId, tableName);
@@ -463,15 +499,6 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         try {
             conn = this.getConnection();
             stmt = conn.prepareStatement(this.getRecordRetrievalQuery(tenantId, tableName));
-            if (timeFrom == -1) {
-                timeFrom = Long.MIN_VALUE;
-            }
-            if (timeTo == -1) {
-                timeTo = Long.MAX_VALUE;
-            }
-            if (recordsFrom == -1) {
-                recordsFrom = 0;
-            }
             if (recordsCount == -1) {
                 recordsCount = Integer.MAX_VALUE;
             }
@@ -549,12 +576,6 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         try {
             conn = this.getConnection();
             stmt = conn.prepareStatement(sql);
-            if (timeFrom == -1) {
-                timeFrom = Long.MIN_VALUE;
-            }
-            if (timeTo == -1) {
-                timeTo = Long.MAX_VALUE;
-            }
             stmt.setLong(1, timeFrom);
             stmt.setLong(2, timeTo);
             stmt.executeUpdate();
@@ -607,16 +628,34 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         }
     }
     
-    private String generateTablePrefix(int tenantId) {
-        if (tenantId < 0) {
-            return RDBMSAnalyticsRecordStore.ANALYTICS_USER_TABLE_PREFIX + "_X" + Math.abs(tenantId) + "_";
-        } else {
-            return RDBMSAnalyticsRecordStore.ANALYTICS_USER_TABLE_PREFIX + "_" + tenantId + "_";
+    /**
+     * This method is used to generate an UUID from the target table name, to make sure, it is a compact
+     * name that can be fitted in all the supported RDBMSs. For example, Oracle has a table name
+     * length of 30. So we must translate source table names to hashed strings, which here will have
+     * a very low probability of clashing.
+     */
+    private String generateTableUUID(int tenantId, String tableName) {
+        try {
+            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+            DataOutputStream dout = new DataOutputStream(byteOut);
+            /* we've to limit it to 64 bits */
+            dout.writeInt(tableName.hashCode());
+            dout.close();
+            byteOut.close();
+            String result = Base64.encode(byteOut.toByteArray());
+            result = result.replace('=', '_');
+            result = result.replace('+', '_');
+            result = result.replace('/', '_');
+            /* a table name must start with a letter */
+            return ANALYTICS_USER_TABLE_PREFIX + result;
+        } catch (IOException e) {
+            /* this will never happen */
+            throw new RuntimeException(e);
         }
     }
     
     private String generateTargetTableName(int tenantId, String tableName) {
-        return this.normalizeTableName(this.generateTablePrefix(tenantId) + tableName);
+        return this.generateTableUUID(tenantId, this.normalizeTableName(tableName));
     }
     
     private String translateQueryWithTableInfo(String query, int tenantId, String tableName) {
@@ -748,28 +787,23 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     
     @Override
     public List<String> listTables(int tenantId) throws AnalyticsException {
-        List<String> result = new ArrayList<String>();
         Connection conn = null;
+        PreparedStatement stmt = null;
         ResultSet rs = null;
-        String tableName;
-        String prefix = this.normalizeTableName(this.generateTablePrefix(tenantId));
         try {
             conn = this.getConnection();
-            DatabaseMetaData dbm = conn.getMetaData();
-            rs = dbm.getTables(null, null, "%", null);
+            stmt = conn.prepareStatement(this.getRecordMetaTablesSelectByTenantQuery());
+            stmt.setInt(1, tenantId);
+            rs = stmt.executeQuery();
+            List<String> result = new ArrayList<String>();
             while (rs.next()) {
-                tableName = rs.getString("TABLE_NAME");
-                if (tableName.startsWith(prefix)) {
-                    tableName = tableName.substring(prefix.length());
-                    tableName = this.normalizeTableName(tableName);
-                    result.add(tableName);
-                }
+                result.add(rs.getString(1));
             }
             return result;
         } catch (SQLException e) {
             throw new AnalyticsException("Error in listing tables: " + e.getMessage(), e);
         } finally {
-            RDBMSUtils.cleanupConnection(rs, null, conn);
+            RDBMSUtils.cleanupConnection(rs, stmt, conn);
         }
     }
 

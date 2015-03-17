@@ -27,9 +27,9 @@ public class ResponseResult {
 
     private String message;
 
-    private int totalRecordCount;
+    private long totalRecordCount;
 
-    private List<ResponseRecord> records = new ArrayList<>();
+    private List<Record> records = new ArrayList<>();
 
     public ResponseResult() {
     }
@@ -50,19 +50,19 @@ public class ResponseResult {
         this.message = message;
     }
 
-    public int getTotalRecordCount() {
+    public long getTotalRecordCount() {
         return totalRecordCount;
     }
 
-    public void setTotalRecordCount(int totalRecordCount) {
+    public void setTotalRecordCount(long totalRecordCount) {
         this.totalRecordCount = totalRecordCount;
     }
 
-    public List<ResponseRecord> getRecords() {
+    public List<Record> getRecords() {
         return records;
     }
 
-    public void setRecords(List<ResponseRecord> records) {
+    public void setRecords(List<Record> records) {
         this.records = records;
     }
 }

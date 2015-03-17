@@ -372,7 +372,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         List<String> ids = this.extractIds(indexOpBatch);
         AnalyticsRecordStore ars = this.getAnalyticsRecordStore();
         try {
-            return GenericUtils.listRecords(ars, ars.get(tenantId, tableName, null, ids));
+            return GenericUtils.listRecords(ars, ars.get(tenantId, tableName, 1, null, ids));
         } catch (AnalyticsTableNotAvailableException e) {
             return new ArrayList<Record>(0);
         }
@@ -494,7 +494,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     private List<Record> loadIndexOperationRecords(int tenantId, String tableName) throws AnalyticsException {
         try {
             return GenericUtils.listRecords(this.getAnalyticsRecordStore(), 
-                    this.getAnalyticsRecordStore().get(tenantId, tableName, null, -1, -1, 0, -1));
+                    this.getAnalyticsRecordStore().get(tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         } catch (AnalyticsTableNotAvailableException e) {
             /* ignore this scenario, before any indexes, this will happen */
             return new ArrayList<Record>(0);
@@ -1109,7 +1109,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             try {
                 if (GenericUtils.listRecords(this.getAnalyticsRecordStore(), 
                         this.getAnalyticsRecordStore().get(firstRecord.getTenantId(), 
-                        firstRecord.getTableName(), null, 
+                        firstRecord.getTableName(), 1, null, 
                         this.extractRecordIds(group))).size() > 0) {
                     return false;
                 }

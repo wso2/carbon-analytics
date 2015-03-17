@@ -17,10 +17,15 @@
 */
 package org.wso2.carbon.analytics.spark.admin.dto;
 
+/**
+ * DTO which transfers the Row results that contains the column value for the row,
+ * between the admin service and client.
+ */
 public class AnalyticsRowResultDto {
+
     private String[] columnValues;
 
-    public AnalyticsRowResultDto(String[] columnValues){
+    public AnalyticsRowResultDto(String[] columnValues) {
         this.columnValues = columnValues;
     }
 

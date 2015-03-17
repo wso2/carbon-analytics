@@ -93,7 +93,8 @@ public class H2FileDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
         String[] recordMetaTableInitQueries = new String[1];
         recordMetaTableInitQueries[0] = "CREATE TABLE AN_TABLE_META (tenantId INTEGER, tableName VARCHAR(256), schema BINARY, PRIMARY KEY(tenantId, tableName))";
         conf.setRecordMetaTableInitQueries(recordMetaTableInitQueries);
-        conf.setRecordMetaTableSelectQuery("SELECT tenantId, tableName, schema FROM AN_TABLE_META WHERE tenantId = ? AND tableName = ?");
+        conf.setRecordMetaTableSelectQuery("SELECT schema FROM AN_TABLE_META WHERE tenantId = ? AND tableName = ?");
+        conf.setRecordMetaTablesSelectByTenantQuery("SELECT tableName FROM AN_TABLE_META WHERE tenantId = ?");
         conf.setRecordMetaTableInsertQuery("INSERT INTO AN_TABLE_META (tenantId, tableName) VALUES (?, ?)");
         conf.setRecordMetaTableUpdateQuery("UPDATE AN_TABLE_META SET schema = ? WHERE tenantId = ? AND tableName = ?");
         conf.setRecordMetaTableDeleteQuery("DELETE AN_TABLE_META WHERE tenantId = ? AND tableName = ?");

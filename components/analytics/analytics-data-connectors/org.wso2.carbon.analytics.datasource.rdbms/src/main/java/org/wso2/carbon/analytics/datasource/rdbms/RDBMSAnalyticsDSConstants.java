@@ -24,5 +24,7 @@ package org.wso2.carbon.analytics.datasource.rdbms;
 public class RDBMSAnalyticsDSConstants {
 
     public static final String DATASOURCE = "datasource";
+    
+    public static final String DEFAULT_CHARSET = "UTF8";
         
 }

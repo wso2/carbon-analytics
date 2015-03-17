@@ -43,9 +43,8 @@ public class AnalyticsResultConverter {
                 rowIndex++;
             }
             return new AnalyticsQueryResultDto(analyticsQueryResult.getColumnNames(), rowResults);
-        }else {
+        } else {
             return null;
         }
     }
-
 }
