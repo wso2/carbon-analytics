@@ -23,10 +23,7 @@ import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsSchema;
-import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsTableNotAvailableException;
-import org.wso2.carbon.analytics.datasource.core.rs.DirectAnalyticsRecordStore;
-import org.wso2.carbon.analytics.datasource.core.rs.Record;
+import org.wso2.carbon.analytics.datasource.core.rs.*;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseAnalyticsDSConstants;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseUtils;
@@ -36,7 +33,7 @@ import javax.naming.NamingException;
 import java.io.*;
 import java.util.*;
 
-public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
+public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
 
     private Admin admin;
     private Connection conn;
@@ -145,7 +142,6 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
         } catch (IOException e) {
             throw new AnalyticsException("Error deleting table " + tableName, e);
         }
-
     }
 
     public void close() {
@@ -361,19 +357,42 @@ public class HBaseAnalyticsRecordStore extends DirectAnalyticsRecordStore {
     }
 
     @Override
+    public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, long timeFrom,
+                             long timeTo, int recordsFrom, int recordsCount) throws AnalyticsException {
+        //TODO
+        return new RecordGroup[0];
+    }
+
+    @Override
+    public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns,
+                             List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
+        return new HBaseIDRecordGroup[] {new HBaseIDRecordGroup(tenantId, tableName, columns, ids)};
+    }
+
+    @Override
+    public Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException {
+        if(recordGroup instanceof HBaseIDRecordGroup){
+            HBaseIDRecordGroup recordIdGroup = (HBaseIDRecordGroup) recordGroup;
+            return this.getRecords(recordIdGroup.getTenantId(), recordIdGroup.getTableName(),
+                    recordIdGroup.getColumns(), recordIdGroup.getIds());
+        }
+        // TODO
+        return null;
+    }
+
+
     public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns, long timeFrom,
                                        long timeTo, int recordsFrom, int recordsCount) throws AnalyticsException {
         return this.getRecords(tenantId, tableName, columns, this.lookupIndex(tenantId, tableName, timeFrom, timeTo));
     }
 
-    @Override
     public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns, List<String> ids)
             throws AnalyticsException {
         int batchSize = this.queryConfig.getBatchSize();
         if (batchSize > ids.size()) {
             batchSize = ids.size();
         }
-        return new BatchedHBaseResultIterator(tenantId, tableName, columns, ids, this.conn, batchSize);
+        return new HBaseRecordIterator(tenantId, tableName, columns, ids, this.conn, batchSize);
     }
 
     private List<String> lookupIndex(int tenantId, String tableName, long startTime, long endTime)
