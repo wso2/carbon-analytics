@@ -314,7 +314,6 @@
                                 <bundleDef>org.eclipse.jetty:jetty-webapp</bundleDef>
                                 <bundleDef>org.eclipse.jetty:jetty-xml</bundleDef>
                                 <bundleDef>io.netty:netty</bundleDef>
-                                <bundleDef>org.spark-project.protobuf:protobuf-java</bundleDef>
                                 <bundleDef>org.wso2.uncommons.maths:uncommons-maths</bundleDef>
                                 <bundleDef>com.ning:compress-lzf</bundleDef>
                                 <bundleDef>com.google.guava:guava</bundleDef>
@@ -324,6 +323,7 @@
                                 <bundleDef>org.wso2.clearspring.analytics:stream</bundleDef>
                                 <bundleDef>org.wso2.orbit.org.apache.mesos:mesos</bundleDef>
                                 <bundleDef>com.google.protobuf:protobuf-java</bundleDef>
+                                <bundleDef>org.spark-project.protobuf:protobuf-java</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}
