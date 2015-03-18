@@ -45,17 +45,24 @@ import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionExceptio
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsRelation;
+import org.wso2.carbon.utils.CarbonUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -157,10 +164,30 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                 });
     }
 
-    private static void initSparkDataListener() {
+    private void initSparkDataListener() {
+        this.validateSparkScriptPathPermission();
         ExecutorService executor = Executors.newFixedThreadPool(1);
         SparkDataListener listener = new SparkDataListener();
         executor.execute(listener);
+    }
+
+    private void validateSparkScriptPathPermission() {
+        Set<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
+        //add owners permission
+        perms.add(PosixFilePermission.OWNER_READ);
+        perms.add(PosixFilePermission.OWNER_WRITE);
+        perms.add(PosixFilePermission.OWNER_EXECUTE);
+        //add group permissions
+        perms.add(PosixFilePermission.GROUP_READ);
+        perms.add(PosixFilePermission.GROUP_WRITE);
+        perms.add(PosixFilePermission.GROUP_EXECUTE);
+        try {
+            Files.setPosixFilePermissions(Paths.get(CarbonUtils.getCarbonHome() + File.separator +
+                    AnalyticsConstants.SPARK_COMPUTE_CLASSPATH_SCRIPT_PATH), perms);
+        } catch (IOException e) {
+            log.warn("Error while checking the permission for " + AnalyticsConstants.SPARK_COMPUTE_CLASSPATH_SCRIPT_PATH
+                    + ". " + e.getMessage());
+        }
     }
 
     public void stop() {
