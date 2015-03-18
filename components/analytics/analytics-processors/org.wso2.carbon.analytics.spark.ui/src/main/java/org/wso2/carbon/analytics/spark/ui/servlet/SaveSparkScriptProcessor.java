@@ -36,6 +36,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SaveSparkScriptProcessor extends HttpServlet {
+    
+    private static final long serialVersionUID = 5936476293277591602L;
+    
     private static Log log = LogFactory.getLog(SaveSparkScriptProcessor.class);
 
     private void processRequest(HttpServletRequest request, HttpServletResponse response) {

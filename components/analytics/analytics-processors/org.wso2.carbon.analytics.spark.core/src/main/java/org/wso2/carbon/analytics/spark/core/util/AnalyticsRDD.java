@@ -31,7 +31,6 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
-import org.wso2.carbon.analytics.spark.core.internal.SparkAnalyticsExecutor;
 
 import scala.collection.JavaConversions;
 import scala.collection.Seq;
@@ -102,7 +101,7 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
         RecordGroup[] rgs;
         try {
             rgs = ServiceHolder.getAnalyticsDataService().get(this.tenantId, this.tableName, 
-                    SparkAnalyticsExecutor.getNumPartitionsHint(),
+                    ServiceHolder.getAnalyticskExecutor().getNumPartitionsHint(),
                     this.columns, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
         } catch (AnalyticsException e) {
             throw new RuntimeException(e.getMessage(), e);

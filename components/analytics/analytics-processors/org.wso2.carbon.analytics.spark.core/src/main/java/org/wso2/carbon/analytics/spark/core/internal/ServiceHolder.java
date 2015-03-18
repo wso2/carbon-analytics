@@ -49,6 +49,8 @@ public class ServiceHolder {
     private static RegistryService registryService;
 
     private static TenantRegistryLoader tenantRegistryLoader;
+    
+    private static SparkAnalyticsExecutor analyticskExecutor;
 
     public static void setTaskService(TaskService taskService) {
         ServiceHolder.taskService = taskService;
@@ -94,4 +96,14 @@ public class ServiceHolder {
             return ServiceHolder.registryService.getConfigSystemRegistry(tenantId);
         }
     }
+    
+    public static SparkAnalyticsExecutor getAnalyticskExecutor() {
+        return analyticskExecutor;
+    }
+
+    
+    public static void setAnalyticskExecutor(SparkAnalyticsExecutor analyticskExecutor) {
+        ServiceHolder.analyticskExecutor = analyticskExecutor;
+    }
+    
 }

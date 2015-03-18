@@ -72,15 +72,15 @@ public class AnalyticsSparkSQLUITest {
         AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
         this.service = new AnalyticsDataServiceImpl(ars, afs, 6);
         ServiceHolder.setAnalyticsDataService(this.service);
-        SparkAnalyticsExecutor.initUsingLocal();
+        ServiceHolder.setAnalyticskExecutor(new SparkAnalyticsExecutor("localhost", 0));
     }
 
     @AfterClass
     public void done() throws NamingException, AnalyticsException, IOException {
-        SparkAnalyticsExecutor.stop();
         this.service.destroy();
         this.h2arstest.destroy();
         this.h2afstest.destroy();
+        ServiceHolder.getAnalyticskExecutor().stop();
     }
 
     @Test(expectedExceptions = RuntimeException.class)
@@ -125,7 +125,6 @@ public class AnalyticsSparkSQLUITest {
         Assert.assertEquals(result.charAt(result.length() - 1), '}');
 
         this.service.deleteTable(1, "Log");
-        SparkAnalyticsExecutor.stop();
     }
 
     private AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto getResult(AnalyticsQueryResultDto queryResultDto) {

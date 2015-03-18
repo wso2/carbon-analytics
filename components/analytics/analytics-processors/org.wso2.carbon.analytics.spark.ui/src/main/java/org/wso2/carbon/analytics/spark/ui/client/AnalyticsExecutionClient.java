@@ -124,14 +124,12 @@ public class AnalyticsExecutionClient {
             for (AnalyticsProcessorAdminServiceStub.AnalyticsRowResultDto row : res.getRowsResults()) {
                 if (row != null) {
                     JsonArray singleRow = new JsonArray();
-                    int i = 0;
                     for (String elm : row.getColumnValues()) {
                         if (elm != null) {
                             singleRow.add(new JsonPrimitive(elm.toString()));
                         } else {
                             singleRow.add(new JsonPrimitive("NULL"));
                         }
-                        i++;
                     }
                     rows.add(singleRow);
                 }
