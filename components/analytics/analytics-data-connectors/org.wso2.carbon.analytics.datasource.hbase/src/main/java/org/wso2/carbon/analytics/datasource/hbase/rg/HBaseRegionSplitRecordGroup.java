@@ -20,25 +20,25 @@ package org.wso2.carbon.analytics.datasource.hbase.rg;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
 
-import java.util.List;
-
-public class HBaseTimestampRecordGroup implements RecordGroup {
+public class HBaseRegionSplitRecordGroup implements RecordGroup {
 
     private int tenantId;
     private String tableName;
-    private List<String> columns;long startTime, endTime;
+    private byte[] startRow;
+    private byte[] endRow;
+    private String location;
 
-    public HBaseTimestampRecordGroup(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo){
+    public HBaseRegionSplitRecordGroup(int tenantId, String tableName, byte[] startRow, byte[] endRow, String location) {
         this.tenantId = tenantId;
         this.tableName = tableName;
-        this.columns = columns;
-        this.startTime = timeFrom;
-        this.endTime = timeTo;
+        this.startRow = startRow;
+        this.endRow = endRow;
+        this.location = location;
     }
 
     @Override
     public String[] getLocations() throws AnalyticsException {
-        return new String[]{"local"};
+        return new String[]{this.location};
     }
 
     public int getTenantId() {
@@ -49,16 +49,17 @@ public class HBaseTimestampRecordGroup implements RecordGroup {
         return tableName;
     }
 
-    public List<String> getColumns() {
-        return columns;
+    public byte[] getStartRow() {
+        return startRow;
     }
 
-    public long getStartTime() {
-        return startTime;
+    public byte[] getEndRow() {
+        return endRow;
     }
 
-    public long getEndTime() {
-        return endTime;
+    public String getLocation() {
+        return location;
     }
+
 
 }

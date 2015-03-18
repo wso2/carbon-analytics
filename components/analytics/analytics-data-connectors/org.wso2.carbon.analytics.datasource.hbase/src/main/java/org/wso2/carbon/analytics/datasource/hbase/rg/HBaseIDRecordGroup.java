@@ -24,10 +24,10 @@ import java.util.List;
 
 public class HBaseIDRecordGroup implements RecordGroup {
 
-    int tenantId;
-    String tableName;
-    List<String> columns;
-    List<String> ids;
+    private int tenantId;
+    private String tableName;
+    private List<String> columns;
+    private List<String> ids;
 
     @Override
     public String[] getLocations() throws AnalyticsException {
