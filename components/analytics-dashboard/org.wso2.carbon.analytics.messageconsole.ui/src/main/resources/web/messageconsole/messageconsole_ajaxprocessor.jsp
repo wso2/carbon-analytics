@@ -25,7 +25,7 @@
     }
 
     switch (type) {
-        case MessageConsoleConnector.TYPE_LIST_RECORD:
+        case MessageConsoleConnector.TYPE_LIST_RECORD: {
             String jtStartIndex = request.getParameter("jtStartIndex");
             if (jtStartIndex == null || jtStartIndex.isEmpty()) {
                 jtStartIndex = "0";
@@ -51,29 +51,75 @@
             }
             out.print(connector.getRecords(tableName, from, to, startIndex, pageSize, query));
             break;
-        case MessageConsoleConnector.TYPE_UPDATE_RECORD:
-            break;
-        case MessageConsoleConnector.TYPE_CREATE_RECORD:
+        }
+        case MessageConsoleConnector.TYPE_UPDATE_RECORD: {
             Map<String, String[]> parameters = request.getParameterMap();
-            String[] columns = new String[parameters.size() - 2];
-            String[] values = new String[parameters.size() - 2];
+            Properties properties = new Properties(parameters).invoke();
+            String[] columns = properties.getColumns();
+            String[] values = properties.getValues();
+
+            String recordID = request.getParameter(MessageConsoleConnector.RECORD_ID);
+            String timestamp = request.getParameter(MessageConsoleConnector.TIMESTAMP);
+            out.print(connector.updateRecord(tableName, columns, values, recordID, timestamp));
+            break;
+        }
+        case MessageConsoleConnector.TYPE_CREATE_RECORD: {
+            Map<String, String[]> parameters = request.getParameterMap();
+            Properties properties = new Properties(parameters).invoke();
+            String[] columns = properties.getColumns();
+            String[] values = properties.getValues();
+
+            out.print(connector.addRecord(tableName, columns, values));
+            break;
+        }
+        case MessageConsoleConnector.TYPE_DELETE_RECORD: {
+            String recordsIdString = request.getParameter(MessageConsoleConnector.RECORD_ID);
+            String[] recordsIds = new String[]{recordsIdString};
+            out.print(connector.deleteRecords(tableName, recordsIds));
+            break;
+        }
+        case MessageConsoleConnector.TYPE_TABLE_INFO: {
+            out.print(connector.getTableInfo(tableName));
+            break;
+        }
+    }
+
+%><%!
+    private class Properties {
+        private Map<String, String[]> parameters;
+        private String[] columns;
+        private String[] values;
+
+        public Properties(Map<String, String[]> parameters) {
+            this.parameters = parameters;
+        }
+
+        public String[] getColumns() {
+            return columns;
+        }
+
+        public String[] getValues() {
+            return values;
+        }
+
+        public Properties invoke() {
+            columns = new String[parameters.size() - 4];
+            values = new String[parameters.size() - 4];
             int i = 0;
             for (Map.Entry<String, String[]> column : parameters.entrySet()) {
-                if (!"tableName".equals(column.getKey()) && !"type".equals(column.getKey()) && column.getValue().length >= 1) {
+                String columnName = column.getKey();
+                if (checkUnwantedFields(columnName) && column.getValue().length >= 1) {
                     columns[i] = column.getKey();
                     values[i] = column.getValue()[0];
                     i++;
                 }
             }
-            out.print(connector.addRecord(tableName, columns, values));
-            break;
-        case MessageConsoleConnector.TYPE_DELETE_RECORD:
-            String recordsIdString = request.getParameter(MessageConsoleConnector.RECORD_ID);
-            String[] recordsIds = new String[]{recordsIdString};
-            out.print(connector.deleteRecords(tableName, recordsIds));
-            break;
-        case MessageConsoleConnector.TYPE_TABLE_INFO:
-            out.print(connector.getTableInfo(tableName));
-            break;
+            return this;
+        }
+
+        private boolean checkUnwantedFields(String columnName) {
+            return !"tableName".equals(columnName) && !"type".equals(columnName) &&
+                   !MessageConsoleConnector.RECORD_ID.equals(columnName) && !MessageConsoleConnector.TIMESTAMP.equals(columnName);
+        }
     }
 %>

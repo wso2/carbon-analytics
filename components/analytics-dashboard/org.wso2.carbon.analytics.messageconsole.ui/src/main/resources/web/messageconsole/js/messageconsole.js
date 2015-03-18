@@ -1,10 +1,10 @@
 var tableLoaded = false;
-
+var timestamp;
 function createMainJTable(fields) {
     $('#AnalyticsTableContainer').jtable({
                                              title: $("#tableSelect").val(),
                                              paging: true,
-                                             pageSize: 10,
+                                             pageSize: 25,
                                              selecting: true,
                                              multiselect: true,
                                              selectingCheckboxes: true,
@@ -23,8 +23,8 @@ function createMainJTable(fields) {
                                                      return deleteActionMethod(postData);
                                                  }
                                              },
-                                             formSubmitting: function (event, data) {
-                                                 $('#AnalyticsTableContainer').jtable('reload');
+                                             formCreated: function (event, data) {
+                                                 timestamp = data.record.bam_rec_timestamp;
                                              },
                                              fields: fields
 
@@ -109,8 +109,11 @@ function createJTable() {
                           }
                           if (val.name == 'bam_unique_rec_id' || val.name == 'bam_rec_timestamp') {
                               fields[val.name].edit = false;
+                              fields[val.name].create = false;
                           }
                       });
+
+                      console.log(fields);
 
                       if (data) {
                           if (tableLoaded == true) {
@@ -168,7 +171,8 @@ function createActionMethod(postData) {
 function updateActionMethod(postData) {
     return $.Deferred(function ($dfd) {
         $.ajax({
-                   url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeUpdateRecord,
+                   url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?' +
+                        'type=' + typeUpdateRecord + '&tableName=' + $("#tableSelect").val() + '&bam_rec_timestamp=' + timestamp,
                    type: 'POST',
                    dataType: 'json',
                    data: postData,

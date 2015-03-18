@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDSUtils;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
@@ -215,38 +216,7 @@ public class MessageConsoleService {
 
         RecordBean recordBean;
         try {
-            AnalyticsSchema schema = analyticsDataService.getTableSchema(tenantId, table);
-            Map<String, AnalyticsSchema.ColumnType> columnsMetaInfo = schema.getColumns();
-
-            Map<String, Object> objectMap = new HashMap<>(columns.length);
-            for (int i = 0; i < columns.length; i++) {
-                String columnName = columns[i];
-                String stringValue = values[i];
-                if (columnName != null) {
-                    AnalyticsSchema.ColumnType columnType = columnsMetaInfo.get(columnName);
-                    Object value = stringValue;
-                    switch (columnType) {
-                        case STRING:
-                            break;
-                        case INT:
-                            value = Integer.valueOf(stringValue);
-                            break;
-                        case LONG:
-                            value = Long.valueOf(stringValue);
-                            break;
-                        case BOOLEAN:
-                            value = Boolean.valueOf(stringValue);
-                            break;
-                        case FLOAT:
-                            value = Float.valueOf(stringValue);
-                            break;
-                        case DOUBLE:
-                            value = Double.valueOf(stringValue);
-                            break;
-                    }
-                    objectMap.put(columnName, value);
-                }
-            }
+            Map<String, Object> objectMap = getRecordPropertyMap(table, columns, values, tenantId);
 
             Record record = new Record(tenantId, table, objectMap, System.currentTimeMillis());
             recordBean = createRecordBean(record);
@@ -260,5 +230,74 @@ public class MessageConsoleService {
         }
 
         return recordBean;
+    }
+
+    public RecordBean updateRecord(String table, String recordId, String[] columns, String[] values, long timestamp)
+            throws
+            MessageConsoleException {
+
+        int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Record {id: " + recordId + ", column: " + Arrays.toString(columns) + ", values: " + Arrays.toString
+                    (values) +
+                         "} going to update to" + table);
+        }
+
+        RecordBean recordBean;
+        try {
+            Map<String, Object> objectMap = getRecordPropertyMap(table, columns, values, tenantId);
+
+            Record record = new Record(recordId, tenantId, table, objectMap, timestamp);
+            recordBean = createRecordBean(record);
+
+            List<Record> records = new ArrayList<>(1);
+            records.add(record);
+            analyticsDataService.put(records);
+        } catch (Exception e) {
+            logger.error("Unable to update record {id: " + recordId + ", column: " + Arrays.toString(columns) + ", " +
+                         "values: " + Arrays.toString(values) + " } to table :" + table, e);
+            throw new MessageConsoleException("Unable to update record {id: " + recordId + ", column: " + Arrays
+                    .toString(columns) + ", values: " + Arrays.toString(values) + " } to table :" + table, e);
+        }
+
+        return recordBean;
+    }
+
+    private Map<String, Object> getRecordPropertyMap(String table, String[] columns, String[] values, int tenantId)
+            throws AnalyticsException {
+        AnalyticsSchema schema = analyticsDataService.getTableSchema(tenantId, table);
+        Map<String, AnalyticsSchema.ColumnType> columnsMetaInfo = schema.getColumns();
+
+        Map<String, Object> objectMap = new HashMap<>(columns.length);
+        for (int i = 0; i < columns.length; i++) {
+            String columnName = columns[i];
+            String stringValue = values[i];
+            if (columnName != null) {
+                AnalyticsSchema.ColumnType columnType = columnsMetaInfo.get(columnName);
+                Object value = stringValue;
+                switch (columnType) {
+                    case STRING:
+                        break;
+                    case INT:
+                        value = Integer.valueOf(stringValue);
+                        break;
+                    case LONG:
+                        value = Long.valueOf(stringValue);
+                        break;
+                    case BOOLEAN:
+                        value = Boolean.valueOf(stringValue);
+                        break;
+                    case FLOAT:
+                        value = Float.valueOf(stringValue);
+                        break;
+                    case DOUBLE:
+                        value = Double.valueOf(stringValue);
+                        break;
+                }
+                objectMap.put(columnName, value);
+            }
+        }
+        return objectMap;
     }
 }
