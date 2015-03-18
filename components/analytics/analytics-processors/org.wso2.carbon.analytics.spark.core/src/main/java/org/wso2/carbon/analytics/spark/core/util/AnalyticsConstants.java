@@ -39,6 +39,7 @@ public class AnalyticsConstants {
             +"components"+RegistryConstants.PATH_SEPARATOR +RegistryConstants.PATH_SEPARATOR
             +"org.wso2.carbon.analytics.spark";
     public static final String ANALYTICS_MEDIA_TYPE = "application/xml";
+    public static final String SPARK_COMPUTE_CLASSPATH_SCRIPT_PATH = "bin/compute-classpath.sh";
 
     public static final String STRING_TYPE = "string";
     public static final String INT_TYPE = "int";
