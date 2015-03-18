@@ -24,9 +24,9 @@ import java.util.List;
 
 public class HBaseTimestampRecordGroup implements RecordGroup {
 
-    int tenantId;
-    String tableName;
-    List<String> columns;long startTime, endTime;
+    private int tenantId;
+    private String tableName;
+    private List<String> columns;long startTime, endTime;
 
     public HBaseTimestampRecordGroup(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo){
         this.tenantId = tenantId;
