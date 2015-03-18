@@ -70,7 +70,7 @@ public class SparkDataListener implements Runnable {
                             System.out.println(str);
                         }
                         if (new File(destFolderPath+"/"+fileName).delete()){
-                            log.info("Deleted file : "+ fileName);
+                            log.info("Deleted file : " + fileName);
                         }
 
                         //todo: spawn this in a new thread

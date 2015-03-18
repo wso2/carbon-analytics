@@ -1,2 +1,0 @@
-instructions.configure = \
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.analytics.spark.server_${feature.version}/compute-classpath.sh,target:${installFolder}/../../../bin/compute-classpath.sh,overwrite:true);\

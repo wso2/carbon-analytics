@@ -37,7 +37,8 @@ public class SparkBackendExecutor implements Runnable {
 
     @Override
     public void run() {
-        log.info("Starting executor using args : "+ Arrays.toString(argArray));
+//        log.info("Starting executor using args : "+ Arrays.toString(argArray));
+        System.out.println("Starting executor using args : "+ Arrays.toString(argArray));
         CoarseGrainedExecutorBackend.main(argArray);
     }
 }
