@@ -17,13 +17,10 @@
 */
 package org.wso2.carbon.analytics.datasource.hbase;
 
-import com.google.common.collect.Lists;
 import org.apache.hadoop.hbase.Cell;
+import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.TableName;
-import org.apache.hadoop.hbase.client.Connection;
-import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.client.Table;
+import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
@@ -34,27 +31,31 @@ import org.wso2.carbon.analytics.datasource.hbase.util.HBaseUtils;
 import java.io.IOException;
 import java.util.*;
 
-public class HBaseRecordIterator implements Iterator<Record> {
+public class HBaseTimestampIterator implements Iterator<Record> {
 
     private List<String> columns;
-    private List<List<String>> batchedIds;
 
-    private int tenantId, totalBatches, currentBatchIndex;
+    private int tenantId, batchSize;
+
+    private byte[] latestRow, endRow;
+    private static final long POSTFIX = 1L;
 
     private boolean fullyFetched;
     private String tableName;
-    private Table table;
+    private Table table, indexTable;
     private Iterator<Record> subIterator;
 
-    public HBaseRecordIterator(int tenantId, String tableName, List<String> columns, List<String> recordIds,
-                               Connection conn, int batchSize) throws AnalyticsException {
-        this.init(conn, tenantId, tableName, columns);
-        if (batchSize <= 0) {
-            throw new AnalyticsException("Error batching records: the batch size should be a positive integer");
+    HBaseTimestampIterator(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo,
+                           Connection conn, int batchSize) throws AnalyticsException {
+        if ((timeFrom > timeTo) || (batchSize < 0)) {
+            throw new AnalyticsException("Invalid parameters specified for reading data from table " + tableName +
+                    " for tenant " + tenantId);
         } else {
-            this.batchedIds = Lists.partition(recordIds, batchSize);
-            this.totalBatches = this.batchedIds.size();
-                /* pre-fetching from HBase and populating records for the first time */
+            this.init(conn, tenantId, tableName, columns, batchSize);
+            /* setting the initial row to start time -1 because it will soon be incremented by 1L. */
+            this.latestRow = HBaseUtils.encodeLong(timeFrom - POSTFIX);
+            this.endRow = HBaseUtils.encodeLong(timeTo + POSTFIX);
+            /* pre-fetching from HBase and populating records for the first time */
             this.preFetch();
         }
     }
@@ -80,16 +81,21 @@ public class HBaseRecordIterator implements Iterator<Record> {
 
     @Override
     public void remove() {
-            /* nothing to do here, since this is a read-only iterator */
+        /* nothing to do here, since this is a read-only iterator */
     }
 
     private void preFetch() {
-        if (fullyFetched || this.totalBatches == 0) {
+        if (this.fullyFetched) {
             return;
         }
-        List<String> currentBatch = this.batchedIds.get(this.currentBatchIndex);
+        List<String> currentBatch = this.populateRecordBatches();
+        if (currentBatch.size() == 0) {
+            return;
+        }
+
         List<Record> fetchedRecords = new ArrayList<>();
         List<Get> gets = new ArrayList<>();
+
         for (String currentId : currentBatch) {
             Get get = new Get(Bytes.toBytes(currentId));
 
@@ -106,6 +112,7 @@ public class HBaseRecordIterator implements Iterator<Record> {
             }
             gets.add(get);
         }
+
         try {
             Result[] results = this.table.get(gets);
             for (Result currentResult : results) {
@@ -133,18 +140,51 @@ public class HBaseRecordIterator implements Iterator<Record> {
             throw new HBaseRuntimeException("Error reading data from table " + this.tableName + " for tenant " +
                     this.tenantId, e);
         }
-
-        this.currentBatchIndex++;
-        if ((this.totalBatches == 1) || this.currentBatchIndex == this.totalBatches - 1) {
-            this.fullyFetched = true;
-        }
     }
 
-    private void init(Connection conn, int tenantId, String tableName, List<String> columns) throws AnalyticsException {
+    private List<String> populateRecordBatches() {
+        List<String> currentBatch = new ArrayList<>();
+        int counter = 0;
+        /* Setting (end-time)+1L because end-time is exclusive (which is not what we want) */
+        Scan indexScan = new Scan();
+        long latestTime = HBaseUtils.decodeLong(this.latestRow);
+        indexScan.setStartRow(HBaseUtils.encodeLong(latestTime + POSTFIX));
+        indexScan.setStopRow(this.endRow);
+        indexScan.addFamily(HBaseAnalyticsDSConstants.ANALYTICS_INDEX_COLUMN_FAMILY_NAME);
+        ResultScanner resultScanner;
+        try {
+            resultScanner = indexTable.getScanner(indexScan);
+            for (Result rowResult : resultScanner) {
+                if (counter == this.batchSize) {
+                    break;
+                }
+                Cell[] cells = rowResult.rawCells();
+                for (Cell cell : cells) {
+                    currentBatch.add(Bytes.toString(CellUtil.cloneValue(cell)));
+                }
+                this.latestRow = rowResult.getRow();
+                counter++;
+            }
+            resultScanner.close();
+            indexTable.close();
+        } catch (IOException e) {
+            throw new HBaseRuntimeException("Error reading index data for table " + this.tableName + ", tenant " +
+                    this.tenantId, e);
+        }
+        if (counter == 0) {
+            this.fullyFetched = true;
+        }
+        return currentBatch;
+    }
+
+    private void init(Connection conn, int tenantId, String tableName, List<String> columns, int batchSize) throws AnalyticsException {
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.columns = columns;
+        this.batchSize = batchSize;
         try {
+            this.indexTable = conn.getTable(TableName.valueOf(
+                    HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.INDEX)));
             this.table = conn.getTable(TableName.valueOf(
                     HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.DATA)));
         } catch (IOException e) {
@@ -160,5 +200,4 @@ public class HBaseRecordIterator implements Iterator<Record> {
             /* do nothing, the connection is dead anyway */
         }
     }
-
 }

@@ -18,8 +18,6 @@
 
 package org.wso2.carbon.analytics.spark.core.internal;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.spark.executor.CoarseGrainedExecutorBackend;
 
 import java.util.Arrays;
@@ -28,7 +26,7 @@ import java.util.Arrays;
  * Creates different threads for each executor
  */
 public class SparkBackendExecutor implements Runnable {
-    private static final Log log = LogFactory.getLog(SparkBackendExecutor.class);
+
     private final String [] argArray;
 
     public SparkBackendExecutor(String [] argArray){
@@ -37,8 +35,7 @@ public class SparkBackendExecutor implements Runnable {
 
     @Override
     public void run() {
-//        log.info("Starting executor using args : "+ Arrays.toString(argArray));
-        System.out.println("Starting executor using args : "+ Arrays.toString(argArray));
+        System.out.println("Starting executor using args: " + Arrays.toString(argArray));
         CoarseGrainedExecutorBackend.main(argArray);
     }
 }

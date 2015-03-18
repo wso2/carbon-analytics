@@ -17,17 +17,22 @@
 */
 package org.wso2.carbon.analytics.spark.core.internal;
 
+import java.net.SocketException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterException;
 import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.CarbonAnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
+import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
+import org.wso2.carbon.utils.NetworkUtils;
 
 /**
  * @scr.component name="analytics.core" immediate="true"
@@ -40,16 +45,35 @@ import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
  * @scr.reference name="tenant.registryloader" interface="org.wso2.carbon.registry.core.service.TenantRegistryLoader"
  * cardinality="1..1" policy="dynamic" bind="setTenantRegistryLoader" unbind="unsetTenantRegistryLoader"
  */
-
 public class AnalyticsComponent {
+    
+    private static final String PORT_OFFSET_SERVER_PROP = "Ports.Offset";
+    
     private static final Log log = LogFactory.getLog(AnalyticsComponent.class);
 
     protected void activate(ComponentContext ctx) {
-        if (log.isDebugEnabled()) log.debug("Activating Analytics Spark Core");
-        SparkAnalyticsExecutor.init();
+        if (log.isDebugEnabled()) { 
+            log.debug("Activating Analytics Spark Core");
+        }
+        try {
+            int portOffset = Integer.parseInt(ServerConfiguration.getInstance().getFirstProperty(PORT_OFFSET_SERVER_PROP));
+            ServiceHolder.setAnalyticskExecutor(new SparkAnalyticsExecutor(
+                    NetworkUtils.getLocalHostname(), portOffset));
+        } catch (AnalyticsClusterException | SocketException e) {
+            String msg = "Error initializing analytics executor: " + e.getMessage();
+            log.error(msg, e);
+            throw new RuntimeException(msg, e);
+        }
         AnalyticsProcessorService analyticsProcessorService = new CarbonAnalyticsProcessorService();
         ctx.getBundleContext().registerService(AnalyticsProcessorService.class, analyticsProcessorService, null);
         ServiceHolder.setAnalyticsProcessorService(analyticsProcessorService);
+        if (log.isDebugEnabled()) { 
+            log.debug("Finished activating Analytics Spark Core");
+        }
+    }
+    
+    protected void deactivate(ComponentContext ctx) {
+        ServiceHolder.getAnalyticskExecutor().stop();
     }
 
     protected void setTaskService(TaskService taskService) {

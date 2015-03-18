@@ -56,11 +56,10 @@ public class SparkDataListener implements Runnable {
             WatchService watcher = FileSystems.getDefault().newWatchService();
             dir.register(watcher, StandardWatchEventKinds.ENTRY_CREATE
                     , StandardWatchEventKinds.ENTRY_MODIFY);
-
             for (; ; ) {
                 WatchKey watckKey = watcher.take();
                 List<WatchEvent<?>> events = watckKey.pollEvents();
-                for (WatchEvent event : events) {
+                for (WatchEvent<?> event : events) {
                     if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
                         String fileName = event.context().toString();
                         final String[] argArray = getArgArray(Paths.get(destFolderPath, fileName));
@@ -72,24 +71,10 @@ public class SparkDataListener implements Runnable {
                         if (new File(destFolderPath+"/"+fileName).delete()){
                             log.info("Deleted file : " + fileName);
                         }
-
-                        //todo: spawn this in a new thread
-//                        CoarseGrainedExecutorBackend.main(argArray);
-
                         ExecutorService executor = Executors.newCachedThreadPool();
                         executor.execute(new SparkBackendExecutor(argArray));
-
-//                        new Thread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                CoarseGrainedExecutorBackend.main(argArray);
-//                            }
-//                        }).start();
-
-//                        break;
                     }
                 }
-
                 boolean valid = watckKey.reset();
                 if (!valid) {
                     break;
@@ -104,4 +89,5 @@ public class SparkDataListener implements Runnable {
         List<String> lines = Files.readAllLines(filePath, Charset.defaultCharset());
         return lines.toArray(new String[lines.size()]);
     }
+    
 }

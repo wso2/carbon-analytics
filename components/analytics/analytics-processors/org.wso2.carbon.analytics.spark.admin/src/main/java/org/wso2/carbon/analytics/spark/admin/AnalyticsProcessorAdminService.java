@@ -19,7 +19,6 @@ package org.wso2.carbon.analytics.spark.admin;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.spark.admin.dto.AnalyticsRowResultDto;
 import org.wso2.carbon.analytics.spark.admin.dto.AnalyticsScriptDto;
 import org.wso2.carbon.analytics.spark.admin.internal.AnalyticsResultConverter;
 import org.wso2.carbon.analytics.spark.admin.internal.ServiceHolder;
@@ -27,7 +26,6 @@ import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionExceptio
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsPersistenceException;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.admin.dto.AnalyticsQueryResultDto;
-import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsScript;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.AbstractAdmin;

@@ -30,47 +30,108 @@ import org.apache.spark.sql.api.java.Row;
 import org.apache.spark.sql.api.java.StructField;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDSUtils;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterException;
+import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
+import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.analytics.spark.core.internal.SparkDataListener;
-import org.wso2.carbon.utils.CarbonUtils;
+
 import scala.Option;
+
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsRelation;
+import org.wso2.carbon.utils.CarbonUtils;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
  * This class represents the analytics query execution context.
  */
-public class SparkAnalyticsExecutor {
+public class SparkAnalyticsExecutor implements GroupEventListener {
+
+    private static final int P2_BASE_PORT = 8090;
+
+    private static final int P1_BASE_PORT = 4501;
+
+    private static final String MASTER_PORT_GROUP_PROP = "MASTER_PORT";
+
+    private static final String MASTER_HOST_GROUP_PROP = "MASTER_HOST";
+
+    private static final int BASE_WEBUI_PORT = 8081;
+
+    private static final int BASE_MASTER_PORT = 7077;
+
+    private static final String CLUSTER_GROUP_NAME = "CARBON_ANALYTICS_EXECUTION";
+
+    private static final String LOCAL_MASTER_URL = "local";
 
     private static final String CARBON_ANALYTICS_SPARK_APP_NAME = "CarbonAnalytics";
 
     private static final Log log = LogFactory.getLog(SparkAnalyticsExecutor.class);
+    
+    private SparkConf sparkConf = new SparkConf();
+    
+    private JavaSparkContext sparkCtx;
 
-    private static JavaSparkContext sparkCtx;
+    private JavaSQLContext sqlCtx;
+    
+    private String myHost;
+    
+    private int portOffset;
+    
+    private int workerCount = 1;
 
-    private static JavaSQLContext sqlCtx;
+    public SparkAnalyticsExecutor(String myHost, int portOffset) throws AnalyticsClusterException {
+        this.myHost = myHost;
+        this.portOffset = portOffset;
+        AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
+        if (acm.isClusteringEnabled()) {
+            initSparkDataListener();
+            acm.joinGroup(CLUSTER_GROUP_NAME, this);
+        } else {
+            this.initClient(LOCAL_MASTER_URL);
+        }
+    }
+    
+    private void initClient(String masterUrl) {
+        this.sparkConf.setMaster(masterUrl).setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
+        this.sparkCtx = new JavaSparkContext(this.sparkConf);
+        this.sqlCtx = new JavaSQLContext(this.sparkCtx);
+    }
 
-    public static void init() {
-        validateSparkScriptPathPermission();
-        initSparkDataListener();
-        SparkConf sparkConf = new SparkConf();
-        //master
-        startMaster("localhost", 7077, 8081, sparkConf);
-        //workers
-        Worker.startSystemAndActor("localhost", 4501, 8090, 2, 1000000,
-                new String[]{"spark://localhost:7077"}, null, new Option<Object>() {
+    private void startMaster(String host, int port, int webUIport){
+        Master.startSystemAndActor(host, port, webUIport, this.sparkConf);
+    }
+    
+    private void startWorker(String workerHost, String masterHost, int masterPort, int p1, int p2) {
+        Worker.startSystemAndActor(workerHost, p1, p2, 2, 1000000, new String[] { "spark://" + masterHost + ":" + masterPort },
+                null, new Option<Object>() {
+            
+                    private static final long serialVersionUID = 3087598975952096368L;
+
                     @Override
                     public boolean isEmpty() {
                         return false;
@@ -101,46 +162,16 @@ public class SparkAnalyticsExecutor {
                         return false;
                     }
                 });
-
-//        Worker.startSystemAndActor("localhost", 4502, 8091, 2, 1000000,
-//                                   new String[]{"spark://localhost:7077"}, null, new Option<Object>() {
-//                    @Override
-//                    public boolean isEmpty() {
-//                        return false;
-//                    }
-//
-//                    @Override
-//                    public Object get() {
-//                        return new Integer(2);
-//                    }
-//
-//                    @Override
-//                    public Object productElement(int n) {
-//                        return null;
-//                    }
-//
-//                    @Override
-//                    public int productArity() {
-//                        return 0;
-//                    }
-//
-//                    @Override
-//                    public boolean canEqual(Object that) {
-//                        return false;
-//                    }
-//
-//                    @Override
-//                    public boolean equals(Object that) {
-//                        return false;
-//                    }
-//                });
-
-        sparkConf.setMaster("spark://localhost:7077").setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
-        sparkCtx = new JavaSparkContext(sparkConf);
-        sqlCtx = new JavaSQLContext(sparkCtx);
     }
 
-    private static void validateSparkScriptPathPermission() {
+    private void initSparkDataListener() {
+        this.validateSparkScriptPathPermission();
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        SparkDataListener listener = new SparkDataListener();
+        executor.execute(listener);
+    }
+
+    private void validateSparkScriptPathPermission() {
         Set<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
         //add owners permission
         perms.add(PosixFilePermission.OWNER_READ);
@@ -159,30 +190,15 @@ public class SparkAnalyticsExecutor {
         }
     }
 
-    public static void initUsingLocal() {
-        SparkConf sparkConf = new SparkConf();
-        sparkConf.setMaster("local").setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
-        sparkCtx = new JavaSparkContext(sparkConf);
-        sqlCtx = new JavaSQLContext(sparkCtx);
+    public void stop() {
+        if (this.sqlCtx != null) {
+            this.sqlCtx.sqlContext().sparkContext().stop();
+            this.sparkCtx.close();
+        }
     }
-
-    private static void startMaster(String host, int port, int webUIport, SparkConf sConf) {
-        Master.startSystemAndActor(host, port, webUIport, sConf);
-    }
-
-    private static void initSparkDataListener() {
-        ExecutorService executor = Executors.newFixedThreadPool(1);
-        SparkDataListener listener = new SparkDataListener();
-        executor.execute(listener);
-    }
-
-    public static void stop() {
-        sqlCtx.sqlContext().sparkContext().stop();
-        sparkCtx.close();
-    }
-
-    private static void processDefineTable(int tenantId, String query,
-                                           String[] tokens) throws AnalyticsExecutionException {
+    
+    private void processDefineTable(int tenantId, String query, 
+            String[] tokens) throws AnalyticsExecutionException {
         String tableName = tokens[2].trim();
         String alias = tableName;
         if (tokens[tokens.length - 2].equalsIgnoreCase(AnalyticsConstants.TERM_AS)) {
@@ -196,23 +212,24 @@ public class SparkAnalyticsExecutor {
             throw new AnalyticsExecutionException("Error in registering analytics table: " + e.getMessage(), e);
         }
     }
-
-    public static int getNumPartitionsHint() {
-        return 4;
+    
+    public int getNumPartitionsHint() {
+        /* all workers will not have the same CPU count, this is just an approximation */
+        return this.getWorkerCount() * Runtime.getRuntime().availableProcessors();
     }
-
-    private static void processInsertInto(int tenantId, String query,
-                                          String[] tokens) throws AnalyticsExecutionException {
+    
+    private void processInsertInto(int tenantId, String query, 
+            String[] tokens) throws AnalyticsExecutionException {
         String tableName = tokens[2].trim();
         String selectQuery = query.substring(query.indexOf(tableName) + tableName.length()).trim();
         try {
-            insertIntoTable(tenantId, tableName, toResult(sqlCtx.sql(selectQuery)));
+            insertIntoTable(tenantId, tableName, toResult(this.sqlCtx.sql(selectQuery)));
         } catch (AnalyticsException e) {
             throw new AnalyticsExecutionException("Error in executing insert into query: " + e.getMessage(), e);
         }
     }
-
-    public static AnalyticsQueryResult executeQuery(int tenantId, String query) throws AnalyticsExecutionException {
+    
+    public AnalyticsQueryResult executeQuery(int tenantId, String query) throws AnalyticsExecutionException {
         query = query.trim();
         if (query.endsWith(";")) {
             query = query.substring(0, query.length() - 1);
@@ -221,25 +238,25 @@ public class SparkAnalyticsExecutor {
         if (tokens.length >= 3) {
             if (tokens[0].trim().equalsIgnoreCase(AnalyticsConstants.TERM_DEFINE) &&
                     tokens[1].trim().equalsIgnoreCase(AnalyticsConstants.TERM_TABLE)) {
-                processDefineTable(tenantId, query, tokens);
+                this.processDefineTable(tenantId, query, tokens);
                 return null;
             } else if (tokens[0].trim().equalsIgnoreCase(AnalyticsConstants.TERM_INSERT) &&
                     tokens[1].trim().equalsIgnoreCase(AnalyticsConstants.TERM_INTO)) {
-                processInsertInto(tenantId, query, tokens);
+                this.processInsertInto(tenantId, query, tokens);
                 return null;
             }
         }
         return toResult(sqlCtx.sql(query));
     }
-
-    private static void insertIntoTable(int tenantId, String tableName,
-                                        AnalyticsQueryResult data) throws AnalyticsTableNotAvailableException, AnalyticsException {
+    
+    private void insertIntoTable(int tenantId, String tableName, 
+            AnalyticsQueryResult data) throws AnalyticsTableNotAvailableException, AnalyticsException {
         AnalyticsDataService ads = ServiceHolder.getAnalyticsDataService();
-        List<Record> records = generateInsertRecordsForTable(tenantId, tableName, data);
+        List<Record> records = this.generateInsertRecordsForTable(tenantId, tableName, data);
         ads.put(records);
     }
-
-    private static Integer[] generateTableKeyIndices(String[] keys, StructField[] columns) {
+    
+    private Integer[] generateTableKeyIndices(String[] keys, StructField[] columns) {
         List<Integer> result = new ArrayList<Integer>();
         for (String key : keys) {
             for (int i = 0; i < columns.length; i++) {
@@ -251,8 +268,8 @@ public class SparkAnalyticsExecutor {
         }
         return result.toArray(new Integer[result.size()]);
     }
-
-    private static String generateInsertRecordId(List<Object> row, Integer[] keyIndices) {
+    
+    private String generateInsertRecordId(List<Object> row, Integer[] keyIndices) {
         StringBuilder builder = new StringBuilder();
         Object obj;
         for (int index : keyIndices) {
@@ -271,29 +288,29 @@ public class SparkAnalyticsExecutor {
             throw new RuntimeException(e);
         }
     }
-
-    private static List<Record> generateInsertRecordsForTable(int tenantId, String tableName,
-                                                              AnalyticsQueryResult data) throws AnalyticsException {
+    
+    private List<Record> generateInsertRecordsForTable(int tenantId, String tableName, 
+            AnalyticsQueryResult data) throws AnalyticsException {
         String[] keys = loadTableKeys(tenantId, tableName);
         boolean primaryKeysExists = keys.length > 0;
         List<List<Object>> rows = data.getRows();
         StructField[] columns = data.getColumns();
-        Integer[] keyIndices = generateTableKeyIndices(keys, columns);
+        Integer[] keyIndices = this.generateTableKeyIndices(keys, columns);
         List<Record> result = new ArrayList<Record>(rows.size());
         Record record;
         for (List<Object> row : rows) {
             if (primaryKeysExists) {
-                record = new Record(generateInsertRecordId(row, keyIndices), tenantId, tableName,
+                record = new Record(this.generateInsertRecordId(row, keyIndices), tenantId, tableName, 
                         extractValuesFromRow(row, columns), System.currentTimeMillis());
             } else {
-                record = new Record(tenantId, tableName, extractValuesFromRow(row, columns),
+                record = new Record(tenantId, tableName, extractValuesFromRow(row, columns), 
                         System.currentTimeMillis());
             }
             result.add(record);
         }
         return result;
     }
-
+    
     private static Map<String, Object> extractValuesFromRow(List<Object> row, StructField[] columns) {
         Map<String, Object> result = new HashMap<String, Object>(row.size());
         for (int i = 0; i < row.size(); i++) {
@@ -301,11 +318,11 @@ public class SparkAnalyticsExecutor {
         }
         return result;
     }
-
+    
     private static AnalyticsQueryResult toResult(JavaSchemaRDD schemaRDD) throws AnalyticsExecutionException {
         return new AnalyticsQueryResult(schemaRDD.schema().getFields(), convertRowsToObjects(schemaRDD.collect()));
     }
-
+    
     private static List<List<Object>> convertRowsToObjects(List<Row> rows) {
         List<List<Object>> result = new ArrayList<List<Object>>();
         List<Object> objects;
@@ -318,16 +335,16 @@ public class SparkAnalyticsExecutor {
         }
         return result;
     }
-
+    
     private static void throwInvalidDefineTableQueryException() throws AnalyticsException {
         throw new AnalyticsException("Invalid define table query, must be in the format of "
                 + "'define table <table> (name1 type1, name2 type2, name3 type3,... primary key(name1, name2..))'");
     }
-
+    
     private static String generateTableKeysId(int tenantId, String tableName) {
         return tenantId + "_" + tableName;
     }
-
+    
     private static byte[] tableKeysToBinary(String[] keys) throws AnalyticsException {
         ByteArrayOutputStream byteOut = null;
         ObjectOutputStream objOut = null;
@@ -351,7 +368,7 @@ public class SparkAnalyticsExecutor {
             }
         }
     }
-
+    
     private static String[] binaryToTableKeys(byte[] data) throws AnalyticsException {
         ByteArrayInputStream byteIn = null;
         ObjectInputStream objIn = null;
@@ -374,7 +391,7 @@ public class SparkAnalyticsExecutor {
             }
         }
     }
-
+    
     private static String[] loadTableKeys(int tenantId, String tableName) throws AnalyticsException {
         AnalyticsDataService ads = ServiceHolder.getAnalyticsDataService();
         List<String> ids = new ArrayList<String>(1);
@@ -392,13 +409,13 @@ public class SparkAnalyticsExecutor {
         }
         return binaryToTableKeys(data);
     }
-
-    private static void registerTableKeys(int tenantId, String tableName,
-                                          String[] keys) throws AnalyticsException {
+    
+    private static void registerTableKeys(int tenantId, String tableName, 
+            String[] keys) throws AnalyticsException {
         AnalyticsDataService ads = ServiceHolder.getAnalyticsDataService();
         Map<String, Object> values = new HashMap<String, Object>();
         values.put(AnalyticsConstants.OBJECT, tableKeysToBinary(keys));
-        Record record = new Record(generateTableKeysId(tenantId, tableName),
+        Record record = new Record(generateTableKeysId(tenantId, tableName), 
                 AnalyticsConstants.TABLE_INFO_TENANT_ID, AnalyticsConstants.TABLE_INFO_TABLE_NAME,
                 values, System.currentTimeMillis());
         List<Record> records = new ArrayList<Record>(1);
@@ -410,9 +427,9 @@ public class SparkAnalyticsExecutor {
             ads.put(records);
         }
     }
-
-    private static String processPrimaryKeyAndReturnSchema(int tenantId, String tableName,
-                                                           String schemaString) throws AnalyticsException {
+    
+    private static String processPrimaryKeyAndReturnSchema(int tenantId, String tableName, 
+            String schemaString) throws AnalyticsException {
         int index = schemaString.toLowerCase().lastIndexOf(AnalyticsConstants.TERM_PRIMARY);
         String lastSection = "";
         if (index != -1) {
@@ -438,9 +455,9 @@ public class SparkAnalyticsExecutor {
             return schemaString;
         }
     }
-
-    private static void registerTable(int tenantId, String tableName, String alias,
-                                      String schemaString) throws AnalyticsException {
+    
+    private void registerTable(int tenantId, String tableName, String alias,
+            String schemaString) throws AnalyticsException {
         if (!(schemaString.startsWith("(") && schemaString.endsWith(")"))) {
             throwInvalidDefineTableQueryException();
         }
@@ -450,8 +467,48 @@ public class SparkAnalyticsExecutor {
         if (!ads.tableExists(tenantId, tableName)) {
             ads.createTable(tenantId, tableName);
         }
-        AnalyticsRelation table = new AnalyticsRelation(tenantId, tableName, sqlCtx, schemaString);
-        JavaSchemaRDD schemaRDD = sqlCtx.baseRelationToSchemaRDD(table);
+        AnalyticsRelation table = new AnalyticsRelation(tenantId, tableName, this.sqlCtx, schemaString);
+        JavaSchemaRDD schemaRDD = this.sqlCtx.baseRelationToSchemaRDD(table);
         schemaRDD.registerTempTable(alias);
     }
+
+    @Override
+    public void onBecomingLeader() {
+        int masterPort = BASE_MASTER_PORT + this.portOffset;
+        int webuiPort = BASE_WEBUI_PORT + this.portOffset;
+        startMaster(this.myHost, masterPort, webuiPort);
+        AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
+        acm.setProperty(CLUSTER_GROUP_NAME, MASTER_HOST_GROUP_PROP, this.myHost);
+        acm.setProperty(CLUSTER_GROUP_NAME, MASTER_PORT_GROUP_PROP, masterPort);
+        log.info("Analytics master started: [" + this.myHost + ":" + masterPort + "]");
+    }
+
+    @Override
+    public void onLeaderUpdate() {
+        this.stop();
+        AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
+        String masterHost = (String) acm.getProperty(CLUSTER_GROUP_NAME, MASTER_HOST_GROUP_PROP);
+        int masterPort = (Integer) acm.getProperty(CLUSTER_GROUP_NAME, MASTER_PORT_GROUP_PROP);
+        int p1 = P1_BASE_PORT + this.portOffset;
+        int p2 = P2_BASE_PORT + this.portOffset;
+        this.startWorker(this.myHost, masterHost, masterPort, p1, p2);
+        this.initClient("spark://" + masterHost + ":" + masterPort);
+        log.info("Analytics worker started: [" + this.myHost + ":" + p1 + ":" + p2 + "] "
+                + "Master [" + masterHost + ":" + masterPort + "]");
+    }
+
+    public int getWorkerCount() {
+        return workerCount;
+    }
+    
+    @Override
+    public void onMembersChangeForLeader() {
+        try {
+            this.workerCount = AnalyticsServiceHolder.getAnalyticsClusterManager().getMembers(CLUSTER_GROUP_NAME).size();
+            log.info("Analytics worker updated, total count: " + this.getWorkerCount());
+        } catch (AnalyticsClusterException e) {
+            log.error("Error in extracting the worker count: " + e.getMessage(), e);
+        }
+    }
+    
 }

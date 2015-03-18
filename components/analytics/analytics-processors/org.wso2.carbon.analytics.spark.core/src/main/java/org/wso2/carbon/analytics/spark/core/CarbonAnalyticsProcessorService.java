@@ -21,7 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsPersistenceException;
 import org.wso2.carbon.analytics.spark.core.internal.AnalyticsPersistenceManager;
-import org.wso2.carbon.analytics.spark.core.internal.SparkAnalyticsExecutor;
+import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsScript;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
@@ -186,7 +186,7 @@ public class CarbonAnalyticsProcessorService implements AnalyticsProcessorServic
     public AnalyticsQueryResult executeQuery(int tenantId, String query) throws AnalyticsExecutionException {
         if (query != null && !query.trim().isEmpty()) {
             try {
-                return SparkAnalyticsExecutor.executeQuery(tenantId, query);
+                return ServiceHolder.getAnalyticskExecutor().executeQuery(tenantId, query);
             } catch (AnalyticsExecutionException e) {
                 log.error("Error while executing query : " + query, e);
                 throw e;

@@ -22,9 +22,13 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.hbase.util.Pair;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.rs.*;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.analytics.datasource.hbase.rg.HBaseIDRecordGroup;
+import org.wso2.carbon.analytics.datasource.hbase.rg.HBaseRegionSplitRecordGroup;
+import org.wso2.carbon.analytics.datasource.hbase.rg.HBaseTimestampRecordGroup;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseAnalyticsDSConstants;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseUtils;
 
@@ -291,7 +295,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         Put put = new Put(formattedTableName.getBytes());
         put.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_META_COLUMN_FAMILY_NAME,
                 HBaseAnalyticsDSConstants.ANALYTICS_SCHEMA_QUALIFIER_NAME, encodedSchema);
-        try{
+        try {
             metaTable.put(put);
             metaTable.close();
         } catch (IOException e) {
@@ -313,7 +317,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         Get get = new Get(formattedTableName.getBytes());
         get.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_META_COLUMN_FAMILY_NAME,
                 HBaseAnalyticsDSConstants.ANALYTICS_SCHEMA_QUALIFIER_NAME);
-        try{
+        try {
             resultSchema = metaTable.get(get).value();
             metaTable.close();
         } catch (IOException e) {
@@ -359,31 +363,46 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
     @Override
     public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, long timeFrom,
                              long timeTo, int recordsFrom, int recordsCount) throws AnalyticsException {
-        //TODO
-        return new RecordGroup[0];
+        if (recordsCount > 0) {
+            throw new HBaseUnsupportedOperationException("Pagination is not supported for HBase Analytics Record Stores");
+        }
+        if ((timeFrom == Long.MIN_VALUE) && (timeTo == Long.MAX_VALUE)) {
+            return this.computeRegionSplits(tenantId, tableName);
+        } else {
+            return new HBaseTimestampRecordGroup[]{
+                    new HBaseTimestampRecordGroup(tenantId, tableName, columns, timeFrom, timeTo)
+            };
+        }
     }
 
     @Override
     public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns,
                              List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
-        return new HBaseIDRecordGroup[] {new HBaseIDRecordGroup(tenantId, tableName, columns, ids)};
+        return new HBaseIDRecordGroup[]{
+                new HBaseIDRecordGroup(tenantId, tableName, columns, ids)
+        };
     }
 
     @Override
     public Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException {
-        if(recordGroup instanceof HBaseIDRecordGroup){
-            HBaseIDRecordGroup recordIdGroup = (HBaseIDRecordGroup) recordGroup;
-            return this.getRecords(recordIdGroup.getTenantId(), recordIdGroup.getTableName(),
-                    recordIdGroup.getColumns(), recordIdGroup.getIds());
+        if (recordGroup instanceof HBaseIDRecordGroup) {
+            HBaseIDRecordGroup idRecordGroup = (HBaseIDRecordGroup) recordGroup;
+            return this.getRecords(idRecordGroup.getTenantId(), idRecordGroup.getTableName(),
+                    idRecordGroup.getColumns(), idRecordGroup.getIds());
+        } else if (recordGroup instanceof HBaseTimestampRecordGroup) {
+            HBaseTimestampRecordGroup tsRecordGroup = (HBaseTimestampRecordGroup) recordGroup;
+            return this.getRecords(tsRecordGroup.getTenantId(), tsRecordGroup.getTableName(),
+                    tsRecordGroup.getColumns(), tsRecordGroup.getStartTime(), tsRecordGroup.getEndTime());
         }
         // TODO
         return null;
     }
 
 
-    public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns, long timeFrom,
-                                       long timeTo, int recordsFrom, int recordsCount) throws AnalyticsException {
-        return this.getRecords(tenantId, tableName, columns, this.lookupIndex(tenantId, tableName, timeFrom, timeTo));
+    public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns, long startTime, long endTime)
+            throws AnalyticsException {
+        int batchSize = this.queryConfig.getBatchSize();
+        return new HBaseTimestampIterator(tenantId, tableName, columns, startTime, endTime, this.conn, batchSize);
     }
 
     public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns, List<String> ids)
@@ -395,17 +414,40 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         return new HBaseRecordIterator(tenantId, tableName, columns, ids, this.conn, batchSize);
     }
 
+    private RecordGroup[] computeRegionSplits(int tenantId, String tableName) throws AnalyticsException {
+        List<RecordGroup> regionalGroups = new ArrayList<>();
+        String formattedTableName = HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.DATA);
+        try {
+            RegionLocator locator = this.conn.getRegionLocator(TableName.valueOf(formattedTableName));
+            final Pair<byte[][], byte[][]> startEndKeys = locator.getStartEndKeys();
+            byte[][] startKeys = startEndKeys.getFirst();
+            byte[][] endKeys = startEndKeys.getSecond();
+            for (int i = 0; i < startKeys.length && i < endKeys.length; i++) {
+                RecordGroup regionalGroup = new HBaseRegionSplitRecordGroup(tenantId, tableName, startKeys[i],
+                        endKeys[i], locator.getRegionLocation(startKeys[i]).getHostname());
+                regionalGroups.add(regionalGroup);
+            }
+        } catch (IOException e) {
+            throw new AnalyticsException("Error computing region splits for table " + tableName +
+                    " for tenant " + tenantId);
+        }
+        return regionalGroups.toArray(new RecordGroup[regionalGroups.size()]);
+    }
+
     private List<String> lookupIndex(int tenantId, String tableName, long startTime, long endTime)
             throws AnalyticsException {
         List<String> recordIds = new ArrayList<>();
         String formattedTableName = HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.INDEX);
         Table indexTable;
         Cell[] cells;
-
-        //TODO: LOGIC FOR NEGATIVE TIMESTAMPS
-
-        /* Setting (end-time)+1L because end-time is exclusive (which is not what we want) */
-        Scan indexScan = new Scan(HBaseUtils.encodeLong(startTime), HBaseUtils.encodeLong(endTime + 1L));
+        Scan indexScan = new Scan();
+        if (startTime != Long.MAX_VALUE) {
+            indexScan.setStartRow(HBaseUtils.encodeLong(startTime));
+        }
+        if ((endTime != Long.MAX_VALUE) && (endTime != Long.MAX_VALUE - 1)) {
+            /* Setting (end-time)+1L because end-time is exclusive (which is not what we want) */
+            indexScan.setStopRow(HBaseUtils.encodeLong(endTime + 1L));
+        }
         indexScan.addFamily(HBaseAnalyticsDSConstants.ANALYTICS_INDEX_COLUMN_FAMILY_NAME);
         ResultScanner resultScanner;
         try {
@@ -442,7 +484,8 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             dataTable = this.conn.getTable(TableName.valueOf(dataTableName));
             dataTable.delete(dataDeletes);
         } catch (IOException e) {
-            throw new AnalyticsException("Error deleting records from " + tableName + " for tenant " + tenantId + " : " + e.getMessage(), e);
+            throw new AnalyticsException("Error deleting records from " + tableName + " for tenant " + tenantId + " : "
+                    + e.getMessage(), e);
         }
         this.deleteIndexEntries(tenantId, tableName, this.lookupTimestamp(dataTable, ids, tenantId, tableName));
     }

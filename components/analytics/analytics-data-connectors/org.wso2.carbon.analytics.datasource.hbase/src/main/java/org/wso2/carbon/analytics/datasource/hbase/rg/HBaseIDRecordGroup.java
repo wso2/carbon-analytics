@@ -15,7 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.analytics.datasource.hbase;
+package org.wso2.carbon.analytics.datasource.hbase.rg;
 
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
@@ -23,6 +23,23 @@ import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
 import java.util.List;
 
 public class HBaseIDRecordGroup implements RecordGroup {
+
+    private int tenantId;
+    private String tableName;
+    private List<String> columns;
+    private List<String> ids;
+
+    @Override
+    public String[] getLocations() throws AnalyticsException {
+        return new String[]{"local"};
+    }
+
+    public HBaseIDRecordGroup(int tenantId, String tableName, List<String> columns, List<String> ids) {
+        this.tenantId = tenantId;
+        this.tableName = tableName;
+        this.columns = columns;
+        this.ids = ids;
+    }
 
     public int getTenantId() {
         return this.tenantId;
@@ -38,23 +55,6 @@ public class HBaseIDRecordGroup implements RecordGroup {
 
     public List<String> getIds() {
         return this.ids;
-    }
-
-    int tenantId;
-    String tableName;
-    List<String> columns;
-    List<String> ids;
-
-    @Override
-    public String[] getLocations() throws AnalyticsException {
-        return new String[]{"local"};
-    }
-
-    HBaseIDRecordGroup(int tenantId, String tableName, List<String> columns, List<String> ids) {
-        this.tenantId = tenantId;
-        this.tableName = tableName;
-        this.columns = columns;
-        this.ids = ids;
     }
 
 }
