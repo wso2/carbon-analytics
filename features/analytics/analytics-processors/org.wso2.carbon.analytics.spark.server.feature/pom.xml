@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>analytics-processors-feature</artifactId>
         <groupId>org.wso2.carbon.analytics</groupId>
@@ -57,7 +59,7 @@
             <artifactId>scala-reflect</artifactId>
         </dependency>
 
-         <dependency>
+        <dependency>
             <groupId>com.codahale.metrics</groupId>
             <artifactId>metrics-core</artifactId>
         </dependency>
@@ -229,35 +231,16 @@
     <build>
         <resources>
             <resource>
-                <directory>src/main/resources</directory>
+                <directory>resources</directory>
+                <includes>
+                    <include>compute-classpath.sh</include>
+                    <include>p2.inf</include>
+                    <include>build.properties</include>
+                    <include>protobuf-java-2.5.0.jar</include>
+                </includes>
             </resource>
         </resources>
         <plugins>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>src/main/resources</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>resources</directory>
-                                    <includes>
-                                        <include>compute-classpath.sh</include>
-                                        <include>p2.inf</include>
-                                        <include>build.properties</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.wso2.maven</groupId>
                 <artifactId>carbon-p2-plugin</artifactId>
