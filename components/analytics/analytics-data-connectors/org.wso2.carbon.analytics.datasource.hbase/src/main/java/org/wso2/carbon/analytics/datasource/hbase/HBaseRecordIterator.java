@@ -34,7 +34,7 @@ import org.wso2.carbon.analytics.datasource.hbase.util.HBaseUtils;
 import java.io.IOException;
 import java.util.*;
 
-class HBaseRecordIterator implements Iterator<Record> {
+public class HBaseRecordIterator implements Iterator<Record> {
 
     private List<String> columns;
     private List<List<String>> batchedIds;
@@ -46,7 +46,7 @@ class HBaseRecordIterator implements Iterator<Record> {
     private Table table;
     private Iterator<Record> subIterator;
 
-    HBaseRecordIterator(int tenantId, String tableName, List<String> columns, List<String> recordIds,
+    public HBaseRecordIterator(int tenantId, String tableName, List<String> columns, List<String> recordIds,
                                Connection conn, int batchSize) throws AnalyticsException {
         this.init(conn, tenantId, tableName, columns);
         if (batchSize <= 0) {
