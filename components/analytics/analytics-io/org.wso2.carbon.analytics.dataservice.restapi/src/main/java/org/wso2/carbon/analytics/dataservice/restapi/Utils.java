@@ -73,7 +73,7 @@ public class Utils {
 					throw new AnalyticsException("TableName cannot be empty!");
 				}
 			records.add(new Record(recordBean.getId(), tenantId, recordBean.getTableName(),
-		                           recordBean.getValues(), recordBean.getTimestamp()));
+		                           recordBean.getValues()));
 			}
 		}catch(NullPointerException e){
 			throw new AnalyticsException("TableName cannot be null");
@@ -91,7 +91,7 @@ public class Utils {
 		List<Record> records = new ArrayList<Record>();
 		for (RecordBean recordBean : recordBeans) {
 			records.add(new Record(recordBean.getId(), tenantId, tableName,
-		                           recordBean.getValues(), recordBean.getTimestamp()));
+		                           recordBean.getValues()));
 		}
 		return records;
 	}

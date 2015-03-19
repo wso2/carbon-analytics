@@ -15,10 +15,12 @@
  */
 package org.wso2.carbon.analytics.dataservice.restapi.beans;
 
-import javax.xml.bind.annotation.*;
-
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -28,25 +30,25 @@ import java.util.Map.Entry;
  * The Class RecordBean.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(propOrder = { "id", "tenantId", "tableName", "timestamp", "values" })
 @XmlRootElement(name = "record")
+@XmlType(propOrder = { "id", "tableName", "timestamp", "values" })
 public class RecordBean {
 
+    /** The id. */
+    @XmlElement(required = false, name = "id")
+    private String id;
+
 	/** The table name. */
-	@XmlElement(required = false)
+	@XmlElement(required = false, name = "tableName")
 	private String tableName;
 
+    /** The timestamp. */
+    @XmlElement(required = false, nillable = true, name = "timestamp")
+    private Long timestamp;
+
 	/** The values. */
-	@XmlElement(required = true)
+	@XmlElement(required = true, name = "values")
 	private Map<String, Object> values;
-
-	/** The timestamp. */
-	@XmlElement(required = false, nillable = true)
-	private Long timestamp;
-
-	/** The id. */
-	@XmlElement(required = false)
-	private String id;
 
 	/**
 	 * Sets the table name.
@@ -118,10 +120,7 @@ public class RecordBean {
 	 * @return the timestamp
 	 */
 	public long getTimestamp() {
-		if (timestamp == null ){
-			return (new Date()).getTime();
-		}
-		return timestamp.longValue();
+		return timestamp;
 	}
 
 	/**
