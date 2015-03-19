@@ -184,6 +184,12 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
     }
 
     @Override
+    public boolean isPaginationSupported() {
+        /* Pagination & determination of record counts are not supported for this implementation. */
+        return false;
+    }
+
+    @Override
     public long getRecordCount(int tenantId, String tableName) throws AnalyticsException {
         throw new HBaseUnsupportedOperationException("Retrieving row count is not supported " +
                 "for HBase Analytics Record Stores");
