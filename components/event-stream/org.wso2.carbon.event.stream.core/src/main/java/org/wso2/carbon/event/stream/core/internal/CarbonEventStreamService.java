@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
+import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import org.wso2.carbon.event.stream.core.*;
@@ -277,6 +278,11 @@ public class CarbonEventStreamService implements EventStreamService {
     @Override
     public void unsubscribe(WSO2EventListConsumer wso2EventConsumer) {
         EventStreamServiceValueHolder.getEventStreamRuntime().unsubscribe(wso2EventConsumer);
+    }
+
+    @Override
+    public void publish(Event event) {
+        EventStreamServiceValueHolder.getEventStreamRuntime().publish(event.getStreamId(),event);
     }
 
 

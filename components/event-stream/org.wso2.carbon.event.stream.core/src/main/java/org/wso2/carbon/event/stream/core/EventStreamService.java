@@ -14,6 +14,7 @@
  */
 package org.wso2.carbon.event.stream.core;
 
+import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 
@@ -93,5 +94,7 @@ public interface EventStreamService {
     public void unsubscribe(WSO2EventConsumer wso2EventConsumer);
 
     public void unsubscribe(WSO2EventListConsumer wso2EventConsumer);
+
+    public void publish(Event event);
 
 }
