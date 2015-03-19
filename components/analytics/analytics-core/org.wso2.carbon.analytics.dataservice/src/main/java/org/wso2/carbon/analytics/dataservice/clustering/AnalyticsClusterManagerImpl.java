@@ -44,6 +44,8 @@ import com.hazelcast.core.MembershipListener;
  */
 public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, MembershipListener {
 
+    private static final String LEADER_INIT_DONE_FLAG = "LEADER_INIT_FLAG";
+
     private static final String ANALYTICS_GROUP_EXECUTOR_SERVICE_PREFIX = "_ANALYTICS_GROUP_EXECUTOR_SERVICE_";
 
     private static final String ANALYTICS_CLUSTER_GROUP_MEMBERS_PREFIX = "_ANALYTICS_CLUSTER_GROUP_MEMBERS_";
@@ -81,10 +83,41 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         groupMembers.add(myself);
         if (this.isLeader(groupId)) {
             groupEventListener.onBecomingLeader();
+            this.setLeaderInitDoneFlag(groupId);
+            groupEventListener.onLeaderUpdate();
         } else {
+            this.waitForInitialLeader(groupId);
+            groupEventListener.onLeaderUpdate();
             this.sendMemberAddedNotificationToLeader(groupId);
         }
-        groupEventListener.onLeaderUpdate();
+    }
+    
+    private String generateLeaderInitDoneFlagName(String groupId) {
+        return groupId + "_" + LEADER_INIT_DONE_FLAG;
+    }
+    
+    private void setLeaderInitDoneFlag(String groupId) {
+        this.hz.getAtomicLong(this.generateLeaderInitDoneFlagName(groupId)).set(1);
+    }
+    
+    private void resetLeaderInitDoneFlag(String groupId) {
+        this.hz.getAtomicLong(this.generateLeaderInitDoneFlagName(groupId)).set(0);
+    }
+    
+    private void waitForInitialLeader(String groupId) {
+        if (log.isDebugEnabled()) {
+            log.debug("Waiting for initial leader...");
+        }
+        while (this.hz.getAtomicLong(this.generateLeaderInitDoneFlagName(groupId)).get() <= 0) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                log.error(e);
+            }
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Done waiting for initial leader.");
+        }
     }
     
     private void sendMemberAddedNotificationToLeader(String groupId) throws AnalyticsClusterException {
@@ -137,6 +170,9 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
             if (!existingMembers.contains(memberItr.next())) {
                 memberItr.remove();
             }
+        }
+        if (this.getGroupMembers(groupId).size() == 0) {
+            this.resetLeaderInitDoneFlag(groupId); 
         }
     }
     
