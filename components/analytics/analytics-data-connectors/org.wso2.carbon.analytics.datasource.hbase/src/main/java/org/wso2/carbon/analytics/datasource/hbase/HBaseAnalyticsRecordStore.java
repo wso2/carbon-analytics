@@ -225,7 +225,6 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
                             for (String key : columns.keySet()) {
                                 /* encoding column data to bytes.
                                 * Note: the encoded column value also contains the column name. */
-                                // TODO: change long encoding to respect HBase lexical ordering
                                 columnData = GenericUtils.encodeElement(key, columns.get(key));
                                 if (columnData.length != 0) {
                                     put.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
@@ -297,10 +296,11 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
                 HBaseAnalyticsDSConstants.ANALYTICS_SCHEMA_QUALIFIER_NAME, encodedSchema);
         try {
             metaTable.put(put);
-            metaTable.close();
         } catch (IOException e) {
             throw new AnalyticsException("Error setting schema to table " + tableName + " for tenant " + tenantId +
                     " : " + e.getMessage(), e);
+        } finally {
+            GenericUtils.closeQuietly(metaTable);
         }
     }
 
@@ -310,9 +310,13 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         String formattedTableName = HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.META);
         Table metaTable;
         try {
+            if (!this.admin.tableExists(TableName.valueOf(formattedTableName))) {
+                throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+            }
             metaTable = this.conn.getTable(TableName.valueOf(formattedTableName));
         } catch (IOException e) {
-            throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+            throw new AnalyticsException("Error setting schema to table " + tableName + " for tenant " + tenantId +
+                    " : " + e.getMessage(), e);
         }
         Get get = new Get(formattedTableName.getBytes());
         get.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_META_COLUMN_FAMILY_NAME,
@@ -367,7 +371,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             throw new HBaseUnsupportedOperationException("Pagination is not supported for HBase Analytics Record Stores");
         }
         if ((timeFrom == Long.MIN_VALUE) && (timeTo == Long.MAX_VALUE)) {
-            return this.computeRegionSplits(tenantId, tableName);
+            return this.computeRegionSplits(tenantId, tableName, columns);
         } else {
             return new HBaseTimestampRecordGroup[]{
                     new HBaseTimestampRecordGroup(tenantId, tableName, columns, timeFrom, timeTo)
@@ -393,16 +397,13 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             HBaseTimestampRecordGroup tsRecordGroup = (HBaseTimestampRecordGroup) recordGroup;
             return this.getRecords(tsRecordGroup.getTenantId(), tsRecordGroup.getTableName(),
                     tsRecordGroup.getColumns(), tsRecordGroup.getStartTime(), tsRecordGroup.getEndTime());
+        } else if (recordGroup instanceof HBaseRegionSplitRecordGroup) {
+            HBaseRegionSplitRecordGroup rsRecordGroup = (HBaseRegionSplitRecordGroup) recordGroup;
+            return this.getRecords(rsRecordGroup.getTenantId(), rsRecordGroup.getTableName(),
+                    rsRecordGroup.getColumns(), rsRecordGroup.getStartRow(), rsRecordGroup.getEndRow());
+        } else {
+            throw new AnalyticsException("Invalid HBase RecordGroup implementation: " + recordGroup.getClass());
         }
-        // TODO
-        return null;
-    }
-
-
-    public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns, long startTime, long endTime)
-            throws AnalyticsException {
-        int batchSize = this.queryConfig.getBatchSize();
-        return new HBaseTimestampIterator(tenantId, tableName, columns, startTime, endTime, this.conn, batchSize);
     }
 
     public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns, List<String> ids)
@@ -414,7 +415,19 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         return new HBaseRecordIterator(tenantId, tableName, columns, ids, this.conn, batchSize);
     }
 
-    private RecordGroup[] computeRegionSplits(int tenantId, String tableName) throws AnalyticsException {
+    public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns, long startTime, long endTime)
+            throws AnalyticsException {
+        int batchSize = this.queryConfig.getBatchSize();
+        return new HBaseTimestampIterator(tenantId, tableName, columns, startTime, endTime, this.conn, batchSize);
+    }
+
+    public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns, byte[] startRow, byte[] endRow)
+            throws AnalyticsException {
+
+        return new HBaseRegionSplitIterator(tenantId, tableName, columns, this.conn, startRow, endRow);
+    }
+
+    private RecordGroup[] computeRegionSplits(int tenantId, String tableName, List<String> columns) throws AnalyticsException {
         List<RecordGroup> regionalGroups = new ArrayList<>();
         String formattedTableName = HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.DATA);
         try {
@@ -423,7 +436,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             byte[][] startKeys = startEndKeys.getFirst();
             byte[][] endKeys = startEndKeys.getSecond();
             for (int i = 0; i < startKeys.length && i < endKeys.length; i++) {
-                RecordGroup regionalGroup = new HBaseRegionSplitRecordGroup(tenantId, tableName, startKeys[i],
+                RecordGroup regionalGroup = new HBaseRegionSplitRecordGroup(tenantId, tableName, columns, startKeys[i],
                         endKeys[i], locator.getRegionLocation(startKeys[i]).getHostname());
                 regionalGroups.add(regionalGroup);
             }

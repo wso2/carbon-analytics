@@ -20,6 +20,8 @@ package org.wso2.carbon.analytics.datasource.hbase.rg;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
 
+import java.util.List;
+
 public class HBaseRegionSplitRecordGroup implements RecordGroup {
 
     private int tenantId;
@@ -28,12 +30,15 @@ public class HBaseRegionSplitRecordGroup implements RecordGroup {
     private byte[] endRow;
     private String location;
 
-    public HBaseRegionSplitRecordGroup(int tenantId, String tableName, byte[] startRow, byte[] endRow, String location) {
+    private List<String> columns;
+
+    public HBaseRegionSplitRecordGroup(int tenantId, String tableName, List<String> columns, byte[] startRow, byte[] endRow, String location) {
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.startRow = startRow;
         this.endRow = endRow;
         this.location = location;
+        this.columns = columns;
     }
 
     @Override
@@ -49,6 +54,10 @@ public class HBaseRegionSplitRecordGroup implements RecordGroup {
         return tableName;
     }
 
+    public List<String> getColumns() {
+        return columns;
+    }
+
     public byte[] getStartRow() {
         return startRow;
     }
@@ -56,10 +65,5 @@ public class HBaseRegionSplitRecordGroup implements RecordGroup {
     public byte[] getEndRow() {
         return endRow;
     }
-
-    public String getLocation() {
-        return location;
-    }
-
 
 }
