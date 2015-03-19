@@ -18,44 +18,40 @@ package org.wso2.carbon.messageconsole.ui.beans;
 * under the License.
 */
 
-public class Column {
+import java.io.Serializable;
 
-    private String key;
-    private String value;
-    private String type;
+public class ResponseArbitraryFieldColumn implements Serializable {
 
-    public Column(String key, String value) {
-        this.key = key;
-        this.value = value;
+    private static final long serialVersionUID = -4926680390319926801L;
+
+    private String result;
+    private Column column;
+    private String message;
+
+    public ResponseArbitraryFieldColumn() {
     }
 
-    public Column(String key, String value, String type) {
-        this.key = key;
-        this.value = value;
-        this.type = type;
+    public String getResult() {
+        return result;
     }
 
-    public String getKey() {
-        return key;
+    public void setResult(String result) {
+        this.result = result;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public Column getColumn() {
+        return column;
     }
 
-    public String getValue() {
-        return value;
+    public void setColumn(Column column) {
+        this.column = column;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public String getMessage() {
+        return message;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

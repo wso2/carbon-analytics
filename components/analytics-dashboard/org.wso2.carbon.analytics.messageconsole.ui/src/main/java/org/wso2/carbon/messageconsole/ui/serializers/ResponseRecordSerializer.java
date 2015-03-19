@@ -1,4 +1,4 @@
-package org.wso2.carbon.messageconsole.ui;
+package org.wso2.carbon.messageconsole.ui.serializers;
 
 /*
 * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -18,49 +18,38 @@ package org.wso2.carbon.messageconsole.ui;
 * under the License.
 */
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import org.wso2.carbon.messageconsole.ui.beans.Column;
-import org.wso2.carbon.messageconsole.ui.beans.Record;
-import org.wso2.carbon.messageconsole.ui.beans.ResponseResult;
+import org.wso2.carbon.messageconsole.ui.beans.ResponseRecord;
 
 import java.lang.reflect.Type;
 
-public class ResponseResultSerializer implements JsonSerializer<ResponseResult> {
+public class ResponseRecordSerializer implements JsonSerializer<ResponseRecord> {
 
     private static final String RESULT = "Result";
     private static final String MESSAGE = "Message";
-    private static final String TOTAL_RECORD_COUNT = "TotalRecordCount";
-    private static final String RECORDS = "Records";
+    private static final String RECORD = "Record";
 
-    public ResponseResultSerializer() {
+    public ResponseRecordSerializer() {
         super();
     }
 
     @Override
-    public JsonElement serialize(ResponseResult responseResult, Type type,
+    public JsonElement serialize(ResponseRecord responseRecord, Type type,
                                  JsonSerializationContext jsonSerializationContext) {
 
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty(RESULT, responseResult.getResult());
-        jsonObject.addProperty(MESSAGE, responseResult.getMessage());
-        jsonObject.addProperty(TOTAL_RECORD_COUNT, responseResult.getTotalRecordCount());
+        jsonObject.addProperty(RESULT, responseRecord.getResult());
+        jsonObject.addProperty(MESSAGE, responseRecord.getMessage());
 
-        JsonArray records = new JsonArray();
-
-        for (Record record : responseResult.getRecords()) {
-            JsonObject jsonRecord = new JsonObject();
-            for (Column column : record.getColumns()) {
-                jsonRecord.addProperty(column.getKey(), column.getValue());
-            }
-            records.add(jsonRecord);
+        JsonObject jsonRecord = new JsonObject();
+        for (Column column : responseRecord.getRecord().getColumns()) {
+            jsonRecord.addProperty(column.getKey(), column.getValue());
         }
-
-        jsonObject.add(RECORDS, records);
-
+        jsonObject.add(RECORD, jsonRecord);
         return jsonObject;
     }
 }

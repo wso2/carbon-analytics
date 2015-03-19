@@ -18,18 +18,13 @@ package org.wso2.carbon.messageconsole.ui.beans;
 * under the License.
 */
 
-import com.google.gson.annotations.SerializedName;
-
 import java.io.Serializable;
 
 public class ResponseRecord implements Serializable {
     private static final long serialVersionUID = 7839182403507282538L;
 
-    @SerializedName("Result")
     private String result;
-    @SerializedName("Record")
     private Record record;
-    @SerializedName("Message")
     private String message;
 
     public ResponseRecord() {

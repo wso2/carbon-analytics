@@ -33,6 +33,12 @@ public class EntityBean implements Serializable {
         this.value = value;
     }
 
+    public EntityBean(String columnName, String value, String type) {
+        this.columnName = columnName;
+        this.value = value;
+        this.type = type;
+    }
+
     public String getColumnName() {
         return columnName;
     }

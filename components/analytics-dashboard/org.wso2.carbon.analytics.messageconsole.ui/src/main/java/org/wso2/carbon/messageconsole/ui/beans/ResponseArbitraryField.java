@@ -18,44 +18,36 @@ package org.wso2.carbon.messageconsole.ui.beans;
 * under the License.
 */
 
-public class Column {
+import java.util.ArrayList;
+import java.util.List;
 
-    private String key;
-    private String value;
-    private String type;
+public class ResponseArbitraryField {
 
-    public Column(String key, String value) {
-        this.key = key;
-        this.value = value;
+    private String result;
+    private String message;
+    private List<Column> columns = new ArrayList<>();
+
+    public String getResult() {
+        return result;
     }
 
-    public Column(String key, String value, String type) {
-        this.key = key;
-        this.value = value;
-        this.type = type;
+    public void setResult(String result) {
+        this.result = result;
     }
 
-    public String getKey() {
-        return key;
+    public String getMessage() {
+        return message;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
-    public String getValue() {
-        return value;
+    public List<Column> getColumns() {
+        return columns;
     }
 
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
+    public void setColumns(List<Column> columns) {
+        this.columns = columns;
     }
 }

@@ -1,4 +1,4 @@
-package org.wso2.carbon.messageconsole.ui;
+package org.wso2.carbon.messageconsole.ui.serializers;
 
 /*
 * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -22,33 +22,31 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import org.wso2.carbon.messageconsole.ui.beans.Column;
-import org.wso2.carbon.messageconsole.ui.beans.ResponseRecord;
+import org.wso2.carbon.messageconsole.ui.beans.ResponseArbitraryFieldColumn;
 
 import java.lang.reflect.Type;
 
-public class ResponseRecordSerializer implements JsonSerializer<ResponseRecord> {
+public class ResponseArbitraryFieldSerializer implements JsonSerializer<ResponseArbitraryFieldColumn> {
 
     private static final String RESULT = "Result";
     private static final String MESSAGE = "Message";
     private static final String RECORD = "Record";
-
-    public ResponseRecordSerializer() {
-        super();
-    }
+    private static final String NAME = "Name";
+    private static final String VALUE = "Value";
+    private static final String TYPE = "Type";
 
     @Override
-    public JsonElement serialize(ResponseRecord responseRecord, Type type,
+    public JsonElement serialize(ResponseArbitraryFieldColumn responseArbitraryFieldColumn, Type type,
                                  JsonSerializationContext jsonSerializationContext) {
-
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty(RESULT, responseRecord.getResult());
-        jsonObject.addProperty(MESSAGE, responseRecord.getMessage());
+        jsonObject.addProperty(RESULT, responseArbitraryFieldColumn.getResult());
+        jsonObject.addProperty(MESSAGE, responseArbitraryFieldColumn.getMessage());
 
         JsonObject jsonRecord = new JsonObject();
-        for (Column column : responseRecord.getRecord().getColumns()) {
-            jsonRecord.addProperty(column.getKey(), column.getValue());
-        }
+        jsonRecord.addProperty(NAME, responseArbitraryFieldColumn.getColumn().getKey());
+        jsonRecord.addProperty(VALUE, responseArbitraryFieldColumn.getColumn().getValue());
+        jsonRecord.addProperty(TYPE, responseArbitraryFieldColumn.getColumn().getType());
+
         jsonObject.add(RECORD, jsonRecord);
         return jsonObject;
     }
