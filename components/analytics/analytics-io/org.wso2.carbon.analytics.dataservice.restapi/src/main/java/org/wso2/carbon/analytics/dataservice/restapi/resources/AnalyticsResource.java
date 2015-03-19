@@ -217,6 +217,7 @@ public class AnalyticsResource extends AbstractResource {
             }
         };
 	}
+
 	/**
 	 * Delete records either the time range, but not both
 	 * @param tableName  the table name
