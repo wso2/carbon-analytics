@@ -113,12 +113,12 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             this.initSparkDataListener();
             acm.joinGroup(CLUSTER_GROUP_NAME, this);
         } else {
+            this.sparkConf = new SparkConf();
             this.initClient(LOCAL_MASTER_URL);
         }
     }
     
     private void initClient(String masterUrl) {
-        this.sparkConf = new SparkConf();
         this.sparkConf.setMaster(masterUrl).setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
         this.sparkCtx = new JavaSparkContext(this.sparkConf);
         this.sqlCtx = new JavaSQLContext(this.sparkCtx);
@@ -497,9 +497,10 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     @Override
     public void onBecomingLeader() {
+        this.sparkConf = new SparkConf();
         int masterPort = BASE_MASTER_PORT + this.portOffset;
         int webuiPort = BASE_WEBUI_PORT + this.portOffset;
-        startMaster(this.myHost, masterPort, webuiPort);
+        this.startMaster(this.myHost, masterPort, webuiPort);
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         acm.setProperty(CLUSTER_GROUP_NAME, MASTER_HOST_GROUP_PROP, this.myHost);
         acm.setProperty(CLUSTER_GROUP_NAME, MASTER_PORT_GROUP_PROP, masterPort);
