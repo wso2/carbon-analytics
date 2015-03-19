@@ -689,7 +689,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     }
     
     private void updateIndex(int shardIndex, List<Record> recordBatch, 
-            Map<String, IndexType> columns) throws AnalyticsException {
+            Map<String, IndexType> columns) throws AnalyticsIndexException {
         Record firstRecord = recordBatch.get(0);
         int tenantId = firstRecord.getTenantId();
         String tableName = firstRecord.getTableName();
@@ -883,6 +883,14 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return basePath + tableId;
     }
 
+    private Directory createDirectory(String tableId) throws AnalyticsIndexException {
+        String path = this.generateDirPath(tableId);
+        try {
+            return new AnalyticsDirectory(this.getFileSystem(), new SingleInstanceLockFactory(), path);
+        } catch (AnalyticsException e) {
+            throw new AnalyticsIndexException("Error in creating directory: " + e.getMessage(), e);
+        }
+    }
     private Directory createDirectory(String tableId, String basePath) throws AnalyticsIndexException {
         String path = this.generateDirPath(tableId, basePath);
         try {
@@ -898,7 +906,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             synchronized (this.indexDirs) {
                 indexDir = this.indexDirs.get(tableId);
                 if (indexDir == null) {
-                    indexDir = this.createDirectory(tableId, INDEX_DATA_FS_BASE_PATH);
+                    indexDir = this.createDirectory(tableId);
                     this.indexDirs.put(tableId, indexDir);
                 }
             }

@@ -66,6 +66,8 @@ public class AnalyticsResource extends AbstractResource {
 
     private static final int DEFAULT_START_INDEX = 0;
 	private static final int DEFAULT_INFINITY_INDEX = -1;
+    private static final long DEFAULT_FROM_TIME = Long.MIN_VALUE;
+    private static final long DEFAULT_TO_TIME = Long.MAX_VALUE;
     private static final Gson gson = new Gson();
 	/** The logger. */
 	private static final Log logger = LogFactory.getLog(AnalyticsResource.class);
@@ -182,7 +184,7 @@ public class AnalyticsResource extends AbstractResource {
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}")
-	public Response insertRecordsToTable(@PathParam("tableName")String tableName, List<RecordBean> recordBeans)
+	public StreamingOutput insertRecordsToTable(@PathParam("tableName")String tableName, List<RecordBean> recordBeans)
 	                                                           throws AnalyticsException {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking insertRecordsToTable");
@@ -197,7 +199,23 @@ public class AnalyticsResource extends AbstractResource {
 		}
 		List<Record> records = Utils.getRecordsForTable(tenantId, tableName, recordBeans);
 		analyticsDataService.put(records);
-		return handleResponse(ResponseStatus.SUCCESS, "Successfully inserted records to table:" + tableName);
+        final Iterator<Record> recordIterator = records.iterator();
+        return new StreamingOutput() {
+            @Override
+            public void write(OutputStream outputStream)
+                    throws IOException, WebApplicationException {
+                Writer recordWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+                recordWriter.write(STR_JSON_ARRAY_OPEN_SQUARE_BRACKET);
+                while (recordIterator.hasNext()) {
+                    recordWriter.write(recordIterator.next().getId());
+                    if (recordIterator.hasNext()) {
+                        recordWriter.write(STR_JSON_COMMA);
+                    }
+                }
+                recordWriter.write(STR_JSON_ARRAY_CLOSING_SQUARE_BRACKET);
+                recordWriter.flush();
+            }
+        };
 	}
 	/**
 	 * Delete records either the time range, but not both
@@ -378,7 +396,7 @@ public class AnalyticsResource extends AbstractResource {
 	public StreamingOutput getRecords(@PathParam("tableName") String tableName,
 	                           @PathParam("from") long timeFrom)
 	                                                            throws AnalyticsException {
-		return getRecords(tableName, timeFrom, DEFAULT_INFINITY_INDEX, DEFAULT_START_INDEX,
+		return getRecords(tableName, timeFrom, DEFAULT_TO_TIME, DEFAULT_START_INDEX,
 		                  DEFAULT_INFINITY_INDEX);
 	}
 
@@ -393,7 +411,7 @@ public class AnalyticsResource extends AbstractResource {
 	@Path("tables/{tableName}")
 	public StreamingOutput getRecords(@PathParam("tableName") String tableName)
 	                                                                    throws AnalyticsException {
-		return getRecords(tableName, DEFAULT_INFINITY_INDEX, DEFAULT_INFINITY_INDEX,
+		return getRecords(tableName, DEFAULT_FROM_TIME, DEFAULT_TO_TIME,
 		                  DEFAULT_START_INDEX, DEFAULT_INFINITY_INDEX);
 	}
 
@@ -407,7 +425,7 @@ public class AnalyticsResource extends AbstractResource {
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path(Constants.ResourcePath.RECORDS)
-	public Response insertRecords(List<RecordBean> recordBeans)
+	public StreamingOutput insertRecords(List<RecordBean> recordBeans)
 	                                                           throws AnalyticsException {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking insertRecords");
@@ -422,7 +440,23 @@ public class AnalyticsResource extends AbstractResource {
 		}
 		List<Record> records = Utils.getRecords(tenantId, recordBeans);
 		analyticsDataService.put(records);
-		return handleResponse(ResponseStatus.SUCCESS, "Successfully inserted records");
+        final Iterator<Record> recordIterator = records.iterator();
+        return new StreamingOutput() {
+            @Override
+            public void write(OutputStream outputStream)
+                    throws IOException, WebApplicationException {
+                Writer recordWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+                recordWriter.write(STR_JSON_ARRAY_OPEN_SQUARE_BRACKET);
+                while (recordIterator.hasNext()) {
+                    recordWriter.write(recordIterator.next().getId());
+                    if (recordIterator.hasNext()) {
+                        recordWriter.write(STR_JSON_COMMA);
+                    }
+                }
+                recordWriter.write(STR_JSON_ARRAY_CLOSING_SQUARE_BRACKET);
+                recordWriter.flush();
+            }
+        };
 	}
 
 	/**
