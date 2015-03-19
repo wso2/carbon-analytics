@@ -275,7 +275,31 @@ public class GenericUtils {
         } catch (IOException ignore) {
             /* ignore */
         }
-
+    }
+    
+    public static String normalizeTableName(String tableName) {
+        return tableName.toUpperCase();
+    }
+    
+    public static String calculateRecordIdentity(Record record) {
+        return record.getTenantId() + "_" + normalizeTableName(record.getTableName());
+    }
+    
+    public static Collection<List<Record>> generateRecordBatches(List<Record> records) {
+        /* if the records have identities (unique table category and name) as the following
+         * "ABABABCCAACBDABCABCDBAC", the job of this method is to make it like the following,
+         * {"AAAAAAAA", "BBBBBBB", "CCCCCC", "DD" } */
+        Map<String, List<Record>> recordBatches = new HashMap<String, List<Record>>();
+        List<Record> recordBatch;
+        for (Record record : records) {
+            recordBatch = recordBatches.get(calculateRecordIdentity(record));
+            if (recordBatch == null) {
+                recordBatch = new ArrayList<Record>();
+                recordBatches.put(calculateRecordIdentity(record), recordBatch);
+            }
+            recordBatch.add(record);
+        }
+        return recordBatches.values();
     }
 
 }

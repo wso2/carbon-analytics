@@ -207,8 +207,8 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         Map<String, Object> values2 = new HashMap<String, Object>();
         values2.put("STR1", "Canada is known for Ice Hockey");
         values2.put("STR2", "It is very cold");
-        Record record = new Record(tenantId, tableName, values, System.currentTimeMillis());
-        Record record2 = new Record(tenantId, tableName, values2, System.currentTimeMillis());
+        Record record = new Record(tenantId, tableName, values);
+        Record record2 = new Record(tenantId, tableName, values2);
         List<Record> records = new ArrayList<Record>();
         records.add(record);
         records.add(record2);
@@ -227,7 +227,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         values = new HashMap<String, Object>();
         values.put("STR1", "South Africa is know for diamonds");
         values.put("STR2", "NBA has the best basketball action");
-        record = new Record(id, tenantId, tableName, values, System.currentTimeMillis());
+        record = new Record(id, tenantId, tableName, values);
         records = new ArrayList<Record>();
         records.add(record);
         /* update */

@@ -295,8 +295,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             List<IndexOperation> indexOps) throws AnalyticsException {
         Map<String, Object> values = new HashMap<String, Object>(1);
         values.put(INDEX_OP_DATA_ATTRIBUTE, this.indexOpsToBinary(indexOps));
-        return new Record(tenantId, this.generateShardedIndexDataTableName(tableNamePrefix, shardIndex), 
-                values, System.currentTimeMillis());
+        return new Record(tenantId, this.generateShardedIndexDataTableName(tableNamePrefix, shardIndex), values);
     }
     
     private List<Record> generateIndexOperationRecords(int tenantId, String tableNamePrefix,
