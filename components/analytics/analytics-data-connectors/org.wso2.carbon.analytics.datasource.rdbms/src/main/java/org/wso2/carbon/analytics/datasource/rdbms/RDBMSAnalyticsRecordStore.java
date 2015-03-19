@@ -32,7 +32,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -166,27 +166,6 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         return conn;
     }
     
-    private String calculateRecordIdentity(Record record) {
-        return this.generateTargetTableName(record.getTenantId(), record.getTableName());
-    }
-    
-    private Map<String, List<Record>> generateRecordBatches(List<Record> records) {
-        /* if the records have identities (unique table category and name) as the following
-         * "ABABABCCAACBDABCABCDBAC", the job of this method is to make it like the following,
-         * {"AAAAAAAA", "BBBBBBB", "CCCCCC", "DD" } */
-        Map<String, List<Record>> recordBatches = new HashMap<String, List<Record>>();
-        List<Record> recordBatch;
-        for (Record record : records) {
-            recordBatch = recordBatches.get(this.calculateRecordIdentity(record));
-            if (recordBatch == null) {
-                recordBatch = new ArrayList<Record>();
-                recordBatches.put(this.calculateRecordIdentity(record), recordBatch);
-            }
-            recordBatch.add(record);
-        }
-        return recordBatches;
-    }
-    
     @Override
     public void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {        
         if (records.size() == 0) {
@@ -195,8 +174,8 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         Connection conn = null;
         try {
             conn = this.getConnection(false);
-            Map<String, List<Record>> recordBatches = this.generateRecordBatches(records);
-            for (List<Record> batch : recordBatches.values()) {
+            Collection<List<Record>> recordBatches = GenericUtils.generateRecordBatches(records);
+            for (List<Record> batch : recordBatches) {
                 this.addRecordsSimilar(conn, batch);
             }
             conn.commit();
@@ -441,7 +420,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     @Override
     public void setTableSchema(int tenantId, String tableName, 
             AnalyticsSchema schema) throws AnalyticsTableNotAvailableException, AnalyticsException {
-        tableName = this.normalizeTableName(tableName);
+        tableName = GenericUtils.normalizeTableName(tableName);
         Connection conn = null;
         PreparedStatement stmt = null;
         try {
@@ -464,7 +443,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     @Override
     public AnalyticsSchema getTableSchema(int tenantId, String tableName) 
             throws AnalyticsTableNotAvailableException, AnalyticsException {
-        tableName = this.normalizeTableName(tableName);
+        tableName = GenericUtils.normalizeTableName(tableName);
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -655,7 +634,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     }
     
     private String generateTargetTableName(int tenantId, String tableName) {
-        return this.generateTableUUID(tenantId, this.normalizeTableName(tableName));
+        return this.generateTableUUID(tenantId, GenericUtils.normalizeTableName(tableName));
     }
     
     private String translateQueryWithTableInfo(String query, int tenantId, String tableName) {
@@ -706,7 +685,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     }
     
     private Map<String, Object[]> getRecordTableMetaInsertQuery(int tenantId, String tableName) {
-        tableName = this.normalizeTableName(tableName);
+        tableName = GenericUtils.normalizeTableName(tableName);
         String query = this.getQueryConfiguration().getRecordMetaTableInsertQuery();
         Object[] params = new Object[] { tenantId, tableName };
         Map<String, Object[]> result = new LinkedHashMap<String, Object[]>(1);
@@ -719,7 +698,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     }
     
     private Map<String, Object[]> getRecordTableMetaDeleteQuery(int tenantId, String tableName) {
-        tableName = this.normalizeTableName(tableName);
+        tableName = GenericUtils.normalizeTableName(tableName);
         String query = this.getQueryConfiguration().getRecordMetaTableDeleteQuery();
         Object[] params = new Object[] { tenantId, tableName };
         Map<String, Object[]> result = new LinkedHashMap<String, Object[]>(1);
@@ -763,7 +742,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     
     @Override
     public boolean tableExists(int tenantId, String tableName) throws AnalyticsException {
-        tableName = this.normalizeTableName(tableName);
+        tableName = GenericUtils.normalizeTableName(tableName);
         Connection conn = null;
         ResultSet rs = null;
         try {
@@ -781,10 +760,6 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         }
     }
 
-    private String normalizeTableName(String tableName) {
-        return tableName.toUpperCase();
-    }
-    
     @Override
     public List<String> listTables(int tenantId) throws AnalyticsException {
         Connection conn = null;

@@ -301,10 +301,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         for (List<Object> row : rows) {
             if (primaryKeysExists) {
                 record = new Record(this.generateInsertRecordId(row, keyIndices), tenantId, tableName, 
-                        extractValuesFromRow(row, columns), System.currentTimeMillis());
+                        extractValuesFromRow(row, columns));
             } else {
-                record = new Record(tenantId, tableName, extractValuesFromRow(row, columns), 
-                        System.currentTimeMillis());
+                record = new Record(tenantId, tableName, extractValuesFromRow(row, columns));
             }
             result.add(record);
         }
@@ -416,8 +415,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         Map<String, Object> values = new HashMap<String, Object>();
         values.put(AnalyticsConstants.OBJECT, tableKeysToBinary(keys));
         Record record = new Record(generateTableKeysId(tenantId, tableName), 
-                AnalyticsConstants.TABLE_INFO_TENANT_ID, AnalyticsConstants.TABLE_INFO_TABLE_NAME,
-                values, System.currentTimeMillis());
+                AnalyticsConstants.TABLE_INFO_TENANT_ID, AnalyticsConstants.TABLE_INFO_TABLE_NAME, values);
         List<Record> records = new ArrayList<Record>(1);
         records.add(record);
         try {
