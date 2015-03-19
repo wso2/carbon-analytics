@@ -18,11 +18,11 @@
  */
 package org.wso2.carbon.analytics.datasource.core.rs;
 
+import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 
 /**
  * This interface represents all the analytic record related operations.
@@ -93,6 +93,15 @@ public interface AnalyticsRecordStore {
      * @throws AnalyticsException
      */
     List<String> listTables(int tenantId) throws AnalyticsException;
+
+    /**
+     * Checks whether or not pagination (i.e. jumping to record n and then retrieving k further records)
+     * is supported by the underlying record store implementation.
+     * Also returns false if the total record count in a table cannot be determined.
+     *
+     * @return Pagination/row-count support
+     */
+    boolean isPaginationSupported();
 
     /**
      * Returns the number of records in the table with the given category and name.
