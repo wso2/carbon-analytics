@@ -18,24 +18,15 @@
  */
 package org.wso2.carbon.analytics.datasource.core;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
-import javax.naming.Context;
-
 import org.apache.commons.collections.IteratorUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
-import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsSchema;
-import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsTableNotAvailableException;
-import org.wso2.carbon.analytics.datasource.core.rs.Record;
-import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
+import org.wso2.carbon.analytics.datasource.core.rs.*;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsSchema.ColumnType;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+
+import javax.naming.Context;
+import java.util.*;
 
 /**
  * This class contains tests related to {@link AnalyticsRecordStore}.
@@ -272,6 +263,9 @@ public class AnalyticsRecordStoreTest {
     
     @Test
     public void testDataRecordCount() throws AnalyticsException {
+        if (!this.analyticsRS.isPaginationSupported()) {
+            return;
+        }
         this.cleanupT1();
         this.analyticsRS.createTable(7, "T1");
         int count = (int) (200 * Math.random()) + 1;
@@ -348,6 +342,9 @@ public class AnalyticsRecordStoreTest {
     
     @Test
     public void testMultipleDataRecordAddRetieveWithPagination1() throws AnalyticsException {
+        if (!this.analyticsRS.isPaginationSupported()) {
+            return;
+        }
         this.cleanupT1();
         this.analyticsRS.createTable(7, "T1");
         long time = System.currentTimeMillis();
@@ -380,6 +377,9 @@ public class AnalyticsRecordStoreTest {
     
     @Test
     public void testMultipleDataRecordAddRetieveWithPagination2() throws AnalyticsException {
+        if (!this.analyticsRS.isPaginationSupported()) {
+            return;
+        }
         this.cleanupT1();
         this.analyticsRS.createTable(7, "T1");
         long time = System.currentTimeMillis();
