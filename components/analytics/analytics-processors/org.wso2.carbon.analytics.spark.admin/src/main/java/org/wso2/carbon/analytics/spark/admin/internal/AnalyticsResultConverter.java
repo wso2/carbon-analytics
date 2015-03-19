@@ -42,7 +42,7 @@ public class AnalyticsResultConverter {
                 rowResults[rowIndex] = new AnalyticsRowResultDto(columnValues);
                 rowIndex++;
             }
-            return new AnalyticsQueryResultDto(analyticsQueryResult.getColumnNames(), rowResults);
+            return new AnalyticsQueryResultDto(analyticsQueryResult.getColumns(), rowResults);
         } else {
             return null;
         }

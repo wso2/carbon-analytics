@@ -18,36 +18,27 @@
  */
 package org.wso2.carbon.analytics.spark.core.util;
 
-import org.apache.spark.sql.api.java.StructField;
-
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * This class represents an analytics query result.
  */
-public class AnalyticsQueryResult {
+public class AnalyticsQueryResult implements Serializable {
 
-    private StructField[] columns;
+    private static final long serialVersionUID = -4154776904892662809L;
+
+    private String[] columns;
     
     private List<List<Object>> rows;
     
-    public AnalyticsQueryResult(StructField[] columns, List<List<Object>> rows) {
+    public AnalyticsQueryResult(String[] columns, List<List<Object>> rows) {
         this.columns = columns;
         this.rows = rows;
     }
-    
-    public StructField[] getColumns() {
-        return columns;
-    }
 
-    public String[] getColumnNames(){
-        String[] colNames= new String[columns.length];
-        int colIndex = 0;
-        for (StructField col : columns){
-            colNames[colIndex] = col.getName();
-            colIndex++;
-        }
-        return colNames;
+    public String[] getColumns(){
+        return columns;
     }
     
     public List<List<Object>> getRows() {
@@ -57,8 +48,8 @@ public class AnalyticsQueryResult {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        for (StructField column : this.getColumns()) {
-            builder.append("|" + column.getName() + "|\t");
+        for (String column : this.getColumns()) {
+            builder.append("|" + column + "|\t");
         }
         builder.append("\n");
         for (List<Object> row : this.getRows()) {
@@ -70,4 +61,5 @@ public class AnalyticsQueryResult {
         builder.append("\n");
         return builder.toString();
     }
+    
 }

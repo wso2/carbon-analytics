@@ -37,6 +37,7 @@ import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
+import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionCall;
 import org.wso2.carbon.analytics.spark.core.internal.SparkDataListener;
 
 import scala.Option;
@@ -92,7 +93,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private static final Log log = LogFactory.getLog(SparkAnalyticsExecutor.class);
     
-    private SparkConf sparkConf = new SparkConf();
+    private SparkConf sparkConf;
     
     private JavaSparkContext sparkCtx;
 
@@ -109,7 +110,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         this.portOffset = portOffset;
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         if (acm.isClusteringEnabled()) {
-            initSparkDataListener();
+            this.initSparkDataListener();
             acm.joinGroup(CLUSTER_GROUP_NAME, this);
         } else {
             this.initClient(LOCAL_MASTER_URL);
@@ -117,6 +118,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
     
     private void initClient(String masterUrl) {
+        this.sparkConf = new SparkConf();
         this.sparkConf.setMaster(masterUrl).setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
         this.sparkCtx = new JavaSparkContext(this.sparkConf);
         this.sqlCtx = new JavaSQLContext(this.sparkCtx);
@@ -230,6 +232,20 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
     
     public AnalyticsQueryResult executeQuery(int tenantId, String query) throws AnalyticsExecutionException {
+        AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
+        if (acm.isClusteringEnabled() && !acm.isLeader(CLUSTER_GROUP_NAME)) {
+            try {
+                return acm.executeOne(CLUSTER_GROUP_NAME, acm.getLeader(CLUSTER_GROUP_NAME), 
+                        new AnalyticsExecutionCall(tenantId, query));
+            } catch (AnalyticsClusterException e) {
+                throw new AnalyticsExecutionException("Error executing analytics query: " + e.getMessage(), e);
+            }
+        } else {
+            return this.executeQueryLocal(tenantId, query);
+        }
+    }
+    
+    public AnalyticsQueryResult executeQueryLocal(int tenantId, String query) throws AnalyticsExecutionException {
         query = query.trim();
         if (query.endsWith(";")) {
             query = query.substring(0, query.length() - 1);
@@ -246,7 +262,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                 return null;
             }
         }
-        return toResult(sqlCtx.sql(query));
+        return toResult(this.sqlCtx.sql(query));
     }
     
     private void insertIntoTable(int tenantId, String tableName, 
@@ -256,11 +272,11 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         ads.put(records);
     }
     
-    private Integer[] generateTableKeyIndices(String[] keys, StructField[] columns) {
+    private Integer[] generateTableKeyIndices(String[] keys, String[] columns) {
         List<Integer> result = new ArrayList<Integer>();
         for (String key : keys) {
             for (int i = 0; i < columns.length; i++) {
-                if (key.equals(columns[i].getName())) {
+                if (key.equals(columns[i])) {
                     result.add(i);
                     break;
                 }
@@ -294,7 +310,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         String[] keys = loadTableKeys(tenantId, tableName);
         boolean primaryKeysExists = keys.length > 0;
         List<List<Object>> rows = data.getRows();
-        StructField[] columns = data.getColumns();
+        String[] columns = data.getColumns();
         Integer[] keyIndices = this.generateTableKeyIndices(keys, columns);
         List<Record> result = new ArrayList<Record>(rows.size());
         Record record;
@@ -310,16 +326,25 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         return result;
     }
     
-    private static Map<String, Object> extractValuesFromRow(List<Object> row, StructField[] columns) {
+    private static Map<String, Object> extractValuesFromRow(List<Object> row, String[] columns) {
         Map<String, Object> result = new HashMap<String, Object>(row.size());
         for (int i = 0; i < row.size(); i++) {
-            result.put(columns[i].getName(), row.get(i));
+            result.put(columns[i], row.get(i));
         }
         return result;
     }
     
+    private static String[] extractColumns(StructField[] fields) {
+        String[] columns = new String[fields.length];
+        for (int i = 0; i < fields.length; i++) {
+            columns[i] = fields[i].getName();
+        }
+        return columns;
+    }
+    
     private static AnalyticsQueryResult toResult(JavaSchemaRDD schemaRDD) throws AnalyticsExecutionException {
-        return new AnalyticsQueryResult(schemaRDD.schema().getFields(), convertRowsToObjects(schemaRDD.collect()));
+        return new AnalyticsQueryResult(extractColumns(schemaRDD.schema().getFields()), 
+                convertRowsToObjects(schemaRDD.collect()));
     }
     
     private static List<List<Object>> convertRowsToObjects(List<Row> rows) {
@@ -478,6 +503,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         acm.setProperty(CLUSTER_GROUP_NAME, MASTER_HOST_GROUP_PROP, this.myHost);
         acm.setProperty(CLUSTER_GROUP_NAME, MASTER_PORT_GROUP_PROP, masterPort);
+        this.initClient("spark://" + this.myHost + ":" + masterPort);
         log.info("Analytics master started: [" + this.myHost + ":" + masterPort + "]");
     }
 
@@ -490,7 +516,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         int p1 = P1_BASE_PORT + this.portOffset;
         int p2 = P2_BASE_PORT + this.portOffset;
         this.startWorker(this.myHost, masterHost, masterPort, p1, p2);
-        this.initClient("spark://" + masterHost + ":" + masterPort);
         log.info("Analytics worker started: [" + this.myHost + ":" + p1 + ":" + p2 + "] "
                 + "Master [" + masterHost + ":" + masterPort + "]");
     }

@@ -36,6 +36,21 @@ public interface AnalyticsClusterManager {
     void joinGroup(String groupId, GroupEventListener groupEventListener) throws AnalyticsClusterException;
     
     /**
+     * Checks if the current node is the leader of the given node.
+     * @param groupId The group id of the group
+     * @return True if the current node is the leader
+     */
+    boolean isLeader(String groupId);
+    
+    /**
+     * Returns the leader member of the given group.
+     * @param groupId The group id of the group
+     * @return The member object of the leaders
+     * @throws AnalyticsClusterException
+     */
+    Object getLeader(String groupId);
+    
+    /**
      * Returns a list of members of the given group. The member object returned from this can be 
      * used in other methods which expects this member object as a parameter, e.g. 'executeOne'
      * @param groupId The group id of the group

@@ -19,7 +19,6 @@
 package org.wso2.carbon.analytics.dataservice;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -39,7 +38,6 @@ import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.rs.Record;
 import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 /**
  * The implementation of {@link AnalyticsDataService}.
@@ -49,7 +47,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private AnalyticsRecordStore analyticsRecordStore;
         
     private AnalyticsDataIndexer indexer;
-            
+        
     public AnalyticsDataServiceImpl(AnalyticsRecordStore analyticsRecordStore,
             AnalyticsFileSystem analyticsFileSystem, int shardCount) throws AnalyticsException {
         this.analyticsRecordStore = analyticsRecordStore;
@@ -136,26 +134,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         return this.getAnalyticsRecordStore().getRecordCount(tenantId, tableName);
     }
 
-    /**
-     * This method preprocesses the records before adding to the record store,
-     * e.g. update the record ids if its not already set by using the table
-     * schema's primary keys.
-     * @param records
-     */
-    private void preprocessRecords(List<Record> records) {
-        Collection<List<Record>> recordBatches = GenericUtils.generateRecordBatches(records);
-        for (List<Record> recordBatch : recordBatches) {
-            this.preprecessRecordBatch(recordBatch);
-        }
-    }
-    
-    private void preprecessRecordBatch(List<Record> recordBatch) {
-        
-    }
-    
     @Override
     public void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
-        this.preprocessRecords(records);
         this.getAnalyticsRecordStore().put(records);
         this.getIndexer().put(records);
     }

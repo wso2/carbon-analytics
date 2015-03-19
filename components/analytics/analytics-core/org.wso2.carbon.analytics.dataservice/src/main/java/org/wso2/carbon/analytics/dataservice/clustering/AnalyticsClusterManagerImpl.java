@@ -21,7 +21,6 @@ package org.wso2.carbon.analytics.dataservice.clustering;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -56,9 +55,7 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
     private HazelcastInstance hz;
     
     private Map<String, GroupEventListener> groups = new HashMap<String, GroupEventListener>();
-    
-    private Set<String> leaderInGroups = new HashSet<String>();
-    
+        
     public AnalyticsClusterManagerImpl() {
         this.hz = AnalyticsServiceHolder.getHazelcastInstance();
         if (this.isClusteringEnabled()) {
@@ -82,15 +79,12 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         List<Member> groupMembers = this.getGroupMembers(groupId);
         Member myself = this.hz.getCluster().getLocalMember();
         groupMembers.add(myself);
-        if (this.getLeader(groupId).equals(myself)) {
-            this.executeMyselfBecomingLeader(groupId);
+        if (this.isLeader(groupId)) {
+            groupEventListener.onBecomingLeader();
         } else {
             this.sendMemberAddedNotificationToLeader(groupId);
         }
-    }
-    
-    private Member getLeader(String groupId) {
-        return this.getGroupMembers(groupId).get(0);
+        groupEventListener.onLeaderUpdate();
     }
     
     private void sendMemberAddedNotificationToLeader(String groupId) throws AnalyticsClusterException {
@@ -98,12 +92,17 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         this.executeOne(groupId, member, new LeaderMemberAddedNotification(groupId));
     }
     
-    private boolean isLeader(String groupId) {
-        return this.leaderInGroups.contains(groupId);
+    @Override
+    public Member getLeader(String groupId) {
+        return this.getGroupMembers(groupId).get(0);
+    }
+    
+    @Override
+    public boolean isLeader(String groupId) {
+        return this.hz.getCluster().getLocalMember().equals(this.getLeader(groupId));
     }
     
     private void executeMyselfBecomingLeader(String groupId) throws AnalyticsClusterException {
-        this.leaderInGroups.add(groupId);
         this.groups.get(groupId).onBecomingLeader();
         this.executeAll(groupId, new LeaderUpdateNotification(groupId));
     }
