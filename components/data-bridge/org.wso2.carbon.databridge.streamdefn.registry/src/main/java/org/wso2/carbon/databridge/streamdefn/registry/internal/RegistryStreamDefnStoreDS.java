@@ -34,7 +34,6 @@ public class RegistryStreamDefnStoreDS {
     private static Log log = LogFactory.getLog(RegistryStreamDefnStoreDS.class);
 
     protected void activate(ComponentContext componentContext) {
-
         AbstractStreamDefinitionStore abstractStreamDefinitionStore = new RegistryStreamDefinitionStore();
         componentContext.getBundleContext().registerService(AbstractStreamDefinitionStore.class.getName(), abstractStreamDefinitionStore, null);
         if (log.isDebugEnabled()) {

@@ -42,7 +42,7 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics-common</groupId>
-            <artifactId>org.wso2.carbon.databridge.agent.thrift.server.feature</artifactId>
+            <artifactId>org.wso2.carbon.databridge.agent.server.feature</artifactId>
             <type>zip</type>
         </dependency>
     </dependencies>
@@ -75,7 +75,10 @@
                                     org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.commons.thrift.server.feature:${carbon.analytics.common.version}
                                 </includedFeatureDef>
                                 <includedFeatureDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.agent.thrift.server.feature:${carbon.analytics.common.version}
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.commons.binary.server.feature:${carbon.analytics.common.version}
+                                </includedFeatureDef>
+                                <includedFeatureDef>
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.agent.server.feature:${carbon.analytics.common.version}
                                 </includedFeatureDef>
                             </includedFeatures>
                         </configuration>

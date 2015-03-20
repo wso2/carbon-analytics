@@ -33,6 +33,7 @@
     <modules>
         <module>org.wso2.carbon.databridge.commons.server.feature</module>
         <module>org.wso2.carbon.databridge.commons.binary.server.feature</module>
+        <module>org.wso2.carbon.databridge.agent.server.feature</module>
         <module>org.wso2.carbon.databridge.agent.thrift.server.feature</module>
         <module>org.wso2.carbon.databridge.commons.thrift.server.feature</module>
         <module>org.wso2.carbon.databridge.datapublisher.feature</module>
@@ -41,6 +42,7 @@
         <module>org.wso2.carbon.databridge.streamdefn.registry.server.feature</module>
         <module>org.wso2.carbon.databridge.datareceiver.feature</module>
         <module>org.wso2.carbon.databridge.receiver.binary.server.feature</module>
+        <module>org.wso2.carbon.databridge.streamdefn.filesystem.server.feature</module>
     </modules>
 
 </project>
