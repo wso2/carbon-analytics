@@ -1,5 +1,6 @@
 var tableLoaded = false;
 var timestamp;
+var arbitraryColumnName;
 function createMainJTable(fields) {
     $('#AnalyticsTableContainer').jtable({
                                              title: $("#tableSelect").val(),
@@ -46,21 +47,42 @@ function getArbitraryFields(rowData) {
                                              $img.closest('tr'), //Parent row
                                              {
                                                  title: 'Arbitrary Fields',
+                                                 selecting: true,
                                                  messages: {
                                                      addNewRecord: 'Add new arbitrary field'
                                                  },
                                                  actions: {
+                                                     // For Details: http://jtable.org/Demo/FunctionsAsActions
                                                      listAction: function (postData, jtParams) {
-                                                         return listActionMethod(jtParams);
+                                                         var postData = {};
+                                                         postData['tableName'] = $("#tableSelect").val();
+                                                         postData['bam_unique_rec_id'] = rowData.record.bam_unique_rec_id;
+                                                         return arbitraryFieldListActionMethod(postData, jtParams);
                                                      },
-                                                     deleteAction: '/Demo/DeleteExam',
-                                                     updateAction: '/Demo/UpdateExam',
-                                                     createAction: '/Demo/CreateExam'
+                                                     createAction: function (postData) {
+                                                         return arbitraryFieldCreateActionMethod(postData);
+                                                     },
+                                                     updateAction: function (postData) {
+                                                         return arbitraryFieldUpdateActionMethod(postData);
+                                                     },
+                                                     deleteAction: function (postData) {
+                                                         postData['tableName'] = $("#tableSelect").val();
+                                                         postData['bam_unique_rec_id'] = rowData.record.bam_unique_rec_id;
+                                                         return arbitraryFieldDeleteActionMethod(postData);
+                                                     }
+                                                 },
+                                                 deleteConfirmation: function (data) {
+                                                     arbitraryColumnName = data.record.Name;
+                                                 },
+                                                 rowsRemoved: function (event, data) {
+                                                     arbitraryColumnName ="";
                                                  },
                                                  fields: {
-                                                     PersonId: {
+                                                     bam_unique_rec_id: {
+                                                         type: 'hidden',
                                                          key: true,
-                                                         list: false
+                                                         list: false,
+                                                         defaultValue: rowData.record.bam_unique_rec_id
                                                      },
                                                      Name: {
                                                          title: 'Name'
@@ -70,7 +92,7 @@ function getArbitraryFields(rowData) {
                                                      },
                                                      Type: {
                                                          title: 'Type',
-                                                         options: ["String", "boolean", "int", "long"]
+                                                         options: ["String", "Integer", "LOng", "Boolean", "Float", "Double"]
                                                      }
                                                  }
                                              }, function (data) { //opened handler
@@ -79,6 +101,95 @@ function getArbitraryFields(rowData) {
         );
     });
     return $img;
+}
+
+function arbitraryFieldListActionMethod(postData, jtParams) {
+    return $.Deferred(function ($dfd) {
+        $.ajax({
+                   url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeListArbitraryRecord,
+                   type: 'POST',
+                   dataType: 'json',
+                   data: postData,
+                   success: function (data) {
+                       $dfd.resolve(data);
+                   },
+                   error: function () {
+                       $dfd.reject();
+                   }
+               }
+        );
+    });
+}
+
+function arbitraryFieldCreateActionMethod(postData) {
+    var recordId;
+    var $selectedRows = $('#AnalyticsTableContainer').jtable('selectedRows');
+    if ($selectedRows.length > 0) {
+        $selectedRows.each(function () {
+            var record = $(this).data('record');
+            recordId = record.bam_unique_rec_id;
+        });
+    }
+    return $.Deferred(function ($dfd) {
+        $.ajax({
+                   url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeCreateArbitraryRecord + "&tableName=" + $("#tableSelect").val() + "&bam_unique_rec_id=" + recordId,
+                   type: 'POST',
+                   dataType: 'json',
+                   data: postData,
+                   success: function (data) {
+                       $dfd.resolve(data);
+                   },
+                   error: function () {
+                       $dfd.reject();
+                   }
+               }
+        );
+    });
+}
+
+function arbitraryFieldUpdateActionMethod(postData) {
+    var recordId;
+    var $selectedRows = $('#AnalyticsTableContainer').jtable('selectedRows');
+    if ($selectedRows.length > 0) {
+        $selectedRows.each(function () {
+            var record = $(this).data('record');
+            recordId = record.bam_unique_rec_id;
+        });
+    }
+    return $.Deferred(function ($dfd) {
+        $.ajax({
+                   url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeUpdateArbitraryRecord + "&tableName=" + $("#tableSelect").val() + "&bam_unique_rec_id=" + recordId,
+                   type: 'POST',
+                   dataType: 'json',
+                   data: postData,
+                   success: function (data) {
+                       $dfd.resolve(data);
+                   },
+                   error: function () {
+                       $dfd.reject();
+                   }
+               }
+        );
+    });
+}
+
+function arbitraryFieldDeleteActionMethod(postData) {
+    postData["Name"] = arbitraryColumnName;
+    return $.Deferred(function ($dfd) {
+        $.ajax({
+                   url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeDeleteArbitraryRecord,
+                   type: 'POST',
+                   dataType: 'json',
+                   data: postData,
+                   success: function (data) {
+                       $dfd.resolve(data);
+                   },
+                   error: function () {
+                       $dfd.reject();
+                   }
+               }
+        );
+    });
 }
 
 function createJTable() {
@@ -112,9 +223,6 @@ function createJTable() {
                               fields[val.name].create = false;
                           }
                       });
-
-                      console.log(fields);
-
                       if (data) {
                           if (tableLoaded == true) {
                               $('#AnalyticsTableContainer').jtable('destroy');

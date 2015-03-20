@@ -300,4 +300,116 @@ public class MessageConsoleService {
         }
         return objectMap;
     }
+
+    public EntityBean[] getArbitraryList(String table, String recordId) throws MessageConsoleException {
+        int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+        List<EntityBean> entityBeansList = new ArrayList<>();
+        List<String> ids = new ArrayList<>(1);
+        ids.add(recordId);
+        try {
+            RecordGroup[] results = analyticsDataService.get(tenantId, table, 1, null, ids);
+            List<Record> records = AnalyticsDSUtils.listRecords(analyticsDataService, results);
+            AnalyticsSchema schema = analyticsDataService.getTableSchema(tenantId, table);
+
+            if (records != null && !records.isEmpty()) {
+                Map<String, AnalyticsSchema.ColumnType> schemaColumns = schema.getColumns();
+                Record record = records.get(0);
+                Map<String, Object> recordValues = record.getValues();
+                for (Map.Entry<String, Object> objectEntry : recordValues.entrySet()) {
+                    if (!schemaColumns.containsKey(objectEntry.getKey())) {
+                        EntityBean entityBean;
+                        if (objectEntry.getValue() != null) {
+                            entityBean = new EntityBean(objectEntry.getKey(), String.valueOf(objectEntry.getValue()), objectEntry
+                                    .getValue().getClass().getSimpleName());
+
+                        } else {
+                            entityBean = new EntityBean(objectEntry.getKey(), "NULL", "String");
+                        }
+                        entityBeansList.add(entityBean);
+                    }
+                }
+            }
+        } catch (AnalyticsException e) {
+            logger.error("Unable to get arbitrary fields for id [" + recordId + "] from table :" + table, e);
+            throw new MessageConsoleException("Unable to get arbitrary fields for id [" + recordId + "] from table :" + table, e);
+        }
+
+        EntityBean[] entityBeans = new EntityBean[entityBeansList.size()];
+        return entityBeansList.toArray(entityBeans);
+    }
+
+    public void deleteArbitraryField(String table, String recordId, String fieldName) throws MessageConsoleException {
+        int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+        List<String> ids = new ArrayList<>(1);
+        ids.add(recordId);
+        try {
+            RecordGroup[] results = analyticsDataService.get(tenantId, table, 1, null, ids);
+            List<Record> records = AnalyticsDSUtils.listRecords(analyticsDataService, results);
+            if (records != null && !records.isEmpty()) {
+                Record record = records.get(0);
+                Map<String, Object> recordValues = record.getValues();
+                recordValues.remove(fieldName);
+                Record editedRecord = new Record(recordId, tenantId, table, recordValues, record.getTimestamp());
+                records.clear();
+                records.add(editedRecord);
+                analyticsDataService.put(records);
+            }
+        } catch (AnalyticsException e) {
+            logger.error("Unable to delete arbitrary field[" + fieldName + "] for id [" + recordId + "] from table :" + table, e);
+            throw new MessageConsoleException("Unable to arbitrary arbitrary field[" + fieldName + "] for id [" + recordId + "] from table :" + table, e);
+        }
+    }
+
+    public void putArbitraryField(String table, String recordId, String fieldName, String value, String type)
+            throws MessageConsoleException {
+
+        int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+        List<String> ids = new ArrayList<>(1);
+        ids.add(recordId);
+        try {
+            RecordGroup[] results = analyticsDataService.get(tenantId, table, 1, null, ids);
+            List<Record> records = AnalyticsDSUtils.listRecords(analyticsDataService, results);
+            if (records != null && !records.isEmpty()) {
+                Record record = records.get(0);
+                Map<String, Object> recordValues = record.getValues();
+                recordValues.remove(fieldName);
+                Object convertedValue;
+                switch (type) {
+                    case "String": {
+                        convertedValue = String.valueOf(value);
+                        break;
+                    }
+                    case "Integer": {
+                        convertedValue = Integer.valueOf(value);
+                        break;
+                    }
+                    case "Boolean": {
+                        convertedValue = Boolean.valueOf(value);
+                        break;
+                    }
+                    case "Float": {
+                        convertedValue = Float.valueOf(value);
+                        break;
+                    }
+                    case "Double": {
+                        convertedValue = Double.valueOf(value);
+                        break;
+                    }
+                    default: {
+                        convertedValue = value;
+                    }
+                }
+
+                recordValues.put(fieldName, convertedValue);
+
+                records.clear();
+                Record editedRecord = new Record(recordId, tenantId, table, recordValues, record.getTimestamp());
+                records.add(editedRecord);
+                analyticsDataService.put(records);
+            }
+        } catch (AnalyticsException e) {
+            logger.error("Unable to update arbitrary field[" + fieldName + "] for id [" + recordId + "] from table :" + table, e);
+            throw new MessageConsoleException("Unable to update arbitrary field[" + fieldName + "] for id [" + recordId + "] from table :" + table, e);
+        }
+    }
 }

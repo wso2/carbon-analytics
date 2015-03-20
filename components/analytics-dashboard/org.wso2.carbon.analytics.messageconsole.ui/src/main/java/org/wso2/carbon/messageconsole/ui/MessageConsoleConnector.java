@@ -34,9 +34,15 @@ import org.wso2.carbon.analytics.messageconsole.stub.beans.RecordResultBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.TableBean;
 import org.wso2.carbon.messageconsole.ui.beans.Column;
 import org.wso2.carbon.messageconsole.ui.beans.Record;
+import org.wso2.carbon.messageconsole.ui.beans.ResponseArbitraryField;
+import org.wso2.carbon.messageconsole.ui.beans.ResponseArbitraryFieldColumn;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseRecord;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseResult;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseTable;
+import org.wso2.carbon.messageconsole.ui.serializers.ResponseArbitraryFieldSerializer;
+import org.wso2.carbon.messageconsole.ui.serializers.ResponseArbitraryFieldsSerializer;
+import org.wso2.carbon.messageconsole.ui.serializers.ResponseRecordSerializer;
+import org.wso2.carbon.messageconsole.ui.serializers.ResponseResultSerializer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,11 +64,21 @@ public class MessageConsoleConnector {
     public static final int TYPE_DELETE_RECORD = 4;
     public static final int TYPE_TABLE_INFO = 5;
 
+    public static final int TYPE_LIST_ARBITRARY_RECORD = 6;
+    public static final int TYPE_CRATE_ARBITRARY_RECORD = 7;
+    public static final int TYPE_UPDATE_ARBITRARY_RECORD = 8;
+    public static final int TYPE_DELETE_ARBITRARY_RECORD = 9;
+
     private MessageConsoleStub stub;
     private static GsonBuilder RESPONSE_RESULT_BUILDER = new GsonBuilder().registerTypeAdapter(ResponseResult.class,
                                                                                                new ResponseResultSerializer());
     private static GsonBuilder RESPONSE_RECORD_BUILDER = new GsonBuilder().registerTypeAdapter(ResponseRecord.class,
                                                                                                new ResponseRecordSerializer());
+    private static GsonBuilder RESPONSE_ARBITRARY_FIELD_BUILDER = new GsonBuilder().
+            registerTypeAdapter(ResponseArbitraryField.class, new ResponseArbitraryFieldsSerializer());
+    private static GsonBuilder RESPONSE_ARBITRARY_FIELD_COLUMN_BUILDER = new GsonBuilder().
+            registerTypeAdapter(ResponseArbitraryFieldColumn.class, new ResponseArbitraryFieldSerializer());
+
 
     public MessageConsoleConnector(ConfigurationContext configCtx, String backendServerURL, String cookie) {
         String serviceURL = backendServerURL + MESSAGE_CONSOLE;
@@ -250,5 +266,59 @@ public class MessageConsoleConnector {
             responseRecord.setMessage(e.getMessage());
         }
         return gson.toJson(responseRecord);
+    }
+
+    public String getArbitraryFields(String table, String recordId) {
+        ResponseArbitraryField responseArbitraryField = new ResponseArbitraryField();
+        Gson gson = RESPONSE_ARBITRARY_FIELD_BUILDER.serializeNulls().create();
+        responseArbitraryField.setResult(OK);
+        try {
+            List<Column> resultColumns = new ArrayList<>();
+            EntityBean[] entityBeans = stub.getArbitraryList(table, recordId);
+
+            if (entityBeans != null) {
+                for (EntityBean entityBean : entityBeans) {
+                    Column column = new Column(entityBean.getColumnName(), entityBean.getValue(), entityBean.getType());
+                    resultColumns.add(column);
+                }
+            }
+
+            responseArbitraryField.setColumns(resultColumns);
+        } catch (Exception e) {
+            responseArbitraryField.setResult(ERROR);
+            responseArbitraryField.setMessage(e.getMessage());
+        }
+
+        return gson.toJson(responseArbitraryField);
+    }
+
+    public String deleteArbitraryField(String table, String recordId, String fieldName) {
+        ResponseArbitraryField responseArbitraryField = new ResponseArbitraryField();
+        Gson gson = RESPONSE_ARBITRARY_FIELD_BUILDER.serializeNulls().create();
+        responseArbitraryField.setResult(OK);
+
+        try {
+            stub.deleteArbitraryField(table, recordId, fieldName);
+        } catch (Exception e) {
+            responseArbitraryField.setResult(ERROR);
+            responseArbitraryField.setMessage(e.getMessage());
+        }
+
+        return gson.toJson(responseArbitraryField);
+    }
+
+    public String putArbitraryField(String table, String recordId, String fieldName, String value, String type) {
+
+        ResponseArbitraryFieldColumn responseArbitraryFieldColumn = new ResponseArbitraryFieldColumn();
+        Gson gson = RESPONSE_ARBITRARY_FIELD_COLUMN_BUILDER.serializeNulls().create();
+        responseArbitraryFieldColumn.setResult(OK);
+        try {
+            stub.putArbitraryField(table, recordId, fieldName, value, type);
+            responseArbitraryFieldColumn.setColumn(new Column(fieldName, value, type));
+        } catch (Exception e) {
+            responseArbitraryFieldColumn.setResult(ERROR);
+            responseArbitraryFieldColumn.setMessage(e.getMessage());
+        }
+        return gson.toJson(responseArbitraryFieldColumn);
     }
 }

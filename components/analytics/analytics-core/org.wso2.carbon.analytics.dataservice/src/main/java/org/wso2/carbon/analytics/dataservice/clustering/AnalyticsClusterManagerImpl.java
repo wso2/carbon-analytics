@@ -21,7 +21,6 @@ package org.wso2.carbon.analytics.dataservice.clustering;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +44,8 @@ import com.hazelcast.core.MembershipListener;
  */
 public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, MembershipListener {
 
+    private static final String LEADER_INIT_DONE_FLAG = "LEADER_INIT_FLAG";
+
     private static final String ANALYTICS_GROUP_EXECUTOR_SERVICE_PREFIX = "_ANALYTICS_GROUP_EXECUTOR_SERVICE_";
 
     private static final String ANALYTICS_CLUSTER_GROUP_MEMBERS_PREFIX = "_ANALYTICS_CLUSTER_GROUP_MEMBERS_";
@@ -56,9 +57,7 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
     private HazelcastInstance hz;
     
     private Map<String, GroupEventListener> groups = new HashMap<String, GroupEventListener>();
-    
-    private Set<String> leaderInGroups = new HashSet<String>();
-    
+        
     public AnalyticsClusterManagerImpl() {
         this.hz = AnalyticsServiceHolder.getHazelcastInstance();
         if (this.isClusteringEnabled()) {
@@ -82,15 +81,43 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         List<Member> groupMembers = this.getGroupMembers(groupId);
         Member myself = this.hz.getCluster().getLocalMember();
         groupMembers.add(myself);
-        if (this.getLeader(groupId).equals(myself)) {
-            this.executeMyselfBecomingLeader(groupId);
+        if (this.isLeader(groupId)) {
+            groupEventListener.onBecomingLeader();
+            this.setLeaderInitDoneFlag(groupId);
+            groupEventListener.onLeaderUpdate();
         } else {
+            this.waitForInitialLeader(groupId);
+            groupEventListener.onLeaderUpdate();
             this.sendMemberAddedNotificationToLeader(groupId);
         }
     }
     
-    private Member getLeader(String groupId) {
-        return this.getGroupMembers(groupId).get(0);
+    private String generateLeaderInitDoneFlagName(String groupId) {
+        return groupId + "_" + LEADER_INIT_DONE_FLAG;
+    }
+    
+    private void setLeaderInitDoneFlag(String groupId) {
+        this.hz.getAtomicLong(this.generateLeaderInitDoneFlagName(groupId)).set(1);
+    }
+    
+    private void resetLeaderInitDoneFlag(String groupId) {
+        this.hz.getAtomicLong(this.generateLeaderInitDoneFlagName(groupId)).set(0);
+    }
+    
+    private void waitForInitialLeader(String groupId) {
+        if (log.isDebugEnabled()) {
+            log.debug("Waiting for initial leader...");
+        }
+        while (this.hz.getAtomicLong(this.generateLeaderInitDoneFlagName(groupId)).get() <= 0) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                log.error(e);
+            }
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Done waiting for initial leader.");
+        }
     }
     
     private void sendMemberAddedNotificationToLeader(String groupId) throws AnalyticsClusterException {
@@ -98,12 +125,17 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         this.executeOne(groupId, member, new LeaderMemberAddedNotification(groupId));
     }
     
-    private boolean isLeader(String groupId) {
-        return this.leaderInGroups.contains(groupId);
+    @Override
+    public Member getLeader(String groupId) {
+        return this.getGroupMembers(groupId).get(0);
+    }
+    
+    @Override
+    public boolean isLeader(String groupId) {
+        return this.hz.getCluster().getLocalMember().equals(this.getLeader(groupId));
     }
     
     private void executeMyselfBecomingLeader(String groupId) throws AnalyticsClusterException {
-        this.leaderInGroups.add(groupId);
         this.groups.get(groupId).onBecomingLeader();
         this.executeAll(groupId, new LeaderUpdateNotification(groupId));
     }
@@ -138,6 +170,9 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
             if (!existingMembers.contains(memberItr.next())) {
                 memberItr.remove();
             }
+        }
+        if (this.getGroupMembers(groupId).size() == 0) {
+            this.resetLeaderInitDoneFlag(groupId); 
         }
     }
     

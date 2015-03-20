@@ -27,7 +27,7 @@
     <script src="js/jquery-1.11.2.min.js" type="text/javascript"></script>
     <script src="js/jquery-ui.min.js" type="text/javascript"></script>
     <script src="js/jquery.jtable.min.js" type="text/javascript"></script>
-    <script src="js/jquery.datetimepicker.js"></script>
+    <script src="js/jquery.datetimepicker.js" type="text/javascript"></script>
     <script src="js/messageconsole.js" type="text/javascript"></script>
 
     <script type="text/javascript">
@@ -37,6 +37,11 @@
         var typeUpdateRecord = '<%= MessageConsoleConnector.TYPE_UPDATE_RECORD%>';
         var typeUpdateRecord = '<%= MessageConsoleConnector.TYPE_UPDATE_RECORD%>';
         var typeTableInfo = '<%= MessageConsoleConnector.TYPE_TABLE_INFO%>';
+
+        var typeListArbitraryRecord = '<%= MessageConsoleConnector.TYPE_LIST_ARBITRARY_RECORD%>';
+        var typeCreateArbitraryRecord = '<%= MessageConsoleConnector.TYPE_CRATE_ARBITRARY_RECORD%>';
+        var typeUpdateArbitraryRecord = '<%= MessageConsoleConnector.TYPE_UPDATE_ARBITRARY_RECORD%>';
+        var typeDeleteArbitraryRecord = '<%= MessageConsoleConnector.TYPE_DELETE_ARBITRARY_RECORD%>';
 
         $(document).ready(function () {
             var tableNames = "";
