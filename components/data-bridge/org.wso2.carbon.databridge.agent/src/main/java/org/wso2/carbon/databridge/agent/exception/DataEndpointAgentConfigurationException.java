@@ -18,7 +18,7 @@
 package org.wso2.carbon.databridge.agent.exception;
 
 /**
- * Exception to be thrown for DataEndpointAgentConfiguration which was specified in the data-agent-conf.xml
+ * Exception to be thrown for DataEndpointAgentConfiguration which was specified in the data-agent-config.xml
  */
 
 public class DataEndpointAgentConfigurationException extends Exception {
