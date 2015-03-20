@@ -67,41 +67,8 @@ function addEventStream(form, option, eventStreamId) {
                     onSuccess: function (event) {
                         if ("true" == event.responseText.trim()) {
                             CARBON.showInfoDialog("Stream definition added successfully!!",function () {
-                                    CARBON.customConfirmDialogBox("The defined event stream can be populated with in flow of events using an event builder.\nDo you want to create an event builder now? ", "Default WSO2Event Builder", "Custom Event Builder",
-                                        function (option) {
-                                            if (option == "custom") {
-                                                new Ajax.Request('../eventbuilder/popup_create_event_builder_ajaxprocessor.jsp',{
-                                                        method: 'POST',
-                                                        asynchronous: false,
-                                                        parameters: {
-                                                            streamNameWithVersion: newEventStreamId
-                                                },onSuccess: function (data) {
-                                                    showCustomPopupDialog(data.responseText, "Create Event Builder", "80%", "", ignore, "90%");
-                                                    }
-                                                });
-
-                                            } else {
-                                                new Ajax.Request('../eventbuilder/add_default_event_builder_ajaxprocessor.jsp',{
-                                                    method: 'POST',
-                                                    asynchronous: false,
-                                                    parameters: {
-                                                        eventStreamId: newEventStreamId
-                                                    },onSuccess: function (response) {
-                                                        if ("true" == response.responseText.trim()) {
-                                                            CARBON.showInfoDialog("Default Event Builder added successfully!!");
-                                                            form.submit();
-                                                        } else {
-                                                            CARBON.showErrorDialog("Failed to add event builder, Exception: " + response.responseText.trim());
-                                                        }
-                                                    }
-                                                });
-                                            }
-
-                                        },function () {
-                                            form.submit();
-                                        });
-
-                                }, null);
+                                form.submit();
+                            });
                         } else {
                             CARBON.showErrorDialog("Failed to add event stream, Exception: " + event.responseText.trim());
                         }
@@ -558,46 +525,9 @@ function addEventStreamByString(form) {
             } else {
                 var eventStreamDefinitionJSON = JSON.parse(eventStreamDefinitionString);
                 var newEventStreamId = eventStreamDefinitionJSON.name + ":" + eventStreamDefinitionJSON.version;
-                CARBON.showInfoDialog("Stream definition added successfully!!",
-                    function () {
-                        CARBON.customConfirmDialogBox( "The defined event stream can be populated with in flow of events using an event builder.\nDo you want to create an event builder now? ", "Default WSO2Event Builder", "Custom Event Builder",
-                        function (option) {
-                            if (option == "custom") {
-                                new Ajax.Request('../eventbuilder/popup_create_event_builder_ajaxprocessor.jsp',{
-                                    method: 'POST',
-                                    asynchronous: false,
-                                    parameters: {
-                                        streamNameWithVersion: newEventStreamId
-                                    },
-                                    onSuccess: function (data) {
-                                        showCustomPopupDialog(data.responseText, "Create Event Builder", "80%", "", ignore, "90%");
-                                    }
-                                });
-
-                            } else {
-                                new Ajax.Request('../eventbuilder/add_default_event_builder_ajaxprocessor.jsp',{
-                                    method: 'POST',
-                                    asynchronous: false,
-                                    parameters: {
-                                        eventStreamId: newEventStreamId
-                                    },
-                                    onSuccess: function (response) {
-                                        if ("true" == response.responseText.trim()) {
-                                            CARBON.showInfoDialog("Default Event Builder added successfully!!");
-                                            form.submit();
-                                        } else {
-                                            CARBON.showErrorDialog("Failed to add event builder, Exception: " + response.responseText.trim());
-                                        }
-                                    }
-                                });
-                            }
-
-                        },
-                        function () {
-                            form.submit();
-                        });
-
-                    }, null);
+                CARBON.showInfoDialog("Stream definition added successfully!!",function () {
+                    form.submit();
+                });
             }
 
 
