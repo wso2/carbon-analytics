@@ -45,6 +45,8 @@ public class SparkDataListener implements Runnable {
     private static final String DIR_RELATIVE_PATH = "repository/data/spark-data";
     private static final Log log = LogFactory.getLog(SparkDataListener.class);
 
+    private static boolean done = false;
+
     @Override
     public void run() {
 
@@ -71,8 +73,15 @@ public class SparkDataListener implements Runnable {
                         if (new File(destFolderPath+"/"+fileName).delete()){
                             log.info("Deleted file : " + fileName);
                         }
-                        ExecutorService executor = Executors.newCachedThreadPool();
-                        executor.execute(new SparkBackendExecutor(argArray));
+
+                        if (!done) {
+                            log.info("Starting the executor for hte first time!");
+                            ExecutorService executor = Executors.newCachedThreadPool();
+                            executor.execute(new SparkBackendExecutor(argArray));
+                            done = true;
+                        } else {
+                            System.out.println("Ignoring the starting executor request!");
+                        }
                     }
                 }
                 boolean valid = watckKey.reset();

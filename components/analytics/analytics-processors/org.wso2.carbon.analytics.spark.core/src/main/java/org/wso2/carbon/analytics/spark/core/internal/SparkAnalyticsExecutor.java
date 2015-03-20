@@ -504,7 +504,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         acm.setProperty(CLUSTER_GROUP_NAME, MASTER_HOST_GROUP_PROP, this.myHost);
         acm.setProperty(CLUSTER_GROUP_NAME, MASTER_PORT_GROUP_PROP, masterPort);
-        this.initClient("spark://" + this.myHost + ":" + masterPort);
         log.info("Analytics master started: [" + this.myHost + ":" + masterPort + "]");
     }
 
@@ -517,6 +516,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         int p1 = P1_BASE_PORT + this.portOffset;
         int p2 = P2_BASE_PORT + this.portOffset;
         this.startWorker(this.myHost, masterHost, masterPort, p1, p2);
+
+        if (acm.isLeader(CLUSTER_GROUP_NAME)) this.initClient("spark://" + this.myHost + ":" + masterPort);
+
         log.info("Analytics worker started: [" + this.myHost + ":" + p1 + ":" + p2 + "] "
                 + "Master [" + masterHost + ":" + masterPort + "]");
     }
