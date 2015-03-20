@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
 /**
- * Wrapper class for the Agent Configuration which are loaded from data-agent-conf.xml.
+ * Wrapper class for the Agent Configuration which are loaded from data-agent-config.xml.
  */
 
 @XmlRootElement (name = "DataAgentsConfiguration")

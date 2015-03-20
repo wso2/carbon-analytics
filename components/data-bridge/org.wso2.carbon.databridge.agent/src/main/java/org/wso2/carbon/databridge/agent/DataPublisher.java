@@ -106,7 +106,7 @@ public class DataPublisher {
      *
      * @param type           The Agent name from which the DataPublisher that needs to be created. By default Thrift,
      *                       and Binary is supported. The type should match with the <Name>
-     *                       element in the <data-agent-conf.xml>.
+     *                       element in the <data-agent-config.xml>.
      * @param receiverURLSet The receiving endpoint URL Set. This can be either load balancing URL set,
      *                       or Failover URL set.
      * @param authURLSet     The authenticating URL Set for the endpoints given in receiverURLSet parameter.

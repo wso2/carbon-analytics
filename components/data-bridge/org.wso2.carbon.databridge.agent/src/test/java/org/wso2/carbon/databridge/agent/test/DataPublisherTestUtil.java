@@ -66,7 +66,7 @@ public class DataPublisherTestUtil {
         if (!filePath.exists()) {
             filePath = new File("test" + File.separator + "resources");
         }
-        return filePath.getAbsolutePath() + File.separator + "data-agent-conf.xml";
+        return filePath.getAbsolutePath() + File.separator + "data-agent-config.xml";
     }
 
     public static String getDataBridgeConfigPath() {

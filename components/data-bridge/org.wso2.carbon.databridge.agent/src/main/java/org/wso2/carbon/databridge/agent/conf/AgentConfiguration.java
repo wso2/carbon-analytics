@@ -24,7 +24,7 @@ import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 import javax.xml.bind.annotation.XmlElement;
 
 /**
- * This class has the Agent's POJO representation of the XML data-agent-conf.xml.
+ * This class has the Agent's POJO representation of the XML data-agent-config.xml.
  */
 public class AgentConfiguration {
 
