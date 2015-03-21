@@ -20,8 +20,6 @@ package org.wso2.carbon.analytics.spark.core.internal;
 
 import org.apache.spark.executor.CoarseGrainedExecutorBackend;
 
-import java.util.Arrays;
-
 /**
  * Creates different threads for each executor
  */
@@ -35,7 +33,6 @@ public class SparkBackendExecutor implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("Starting executor using args: " + Arrays.toString(argArray));
         CoarseGrainedExecutorBackend.main(argArray);
     }
 }

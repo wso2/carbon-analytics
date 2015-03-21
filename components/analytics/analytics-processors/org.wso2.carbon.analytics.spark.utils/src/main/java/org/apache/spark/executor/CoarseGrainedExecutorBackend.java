@@ -26,6 +26,7 @@ import java.util.UUID;
  * a proxy class to mimic the CoarseGrainedExecutorBackend class in spark
  */
 public class CoarseGrainedExecutorBackend {
+    
     private static final String DIR_RELATIVE_PATH = "../../../repository/data/spark-data";
 
     public static void main(String[] args) {
@@ -36,7 +37,6 @@ public class CoarseGrainedExecutorBackend {
             if (!destDir.exists()){
                 destDir.mkdirs();
             }
-
             File file = new File(destDir.getPath() + "/" + uuid.toString());
             writer = new BufferedWriter(new FileWriter(file));
             for (String line : args) {

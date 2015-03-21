@@ -517,7 +517,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         int p2 = P2_BASE_PORT + this.portOffset;
         this.startWorker(this.myHost, masterHost, masterPort, p1, p2);
 
-        if (acm.isLeader(CLUSTER_GROUP_NAME)) this.initClient("spark://" + this.myHost + ":" + masterPort);
+        if (acm.isLeader(CLUSTER_GROUP_NAME)) {
+            this.initClient("spark://" + this.myHost + ":" + masterPort);
+        }
 
         log.info("Analytics worker started: [" + this.myHost + ":" + p1 + ":" + p2 + "] "
                 + "Master [" + masterHost + ":" + masterPort + "]");
