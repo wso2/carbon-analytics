@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.DoubleDocValuesField;
 import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.FloatField;
@@ -30,10 +31,8 @@ import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
-import org.apache.lucene.facet.FacetField;
 import org.apache.lucene.facet.FacetsConfig;
 import org.apache.lucene.facet.taxonomy.FloatAssociationFacetField;
-import org.apache.lucene.facet.taxonomy.IntAssociationFacetField;
 import org.apache.lucene.facet.taxonomy.TaxonomyWriter;
 import org.apache.lucene.facet.taxonomy.directory.DirectoryTaxonomyWriter;
 import org.apache.lucene.index.DirectoryReader;
@@ -58,10 +57,7 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterException;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
-import org.wso2.carbon.analytics.dataservice.indexing.facets.models.AnalyticsCategories;
 import org.wso2.carbon.analytics.dataservice.indexing.facets.models.AnalyticsFacetField;
-import org.wso2.carbon.analytics.dataservice.indexing.facets.models.AnalyticsFloatAssociationFacetField;
-import org.wso2.carbon.analytics.dataservice.indexing.facets.models.AnalyticsIntAssociationFacetField;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataCorruptionException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsTimeoutException;
@@ -713,7 +709,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
     
-    private void checkAndAddDocEntry(Document doc, IndexType type, String name, Object obj) {
+    private void checkAndAddDocEntry(Document doc, IndexType type, String name, Object obj)
+            throws AnalyticsIndexException {
         if (obj == null) {
             doc.add(new StringField(name, NULL_INDEX_VALUE, Store.NO));
             return;
@@ -777,45 +774,44 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         case BOOLEAN:
             doc.add(new StringField(name, obj.toString(), Store.NO));
             break;
+        case SCOREPARAM:
+            if (obj instanceof Float) {
+                doc.add(new DoubleDocValuesField(name,((Float)obj).doubleValue()));
+            } else if (obj instanceof Integer) {
+                doc.add(new DoubleDocValuesField(name,((Integer)obj).doubleValue()));
+            } else if (obj instanceof Long) {
+                doc.add(new DoubleDocValuesField(name,((Long)obj).doubleValue()));
+            } else if (obj instanceof Double) {
+                doc.add(new DoubleDocValuesField(name,((Double)obj).doubleValue()));
+            } else {
+                throw new AnalyticsIndexException(name + ": " +obj.toString() +
+                                                  " is not a SCOREPARAM");
+            }
+            break;
         }
     }
 
     private void checkAndAddTaxonomyDocEntries(Document doc, IndexType type,
-                                               Object obj, TaxonomyWriter taxonomyWriter)
+                                                String name, Object obj, TaxonomyWriter taxonomyWriter)
             throws AnalyticsIndexException{
         if (obj == null) return;
         switch (type) {
             case FACET:
-                FacetsConfig facetsConfig = new FacetsConfig();
-                if (obj instanceof AnalyticsCategories){
-                    for(AnalyticsFacetField analyticsFacetField : ((AnalyticsCategories) obj).getAnalyticsFacetFields()){
+                if (obj instanceof AnalyticsFacetField) {
 
-                        String dimension = analyticsFacetField.getDimension();
-                        //the field name for dimensions will be "$ + {dimension}"
-                        facetsConfig.setIndexFieldName(dimension, new StringBuilder("$").append(dimension).toString());
-                        facetsConfig.setMultiValued(dimension, true);
-                        facetsConfig.setHierarchical(dimension, true);
-
-                        if (analyticsFacetField instanceof AnalyticsIntAssociationFacetField) {
-                            AnalyticsIntAssociationFacetField associationFacetField =
-                                    (AnalyticsIntAssociationFacetField)analyticsFacetField;
-                            doc.add(new IntAssociationFacetField(associationFacetField.getAssociationValue(),
-                                                                 dimension,
-                                                                 associationFacetField.getPath()));
-                        } else if (analyticsFacetField instanceof AnalyticsFloatAssociationFacetField) {
-                            AnalyticsFloatAssociationFacetField associationFacetField =
-                                    (AnalyticsFloatAssociationFacetField)analyticsFacetField;
-                            doc.add(new FloatAssociationFacetField(associationFacetField.getAssociationValue(),
-                                                                 dimension,
-                                                                 associationFacetField.getPath()));
-                        } else if (analyticsFacetField instanceof AnalyticsFacetField) {
-                            doc.add(new FacetField(dimension, analyticsFacetField.getPath()));
-                        }
-                        try {
-                            doc = facetsConfig.build(taxonomyWriter, doc);
-                        }catch (IOException e){
-                            throw new AnalyticsIndexException("Error while adding Taxonomy entry", e);
-                        }
+                    FacetsConfig facetsConfig = new FacetsConfig();
+                    AnalyticsFacetField analyticsFacetField = (AnalyticsFacetField) obj;
+                    //the field name for dimensions will be "$ + {name}"
+                    facetsConfig.setIndexFieldName(name, new StringBuilder("$").append(name).toString());
+                    facetsConfig.setMultiValued(name, true);
+                    facetsConfig.setHierarchical(name, true);
+                    doc.add(new FloatAssociationFacetField(analyticsFacetField.getWeight(),
+                                                           name,
+                                                           analyticsFacetField.getPath()));
+                    try {
+                        doc = facetsConfig.build(taxonomyWriter, doc);
+                    } catch (IOException e) {
+                        throw new AnalyticsIndexException("Error while adding Taxonomy entry", e);
                     }
                 }
                 break;
@@ -833,7 +829,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         for (Map.Entry<String, IndexType> entry : columns.entrySet()) {
             name = entry.getKey();
             this.checkAndAddDocEntry(doc, entry.getValue(), name, record.getValue(name));
-            this.checkAndAddTaxonomyDocEntries(doc, entry.getValue(), record.getValue(name),
+            this.checkAndAddTaxonomyDocEntries(doc, entry.getValue(),name, record.getValue(name),
                                                taxonomyWriter);
         }
         return doc;

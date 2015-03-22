@@ -29,6 +29,7 @@ public enum IndexType {
     FLOAT,
     DOUBLE,
     BOOLEAN,
-    FACET
-    
+    FACET,
+    SCOREPARAM
+
 }
