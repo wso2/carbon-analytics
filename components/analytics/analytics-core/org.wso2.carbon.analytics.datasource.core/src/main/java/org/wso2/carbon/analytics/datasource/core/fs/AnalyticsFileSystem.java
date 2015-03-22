@@ -18,12 +18,13 @@
  */
 package org.wso2.carbon.analytics.datasource.core.fs;
 
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 
 /**
  * Represents a virtual file system data operations, the path values can either terminate with "/" or not,

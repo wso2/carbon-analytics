@@ -18,18 +18,19 @@
  */
 package org.wso2.carbon.analytics.dataservice;
 
+import org.wso2.carbon.analytics.dataservice.commons.IndexType;
+import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
+import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutException;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.wso2.carbon.analytics.dataservice.indexing.IndexType;
-import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsTimeoutException;
-import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsSchema;
-import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsTableNotAvailableException;
-import org.wso2.carbon.analytics.datasource.core.rs.Record;
-import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
 
 /**
  * This interface represents the analytics data service operations.
@@ -132,7 +133,7 @@ public interface AnalyticsDataService {
      * @throws AnalyticsException
      * @throws AnalyticsTableNotAvailableException
      */
-    RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, long timeFrom, 
+    RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, long timeFrom,
             long timeTo, int recordsFrom, int recordsCount) 
             throws AnalyticsException, AnalyticsTableNotAvailableException;
     
@@ -188,7 +189,7 @@ public interface AnalyticsDataService {
      * @param tenantId The tenant id
      * @param tableName The table name
      * @param columns The set of columns to create indices for, and their data types
-     * @throws AnalyticsIndexException
+     * @throws org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException
      */
     void setIndices(int tenantId, String tableName, Map<String, IndexType> columns) throws AnalyticsIndexException;
     
@@ -223,7 +224,7 @@ public interface AnalyticsDataService {
      * @throws AnalyticsIndexException
      * @throws AnalyticsException 
      */
-    List<SearchResultEntry> search(int tenantId, String tableName, String language, 
+    List<SearchResultEntry> search(int tenantId, String tableName, String language,
             String query, int start, int count) throws AnalyticsIndexException, AnalyticsException;
     
     /**

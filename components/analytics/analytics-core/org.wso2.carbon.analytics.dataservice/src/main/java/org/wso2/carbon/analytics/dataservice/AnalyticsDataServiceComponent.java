@@ -34,8 +34,8 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerImpl;
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfiguration;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.utils.CarbonUtils;
 
 import com.hazelcast.core.HazelcastInstance;

@@ -18,7 +18,7 @@
  */
 package org.wso2.carbon.analytics.spark.core.exception;
 
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
 /**
  * This class represents exceptions occuring in Spark query execution.

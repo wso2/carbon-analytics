@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.core.rs;
+package org.wso2.carbon.analytics.datasource.commons;
 
 import java.io.Serializable;
 import java.util.List;

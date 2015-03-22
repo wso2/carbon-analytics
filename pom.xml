@@ -168,6 +168,16 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.datasource.commons</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.dataservice.commons</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.datasource.core</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
@@ -241,6 +251,16 @@
                 <artifactId>org.wso2.carbon.ntask.core</artifactId>
                 <version>${carbon.commons.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.commons</groupId>
+                <artifactId>org.wso2.carbon.identity.authentication</artifactId>
+                <version>${carbon.commons.version}</version>
+            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>org.wso2.carbon.analytics</groupId>-->
+                <!--<artifactId>org.wso2.carbon.analytics.dataservice.thrift.commons</artifactId>-->
+                <!--<version>${carbon.analytics.version}</version>-->
+            <!--</dependency>-->
             <dependency>
                 <groupId>org.wso2.carbon.commons</groupId>
                 <artifactId>org.wso2.carbon.databridge.core</artifactId>
@@ -552,9 +572,9 @@
                 <version>${jetty.version}</version>
             </dependency>
             <!--<dependency>-->
-                <!--<groupId>org.eclipse.jetty</groupId>-->
-                <!--<artifactId>jetty-plus</artifactId>-->
-                <!--<version>${jetty.version}</version>-->
+            <!--<groupId>org.eclipse.jetty</groupId>-->
+            <!--<artifactId>jetty-plus</artifactId>-->
+            <!--<version>${jetty.version}</version>-->
             <!--</dependency>-->
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
@@ -658,7 +678,6 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-
 
 
             <dependency>

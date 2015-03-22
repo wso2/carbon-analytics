@@ -19,9 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections.IteratorUtils;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.rs.Record;
-import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
+import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
 /**
  * This class contains utility methods for analytics data service.
@@ -29,7 +29,7 @@ import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
 public class AnalyticsDSUtils {
 
     @SuppressWarnings("unchecked")
-    public static List<Record> listRecords(AnalyticsDataService ads, 
+    public static List<Record> listRecords(AnalyticsDataService ads,
             RecordGroup[] rgs) throws AnalyticsException {
         List<Record> result = new ArrayList<Record>();
         for (RecordGroup rg : rgs) {

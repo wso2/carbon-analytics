@@ -17,17 +17,17 @@
 package org.wso2.carbon.analytics.dataservice.restapi;
 
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
-import org.wso2.carbon.analytics.dataservice.indexing.IndexType;
-import org.wso2.carbon.analytics.dataservice.indexing.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.IndexType;
+import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.ColumnTypeBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.IndexTypeBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.SearchResultEntryBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.AnalyticsSchemaBean;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsSchema;
-import org.wso2.carbon.analytics.datasource.core.rs.Record;
-import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
+import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 
 import java.util.ArrayList;

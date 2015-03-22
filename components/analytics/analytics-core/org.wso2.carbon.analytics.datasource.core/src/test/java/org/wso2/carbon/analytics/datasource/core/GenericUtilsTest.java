@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 /**

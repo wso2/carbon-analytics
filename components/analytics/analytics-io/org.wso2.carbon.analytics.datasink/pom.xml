@@ -60,6 +60,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.analytics.datasource.commons</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.core.common</artifactId>
         </dependency>

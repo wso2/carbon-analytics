@@ -16,18 +16,21 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.dataservice.indexing;
+package org.wso2.carbon.analytics.datasource.commons.exception;
 
 /**
- * Index type definitions.
+ * This class represents analytics related exceptions.
  */
-public enum IndexType {
+public class AnalyticsException extends Exception {
 
-    STRING,
-    INTEGER,
-    LONG,
-    FLOAT,
-    DOUBLE,
-    BOOLEAN
+    private static final long serialVersionUID = 6750673867599631611L;
     
+    public AnalyticsException(String msg) {
+        super(msg);
+    }
+    
+    public AnalyticsException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+
 }

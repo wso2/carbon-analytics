@@ -16,9 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.core.rs;
-
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+package org.wso2.carbon.analytics.datasource.commons.exception;
 
 /**
  * This exception represents a situation when the requested analytics data source table is not available.

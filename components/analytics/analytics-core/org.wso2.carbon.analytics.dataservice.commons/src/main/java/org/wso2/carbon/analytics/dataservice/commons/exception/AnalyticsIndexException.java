@@ -16,9 +16,10 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.dataservice;
+package org.wso2.carbon.analytics.dataservice.commons.exception;
 
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
 /**
  * This class represents analytics indexing related exceptions.

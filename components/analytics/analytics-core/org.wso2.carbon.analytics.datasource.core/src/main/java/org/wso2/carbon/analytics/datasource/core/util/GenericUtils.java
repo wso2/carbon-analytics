@@ -19,10 +19,10 @@
 package org.wso2.carbon.analytics.datasource.core.util;
 
 import org.apache.commons.collections.IteratorUtils;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
-import org.wso2.carbon.analytics.datasource.core.rs.Record;
-import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
 
 import java.io.Closeable;
 import java.io.IOException;

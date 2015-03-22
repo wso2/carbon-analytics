@@ -16,11 +16,12 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.core.rs;
+package org.wso2.carbon.analytics.datasource.commons;
+
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
 import java.io.Serializable;
 
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 
 /**
  * This interface represents a record group, which represents the availability set of records local to a common environment. 

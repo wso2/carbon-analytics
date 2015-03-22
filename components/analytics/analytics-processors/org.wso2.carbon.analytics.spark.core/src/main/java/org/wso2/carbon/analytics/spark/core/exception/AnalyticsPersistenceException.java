@@ -17,7 +17,7 @@
 */
 package org.wso2.carbon.analytics.spark.core.exception;
 
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
 /**
  * This is an exception thrown when there is an error occured while it's trying to read/write f

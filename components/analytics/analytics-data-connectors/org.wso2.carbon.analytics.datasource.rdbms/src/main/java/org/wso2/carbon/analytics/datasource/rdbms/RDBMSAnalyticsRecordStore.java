@@ -19,7 +19,6 @@
 package org.wso2.carbon.analytics.datasource.rdbms;
 
 import org.apache.axiom.om.util.Base64;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.rs.*;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
@@ -29,6 +28,15 @@ import javax.sql.DataSource;
 import java.io.*;
 import java.sql.*;
 import java.util.*;
+
+import org.apache.axiom.om.util.Base64;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
+import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 /**
  * Abstract RDBMS database backed implementation of {@link AnalyticsRecordStore}.

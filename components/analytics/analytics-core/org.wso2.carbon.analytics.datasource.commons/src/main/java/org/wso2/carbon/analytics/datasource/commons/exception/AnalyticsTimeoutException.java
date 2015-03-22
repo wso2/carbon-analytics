@@ -16,8 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.core;
-
+package org.wso2.carbon.analytics.datasource.commons.exception;
 
 /**
  * This class represents analytics timeout related exceptions.
