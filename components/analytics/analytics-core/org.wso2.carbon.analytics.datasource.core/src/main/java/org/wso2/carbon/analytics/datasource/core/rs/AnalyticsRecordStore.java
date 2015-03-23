@@ -23,7 +23,6 @@ import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
-import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
 import java.util.Iterator;
 import java.util.List;
