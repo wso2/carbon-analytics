@@ -290,7 +290,7 @@ public class AnalyticsResource extends AbstractResource {
 			             tenantId);
 		}
 		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
-		long recordCount = analyticsDataService.getRecordCount(tenantId, tableName);
+		long recordCount = analyticsDataService.getRecordCount(tenantId, tableName, Long.MIN_VALUE, Long.MAX_VALUE);
 		if (logger.isDebugEnabled()) {
 			logger.debug("RecordCount for tableName: " + tableName + " is " + recordCount);
 		}

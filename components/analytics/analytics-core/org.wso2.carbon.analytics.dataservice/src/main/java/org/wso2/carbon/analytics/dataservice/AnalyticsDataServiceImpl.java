@@ -130,9 +130,9 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     @Override
-    public long getRecordCount(int tenantId, 
-            String tableName) throws AnalyticsException, AnalyticsTableNotAvailableException {
-        return this.getAnalyticsRecordStore().getRecordCount(tenantId, tableName);
+    public long getRecordCount(int tenantId, String tableName, long timeFrom, long timeTo) 
+            throws AnalyticsException, AnalyticsTableNotAvailableException {
+        return this.getAnalyticsRecordStore().getRecordCount(tenantId, tableName, timeFrom, timeTo);
     }
 
     @Override
@@ -159,6 +159,11 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException {
         return this.getAnalyticsRecordStore().readRecords(recordGroup);
+    }
+    
+    @Override
+    public boolean isPaginationSupported() {
+        return this.getAnalyticsRecordStore().isPaginationSupported();
     }
 
     @Override
@@ -228,5 +233,5 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             this.indexer.close();
         }
     }
-
+    
 }

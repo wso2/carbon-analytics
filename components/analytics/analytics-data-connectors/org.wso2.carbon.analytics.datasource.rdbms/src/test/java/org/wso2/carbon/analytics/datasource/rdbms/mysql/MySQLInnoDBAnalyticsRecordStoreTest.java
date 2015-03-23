@@ -108,7 +108,7 @@ public class MySQLInnoDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTes
         conf.setRecordRetrievalWithIdsQuery("SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})");
         conf.setRecordDeletionWithIdsQuery("DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})");
         conf.setRecordDeletionQuery("DELETE FROM {{TABLE_NAME}} WHERE timestamp >= ? AND timestamp < ?");
-        conf.setRecordCountQuery("SELECT COUNT(*) FROM {{TABLE_NAME}}");
+        conf.setRecordCountQuery("SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp >= ? AND timestamp < ?");
         conf.setPaginationFirstZeroIndexed(true);
         conf.setPaginationFirstInclusive(true);
         conf.setPaginationSecondLength(true);

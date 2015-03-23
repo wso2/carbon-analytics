@@ -111,11 +111,15 @@ public interface AnalyticsRecordStore {
      * Returns the number of records in the table with the given category and name.
      * @param tenantId The tenant which this table belongs to
      * @param tableName The name of the table to get the count from
+     * @param timeFrom The starting time to consider the count from, inclusive, relatively to epoch,
+     * Long.MIN_VALUE should signal, this restriction to be disregarded
+     * @param timeTo The ending time to consider the count to, non-inclusive, relatively to epoch,
+     * Long.MAX_VALUE should signal, this restriction to be disregarded     
      * @return The record count
      * @throws AnalyticsException
      * @throws AnalyticsTableNotAvailableException
      */
-    long getRecordCount(int tenantId, String tableName) 
+    long getRecordCount(int tenantId, String tableName, long timeFrom, long timeTo) 
             throws AnalyticsException, AnalyticsTableNotAvailableException;
     
     /**

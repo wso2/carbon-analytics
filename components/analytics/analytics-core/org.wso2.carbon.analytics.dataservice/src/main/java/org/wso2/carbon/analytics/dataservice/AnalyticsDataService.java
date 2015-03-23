@@ -99,11 +99,17 @@ public interface AnalyticsDataService {
      * Returns the number of records in the table with the given category and name.
      * @param tenantId The tenant which this table belongs to
      * @param tableName The name of the table to get the count from
+     * @param timeFrom The starting time to consider the count from, inclusive, relatively to epoch,
+     * Long.MIN_VALUE should signal, this restriction to be disregarded
+     * @param timeTo The ending time to consider the count to, non-inclusive, relatively to epoch,
+     * Long.MAX_VALUE should signal, this restriction to be disregarded     
      * @return The record count
      * @throws AnalyticsException
      * @throws AnalyticsTableNotAvailableException
      */
-    long getRecordCount(int tenantId, String tableName) throws AnalyticsTableNotAvailableException, AnalyticsException;
+    long getRecordCount(int tenantId, String tableName, long timeFrom, long timeTo) 
+            throws AnalyticsException, AnalyticsTableNotAvailableException;
+    
     
     /**
      * Adds a new record to the table. If the record id is mentioned, 
@@ -158,6 +164,15 @@ public interface AnalyticsDataService {
      * @throws AnalyticsException
      */
     Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException;
+    
+    /**
+     * Checks whether or not pagination (i.e. jumping to record n and then retrieving k further records)
+     * is supported by the underlying record store implementation.
+     * Also returns false if the total record count in a table cannot be determined.
+     *
+     * @return Pagination/row-count support
+     */
+    boolean isPaginationSupported();
 
     /**
      * Deletes a set of records in the table.

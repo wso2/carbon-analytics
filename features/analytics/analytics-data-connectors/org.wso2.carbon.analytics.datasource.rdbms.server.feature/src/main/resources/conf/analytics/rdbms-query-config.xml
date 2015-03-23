@@ -6,7 +6,7 @@
         <paginationSecondInclusive>false</paginationSecondInclusive>
         <paginationSecondLength>true</paginationSecondLength>
         <paginationSecondZeroIndexed>false</paginationSecondZeroIndexed>
-        <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}}</recordCountQuery>
+        <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
         <recordDeletionQuery>DELETE FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordDeletionQuery>
         <recordDeletionWithIdsQuery>DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordDeletionWithIdsQuery>
         <recordMergeQuery>MERGE INTO {{TABLE_NAME}} (timestamp, data, record_id) KEY (record_id) VALUES (?, ?, ?)</recordMergeQuery>
@@ -54,7 +54,7 @@
         <paginationSecondInclusive>false</paginationSecondInclusive>
         <paginationSecondLength>true</paginationSecondLength>
         <paginationSecondZeroIndexed>false</paginationSecondZeroIndexed>
-        <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}}</recordCountQuery>
+        <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
         <recordDeletionQuery>DELETE FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordDeletionQuery>
         <recordDeletionWithIdsQuery>DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordDeletionWithIdsQuery>
         <recordMergeQuery>INSERT INTO {{TABLE_NAME}} (timestamp, data, record_id) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE timestamp=VALUES(timestamp), data=VALUES(data)</recordMergeQuery>
