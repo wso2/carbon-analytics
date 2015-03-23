@@ -109,6 +109,11 @@
             out.print(connector.deleteArbitraryField(tableName, recordId, fieldName));
             break;
         }
+        case MessageConsoleConnector.TYPE_CREATE_TABLE: {
+            String tableInfo = request.getParameter("tableInfo");
+            out.print(connector.createTable(tableName, tableInfo));
+            break;
+        }
     }
 
 %><%!
