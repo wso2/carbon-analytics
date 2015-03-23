@@ -18,6 +18,19 @@
  */
 package org.wso2.carbon.analytics.datasource.rdbms;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
+import org.wso2.carbon.analytics.datasource.core.fs.ChunkedDataInput;
+import org.wso2.carbon.analytics.datasource.core.fs.ChunkedDataOutput;
+import org.wso2.carbon.analytics.datasource.core.fs.ChunkedStream;
+import org.wso2.carbon.analytics.datasource.core.fs.ChunkedStream.DataChunk;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,20 +44,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
-import org.wso2.carbon.analytics.datasource.core.fs.ChunkedDataInput;
-import org.wso2.carbon.analytics.datasource.core.fs.ChunkedDataOutput;
-import org.wso2.carbon.analytics.datasource.core.fs.ChunkedStream;
-import org.wso2.carbon.analytics.datasource.core.fs.ChunkedStream.DataChunk;
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 /**
  * RDBMS {@link AnalyticsFileSystem} implementation.

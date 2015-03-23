@@ -18,13 +18,10 @@
  */
 package org.wso2.carbon.analytics.dataservice;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.lucene.analysis.Analyzer;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsScore;
+import org.wso2.carbon.analytics.dataservice.commons.DrillDownResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
@@ -39,6 +36,12 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotA
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutException;
 import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The implementation of {@link AnalyticsDataService}.
@@ -203,6 +206,13 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     public int searchCount(int tenantId, String tableName, String language, 
             String query) throws AnalyticsIndexException {
         return this.getIndexer().searchCount(tenantId, tableName, language, query);
+    }
+
+    @Override
+    public Map<String, DrillDownResultEntry> drillDown(int tenantId, String tableName,
+                                                       AnalyticsDrillDownRequest drillDownRequest,
+                                                       AnalyticsScore score) {
+        return null;
     }
 
     @Override

@@ -277,7 +277,7 @@ public class Utils {
 
     /**
      * Create a Analytics schema from a bean class
-     * @param analyticsSchemaBean bean table schema to be convereted to Analytics Schema.
+     * @param analyticsSchemaBean bean table schema to be converted to Analytics Schema.
      * @return Analytics schema
      */
     public static AnalyticsSchema createAnalyticsSchema(AnalyticsSchemaBean analyticsSchemaBean) {

@@ -18,19 +18,19 @@
  */
 package org.wso2.carbon.analytics.dataservice;
 
-import java.util.Map;
-
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.NumericRangeQuery;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.util.BytesRefBuilder;
 import org.apache.lucene.util.NumericUtils;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.index.Term;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsDataIndexer;
+
+import java.util.Map;
 
 /**
  * This represents a custom {@link QueryParser} implementation, with index data type awareness,

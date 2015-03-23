@@ -51,7 +51,6 @@ import org.apache.lucene.util.Version;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceImpl;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDirectory;
-import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.AnalyticsQueryParser;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterException;
@@ -59,11 +58,12 @@ import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutException;
-import org.wso2.carbon.analytics.dataservice.indexing.facets.models.AnalyticsFacetField;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataCorruptionException;
 import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
@@ -799,17 +799,17 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         if (obj == null) return;
         switch (type) {
             case FACET:
-                if (obj instanceof AnalyticsFacetField) {
+                if (obj instanceof AnalyticsCategoryPath) {
 
                     FacetsConfig facetsConfig = new FacetsConfig();
-                    AnalyticsFacetField analyticsFacetField = (AnalyticsFacetField) obj;
+                    AnalyticsCategoryPath analyticsCategoryPath = (AnalyticsCategoryPath) obj;
                     //the field name for dimensions will be "$ + {name}"
                     facetsConfig.setIndexFieldName(name, new StringBuilder("$").append(name).toString());
                     facetsConfig.setMultiValued(name, true);
                     facetsConfig.setHierarchical(name, true);
-                    doc.add(new FloatAssociationFacetField(analyticsFacetField.getWeight(),
+                    doc.add(new FloatAssociationFacetField(analyticsCategoryPath.getWeight(),
                                                            name,
-                                                           analyticsFacetField.getPath()));
+                                                           analyticsCategoryPath.getPath()));
                     try {
                         doc = facetsConfig.build(taxonomyWriter, doc);
                     } catch (IOException e) {
@@ -831,7 +831,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         for (Map.Entry<String, IndexType> entry : columns.entrySet()) {
             name = entry.getKey();
             this.checkAndAddDocEntry(doc, entry.getValue(), name, record.getValue(name));
-            this.checkAndAddTaxonomyDocEntries(doc, entry.getValue(),name, record.getValue(name),
+            this.checkAndAddTaxonomyDocEntries(doc, entry.getValue(), name, record.getValue(name),
                                                taxonomyWriter);
         }
         return doc;

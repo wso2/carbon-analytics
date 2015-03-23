@@ -19,6 +19,7 @@
 package org.wso2.carbon.analytics.datasource.core.util;
 
 import org.apache.commons.collections.IteratorUtils;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -54,6 +55,8 @@ public class GenericUtils {
     private static final byte DATA_TYPE_BOOLEAN = 0x06;
 
     private static final byte DATA_TYPE_BINARY = 0x07;
+
+    private static final byte DATA_TYPE_CATEGORY = 0x10;
 
     private static final String DEFAULT_CHARSET = "UTF8";
 
@@ -146,6 +149,14 @@ public class GenericUtils {
                 binData = (byte[]) value;
                 buffer.putInt(binData.length);
                 buffer.put(binData);
+            }else if (value instanceof AnalyticsCategoryPath) {
+                buffer.putInt(DATA_TYPE_CATEGORY);
+                AnalyticsCategoryPath analyticsCategoryPath = (AnalyticsCategoryPath) value;
+                buffer.putFloat(analyticsCategoryPath.getWeight());
+                buffer.putInt(AnalyticsCategoryPath.getCombinedPath(analyticsCategoryPath.getPath())
+                                      .getBytes().length);
+                buffer.put(AnalyticsCategoryPath.getCombinedPath(analyticsCategoryPath.getPath())
+                                   .getBytes(DEFAULT_CHARSET));
             } else if (value == null) {
                 buffer.put(DATA_TYPE_NULL);
             } else {
@@ -162,28 +173,38 @@ public class GenericUtils {
         int count = 0;
          /* column name length value + data type (including null) */
         count += Integer.SIZE / 8 + 1;
+        try {
             /* column name */
-        count += name.getBytes().length;
-        if (value instanceof String) {
+            count += name.getBytes(DEFAULT_CHARSET).length;
+            if (value instanceof String) {
                 /* string length + value */
-            count += Integer.SIZE / 8;
-            count += ((String) value).getBytes().length;
-        } else if (value instanceof Long) {
-            count += Long.SIZE / 8;
-        } else if (value instanceof Double) {
-            count += Double.SIZE / 8;
-        } else if (value instanceof Boolean) {
-            count += Byte.SIZE / 8;
-        } else if (value instanceof Integer) {
-            count += Integer.SIZE / 8;
-        } else if (value instanceof Float) {
-            count += Float.SIZE / 8;
-        } else if (value instanceof byte[]) {
-            count += Integer.SIZE / 8;
-            count += ((byte[]) value).length;
-        } else if (value != null) {
-            throw new AnalyticsException("Invalid column value type in calculating column "
-                    + "values length: " + value.getClass());
+                count += Integer.SIZE / 8;
+                count += ((String) value).getBytes(DEFAULT_CHARSET).length;
+            } else if (value instanceof Long) {
+                count += Long.SIZE / 8;
+            } else if (value instanceof Double) {
+                count += Double.SIZE / 8;
+            } else if (value instanceof Boolean) {
+                count += Byte.SIZE / 8;
+            } else if (value instanceof Integer) {
+                count += Integer.SIZE / 8;
+            } else if (value instanceof Float) {
+                count += Float.SIZE / 8;
+            } else if (value instanceof byte[]) {
+                count += Integer.SIZE / 8;
+                count += ((byte[]) value).length;
+            } else if (value instanceof AnalyticsCategoryPath) {
+                count += Float.SIZE / 8;
+                count += Integer.SIZE / 8;
+                AnalyticsCategoryPath analyticsCategoryPath = (AnalyticsCategoryPath) value;
+                count += AnalyticsCategoryPath.getCombinedPath(analyticsCategoryPath.getPath())
+                        .getBytes(DEFAULT_CHARSET).length;
+            } else if (value != null) {
+                throw new AnalyticsException("Invalid column value type in calculating column "
+                                             + "values length: " + value.getClass());
+            }
+        } catch (UnsupportedEncodingException e) {
+            throw new AnalyticsException("Default CharSet : " + DEFAULT_CHARSET + " is not supported");
         }
         return count;
     }
@@ -241,6 +262,14 @@ public class GenericUtils {
                         buffer.get(binData);
                         value = binData;
                         break;
+                    case DATA_TYPE_CATEGORY:
+                        float weight = buffer.getFloat();
+                        size = buffer.getInt();
+                        buff = new byte[size];
+                        buffer.get(buff, 0, size);
+                        value = new String(buff, DEFAULT_CHARSET);
+                        value = new AnalyticsCategoryPath(weight, AnalyticsCategoryPath
+                                .getPathAsArray((String) value));
                     case DATA_TYPE_NULL:
                         value = null;
                         break;

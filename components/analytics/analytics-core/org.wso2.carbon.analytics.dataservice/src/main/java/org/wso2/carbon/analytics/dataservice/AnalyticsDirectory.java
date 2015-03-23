@@ -18,12 +18,6 @@
  */
 package org.wso2.carbon.analytics.dataservice;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.IOContext;
 import org.apache.lucene.store.IndexInput;
@@ -35,6 +29,12 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem.DataInput;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * This represents a Lucene {@link Directory} implementation using Carbon Analytics {@link AnalyticsFileSystem}.

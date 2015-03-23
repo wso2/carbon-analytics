@@ -50,7 +50,6 @@
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-regex</artifactId>
         </dependency>
-        </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-expressions</artifactId>
