@@ -31,7 +31,7 @@ import java.util.Map;
 /**
  * This interface represents all the analytic record related operations.
  */
-public interface AnalyticsRecordStore {
+public interface AnalyticsRecordStore extends AnalyticsRecordReader {
 
     /**
      * This method initializes the AnalyticsRecordStore implementation, and is called once before any other method.
@@ -167,14 +167,6 @@ public interface AnalyticsRecordStore {
      */
     RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, 
             List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException;
-    
-    /**
-     * Reads in the records from a given record group, the records will be streamed in.
-     * @param recordGroup The record group which represents the local data set
-     * @return An iterator of type {@link Record} in the local record group
-     * @throws AnalyticsException
-     */
-    Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException;
 
     /**
      * Deletes a set of records in the table.

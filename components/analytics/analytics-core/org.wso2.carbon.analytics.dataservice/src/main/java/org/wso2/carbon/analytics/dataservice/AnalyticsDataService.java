@@ -27,6 +27,7 @@ import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutException;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordReader;
 
 import java.util.Iterator;
 import java.util.List;
@@ -35,7 +36,7 @@ import java.util.Map;
 /**
  * This interface represents the analytics data service operations.
  */
-public interface AnalyticsDataService {
+public interface AnalyticsDataService extends AnalyticsRecordReader {
     
     /**
      * Creates a table, if not already there, where the columns are not defined here, but can contain any arbitrary number
@@ -156,14 +157,6 @@ public interface AnalyticsDataService {
      */
     RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, 
             List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException;
-    
-    /**
-     * Reads in the records from a given record group, the records will be streamed in.
-     * @param recordGroup The record group which represents the local data set
-     * @return An iterator of type {@link Record} in the local record group
-     * @throws AnalyticsException
-     */
-    Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException;
     
     /**
      * Checks whether or not pagination (i.e. jumping to record n and then retrieving k further records)

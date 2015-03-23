@@ -39,6 +39,7 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotA
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutException;
 import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 /**
  * The implementation of {@link AnalyticsDataService}.
@@ -176,8 +177,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     
     private List<String> getRecordIdsFromTimeRange(int tenantId, String tableName, long timeFrom, 
             long timeTo) throws AnalyticsException {
-        List<Record> records = AnalyticsDSUtils.listRecords(this, 
-                this.get(tenantId, tableName, 1, null, timeFrom, timeTo, 0, -1));
+        List<Record> records = GenericUtils.listRecords(this,
+                                                        this.get(tenantId, tableName, 1, null, timeFrom, timeTo, 0, -1));
         List<String> result = new ArrayList<>(records.size());
         for (Record record : records) {
             result.add(record.getId());
