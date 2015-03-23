@@ -1,0 +1,12 @@
+[
+    {
+        "title": "Sales By Year",
+        "group": "Sales",
+        "id": "1"
+    },
+    {
+        "title": "Message Console",
+        "group": "Default",
+        "id": "2"
+    }
+]

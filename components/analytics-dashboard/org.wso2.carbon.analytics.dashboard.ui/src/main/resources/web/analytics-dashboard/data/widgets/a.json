@@ -1,0 +1,23 @@
+{
+    "name": "a",
+    "type": "batch",
+    "datasource": "sales",
+    "columns": [
+        "Year:string",
+        "Sales:float",
+        "Expenses:float"
+    ],
+    "filter": {
+        "language": "lucene",
+        "query": "some lucene query"
+    },
+    "widget": {
+            "id": "a",
+            "title": "Sales By Region",
+            "config": {
+                "chartType": "bar",
+                "xAxis": 0,
+                "yAxis": 1
+            }
+    }
+}

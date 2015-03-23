@@ -1,0 +1,19 @@
+{
+	"id" : "2",
+	"title" : "Some title",
+	"group" : "Some Group",
+	"role" : "admin",
+
+	"widgets" : [
+		{
+            "id": "1.a",
+            "dimensions": {
+                "row": 1,
+                "col": 1,
+                "width": 6,
+                "height": 4
+            }
+        }
+	]
+
+}

@@ -1,0 +1,16 @@
+{
+    "dataview" : "dv1",
+    "data" : [
+    [0,"Books","Colombo","A","3",100],
+    [1,"Pens","Kandy", "B","4",500],
+    [2,"Pencils","Gampaha","C","5", 300],
+    [3, "Papers","Jaffna","D","7", 400],
+    [4, "Highlighter","Galle","E","6",200],
+    [5,"Folders","Colombo","F","8",500],
+    [6,"Clips","Nuwaraeliya","F","9",600],
+    [7,"Puncher","Kurunegala","F","10",550],
+    [8,"Stapeler","Monaragala","F","9",700],
+    [9,"Foo","Ampara","F","11",800],
+    [10,"Bar","Colombo","F","12",900]
+]
+}

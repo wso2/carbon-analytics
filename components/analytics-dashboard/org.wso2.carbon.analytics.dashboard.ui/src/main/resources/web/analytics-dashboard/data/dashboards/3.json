@@ -1,0 +1,11 @@
+{
+	"id" : "2",
+	"title" : "Some title",
+	"group" : "Some Group",
+	"role" : "admin",
+
+	"widgets" : [
+		"d"
+	]
+
+}
