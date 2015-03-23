@@ -18,10 +18,11 @@
  */
 package org.wso2.carbon.analytics.datasource.rdbms;
 
+import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+
 import java.util.List;
 
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
 
 /**
  * RDBMS range based implementation of {@link RecordGroup}.

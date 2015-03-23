@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -16,21 +16,20 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.core;
-
+package org.wso2.carbon.analytics.datasource.commons.exception;
 
 /**
- * This class represents analytics timeout related exceptions.
+ * This class represents analytics related exceptions.
  */
-public class AnalyticsTimeoutException extends AnalyticsException {
+public class AnalyticsException extends Exception {
 
-    private static final long serialVersionUID = -2986526796979584267L;
-
-    public AnalyticsTimeoutException(String msg) {
+    private static final long serialVersionUID = 6750673867599631611L;
+    
+    public AnalyticsException(String msg) {
         super(msg);
     }
     
-    public AnalyticsTimeoutException(String msg, Throwable cause) {
+    public AnalyticsException(String msg, Throwable cause) {
         super(msg, cause);
     }
 

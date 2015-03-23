@@ -18,9 +18,10 @@
  */
 package org.wso2.carbon.analytics.datasource.core.rs;
 
+import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
+
 import java.util.List;
 
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 
 /**
  * {@link RecordGroup} implementation for direct analytics data source.
@@ -70,7 +71,7 @@ public class DirectRecordGroup implements RecordGroup {
     }
     
     @Override
-    public String[] getLocations() throws AnalyticsException {
+    public String[] getLocations(){
         return new String[] { LOCALHOST };
     }
 

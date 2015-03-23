@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.core.rs;
+package org.wso2.carbon.analytics.datasource.commons;
 
 import java.io.Serializable;
 import java.util.Iterator;
@@ -24,7 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * This class represents a data record in {@link AnalyticsDataSource}. A record's equality is measured
+ * This class represents a data record in AnalyticsDataSource. A record's equality is measured
  * by the non-null column name/values that it has, the null column values are ignored.
  */
 public class Record implements Serializable {

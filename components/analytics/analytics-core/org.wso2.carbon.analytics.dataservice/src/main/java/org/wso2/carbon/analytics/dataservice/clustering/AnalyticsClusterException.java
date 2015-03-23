@@ -18,7 +18,7 @@
  */
 package org.wso2.carbon.analytics.dataservice.clustering;
 
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
 /**
  * This represents analytics clustering related exceptions.

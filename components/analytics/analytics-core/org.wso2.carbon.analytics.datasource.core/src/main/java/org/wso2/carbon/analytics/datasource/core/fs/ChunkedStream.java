@@ -64,7 +64,7 @@ public abstract class ChunkedStream {
     
     /**
      * Writes the given data chunks target stream.
-     * @param data The chunk data
+     * @param chunks The List of chunk data
      * @throws IOException
      */
     public abstract void writeChunks(List<DataChunk> chunks) throws IOException;

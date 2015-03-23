@@ -21,14 +21,16 @@ package org.wso2.carbon.analytics.datasource.core.rs;
 import java.util.Iterator;
 import java.util.List;
 
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
 /**
  * Analytics record source implementation without data locality semantics. 
  */
 public abstract class DirectAnalyticsRecordStore implements AnalyticsRecordStore {
     
-    public RecordGroup[] get(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo, int recordsFrom, 
+    public RecordGroup[] get(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo, int recordsFrom,
             int recordsCount) throws AnalyticsException {
         return new DirectRecordGroup[] { new DirectRecordGroup(tenantId, tableName, columns, timeFrom, timeTo, recordsFrom, recordsCount) };
     }

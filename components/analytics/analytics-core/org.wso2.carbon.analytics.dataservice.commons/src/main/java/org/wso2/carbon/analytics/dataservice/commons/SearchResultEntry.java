@@ -16,10 +16,10 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.dataservice.indexing;
+package org.wso2.carbon.analytics.dataservice.commons;
 
 /**
- * This represents a search result entry from {@link AnalyticsDataIndexer}.
+ * This represents a search result entry from Indexer.
  */
 public class SearchResultEntry implements Comparable<SearchResultEntry> {
     

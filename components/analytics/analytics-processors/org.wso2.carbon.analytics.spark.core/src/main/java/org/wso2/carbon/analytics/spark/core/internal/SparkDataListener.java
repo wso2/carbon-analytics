@@ -33,7 +33,10 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -43,36 +46,46 @@ import java.util.concurrent.Executors;
 public class SparkDataListener implements Runnable {
 
     private static final String DIR_RELATIVE_PATH = "repository/data/spark-data";
+    
     private static final Log log = LogFactory.getLog(SparkDataListener.class);
+    
+    private ExecutorService executor = Executors.newCachedThreadPool();
+    
+    private Set<String> appIds = new HashSet<String>();
 
     @Override
     public void run() {
-
         String destFolderPath = CarbonUtils.getCarbonHome() + "/" + DIR_RELATIVE_PATH;
         if (! new File(destFolderPath).exists()) new File(destFolderPath).mkdirs();
         Path dir = Paths.get(destFolderPath);
-
         try {
             WatchService watcher = FileSystems.getDefault().newWatchService();
-            dir.register(watcher, StandardWatchEventKinds.ENTRY_CREATE
-                    , StandardWatchEventKinds.ENTRY_MODIFY);
-            for (; ; ) {
+            dir.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY);
+            while (true) {
                 WatchKey watckKey = watcher.take();
                 List<WatchEvent<?>> events = watckKey.pollEvents();
                 for (WatchEvent<?> event : events) {
                     if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
                         String fileName = event.context().toString();
                         final String[] argArray = getArgArray(Paths.get(destFolderPath, fileName));
-                        log.info("Created file : " + fileName);
-
-                        for (String str : argArray) {
-                            System.out.println(str);
+                        if (argArray.length == 0) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Empty param Spark executor execution");
+                            }
+                            continue;
                         }
-                        if (new File(destFolderPath+"/"+fileName).delete()){
-                            log.info("Deleted file : " + fileName);
+                        String appId = argArray[4];
+                        if (this.appIds.contains(appId)) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Spark executor already available for app id: " + appId);
+                            }
+                            continue;
+                        } else {
+                            this.appIds.add(appId);
                         }
-                        ExecutorService executor = Executors.newCachedThreadPool();
-                        executor.execute(new SparkBackendExecutor(argArray));
+                        new File(destFolderPath + File.separator + fileName).delete();
+                        log.info("Starting a Spark executor: " + Arrays.toString(argArray));
+                        this.executor.execute(new SparkBackendExecutor(argArray));
                     }
                 }
                 boolean valid = watckKey.reset();
@@ -81,7 +94,7 @@ public class SparkDataListener implements Runnable {
                 }
             }
         } catch (Exception e) {
-            log.error(e.toString());
+            log.error("Error in SparkDataListener: " + e.toString(), e);
         }
     }
 

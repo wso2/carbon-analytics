@@ -16,20 +16,23 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.dataservice.indexing;
+package org.wso2.carbon.analytics.datasource.commons;
+
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+
+import java.io.Serializable;
+
 
 /**
- * Index type definitions.
+ * This interface represents a record group, which represents the availability set of records local to a common environment. 
  */
-public enum IndexType {
-
-    STRING,
-    INTEGER,
-    LONG,
-    FLOAT,
-    DOUBLE,
-    BOOLEAN,
-    FACET,
-    SCOREPARAM
-
+public interface RecordGroup extends Serializable {
+    
+    /**
+     * Returns all the locations this record group is situation at.
+     * @return The list of hosts
+     * @throws AnalyticsException
+     */
+    String[] getLocations() throws AnalyticsException;
+    
 }

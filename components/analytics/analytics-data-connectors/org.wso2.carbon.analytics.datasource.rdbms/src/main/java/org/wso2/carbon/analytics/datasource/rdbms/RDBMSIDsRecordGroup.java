@@ -18,10 +18,10 @@
  */
 package org.wso2.carbon.analytics.datasource.rdbms;
 
-import java.util.List;
+import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
+import java.util.List;
 
 /**
  * RDBMS {@link RecordGroup} implementation with given record ids.

@@ -18,6 +18,8 @@
  */
 package org.wso2.carbon.analytics.datasource.core;
 
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+
 /**
  * This exception represents an analytics data, data corruption scenario.
  */

@@ -23,7 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.restapi.Constants;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.ResponseBean;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsTimeoutException;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutException;
 
 /**
  * The Class AnalyticsExceptionMapper triggers when AnalyticsTimeoutException occurred.
