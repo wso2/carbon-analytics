@@ -35,7 +35,7 @@
         <module>org.wso2.carbon.analytics.message.tracer.filter</module>
         <module>org.wso2.carbon.analytics.message.tracer.handler</module>
         <module>org.wso2.carbon.analytics.message.tracer.handler.ui</module>
-        <module>org.wso2.carbon.analytics.log.agent</module>
+        <!--module>org.wso2.carbon.analytics.log.agent</module-->
   </modules>
 
 </project>
