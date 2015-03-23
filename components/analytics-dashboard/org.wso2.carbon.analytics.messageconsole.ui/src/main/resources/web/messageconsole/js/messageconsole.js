@@ -32,7 +32,7 @@ function createMainJTable(fields) {
                                          });
     $('#AnalyticsTableContainer').jtable('load');
     $("#DeleteAllButton").show();
-    $('#DeleteAllButton').button().click(function () {
+    $("#DeleteAllButton").on("click", function () {
         var $selectedRows = $('#AnalyticsTableContainer').jtable('selectedRows');
         $('#AnalyticsTableContainer').jtable('deleteRows', $selectedRows);
     });
@@ -75,7 +75,7 @@ function getArbitraryFields(rowData) {
                                                      arbitraryColumnName = data.record.Name;
                                                  },
                                                  rowsRemoved: function (event, data) {
-                                                     arbitraryColumnName ="";
+                                                     arbitraryColumnName = "";
                                                  },
                                                  fields: {
                                                      bam_unique_rec_id: {
@@ -92,7 +92,7 @@ function getArbitraryFields(rowData) {
                                                      },
                                                      Type: {
                                                          title: 'Type',
-                                                         options: ["String", "Integer", "LOng", "Boolean", "Float", "Double"]
+                                                         options: ["String", "Integer", "Long", "Boolean", "Float", "Double"]
                                                      }
                                                  }
                                              }, function (data) { //opened handler
@@ -315,4 +315,41 @@ function deleteRecords(postData) {
 
 function deleteActionMethod(postData) {
     return deleteRecords(postData);
+}
+
+function createTable() {
+    var tableName = document.getElementById('tableName').value;
+    var jsonObj = [];
+    var table = document.getElementById('column-details');
+    for (var r = 1, n = table.rows.length; r < n; r++) {
+        var item = {};
+        for (var c = 0, m = table.rows[r].cells.length; c < m; c++) {
+            if (c == 0) {
+                item ["column"] = table.rows[r].cells[c].childNodes[0].value;
+            } else if (c == 1) {
+                item ["type"] = table.rows[r].cells[c].childNodes[0].value;
+            } else if (c == 2) {
+                item ["primary"] = table.rows[r].cells[c].childNodes[0].checked;
+            } else if (c == 3) {
+                item ["index"] = table.rows[r].cells[c].childNodes[0].checked;
+            }
+        }
+        jsonObj.push(item);
+    }
+    var values = {};
+    values.tableInfo = JSON.stringify(jsonObj);
+    $.ajax({
+               type: 'POST',
+               url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' +
+                    typeCreateTable + "&tableName=" + tableName,
+               data: values,
+               success: function (data) {
+                   console.log(data);
+                   $("#").html(data);
+               },
+               error: function (data) {
+               }
+           });
+
+    return false;
 }

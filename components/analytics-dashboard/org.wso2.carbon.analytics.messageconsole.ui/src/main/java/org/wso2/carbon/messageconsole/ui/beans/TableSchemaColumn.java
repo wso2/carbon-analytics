@@ -1,4 +1,4 @@
-package org.wso2.carbon.analytics.messageconsole.beans;
+package org.wso2.carbon.messageconsole.ui.beans;
 
 /*
 * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -18,35 +18,22 @@ package org.wso2.carbon.analytics.messageconsole.beans;
 * under the License.
 */
 
-import java.io.Serializable;
+public class TableSchemaColumn {
 
-public class ColumnBean implements Serializable {
+    String column;
+    String type;
+    boolean primary;
+    boolean index;
 
-    private static final long serialVersionUID = -7172735025380310413L;
-
-    private String name;
-    private String type;
-    private boolean primary = false;
-    private boolean display = true;
-    private boolean index = false;
-
-    public ColumnBean() {
+    public TableSchemaColumn() {
     }
 
-    public boolean isDisplay() {
-        return display;
+    public String getColumn() {
+        return column;
     }
 
-    public void setDisplay(boolean display) {
-        this.display = display;
-    }
-
-    public boolean isPrimary() {
-        return primary;
-    }
-
-    public void setPrimary(boolean primary) {
-        this.primary = primary;
+    public void setColumn(String column) {
+        this.column = column;
     }
 
     public String getType() {
@@ -57,12 +44,12 @@ public class ColumnBean implements Serializable {
         this.type = type;
     }
 
-    public String getName() {
-        return name;
+    public boolean isPrimary() {
+        return primary;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setPrimary(boolean primary) {
+        this.primary = primary;
     }
 
     public boolean isIndex() {

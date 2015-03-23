@@ -22,7 +22,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDSUtils;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
@@ -383,6 +385,10 @@ public class MessageConsoleService {
                         convertedValue = Integer.valueOf(value);
                         break;
                     }
+                    case "Long": {
+                        convertedValue = Integer.valueOf(value);
+                        break;
+                    }
                     case "Boolean": {
                         convertedValue = Boolean.valueOf(value);
                         break;
@@ -410,6 +416,84 @@ public class MessageConsoleService {
         } catch (AnalyticsException e) {
             logger.error("Unable to update arbitrary field[" + fieldName + "] for id [" + recordId + "] from table :" + table, e);
             throw new MessageConsoleException("Unable to update arbitrary field[" + fieldName + "] for id [" + recordId + "] from table :" + table, e);
+        }
+    }
+
+    public void createTable(TableBean tableInfo) throws MessageConsoleException {
+
+        int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+
+        try {
+            analyticsDataService.createTable(tenantId, tableInfo.getName());
+        } catch (AnalyticsException e) {
+            logger.error("Unable to create table: " + e.getMessage(), e);
+            throw new MessageConsoleException("Unable to create table: " + e.getMessage(), e);
+        }
+
+        List<String> primaryKeys = new ArrayList<>();
+        Map<String, AnalyticsSchema.ColumnType> columns = new HashMap<>();
+        Map<String, IndexType> indexColumns = new HashMap<>();
+        for (ColumnBean column : tableInfo.getColumns()) {
+            if (column.isPrimary()) {
+                primaryKeys.add(column.getName());
+            }
+            if (column.isIndex()) {
+                indexColumns.put(column.getName(), createIndexType(column.getType()));
+            }
+            columns.put(column.getName(), getColumnType(column.getType()));
+        }
+
+        AnalyticsSchema schema = new AnalyticsSchema(columns, primaryKeys);
+        try {
+            analyticsDataService.setTableSchema(tenantId, tableInfo.getName(), schema);
+        } catch (AnalyticsException e) {
+            logger.error("Unable to save table schema information: " + e.getMessage(), e);
+            throw new MessageConsoleException("Unable to save table schema information: " + e.getMessage(), e);
+        }
+
+        try {
+            analyticsDataService.setIndices(tenantId, tableInfo.getName(), indexColumns);
+        } catch (AnalyticsIndexException e) {
+            logger.error("Unable to save table index information: " + e.getMessage(), e);
+            throw new MessageConsoleException("Unable to save table index information: " + e.getMessage(), e);
+        }
+    }
+
+    private AnalyticsSchema.ColumnType getColumnType(String columnType) {
+        switch (columnType) {
+            case "String":
+                return AnalyticsSchema.ColumnType.STRING;
+            case "Integer":
+                return AnalyticsSchema.ColumnType.INT;
+            case "Long":
+                return AnalyticsSchema.ColumnType.LONG;
+            case "Float":
+                return AnalyticsSchema.ColumnType.FLOAT;
+            case "Double":
+                return AnalyticsSchema.ColumnType.DOUBLE;
+            case "Boolean":
+                return AnalyticsSchema.ColumnType.BOOLEAN;
+            default:
+                return AnalyticsSchema.ColumnType.STRING;
+        }
+    }
+
+    private IndexType createIndexType(String indexType) {
+        switch (indexType) {
+            case "Boolean":
+                return IndexType.BOOLEAN;
+            case "Float":
+                return IndexType.FLOAT;
+            case "Double":
+                return IndexType.DOUBLE;
+            case "Integer":
+                return IndexType.INTEGER;
+            case "Long":
+                return IndexType.LONG;
+            case "String":
+                return IndexType.STRING;
+            default:
+                return IndexType.STRING;
         }
     }
 }
