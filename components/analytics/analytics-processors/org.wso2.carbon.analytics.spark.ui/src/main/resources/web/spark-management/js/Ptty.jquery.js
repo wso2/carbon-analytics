@@ -66,8 +66,8 @@
             height: '100%',
 
             // Message to be shown when the terminal is first 
-            welcome: '<strong>Welcome to interactive Spark SQL shell</strong><br>' +
-                     '<p>This interactive shell lets you execute Spark SQL commands against a local Spark cluster</p>' +
+            welcome: '<strong>Welcome to interactive analytics SQL shell</strong><br>' +
+                     '<p>This interactive shell lets you execute Spark SQL commands against a Spark cluster</p>' +
                      '<strong>Initializing Spark client...</strong>',
 
             // The password placeholder symbol

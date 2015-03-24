@@ -22,7 +22,7 @@ import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.junit.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.InMemoryICFactory;
 
@@ -47,15 +47,17 @@ public class HBaseAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
         return ConnectionFactory.createConnection(config);
     }
 
-    private HBaseAnalyticsConfigurationEntry createConfig(){
+    private HBaseAnalyticsConfigurationEntry createConfig() {
         HBaseAnalyticsConfigurationEntry entry = new HBaseAnalyticsConfigurationEntry();
-        entry.setBatchSize(20);
+        entry.setBatchSize(50);
         return entry;
     }
 
     @AfterClass
     public void destroy() throws IOException {
-        this.store.close();
+        if (this.store != null) {
+            this.store.close();
+        }
     }
 
     public HBaseAnalyticsRecordStore getStore() {

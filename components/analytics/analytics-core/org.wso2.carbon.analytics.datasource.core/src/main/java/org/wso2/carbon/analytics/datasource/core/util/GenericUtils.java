@@ -23,6 +23,7 @@ import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordReader;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 
 import java.io.Closeable;
@@ -287,7 +288,7 @@ public class GenericUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static List<Record> listRecords(AnalyticsRecordStore rs,
+    public static List<Record> listRecords(AnalyticsRecordReader rs,
                                            RecordGroup[] rgs) throws AnalyticsException {
         List<Record> result = new ArrayList<Record>();
         for (RecordGroup rg : rgs) {

@@ -18,10 +18,12 @@
 package org.wso2.carbon.analytics.datasource.hbase;
 
 import org.apache.hadoop.hbase.Cell;
+import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.rs.Record;
+import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseAnalyticsDSConstants;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseRuntimeException;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseUtils;
@@ -39,6 +41,7 @@ public class HBaseRegionSplitIterator implements Iterator<Record> {
     private Table table;
     private Iterator<Result> resultIterator;
 
+    Set<String> colSet = null;
 
     public HBaseRegionSplitIterator(int tenantId, String tableName, List<String> columns, Connection conn,
                                     byte[] startRow, byte[] endRow) throws AnalyticsException {
@@ -56,13 +59,11 @@ public class HBaseRegionSplitIterator implements Iterator<Record> {
         Scan splitScan = new Scan();
         splitScan.setStartRow(this.startRow);
         splitScan.setStopRow(this.endRow);
-        if (columns != null) {
-            for (String column : columns) {
-                if (column != null && !(column.isEmpty())) {
-                    splitScan.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                            HBaseUtils.generateColumnQualifier(column));
-                }
-            }
+
+        if (columns != null && columns.size() > 0) {
+            this.colSet = new HashSet<>(columns);
+            splitScan.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                    HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME);
         } else {
             splitScan.addFamily(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME);
         }
@@ -87,20 +88,8 @@ public class HBaseRegionSplitIterator implements Iterator<Record> {
                 Result currentResult = this.resultIterator.next();
                 Cell[] cells = currentResult.rawCells();
                 byte[] rowId = currentResult.getRow();
-                Map<String, Object> values;
-                long timestamp;
-                if (cells.length > 0) {
-                    values = HBaseUtils.decodeElementValue(cells);
-                    timestamp = cells[0].getTimestamp();
-                    values.remove(HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
-                } else {
-                    Get get = new Get(rowId);
-                    get.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_META_COLUMN_FAMILY_NAME,
-                            HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
-                    Result timestampResult = this.table.get(get);
-                    timestamp = HBaseUtils.decodeLong(timestampResult.value());
-                    values = new HashMap<>();
-                }
+                Map<String, Object> values = GenericUtils.decodeRecordValues(CellUtil.cloneValue(cells[0]), colSet);
+                long timestamp = cells[0].getTimestamp();
                 return new Record(new String(rowId), this.tenantId, this.tableName, values, timestamp);
             } catch (Exception e) {
                 this.cleanup();

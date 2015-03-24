@@ -17,8 +17,8 @@
 */
 package org.wso2.carbon.analytics.datasource.hbase.rg;
 
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
+import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
 import java.util.List;
 

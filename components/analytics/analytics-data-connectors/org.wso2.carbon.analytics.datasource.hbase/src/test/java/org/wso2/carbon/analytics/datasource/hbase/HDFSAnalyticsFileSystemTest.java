@@ -21,10 +21,10 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystemTest;
 import org.wso2.carbon.analytics.datasource.core.InMemoryICFactory;
+import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
 
 import javax.naming.Context;
 import javax.naming.NamingException;
@@ -38,7 +38,7 @@ public class HDFSAnalyticsFileSystemTest extends AnalyticsFileSystemTest {
     public void setup() throws IOException, NamingException, AnalyticsException {
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, InMemoryICFactory.class.getName());
         this.afs = new HDFSAnalyticsFileSystem(this.initFS("hdfs", "localhost", "9000"));
-        super.init("HBaseDataSource", afs);
+        super.init("HDFSAnalyticsFileSystem", afs);
     }
 
     private FileSystem initFS(String protocol, String host, String port) throws IOException, NamingException {
@@ -53,7 +53,9 @@ public class HDFSAnalyticsFileSystemTest extends AnalyticsFileSystemTest {
 
     @AfterClass
     public void destroy() throws IOException {
-        this.afs.close();
+        if (this.afs != null) {
+            this.afs.close();
+        }
     }
 
 }

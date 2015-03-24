@@ -323,7 +323,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             int numPartitionsHint, int recordsFrom, int recordsCount) throws AnalyticsException, 
             AnalyticsTableNotAvailableException {
         List<Integer[]> result = new ArrayList<Integer[]>();
-        int recordsCountAll = (int) this.getRecordCount(tenantId, tableName);
+        int recordsCountAll = (int) this.getRecordCount(tenantId, tableName, Long.MIN_VALUE, Long.MAX_VALUE);
         if (recordsCount == -1) {
             recordsCount = recordsCountAll;
         } else if (recordsCount > recordsCountAll) {
@@ -797,16 +797,18 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     }
     
     @Override
-    public long getRecordCount(int tenantId, String tableName) 
+    public long getRecordCount(int tenantId, String tableName, long timeFrom, long timeTo) 
             throws AnalyticsException, AnalyticsTableNotAvailableException {
         String recordCountQuery = this.getRecordCountQuery(tenantId, tableName);
         Connection conn = null;
-        Statement stmt = null;
+        PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             conn = this.getConnection();
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(recordCountQuery);
+            stmt = conn.prepareStatement(recordCountQuery);
+            stmt.setLong(1, timeFrom);
+            stmt.setLong(2, timeTo);
+            rs = stmt.executeQuery();
             if (rs.next()) {
                 return rs.getLong(1);
             } else {

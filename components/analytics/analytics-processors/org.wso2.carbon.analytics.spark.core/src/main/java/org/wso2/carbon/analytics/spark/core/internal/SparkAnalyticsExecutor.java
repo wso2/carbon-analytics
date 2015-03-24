@@ -28,7 +28,6 @@ import org.apache.spark.sql.api.java.JavaSQLContext;
 import org.apache.spark.sql.api.java.JavaSchemaRDD;
 import org.apache.spark.sql.api.java.Row;
 import org.apache.spark.sql.api.java.StructField;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDSUtils;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterException;
@@ -37,6 +36,7 @@ import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionCall;
 import org.wso2.carbon.analytics.spark.core.internal.SparkDataListener;
 
@@ -420,7 +420,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         AnalyticsDataService ads = ServiceHolder.getAnalyticsDataService();
         List<String> ids = new ArrayList<String>(1);
         ids.add(generateTableKeysId(tenantId, tableName));
-        List<Record> records = AnalyticsDSUtils.listRecords(ads, ads.get(
+        List<Record> records = GenericUtils.listRecords(ads, ads.get(
                 AnalyticsConstants.TABLE_INFO_TENANT_ID,
                 AnalyticsConstants.TABLE_INFO_TABLE_NAME, 1, null, ids));
         if (records.size() == 0) {

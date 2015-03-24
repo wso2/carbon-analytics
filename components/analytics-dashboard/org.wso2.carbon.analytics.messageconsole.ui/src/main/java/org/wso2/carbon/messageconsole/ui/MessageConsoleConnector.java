@@ -27,7 +27,6 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.messageconsole.stub.MessageConsoleMessageConsoleExceptionException;
 import org.wso2.carbon.analytics.messageconsole.stub.MessageConsoleStub;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.ColumnBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.EntityBean;
@@ -48,7 +47,6 @@ import org.wso2.carbon.messageconsole.ui.serializers.ResponseRecordSerializer;
 import org.wso2.carbon.messageconsole.ui.serializers.ResponseResultSerializer;
 
 import java.lang.reflect.Type;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

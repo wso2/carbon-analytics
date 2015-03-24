@@ -19,7 +19,6 @@ package org.wso2.carbon.analytics.dataservice.restapi.resources;
 import com.google.gson.Gson;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDSUtils;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
@@ -34,6 +33,7 @@ import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -290,7 +290,7 @@ public class AnalyticsResource extends AbstractResource {
 			             tenantId);
 		}
 		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
-		long recordCount = analyticsDataService.getRecordCount(tenantId, tableName);
+		long recordCount = analyticsDataService.getRecordCount(tenantId, tableName, Long.MIN_VALUE, Long.MAX_VALUE);
 		if (logger.isDebugEnabled()) {
 			logger.debug("RecordCount for tableName: " + tableName + " is " + recordCount);
 		}
@@ -559,8 +559,8 @@ public class AnalyticsResource extends AbstractResource {
 		                                                                    queryBean.getCount());
 		List<String> ids = Utils.getRecordIds(searchResults);
 		RecordGroup[] recordGroups = analyticsDataService.get(-1234, queryBean.getTableName(), 1, null, ids);
-		List<RecordBean> recordBeans = Utils.createRecordBeans(AnalyticsDSUtils.listRecords(analyticsDataService,
-		                                                                                    recordGroups));
+		List<RecordBean> recordBeans = Utils.createRecordBeans(GenericUtils.listRecords(analyticsDataService,
+                                                                                        recordGroups));
 		if (logger.isDebugEnabled()) {
 			for (RecordBean recordBean : recordBeans) {
 				logger.debug("Search Result -- Record Id: " + recordBean.getId() + " values :" +

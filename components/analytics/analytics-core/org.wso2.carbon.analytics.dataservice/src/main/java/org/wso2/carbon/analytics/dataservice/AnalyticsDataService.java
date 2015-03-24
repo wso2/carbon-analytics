@@ -29,6 +29,7 @@ import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutException;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordReader;
 
 import java.util.Iterator;
 import java.util.List;
@@ -37,7 +38,7 @@ import java.util.Map;
 /**
  * This interface represents the analytics data service operations.
  */
-public interface AnalyticsDataService {
+public interface AnalyticsDataService extends AnalyticsRecordReader {
     
     /**
      * Creates a table, if not already there, where the columns are not defined here, but can contain any arbitrary number
@@ -101,11 +102,17 @@ public interface AnalyticsDataService {
      * Returns the number of records in the table with the given category and name.
      * @param tenantId The tenant which this table belongs to
      * @param tableName The name of the table to get the count from
+     * @param timeFrom The starting time to consider the count from, inclusive, relatively to epoch,
+     * Long.MIN_VALUE should signal, this restriction to be disregarded
+     * @param timeTo The ending time to consider the count to, non-inclusive, relatively to epoch,
+     * Long.MAX_VALUE should signal, this restriction to be disregarded     
      * @return The record count
      * @throws AnalyticsException
      * @throws AnalyticsTableNotAvailableException
      */
-    long getRecordCount(int tenantId, String tableName) throws AnalyticsTableNotAvailableException, AnalyticsException;
+    long getRecordCount(int tenantId, String tableName, long timeFrom, long timeTo) 
+            throws AnalyticsException, AnalyticsTableNotAvailableException;
+    
     
     /**
      * Adds a new record to the table. If the record id is mentioned, 
@@ -154,12 +161,13 @@ public interface AnalyticsDataService {
             List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException;
     
     /**
-     * Reads in the records from a given record group, the records will be streamed in.
-     * @param recordGroup The record group which represents the local data set
-     * @return An iterator of type {@link Record} in the local record group
-     * @throws AnalyticsException
+     * Checks whether or not pagination (i.e. jumping to record n and then retrieving k further records)
+     * is supported by the underlying record store implementation.
+     * Also returns false if the total record count in a table cannot be determined.
+     *
+     * @return Pagination/row-count support
      */
-    Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException;
+    boolean isPaginationSupported();
 
     /**
      * Deletes a set of records in the table.

@@ -19,14 +19,16 @@ package org.wso2.carbon.analytics.datasource.hbase;
 
 import com.google.common.collect.Lists;
 import org.apache.hadoop.hbase.Cell;
+import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.rs.Record;
+import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseAnalyticsDSConstants;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseRuntimeException;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseUtils;
@@ -54,7 +56,7 @@ public class HBaseRecordIterator implements Iterator<Record> {
         } else {
             this.batchedIds = Lists.partition(recordIds, batchSize);
             this.totalBatches = this.batchedIds.size();
-                /* pre-fetching from HBase and populating records for the first time */
+            /* pre-fetching from HBase and populating records for the first time */
             this.preFetch();
         }
     }
@@ -90,17 +92,15 @@ public class HBaseRecordIterator implements Iterator<Record> {
         List<String> currentBatch = this.batchedIds.get(this.currentBatchIndex);
         List<Record> fetchedRecords = new ArrayList<>();
         List<Get> gets = new ArrayList<>();
+        Set<String> colSet = null;
+
         for (String currentId : currentBatch) {
             Get get = new Get(Bytes.toBytes(currentId));
-
             /* if the list of columns to be retrieved is null, retrieve ALL columns. */
-            if (this.columns != null) {
-                for (String column : this.columns) {
-                    if (column != null && !(column.isEmpty())) {
-                        get.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                                HBaseUtils.generateColumnQualifier(column));
-                    }
-                }
+            if (this.columns != null && this.columns.size() > 0) {
+                colSet = new HashSet<>(this.columns);
+                get.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                        HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME);
             } else {
                 get.addFamily(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME);
             }
@@ -111,20 +111,8 @@ public class HBaseRecordIterator implements Iterator<Record> {
             for (Result currentResult : results) {
                 Cell[] cells = currentResult.rawCells();
                 byte[] rowId = currentResult.getRow();
-                Map<String, Object> values;
-                long timestamp;
-                if (cells.length > 0) {
-                    values = HBaseUtils.decodeElementValue(cells);
-                    timestamp = cells[0].getTimestamp();
-                    values.remove(HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
-                } else {
-                    Get get = new Get(rowId);
-                    get.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_META_COLUMN_FAMILY_NAME,
-                            HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
-                    Result timestampResult = this.table.get(get);
-                    timestamp = HBaseUtils.decodeLong(timestampResult.value());
-                    values = new HashMap<>();
-                }
+                Map<String, Object> values = GenericUtils.decodeRecordValues(CellUtil.cloneValue(cells[0]), colSet);
+                long timestamp = cells[0].getTimestamp();
                 fetchedRecords.add(new Record(new String(rowId), this.tenantId, this.tableName, values, timestamp));
             }
             this.subIterator = fetchedRecords.iterator();

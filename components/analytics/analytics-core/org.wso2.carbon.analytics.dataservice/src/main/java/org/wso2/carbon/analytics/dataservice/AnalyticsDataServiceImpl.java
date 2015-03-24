@@ -36,6 +36,7 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotA
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutException;
 import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -133,9 +134,9 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     @Override
-    public long getRecordCount(int tenantId, 
-            String tableName) throws AnalyticsException, AnalyticsTableNotAvailableException {
-        return this.getAnalyticsRecordStore().getRecordCount(tenantId, tableName);
+    public long getRecordCount(int tenantId, String tableName, long timeFrom, long timeTo) 
+            throws AnalyticsException, AnalyticsTableNotAvailableException {
+        return this.getAnalyticsRecordStore().getRecordCount(tenantId, tableName, timeFrom, timeTo);
     }
 
     @Override
@@ -163,6 +164,11 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     public Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException {
         return this.getAnalyticsRecordStore().readRecords(recordGroup);
     }
+    
+    @Override
+    public boolean isPaginationSupported() {
+        return this.getAnalyticsRecordStore().isPaginationSupported();
+    }
 
     @Override
     public void delete(int tenantId, String tableName, long timeFrom, long timeTo) throws AnalyticsException,
@@ -174,8 +180,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     
     private List<String> getRecordIdsFromTimeRange(int tenantId, String tableName, long timeFrom, 
             long timeTo) throws AnalyticsException {
-        List<Record> records = AnalyticsDSUtils.listRecords(this, 
-                this.get(tenantId, tableName, 1, null, timeFrom, timeTo, 0, -1));
+        List<Record> records = GenericUtils.listRecords(this,
+                                                        this.get(tenantId, tableName, 1, null, timeFrom, timeTo, 0, -1));
         List<String> result = new ArrayList<>(records.size());
         for (Record record : records) {
             result.add(record.getId());
@@ -237,5 +243,5 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             this.indexer.close();
         }
     }
-
+    
 }

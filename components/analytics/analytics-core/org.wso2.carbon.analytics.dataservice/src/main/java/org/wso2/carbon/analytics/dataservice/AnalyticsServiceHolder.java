@@ -21,6 +21,7 @@ package org.wso2.carbon.analytics.dataservice;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 
 import com.hazelcast.core.HazelcastInstance;
+import org.wso2.carbon.user.core.service.RealmService;
 
 /**
  * This represents a service holder class for analytics data service.
@@ -32,6 +33,8 @@ public class AnalyticsServiceHolder {
     private static AnalyticsClusterManager analyticsClusterManager;
     
     private static AnalyticsDataService analyticsDataService;
+
+    private static RealmService realmService;
 
     public static void setHazelcastInstance(HazelcastInstance hazelcastInstance) {
         AnalyticsServiceHolder.hazelcastInstance = hazelcastInstance;
@@ -57,4 +60,11 @@ public class AnalyticsServiceHolder {
         AnalyticsServiceHolder.analyticsDataService = analyticsDataService;
     }
 
+    public static void setRealmService(RealmService realmService) {
+        AnalyticsServiceHolder.realmService = realmService;
+    }
+
+    public static RealmService getRealmService() {
+        return AnalyticsServiceHolder.realmService;
+    }
 }

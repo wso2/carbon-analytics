@@ -23,13 +23,14 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 import org.wso2.carbon.analytics.messageconsole.MessageConsoleService;
 
 /**
  * This class represents the analytics message console service declarative services component.
  *
  * @scr.component name="messageconsole.component" immediate="true"
- * @scr.reference name="analytics.component" interface="org.wso2.carbon.analytics.dataservice.AnalyticsDataService"
+ * @scr.reference name="analytics.component" interface="org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService"
  * cardinality="1..1" policy="dynamic" bind="setAnalyticsDataService" unbind="unsetAnalyticsDataService"
  */
 public class MessageConsoleServiceComponent {
@@ -45,11 +46,11 @@ public class MessageConsoleServiceComponent {
         bundleContext.registerService(MessageConsoleService.class, new MessageConsoleService(), null);
     }
 
-    protected void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {
-        ServiceHolder.setAnalyticsDataService(analyticsDataService);
+    protected void setAnalyticsDataService(SecureAnalyticsDataService secureAnalyticsDataService) {
+        ServiceHolder.setAnalyticsDataService(secureAnalyticsDataService);
     }
 
-    protected void unsetAnalyticsDataService(AnalyticsDataService analyticsDataService) {
+    protected void unsetAnalyticsDataService(SecureAnalyticsDataService secureAnalyticsDataService) {
         ServiceHolder.setAnalyticsDataService(null);
     }
 }
