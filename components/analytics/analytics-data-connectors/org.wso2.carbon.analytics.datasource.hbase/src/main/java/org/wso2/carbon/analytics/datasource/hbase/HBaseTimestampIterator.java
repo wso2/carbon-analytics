@@ -22,8 +22,9 @@ import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.rs.Record;
+import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseAnalyticsDSConstants;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseRuntimeException;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseUtils;
@@ -43,7 +44,7 @@ public class HBaseTimestampIterator implements Iterator<Record> {
     private boolean fullyFetched;
     private String tableName;
     private Table table, indexTable;
-    private Iterator<Record> subIterator;
+    private Iterator<Record> subIterator = Collections.emptyIterator();
 
     HBaseTimestampIterator(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo,
                            Connection conn, int batchSize) throws AnalyticsException {
@@ -54,7 +55,7 @@ public class HBaseTimestampIterator implements Iterator<Record> {
             this.init(conn, tenantId, tableName, columns, batchSize);
             /* setting the initial row to start time -1 because it will soon be incremented by 1L. */
             this.latestRow = HBaseUtils.encodeLong(timeFrom - POSTFIX);
-            this.endRow = HBaseUtils.encodeLong(timeTo + POSTFIX);
+            this.endRow = HBaseUtils.encodeLong(timeTo);
             /* pre-fetching from HBase and populating records for the first time */
             this.preFetch();
         }
@@ -92,7 +93,7 @@ public class HBaseTimestampIterator implements Iterator<Record> {
         if (currentBatch.size() == 0) {
             return;
         }
-
+        Set<String> colSet = null;
         List<Record> fetchedRecords = new ArrayList<>();
         List<Get> gets = new ArrayList<>();
 
@@ -100,13 +101,10 @@ public class HBaseTimestampIterator implements Iterator<Record> {
             Get get = new Get(Bytes.toBytes(currentId));
 
             /* if the list of columns to be retrieved is null, retrieve ALL columns. */
-            if (this.columns != null) {
-                for (String column : this.columns) {
-                    if (column != null && !(column.isEmpty())) {
-                        get.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                                HBaseUtils.generateColumnQualifier(column));
-                    }
-                }
+            if (this.columns != null && this.columns.size() > 0) {
+                colSet = new HashSet<>(this.columns);
+                get.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                        HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME);
             } else {
                 get.addFamily(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME);
             }
@@ -118,20 +116,8 @@ public class HBaseTimestampIterator implements Iterator<Record> {
             for (Result currentResult : results) {
                 Cell[] cells = currentResult.rawCells();
                 byte[] rowId = currentResult.getRow();
-                Map<String, Object> values;
-                long timestamp;
-                if (cells.length > 0) {
-                    values = HBaseUtils.decodeElementValue(cells);
-                    timestamp = cells[0].getTimestamp();
-                    values.remove(HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
-                } else {
-                    Get get = new Get(rowId);
-                    get.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_META_COLUMN_FAMILY_NAME,
-                            HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
-                    Result timestampResult = this.table.get(get);
-                    timestamp = HBaseUtils.decodeLong(timestampResult.value());
-                    values = new HashMap<>();
-                }
+                Map<String, Object> values = GenericUtils.decodeRecordValues(CellUtil.cloneValue(cells[0]), colSet);
+                long timestamp = cells[0].getTimestamp();
                 fetchedRecords.add(new Record(new String(rowId), this.tenantId, this.tableName, values, timestamp));
             }
             this.subIterator = fetchedRecords.iterator();
@@ -145,7 +131,6 @@ public class HBaseTimestampIterator implements Iterator<Record> {
     private List<String> populateRecordBatches() {
         List<String> currentBatch = new ArrayList<>();
         int counter = 0;
-        /* Setting (end-time)+1L because end-time is exclusive (which is not what we want) */
         Scan indexScan = new Scan();
         long latestTime = HBaseUtils.decodeLong(this.latestRow);
         indexScan.setStartRow(HBaseUtils.encodeLong(latestTime + POSTFIX));
