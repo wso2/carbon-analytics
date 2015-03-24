@@ -17,8 +17,9 @@
 */
 package org.wso2.carbon.analytics.datasource.hbase.rg;
 
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.rs.RecordGroup;
+
+import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
 import java.util.List;
 
@@ -26,9 +27,10 @@ public class HBaseTimestampRecordGroup implements RecordGroup {
 
     private int tenantId;
     private String tableName;
-    private List<String> columns;long startTime, endTime;
+    private List<String> columns;
+    long startTime, endTime;
 
-    public HBaseTimestampRecordGroup(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo){
+    public HBaseTimestampRecordGroup(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo) {
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.columns = columns;
