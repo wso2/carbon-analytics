@@ -33,6 +33,7 @@ import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.facet.FacetsConfig;
 import org.apache.lucene.facet.taxonomy.FloatAssociationFacetField;
+import org.apache.lucene.facet.taxonomy.TaxonomyMergeUtils;
 import org.apache.lucene.facet.taxonomy.TaxonomyWriter;
 import org.apache.lucene.facet.taxonomy.directory.DirectoryTaxonomyWriter;
 import org.apache.lucene.index.DirectoryReader;
@@ -56,6 +57,8 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterException;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
+import org.wso2.carbon.analytics.dataservice.commons.DrillDownResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
@@ -80,6 +83,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -538,8 +542,9 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return Math.abs(id.hashCode()) % this.getShardCount();
     }
     
-    private List<String> lookupGloballyExistingShardIds(int tenantId, String tableName) throws AnalyticsIndexException {
-        String globalPath = this.generateDirPath(this.generateTableId(tenantId, tableName));
+    private List<String> lookupGloballyExistingShardIds(String basepath, int tenantId, String tableName)
+            throws AnalyticsIndexException {
+        String globalPath = this.generateDirPath(basepath, this.generateTableId(tenantId, tableName));
         try {
             List<String> names = this.getFileSystem().list(globalPath);
             List<String> result = new ArrayList<String>();
@@ -555,7 +560,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     
     public List<SearchResultEntry> search(int tenantId, String tableName, String language, String query, 
             int start, int count) throws AnalyticsIndexException {
-        List<String> shardIds = this.lookupGloballyExistingShardIds(tenantId, tableName);
+        List<String> shardIds = this.lookupGloballyExistingShardIds(INDEX_DATA_FS_BASE_PATH, tenantId, tableName);
         List<SearchResultEntry> result = new ArrayList<SearchResultEntry>();
         for (String shardId : shardIds) {
             result.addAll(this.search(tenantId, tableName, language, query, 0, count + start, shardId));
@@ -574,7 +579,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     
     public int searchCount(int tenantId, String tableName, String language, 
             String query) throws AnalyticsIndexException {
-        List<String> shardIds = this.lookupGloballyExistingShardIds(tenantId, tableName);
+        List<String> shardIds = this.lookupGloballyExistingShardIds(INDEX_DATA_FS_BASE_PATH, tenantId, tableName);
         int result = 0;
         for (String shardId : shardIds) {
             result += this.searchCount(tenantId, tableName, language, query, shardId);
@@ -640,7 +645,59 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             }
         }
     }
-    
+
+    public Map<String, DrillDownResultEntry> drillDown(AnalyticsDrillDownRequest drillDownRequest)
+            throws AnalyticsIndexException {
+        int tenantId = drillDownRequest.getTenantId();
+        String tableName = drillDownRequest.getTableName();
+        List<String> shardIds = this.lookupGloballyExistingShardIds(INDEX_DATA_FS_BASE_PATH,
+                                                                    tenantId, tableName);
+        List<String> taxonomyShardIds = this.lookupGloballyExistingShardIds(TAXONOMY_INDEX_DATA_FS_BASE_PATH,
+                                                                            tenantId,tableName);
+        Map<String, DrillDownResultEntry> result = new LinkedHashMap<>();
+        shardIds.retainAll(taxonomyShardIds);
+
+
+        return null;
+    }
+
+    private void mergeTaxnomonyShards(int tenantId, String tableName, List<String> srcShardIds,
+                                      Directory desIndex, Directory desTaxonomyIndex)
+            throws IOException, AnalyticsIndexException {
+
+        FacetsConfig config = new FacetsConfig();
+        IndexWriterConfig indexWriterConfig = new IndexWriterConfig(Version.LUCENE_4_10_3,
+                                                                    this.luceneAnalyzer);
+        IndexWriter desIndexWriter = new IndexWriter(desIndex, indexWriterConfig);
+        DirectoryTaxonomyWriter desTaxonomyWriter = new DirectoryTaxonomyWriter(desTaxonomyIndex);
+        for (String shardId : srcShardIds) {
+            String shardedTableId = this.generateShardedTableId(tenantId, tableName, shardId);
+            mergeTaxonomyShard(shardedTableId, desIndexWriter, desTaxonomyWriter, config);
+        }
+    }
+
+    private void mergeTaxonomyShard(String shardedTableId, IndexWriter desIndexWriter,
+                                    DirectoryTaxonomyWriter desTaxonomyWriter, FacetsConfig config)
+            throws AnalyticsIndexException, IOException {
+        Directory shardedIndex = this.lookupIndexDir(shardedTableId);
+        Directory shardedTaxonomyIndex = this.lookupTaxonomyIndexDir(shardedTableId);
+        mergeTaxonomyDirectory(shardedIndex, shardedTaxonomyIndex, desIndexWriter, desTaxonomyWriter, config);
+
+    }
+
+    private void mergeTaxonomyDirectory(Directory srcIndex, Directory srcTaxonomyIndex,
+                                        IndexWriter desIndexWriter,
+                                        DirectoryTaxonomyWriter desTaxonomyWriter,
+                                        FacetsConfig config)
+            throws IOException {
+        TaxonomyMergeUtils.merge(srcIndex,srcTaxonomyIndex, new DirectoryTaxonomyWriter.MemoryOrdinalMap(),
+                                 desIndexWriter, desTaxonomyWriter, config);
+    }
+
+    private void addDrillDownResults(AnalyticsDrillDownRequest drillDownRequest, Map facetResults,
+                                     String shardId ) {
+
+    }
     /**
      * Adds the given records to the index if they are previously scheduled to be indexed.
      * @param records The records to be indexed
@@ -876,7 +933,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return INDEX_DATA_FS_BASE_PATH + tableId;
     }
 
-    private String generateDirPath(String tableId, String basePath) {
+    private String generateDirPath(String basePath, String tableId) {
         return basePath + tableId;
     }
 
@@ -888,8 +945,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             throw new AnalyticsIndexException("Error in creating directory: " + e.getMessage(), e);
         }
     }
-    private Directory createDirectory(String tableId, String basePath) throws AnalyticsIndexException {
-        String path = this.generateDirPath(tableId, basePath);
+    private Directory createDirectory(String basePath, String tableId) throws AnalyticsIndexException {
+        String path = this.generateDirPath(basePath, tableId);
         try {
             return new AnalyticsDirectory(this.getFileSystem(), new SingleInstanceLockFactory(), path);
         } catch (AnalyticsException e) {
@@ -917,7 +974,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             synchronized (this.indexTaxonomyDirs) {
                 indexTaxonomyDir = this.indexTaxonomyDirs.get(tableId);
                 if (indexTaxonomyDir == null) {
-                    indexTaxonomyDir = this.createDirectory(tableId, TAXONOMY_INDEX_DATA_FS_BASE_PATH);
+                    indexTaxonomyDir = this.createDirectory(TAXONOMY_INDEX_DATA_FS_BASE_PATH, tableId);
                     this.indexTaxonomyDirs.put(tableId, indexTaxonomyDir);
                 }
             }
@@ -945,7 +1002,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     }
     
     private void deleteIndexData(int tenantId, String tableName) throws AnalyticsIndexException {
-        List<String> shardIds = this.lookupGloballyExistingShardIds(tenantId, tableName);
+        List<String> shardIds = this.lookupGloballyExistingShardIds(INDEX_DATA_FS_BASE_PATH, tenantId, tableName);
         for (String shardId : shardIds) {
             this.deleteIndexData(tenantId, tableName, shardId);
         }
@@ -1173,7 +1230,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             log.error("Error in planning indexing workers on members change: " + e.getMessage(), e);
         }
     }
-    
+
     /**
      * This is executed to stop all indexing operations in the current node.
      */

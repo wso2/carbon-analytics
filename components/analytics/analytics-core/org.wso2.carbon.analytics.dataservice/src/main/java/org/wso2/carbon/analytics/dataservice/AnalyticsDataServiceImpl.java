@@ -209,10 +209,9 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     @Override
-    public Map<String, DrillDownResultEntry> drillDown(int tenantId, String tableName,
-                                                       AnalyticsDrillDownRequest drillDownRequest,
-                                                       AnalyticsScore score) {
-        return null;
+    public Map<String, DrillDownResultEntry> drillDown(AnalyticsDrillDownRequest drillDownRequest)
+            throws AnalyticsIndexException {
+        return this.getIndexer().drillDown(drillDownRequest);
     }
 
     @Override

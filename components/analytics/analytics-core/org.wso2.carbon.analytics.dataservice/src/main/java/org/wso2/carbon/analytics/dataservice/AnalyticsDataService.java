@@ -19,7 +19,6 @@
 package org.wso2.carbon.analytics.dataservice;
 
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
-import org.wso2.carbon.analytics.dataservice.commons.AnalyticsScore;
 import org.wso2.carbon.analytics.dataservice.commons.DrillDownResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
@@ -243,8 +242,7 @@ public interface AnalyticsDataService {
             String query) throws AnalyticsIndexException;
 
 
-    Map<String, DrillDownResultEntry> drillDown(int tenantId,
-            String tableName, AnalyticsDrillDownRequest drillDownRequest, AnalyticsScore score);
+    Map<String, DrillDownResultEntry> drillDown( AnalyticsDrillDownRequest drillDownRequest) throws AnalyticsIndexException;
 
     /**
      * This method waits until the current indexing operations for the system is done.
