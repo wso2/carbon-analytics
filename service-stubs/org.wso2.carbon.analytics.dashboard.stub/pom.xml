@@ -51,7 +51,7 @@
                                     <pathelement location="${settings.localRepository}/org/apache/axis2/wso2/axis2/${orbit.version.axis2}/axis2-${orbit.version.axis2}.jar" />
                                 </path>
                                 <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
-                                    <arg line="-uri src/main/resources/DashboardAdminService.wsdl -u -uw -o target/generated-code -ns2p http://internal.admin.dashboard.analytics.carbon.wso2.org=org.wso2.carbon.analytics.dashboard.stub,ttp://internal.admin.dashboard.analytics.carbon.wso2.org/xsd=org.wso2.carbon.analytics.dashboard.stub.types" />
+                                    <arg line="-uri src/main/resources/DashboardAdminService.wsdl -u -uw -o target/generated-code -p org.wso2.carbon.analytics.dashboard.stub -ns2p http://data.admin.dashboard.analytics.carbon.wso2.org/xsd=org.wso2.carbon.analytics.dashboard.admin.data" />
                                     <classpath refid="wsdl2java.classpath" />
                                 </java>
                             </tasks>
@@ -82,22 +82,16 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Carbon-Component>UIBundle</Carbon-Component>
+                        <Bundle-SymbolicName>
+                            ${project.artifactId}
+                        </Bundle-SymbolicName>
                         <Export-Package>
-                            org.wso2.carbon.analytics.dashboard.stub.*;version="${carbon.analytics.common.version}",
+                            org.wso2.carbon.analytics.dashboard.stub.*;
+                            version="${carbon.analytics.common.version}"
                         </Export-Package>
-                        <Import-Package>
-                            !javax.xml.namespace,
-                            javax.xml.namespace; version=0.0.0,
-                            *;resolution:=optional,
-                        </Import-Package>
-                        <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>
             </plugin>
@@ -113,6 +107,10 @@
             <groupId>org.apache.axis2.wso2</groupId>
             <artifactId>axis2-client</artifactId>
         </dependency>
+        <!-- <dependency>
+            <groupId>wsdl4j.wso2</groupId>
+            <artifactId>wsdl4j</artifactId>
+        </dependency> -->
         <dependency>
             <groupId>org.apache.ws.commons.axiom.wso2</groupId>
             <artifactId>axiom</artifactId>
