@@ -18,10 +18,8 @@
 package org.wso2.carbon.analytics.datasource.hbase.util;
 
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hbase.Cell;
-import org.apache.hadoop.hbase.CellUtil;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.datasource.hbase.HBaseAnalyticsConfigurationEntry;
 import org.wso2.carbon.utils.CarbonUtils;
@@ -30,23 +28,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
-import java.nio.ByteBuffer;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class HBaseUtils {
-
-    private static final byte BOOLEAN_TRUE = 1;
-    private static final byte BOOLEAN_FALSE = 0;
-    private static final byte DATA_TYPE_NULL = 0x00;
-    private static final byte DATA_TYPE_STRING = 0x01;
-    private static final byte DATA_TYPE_INTEGER = 0x02;
-    private static final byte DATA_TYPE_LONG = 0x03;
-    private static final byte DATA_TYPE_FLOAT = 0x04;
-    private static final byte DATA_TYPE_DOUBLE = 0x05;
-    private static final byte DATA_TYPE_BOOLEAN = 0x06;
-    private static final byte DATA_TYPE_BINARY = 0x07;
-    private static final String DEFAULT_CHARSET = "UTF8";
 
     public static String normalizeTableName(String tableName) {
         return tableName.toUpperCase();
@@ -96,87 +79,12 @@ public class HBaseUtils {
         return new Path(source);
     }
 
-    public static byte[] generateColumnQualifier(String columnKey) {
-        return (HBaseAnalyticsDSConstants.ANALYTICS_USER_TABLE_PREFIX + "_" + columnKey).getBytes();
-    }
-
     public static byte[] encodeLong(long value) {
         return Long.toString(value).getBytes();
     }
 
     public static long decodeLong(byte[] arr) {
         return Long.parseLong(new String(arr));
-    }
-
-    public static Map<String, Object> decodeElementValue(Cell[] cells) throws AnalyticsException {
-        /* using LinkedHashMap to retain the column order */
-        Map<String, Object> values = new LinkedHashMap<>();
-        ByteBuffer buffer;
-        int type, size;
-        String colName;
-        Object value;
-        byte[] buff;
-        byte boolVal;
-        byte[] binData;
-
-        for (Cell cell : cells) {
-            try {
-                buffer = ByteBuffer.wrap(CellUtil.cloneValue(cell));
-                size = buffer.getInt();
-                buff = new byte[size];
-                buffer.get(buff, 0, size);
-                colName = new String(buff, DEFAULT_CHARSET);
-                type = buffer.get();
-                switch (type) {
-                    case DATA_TYPE_STRING:
-                        size = buffer.getInt();
-                        buff = new byte[size];
-                        buffer.get(buff, 0, size);
-                        value = new String(buff, DEFAULT_CHARSET);
-                        break;
-                    case DATA_TYPE_LONG:
-                        value = buffer.getLong();
-                        break;
-                    case DATA_TYPE_DOUBLE:
-                        value = buffer.getDouble();
-                        break;
-                    case DATA_TYPE_BOOLEAN:
-                        boolVal = buffer.get();
-                        if (boolVal == BOOLEAN_TRUE) {
-                            value = true;
-                        } else if (boolVal == BOOLEAN_FALSE) {
-                            value = false;
-                        } else {
-                            throw new AnalyticsException("Invalid encoded boolean value " + boolVal + " for column " +
-                                    colName);
-                        }
-                        break;
-                    case DATA_TYPE_INTEGER:
-                        value = buffer.getInt();
-                        break;
-                    case DATA_TYPE_FLOAT:
-                        value = buffer.getFloat();
-                        break;
-                    case DATA_TYPE_BINARY:
-                        size = buffer.getInt();
-                        binData = new byte[size];
-                        buffer.get(binData);
-                        value = binData;
-                        break;
-                    case DATA_TYPE_NULL:
-                        value = null;
-                        break;
-                    default:
-                        throw new AnalyticsException("Unknown encoded data source type: " + type + " for column " +
-                                colName);
-                }
-                values.put(colName, value);
-
-            } catch (Exception e) {
-                throw new AnalyticsException("Error in decoding cell values: " + e.getMessage(), e);
-            }
-        }
-        return values;
     }
 
     public static HBaseAnalyticsConfigurationEntry lookupConfiguration() throws AnalyticsException {
