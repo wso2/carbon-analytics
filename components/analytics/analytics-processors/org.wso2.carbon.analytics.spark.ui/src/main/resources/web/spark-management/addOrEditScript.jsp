@@ -191,9 +191,9 @@
 
         <div id="workArea">
             <% if (!isExistingScript) { %>
-            <div class="sectionSeperator togglebleTitle">New Spark Script Information</div>
+            <div class="sectionSeperator togglebleTitle">New Analytics Script Information</div>
             <% } else { %>
-            <div class="sectionSeperator togglebleTitle">Spark Script Information</div>
+            <div class="sectionSeperator togglebleTitle">Analytics Script Information</div>
             <% } %>
             <div class="sectionSub">
                 <table class="carbonFormTable">
@@ -210,7 +210,7 @@
                                    class="required" autofocus/>
 
                             <div class="sectionHelp">
-                                Enter the name of the actual spark script.
+                                Enter the name of the actual analytics script.
                             </div>
 
                         </td>
@@ -247,7 +247,7 @@
                                    value="<%=cronExp.trim()%>"/>
 
                             <div class="sectionHelp">
-                                Enter the cron expression for the rate of spark script to be executed
+                                Enter the cron expression for the rate of analytics script to be executed
                             </div>
                         </td>
                     </tr>
