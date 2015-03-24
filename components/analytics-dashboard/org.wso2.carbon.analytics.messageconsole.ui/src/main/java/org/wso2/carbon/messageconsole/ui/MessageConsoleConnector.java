@@ -20,12 +20,14 @@ package org.wso2.carbon.messageconsole.ui;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.analytics.messageconsole.stub.MessageConsoleMessageConsoleExceptionException;
 import org.wso2.carbon.analytics.messageconsole.stub.MessageConsoleStub;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.ColumnBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.EntityBean;
@@ -39,11 +41,14 @@ import org.wso2.carbon.messageconsole.ui.beans.ResponseArbitraryFieldColumn;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseRecord;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseResult;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseTable;
+import org.wso2.carbon.messageconsole.ui.beans.TableSchemaColumn;
 import org.wso2.carbon.messageconsole.ui.serializers.ResponseArbitraryFieldSerializer;
 import org.wso2.carbon.messageconsole.ui.serializers.ResponseArbitraryFieldsSerializer;
 import org.wso2.carbon.messageconsole.ui.serializers.ResponseRecordSerializer;
 import org.wso2.carbon.messageconsole.ui.serializers.ResponseResultSerializer;
 
+import java.lang.reflect.Type;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -68,16 +73,19 @@ public class MessageConsoleConnector {
     public static final int TYPE_CRATE_ARBITRARY_RECORD = 7;
     public static final int TYPE_UPDATE_ARBITRARY_RECORD = 8;
     public static final int TYPE_DELETE_ARBITRARY_RECORD = 9;
+    public static final int TYPE_CREATE_TABLE = 10;
 
     private MessageConsoleStub stub;
-    private static GsonBuilder RESPONSE_RESULT_BUILDER = new GsonBuilder().registerTypeAdapter(ResponseResult.class,
-                                                                                               new ResponseResultSerializer());
-    private static GsonBuilder RESPONSE_RECORD_BUILDER = new GsonBuilder().registerTypeAdapter(ResponseRecord.class,
-                                                                                               new ResponseRecordSerializer());
-    private static GsonBuilder RESPONSE_ARBITRARY_FIELD_BUILDER = new GsonBuilder().
+    private static final GsonBuilder RESPONSE_RESULT_BUILDER = new GsonBuilder().registerTypeAdapter(ResponseResult.class,
+                                                                                                     new ResponseResultSerializer());
+    private static final GsonBuilder RESPONSE_RECORD_BUILDER = new GsonBuilder().registerTypeAdapter(ResponseRecord.class,
+                                                                                                     new ResponseRecordSerializer());
+    private static final GsonBuilder RESPONSE_ARBITRARY_FIELD_BUILDER = new GsonBuilder().
             registerTypeAdapter(ResponseArbitraryField.class, new ResponseArbitraryFieldsSerializer());
-    private static GsonBuilder RESPONSE_ARBITRARY_FIELD_COLUMN_BUILDER = new GsonBuilder().
+    private static final GsonBuilder RESPONSE_ARBITRARY_FIELD_COLUMN_BUILDER = new GsonBuilder().
             registerTypeAdapter(ResponseArbitraryFieldColumn.class, new ResponseArbitraryFieldSerializer());
+    private static final Type TABLE_SCHEMA_TYPE = new TypeToken<List<TableSchemaColumn>>() {
+    }.getType();
 
 
     public MessageConsoleConnector(ConfigurationContext configCtx, String backendServerURL, String cookie) {
@@ -320,5 +328,34 @@ public class MessageConsoleConnector {
             responseArbitraryFieldColumn.setMessage(e.getMessage());
         }
         return gson.toJson(responseArbitraryFieldColumn);
+    }
+
+    public String createTable(String table, String detailsJsonString) {
+
+        String msg;
+        TableBean tableBean = new TableBean();
+        tableBean.setName(table);
+
+        Gson gson = new Gson();
+        List<TableSchemaColumn> columnList = gson.fromJson(detailsJsonString, TABLE_SCHEMA_TYPE);
+        ColumnBean[] columns = new ColumnBean[columnList.size()];
+        int i = 0;
+        for (TableSchemaColumn schemaColumn : columnList) {
+            ColumnBean columnBean = new ColumnBean();
+            columnBean.setName(schemaColumn.getColumn());
+            columnBean.setType(schemaColumn.getType());
+            columnBean.setPrimary(schemaColumn.isPrimary());
+            columnBean.setIndex(schemaColumn.isIndex());
+            columns[i++] = columnBean;
+        }
+        tableBean.setColumns(columns);
+        msg = "Successfully saved table information";
+        try {
+            stub.createTable(tableBean);
+        } catch (Exception e) {
+            log.error("Unable to save table information: " + e.getMessage(), e);
+            msg = "Unable to save table information: " + e.getMessage();
+        }
+        return msg;
     }
 }
