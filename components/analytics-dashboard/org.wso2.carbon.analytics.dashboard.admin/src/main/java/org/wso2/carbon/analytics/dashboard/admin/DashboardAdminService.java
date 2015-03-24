@@ -49,7 +49,7 @@ public class DashboardAdminService extends AbstractAdmin {
 	 * @throws AxisFault
 	 */
 	public DataView[] getDataViewsInfo() throws AxisFault {
-		ArrayList<DataView> dataViews = new ArrayList<>();
+		ArrayList<DataView> dataViews = new ArrayList<DataView>();
 		Collection dataViewsCollection = RegistryUtils.readCollection(DATAVIEWS_DIR);
 		String[] resourceNames;
 		try {
@@ -188,7 +188,7 @@ public class DashboardAdminService extends AbstractAdmin {
 	 */
 	public Dashboard[] getDashboards() throws AxisFault {
 		try {
-			List<Dashboard> dashboards = new ArrayList<>();
+			List<Dashboard> dashboards = new ArrayList<Dashboard>();
 			Collection dashboardsCollection = RegistryUtils.readCollection(DASHBOARDS_DIR);
 			String[] resourceNames =
 					dashboardsCollection.getChildren();
