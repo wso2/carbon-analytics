@@ -32,7 +32,7 @@
     <script src="js/Ptty.jquery.js"></script>
 
     <div id="middle">
-        <h2>Interactive Spark Console</h2>
+        <h2>Interactive Analytics Console</h2>
 
         <div id="workArea">
 
@@ -42,6 +42,7 @@
                 </section>
 
                 <script>
+                    var sparkVersion = '1.2.1';
                     $(document).ready(function () {
                         /* Start Ptty terminal */
                         $('#terminal').Ptty();
@@ -73,7 +74,7 @@
                                 'about [no options]',
                                 function () {
                                     var about = '<p>This interactive shell lets you execute Spark SQL commands against a local Spark cluster.<br>' +
-                                            'Running on Spark v 1.2.1</p>';
+                                            'Running on Spark v'+ sparkVersion +'</p>';
 
                                     return {
                                         type: 'print',

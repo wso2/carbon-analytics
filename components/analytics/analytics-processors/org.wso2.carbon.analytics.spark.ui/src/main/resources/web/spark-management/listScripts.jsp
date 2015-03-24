@@ -55,7 +55,7 @@
         }
     %>
     <div id="middle">
-        <h2>Available Spark Scripts</h2>
+        <h2>Available Analytics Scripts</h2>
 
         <div id="workArea">
 
@@ -100,7 +100,7 @@
                         }
                     } else { %>
                     <tr>
-                        <td colspan="2">No spark scripts found</td>
+                        <td colspan="2">No analytics scripts found</td>
                     </tr>
 
                     <% }

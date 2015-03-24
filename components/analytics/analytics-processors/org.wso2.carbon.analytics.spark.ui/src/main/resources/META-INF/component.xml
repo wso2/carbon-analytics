@@ -45,7 +45,7 @@
             <i18n-key>spark.console.menu</i18n-key>
             <i18n-bundle>org.wso2.carbon.analytics.spark.ui.i18n.Resources</i18n-bundle>
             <parent-menu>spark_console_parent</parent-menu>
-            <link>../spark-management/index.jsp</link>
+            <link>../spark-management/sparkConsole.jsp</link>
             <region>region1</region>
             <order>20</order>
             <style-class>tools</style-class>
