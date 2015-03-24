@@ -38,15 +38,17 @@
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-client</artifactId>
             <version>1.0.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+        
         <dependency>
             <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-common</artifactId>
-            <version>2.6.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-hdfs</artifactId>
+            <artifactId>hadoop-client</artifactId>
             <version>2.6.0</version>
         </dependency>
 
@@ -85,6 +87,10 @@
                         <Export-Package>
                             org.wso2.carbon.analytics.datasource.hbase.*
                         </Export-Package>
+                        <Import-Package>
+                            org.apache.hadoop.hbase*;version="[1.0.0, 1.1.0)",
+                            org.apache.hadoop.*;version="[2.6.0, 2.7.0)"
+                        </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>
