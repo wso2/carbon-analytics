@@ -125,11 +125,12 @@ public interface SecureAnalyticsDataService extends AnalyticsRecordReader{
      * this will be a full replace of the record, where the older record is effectively deleted and the new one is
      * added, there will not be a merge of older record's field's with the new one.
      *
+     * @param username  The username of the user that invoke this method
      * @param records The list of records to be inserted
      * @throws AnalyticsException
      * @throws AnalyticsTableNotAvailableException
      */
-    void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException;
+    void put(String username, List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException;
 
     /**
      * Retrieves data from a table, with a given range.

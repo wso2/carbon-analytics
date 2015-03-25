@@ -37,6 +37,7 @@ import org.wso2.carbon.analytics.messageconsole.beans.TableBean;
 import org.wso2.carbon.analytics.messageconsole.exception.MessageConsoleException;
 import org.wso2.carbon.analytics.messageconsole.internal.ServiceHolder;
 import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.core.AbstractAdmin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,7 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MessageConsoleService {
+public class MessageConsoleService extends AbstractAdmin {
 
     private static final Log logger = LogFactory.getLog(MessageConsoleService.class);
     private static final String LUCENE = "lucene";
@@ -57,7 +58,7 @@ public class MessageConsoleService {
 
     public List<String> listTables() throws MessageConsoleException {
 
-        String username = CarbonContext.getThreadLocalCarbonContext().getUsername();
+        String username = getUsername();
         if (logger.isDebugEnabled()) {
             logger.debug("Getting table list from data layer for user:" + username);
         }
@@ -82,7 +83,7 @@ public class MessageConsoleService {
             logger.debug("Page Size: " + recordCount);
         }
 
-        String username = CarbonContext.getThreadLocalCarbonContext().getUsername();
+        String username = getUsername();
 
         RecordResultBean recordResult = new RecordResultBean();
         RecordGroup[] results;
@@ -166,7 +167,7 @@ public class MessageConsoleService {
 
     public TableBean getTableInfo(String tableName) throws MessageConsoleException {
 
-        String username = CarbonContext.getThreadLocalCarbonContext().getUsername();
+        String username = getUsername();
         TableBean table = new TableBean();
         table.setName(tableName);
         try {
@@ -193,7 +194,7 @@ public class MessageConsoleService {
 
     public void deleteRecords(String table, String[] recordIds) throws MessageConsoleException {
 
-        String username = CarbonContext.getThreadLocalCarbonContext().getUsername();
+        String username = getUsername();
 
         String ids = Arrays.toString(recordIds);
         if (logger.isDebugEnabled()) {
@@ -210,7 +211,7 @@ public class MessageConsoleService {
     public RecordBean addRecord(String table, String[] columns, String[] values) throws MessageConsoleException {
 
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
-        String username = CarbonContext.getThreadLocalCarbonContext().getUsername();
+        String username = getUsername();
 
         if (logger.isDebugEnabled()) {
             logger.debug("New record {column: " + Arrays.toString(columns) + ", values: " + Arrays.toString(values) +
@@ -226,7 +227,7 @@ public class MessageConsoleService {
 
             List<Record> records = new ArrayList<>(1);
             records.add(record);
-            analyticsDataService.put(records);
+            analyticsDataService.put(username, records);
         } catch (Exception e) {
             logger.error("Unable to add record {column: " + Arrays.toString(columns) + ", values: " + Arrays.toString(values) + " } to table :" + table, e);
             throw new MessageConsoleException("Unable to add record {column: " + Arrays.toString(columns) + ", values: " + Arrays.toString(values) + " } to table :" + table, e);
@@ -240,7 +241,7 @@ public class MessageConsoleService {
             MessageConsoleException {
 
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
-        String username = CarbonContext.getThreadLocalCarbonContext().getUsername();
+        String username = getUsername();
 
         if (logger.isDebugEnabled()) {
             logger.debug("Record {id: " + recordId + ", column: " + Arrays.toString(columns) + ", values: " + Arrays.toString
@@ -256,7 +257,7 @@ public class MessageConsoleService {
 
             List<Record> records = new ArrayList<>(1);
             records.add(record);
-            analyticsDataService.put(records);
+            analyticsDataService.put(username, records);
         } catch (Exception e) {
             logger.error("Unable to update record {id: " + recordId + ", column: " + Arrays.toString(columns) + ", " +
                          "values: " + Arrays.toString(values) + " } to table :" + table, e);
@@ -305,7 +306,7 @@ public class MessageConsoleService {
     }
 
     public EntityBean[] getArbitraryList(String table, String recordId) throws MessageConsoleException {
-        String username = CarbonContext.getThreadLocalCarbonContext().getUsername();
+        String username = getUsername();
         List<EntityBean> entityBeansList = new ArrayList<>();
         List<String> ids = new ArrayList<>(1);
         ids.add(recordId);
@@ -343,7 +344,7 @@ public class MessageConsoleService {
 
     public void deleteArbitraryField(String table, String recordId, String fieldName) throws MessageConsoleException {
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
-        String username = CarbonContext.getThreadLocalCarbonContext().getUsername();
+        String username = getUsername();
         List<String> ids = new ArrayList<>(1);
         ids.add(recordId);
         try {
@@ -356,7 +357,7 @@ public class MessageConsoleService {
                 Record editedRecord = new Record(recordId, tenantId, table, recordValues, record.getTimestamp());
                 records.clear();
                 records.add(editedRecord);
-                analyticsDataService.put(records);
+                analyticsDataService.put(username, records);
             }
         } catch (AnalyticsException e) {
             logger.error("Unable to delete arbitrary field[" + fieldName + "] for id [" + recordId + "] from table :" + table, e);
@@ -368,7 +369,7 @@ public class MessageConsoleService {
             throws MessageConsoleException {
 
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
-        String username = CarbonContext.getThreadLocalCarbonContext().getUsername();
+        String username = getUsername();
         List<String> ids = new ArrayList<>(1);
         ids.add(recordId);
         try {
@@ -414,7 +415,7 @@ public class MessageConsoleService {
                 records.clear();
                 Record editedRecord = new Record(recordId, tenantId, table, recordValues, record.getTimestamp());
                 records.add(editedRecord);
-                analyticsDataService.put(records);
+                analyticsDataService.put(username, records);
             }
         } catch (AnalyticsException e) {
             logger.error("Unable to update arbitrary field[" + fieldName + "] for id [" + recordId + "] from table :" + table, e);
@@ -424,7 +425,7 @@ public class MessageConsoleService {
 
     public void createTable(TableBean tableInfo) throws MessageConsoleException {
 
-        String username = CarbonContext.getThreadLocalCarbonContext().getUsername();
+        String username = getUsername();
 
         try {
             analyticsDataService.createTable(username, tableInfo.getName());
@@ -498,5 +499,10 @@ public class MessageConsoleService {
             default:
                 return IndexType.STRING;
         }
+    }
+
+    @Override
+    protected String getUsername() {
+        return super.getUsername() + "@" + getTenantDomain();
     }
 }
