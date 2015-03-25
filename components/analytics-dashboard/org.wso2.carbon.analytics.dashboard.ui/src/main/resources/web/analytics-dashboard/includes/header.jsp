@@ -25,7 +25,7 @@
         <a class="navbar-brand" href="../">
           <span class="glyphicon glyphicon-stats"></span>
         </a>
-        <a class="navbar-brand" href="./">Analytics Dashboard</a>
+        <a class="navbar-brand" href="./index_ajaxprocessor.jsp">Analytics Dashboard</a>
       </div>
       <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav navbar-left">
@@ -34,8 +34,8 @@
               <span class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></span>
             </button>
           </li>
-          <li><a href="dataviews.jsp" title="Add Widget"><span class="glyphicon glyphicon glyphicon-th-large"></span></a></li>
-          <!-- <li><a href="#" title="New Dashboard" data-toggle="modal" data-target="#mdlDashboard"><span class="glyphicon glyphicon-plus-sign"></span></a></li> -->
+          <li><a href="dataviews_ajaxprocessor.jsp" title="Add Widget"><span class="glyphicon glyphicon glyphicon-th-large"></span></a></li>
+          <li><a href="#" title="New Dashboard" data-toggle="modal" data-target="#mdlDashboard"><span class="glyphicon glyphicon-plus-sign"></span></a></li>
           <!-- <li><p class="navbar-btn">
                     <a href="#" class="btn btn-success" data-toggle="modal" data-target="#mdlDashboard">New Dashboard</a>
                 </p></li> -->
@@ -44,7 +44,7 @@
         </ul>
 
         <ul class="nav navbar-nav navbar-right">
-          <li><a href="dataviews.jsp">Browse Datasets</a></li>
+          <li><a href="dataviews_ajaxprocessor.jsp">Browse Datasets</a></li>
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dunith<span class="caret"></span></a>
             <ul class="dropdown-menu" role="menu">
