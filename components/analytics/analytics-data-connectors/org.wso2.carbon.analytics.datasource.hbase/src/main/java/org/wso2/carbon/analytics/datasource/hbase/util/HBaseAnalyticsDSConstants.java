@@ -32,7 +32,6 @@ public class HBaseAnalyticsDSConstants {
     public static final byte[] ANALYTICS_DATA_COLUMN_FAMILY_NAME = "carbon-analytics-data".getBytes();
     public static final byte[] ANALYTICS_META_COLUMN_FAMILY_NAME = "carbon-analytics-meta".getBytes();
     public static final byte[] ANALYTICS_INDEX_COLUMN_FAMILY_NAME = "carbon-analytics-index".getBytes();
-    public static final byte[] ANALYTICS_TIMESTAMP_COLUMN_FAMILY_NAME = "carbon-analytics-timestamp".getBytes();
 
     public static final byte[] ANALYTICS_ROWDATA_QUALIFIER_NAME = "row-values".getBytes();
     public static final byte[] ANALYTICS_SCHEMA_QUALIFIER_NAME = "database-schema".getBytes();
@@ -40,5 +39,6 @@ public class HBaseAnalyticsDSConstants {
 
     public static final int DEFAULT_QUERY_BATCH_SIZE = 7000;
     public static final String HBASE_ANALYTICS_CONFIG_FILE = "hbase-analytics-config.xml";
+    public static final String DELIMITER = "~%~";
 
 }
