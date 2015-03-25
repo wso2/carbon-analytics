@@ -20,6 +20,8 @@ package org.wso2.carbon.analytics.messageconsole;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.CarbonConstants;
+import org.wso2.carbon.analytics.dataservice.Constants;
 import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
@@ -31,6 +33,7 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.messageconsole.beans.ColumnBean;
 import org.wso2.carbon.analytics.messageconsole.beans.EntityBean;
+import org.wso2.carbon.analytics.messageconsole.beans.PermissionBean;
 import org.wso2.carbon.analytics.messageconsole.beans.RecordBean;
 import org.wso2.carbon.analytics.messageconsole.beans.RecordResultBean;
 import org.wso2.carbon.analytics.messageconsole.beans.TableBean;
@@ -38,6 +41,10 @@ import org.wso2.carbon.analytics.messageconsole.exception.MessageConsoleExceptio
 import org.wso2.carbon.analytics.messageconsole.internal.ServiceHolder;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.core.AbstractAdmin;
+import org.wso2.carbon.user.api.AuthorizationManager;
+import org.wso2.carbon.user.api.UserRealm;
+import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,6 +61,42 @@ public class MessageConsoleService extends AbstractAdmin {
 
     public MessageConsoleService() {
         this.analyticsDataService = ServiceHolder.getAnalyticsDataService();
+    }
+
+    public PermissionBean getAvailablePermissions() throws MessageConsoleException {
+        PermissionBean permission = new PermissionBean();
+        String username = super.getUsername();
+        try {
+            AuthorizationManager authorizationManager = getUserRealm().getAuthorizationManager();
+            permission.setCreateTable(authorizationManager.isUserAuthorized(username, Constants.PERMISSION_CREATE_TABLE,
+                                                                            CarbonConstants.UI_PERMISSION_ACTION));
+            permission.setListTable(authorizationManager.isUserAuthorized(username, Constants.PERMISSION_LIST_TABLE,
+                                                                          CarbonConstants.UI_PERMISSION_ACTION));
+            permission.setDropTable(authorizationManager.isUserAuthorized(username, Constants.PERMISSION_DROP_TABLE,
+                                                                          CarbonConstants.UI_PERMISSION_ACTION));
+            permission.setSearchRecord(authorizationManager.isUserAuthorized(username, Constants.PERMISSION_SEARCH_RECORD,
+                                                                             CarbonConstants.UI_PERMISSION_ACTION));
+            permission.setListRecord(authorizationManager.isUserAuthorized(username, Constants.PERMISSION_LIST_RECORD,
+                                                                           CarbonConstants.UI_PERMISSION_ACTION));
+            permission.setPutRecord(authorizationManager.isUserAuthorized(username, Constants.PERMISSION_PUT_RECORD,
+                                                                          CarbonConstants.UI_PERMISSION_ACTION));
+            permission.setDeleteRecord(authorizationManager.isUserAuthorized(username, Constants.PERMISSION_DELETE_RECORD,
+                                                                             CarbonConstants.UI_PERMISSION_ACTION));
+            permission.setSetIndex(authorizationManager.isUserAuthorized(username, Constants.PERMISSION_SET_INDEXING,
+                                                                         CarbonConstants.UI_PERMISSION_ACTION));
+            permission.setGetIndex(authorizationManager.isUserAuthorized(username, Constants.PERMISSION_GET_INDEXING,
+                                                                         CarbonConstants.UI_PERMISSION_ACTION));
+            permission.setDeleteIndex(authorizationManager.isUserAuthorized(username, Constants.PERMISSION_DELETE_INDEXING,
+                                                                            CarbonConstants.UI_PERMISSION_ACTION));
+        } catch (UserStoreException e) {
+            throw new MessageConsoleException("Unable to get user permission details due to " + e.getMessage(), e);
+        }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Granted analytics permission for user[" + username + "] :" + permission.toString());
+        }
+
+        return permission;
     }
 
     public List<String> listTables() throws MessageConsoleException {

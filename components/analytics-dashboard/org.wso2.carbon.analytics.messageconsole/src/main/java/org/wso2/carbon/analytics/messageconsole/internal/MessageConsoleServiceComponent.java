@@ -25,6 +25,7 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 import org.wso2.carbon.analytics.messageconsole.MessageConsoleService;
+import org.wso2.carbon.user.core.service.RealmService;
 
 /**
  * This class represents the analytics message console service declarative services component.
@@ -47,10 +48,16 @@ public class MessageConsoleServiceComponent {
     }
 
     protected void setAnalyticsDataService(SecureAnalyticsDataService secureAnalyticsDataService) {
+        if (logger.isDebugEnabled()) {
+            logger.info("Setting the Secure Analytics Data Service");
+        }
         ServiceHolder.setAnalyticsDataService(secureAnalyticsDataService);
     }
 
     protected void unsetAnalyticsDataService(SecureAnalyticsDataService secureAnalyticsDataService) {
+        if (logger.isDebugEnabled()) {
+            logger.info("Unsetting the Secure Analytics Data Service");
+        }
         ServiceHolder.setAnalyticsDataService(null);
     }
 }

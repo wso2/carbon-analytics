@@ -1,7 +1,7 @@
 var tableLoaded = false;
 var timestamp;
 var arbitraryColumnName;
-function createMainJTable(fields) {
+/*function createMainJTable(fields) {
     $('#AnalyticsTableContainer').jtable({
                                              title: $("#tableSelect").val(),
                                              paging: true,
@@ -37,7 +37,7 @@ function createMainJTable(fields) {
         $('#AnalyticsTableContainer').jtable('deleteRows', $selectedRows);
     });
     tableLoaded = true;
-}
+}*/
 
 function getArbitraryFields(rowData) {
     var $img =

@@ -1,8 +1,10 @@
 <%@ page import="org.apache.axis2.context.ConfigurationContext" %>
 <%@ page import="org.wso2.carbon.CarbonConstants" %>
+<%@ page import="org.wso2.carbon.messageconsole.ui.MessageConsoleConnector" %>
+<%@ page import="org.wso2.carbon.messageconsole.ui.beans.Permissions" %>
+<%@ page import="org.wso2.carbon.messageconsole.ui.exception.MessageConsoleException" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
-<%@ page import="org.wso2.carbon.messageconsole.ui.MessageConsoleConnector" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%
@@ -13,6 +15,13 @@
 
     MessageConsoleConnector connector = new MessageConsoleConnector(configContext, serverURL, cookie);
     pageContext.setAttribute("connector", connector, PageContext.PAGE_SCOPE);
+
+    try {
+        Permissions permissions = connector.getAvailablePermissionForUser();
+        pageContext.setAttribute("permissions", permissions, PageContext.PAGE_SCOPE);
+    } catch (MessageConsoleException e) {
+        pageContext.setAttribute("permissionError", e, PageContext.PAGE_SCOPE);
+    }
 %>
 
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
@@ -35,7 +44,6 @@
         var typeListRecord = '<%= MessageConsoleConnector.TYPE_LIST_RECORD%>';
         var typeDeleteRecord = '<%= MessageConsoleConnector.TYPE_DELETE_RECORD%>';
         var typeUpdateRecord = '<%= MessageConsoleConnector.TYPE_UPDATE_RECORD%>';
-        var typeUpdateRecord = '<%= MessageConsoleConnector.TYPE_UPDATE_RECORD%>';
         var typeTableInfo = '<%= MessageConsoleConnector.TYPE_TABLE_INFO%>';
 
         var typeListArbitraryRecord = '<%= MessageConsoleConnector.TYPE_LIST_ARBITRARY_RECORD%>';
@@ -45,11 +53,13 @@
         var typeCreateTable = '<%= MessageConsoleConnector.TYPE_CREATE_TABLE%>';
 
         $(document).ready(function () {
+            <c:if test="${permissions != null && permissions.isListTable()}">
             var tableNames = "";
             <c:forEach var='tableName' items='${connector.getTableList()}'>
             tableNames += "<option value='${tableName}'>" + '${tableName}' + "</option>";
             </c:forEach>
             $("#tableSelect").append(tableNames);
+            </c:if>
             $("#DeleteAllButton").hide();
             jQuery('#timeFrom').datetimepicker({
                                                    format: 'unixtime',
@@ -133,10 +143,91 @@
             return result;
         }
 
+        function createMainJTable(fields) {
+            $('#AnalyticsTableContainer').jtable({
+                                                     title: $("#tableSelect").val(),
+                                                     paging: true,
+                                                     pageSize: 25,
+                                                     selecting: true,
+                                                     multiselect: true,
+                                                     selectingCheckboxes: true,
+                                                     actions: {
+                                                         // For Details: http://jtable.org/Demo/FunctionsAsActions
+                                                         listAction: function (postData, jtParams) {
+                                                             return listActionMethod(jtParams);
+                                                         }
+                                                         <c:if test="${permissions != null && permissions.isPutRecord()}">
+                                                         // Don't remove this leading comma
+                                                         , createAction: function (postData) {
+                                                             return createActionMethod(postData);
+                                                         },
+                                                         updateAction: function (postData) {
+                                                             return updateActionMethod(postData);
+                                                         }
+                                                         </c:if>
+                                                         <c:if test="${permissions != null && permissions.isDeleteRecord()}">
+                                                         // Don't remove this leading comma
+                                                         , deleteAction: function (postData) {
+                                                             return deleteActionMethod(postData);
+                                                         }
+                                                         </c:if>
+                                                     },
+                                                     formCreated: function (event, data) {
+                                                         timestamp = data.record.bam_rec_timestamp;
+                                                     },
+                                                     fields: fields
+
+                                                 });
+            $('#AnalyticsTableContainer').jtable('load');
+            $("#DeleteAllButton").show();
+            $("#DeleteAllButton").on("click", function () {
+                var $selectedRows = $('#AnalyticsTableContainer').jtable('selectedRows');
+                $('#AnalyticsTableContainer').jtable('deleteRows', $selectedRows);
+            });
+            tableLoaded = true;
+        }
+
     </script>
 
 </head>
 <body>
+<c:if test="${permissionError != null}">
+    <div>
+        <p><c:out value="${permissionError.message}"/></p>
+    </div>
+</c:if>
+
+<fieldset>
+    <legend>Search:</legend>
+    <c:if test="${permissions != null && permissions.isListTable() && permissions.isListRecord()}">
+        <label> Table Name*:
+            <select id="tableSelect">
+                <option value="-1">Select a table</option>
+            </select>
+        </label>
+        <fieldset>
+            <legend>By Date Range:</legend>
+            <label> From: <input id="timeFrom" type="text"> </label>
+            <label> To: <input id="timeTo" type="text"> </label>
+        </fieldset>
+        <c:if test="${permissions != null && permissions.isSearchRecord()}">
+            <fieldset>
+                <legend>By Query:</legend>
+                <label> Search Query:
+                    <textarea id="query" rows="4" cols="50"></textarea>
+                </label>
+            </fieldset>
+        </c:if>
+        <input id="search" type="submit" value="Search" onclick="createJTable();">
+    </c:if>
+</fieldset>
+
+<div id="AnalyticsTableContainer"></div>
+<input type="button" id="DeleteAllButton" value="Delete all selected records">
+<c:if test="${permissions != null && permissions.isCreateTable()}">
+    <input type="button" id="button" value="Add New Table">
+</c:if>
+
 <div id="dialog" title="Create a new table">
     <div id="msg">
         <label id="msgLabel" style="display: none"></label>
@@ -175,31 +266,5 @@
         </form>
     </div>
 </div>
-<fieldset>
-    <legend>Search:</legend>
-    <label> Table Name*:
-        <select id="tableSelect">
-            <option value="-1">Select a table</option>
-        </select>
-    </label>
-    <fieldset>
-        <legend>By Date Range:</legend>
-        <label> From: <input id="timeFrom" type="text"> </label>
-        <label> To: <input id="timeTo" type="text"> </label>
-    </fieldset>
-    <fieldset>
-        <legend>By Query:</legend>
-        <label> Search Query:
-            <textarea id="query" rows="4" cols="50"></textarea>
-        </label>
-    </fieldset>
-    <input id="search" type="submit" value="Search" onclick="createJTable();">
-</fieldset>
-
-</body>
-<div id="AnalyticsTableContainer"></div>
-<input type="button" id="DeleteAllButton" value="Delete all selected records">
-<input type="button" id="button" value="Add New Table">
-
 </body>
 </html>

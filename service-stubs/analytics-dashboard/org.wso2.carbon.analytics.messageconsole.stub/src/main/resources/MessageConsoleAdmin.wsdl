@@ -3,21 +3,6 @@
     <wsdl:documentation>MessageConsole</wsdl:documentation>
     <wsdl:types>
         <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://beans.messageconsole.analytics.carbon.wso2.org/xsd">
-            <xs:complexType name="TableBean">
-                <xs:sequence>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="ax211:ColumnBean"></xs:element>
-                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
-                </xs:sequence>
-            </xs:complexType>
-            <xs:complexType name="ColumnBean">
-                <xs:sequence>
-                    <xs:element minOccurs="0" name="display" type="xs:boolean"></xs:element>
-                    <xs:element minOccurs="0" name="index" type="xs:boolean"></xs:element>
-                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
-                    <xs:element minOccurs="0" name="primary" type="xs:boolean"></xs:element>
-                    <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"></xs:element>
-                </xs:sequence>
-            </xs:complexType>
             <xs:complexType name="RecordResultBean">
                 <xs:sequence>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="records" nillable="true" type="ax211:RecordBean"></xs:element>
@@ -38,6 +23,35 @@
                     <xs:element minOccurs="0" name="value" nillable="true" type="xs:string"></xs:element>
                 </xs:sequence>
             </xs:complexType>
+            <xs:complexType name="TableBean">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="ax211:ColumnBean"></xs:element>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ColumnBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="display" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="index" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="primary" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="PermissionBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="createTable" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="deleteIndex" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="deleteRecord" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="dropTable" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="getIndex" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="listRecord" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="listTable" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="putRecord" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="searchRecord" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="setIndex" type="xs:boolean"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
         </xs:schema>
         <xs:schema xmlns:ax212="http://beans.messageconsole.analytics.carbon.wso2.org/xsd" xmlns:ax210="http://exception.messageconsole.analytics.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://messageconsole.analytics.carbon.wso2.org">
             <xs:import namespace="http://exception.messageconsole.analytics.carbon.wso2.org/xsd"></xs:import>
@@ -49,17 +63,15 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getTableInfo">
+            <xs:element name="listTables">
                 <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
-                    </xs:sequence>
+                    <xs:sequence></xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getTableInfoResponse">
+            <xs:element name="listTablesResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax212:TableBean"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -79,18 +91,6 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" nillable="true" type="ax212:RecordResultBean"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="listTables">
-                <xs:complexType>
-                    <xs:sequence></xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="listTablesResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -171,6 +171,32 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="getTableInfo">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTableInfoResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax212:TableBean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAvailablePermissions">
+                <xs:complexType>
+                    <xs:sequence></xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAvailablePermissionsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax212:PermissionBean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="createTable">
                 <xs:complexType>
                     <xs:sequence>
@@ -224,6 +250,12 @@
     <wsdl:message name="deleteRecordsRequest">
         <wsdl:part name="parameters" element="ns:deleteRecords"></wsdl:part>
     </wsdl:message>
+    <wsdl:message name="getAvailablePermissionsRequest">
+        <wsdl:part name="parameters" element="ns:getAvailablePermissions"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAvailablePermissionsResponse">
+        <wsdl:part name="parameters" element="ns:getAvailablePermissionsResponse"></wsdl:part>
+    </wsdl:message>
     <wsdl:message name="updateRecordRequest">
         <wsdl:part name="parameters" element="ns:updateRecord"></wsdl:part>
     </wsdl:message>
@@ -272,6 +304,11 @@
         <wsdl:operation name="deleteRecords">
             <wsdl:input message="ns:deleteRecordsRequest" wsaw:Action="urn:deleteRecords"></wsdl:input>
             <wsdl:fault message="ns:MessageConsoleMessageConsoleException" name="MessageConsoleMessageConsoleException" wsaw:Action="urn:deleteRecordsMessageConsoleMessageConsoleException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getAvailablePermissions">
+            <wsdl:input message="ns:getAvailablePermissionsRequest" wsaw:Action="urn:getAvailablePermissions"></wsdl:input>
+            <wsdl:output message="ns:getAvailablePermissionsResponse" wsaw:Action="urn:getAvailablePermissionsResponse"></wsdl:output>
+            <wsdl:fault message="ns:MessageConsoleMessageConsoleException" name="MessageConsoleMessageConsoleException" wsaw:Action="urn:getAvailablePermissionsMessageConsoleMessageConsoleException"></wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="updateRecord">
             <wsdl:input message="ns:updateRecordRequest" wsaw:Action="urn:updateRecord"></wsdl:input>
@@ -366,6 +403,18 @@
             <wsdl:input>
                 <soap:body use="literal"></soap:body>
             </wsdl:input>
+            <wsdl:fault name="MessageConsoleMessageConsoleException">
+                <soap:fault use="literal" name="MessageConsoleMessageConsoleException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getAvailablePermissions">
+            <soap:operation soapAction="urn:getAvailablePermissions" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
             <wsdl:fault name="MessageConsoleMessageConsoleException">
                 <soap:fault use="literal" name="MessageConsoleMessageConsoleException"></soap:fault>
             </wsdl:fault>
@@ -481,6 +530,18 @@
                 <soap12:fault use="literal" name="MessageConsoleMessageConsoleException"></soap12:fault>
             </wsdl:fault>
         </wsdl:operation>
+        <wsdl:operation name="getAvailablePermissions">
+            <soap12:operation soapAction="urn:getAvailablePermissions" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+            <wsdl:fault name="MessageConsoleMessageConsoleException">
+                <soap12:fault use="literal" name="MessageConsoleMessageConsoleException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
         <wsdl:operation name="updateRecord">
             <soap12:operation soapAction="urn:updateRecord" style="document"></soap12:operation>
             <wsdl:input>
@@ -567,6 +628,15 @@
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"></mime:content>
             </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getAvailablePermissions">
+            <http:operation location="getAvailablePermissions"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="updateRecord">
             <http:operation location="updateRecord"></http:operation>

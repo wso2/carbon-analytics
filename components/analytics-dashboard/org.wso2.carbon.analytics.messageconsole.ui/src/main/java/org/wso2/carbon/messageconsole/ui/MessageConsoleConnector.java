@@ -27,13 +27,16 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.analytics.messageconsole.stub.MessageConsoleMessageConsoleExceptionException;
 import org.wso2.carbon.analytics.messageconsole.stub.MessageConsoleStub;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.ColumnBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.EntityBean;
+import org.wso2.carbon.analytics.messageconsole.stub.beans.PermissionBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.RecordBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.RecordResultBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.TableBean;
 import org.wso2.carbon.messageconsole.ui.beans.Column;
+import org.wso2.carbon.messageconsole.ui.beans.Permissions;
 import org.wso2.carbon.messageconsole.ui.beans.Record;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseArbitraryField;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseArbitraryFieldColumn;
@@ -41,12 +44,14 @@ import org.wso2.carbon.messageconsole.ui.beans.ResponseRecord;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseResult;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseTable;
 import org.wso2.carbon.messageconsole.ui.beans.TableSchemaColumn;
+import org.wso2.carbon.messageconsole.ui.exception.MessageConsoleException;
 import org.wso2.carbon.messageconsole.ui.serializers.ResponseArbitraryFieldSerializer;
 import org.wso2.carbon.messageconsole.ui.serializers.ResponseArbitraryFieldsSerializer;
 import org.wso2.carbon.messageconsole.ui.serializers.ResponseRecordSerializer;
 import org.wso2.carbon.messageconsole.ui.serializers.ResponseResultSerializer;
 
 import java.lang.reflect.Type;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -97,6 +102,27 @@ public class MessageConsoleConnector {
         } catch (AxisFault axisFault) {
             log.error("Unable to create MessageConsoleStub.", axisFault);
         }
+    }
+
+    public Permissions getAvailablePermissionForUser() throws MessageConsoleException {
+        Permissions permissions = new Permissions();
+        try {
+            PermissionBean permissionBean = stub.getAvailablePermissions();
+            permissions.setCreateTable(permissionBean.getCreateTable());
+            permissions.setListTable(permissionBean.getListTable());
+            permissions.setDropTable(permissionBean.getDropTable());
+            permissions.setListRecord(permissionBean.getListRecord());
+            permissions.setPutRecord(permissionBean.getPutRecord());
+            permissions.setSearchRecord(permissionBean.getSearchRecord());
+            permissions.setDeleteRecord(permissionBean.getDeleteRecord());
+            permissions.setGetIndex(permissionBean.getGetIndex());
+            permissions.setSetIndex(permissionBean.getSetIndex());
+            permissions.setDeleteIndex(permissionBean.getDeleteIndex());
+        } catch (Exception e) {
+            throw new MessageConsoleException("Unable to check granted message console permissions due to: " + e
+                    .getMessage(), e);
+        }
+        return permissions;
     }
 
     public String[] getTableList() {
