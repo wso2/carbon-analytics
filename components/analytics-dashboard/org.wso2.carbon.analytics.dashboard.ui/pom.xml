@@ -63,7 +63,7 @@
                             org.wso2.carbon.analytics.dashboard.ui.*,
                         </Export-Package>
                         <Import-Package>
-                            org.wso2.carbon.analytics.dashboard.*,
+                            org.wso2.carbon.analytics.dashboard.stub.*,
                             org.wso2.carbon.utils,
                             org.apache.axis2.*,
                             org.apache.axiom.*,
