@@ -51,8 +51,8 @@
                                     <pathelement location="${settings.localRepository}/org/apache/axis2/wso2/axis2/${orbit.version.axis2}/axis2-${orbit.version.axis2}.jar" />
                                 </path>
                                 <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
-                                    <arg line="-uri src/main/resources/DashboardAdminService.wsdl -u -uw -o target/generated-code -p org.wso2.carbon.analytics.dashboard.stub -ns2p http://data.admin.dashboard.analytics.carbon.wso2.org/xsd=org.wso2.carbon.analytics.dashboard.admin.data" />
-                                    <classpath refid="wsdl2java.classpath" />
+                                <arg line="-uri src/main/resources/DashboardAdminService.wsdl -u -uw -o target/generated-code -p org.wso2.carbon.analytics.dashboard.stub -ns2p http://org.apache.axis2/xsd=org.wso2.carbon.analytics.dashboard.stub.axis2,http://data.admin.dashboard.analytics.carbon.wso2.org/xsd=org.wso2.carbon.analytics.dashboard.stub.data" />
+                                <classpath refid="wsdl2java.classpath" />
                                 </java>
                             </tasks>
                         </configuration>
