@@ -23,6 +23,7 @@ import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseAnalyticsDSConstants;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseRuntimeException;
@@ -39,19 +40,25 @@ public class HBaseRegionSplitIterator implements Iterator<Record> {
 
     private String tableName;
     private Table table;
-    private Iterator<Result> resultIterator;
+    private Iterator<Result> resultIterator = Collections.emptyIterator();
 
     Set<String> colSet = null;
 
     public HBaseRegionSplitIterator(int tenantId, String tableName, List<String> columns, Connection conn,
-                                    byte[] startRow, byte[] endRow) throws AnalyticsException {
+                                    byte[] startRow, byte[] endRow) throws AnalyticsException, AnalyticsTableNotAvailableException {
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.startRow = startRow;
         this.endRow = endRow;
+        Admin admin = null;
+        TableName finalName = TableName.valueOf(
+                HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.DATA));
         try {
-            this.table = conn.getTable(TableName.valueOf(
-                    HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.DATA)));
+            admin = conn.getAdmin();
+            if (!admin.tableExists(finalName)) {
+                throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+            }
+            this.table = conn.getTable(finalName);
         } catch (IOException e) {
             throw new AnalyticsException("The table " + tableName + " for tenant " + tenantId +
                     " could not be initialized for reading: " + e.getMessage(), e);
@@ -71,8 +78,13 @@ public class HBaseRegionSplitIterator implements Iterator<Record> {
             ResultScanner scanner = table.getScanner(splitScan);
             this.resultIterator = scanner.iterator();
         } catch (IOException e) {
+            if (e instanceof RetriesExhaustedException) {
+                throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+            }
             throw new AnalyticsException("The table " + tableName + " for tenant " + tenantId +
                     " could not be read: " + e.getMessage(), e);
+        } finally {
+            GenericUtils.closeQuietly(admin);
         }
     }
 
@@ -86,11 +98,29 @@ public class HBaseRegionSplitIterator implements Iterator<Record> {
         if (this.hasNext()) {
             try {
                 Result currentResult = this.resultIterator.next();
-                Cell[] cells = currentResult.rawCells();
                 byte[] rowId = currentResult.getRow();
-                Map<String, Object> values = GenericUtils.decodeRecordValues(CellUtil.cloneValue(cells[0]), colSet);
-                long timestamp = cells[0].getTimestamp();
-                return new Record(new String(rowId), this.tenantId, this.tableName, values, timestamp);
+                Map<String, Object> values;
+                long timestamp;
+                if (currentResult.containsColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                        HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME)) {
+                    Cell dataCell = currentResult.getColumnLatestCell
+                            (HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                                    HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME);
+                    values = GenericUtils.decodeRecordValues(CellUtil.cloneValue(dataCell), colSet);
+                    timestamp = dataCell.getTimestamp();
+                    return new Record(new String(rowId), this.tenantId, this.tableName, values, timestamp);
+                } else if (currentResult.containsColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                        HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME)) {
+                    Cell timeCell = currentResult.getColumnLatestCell
+                            (HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                                    HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
+                    values = new HashMap<>();
+                    timestamp = HBaseUtils.decodeLong(CellUtil.cloneValue(timeCell));
+                    return new Record(new String(rowId), this.tenantId, this.tableName, values, timestamp);
+                } else {
+                    throw new HBaseRuntimeException("Invalid data found on row " + new String(rowId));
+                }
+
             } catch (Exception e) {
                 this.cleanup();
                 throw new HBaseRuntimeException("Error reading data from table " + this.tableName + " for tenant " +
