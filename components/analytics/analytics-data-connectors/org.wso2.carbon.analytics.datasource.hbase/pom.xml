@@ -32,6 +32,13 @@
             <artifactId>org.wso2.carbon.analytics.dataservice</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.analytics.datasource.rdbms</artifactId>
+            <version>${carbon.analytics.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
 
         <!-- TODO: Move version information to parent. Kept here for the time being to avoid build breaks. -->
         <dependency>
