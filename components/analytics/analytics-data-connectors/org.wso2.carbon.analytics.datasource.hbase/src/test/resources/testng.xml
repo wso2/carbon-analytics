@@ -4,6 +4,8 @@
         <classes>
             <class name="org.wso2.carbon.analytics.datasource.hbase.HBaseAnalyticsRecordStoreTest"/>
             <class name="org.wso2.carbon.analytics.datasource.hbase.HDFSAnalyticsFileSystemTest"/>
+            <class name="org.wso2.carbon.analytics.datasource.hbase.HBaseADServiceStandaloneTest"/>
+            <class name="org.wso2.carbon.analytics.datasource.hbase.HBaseADServiceClusteredTest"/>
         </classes>
     </test>
 </suite>
