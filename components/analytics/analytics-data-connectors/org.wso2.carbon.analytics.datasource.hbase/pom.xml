@@ -42,24 +42,18 @@
 
         <!-- TODO: Move version information to parent. Kept here for the time being to avoid build breaks. -->
         <dependency>
-            <groupId>org.apache.hbase</groupId>
+            <groupId>org.wso2.apache.hbase</groupId>
             <artifactId>hbase-client</artifactId>
-            <version>1.0.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.hadoop</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>1.0.0.wso2v1</version>
         </dependency>
         
         <dependency>
-            <groupId>org.apache.hadoop</groupId>
+            <groupId>org.wso2.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
-            <version>2.6.0</version>
+            <version>2.6.0.wso2v1</version>
         </dependency>
 
-        <!-- /TODO -->
+        <!-- TODO -->
 
         <dependency>
             <groupId>org.testng</groupId>
