@@ -23,6 +23,20 @@
                     <xs:element minOccurs="0" name="value" nillable="true" type="xs:string"></xs:element>
                 </xs:sequence>
             </xs:complexType>
+            <xs:complexType name="PermissionBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="createTable" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="deleteIndex" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="deleteRecord" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="dropTable" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="getIndex" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="listRecord" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="listTable" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="putRecord" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="searchRecord" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="setIndex" type="xs:boolean"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
             <xs:complexType name="TableBean">
                 <xs:sequence>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="ax211:ColumnBean"></xs:element>
@@ -38,20 +52,6 @@
                     <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"></xs:element>
                 </xs:sequence>
             </xs:complexType>
-            <xs:complexType name="PermissionBean">
-                <xs:sequence>
-                    <xs:element minOccurs="0" name="createTable" type="xs:boolean"></xs:element>
-                    <xs:element minOccurs="0" name="deleteIndex" type="xs:boolean"></xs:element>
-                    <xs:element minOccurs="0" name="deleteRecord" type="xs:boolean"></xs:element>
-                    <xs:element minOccurs="0" name="dropTable" type="xs:boolean"></xs:element>
-                    <xs:element minOccurs="0" name="getIndex" type="xs:boolean"></xs:element>
-                    <xs:element minOccurs="0" name="listRecord" type="xs:boolean"></xs:element>
-                    <xs:element minOccurs="0" name="listTable" type="xs:boolean"></xs:element>
-                    <xs:element minOccurs="0" name="putRecord" type="xs:boolean"></xs:element>
-                    <xs:element minOccurs="0" name="searchRecord" type="xs:boolean"></xs:element>
-                    <xs:element minOccurs="0" name="setIndex" type="xs:boolean"></xs:element>
-                </xs:sequence>
-            </xs:complexType>
         </xs:schema>
         <xs:schema xmlns:ax212="http://beans.messageconsole.analytics.carbon.wso2.org/xsd" xmlns:ax210="http://exception.messageconsole.analytics.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://messageconsole.analytics.carbon.wso2.org">
             <xs:import namespace="http://exception.messageconsole.analytics.carbon.wso2.org/xsd"></xs:import>
@@ -60,18 +60,6 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="MessageConsoleException" nillable="true" type="ax29:MessageConsoleException"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="listTables">
-                <xs:complexType>
-                    <xs:sequence></xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="listTablesResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -91,6 +79,44 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" nillable="true" type="ax212:RecordResultBean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAvailablePermissions">
+                <xs:complexType>
+                    <xs:sequence></xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAvailablePermissionsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax212:PermissionBean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTableInfo">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTableInfoResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax212:TableBean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="listTables">
+                <xs:complexType>
+                    <xs:sequence></xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="listTablesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -171,29 +197,10 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getTableInfo">
+            <xs:element name="deleteTable">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getTableInfoResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax212:TableBean"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getAvailablePermissions">
-                <xs:complexType>
-                    <xs:sequence></xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getAvailablePermissionsResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax212:PermissionBean"></xs:element>
+                        <xs:element minOccurs="0" name="table" nillable="true" type="xs:string"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -243,6 +250,9 @@
     </wsdl:message>
     <wsdl:message name="addRecordResponse">
         <wsdl:part name="parameters" element="ns:addRecordResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deleteTableRequest">
+        <wsdl:part name="parameters" element="ns:deleteTable"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="putArbitraryFieldRequest">
         <wsdl:part name="parameters" element="ns:putArbitraryField"></wsdl:part>
@@ -296,6 +306,10 @@
             <wsdl:input message="ns:addRecordRequest" wsaw:Action="urn:addRecord"></wsdl:input>
             <wsdl:output message="ns:addRecordResponse" wsaw:Action="urn:addRecordResponse"></wsdl:output>
             <wsdl:fault message="ns:MessageConsoleMessageConsoleException" name="MessageConsoleMessageConsoleException" wsaw:Action="urn:addRecordMessageConsoleMessageConsoleException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteTable">
+            <wsdl:input message="ns:deleteTableRequest" wsaw:Action="urn:deleteTable"></wsdl:input>
+            <wsdl:fault message="ns:MessageConsoleMessageConsoleException" name="MessageConsoleMessageConsoleException" wsaw:Action="urn:deleteTableMessageConsoleMessageConsoleException"></wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="putArbitraryField">
             <wsdl:input message="ns:putArbitraryFieldRequest" wsaw:Action="urn:putArbitraryField"></wsdl:input>
@@ -382,6 +396,15 @@
         </wsdl:operation>
         <wsdl:operation name="deleteArbitraryField">
             <soap:operation soapAction="urn:deleteArbitraryField" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:fault name="MessageConsoleMessageConsoleException">
+                <soap:fault use="literal" name="MessageConsoleMessageConsoleException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteTable">
+            <soap:operation soapAction="urn:deleteTable" style="document"></soap:operation>
             <wsdl:input>
                 <soap:body use="literal"></soap:body>
             </wsdl:input>
@@ -512,6 +535,15 @@
                 <soap12:fault use="literal" name="MessageConsoleMessageConsoleException"></soap12:fault>
             </wsdl:fault>
         </wsdl:operation>
+        <wsdl:operation name="deleteTable">
+            <soap12:operation soapAction="urn:deleteTable" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:fault name="MessageConsoleMessageConsoleException">
+                <soap12:fault use="literal" name="MessageConsoleMessageConsoleException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
         <wsdl:operation name="putArbitraryField">
             <soap12:operation soapAction="urn:putArbitraryField" style="document"></soap12:operation>
             <wsdl:input>
@@ -613,6 +645,12 @@
         </wsdl:operation>
         <wsdl:operation name="deleteArbitraryField">
             <http:operation location="deleteArbitraryField"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="deleteTable">
+            <http:operation location="deleteTable"></http:operation>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"></mime:content>
             </wsdl:input>

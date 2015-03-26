@@ -77,6 +77,7 @@ public class MessageConsoleConnector {
     public static final int TYPE_UPDATE_ARBITRARY_RECORD = 8;
     public static final int TYPE_DELETE_ARBITRARY_RECORD = 9;
     public static final int TYPE_CREATE_TABLE = 10;
+    public static final int TYPE_DELETE_TABLE = 11;
 
     private MessageConsoleStub stub;
     private static final GsonBuilder RESPONSE_RESULT_BUILDER = new GsonBuilder().registerTypeAdapter(ResponseResult.class,
@@ -380,6 +381,20 @@ public class MessageConsoleConnector {
             log.error("Unable to save table information: " + e.getMessage(), e);
             msg = "Unable to save table information: " + e.getMessage();
         }
+        return msg;
+    }
+
+    public String deleteTable(String table) {
+
+        String msg;
+        try {
+            stub.deleteTable(table);
+            msg = "Table " + table + " deleted successfully";
+        } catch (Exception e) {
+            log.error("Unable to delete table due to " + e.getMessage(), e);
+            msg = "Unable to delete table due to " + e.getMessage();
+        }
+
         return msg;
     }
 }

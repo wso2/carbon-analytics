@@ -1,43 +1,6 @@
 var tableLoaded = false;
 var timestamp;
 var arbitraryColumnName;
-/*function createMainJTable(fields) {
-    $('#AnalyticsTableContainer').jtable({
-                                             title: $("#tableSelect").val(),
-                                             paging: true,
-                                             pageSize: 25,
-                                             selecting: true,
-                                             multiselect: true,
-                                             selectingCheckboxes: true,
-                                             actions: {
-                                                 // For Details: http://jtable.org/Demo/FunctionsAsActions
-                                                 listAction: function (postData, jtParams) {
-                                                     return listActionMethod(jtParams);
-                                                 },
-                                                 createAction: function (postData) {
-                                                     return createActionMethod(postData);
-                                                 },
-                                                 updateAction: function (postData) {
-                                                     return updateActionMethod(postData);
-                                                 },
-                                                 deleteAction: function (postData) {
-                                                     return deleteActionMethod(postData);
-                                                 }
-                                             },
-                                             formCreated: function (event, data) {
-                                                 timestamp = data.record.bam_rec_timestamp;
-                                             },
-                                             fields: fields
-
-                                         });
-    $('#AnalyticsTableContainer').jtable('load');
-    $("#DeleteAllButton").show();
-    $("#DeleteAllButton").on("click", function () {
-        var $selectedRows = $('#AnalyticsTableContainer').jtable('selectedRows');
-        $('#AnalyticsTableContainer').jtable('deleteRows', $selectedRows);
-    });
-    tableLoaded = true;
-}*/
 
 function getArbitraryFields(rowData) {
     var $img =
@@ -315,4 +278,15 @@ function deleteRecords(postData) {
 
 function deleteActionMethod(postData) {
     return deleteRecords(postData);
+}
+
+function tableSelectChange() {
+    var table = $("#tableSelect").val();
+    if (table != '-1') {
+        $("#deleteTableButton").show();
+        $("#editTableButton").show();
+    } else {
+        $("#deleteTableButton").hide();
+        $("#editTableButton").hide();
+    }
 }

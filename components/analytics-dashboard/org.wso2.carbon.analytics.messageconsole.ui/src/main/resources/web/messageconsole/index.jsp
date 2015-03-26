@@ -51,6 +51,7 @@
         var typeUpdateArbitraryRecord = '<%= MessageConsoleConnector.TYPE_UPDATE_ARBITRARY_RECORD%>';
         var typeDeleteArbitraryRecord = '<%= MessageConsoleConnector.TYPE_DELETE_ARBITRARY_RECORD%>';
         var typeCreateTable = '<%= MessageConsoleConnector.TYPE_CREATE_TABLE%>';
+        var typeDeleteTable = '<%= MessageConsoleConnector.TYPE_DELETE_TABLE%>';
 
         $(document).ready(function () {
             <c:if test="${permissions != null && permissions.isListTable()}">
@@ -78,11 +79,11 @@
                                                  }
                                              });
 
-            $("#dialog").dialog({
-                                    autoOpen: false
-                                });
-            $("#button").on("click", function () {
-                $("#dialog").dialog("open");
+            $("#createTableDialog").dialog({
+                                               autoOpen: false
+                                           });
+            $("#addNewTable").on("click", function () {
+                $("#createTableDialog").dialog("open");
             });
 
             $("#column-details tbody").on("click", ".del", function () {
@@ -95,6 +96,28 @@
                 var appendTxt =
                         "<tr><td><input type='text' name='column'/></td><td><select><option value='String'>String</option><option value='Integer'>Integer</option><option value='Long'>Long</option><option value='Boolean'>Boolean</option><option value='Float'>Float</option><option value='Double'>Double</option></select></td><td><input type='checkbox' name='primary'/></td><td><input type='checkbox' name='index'/></td><td><input class='add' type='button' value='Add More'/></td></tr>";
                 $("tr:last").after(appendTxt);
+            });
+
+            $("#deleteTableButton").on("click", function () {
+                $("#table-delete-confirm").dialog({
+                                                      resizable: false,
+                                                      height: 140,
+                                                      modal: true,
+                                                      buttons: {
+                                                          "Delete Table": function () {
+                                                              $.post('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeDeleteTable, {tableName: $("#tableSelect").val()},
+                                                                     function (result) {
+                                                                         $("deleteTableMessage").innerHTML = result;
+                                                                     });
+                                                              $(this).dialog("close");
+                                                          },
+                                                          Cancel: function () {
+                                                              $(this).dialog("close");
+                                                          }
+                                                      }
+                                                  });
+                $("#table-delete-confirm").dialog("open");
+                return false;
             });
         });
 
@@ -130,7 +153,7 @@
                            var label = document.getElementById('msgLabel');
                            label.style.display = 'block';
                            label.innerHTML = data;
-                           document.getElementById('table').style.display = 'none';
+                           document.getElementById('createTablePopup').style.display = 'none';
                        },
                        error: function (data) {
                            result = false;
@@ -186,7 +209,6 @@
             });
             tableLoaded = true;
         }
-
     </script>
 
 </head>
@@ -196,15 +218,27 @@
         <p><c:out value="${permissionError.message}"/></p>
     </div>
 </c:if>
+<div>
+    <label id="deleteTableMessage"></label>
+</div>
+
+<div id="table-delete-confirm" title="Remove entire table?" style="display: none">
+    <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+        This will be permanently delete entire table. Are you sure? </p>
+</div>
 
 <fieldset>
     <legend>Search:</legend>
     <c:if test="${permissions != null && permissions.isListTable() && permissions.isListRecord()}">
         <label> Table Name*:
-            <select id="tableSelect">
+            <select id="tableSelect" onchange="tableSelectChange()">
                 <option value="-1">Select a table</option>
             </select>
         </label>
+        <c:if test="${permissions != null && permissions.isDropTable()}">
+            <input type="button" id="deleteTableButton" value="Delete Table" style="display: none">
+            <input type="button" id="editTableButton" value="Edit Table" style="display: none">
+        </c:if>
         <fieldset>
             <legend>By Date Range:</legend>
             <label> From: <input id="timeFrom" type="text"> </label>
@@ -225,14 +259,14 @@
 <div id="AnalyticsTableContainer"></div>
 <input type="button" id="DeleteAllButton" value="Delete all selected records">
 <c:if test="${permissions != null && permissions.isCreateTable()}">
-    <input type="button" id="button" value="Add New Table">
+    <input type="button" id="addNewTable" value="Add New Table">
 </c:if>
 
-<div id="dialog" title="Create a new table">
+<div id="createTableDialog" title="Create a new table">
     <div id="msg">
         <label id="msgLabel" style="display: none"></label>
     </div>
-    <div id="table">
+    <div id="createTablePopup">
         <form class="noteform" id="notesmodal" action="javascript:createTable()">
             <label> Table Name:
                 <input type="text" id="tableName">

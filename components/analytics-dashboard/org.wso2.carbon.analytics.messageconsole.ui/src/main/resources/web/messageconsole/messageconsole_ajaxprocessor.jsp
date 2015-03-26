@@ -114,6 +114,10 @@
             out.print(connector.createTable(tableName, tableInfo));
             break;
         }
+        case MessageConsoleConnector.TYPE_DELETE_TABLE: {
+            out.print(connector.deleteTable(tableName));
+            break;
+        }
     }
 
 %><%!

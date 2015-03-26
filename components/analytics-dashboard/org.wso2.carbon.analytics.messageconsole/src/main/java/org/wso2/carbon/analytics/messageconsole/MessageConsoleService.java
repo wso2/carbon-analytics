@@ -56,6 +56,7 @@ public class MessageConsoleService extends AbstractAdmin {
 
     private static final Log logger = LogFactory.getLog(MessageConsoleService.class);
     private static final String LUCENE = "lucene";
+    private static final String AT_SIGN = "@";
 
     private SecureAnalyticsDataService analyticsDataService;
 
@@ -546,6 +547,16 @@ public class MessageConsoleService extends AbstractAdmin {
 
     @Override
     protected String getUsername() {
-        return super.getUsername() + "@" + getTenantDomain();
+        return super.getUsername() + AT_SIGN + getTenantDomain();
+    }
+
+    public void deleteTable(String table) throws MessageConsoleException {
+        try {
+            String username = getUsername();
+            analyticsDataService.deleteTable(username, table);
+        } catch (AnalyticsException e) {
+            logger.error("Unable to delete table: " + table, e);
+            throw new MessageConsoleException("Unable to delete table: " + table, e);
+        }
     }
 }
