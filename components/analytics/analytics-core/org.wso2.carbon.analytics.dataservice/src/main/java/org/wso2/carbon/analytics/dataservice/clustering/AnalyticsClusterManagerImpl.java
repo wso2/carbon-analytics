@@ -243,9 +243,6 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         List<Member> groupMembers = this.getGroupMembers(groupId);
         if (groupMembers.contains(member)) {
             groupMembers.remove(member);
-        } else {
-            /* member is not in our group */
-            return;
         }
         Member myself = this.hz.getCluster().getLocalMember();
         if (this.isLeader(groupId)) {
