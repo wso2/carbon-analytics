@@ -1,34 +1,4 @@
 <jsp:include page="includes/header.jsp" />
-
-
-
-<div class="modal fade" id="mdlDashboard" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Create a new Dashboard</h4>
-      </div>
-      <div class="modal-body">
-        <form>
-          <div class="form-group">
-            <label for="exampleInputEmail1">Dashboard Title</label>
-            <input type="text" class="form-control" id="dashboardTitle">
-          </div>
-          <div class="form-group">
-            <label for="exampleInputPassword1">Group</label>
-            <input type="text" class="form-control" id="dashboardGroup">
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button id="btnSave" type="button" class="btn btn-primary">Save</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <jsp:include page="includes/footer.jsp" />
 
 <script type="text/javascript">
@@ -41,22 +11,8 @@
       $("#wrapper").toggleClass("toggled");
   });
 
-  $("#btnSave").on("click",function () {
-    var request = {
-      "action" : "addDashboard",
-      "title" : $("#dashboardTitle").val(),
-      "group" : $("#dashboardGroup").val()
-    };
-    $.post( "/dashboard/servlet/dashboard", request,function( data ) {
-      console.log("POST sent to server. Received data " + data); 
-      window.location.reload();
-      $('#mdlDashboard').modal('hide');
-    });
-    
-  });
-
 	$(document).ready(function() {
-		$.getJSON("/dashboard/servlet/dashboard", function( data ) {
+		$.getJSON("/carbon/analytics-dashboard/ajax/dashboards_ajaxprocessor.jsp", function( data ) {
 			if(data.length == 0) {
 				console.log("No dashboards"); 
 				showNoDashboards();
@@ -70,7 +26,6 @@
 			}
 				appendFooter();
 		});
-		//append the footer
 	});
 
 
@@ -105,7 +60,7 @@
     		"action" : "getDashboardById",
     		"dashboardId" : dashboardId
     	};
-      	$.getJSON("/dashboard/servlet/dashboard",request,function (data) {
+      	$.getJSON("/carbon/analytics-dashboard/ajax/dashboards_ajaxprocessor.jsp",request,function (data) {
 	        if(data.widgets && data.widgets.length!=0) {
         		var title = data.title;
 	        	var widgets = data.widgets;
@@ -237,6 +192,13 @@
   //    bindingSource.onDataReceived(data,true);
 
   // }); 
+
+function fetchData() {
+  var url = "http://localhost:9763/analytics/tables/expenses";
+  $.getJSON(url,function(data) {
+    console.log(data); 
+  });
+};
 
 
 

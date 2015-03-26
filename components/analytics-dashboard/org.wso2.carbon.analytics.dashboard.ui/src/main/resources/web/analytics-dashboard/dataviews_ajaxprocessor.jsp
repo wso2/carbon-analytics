@@ -17,7 +17,7 @@
 
 	$(document).ready(function() {
 
-		$.getJSON("/dashboard/servlet/dataview", function( data ) {
+		$.getJSON("/carbon/analytics-dashboard/ajax/dataviews_ajaxprocessor.jsp", function( data ) {
 			var source   = $("#tplDataViews").html();
 			var template = Handlebars.compile(source);
 			$("#container").append(template({ dataviews : data}));
@@ -43,12 +43,11 @@
 	});	//end of document.ready()
 
 	function renderDVContent(dataview) {
-		console.log("reloading..."); 
 		var dv = {name:"foo",type:"bar",datasource:"bax",widgets:[{id:"1234ew",title:"Sales By Region"}]};
 		// var dv = {name:"foo",type:"bar",datasource:"bax",widgets:[]};
 		var dashboards = [];	
 		//fetch all dashboards. They are required to populate the dropdown list
-		$.getJSON("/dashboard/servlet/dashboard", function( data ) {
+		$.getJSON("/carbon/analytics-dashboard/ajax/dashboards_ajaxprocessor.jsp", function( data ) {
 			data.forEach(function (d,i) {
 				dashboards.push(d);
 			});
@@ -60,7 +59,7 @@
 			"dataViewId" : dataview
 		};
 		
-		$.getJSON("/dashboard/servlet/dataview",request,function (data) {
+		$.getJSON("/carbon/analytics-dashboard/ajax/dataviews_ajaxprocessor.jsp",request,function (data) {
 			// var dashboards = [];
 			var source   = $("#tplDVInfo").html();
 			var template = Handlebars.compile(source);

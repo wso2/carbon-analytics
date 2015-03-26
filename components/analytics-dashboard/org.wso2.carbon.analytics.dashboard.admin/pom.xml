@@ -48,6 +48,23 @@
             <!--<scope>runtime</scope>-->
         <!--</dependency>-->
 
+        <!--carbon-analytics -->
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.analytics.dataservice</artifactId>
+            <version>1.0.3-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.analytics.datasource.commons</artifactId>
+            <version>1.0.3-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.analytics.dataservice.commons</artifactId>
+            <version>1.0.3-SNAPSHOT</version>
+        </dependency>
+
         <!-- Jackson -->
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
@@ -70,7 +87,8 @@
             <artifactId>gson</artifactId>
             <version>1.7.1</version>
         </dependency>
-	</dependencies>
+
+    </dependencies>
 
 	<build>
 	        <plugins>

@@ -18,16 +18,19 @@ package org.wso2.carbon.analytics.dashboard.admin;
 import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.dashboard.admin.data.Dashboard;
-import org.wso2.carbon.analytics.dashboard.admin.data.DataView;
-import org.wso2.carbon.analytics.dashboard.admin.data.Widget;
-import org.wso2.carbon.analytics.dashboard.admin.data.WidgetMetaData;
+import org.wso2.carbon.analytics.dashboard.admin.data.*;
+import org.wso2.carbon.analytics.dashboard.admin.internal.ServiceHolder;
+import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
+import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.core.AbstractAdmin;
 import org.wso2.carbon.registry.api.Collection;
 import org.wso2.carbon.registry.api.RegistryException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class DashboardAdminService extends AbstractAdmin {
 
@@ -35,14 +38,91 @@ public class DashboardAdminService extends AbstractAdmin {
 	 * Relative Registry locations for dataViews and dashboards.
 	 */
 	private static final String DATAVIEWS_DIR =
-			"/repository/components/org.wso2.carbon.analytics.dashboards/";
-	private static final String DASHBOARDS_DIR =
 			"/repository/components/org.wso2.carbon.analytics.dataviews/";
+	private static final String DASHBOARDS_DIR =
+			"/repository/components/org.wso2.carbon.analytics.dashboards/";
+
+    private SecureAnalyticsDataService analyticsDataService;
+
+    public DashboardAdminService() {
+        this.analyticsDataService = ServiceHolder.getAnalyticsDataService();
+    }
 
 	/**
 	 * Logger
 	 */
 	private Log logger = LogFactory.getLog(DashboardAdminService.class);
+
+    public Table getRecords(String tableName, long timeFrom, long timeTo, int startIndex, int recordCount,
+                                       String searchQuery)
+            throws AxisFault {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Search Query: " + searchQuery);
+            logger.debug("timeFrom: " + timeFrom);
+            logger.debug("timeTo: " + timeTo);
+            logger.debug("Start Index: " + startIndex);
+            logger.debug("Page Size: " + recordCount);
+        }
+
+        String username = getUsername();
+
+        Table table = new Table();
+        table.setName(tableName);
+        RecordGroup[] results = new RecordGroup[0];
+        long searchCount = 0;
+
+        if (searchQuery != null && !searchQuery.isEmpty()) {
+            //TODO implement me :(
+        } else {
+            try {
+                results = analyticsDataService.get(username, tableName, 1, null, timeFrom, timeTo, startIndex, recordCount);
+            } catch (Exception e) {
+                logger.error("Unable to get records from Analytics data layer for tenant: " + username +
+                        " and for table:" + tableName, e);
+                throw new AxisFault("Unable to get records from Analytics data layer for tenant: " + username +
+                        " and for table:" + tableName, e);
+            }
+        }
+
+        if (results != null) {
+            List<Record> records;
+            List<Row> rowList = new ArrayList<Row>();
+            try {
+                records = GenericUtils.listRecords(analyticsDataService, results);
+            } catch (Exception e) {
+                logger.error("Unable to convert result to record for tenant: " + username +
+                        " and for table:" + tableName, e);
+                throw new AxisFault("Unable to convert result to record for tenant: " + username +
+                        " and for table:" + tableName, e);
+            }
+            if (records != null && !records.isEmpty()) {
+                for (Record record : records) {
+                    rowList.add(createRow(record));
+                }
+            }
+            Row[] rows = new Row[rowList.size()];
+            rowList.toArray(rows);
+            table.setRows(rows);
+        }
+        return table;
+    }
+
+    private Row createRow(Record record) {
+        Row row = new Row();
+        Cell[] cells = new Cell[record.getValues().size()];
+        int i = 0;
+        for (Map.Entry<String, Object> entry : record.getValues().entrySet()) {
+            cells[i++] = createCell(entry.getKey(), entry.getValue());
+        }
+        row.setCells(cells);
+        return row;
+    }
+
+    private Cell createCell(String key,Object value) {
+        Cell cell = new Cell(key,String.valueOf(value));
+        return cell;
+    }
 
 	/**
 	 * @return All the dataView objects saved in the registry.
@@ -274,4 +354,9 @@ public class DashboardAdminService extends AbstractAdmin {
 		dashboard.updateWidget(widget);
 		return updateDashboard(dashboard);
 	}
+
+    @Override
+    protected String getUsername() {
+        return super.getUsername() + "@" + getTenantDomain();
+    }
 }

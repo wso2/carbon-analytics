@@ -1,3 +1,4 @@
+
 <wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://admin.dashboard.analytics.carbon.wso2.org" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ax23="http://data.admin.dashboard.analytics.carbon.wso2.org/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://admin.dashboard.analytics.carbon.wso2.org">
     <wsdl:documentation>DashboardAdminService</wsdl:documentation>
     <wsdl:types>
@@ -26,6 +27,23 @@
                     <xs:element minOccurs="0" name="title" nillable="true" type="xs:string"></xs:element>
                 </xs:sequence>
             </xs:complexType>
+            <xs:complexType name="Table">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="rows" nillable="true" type="ax23:Row"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="Row">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="cells" nillable="true" type="ax23:Cell"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="Cell">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="key" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="value" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
             <xs:complexType name="Dashboard">
                 <xs:sequence>
                     <xs:element minOccurs="0" name="group" nillable="true" type="xs:string"></xs:element>
@@ -52,6 +70,37 @@
         </xs:schema>
         <xs:schema xmlns:ax24="http://data.admin.dashboard.analytics.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://admin.dashboard.analytics.carbon.wso2.org">
             <xs:import namespace="http://data.admin.dashboard.analytics.carbon.wso2.org/xsd"></xs:import>
+            <xs:element name="getDataViewsInfo">
+                <xs:complexType>
+                    <xs:sequence></xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getDataViewsInfoResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax23:DataView"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getRecords">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="timeFrom" type="xs:long"></xs:element>
+                        <xs:element minOccurs="0" name="timeTo" type="xs:long"></xs:element>
+                        <xs:element minOccurs="0" name="startIndex" type="xs:int"></xs:element>
+                        <xs:element minOccurs="0" name="recordCount" type="xs:int"></xs:element>
+                        <xs:element minOccurs="0" name="searchQuery" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getRecordsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax23:Table"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="getDataView">
                 <xs:complexType>
                     <xs:sequence>
@@ -66,6 +115,34 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="addDataView">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="dataView" nillable="true" type="ax23:DataView"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addDataViewResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="updateDataView">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="dataView" nillable="true" type="ax23:DataView"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="updateDataViewResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="deleteDataView">
                 <xs:complexType>
                     <xs:sequence>
@@ -74,6 +151,21 @@
                 </xs:complexType>
             </xs:element>
             <xs:element name="deleteDataViewResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addWidget">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="dataViewID" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="widget" nillable="true" type="ax23:Widget"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addWidgetResponse">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" type="xs:boolean"></xs:element>
@@ -208,61 +300,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getDataViewsInfo">
-                <xs:complexType>
-                    <xs:sequence></xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getDataViewsInfoResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax23:DataView"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="addDataView">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="dataView" nillable="true" type="ax23:DataView"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="addDataViewResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:boolean"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="updateDataView">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="dataView" nillable="true" type="ax23:DataView"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="updateDataViewResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:boolean"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="addWidget">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="dataViewID" nillable="true" type="xs:string"></xs:element>
-                        <xs:element minOccurs="0" name="widget" nillable="true" type="ax23:Widget"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="addWidgetResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:boolean"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
         </xs:schema>
     </wsdl:types>
     <wsdl:message name="addWidgetRequest">
@@ -355,6 +392,12 @@
     <wsdl:message name="getDataViewResponse">
         <wsdl:part name="parameters" element="ns:getDataViewResponse"></wsdl:part>
     </wsdl:message>
+    <wsdl:message name="getRecordsRequest">
+        <wsdl:part name="parameters" element="ns:getRecords"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getRecordsResponse">
+        <wsdl:part name="parameters" element="ns:getRecordsResponse"></wsdl:part>
+    </wsdl:message>
     <wsdl:portType name="DashboardAdminServicePortType">
         <wsdl:operation name="addWidget">
             <wsdl:input message="ns:addWidgetRequest" wsaw:Action="urn:addWidget"></wsdl:input>
@@ -415,6 +458,10 @@
         <wsdl:operation name="getDataView">
             <wsdl:input message="ns:getDataViewRequest" wsaw:Action="urn:getDataView"></wsdl:input>
             <wsdl:output message="ns:getDataViewResponse" wsaw:Action="urn:getDataViewResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getRecords">
+            <wsdl:input message="ns:getRecordsRequest" wsaw:Action="urn:getRecords"></wsdl:input>
+            <wsdl:output message="ns:getRecordsResponse" wsaw:Action="urn:getRecordsResponse"></wsdl:output>
         </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="DashboardAdminServiceSoap11Binding" type="ns:DashboardAdminServicePortType">
@@ -547,6 +594,15 @@
         </wsdl:operation>
         <wsdl:operation name="getDataView">
             <soap:operation soapAction="urn:getDataView" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getRecords">
+            <soap:operation soapAction="urn:getRecords" style="document"></soap:operation>
             <wsdl:input>
                 <soap:body use="literal"></soap:body>
             </wsdl:input>
@@ -692,6 +748,15 @@
                 <soap12:body use="literal"></soap12:body>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="getRecords">
+            <soap12:operation soapAction="urn:getRecords" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
     </wsdl:binding>
     <wsdl:binding name="DashboardAdminServiceHttpBinding" type="ns:DashboardAdminServicePortType">
         <http:binding verb="POST"></http:binding>
@@ -830,16 +895,25 @@
                 <mime:content type="text/xml" part="parameters"></mime:content>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="getRecords">
+            <http:operation location="getRecords"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
     </wsdl:binding>
     <wsdl:service name="DashboardAdminService">
         <wsdl:port name="DashboardAdminServiceHttpsSoap11Endpoint" binding="ns:DashboardAdminServiceSoap11Binding">
-            <soap:address location="https://10.100.4.135:9443/services/DashboardAdminService.DashboardAdminServiceHttpsSoap11Endpoint/"></soap:address>
+            <soap:address location="https://10.100.0.133:9443/services/DashboardAdminService.DashboardAdminServiceHttpsSoap11Endpoint/"></soap:address>
         </wsdl:port>
         <wsdl:port name="DashboardAdminServiceHttpsSoap12Endpoint" binding="ns:DashboardAdminServiceSoap12Binding">
-            <soap12:address location="https://10.100.4.135:9443/services/DashboardAdminService.DashboardAdminServiceHttpsSoap12Endpoint/"></soap12:address>
+            <soap12:address location="https://10.100.0.133:9443/services/DashboardAdminService.DashboardAdminServiceHttpsSoap12Endpoint/"></soap12:address>
         </wsdl:port>
         <wsdl:port name="DashboardAdminServiceHttpsEndpoint" binding="ns:DashboardAdminServiceHttpBinding">
-            <http:address location="https://10.100.4.135:9443/services/DashboardAdminService.DashboardAdminServiceHttpsEndpoint/"></http:address>
+            <http:address location="https://10.100.0.133:9443/services/DashboardAdminService.DashboardAdminServiceHttpsEndpoint/"></http:address>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>
