@@ -525,7 +525,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         Table dataTable = null;
         List<Delete> dataDeletes = new ArrayList<>();
         String dataTableName = HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.DATA);
-        //List<Long> timestamps = this.lookupTimestamp(dataTableName, ids, tenantId, tableName);
+        List<Long> timestamps = this.lookupTimestamp(dataTableName, ids, tenantId, tableName);
         for (String recordId : ids) {
             dataDeletes.add(new Delete(recordId.getBytes()));
         }
@@ -544,7 +544,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         } finally {
             GenericUtils.closeQuietly(dataTable);
         }
-        //this.deleteIndexEntries(tenantId, tableName, timestamps);
+        this.deleteIndexEntries(tenantId, tableName, timestamps);
     }
 
     private void deleteIndexEntries(int tenantId, String tableName, List<Long> timestamps) throws AnalyticsException {
