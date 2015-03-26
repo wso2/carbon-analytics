@@ -51,6 +51,10 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
         this.fileSystem = fs;
     }
 
+    public HDFSAnalyticsFileSystem() {
+        this.fileSystem = null;
+    }
+
     @Override
     public void init(Map<String, String> properties) throws AnalyticsException {
         String dsName = properties.get(HBaseAnalyticsDSConstants.DATASOURCE_NAME);

@@ -130,9 +130,8 @@ public class HBaseRecordIterator implements Iterator<Record> {
                     values = new HashMap<>();
                     timestamp = HBaseUtils.decodeLong(CellUtil.cloneValue(timeCell));
                     fetchedRecords.add(new Record(new String(rowId), this.tenantId, this.tableName, values, timestamp));
-                } else {
-                    /* No valid data in row, ignore.*/
                 }
+                    /* else, No valid data in row, ignore.*/
             }
             this.subIterator = fetchedRecords.iterator();
         } catch (Exception e) {
