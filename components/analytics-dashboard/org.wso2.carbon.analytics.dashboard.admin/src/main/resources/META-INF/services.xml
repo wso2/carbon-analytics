@@ -23,7 +23,7 @@
         <parameter name="ServiceClass" locked="false">
             org.wso2.carbon.analytics.dashboard.admin.DashboardAdminService
         </parameter>
-       
+
     </service>
 
     <parameter name="adminService" locked="true">true</parameter>

@@ -16,16 +16,17 @@
 ~ under the License.
 --%>
 <%@ page import="com.google.gson.Gson" %>
-<%@ page import="org.wso2.carbon.analytics.dashboard.stub.DashboardAdminServiceStub" %>
-<%@ page import="org.wso2.carbon.analytics.dashboard.stub.data.Table" %>
 <%@ page import="org.wso2.carbon.analytics.dashboard.ui.DashboardAdminClient" %>
 <%@ page import="org.wso2.carbon.analytics.dashboard.ui.dto.TableDTO" %>
+<%@ page import="org.wso2.carbon.analytics.dashboard.batch.stub.BatchAnalyticsDashboardAdminServiceStub" %>
+<%@ page import="org.wso2.carbon.analytics.dashboard.batch.stub.data.Table" %>
 
 <%
 
     String responseText = "";
     String tableName = request.getParameter("table");
-    DashboardAdminServiceStub stub =   DashboardAdminClient.getDashboardAdminService(config, session, request);
+    BatchAnalyticsDashboardAdminServiceStub stub =   DashboardAdminClient.getDashboardBatchAnalyticsAdminService(config,
+            session, request);
     response.setContentType("application/json");
     Gson gson = new Gson();
 

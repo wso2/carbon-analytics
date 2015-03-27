@@ -1,34 +1,35 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
- ~ Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- ~
- ~ WSO2 Inc. licenses this file to you under the Apache License,
- ~ Version 2.0 (the "License"); you may not use this file except
- ~ in compliance with the License.
- ~ You may obtain a copy of the License at
- ~
- ~    http://www.apache.org/licenses/LICENSE-2.0
- ~
- ~ Unless required by applicable law or agreed to in writing,
- ~ software distributed under the License is distributed on an
- ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- ~ KIND, either express or implied.  See the License for the
- ~ specific language governing permissions and limitations
- ~ under the License.
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  ~ /**
+  ~  * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  * you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  *      http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  -->
 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
+        <artifactId>service-stubs</artifactId>
         <groupId>org.wso2.carbon.analytics-common</groupId>
-        <artifactId>carbon-analytics-common</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>org.wso2.carbon.analytics.dashboard.stub</artifactId>
+    <artifactId>org.wso2.carbon.analytics.dashboard.batch.stub</artifactId>
     <packaging>bundle</packaging>
-    <name>WSO2 Carbon - Analytics Dashboard Stub</name>
+    <name>WSO2 Carbon - Batch Analytics Dashboard Stub</name>
     <url>http://wso2.org</url>
 
     <build>
@@ -51,7 +52,8 @@
                                     <pathelement location="${settings.localRepository}/org/apache/axis2/wso2/axis2/${orbit.version.axis2}/axis2-${orbit.version.axis2}.jar" />
                                 </path>
                                 <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
-                                    <arg line="-uri src/main/resources/DashboardAdminService.wsdl -u -uw -o target/generated-code -p org.wso2.carbon.analytics.dashboard.stub -ns2p http://org.apache.axis2/xsd=org.wso2.carbon.analytics.dashboard.stub.axis2,http://data.admin.dashboard.analytics.carbon.wso2.org/xsd=org.wso2.carbon.analytics.dashboard.stub.data" />
+                                    <arg
+                                            line="-uri src/main/resources/BatchAnalyticsDashboardAdminService.wsdl -u -uw -o target/generated-code -p org.wso2.carbon.analytics.dashboard.batch.stub -ns2p http://org.apache.axis2/xsd=org.wso2.carbon.analytics.dashboard.batch.stub.axis2,http://data.admin.batch.dashboard.analytics.carbon.wso2.org/xsd=org.wso2.carbon.analytics.dashboard.batch.stub.data" />
                                     <classpath refid="wsdl2java.classpath" />
                                 </java>
                             </tasks>
@@ -89,7 +91,7 @@
                             ${project.artifactId}
                         </Bundle-SymbolicName>
                         <Export-Package>
-                            org.wso2.carbon.analytics.dashboard.stub.*;
+                            org.wso2.carbon.analytics.dashboard.batch.stub.*;
                             version="${carbon.analytics.common.version}"
                         </Export-Package>
                     </instructions>
@@ -118,4 +120,3 @@
     </dependencies>
 
 </project>
-
