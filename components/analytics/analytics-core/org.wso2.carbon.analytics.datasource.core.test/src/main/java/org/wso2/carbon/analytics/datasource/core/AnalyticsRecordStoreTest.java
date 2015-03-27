@@ -68,7 +68,7 @@ public class AnalyticsRecordStoreTest {
         values.put("log", log);
         values.put("sequence", null);
         values.put("summary2", null);
-        return new Record(tenantId, tableName, values, System.currentTimeMillis());
+        return new Record(GenericUtils.generateRecordID(), tenantId, tableName, values, System.currentTimeMillis());
     }
 
     public static List<Record> generateRecords(int tenantId, String tableName, int i, int c, long time, int timeOffset) {
@@ -91,7 +91,7 @@ public class AnalyticsRecordStoreTest {
             } else {
                 timeTmp = System.currentTimeMillis();
             }
-            result.add(new Record(tenantId, tableName, values, timeTmp));
+            result.add(new Record(GenericUtils.generateRecordID(), tenantId, tableName, values, timeTmp));
         }
         return result;
     }
@@ -147,6 +147,9 @@ public class AnalyticsRecordStoreTest {
         String tableName = "T1";
         this.analyticsRS.deleteTable(tenantId, tableName);
         this.analyticsRS.createTable(tenantId, tableName);
+        AnalyticsSchema schema = this.analyticsRS.getTableSchema(tenantId, tableName);
+        /* for an empty schema, still the schema object must be returned */
+        Assert.assertNotNull(schema);
         Map<String, AnalyticsSchema.ColumnType> columns = new HashMap<String, AnalyticsSchema.ColumnType>();
         columns.put("name", AnalyticsSchema.ColumnType.STRING);
         columns.put("age", AnalyticsSchema.ColumnType.INT);
@@ -157,7 +160,7 @@ public class AnalyticsRecordStoreTest {
         List<String> primaryKeys = new ArrayList<String>();
         primaryKeys.add("name");
         primaryKeys.add("age");
-        AnalyticsSchema schema = new AnalyticsSchema(columns, primaryKeys);
+        schema = new AnalyticsSchema(columns, primaryKeys);
         this.analyticsRS.setTableSchema(tenantId, tableName, schema);
         AnalyticsSchema schemaIn = this.analyticsRS.getTableSchema(tenantId, tableName);
         Assert.assertEquals(schema, schemaIn);

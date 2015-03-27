@@ -1,5 +1,3 @@
-package org.wso2.carbon.analytics.dataservice;
-
 /*
 * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -17,6 +15,7 @@ package org.wso2.carbon.analytics.dataservice;
 * specific language governing permissions and limitations
 * under the License.
 */
+package org.wso2.carbon.analytics.dataservice;
 
 public class Constants {
 
@@ -31,4 +30,7 @@ public class Constants {
     public static final String PERMISSION_SET_INDEXING = "/permission/admin/manage/analytics/indexing/set";
     public static final String PERMISSION_GET_INDEXING = "/permission/admin/manage/analytics/indexing/get";
     public static final String PERMISSION_DELETE_INDEXING = "/permission/admin/manage/analytics/indexing/delete";
+    
+    public static final String DEFAULT_CHARSET = "UTF8";
+    
 }

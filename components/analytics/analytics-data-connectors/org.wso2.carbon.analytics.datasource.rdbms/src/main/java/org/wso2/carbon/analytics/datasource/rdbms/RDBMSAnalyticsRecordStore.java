@@ -24,6 +24,7 @@ import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+
 import java.io.*;
 import java.sql.*;
 import java.util.*;
@@ -386,14 +387,19 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     private AnalyticsSchema streamToSchema(InputStream in) throws AnalyticsException {
         ObjectInputStream objIn = null;
         try {
+            if (in == null || in.available() == 0) {
+                return new AnalyticsSchema(null, null);
+            }
             objIn = new ObjectInputStream(in);
             return (AnalyticsSchema) objIn.readObject();
         } catch (ClassNotFoundException | IOException e) {
-            throw new AnalyticsException("Error in stram -> schema: " + e.getMessage(), e);
+            throw new AnalyticsException("Error in stream -> schema: " + e.getMessage(), e);
         } finally {
             try {
-                objIn.close();
-            } catch (IOException e) {
+                if (objIn != null) {
+                    objIn.close();
+                }
+            } catch (IOException ignore) {
                 /* ignore */
             }
         }
@@ -435,7 +441,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             stmt.setInt(1, tenantId);
             stmt.setString(2, tableName);
             rs = stmt.executeQuery();
-            if (rs.first()) {
+            if (rs.next()) {
                 return this.streamToSchema(rs.getBinaryStream(1));
             } else {
                 if (!this.tableExists(tenantId, tableName)) {
