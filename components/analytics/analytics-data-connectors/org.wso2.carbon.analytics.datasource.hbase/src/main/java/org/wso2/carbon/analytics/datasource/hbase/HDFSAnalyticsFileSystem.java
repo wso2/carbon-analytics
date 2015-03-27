@@ -20,6 +20,7 @@ package org.wso2.carbon.analytics.datasource.hbase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -27,11 +28,8 @@ import org.apache.hadoop.fs.Path;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
-import org.wso2.carbon.analytics.datasource.hbase.util.HBaseAnalyticsDSConstants;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseUtils;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -57,7 +55,7 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
 
     @Override
     public void init(Map<String, String> properties) throws AnalyticsException {
-        String dsName = properties.get(HBaseAnalyticsDSConstants.DATASOURCE_NAME);
+/*        String dsName = properties.get(HBaseAnalyticsDSConstants.DATASOURCE_NAME);
         if (dsName == null) {
             throw new AnalyticsException("The property '" + HBaseAnalyticsDSConstants.DATASOURCE_NAME +
                     "' is required");
@@ -66,6 +64,15 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
             this.fileSystem = (FileSystem) InitialContext.doLookup(dsName);
         } catch (NamingException e) {
             throw new AnalyticsException("Error in looking up data source: " + e.getMessage(), e);
+        }*/
+
+        Configuration conf = new Configuration();
+        conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
+        conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
+        try {
+            this.fileSystem = FileSystem.get(conf);
+        } catch (Exception e) {
+            throw new AnalyticsException("Error creating HDFS Configuration: " + e.getMessage(), e);
         }
     }
 

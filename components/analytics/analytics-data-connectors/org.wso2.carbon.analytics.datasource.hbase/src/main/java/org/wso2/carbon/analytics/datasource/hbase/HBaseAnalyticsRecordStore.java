@@ -19,6 +19,7 @@ package org.wso2.carbon.analytics.datasource.hbase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Pair;
@@ -35,8 +36,6 @@ import org.wso2.carbon.analytics.datasource.hbase.rg.HBaseTimestampRecordGroup;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseAnalyticsDSConstants;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseUtils;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import java.io.*;
 import java.util.*;
 
@@ -61,7 +60,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
     @Override
     public void init(Map<String, String> properties) throws AnalyticsException {
         //this.queryConfig = HBaseUtils.lookupConfiguration();
-        String dsName = properties.get(HBaseAnalyticsDSConstants.DATASOURCE_NAME);
+/*        String dsName = properties.get(HBaseAnalyticsDSConstants.DATASOURCE_NAME);
         if (dsName == null) {
             throw new AnalyticsException("The property '" + HBaseAnalyticsDSConstants.DATASOURCE_NAME +
                     "' is required");
@@ -70,7 +69,15 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             this.conn = (Connection) InitialContext.doLookup(dsName);
         } catch (NamingException e) {
             throw new AnalyticsException("Error in looking up data source: " + e.getMessage(), e);
+        }*/
+        Configuration config = new Configuration();
+        try {
+            this.conn = ConnectionFactory.createConnection(config);
+            this.queryConfig = new HBaseAnalyticsConfigurationEntry();
+        } catch (Exception e) {
+            throw new AnalyticsException("Error establishing connection to HBase instance: " + e.getMessage(), e);
         }
+
     }
 
     @Override
