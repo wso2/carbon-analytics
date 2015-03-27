@@ -149,7 +149,7 @@ public class AnalyticsRecordStoreTest {
         this.analyticsRS.createTable(tenantId, tableName);
         Map<String, AnalyticsSchema.ColumnType> columns = new HashMap<String, AnalyticsSchema.ColumnType>();
         columns.put("name", AnalyticsSchema.ColumnType.STRING);
-        columns.put("age", AnalyticsSchema.ColumnType.INT);
+        columns.put("age", AnalyticsSchema.ColumnType.INTEGER);
         columns.put("weight", AnalyticsSchema.ColumnType.LONG);
         columns.put("something1", AnalyticsSchema.ColumnType.FLOAT);
         columns.put("something2", AnalyticsSchema.ColumnType.DOUBLE);

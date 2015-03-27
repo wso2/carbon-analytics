@@ -1,5 +1,3 @@
-package org.wso2.carbon.analytics.dataservice;
-
 /*
 * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -17,6 +15,7 @@ package org.wso2.carbon.analytics.dataservice;
 * specific language governing permissions and limitations
 * under the License.
 */
+package org.wso2.carbon.analytics.dataservice;
 
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
@@ -35,7 +34,7 @@ import java.util.Map;
 /**
  * This interface validate user permissions before execute analytics data service operations.
  */
-public interface SecureAnalyticsDataService extends AnalyticsRecordReader{
+public interface SecureAnalyticsDataService extends AnalyticsRecordReader {
 
     /**
      * Creates a table, if not already there, where the columns are not defined here, but can contain any arbitrary number
@@ -125,8 +124,8 @@ public interface SecureAnalyticsDataService extends AnalyticsRecordReader{
      * this will be a full replace of the record, where the older record is effectively deleted and the new one is
      * added, there will not be a merge of older record's field's with the new one.
      *
-     * @param username  The username of the user that invoke this method
-     * @param records The list of records to be inserted
+     * @param username The username of the user that invoke this method
+     * @param records  The list of records to be inserted
      * @throws AnalyticsException
      * @throws AnalyticsTableNotAvailableException
      */

@@ -55,7 +55,7 @@ function getArbitraryFields(rowData) {
                                                      },
                                                      Type: {
                                                          title: 'Type',
-                                                         options: ["String", "Integer", "Long", "Boolean", "Float", "Double"]
+                                                         options: ["STRING", "INTEGER", "LONG", "BOOLEAN", "FLOAT", "DOUBLE"]
                                                      }
                                                  }
                                              }, function (data) { //opened handler

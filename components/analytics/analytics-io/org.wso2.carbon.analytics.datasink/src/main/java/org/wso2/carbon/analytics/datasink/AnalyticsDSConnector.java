@@ -142,7 +142,7 @@ public class AnalyticsDSConnector {
                     columnType = AnalyticsSchema.ColumnType.FLOAT;
                     break;
                 case INT:
-                    columnType = AnalyticsSchema.ColumnType.INT;
+                    columnType = AnalyticsSchema.ColumnType.INTEGER;
                     break;
                 case LONG:
                     columnType = AnalyticsSchema.ColumnType.LONG;

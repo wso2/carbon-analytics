@@ -22,10 +22,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 import org.wso2.carbon.analytics.messageconsole.MessageConsoleService;
-import org.wso2.carbon.user.core.service.RealmService;
 
 /**
  * This class represents the analytics message console service declarative services component.

@@ -1,5 +1,3 @@
-package org.wso2.carbon.analytics.messageconsole;
-
 /*
 * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -17,6 +15,7 @@ package org.wso2.carbon.analytics.messageconsole;
 * specific language governing permissions and limitations
 * under the License.
 */
+package org.wso2.carbon.analytics.messageconsole;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,9 +41,7 @@ import org.wso2.carbon.analytics.messageconsole.internal.ServiceHolder;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.core.AbstractAdmin;
 import org.wso2.carbon.user.api.AuthorizationManager;
-import org.wso2.carbon.user.api.UserRealm;
 import org.wso2.carbon.user.api.UserStoreException;
-import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,6 +54,12 @@ public class MessageConsoleService extends AbstractAdmin {
     private static final Log logger = LogFactory.getLog(MessageConsoleService.class);
     private static final String LUCENE = "lucene";
     private static final String AT_SIGN = "@";
+    private static final String STRING = "STRING";
+    private static final String INTEGER = "INTEGER";
+    private static final String LONG = "LONG";
+    private static final String FLOAT = "FLOAT";
+    private static final String DOUBLE = "DOUBLE";
+    private static final String BOOLEAN = "BOOLEAN";
 
     private SecureAnalyticsDataService analyticsDataService;
 
@@ -236,6 +239,24 @@ public class MessageConsoleService extends AbstractAdmin {
         return table;
     }
 
+    public TableBean getTableInfoWithIndicesInfo(String tableName) throws MessageConsoleException {
+
+        TableBean tableBean = getTableInfo(tableName);
+        String username = getUsername();
+        try {
+            Map<String, IndexType> indices = analyticsDataService.getIndices(username, tableName);
+            for (ColumnBean columnBean : tableBean.getColumns()) {
+                if (indices.containsKey(columnBean.getName())) {
+                    columnBean.setIndex(true);
+                }
+            }
+        } catch (AnalyticsException e) {
+            logger.error("Unable to get indices information for table :" + tableName, e);
+            throw new MessageConsoleException("Unable to get indices information for table :" + tableName, e);
+        }
+        return tableBean;
+    }
+
     public void deleteRecords(String table, String[] recordIds) throws MessageConsoleException {
 
         String username = getUsername();
@@ -317,33 +338,35 @@ public class MessageConsoleService extends AbstractAdmin {
         AnalyticsSchema schema = analyticsDataService.getTableSchema(username, table);
         Map<String, AnalyticsSchema.ColumnType> columnsMetaInfo = schema.getColumns();
 
-        Map<String, Object> objectMap = new HashMap<>(columns.length);
-        for (int i = 0; i < columns.length; i++) {
-            String columnName = columns[i];
-            String stringValue = values[i];
-            if (columnName != null) {
-                AnalyticsSchema.ColumnType columnType = columnsMetaInfo.get(columnName);
-                Object value = stringValue;
-                switch (columnType) {
-                    case STRING:
-                        break;
-                    case INT:
-                        value = Integer.valueOf(stringValue);
-                        break;
-                    case LONG:
-                        value = Long.valueOf(stringValue);
-                        break;
-                    case BOOLEAN:
-                        value = Boolean.valueOf(stringValue);
-                        break;
-                    case FLOAT:
-                        value = Float.valueOf(stringValue);
-                        break;
-                    case DOUBLE:
-                        value = Double.valueOf(stringValue);
-                        break;
+        Map<String, Object> objectMap = new HashMap<>();
+        if (columns != null) {
+            for (int i = 0; i < columns.length; i++) {
+                String columnName = columns[i];
+                String stringValue = values[i];
+                if (columnName != null) {
+                    AnalyticsSchema.ColumnType columnType = columnsMetaInfo.get(columnName);
+                    Object value = stringValue;
+                    switch (columnType) {
+                        case STRING:
+                            break;
+                        case INTEGER:
+                            value = Integer.valueOf(stringValue);
+                            break;
+                        case LONG:
+                            value = Long.valueOf(stringValue);
+                            break;
+                        case BOOLEAN:
+                            value = Boolean.valueOf(stringValue);
+                            break;
+                        case FLOAT:
+                            value = Float.valueOf(stringValue);
+                            break;
+                        case DOUBLE:
+                            value = Double.valueOf(stringValue);
+                            break;
+                    }
+                    objectMap.put(columnName, value);
                 }
-                objectMap.put(columnName, value);
             }
         }
         return objectMap;
@@ -425,27 +448,27 @@ public class MessageConsoleService extends AbstractAdmin {
                 recordValues.remove(fieldName);
                 Object convertedValue;
                 switch (type) {
-                    case "String": {
+                    case STRING: {
                         convertedValue = String.valueOf(value);
                         break;
                     }
-                    case "Integer": {
+                    case INTEGER: {
                         convertedValue = Integer.valueOf(value);
                         break;
                     }
-                    case "Long": {
+                    case LONG: {
                         convertedValue = Integer.valueOf(value);
                         break;
                     }
-                    case "Boolean": {
+                    case BOOLEAN: {
                         convertedValue = Boolean.valueOf(value);
                         break;
                     }
-                    case "Float": {
+                    case FLOAT: {
                         convertedValue = Float.valueOf(value);
                         break;
                     }
-                    case "Double": {
+                    case DOUBLE: {
                         convertedValue = Double.valueOf(value);
                         break;
                     }
@@ -482,13 +505,15 @@ public class MessageConsoleService extends AbstractAdmin {
         Map<String, AnalyticsSchema.ColumnType> columns = new HashMap<>();
         Map<String, IndexType> indexColumns = new HashMap<>();
         for (ColumnBean column : tableInfo.getColumns()) {
-            if (column.isPrimary()) {
-                primaryKeys.add(column.getName());
+            if (column != null) {
+                if (column.isPrimary()) {
+                    primaryKeys.add(column.getName());
+                }
+                if (column.isIndex()) {
+                    indexColumns.put(column.getName(), createIndexType(column.getType()));
+                }
+                columns.put(column.getName(), getColumnType(column.getType()));
             }
-            if (column.isIndex()) {
-                indexColumns.put(column.getName(), createIndexType(column.getType()));
-            }
-            columns.put(column.getName(), getColumnType(column.getType()));
         }
 
         AnalyticsSchema schema = new AnalyticsSchema(columns, primaryKeys);
@@ -507,19 +532,55 @@ public class MessageConsoleService extends AbstractAdmin {
         }
     }
 
+    public void editTable(TableBean tableInfo) throws MessageConsoleException {
+
+        String username = getUsername();
+
+        List<String> primaryKeys = new ArrayList<>();
+        Map<String, AnalyticsSchema.ColumnType> columns = new HashMap<>();
+        Map<String, IndexType> indexColumns = new HashMap<>();
+        for (ColumnBean column : tableInfo.getColumns()) {
+            if (column != null) {
+                if (column.isPrimary()) {
+                    primaryKeys.add(column.getName());
+                }
+                if (column.isIndex()) {
+                    indexColumns.put(column.getName(), createIndexType(column.getType()));
+                }
+                columns.put(column.getName(), getColumnType(column.getType()));
+            }
+        }
+
+        AnalyticsSchema schema = new AnalyticsSchema(columns, primaryKeys);
+        try {
+            analyticsDataService.setTableSchema(username, tableInfo.getName(), schema);
+        } catch (AnalyticsException e) {
+            logger.error("Unable to save table schema information: " + e.getMessage(), e);
+            throw new MessageConsoleException("Unable to save table schema information: " + e.getMessage(), e);
+        }
+
+        try {
+            analyticsDataService.clearIndices(username, tableInfo.getName());
+            analyticsDataService.setIndices(username, tableInfo.getName(), indexColumns);
+        } catch (AnalyticsException e) {
+            logger.error("Unable to save table index information: " + e.getMessage(), e);
+            throw new MessageConsoleException("Unable to save table index information: " + e.getMessage(), e);
+        }
+    }
+
     private AnalyticsSchema.ColumnType getColumnType(String columnType) {
         switch (columnType) {
-            case "String":
+            case STRING:
                 return AnalyticsSchema.ColumnType.STRING;
-            case "Integer":
-                return AnalyticsSchema.ColumnType.INT;
-            case "Long":
+            case INTEGER:
+                return AnalyticsSchema.ColumnType.INTEGER;
+            case LONG:
                 return AnalyticsSchema.ColumnType.LONG;
-            case "Float":
+            case FLOAT:
                 return AnalyticsSchema.ColumnType.FLOAT;
-            case "Double":
+            case DOUBLE:
                 return AnalyticsSchema.ColumnType.DOUBLE;
-            case "Boolean":
+            case BOOLEAN:
                 return AnalyticsSchema.ColumnType.BOOLEAN;
             default:
                 return AnalyticsSchema.ColumnType.STRING;
@@ -528,17 +589,17 @@ public class MessageConsoleService extends AbstractAdmin {
 
     private IndexType createIndexType(String indexType) {
         switch (indexType) {
-            case "Boolean":
+            case BOOLEAN:
                 return IndexType.BOOLEAN;
-            case "Float":
+            case FLOAT:
                 return IndexType.FLOAT;
-            case "Double":
+            case DOUBLE:
                 return IndexType.DOUBLE;
-            case "Integer":
+            case INTEGER:
                 return IndexType.INTEGER;
-            case "Long":
+            case LONG:
                 return IndexType.LONG;
-            case "String":
+            case STRING:
                 return IndexType.STRING;
             default:
                 return IndexType.STRING;
