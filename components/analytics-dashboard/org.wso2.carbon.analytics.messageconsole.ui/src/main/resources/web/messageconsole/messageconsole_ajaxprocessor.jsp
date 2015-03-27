@@ -54,7 +54,7 @@
         }
         case MessageConsoleConnector.TYPE_UPDATE_RECORD: {
             Map<String, String[]> parameters = request.getParameterMap();
-            Properties properties = new Properties(parameters).invoke();
+            Properties properties = new Properties(parameters).invoke(UPDATE_RECORD_ACTION);
             String[] columns = properties.getColumns();
             String[] values = properties.getValues();
 
@@ -65,7 +65,7 @@
         }
         case MessageConsoleConnector.TYPE_CREATE_RECORD: {
             Map<String, String[]> parameters = request.getParameterMap();
-            Properties properties = new Properties(parameters).invoke();
+            Properties properties = new Properties(parameters).invoke(CREATE_RECORD_ACTION);
             String[] columns = properties.getColumns();
             String[] values = properties.getValues();
 
@@ -111,16 +111,27 @@
         }
         case MessageConsoleConnector.TYPE_CREATE_TABLE: {
             String tableInfo = request.getParameter("tableInfo");
-            out.print(connector.createTable(tableName, tableInfo));
+            String action = request.getParameter("action");
+            if ("add".equals(action)) {
+                out.print(connector.createTable(tableName, tableInfo));
+            } else if ("edit".equals(action)) {
+                out.print(connector.editTable(tableName, tableInfo));
+            }
             break;
         }
         case MessageConsoleConnector.TYPE_DELETE_TABLE: {
             out.print(connector.deleteTable(tableName));
             break;
         }
+        case MessageConsoleConnector.TYPE_GET_TABLE_INFO: {
+            out.print(connector.getTableInfoWithIndexInfo(tableName));
+            break;
+        }
     }
 
-%><%!
+%><%! public static final int UPDATE_RECORD_ACTION = 2;
+    public static final int CREATE_RECORD_ACTION = 1;
+
     private class Properties {
         private Map<String, String[]> parameters;
         private String[] columns;
@@ -138,9 +149,14 @@
             return values;
         }
 
-        public Properties invoke() {
-            columns = new String[parameters.size() - 4];
-            values = new String[parameters.size() - 4];
+        public Properties invoke(int action) {
+            if (CREATE_RECORD_ACTION == action) {
+                columns = new String[parameters.size() - 2];
+                values = new String[parameters.size() - 2];
+            } else {
+                columns = new String[parameters.size() - 4];
+                values = new String[parameters.size() - 4];
+            }
             int i = 0;
             for (Map.Entry<String, String[]> column : parameters.entrySet()) {
                 String columnName = column.getKey();

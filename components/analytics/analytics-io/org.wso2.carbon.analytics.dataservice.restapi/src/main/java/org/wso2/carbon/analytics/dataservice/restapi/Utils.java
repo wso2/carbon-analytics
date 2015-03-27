@@ -312,7 +312,7 @@ public class Utils {
             case STRING:
                 return AnalyticsSchema.ColumnType.STRING;
             case INT:
-                return AnalyticsSchema.ColumnType.INT;
+                return AnalyticsSchema.ColumnType.INTEGER;
             case LONG:
                 return AnalyticsSchema.ColumnType.LONG;
             case FLOAT:
@@ -337,7 +337,7 @@ public class Utils {
         switch (columnType) {
             case STRING:
                 return ColumnTypeBean.STRING;
-            case INT:
+            case INTEGER:
                 return ColumnTypeBean.INT;
             case LONG:
                 return ColumnTypeBean.LONG;

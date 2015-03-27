@@ -1,5 +1,3 @@
-package org.wso2.carbon.analytics.messageconsole.exception;
-
 /*
 * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -17,6 +15,8 @@ package org.wso2.carbon.analytics.messageconsole.exception;
 * specific language governing permissions and limitations
 * under the License.
 */
+
+package org.wso2.carbon.analytics.messageconsole.exception;
 
 public class MessageConsoleException extends Exception {
 

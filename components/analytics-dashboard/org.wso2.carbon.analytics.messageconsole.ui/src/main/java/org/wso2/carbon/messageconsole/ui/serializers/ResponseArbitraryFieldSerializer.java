@@ -1,5 +1,3 @@
-package org.wso2.carbon.messageconsole.ui.serializers;
-
 /*
 * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -17,6 +15,7 @@ package org.wso2.carbon.messageconsole.ui.serializers;
 * specific language governing permissions and limitations
 * under the License.
 */
+package org.wso2.carbon.messageconsole.ui.serializers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -43,9 +42,11 @@ public class ResponseArbitraryFieldSerializer implements JsonSerializer<Response
         jsonObject.addProperty(MESSAGE, responseArbitraryFieldColumn.getMessage());
 
         JsonObject jsonRecord = new JsonObject();
-        jsonRecord.addProperty(NAME, responseArbitraryFieldColumn.getColumn().getKey());
-        jsonRecord.addProperty(VALUE, responseArbitraryFieldColumn.getColumn().getValue());
-        jsonRecord.addProperty(TYPE, responseArbitraryFieldColumn.getColumn().getType());
+        if (responseArbitraryFieldColumn.getColumn() != null) {
+            jsonRecord.addProperty(NAME, responseArbitraryFieldColumn.getColumn().getKey());
+            jsonRecord.addProperty(VALUE, responseArbitraryFieldColumn.getColumn().getValue());
+            jsonRecord.addProperty(TYPE, responseArbitraryFieldColumn.getColumn().getType());
+        }
 
         jsonObject.add(RECORD, jsonRecord);
         return jsonObject;

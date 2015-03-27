@@ -52,6 +52,9 @@
         var typeDeleteArbitraryRecord = '<%= MessageConsoleConnector.TYPE_DELETE_ARBITRARY_RECORD%>';
         var typeCreateTable = '<%= MessageConsoleConnector.TYPE_CREATE_TABLE%>';
         var typeDeleteTable = '<%= MessageConsoleConnector.TYPE_DELETE_TABLE%>';
+        var typeGetTableInfo = '<%= MessageConsoleConnector.TYPE_GET_TABLE_INFO%>';
+
+        var tablePopupAction;
 
         $(document).ready(function () {
             <c:if test="${permissions != null && permissions.isListTable()}">
@@ -83,7 +86,14 @@
                                                autoOpen: false
                                            });
             $("#addNewTable").on("click", function () {
+                $("#column-details").find('tr').slice(1, document.getElementById('column-details').rows.length - 1).remove();
+                $('#createTableDialog').dialog('option', 'title', 'Create a new table');
                 $("#createTableDialog").dialog("open");
+                document.getElementById("tableName").readOnly = false;
+                document.getElementById("tableName").value = "";
+                tablePopupAction = 'add';
+                document.getElementById('createTablePopup').style.display = 'block';
+                document.getElementById('msgLabel').style.display = 'none';
             });
 
             $("#column-details tbody").on("click", ".del", function () {
@@ -94,7 +104,7 @@
                 $(this).val('Delete');
                 $(this).attr('class', 'del');
                 var appendTxt =
-                        "<tr><td><input type='text' name='column'/></td><td><select><option value='String'>String</option><option value='Integer'>Integer</option><option value='Long'>Long</option><option value='Boolean'>Boolean</option><option value='Float'>Float</option><option value='Double'>Double</option></select></td><td><input type='checkbox' name='primary'/></td><td><input type='checkbox' name='index'/></td><td><input class='add' type='button' value='Add More'/></td></tr>";
+                        "<tr><td><input type='text' name='column'/></td><td><select><option value='STRING'>STRING</option><option value='INTEGER'>INTEGER</option><option value='LONG'>LONG</option><option value='BOOLEAN'>BOOLEAN</option><option value='FLOAT'>FLOAT</option><option value='DOUBLE'>DOUBLE</option></select></td><td><input type='checkbox' name='primary'/></td><td><input type='checkbox' name='index'/></td><td><input class='add' type='button' value='Add More'/></td></tr>";
                 $("tr:last").after(appendTxt);
             });
 
@@ -119,6 +129,70 @@
                 $("#table-delete-confirm").dialog("open");
                 return false;
             });
+
+            $("#editTableButton").on("click", function () {
+                $.post('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeGetTableInfo, {tableName: $("#tableSelect").val()},
+                       function (result) {
+                           var resultArray = jQuery.parseJSON(result);
+                           var arrayLength = resultArray.length;
+                           $("#column-details").find('tr').slice(1, document.getElementById('column-details').rows.length - 1).remove();
+                           var table = document.getElementById('column-details');
+                           $('#createTableDialog').dialog('option', 'title', 'Edit table');
+                           document.getElementById('createTablePopup').style.display = 'block';
+                           document.getElementById('msgLabel').style.display = 'none';
+
+                           document.getElementById("tableName").value = $("#tableSelect").val();
+                           document.getElementById("tableName").readOnly = true;
+
+                           var tbody = table.getElementsByTagName('tbody')[0];
+
+                           for (var i = 0; i < arrayLength; i++) {
+                               var cellNo = 0;
+                               var rowCount = table.rows.length - 2;
+                               var row = tbody.insertRow(rowCount);
+
+                               var columnCell = row.insertCell(cellNo++);
+                               var columnInputElement = document.createElement('input');
+                               columnInputElement.name = "column";
+                               columnInputElement.type = "text";
+                               columnInputElement.value = resultArray[i].column;
+                               columnCell.appendChild(columnInputElement);
+
+                               var typeCell = row.insertCell(cellNo++);
+                               var selectElement = document.createElement('select');
+                               selectElement.options[0] = new Option('STRING', 'STRING');
+                               selectElement.options[1] = new Option('INTEGER', 'INTEGER');
+                               selectElement.options[2] = new Option('LONG', 'LONG');
+                               selectElement.options[3] = new Option('BOOLEAN', 'BOOLEAN');
+                               selectElement.options[4] = new Option('FLOAT', 'FLOAT');
+                               selectElement.options[5] = new Option('DOUBLE', 'DOUBLE');
+                               selectElement.value = resultArray[i].type;
+                               typeCell.appendChild(selectElement);
+
+                               var primaryCell = row.insertCell(cellNo++);
+                               var primaryCheckElement = document.createElement('input');
+                               primaryCheckElement.type = "checkbox";
+                               primaryCheckElement.checked = resultArray[i].primary;
+                               primaryCell.appendChild(primaryCheckElement);
+
+                               var indexCell = row.insertCell(cellNo++);
+                               var indexCheckElement = document.createElement('input');
+                               indexCheckElement.type = "checkbox";
+                               indexCheckElement.checked = resultArray[i].index;
+                               indexCell.appendChild(indexCheckElement);
+
+                               var buttonCell = row.insertCell(cellNo++);
+                               var indexCheckElement = document.createElement('input');
+                               indexCheckElement.type = "button";
+                               indexCheckElement.value = "Delete";
+                               indexCheckElement.className = "del";
+                               buttonCell.appendChild(indexCheckElement);
+                           }
+                           tablePopupAction = 'edit';
+                           $("#createTableDialog").dialog("open");
+                       });
+                return true;
+            });
         });
 
         function createTable() {
@@ -129,14 +203,16 @@
             for (var r = 1, n = table.rows.length; r < n; r++) {
                 var item = {};
                 for (var c = 0, m = table.rows[r].cells.length; c < m; c++) {
-                    if (c == 0) {
-                        item ["column"] = table.rows[r].cells[c].childNodes[0].value;
-                    } else if (c == 1) {
-                        item ["type"] = table.rows[r].cells[c].childNodes[0].value;
-                    } else if (c == 2) {
-                        item ["primary"] = table.rows[r].cells[c].childNodes[0].checked;
-                    } else if (c == 3) {
-                        item ["index"] = table.rows[r].cells[c].childNodes[0].checked;
+                    if (table.rows[r].cells[c].childNodes[0].value != '') {
+                        if (c == 0) {
+                            item ["column"] = table.rows[r].cells[c].childNodes[0].value;
+                        } else if (c == 1) {
+                            item ["type"] = table.rows[r].cells[c].childNodes[0].value;
+                        } else if (c == 2) {
+                            item ["primary"] = table.rows[r].cells[c].childNodes[0].checked;
+                        } else if (c == 3) {
+                            item ["index"] = table.rows[r].cells[c].childNodes[0].checked;
+                        }
                     }
                 }
                 jsonObj.push(item);
@@ -146,7 +222,7 @@
             $.ajax({
                        type: 'POST',
                        url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' +
-                            typeCreateTable + "&tableName=" + tableName,
+                            typeCreateTable + "&tableName=" + tableName + "&action=" + tablePopupAction,
                        data: values,
                        success: function (data) {
                            result = true;
@@ -237,6 +313,8 @@
         </label>
         <c:if test="${permissions != null && permissions.isDropTable()}">
             <input type="button" id="deleteTableButton" value="Delete Table" style="display: none">
+        </c:if>
+        <c:if test="${permissions != null && permissions.isCreateTable()}">
             <input type="button" id="editTableButton" value="Edit Table" style="display: none">
         </c:if>
         <fieldset>
@@ -272,23 +350,25 @@
                 <input type="text" id="tableName">
             </label>
             <table id="column-details">
-                <tbody>
+                <thead>
                 <tr>
-                    <td>Column</td>
-                    <td>Type</td>
-                    <td>Primary key</td>
-                    <td>Index</td>
-                    <td></td>
+                    <th>Column</th>
+                    <th>Type</th>
+                    <th>Primary key</th>
+                    <th>Index</th>
+                    <th></th>
                 </tr>
+                </thead>
+                <tbody>
                 <tr>
                     <td><input type="text" name="column"/></td>
                     <td><select>
-                        <option value="String">String</option>
-                        <option value="Integer">Integer</option>
-                        <option value="Long">Long</option>
-                        <option value="Boolean">Boolean</option>
-                        <option value="Float">Float</option>
-                        <option value="Double">Double</option>
+                        <option value="STRING">STRING</option>
+                        <option value="INTEGER">INTEGER</option>
+                        <option value="LONG">LONG</option>
+                        <option value="BOOLEAN">BOOLEAN</option>
+                        <option value="FLOAT">FLOAT</option>
+                        <option value="DOUBLE">DOUBLE</option>
                     </select></td>
                     <td><input type="checkbox" name="primary"/></td>
                     <td><input type="checkbox" name="index"/></td>

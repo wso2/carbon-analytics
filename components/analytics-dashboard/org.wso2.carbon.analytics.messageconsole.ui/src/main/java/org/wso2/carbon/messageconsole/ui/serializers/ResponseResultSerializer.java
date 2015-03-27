@@ -1,5 +1,3 @@
-package org.wso2.carbon.messageconsole.ui.serializers;
-
 /*
 * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -17,6 +15,7 @@ package org.wso2.carbon.messageconsole.ui.serializers;
 * specific language governing permissions and limitations
 * under the License.
 */
+package org.wso2.carbon.messageconsole.ui.serializers;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -51,12 +50,16 @@ public class ResponseResultSerializer implements JsonSerializer<ResponseResult> 
 
         JsonArray records = new JsonArray();
 
-        for (Record record : responseResult.getRecords()) {
-            JsonObject jsonRecord = new JsonObject();
-            for (Column column : record.getColumns()) {
-                jsonRecord.addProperty(column.getKey(), column.getValue());
+        if (responseResult.getRecords() != null) {
+            for (Record record : responseResult.getRecords()) {
+                JsonObject jsonRecord = new JsonObject();
+                if (record != null) {
+                    for (Column column : record.getColumns()) {
+                        jsonRecord.addProperty(column.getKey(), column.getValue());
+                    }
+                }
+                records.add(jsonRecord);
             }
-            records.add(jsonRecord);
         }
 
         jsonObject.add(RECORDS, records);
