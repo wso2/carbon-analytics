@@ -55,6 +55,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
@@ -104,6 +105,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private int portOffset;
     
     private int workerCount = 1;
+    
+    private Object workerActorSystem;
 
     public SparkAnalyticsExecutor(String myHost, int portOffset) throws AnalyticsClusterException {
         this.myHost = myHost;
@@ -129,7 +132,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
     
     private void startWorker(String workerHost, String masterHost, int masterPort, int p1, int p2) {
-        Worker.startSystemAndActor(workerHost, p1, p2, 2, 1000000, new String[] { "spark://" + masterHost + ":" + masterPort },
+        this.workerActorSystem = Worker.startSystemAndActor(workerHost, p1, p2, 2, 1000000, new String[] { "spark://" + masterHost + ":" + masterPort },
                 null, new Option<Object>() {
             
                     private static final long serialVersionUID = 3087598975952096368L;
@@ -163,7 +166,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                     public boolean equals(Object that) {
                         return false;
                     }
-                });
+                })._1;
     }
 
     private void initSparkDataListener() {
@@ -196,6 +199,18 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         if (this.sqlCtx != null) {
             this.sqlCtx.sqlContext().sparkContext().stop();
             this.sparkCtx.close();
+        }
+    }
+    
+    private void shutdownWorker() {
+        if (this.workerActorSystem == null) {
+            return;
+        }
+        try {
+            Method method = this.workerActorSystem.getClass().getMethod("shutdown");
+            method.invoke(this.workerActorSystem);
+        } catch (Exception e) {
+            throw new RuntimeException("Error in shutting down worker: " + e.getMessage(), e);
         }
     }
     
@@ -509,6 +524,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     @Override
     public void onLeaderUpdate() {
+        this.shutdownWorker();
         this.stop();
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         String masterHost = (String) acm.getProperty(CLUSTER_GROUP_NAME, MASTER_HOST_GROUP_PROP);
