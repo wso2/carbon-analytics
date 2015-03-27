@@ -48,7 +48,7 @@ public class AnalyticsSchema implements Serializable {
 
     public static enum ColumnType {
         STRING,
-        INT,
+        INTEGER,
         LONG,
         FLOAT,
         DOUBLE,

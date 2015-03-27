@@ -215,19 +215,18 @@ public class GenericUtils {
         return count;
     }
 
-    public static Map<String, Object> decodeRecordValues(byte[] data,
-                                                         Set<String> columns) throws AnalyticsException {
+    public static Map<String, Object> decodeRecordValues(byte[] data, Set<String> columns) throws AnalyticsException {
         /* using LinkedHashMap to retain the column order */
         Map<String, Object> result = new LinkedHashMap<String, Object>();
-        ByteBuffer buffer = ByteBuffer.wrap(data);
         int type, size;
         String colName;
         Object value;
         byte[] buff;
         byte boolVal;
         byte[] binData;
-        while (buffer.remaining() > 0) {
-            try {
+        try {
+            ByteBuffer buffer = ByteBuffer.wrap(data);
+            while (buffer.remaining() > 0) {
                 size = buffer.getInt();
                 buff = new byte[size];
                 buffer.get(buff, 0, size);
@@ -286,9 +285,9 @@ public class GenericUtils {
                 if (columns == null || columns.contains(colName)) {
                     result.put(colName, value);
                 }
-            } catch (Exception e) {
-                throw new AnalyticsException("Error in decoding record values: " + e.getMessage());
             }
+        } catch (Exception e) {
+            throw new AnalyticsException("Error in decoding record values: " + e.getMessage());
         }
         return result;
     }

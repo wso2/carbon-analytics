@@ -19,6 +19,7 @@ package org.wso2.carbon.analytics.datasource.hbase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Pair;
@@ -35,14 +36,11 @@ import org.wso2.carbon.analytics.datasource.hbase.rg.HBaseTimestampRecordGroup;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseAnalyticsDSConstants;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseUtils;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import java.io.*;
 import java.util.*;
 
 public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
 
-    private Admin admin;
     private Connection conn;
 
     private HBaseAnalyticsConfigurationEntry queryConfig;
@@ -51,26 +49,35 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
 
     public HBaseAnalyticsRecordStore(Connection conn, HBaseAnalyticsConfigurationEntry entry) throws IOException {
         this.conn = conn;
-        this.admin = conn.getAdmin();
         this.queryConfig = entry;
+    }
+
+    public HBaseAnalyticsRecordStore() {
+        this.conn = null;
+        this.queryConfig = null;
     }
 
     @Override
     public void init(Map<String, String> properties) throws AnalyticsException {
         //this.queryConfig = HBaseUtils.lookupConfiguration();
-        String dsName = properties.get(HBaseAnalyticsDSConstants.DATASOURCE_NAME);
+/*        String dsName = properties.get(HBaseAnalyticsDSConstants.DATASOURCE_NAME);
         if (dsName == null) {
             throw new AnalyticsException("The property '" + HBaseAnalyticsDSConstants.DATASOURCE_NAME +
                     "' is required");
         }
         try {
             this.conn = (Connection) InitialContext.doLookup(dsName);
-            this.admin = conn.getAdmin();
         } catch (NamingException e) {
             throw new AnalyticsException("Error in looking up data source: " + e.getMessage(), e);
-        } catch (IOException e) {
-            throw new AnalyticsException("Error in creating HBase client: " + e.getMessage(), e);
+        }*/
+        Configuration config = new Configuration();
+        try {
+            this.conn = ConnectionFactory.createConnection(config);
+            this.queryConfig = new HBaseAnalyticsConfigurationEntry();
+        } catch (Exception e) {
+            throw new AnalyticsException("Error establishing connection to HBase instance: " + e.getMessage(), e);
         }
+
     }
 
     @Override
@@ -85,12 +92,10 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         HTableDescriptor dataDescriptor = new HTableDescriptor(TableName.valueOf(
                 HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.DATA)));
 
-        /* creating table with standard column families (1) "carbon-analytics-data" and (2) "carbon-analytics-timestamp"
-         * (1) - for storing the actual row data
-         * (2) - for storing the timestamp of the row, for use in deleting index entries */
-        dataDescriptor.addFamily(new HColumnDescriptor(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME))
-                .addFamily(new HColumnDescriptor(HBaseAnalyticsDSConstants.ANALYTICS_TIMESTAMP_COLUMN_FAMILY_NAME)
-                        .setMaxVersions(1));
+        /* creating table with standard column family "carbon-analytics-data" for storing the actual row data
+         * in one column and the record timestamp in another */
+        dataDescriptor.addFamily(new HColumnDescriptor(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME)
+                .setMaxVersions(1));
 
         HTableDescriptor indexDescriptor = new HTableDescriptor(TableName.valueOf(
                 HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.INDEX)));
@@ -105,23 +110,31 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
                 .setMaxVersions(1));
 
         /* Table creation should fail if index cannot be created, so attempting to create index table first. */
+        Admin admin = null;
         try {
+            admin = this.conn.getAdmin();
             admin.createTable(indexDescriptor);
             admin.createTable(metaDescriptor);
             admin.createTable(dataDescriptor);
         } catch (IOException e) {
             throw new AnalyticsException("Error creating table " + tableName + " for tenant " + tenantId, e);
+        } finally {
+            GenericUtils.closeQuietly(admin);
         }
     }
 
     @Override
     public boolean tableExists(int tenantId, String tableName) throws AnalyticsException {
         boolean isExist;
+        Admin admin = null;
         try {
-            isExist = this.admin.tableExists(TableName.valueOf(
+            admin = this.conn.getAdmin();
+            isExist = admin.tableExists(TableName.valueOf(
                     HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.DATA)));
         } catch (IOException e) {
             throw new AnalyticsException("Error checking existence of table " + tableName + " for tenant " + tenantId, e);
+        } finally {
+            GenericUtils.closeQuietly(admin);
         }
         return isExist;
     }
@@ -134,27 +147,30 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
                     " could not be carried out since said table did not exist.");
             return;
         }
+        Admin admin = null;
         TableName dataTable = TableName.valueOf(HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.DATA));
         TableName indexTable = TableName.valueOf(HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.INDEX));
         TableName metaTable = TableName.valueOf(HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.META));
         try {
+            admin = this.conn.getAdmin();
             /* delete the data table first */
-            this.admin.disableTable(dataTable);
-            this.admin.deleteTable(dataTable);
+            admin.disableTable(dataTable);
+            admin.deleteTable(dataTable);
             /* then delete the meta table  */
-            this.admin.disableTable(metaTable);
-            this.admin.deleteTable(metaTable);
+            admin.disableTable(metaTable);
+            admin.deleteTable(metaTable);
             /* finally, delete the index table */
-            this.admin.disableTable(indexTable);
-            this.admin.deleteTable(indexTable);
+            admin.disableTable(indexTable);
+            admin.deleteTable(indexTable);
         } catch (IOException e) {
             throw new AnalyticsException("Error deleting table " + tableName, e);
+        } finally {
+            GenericUtils.closeQuietly(admin);
         }
     }
 
     public void close() {
         try {
-            this.admin.close();
             this.conn.close();
         } catch (IOException ignore) {
                 /* do nothing, the connection is dead anyway */
@@ -164,12 +180,14 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
 
     @Override
     public List<String> listTables(int tenantId) throws AnalyticsException {
+        Admin admin = null;
         List<String> tables = new ArrayList<>();
         /* Handling the existence of analytics tables only, not index.
          * a caveat: the generated prefix is never null.                 */
         String prefix = HBaseUtils.generateTablePrefix(tenantId, HBaseAnalyticsDSConstants.DATA);
         try {
-            HTableDescriptor[] tableDesc = this.admin.listTables();
+            admin = this.conn.getAdmin();
+            HTableDescriptor[] tableDesc = admin.listTables();
             String tableName;
             for (HTableDescriptor htd : tableDesc) {
                 if (htd != null) {
@@ -183,6 +201,8 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             }
         } catch (IOException e) {
             throw new AnalyticsException("Error listing tables for tenant " + tenantId + " :" + e.getMessage(), e);
+        } finally {
+            GenericUtils.closeQuietly(admin);
         }
         return tables;
     }
@@ -201,10 +221,12 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
     }
 
     @Override
-    public void put(List<Record> records) throws AnalyticsException {
+    public void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
+        int tenantId = 0;
+        String tableName = null;
         Table table, indexTable;
         Put put;
-        String recordId, indexTableName;
+        String recordId;
         long timestamp;
         byte[] data;
         Map<String, Object> columns;
@@ -215,14 +237,15 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         Map<String, List<Record>> recordBatches = this.generateRecordBatches(records);
         try {
             /* iterating over record batches */
-            for (String formattedTableName : recordBatches.keySet()) {
-                if ((formattedTableName != null) && !(formattedTableName.isEmpty())) {
-                    table = this.conn.getTable(TableName.valueOf(formattedTableName));
-                    /* Converting data table name to index table name directly since record-level information
-                    * which is required for normal table name construction is not available at this stage. */
-                    indexTableName = HBaseUtils.convertUserToIndexTable(formattedTableName);
-                    indexTable = this.conn.getTable(TableName.valueOf(indexTableName));
-                    List<Record> recordList = recordBatches.get(formattedTableName);
+            for (String genericTableName : recordBatches.keySet()) {
+                if ((genericTableName != null) && !(genericTableName.isEmpty())) {
+                    tenantId = HBaseUtils.inferTenantId(genericTableName);
+                    tableName = HBaseUtils.inferTableName(genericTableName);
+                    table = this.conn.getTable(TableName.valueOf(HBaseUtils.generateTableName(tenantId, tableName,
+                            HBaseAnalyticsDSConstants.DATA)));
+                    indexTable = this.conn.getTable(TableName.valueOf(HBaseUtils.generateTableName(tenantId, tableName,
+                            HBaseAnalyticsDSConstants.INDEX)));
+                    List<Record> recordList = recordBatches.get(genericTableName);
                     puts = new ArrayList<>();
                     indexPuts = new ArrayList<>();
                     /* iterating over single records in a batch */
@@ -240,7 +263,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
                             put = new Put(recordId.getBytes());
                             put.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
                                     HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME, timestamp, data);
-                            put.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_TIMESTAMP_COLUMN_FAMILY_NAME,
+                            put.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
                                     HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME, timestamp, HBaseUtils.encodeLong(timestamp));
                             indexPuts.add(this.putIndexData(record));
                             puts.add(put);
@@ -254,6 +277,9 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
                 }
             }
         } catch (IOException e) {
+            if ((e instanceof RetriesExhaustedException) && e.getMessage().contains("was not found")) {
+                throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+            }
             throw new AnalyticsException("Error adding new records: " + e.getMessage(), e);
         }
     }
@@ -282,7 +308,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
     }
 
     private String inferRecordIdentity(Record record) {
-        return HBaseUtils.generateTableName(record.getTenantId(), record.getTableName(), HBaseAnalyticsDSConstants.DATA);
+        return HBaseUtils.generateGenericTableName(record.getTenantId(), record.getTableName());
     }
 
     @Override
@@ -313,11 +339,13 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
 
     @Override
     public AnalyticsSchema getTableSchema(int tenantId, String tableName) throws AnalyticsException {
+        Admin admin = null;
+        Table metaTable;
         byte[] resultSchema;
         String formattedTableName = HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.META);
-        Table metaTable;
         try {
-            if (!this.admin.tableExists(TableName.valueOf(formattedTableName))) {
+            admin = this.conn.getAdmin();
+            if (!admin.tableExists(TableName.valueOf(formattedTableName))) {
                 throw new AnalyticsTableNotAvailableException(tenantId, tableName);
             }
             metaTable = this.conn.getTable(TableName.valueOf(formattedTableName));
@@ -334,6 +362,8 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         } catch (IOException e) {
             throw new AnalyticsException("Error setting schema to table " + tableName + " for tenant " + tenantId +
                     " : " + e.getMessage(), e);
+        } finally {
+            GenericUtils.closeQuietly(admin);
         }
         return this.deserializeSchema(resultSchema);
     }
@@ -373,9 +403,13 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
 
     @Override
     public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, long timeFrom,
-                             long timeTo, int recordsFrom, int recordsCount) throws AnalyticsException {
+                             long timeTo, int recordsFrom, int recordsCount) throws AnalyticsException,
+            AnalyticsTableNotAvailableException {
         if (recordsCount > 0) {
             throw new HBaseUnsupportedOperationException("Pagination is not supported for HBase Analytics Record Stores");
+        }
+        if (!this.tableExists(tenantId, tableName)) {
+            throw new AnalyticsTableNotAvailableException(tenantId, tableName);
         }
         if ((timeFrom == Long.MIN_VALUE) && (timeTo == Long.MAX_VALUE)) {
             return this.computeRegionSplits(tenantId, tableName, columns);
@@ -389,13 +423,16 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
     @Override
     public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns,
                              List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
+        if (!this.tableExists(tenantId, tableName)) {
+            throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+        }
         return new HBaseIDRecordGroup[]{
                 new HBaseIDRecordGroup(tenantId, tableName, columns, ids)
         };
     }
 
     @Override
-    public Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException {
+    public Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException, AnalyticsTableNotAvailableException {
         if (recordGroup instanceof HBaseIDRecordGroup) {
             HBaseIDRecordGroup idRecordGroup = (HBaseIDRecordGroup) recordGroup;
             return this.getRecords(idRecordGroup.getTenantId(), idRecordGroup.getTableName(),
@@ -414,7 +451,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
     }
 
     public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns, List<String> ids)
-            throws AnalyticsException {
+            throws AnalyticsException, AnalyticsTableNotAvailableException {
         int batchSize = this.queryConfig.getBatchSize();
         if (batchSize > ids.size()) {
             batchSize = ids.size();
@@ -423,14 +460,13 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
     }
 
     public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns, long startTime, long endTime)
-            throws AnalyticsException {
+            throws AnalyticsException, AnalyticsTableNotAvailableException {
         int batchSize = this.queryConfig.getBatchSize();
         return new HBaseTimestampIterator(tenantId, tableName, columns, startTime, endTime, this.conn, batchSize);
     }
 
     public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns, byte[] startRow, byte[] endRow)
-            throws AnalyticsException {
-
+            throws AnalyticsException, AnalyticsTableNotAvailableException {
         return new HBaseRegionSplitIterator(tenantId, tableName, columns, this.conn, startRow, endRow);
     }
 
@@ -493,7 +529,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
 
     @Override
     public void delete(int tenantId, String tableName, List<String> ids) throws AnalyticsException {
-        Table dataTable;
+        Table dataTable = null;
         List<Delete> dataDeletes = new ArrayList<>();
         String dataTableName = HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.DATA);
         List<Long> timestamps = this.lookupTimestamp(dataTableName, ids, tenantId, tableName);
@@ -504,15 +540,16 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             dataTable = this.conn.getTable(TableName.valueOf(dataTableName));
             dataTable.delete(dataDeletes);
             //TODO: HBase bug in delete propagation. WORKAROUND BELOW
-            try {
+/*            try {
                 Thread.sleep(1000L);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }
-            dataTable.close();
+            }*/
         } catch (IOException e) {
             throw new AnalyticsException("Error deleting records from " + tableName + " for tenant " + tenantId + " : "
                     + e.getMessage(), e);
+        } finally {
+            GenericUtils.closeQuietly(dataTable);
         }
         this.deleteIndexEntries(tenantId, tableName, timestamps);
     }
@@ -521,10 +558,8 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         Table indexTable;
         List<Delete> indexDeletes = new ArrayList<>();
         String indexTableName = HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.INDEX);
-        int ctr = 0;
         for (Long timestamp : timestamps) {
             indexDeletes.add(new Delete(HBaseUtils.encodeLong(timestamp)));
-            ctr++;
         }
         try {
             indexTable = this.conn.getTable(TableName.valueOf(indexTableName));
@@ -543,7 +578,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         Table dataTable;
         for (String rowId : rowIds) {
             if (!rowId.isEmpty()) {
-                gets.add(new Get(rowId.getBytes()).addColumn(HBaseAnalyticsDSConstants.ANALYTICS_TIMESTAMP_COLUMN_FAMILY_NAME,
+                gets.add(new Get(rowId.getBytes()).addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
                         HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME));
             }
         }
@@ -552,7 +587,6 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             Result[] results = dataTable.get(gets);
             for (Result res : results) {
                 if ((res != null) && (res.value() != null) && (res.value().length != 0)) {
-                    System.out.println(new String(res.getRow()));
                     timestamps.add(HBaseUtils.decodeLong(res.value()));
                 }
             }

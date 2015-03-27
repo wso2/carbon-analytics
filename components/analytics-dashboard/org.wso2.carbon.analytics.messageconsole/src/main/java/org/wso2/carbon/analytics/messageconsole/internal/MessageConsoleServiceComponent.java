@@ -22,7 +22,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 import org.wso2.carbon.analytics.messageconsole.MessageConsoleService;
 
@@ -47,10 +46,16 @@ public class MessageConsoleServiceComponent {
     }
 
     protected void setAnalyticsDataService(SecureAnalyticsDataService secureAnalyticsDataService) {
+        if (logger.isDebugEnabled()) {
+            logger.info("Setting the Secure Analytics Data Service");
+        }
         ServiceHolder.setAnalyticsDataService(secureAnalyticsDataService);
     }
 
     protected void unsetAnalyticsDataService(SecureAnalyticsDataService secureAnalyticsDataService) {
+        if (logger.isDebugEnabled()) {
+            logger.info("Unsetting the Secure Analytics Data Service");
+        }
         ServiceHolder.setAnalyticsDataService(null);
     }
 }

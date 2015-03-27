@@ -21,4 +21,8 @@ public class HBaseRuntimeException extends RuntimeException {
     public HBaseRuntimeException(String s, Throwable t) {
         super(s, t);
     }
+
+    public HBaseRuntimeException(String s) {
+        super(s);
+    }
 }

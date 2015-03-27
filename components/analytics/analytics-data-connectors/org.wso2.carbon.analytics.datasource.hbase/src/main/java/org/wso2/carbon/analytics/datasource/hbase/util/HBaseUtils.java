@@ -69,9 +69,19 @@ public class HBaseUtils {
         return generateTablePrefix(tenantId, type) + normalizeTableName(tableName);
     }
 
-    public static String convertUserToIndexTable(String userTable) {
-        return userTable.replaceFirst(HBaseAnalyticsDSConstants.ANALYTICS_USER_TABLE_PREFIX,
-                HBaseAnalyticsDSConstants.ANALYTICS_INDEX_TABLE_PREFIX);
+    public static String generateGenericTableName(int tenantId, String tableName) {
+        return tenantId + HBaseAnalyticsDSConstants.DELIMITER + tableName;
+    }
+
+    public static int inferTenantId(String genericTableName) {
+        return Integer.valueOf(genericTableName.substring(0,
+                genericTableName.indexOf(HBaseAnalyticsDSConstants.DELIMITER)));
+    }
+
+    public static String inferTableName(String genericTableName) {
+        int breakpoint = genericTableName.indexOf(HBaseAnalyticsDSConstants.DELIMITER);
+        return genericTableName.substring(breakpoint + HBaseAnalyticsDSConstants.DELIMITER.length(),
+                genericTableName.length());
     }
 
     public static Path createPath(String source) {

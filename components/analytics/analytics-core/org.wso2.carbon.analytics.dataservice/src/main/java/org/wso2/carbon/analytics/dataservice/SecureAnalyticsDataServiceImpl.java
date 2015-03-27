@@ -1,5 +1,3 @@
-package org.wso2.carbon.analytics.dataservice;
-
 /*
 * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -17,7 +15,11 @@ package org.wso2.carbon.analytics.dataservice;
 * specific language governing permissions and limitations
 * under the License.
 */
+package org.wso2.carbon.analytics.dataservice;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
@@ -27,6 +29,7 @@ import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutException;
+import org.wso2.carbon.user.api.UserRealm;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
@@ -34,7 +37,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The implementation of {@link SecureAnalyticsDataService}.
+ */
 public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataService {
+
+    private static final Log logger = LogFactory.getLog(SecureAnalyticsDataServiceImpl.class);
 
     private AnalyticsDataService analyticsDataService;
 
@@ -45,88 +53,91 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     @Override
     public void createTable(String username, String tableName) throws AnalyticsException {
 
-        try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(username);
-            int tenantId = AnalyticsServiceHolder.getRealmService().getTenantManager().getTenantId(tenantDomain);
-            analyticsDataService.createTable(tenantId, tableName);
-        } catch (UserStoreException e) {
-            throw new AnalyticsException("Unable to get tenantId for user: " + username, e);
+        int tenantId = getTenantId(username);
+        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_CREATE_TABLE)) {
+            throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                           "permission to create table");
         }
+        analyticsDataService.createTable(tenantId, tableName);
     }
 
     @Override
     public void setTableSchema(String username, String tableName, AnalyticsSchema schema)
             throws AnalyticsTableNotAvailableException, AnalyticsException {
 
-        try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(username);
-            int tenantId = AnalyticsServiceHolder.getRealmService().getTenantManager().getTenantId(tenantDomain);
-            analyticsDataService.setTableSchema(tenantId, tableName, schema);
-        } catch (UserStoreException e) {
-            throw new AnalyticsException("Unable to get tenantId for user: " + username, e);
+        int tenantId = getTenantId(username);
+        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_CREATE_TABLE)) {
+            throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                           "permission to set table schema");
         }
-
+        analyticsDataService.setTableSchema(tenantId, tableName, schema);
     }
 
     @Override
     public AnalyticsSchema getTableSchema(String username, String tableName)
             throws AnalyticsTableNotAvailableException, AnalyticsException {
-        try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(username);
-            int tenantId = AnalyticsServiceHolder.getRealmService().getTenantManager().getTenantId(tenantDomain);
-            return analyticsDataService.getTableSchema(tenantId, tableName);
-        } catch (UserStoreException e) {
-            throw new AnalyticsException("Unable to get tenantId for user: " + username, e);
+
+        int tenantId = getTenantId(username);
+        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_LIST_TABLE)) {
+            throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                           "permission to get table schema");
         }
+        return analyticsDataService.getTableSchema(tenantId, tableName);
     }
 
     @Override
     public boolean tableExists(String username, String tableName) throws AnalyticsException {
-        try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(username);
-            int tenantId = AnalyticsServiceHolder.getRealmService().getTenantManager().getTenantId(tenantDomain);
-            return analyticsDataService.tableExists(tenantId, tableName);
-        } catch (UserStoreException e) {
-            throw new AnalyticsException("Unable to get tenantId for user: " + username, e);
+
+        int tenantId = getTenantId(username);
+        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_LIST_TABLE)) {
+            throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                           "permission to check table status");
         }
+        return analyticsDataService.tableExists(tenantId, tableName);
     }
 
     @Override
     public void deleteTable(String username, String tableName) throws AnalyticsException {
-        try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(username);
-            int tenantId = AnalyticsServiceHolder.getRealmService().getTenantManager().getTenantId(tenantDomain);
-            analyticsDataService.deleteTable(tenantId, tableName);
-        } catch (UserStoreException e) {
-            throw new AnalyticsException("Unable to get tenantId for user: " + username, e);
+
+        int tenantId = getTenantId(username);
+        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_DROP_TABLE)) {
+            throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                           "permission to delete table");
         }
+        analyticsDataService.deleteTable(tenantId, tableName);
     }
 
     @Override
     public List<String> listTables(String username) throws AnalyticsException {
-        try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(username);
-            int tenantId = AnalyticsServiceHolder.getRealmService().getTenantManager().getTenantId(tenantDomain);
-            return analyticsDataService.listTables(tenantId);
-        } catch (UserStoreException e) {
-            throw new AnalyticsException("Unable to get tenantId for user: " + username, e);
+
+        int tenantId = getTenantId(username);
+        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_LIST_TABLE)) {
+            throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                           "permission to list table information");
         }
+        return analyticsDataService.listTables(tenantId);
     }
 
     @Override
     public long getRecordCount(String username, String tableName, long timeFrom, long timeTo)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
-        try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(username);
-            int tenantId = AnalyticsServiceHolder.getRealmService().getTenantManager().getTenantId(tenantDomain);
-            return analyticsDataService.getRecordCount(tenantId, tableName, timeFrom, timeTo);
-        } catch (UserStoreException e) {
-            throw new AnalyticsException("Unable to get tenantId for user: " + username, e);
+
+        int tenantId = getTenantId(username);
+        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_LIST_RECORD)) {
+            throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                           "permission to get record count");
         }
+        return analyticsDataService.getRecordCount(tenantId, tableName, timeFrom, timeTo);
     }
 
     @Override
-    public void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
+    public void put(String username, List<Record> records) throws AnalyticsException,
+                                                                  AnalyticsTableNotAvailableException {
+        int tenantId = getTenantId(username);
+        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_PUT_RECORD)) {
+            throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                           "permission to put records");
+        }
         analyticsDataService.put(records);
     }
 
@@ -134,26 +145,27 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     public RecordGroup[] get(String username, String tableName, int numPartitionsHint, List<String> columns,
                              long timeFrom, long timeTo, int recordsFrom, int recordsCount)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
-        try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(username);
-            int tenantId = AnalyticsServiceHolder.getRealmService().getTenantManager().getTenantId(tenantDomain);
-            return analyticsDataService.get(tenantId, tableName, numPartitionsHint, columns, timeFrom, timeTo,
-                                            recordsFrom, recordsCount);
-        } catch (UserStoreException e) {
-            throw new AnalyticsException("Unable to get tenantId for user: " + username, e);
+
+        int tenantId = getTenantId(username);
+        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_GET_RECORD)) {
+            throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                           "permission to get records");
         }
+        return analyticsDataService.get(tenantId, tableName, numPartitionsHint, columns, timeFrom, timeTo,
+                                        recordsFrom, recordsCount);
+
     }
 
     @Override
     public RecordGroup[] get(String username, String tableName, int numPartitionsHint, List<String> columns,
                              List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
-        try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(username);
-            int tenantId = AnalyticsServiceHolder.getRealmService().getTenantManager().getTenantId(tenantDomain);
-            return analyticsDataService.get(tenantId, tableName, numPartitionsHint, columns, ids);
-        } catch (UserStoreException e) {
-            throw new AnalyticsException("Unable to get tenantId for user: " + username, e);
+
+        int tenantId = getTenantId(username);
+        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_GET_RECORD)) {
+            throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                           "permission to get records");
         }
+        return analyticsDataService.get(tenantId, tableName, numPartitionsHint, columns, ids);
     }
 
     @Override
@@ -169,83 +181,91 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     @Override
     public void delete(String username, String tableName, long timeFrom, long timeTo)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
-        try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(username);
-            int tenantId = AnalyticsServiceHolder.getRealmService().getTenantManager().getTenantId(tenantDomain);
-            analyticsDataService.delete(tenantId, tableName, timeFrom, timeTo);
-        } catch (UserStoreException e) {
-            throw new AnalyticsException("Unable to get tenantId for user: " + username, e);
+
+        int tenantId = getTenantId(username);
+        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_DELETE_RECORD)) {
+            throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                           "permission to delete records");
         }
+        analyticsDataService.delete(tenantId, tableName, timeFrom, timeTo);
     }
 
     @Override
     public void delete(String username, String tableName, List<String> ids)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
-        try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(username);
-            int tenantId = AnalyticsServiceHolder.getRealmService().getTenantManager().getTenantId(tenantDomain);
-            analyticsDataService.delete(tenantId, tableName, ids);
-        } catch (UserStoreException e) {
-            throw new AnalyticsException("Unable to get tenantId for user: " + username, e);
+
+        int tenantId = getTenantId(username);
+        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_DELETE_RECORD)) {
+            throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                           "permission to delete records");
         }
+        analyticsDataService.delete(tenantId, tableName, ids);
     }
 
     @Override
     public void setIndices(String username, String tableName, Map<String, IndexType> columns)
             throws AnalyticsIndexException {
+
         try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(username);
-            int tenantId = AnalyticsServiceHolder.getRealmService().getTenantManager().getTenantId(tenantDomain);
+            int tenantId = getTenantId(username);
+            if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_SET_INDEXING)) {
+                throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                               "permission to set indices");
+            }
             analyticsDataService.setIndices(tenantId, tableName, columns);
-        } catch (UserStoreException e) {
-            throw new AnalyticsIndexException("Unable to get tenantId for user: " + username, e);
+        } catch (AnalyticsException e) {
+            throw new AnalyticsIndexException(e.getMessage(), e);
         }
     }
 
     @Override
     public Map<String, IndexType> getIndices(String username, String tableName)
             throws AnalyticsIndexException, AnalyticsException {
-        try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(username);
-            int tenantId = AnalyticsServiceHolder.getRealmService().getTenantManager().getTenantId(tenantDomain);
-            return analyticsDataService.getIndices(tenantId, tableName);
-        } catch (UserStoreException e) {
-            throw new AnalyticsException("Unable to get tenantId for user: " + username, e);
+
+        int tenantId = getTenantId(username);
+        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_GET_INDEXING)) {
+            throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                           "permission to get indices");
         }
+        return analyticsDataService.getIndices(tenantId, tableName);
     }
 
     @Override
     public void clearIndices(String username, String tableName) throws AnalyticsIndexException, AnalyticsException {
-        try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(username);
-            int tenantId = AnalyticsServiceHolder.getRealmService().getTenantManager().getTenantId(tenantDomain);
-            analyticsDataService.clearIndices(tenantId, tableName);
-        } catch (UserStoreException e) {
-            throw new AnalyticsException("Unable to get tenantId for user: " + username, e);
+
+        int tenantId = getTenantId(username);
+        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_DELETE_INDEXING)) {
+            throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                           "permission to clear indices");
         }
+        analyticsDataService.clearIndices(tenantId, tableName);
     }
 
     @Override
     public List<SearchResultEntry> search(String username, String tableName, String language, String query, int start,
                                           int count) throws AnalyticsIndexException, AnalyticsException {
-        try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(username);
-            int tenantId = AnalyticsServiceHolder.getRealmService().getTenantManager().getTenantId(tenantDomain);
-            return analyticsDataService.search(tenantId, tableName, language, query, start, count);
-        } catch (UserStoreException e) {
-            throw new AnalyticsException("Unable to get tenantId for user: " + username, e);
+
+        int tenantId = getTenantId(username);
+        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_SEARCH_RECORD)) {
+            throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                           "permission to search indexed records");
         }
+        return analyticsDataService.search(tenantId, tableName, language, query, start, count);
     }
 
     @Override
     public int searchCount(String username, String tableName, String language, String query)
             throws AnalyticsIndexException {
+
         try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(username);
-            int tenantId = AnalyticsServiceHolder.getRealmService().getTenantManager().getTenantId(tenantDomain);
+            int tenantId = getTenantId(username);
+            if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_SEARCH_RECORD)) {
+                throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                               "permission to get search indexed record count");
+            }
             return analyticsDataService.searchCount(tenantId, tableName, language, query);
-        } catch (UserStoreException e) {
-            throw new AnalyticsIndexException("Unable to get tenantId for user: " + username, e);
+        } catch (AnalyticsException e) {
+            throw new AnalyticsIndexException(e.getMessage(), e);
         }
     }
 
@@ -257,5 +277,31 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     @Override
     public void destroy() throws AnalyticsException {
         analyticsDataService.destroy();
+    }
+
+    private int getTenantId(String username) throws AnalyticsException {
+        try {
+            String tenantDomain = MultitenantUtils.getTenantDomain(username);
+            return AnalyticsServiceHolder.getRealmService().getTenantManager().getTenantId(tenantDomain);
+        } catch (UserStoreException e) {
+            throw new AnalyticsException("Unable to get tenantId for user: " + username, e);
+        }
+    }
+
+    private boolean isUserAuthorized(int tenantId, String username, String permission) throws AnalyticsException {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("User[" + username + "] calling method (" + Thread.currentThread().getStackTrace()[2]
+                    .getMethodName() + ") with permission[" + permission + "]");
+        }
+
+        try {
+            UserRealm userRealm = AnalyticsServiceHolder.getRealmService().getTenantUserRealm(tenantId);
+            return userRealm.getAuthorizationManager().isUserAuthorized(MultitenantUtils.getTenantAwareUsername(username), permission,
+                                                                        CarbonConstants.UI_PERMISSION_ACTION);
+        } catch (UserStoreException e) {
+            throw new AnalyticsException("Unable to get user permission information for user[" + username + "] due to " +
+                                         e.getMessage(), e);
+        }
     }
 }

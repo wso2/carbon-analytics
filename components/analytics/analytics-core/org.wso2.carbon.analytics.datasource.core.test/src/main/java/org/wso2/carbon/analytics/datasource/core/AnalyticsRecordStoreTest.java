@@ -149,7 +149,7 @@ public class AnalyticsRecordStoreTest {
         this.analyticsRS.createTable(tenantId, tableName);
         Map<String, AnalyticsSchema.ColumnType> columns = new HashMap<String, AnalyticsSchema.ColumnType>();
         columns.put("name", AnalyticsSchema.ColumnType.STRING);
-        columns.put("age", AnalyticsSchema.ColumnType.INT);
+        columns.put("age", AnalyticsSchema.ColumnType.INTEGER);
         columns.put("weight", AnalyticsSchema.ColumnType.LONG);
         columns.put("something1", AnalyticsSchema.ColumnType.FLOAT);
         columns.put("something2", AnalyticsSchema.ColumnType.DOUBLE);
@@ -508,6 +508,7 @@ public class AnalyticsRecordStoreTest {
         records.remove(97);
         records.remove(96);
         records.remove(95);
+        Assert.assertEquals(recordsIn.size(), records.size());
         Assert.assertEquals(new HashSet<Record>(records), new HashSet<Record>(recordsIn));
         this.analyticsRS.delete(7, "T1", time + timeOffset * 5 - 2, time + timeOffset * 7 + 4);
         recordsIn = GenericUtils.listRecords(this.analyticsRS,

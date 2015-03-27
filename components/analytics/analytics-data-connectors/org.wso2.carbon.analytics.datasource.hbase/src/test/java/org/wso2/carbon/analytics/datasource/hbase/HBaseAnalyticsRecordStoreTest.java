@@ -49,7 +49,7 @@ public class HBaseAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
 
     private HBaseAnalyticsConfigurationEntry createConfig() {
         HBaseAnalyticsConfigurationEntry entry = new HBaseAnalyticsConfigurationEntry();
-        entry.setBatchSize(50);
+        entry.setBatchSize(5000);
         return entry;
     }
 

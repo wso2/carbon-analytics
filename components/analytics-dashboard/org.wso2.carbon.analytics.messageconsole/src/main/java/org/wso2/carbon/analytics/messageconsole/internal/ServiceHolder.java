@@ -1,5 +1,3 @@
-package org.wso2.carbon.analytics.messageconsole.internal;
-
 /*
 * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -18,8 +16,13 @@ package org.wso2.carbon.analytics.messageconsole.internal;
 * under the License.
 */
 
+package org.wso2.carbon.analytics.messageconsole.internal;
+
 import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 
+/**
+ * This represents a service holder class for message console service.
+ */
 public class ServiceHolder {
 
     private static SecureAnalyticsDataService analyticsDataService;

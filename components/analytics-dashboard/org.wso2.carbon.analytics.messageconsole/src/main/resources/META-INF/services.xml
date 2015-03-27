@@ -8,5 +8,5 @@
 
     <parameter name="adminService" locked="true">true</parameter>
     <parameter name="hiddenService" locked="true">true</parameter>
-    <parameter name="AuthorizationAction" locked="true">/permission/admin/protected</parameter>
+    <parameter name="AuthorizationAction" locked="true">/permission/admin/manage/analytics/messageconsole</parameter>
 </serviceGroup>

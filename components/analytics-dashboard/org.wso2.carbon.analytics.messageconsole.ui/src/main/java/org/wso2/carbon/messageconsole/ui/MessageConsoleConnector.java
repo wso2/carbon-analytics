@@ -30,10 +30,12 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.messageconsole.stub.MessageConsoleStub;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.ColumnBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.EntityBean;
+import org.wso2.carbon.analytics.messageconsole.stub.beans.PermissionBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.RecordBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.RecordResultBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.TableBean;
 import org.wso2.carbon.messageconsole.ui.beans.Column;
+import org.wso2.carbon.messageconsole.ui.beans.Permissions;
 import org.wso2.carbon.messageconsole.ui.beans.Record;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseArbitraryField;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseArbitraryFieldColumn;
@@ -41,6 +43,7 @@ import org.wso2.carbon.messageconsole.ui.beans.ResponseRecord;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseResult;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseTable;
 import org.wso2.carbon.messageconsole.ui.beans.TableSchemaColumn;
+import org.wso2.carbon.messageconsole.ui.exception.MessageConsoleException;
 import org.wso2.carbon.messageconsole.ui.serializers.ResponseArbitraryFieldSerializer;
 import org.wso2.carbon.messageconsole.ui.serializers.ResponseArbitraryFieldsSerializer;
 import org.wso2.carbon.messageconsole.ui.serializers.ResponseRecordSerializer;
@@ -72,6 +75,8 @@ public class MessageConsoleConnector {
     public static final int TYPE_UPDATE_ARBITRARY_RECORD = 8;
     public static final int TYPE_DELETE_ARBITRARY_RECORD = 9;
     public static final int TYPE_CREATE_TABLE = 10;
+    public static final int TYPE_DELETE_TABLE = 11;
+    public static final int TYPE_GET_TABLE_INFO = 12;
 
     private MessageConsoleStub stub;
     private static final GsonBuilder RESPONSE_RESULT_BUILDER = new GsonBuilder().registerTypeAdapter(ResponseResult.class,
@@ -97,6 +102,27 @@ public class MessageConsoleConnector {
         } catch (AxisFault axisFault) {
             log.error("Unable to create MessageConsoleStub.", axisFault);
         }
+    }
+
+    public Permissions getAvailablePermissionForUser() throws MessageConsoleException {
+        Permissions permissions = new Permissions();
+        try {
+            PermissionBean permissionBean = stub.getAvailablePermissions();
+            permissions.setCreateTable(permissionBean.getCreateTable());
+            permissions.setListTable(permissionBean.getListTable());
+            permissions.setDropTable(permissionBean.getDropTable());
+            permissions.setListRecord(permissionBean.getListRecord());
+            permissions.setPutRecord(permissionBean.getPutRecord());
+            permissions.setSearchRecord(permissionBean.getSearchRecord());
+            permissions.setDeleteRecord(permissionBean.getDeleteRecord());
+            permissions.setGetIndex(permissionBean.getGetIndex());
+            permissions.setSetIndex(permissionBean.getSetIndex());
+            permissions.setDeleteIndex(permissionBean.getDeleteIndex());
+        } catch (Exception e) {
+            throw new MessageConsoleException("Unable to check granted message console permissions due to: " + e
+                    .getMessage(), e);
+        }
+        return permissions;
     }
 
     public String[] getTableList() {
@@ -147,9 +173,10 @@ public class MessageConsoleConnector {
                 responseResult.setTotalRecordCount(recordBeans.getTotalResultCount());
             }
         } catch (Exception e) {
-            log.error("Unable to get records for table:" + tableName, e);
+            String errorMsg = "Unable to get records for table:" + tableName;
+            log.error(errorMsg, e);
             responseResult.setResult(ERROR);
-            responseResult.setMessage(e.getMessage());
+            responseResult.setMessage(errorMsg);
         }
 
         return gson.toJson(responseResult);
@@ -224,9 +251,10 @@ public class MessageConsoleConnector {
         try {
             stub.deleteRecords(table, recordIds);
         } catch (Exception e) {
-            log.error("Unable to delete records" + Arrays.toString(recordIds) + " from table :" + table, e);
+            String errorMsg = "Unable to delete records" + Arrays.toString(recordIds) + " from table :" + table;
+            log.error(errorMsg, e);
             responseResult.setResult(ERROR);
-            responseResult.setMessage(e.getMessage());
+            responseResult.setMessage(errorMsg);
         }
 
         return gson.toJson(responseResult);
@@ -245,9 +273,11 @@ public class MessageConsoleConnector {
             RecordBean recordBean = stub.addRecord(table, columns, values);
             responseRecord.setRecord(getRecord(recordBean));
         } catch (Exception e) {
-            log.error("Unable to add record {column: " + Arrays.toString(columns) + ", values: " + Arrays.toString(values) + " } to table :" + table, e);
+            String errorMsg = "Unable to add record {column: " + Arrays.toString(columns) + ", values: " + Arrays
+                    .toString(values) + " } to table :" + table;
+            log.error(errorMsg, e);
             responseRecord.setResult(ERROR);
-            responseRecord.setMessage(e.getMessage());
+            responseRecord.setMessage(errorMsg);
         }
         return gson.toJson(responseRecord);
     }
@@ -265,16 +295,19 @@ public class MessageConsoleConnector {
             RecordBean recordBean = stub.updateRecord(table, recordId, columns, values, Long.parseLong(timestamp));
             responseRecord.setRecord(getRecord(recordBean));
         } catch (Exception e) {
-            log.error("Unable to update record {id: " + recordId + ", column: " + Arrays.toString(columns) + ", " +
-                      "values: " + Arrays.toString(values) + " } to table :" + table, e);
-
+            String errorMsg = "Unable to update record {id: " + recordId + ", column: " + Arrays.toString(columns) + ", " +
+                              "values: " + Arrays.toString(values) + " } to table :" + table;
+            log.error(errorMsg, e);
             responseRecord.setResult(ERROR);
-            responseRecord.setMessage(e.getMessage());
+            responseRecord.setMessage(errorMsg);
         }
         return gson.toJson(responseRecord);
     }
 
     public String getArbitraryFields(String table, String recordId) {
+        if (log.isDebugEnabled()) {
+            log.debug("Get arbitrary field values for recordId [" + recordId + "] in table[" + table + "]");
+        }
         ResponseArbitraryField responseArbitraryField = new ResponseArbitraryField();
         Gson gson = RESPONSE_ARBITRARY_FIELD_BUILDER.serializeNulls().create();
         responseArbitraryField.setResult(OK);
@@ -291,14 +324,19 @@ public class MessageConsoleConnector {
 
             responseArbitraryField.setColumns(resultColumns);
         } catch (Exception e) {
+            String errorMsg = "Unable to get arbitrary fields for record[" + recordId + "] in table[" + table + "]";
+            log.error(errorMsg, e);
             responseArbitraryField.setResult(ERROR);
-            responseArbitraryField.setMessage(e.getMessage());
+            responseArbitraryField.setMessage(errorMsg);
         }
 
         return gson.toJson(responseArbitraryField);
     }
 
     public String deleteArbitraryField(String table, String recordId, String fieldName) {
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting arbitrary field[" + fieldName + "] in record[" + recordId + "] in table[" + table + "]");
+        }
         ResponseArbitraryField responseArbitraryField = new ResponseArbitraryField();
         Gson gson = RESPONSE_ARBITRARY_FIELD_BUILDER.serializeNulls().create();
         responseArbitraryField.setResult(OK);
@@ -306,15 +344,20 @@ public class MessageConsoleConnector {
         try {
             stub.deleteArbitraryField(table, recordId, fieldName);
         } catch (Exception e) {
+            String errorMsg = "Unable to delete arbitrary field with record[" + recordId + "] in table[" + table + "]";
+            log.error(errorMsg, e);
             responseArbitraryField.setResult(ERROR);
-            responseArbitraryField.setMessage(e.getMessage());
+            responseArbitraryField.setMessage(errorMsg);
         }
 
         return gson.toJson(responseArbitraryField);
     }
 
     public String putArbitraryField(String table, String recordId, String fieldName, String value, String type) {
-
+        if (log.isDebugEnabled()) {
+            log.debug("Saving arbitrary field[" + fieldName + "] with value[" + value + "] and type [" + type +
+                      "] in record[" + recordId + "] in  table[" + table + "]");
+        }
         ResponseArbitraryFieldColumn responseArbitraryFieldColumn = new ResponseArbitraryFieldColumn();
         Gson gson = RESPONSE_ARBITRARY_FIELD_COLUMN_BUILDER.serializeNulls().create();
         responseArbitraryFieldColumn.setResult(OK);
@@ -322,14 +365,19 @@ public class MessageConsoleConnector {
             stub.putArbitraryField(table, recordId, fieldName, value, type);
             responseArbitraryFieldColumn.setColumn(new Column(fieldName, value, type));
         } catch (Exception e) {
+            String errorMsg = "Unable to save arbitrary field[" + fieldName + "] with record[" + recordId + "] in " +
+                              "table[" + table + "]";
+            log.error(errorMsg, e);
             responseArbitraryFieldColumn.setResult(ERROR);
-            responseArbitraryFieldColumn.setMessage(e.getMessage());
+            responseArbitraryFieldColumn.setMessage(errorMsg);
         }
         return gson.toJson(responseArbitraryFieldColumn);
     }
 
     public String createTable(String table, String detailsJsonString) {
-
+        if (log.isDebugEnabled()) {
+            log.debug("Creating table[" + table + "] with values [" + detailsJsonString + "]");
+        }
         String msg;
         TableBean tableBean = new TableBean();
         tableBean.setName(table);
@@ -339,12 +387,14 @@ public class MessageConsoleConnector {
         ColumnBean[] columns = new ColumnBean[columnList.size()];
         int i = 0;
         for (TableSchemaColumn schemaColumn : columnList) {
-            ColumnBean columnBean = new ColumnBean();
-            columnBean.setName(schemaColumn.getColumn());
-            columnBean.setType(schemaColumn.getType());
-            columnBean.setPrimary(schemaColumn.isPrimary());
-            columnBean.setIndex(schemaColumn.isIndex());
-            columns[i++] = columnBean;
+            if (schemaColumn.getColumn() != null && !schemaColumn.getColumn().isEmpty()) {
+                ColumnBean columnBean = new ColumnBean();
+                columnBean.setName(schemaColumn.getColumn());
+                columnBean.setType(schemaColumn.getType());
+                columnBean.setPrimary(schemaColumn.isPrimary());
+                columnBean.setIndex(schemaColumn.isIndex());
+                columns[i++] = columnBean;
+            }
         }
         tableBean.setColumns(columns);
         msg = "Successfully saved table information";
@@ -355,5 +405,74 @@ public class MessageConsoleConnector {
             msg = "Unable to save table information: " + e.getMessage();
         }
         return msg;
+    }
+
+    public String editTable(String table, String detailsJsonString) {
+        if (log.isDebugEnabled()) {
+            log.debug("Editing table[" + table + "] with values [" + detailsJsonString + "]");
+        }
+        String msg;
+        TableBean tableBean = new TableBean();
+        tableBean.setName(table);
+
+        Gson gson = new Gson();
+        List<TableSchemaColumn> columnList = gson.fromJson(detailsJsonString, TABLE_SCHEMA_TYPE);
+        ColumnBean[] columns = new ColumnBean[columnList.size()];
+        int i = 0;
+        for (TableSchemaColumn schemaColumn : columnList) {
+            if (schemaColumn.getColumn() != null && !schemaColumn.getColumn().isEmpty()) {
+                ColumnBean columnBean = new ColumnBean();
+                columnBean.setName(schemaColumn.getColumn());
+                columnBean.setType(schemaColumn.getType());
+                columnBean.setPrimary(schemaColumn.isPrimary());
+                columnBean.setIndex(schemaColumn.isIndex());
+                columns[i++] = columnBean;
+            }
+        }
+        tableBean.setColumns(columns);
+        msg = "Successfully saved table information";
+        try {
+            stub.editTable(tableBean);
+        } catch (Exception e) {
+            log.error("Unable to save table information: " + e.getMessage(), e);
+            msg = "Unable to save table information: " + e.getMessage();
+        }
+        return msg;
+    }
+
+    public String deleteTable(String table) {
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting table[" + table + "]");
+        }
+        String msg;
+        try {
+            stub.deleteTable(table);
+            msg = "Table " + table + " deleted successfully";
+        } catch (Exception e) {
+            log.error("Unable to delete table due to " + e.getMessage(), e);
+            msg = "Unable to delete table due to " + e.getMessage();
+        }
+
+        return msg;
+    }
+
+    public String getTableInfoWithIndexInfo(String table) {
+        List<TableSchemaColumn> tableSchemaColumns = new ArrayList<>();
+        Gson gson = new GsonBuilder().serializeNulls().create();
+        try {
+            TableBean tableInfo = stub.getTableInfoWithIndicesInfo(table);
+            for (ColumnBean column : tableInfo.getColumns()) {
+                TableSchemaColumn schemaColumn = new TableSchemaColumn();
+                schemaColumn.setColumn(column.getName());
+                schemaColumn.setType(column.getType());
+                schemaColumn.setIndex(column.getIndex());
+                schemaColumn.setPrimary(column.getPrimary());
+                tableSchemaColumns.add(schemaColumn);
+            }
+        } catch (Exception e) {
+            log.error("Unable to get table information for table:" + table, e);
+        }
+
+        return gson.toJson(tableSchemaColumns);
     }
 }

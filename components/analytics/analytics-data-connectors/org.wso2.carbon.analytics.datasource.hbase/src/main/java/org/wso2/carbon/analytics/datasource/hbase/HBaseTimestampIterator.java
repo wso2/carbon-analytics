@@ -24,6 +24,7 @@ import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseAnalyticsDSConstants;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseRuntimeException;
@@ -47,7 +48,7 @@ public class HBaseTimestampIterator implements Iterator<Record> {
     private Iterator<Record> subIterator = Collections.emptyIterator();
 
     HBaseTimestampIterator(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo,
-                           Connection conn, int batchSize) throws AnalyticsException {
+                           Connection conn, int batchSize) throws AnalyticsException, AnalyticsTableNotAvailableException {
         if ((timeFrom > timeTo) || (batchSize < 0)) {
             throw new AnalyticsException("Invalid parameters specified for reading data from table " + tableName +
                     " for tenant " + tenantId);
@@ -65,7 +66,11 @@ public class HBaseTimestampIterator implements Iterator<Record> {
     public boolean hasNext() {
         boolean hasMore = this.subIterator.hasNext();
         if (!hasMore) {
-            this.preFetch();
+            try {
+                this.preFetch();
+            } catch (AnalyticsTableNotAvailableException e) {
+                this.subIterator = Collections.emptyIterator();
+            }
         }
         return this.subIterator.hasNext();
     }
@@ -85,7 +90,7 @@ public class HBaseTimestampIterator implements Iterator<Record> {
         /* nothing to do here, since this is a read-only iterator */
     }
 
-    private void preFetch() {
+    private void preFetch() throws AnalyticsTableNotAvailableException {
         if (this.fullyFetched) {
             return;
         }
@@ -96,6 +101,8 @@ public class HBaseTimestampIterator implements Iterator<Record> {
         Set<String> colSet = null;
         List<Record> fetchedRecords = new ArrayList<>();
         List<Get> gets = new ArrayList<>();
+        Map<String, Object> values;
+        long timestamp;
 
         for (String currentId : currentBatch) {
             Get get = new Get(Bytes.toBytes(currentId));
@@ -113,16 +120,35 @@ public class HBaseTimestampIterator implements Iterator<Record> {
 
         try {
             Result[] results = this.table.get(gets);
+
             for (Result currentResult : results) {
-                Cell[] cells = currentResult.rawCells();
                 byte[] rowId = currentResult.getRow();
-                Map<String, Object> values = GenericUtils.decodeRecordValues(CellUtil.cloneValue(cells[0]), colSet);
-                long timestamp = cells[0].getTimestamp();
-                fetchedRecords.add(new Record(new String(rowId), this.tenantId, this.tableName, values, timestamp));
+                if (currentResult.containsColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                        HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME)) {
+                    Cell dataCell = currentResult.getColumnLatestCell
+                            (HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                                    HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME);
+                    values = GenericUtils.decodeRecordValues(CellUtil.cloneValue(dataCell), colSet);
+                    timestamp = dataCell.getTimestamp();
+                    fetchedRecords.add(new Record(new String(rowId), this.tenantId, this.tableName, values, timestamp));
+                } else if (currentResult.containsColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                        HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME)) {
+                    Cell timeCell = currentResult.getColumnLatestCell
+                            (HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                                    HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
+                    values = new HashMap<>();
+                    timestamp = HBaseUtils.decodeLong(CellUtil.cloneValue(timeCell));
+                    fetchedRecords.add(new Record(new String(rowId), this.tenantId, this.tableName, values, timestamp));
+                } else {
+                    /* No valid data in row, ignore.*/
+                }
             }
             this.subIterator = fetchedRecords.iterator();
         } catch (Exception e) {
-            //this.cleanup();
+            if (e instanceof RetriesExhaustedException) {
+                throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+            }
+            this.cleanup();
             throw new HBaseRuntimeException("Error reading data from table " + this.tableName + " for tenant " +
                     this.tenantId, e);
         }
