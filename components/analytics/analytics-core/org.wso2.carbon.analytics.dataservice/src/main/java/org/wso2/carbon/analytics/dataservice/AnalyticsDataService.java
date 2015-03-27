@@ -29,7 +29,6 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotA
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutException;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordReader;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 

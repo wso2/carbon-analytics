@@ -57,6 +57,8 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
     private HazelcastInstance hz;
     
     private Map<String, GroupEventListener> groups = new HashMap<String, GroupEventListener>();
+    
+    private Map<String, Member> leaders = new HashMap<String, Member>();
         
     public AnalyticsClusterManagerImpl() {
         this.hz = AnalyticsServiceHolder.getHazelcastInstance();
@@ -81,7 +83,8 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         List<Member> groupMembers = this.getGroupMembers(groupId);
         Member myself = this.hz.getCluster().getLocalMember();
         groupMembers.add(myself);
-        if (this.isLeader(groupId)) {
+        if (this.checkLeader(myself, groupId)) {
+            this.leaders.put(groupId, myself);
             groupEventListener.onBecomingLeader();
             this.setLeaderInitDoneFlag(groupId);
             groupEventListener.onLeaderUpdate();
@@ -90,6 +93,10 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
             groupEventListener.onLeaderUpdate();
             this.sendMemberAddedNotificationToLeader(groupId);
         }
+    }
+    
+    private boolean checkLeader(Member member, String groupId) {
+        return member.equals(this.getLeader(groupId));
     }
     
     private String generateLeaderInitDoneFlagName(String groupId) {
@@ -132,10 +139,11 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
     
     @Override
     public boolean isLeader(String groupId) {
-        return this.hz.getCluster().getLocalMember().equals(this.getLeader(groupId));
+        return this.hz.getCluster().getLocalMember().equals(this.leaders.get(groupId));
     }
     
     private void executeMyselfBecomingLeader(String groupId) throws AnalyticsClusterException {
+        this.leaders.put(groupId, this.hz.getCluster().getLocalMember());
         this.groups.get(groupId).onBecomingLeader();
         this.executeAll(groupId, new LeaderUpdateNotification(groupId));
     }
@@ -244,11 +252,10 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         if (groupMembers.contains(member)) {
             groupMembers.remove(member);
         }
-        Member myself = this.hz.getCluster().getLocalMember();
         if (this.isLeader(groupId)) {
             /* if I'm already the leader, notify of the membership change */
             this.groups.get(groupId).onMembersChangeForLeader();
-        } else if (groupMembers.get(0).equals(myself)) {
+        } else if (this.checkLeader(this.hz.getCluster().getLocalMember(), groupId)) {
             /* check if I'm already not the leader, and if I just became the leader */
             this.executeMyselfBecomingLeader(groupId);
         }
