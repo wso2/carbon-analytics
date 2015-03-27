@@ -20,6 +20,8 @@ import com.google.gson.Gson;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsScore;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.restapi.Constants;
@@ -29,6 +31,7 @@ import org.wso2.carbon.analytics.dataservice.restapi.beans.IndexTypeBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.QueryBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.TableBean;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
@@ -53,6 +56,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -460,7 +465,70 @@ public class AnalyticsResource extends AbstractResource {
         };
 	}
 
-	/**
+    /**
+     * Inserts or update a list of records. Update only happens if there are matching record ids
+     * @param recordBeans the list of the record beans
+     * @return the response
+     * @throws AnalyticsException
+     */
+    @POST
+    @Consumes({ MediaType.APPLICATION_JSON})
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path("facets")
+    public Response insertFacetRecords(List<RecordBean> recordBeans)
+            throws AnalyticsException {
+        AnalyticsDataService ads = Utils.getAnalyticsDataService();
+        List<Record> l = new ArrayList<Record>();
+        String[] str = new String[]{"year", "month", "day"};
+        AnalyticsCategoryPath acp = new AnalyticsCategoryPath(str);
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put("testField", acp);
+        Record r = new Record(-1234,"test",values);
+        l.add(r);
+        ads.put(l);
+
+        List<String> ids = new ArrayList<String>();
+        ids.add(r.getId());
+        RecordGroup[] aaaa = ads.get(-1234, "test", 0, null, ids);
+        List<Record> ddddd = GenericUtils.listRecords(ads, aaaa);
+        Map<String, Object> hhh = ddddd.get(0).getValues();
+        AnalyticsCategoryPath eeee = (AnalyticsCategoryPath)hhh.get("testField");
+        return Response.ok(eeee.getPath()).build();
+    }
+
+    /**
+     * Inserts or update a list of records. Update only happens if there are matching record ids
+     * @param recordBeans the list of the record beans
+     * @return the response
+     * @throws AnalyticsException
+     */
+    @POST
+    @Consumes({ MediaType.APPLICATION_JSON})
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path("drill")
+    public Response drilldown(List<RecordBean> recordBeans)
+            throws AnalyticsException {
+        AnalyticsDataService ads = Utils.getAnalyticsDataService();
+        AnalyticsScore score = new AnalyticsScore("1",null);
+        List<AnalyticsCategoryPath> pathList = new ArrayList<AnalyticsCategoryPath>();
+        AnalyticsCategoryPath path = new AnalyticsCategoryPath("testField", new String[]{"year", "month"});
+        pathList.add(path);
+        AnalyticsDrillDownRequest anss = new AnalyticsDrillDownRequest();
+        anss.setCategoryPaths(pathList);
+        anss.setScore(score);
+        anss.setLanguageQuery(null);
+        anss.setLanguage("lucene");
+        anss.setTenantId(-1234);
+        anss.setTableName("test");
+        anss.setCategoryCount(10);
+        anss.setRecordCount(10);
+        anss.setWithIds(true);
+
+        return Response.ok(ads.drillDown(anss, 10, 10)).build();
+    }
+
+
+    /**
 	 * Sets the indices.
 	 * @param tableName the table name
 	 * @param columnsBean the columns bean containing all the indices

@@ -20,7 +20,6 @@ package org.wso2.carbon.analytics.dataservice;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
-import org.wso2.carbon.analytics.dataservice.commons.AnalyticsScore;
 import org.wso2.carbon.analytics.dataservice.commons.DrillDownResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
@@ -215,9 +214,17 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     @Override
-    public Map<String, DrillDownResultEntry> drillDown(AnalyticsDrillDownRequest drillDownRequest)
+    public Map<String, List<DrillDownResultEntry>> drillDown(AnalyticsDrillDownRequest drillDownRequest,
+                                                             int facetCount, int recordCount)
             throws AnalyticsIndexException {
         return this.getIndexer().drillDown(drillDownRequest);
+    }
+
+    @Override
+    public Map<String, List<DrillDownResultEntry>> searchRange(
+            AnalyticsDrillDownRequest drillDownRequest, int facetCount, int recordCount)
+            throws AnalyticsIndexException {
+        return this.getIndexer().searchRanges(drillDownRequest, facetCount, recordCount);
     }
 
     @Override

@@ -161,6 +161,10 @@ public class Utils {
 				return IndexTypeBean.LONG;
 			case STRING:
 				return IndexTypeBean.STRING;
+            case FACET:
+                return IndexTypeBean.FACET;
+            case SCOREPARAM:
+                return IndexTypeBean.SCOREPARAM;
 			default:
 				return IndexTypeBean.STRING;
 		}
@@ -186,6 +190,10 @@ public class Utils {
 				return IndexType.LONG;
 			case STRING:
 				return IndexType.STRING;
+            case FACET:
+                return IndexType.FACET;
+            case SCOREPARAM:
+                return IndexType.SCOREPARAM;
 			default:
 				return IndexType.STRING;
 		}

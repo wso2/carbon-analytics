@@ -31,7 +31,6 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotA
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutException;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordReader;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -249,8 +248,27 @@ public interface AnalyticsDataService extends AnalyticsRecordReader {
     int searchCount(int tenantId, String tableName, String language, 
             String query) throws AnalyticsIndexException;
 
+    /**
+     * Returns the drill down results of a search query, given {@link org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest}
+     * @param drillDownRequest The drilldown object which contains the drilldown information
+     * @param facetCount nunber of maximum facets per each field
+     * @param recordCount number of each records in each facet
+     * @return the results containing field names and respective facets
+     * @throws AnalyticsIndexException
+     */
+    Map<String, List<DrillDownResultEntry>> drillDown( AnalyticsDrillDownRequest drillDownRequest,
+             int facetCount, int recordCount) throws AnalyticsIndexException;
 
-    Map<String, DrillDownResultEntry> drillDown( AnalyticsDrillDownRequest drillDownRequest) throws AnalyticsIndexException;
+    /**
+     * Returns the drilldown result
+     * @param drillDownRequest
+     * @param facetCount
+     * @param recordCount
+     * @return
+     */
+    Map<String, List<DrillDownResultEntry>> searchRange( AnalyticsDrillDownRequest drillDownRequest,
+                                                         int facetCount, int recordCount)
+            throws AnalyticsIndexException;
 
     /**
      * This method waits until the current indexing operations for the system is done.

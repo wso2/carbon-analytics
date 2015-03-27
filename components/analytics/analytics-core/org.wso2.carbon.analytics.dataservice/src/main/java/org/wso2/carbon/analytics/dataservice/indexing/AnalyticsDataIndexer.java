@@ -31,22 +31,41 @@ import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
+import org.apache.lucene.expressions.Expression;
+import org.apache.lucene.expressions.SimpleBindings;
+import org.apache.lucene.expressions.js.JavascriptCompiler;
+import org.apache.lucene.facet.DrillDownQuery;
+import org.apache.lucene.facet.DrillSideways;
+import org.apache.lucene.facet.FacetField;
+import org.apache.lucene.facet.FacetResult;
+import org.apache.lucene.facet.Facets;
+import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.facet.FacetsConfig;
-import org.apache.lucene.facet.taxonomy.FloatAssociationFacetField;
+import org.apache.lucene.facet.LabelAndValue;
+import org.apache.lucene.facet.taxonomy.TaxonomyFacetSumValueSource;
 import org.apache.lucene.facet.taxonomy.TaxonomyMergeUtils;
+import org.apache.lucene.facet.taxonomy.TaxonomyReader;
 import org.apache.lucene.facet.taxonomy.TaxonomyWriter;
+import org.apache.lucene.facet.taxonomy.directory.DirectoryTaxonomyReader;
 import org.apache.lucene.facet.taxonomy.directory.DirectoryTaxonomyWriter;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queries.function.ValueSource;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.SortField;
+import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.TotalHitCountCollector;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.store.SingleInstanceLockFactory;
 import org.apache.lucene.util.Version;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
@@ -57,7 +76,9 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterException;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsScore;
 import org.wso2.carbon.analytics.dataservice.commons.DrillDownResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
@@ -78,7 +99,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -116,13 +139,19 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         
     private static final String INDEX_DATA_FS_BASE_PATH = "/_data/index/";
 
-    private static final String TAXONOMY_INDEX_DATA_FS_BASE_PATH ="/_data/taxonomy/index/" ;
+    private static final String TAXONOMY_INDEX_DATA_FS_BASE_PATH ="/_data/taxonomy/" ;
 
     public static final String INDEX_ID_INTERNAL_FIELD = "_id";
 
     public static final String INDEX_INTERNAL_TIMESTAMP_FIELD = "_timestamp";
+
+    private static final String INDEX_INTERNAL_SCORE_FIELD = "_score";
+
+    private static final String INDEX_INTERNAL_WEIGHT_FIELD = "_weight";
     
     private static final String NULL_INDEX_VALUE = "";
+
+
 
     private AnalyticsIndexDefinitionRepository repository;
     
@@ -646,39 +675,264 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
 
-    public Map<String, DrillDownResultEntry> drillDown(AnalyticsDrillDownRequest drillDownRequest)
+    public Map<String,List<DrillDownResultEntry>> searchRanges(AnalyticsDrillDownRequest drillDownRequest,
+                                                               int facetCount, int recordCount)
+            throws AnalyticsIndexException {
+
+        int tenantId = drillDownRequest.getTenantId();
+        String tableName = drillDownRequest.getTableName();
+        Map<String, List<DrillDownResultEntry>> result = new LinkedHashMap<>();
+        MultiReader multiReader= null;
+        try {
+            List<String> shardIds = this.lookupGloballyExistingShardIds(INDEX_DATA_FS_BASE_PATH, tenantId, tableName);
+            List<IndexReader> indexReaders = new ArrayList<>();
+            for (String shardId : shardIds) {
+                String shardedTableId = this.generateShardedTableId(tenantId, tableName, shardId);
+                IndexReader reader = DirectoryReader.open(this.lookupIndexDir(shardedTableId));
+                indexReaders.add(reader);
+            }
+            multiReader = new MultiReader(indexReaders.toArray(new IndexReader[indexReaders.size()]));
+            IndexSearcher searcher = new IndexSearcher(multiReader);
+            Map<String, IndexType> indices = this.lookupIndices(tenantId, tableName);
+            Query indexQuery = new AnalyticsQueryParser(this.luceneAnalyzer
+                    , indices).parse(drillDownRequest.getLanguageQuery());
+            List<AnalyticsDrillDownRange> ranges = drillDownRequest.getRanges().subList(0,facetCount);
+            FacetsCollector fc = new FacetsCollector();
+            for (AnalyticsDrillDownRange range : ranges) {
+                DrillDownResultEntry drillDownResultEntry = new DrillDownResultEntry();
+                drillDownResultEntry.setCategory(range.getLabel());
+                DrillDownQuery drillDownQuery = new DrillDownQuery(new FacetsConfig(), indexQuery);
+                drillDownQuery.add(drillDownRequest.getRangeField(),
+                                   NumericRangeQuery.newDoubleRange(drillDownRequest.getRangeField(),
+                                   range.getFrom(), range.getTo(), true, false));
+                TopDocs topDocs = FacetsCollector.search(searcher, drillDownQuery, recordCount, fc);
+                if(drillDownRequest.isWithIds()) {
+                    for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+                        Document document = searcher.doc(scoreDoc.doc);
+                        drillDownResultEntry.addNewFacetId(document.get(INDEX_ID_INTERNAL_FIELD));
+                    }
+                }
+                List<DrillDownResultEntry> childFacets = result.get(drillDownRequest.getRangeField());
+                if (childFacets == null) {
+                    childFacets = new ArrayList<>();
+                    result.put(drillDownRequest.getRangeField(), childFacets);
+                }
+                childFacets.add(drillDownResultEntry);
+            }
+            return  result;
+        } catch (IOException e) {
+            throw new AnalyticsIndexException("Error in opening Index for range searches");
+        } catch (org.apache.lucene.queryparser.classic.ParseException e) {
+            throw new AnalyticsIndexException("Error while parsing the lucene query");
+        } finally {
+            if (multiReader != null) {
+                try {
+                    multiReader.close();
+                } catch (IOException e) {
+                    throw new AnalyticsIndexException("Error in closing the index reader");
+                }
+            }
+        }
+    }
+
+    public Map<String, List<DrillDownResultEntry>> drillDown(AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
         int tenantId = drillDownRequest.getTenantId();
         String tableName = drillDownRequest.getTableName();
+        Directory desIndex = new RAMDirectory();
+        Directory desTaxonomyIndex = new RAMDirectory();
+        mergeTaxnomonyShards(tenantId, tableName, desIndex, desTaxonomyIndex);
+        return drillDown(drillDownRequest, desIndex, desTaxonomyIndex);
+    }
+
+    private Map<String, List<DrillDownResultEntry>> drillDown(AnalyticsDrillDownRequest drillDownRequest,
+                                Directory indexDir, Directory taxonomyIndexDir)
+            throws AnalyticsIndexException {
+
+        IndexReader indexReader = null;
+        TaxonomyReader taxonomyReader = null;
+        try {
+            indexReader = DirectoryReader.open(indexDir);
+            taxonomyReader = new DirectoryTaxonomyReader(taxonomyIndexDir);
+            IndexSearcher indexSearcher = new IndexSearcher(indexReader);
+            FacetsCollector facetsCollector = new FacetsCollector(true);
+            Map<String, IndexType> indices = this.lookupIndices(drillDownRequest.getTenantId(),
+                                                                drillDownRequest.getTableName());
+            FacetsConfig config = this.getFacetsConfigurations(indices);
+            DrillSideways drillSideways = new DrillSideways(indexSearcher, config, taxonomyReader);
+            DrillDownQuery drillDownQuery = this.createDrillDownQuery(drillDownRequest, indices, config);
+            drillSideways.search(drillDownQuery, facetsCollector);
+            ValueSource valueSource = this.getCompiledScoreFunction(drillDownRequest.getScore());
+            Facets facets = new TaxonomyFacetSumValueSource(taxonomyReader, config, facetsCollector,
+                                                            valueSource);
+            Map<String, List<DrillDownResultEntry>> result = this.getDrilldownTopChildren(drillDownRequest,
+                            indexSearcher, facetsCollector, config, drillDownQuery, facets);
+            return result;
+        } catch (IOException e) {
+            throw new AnalyticsIndexException("Error while performing drill down");
+        } finally {
+            if (indexReader != null) {
+                try {
+                    indexReader.close();
+                } catch (IOException e) {
+                    throw new AnalyticsIndexException("Error while closing index reader in drilldown");
+                }
+            }
+            if (taxonomyReader != null) {
+                try {
+                    taxonomyReader.close();
+                } catch (IOException e) {
+                    throw new AnalyticsIndexException("Error while closing taxonomy reader in drilldown");
+                }
+            }
+        }
+    }
+
+    private Map<String, List<DrillDownResultEntry>> getDrilldownTopChildren(
+            AnalyticsDrillDownRequest drillDownRequest, IndexSearcher indexSearcher,
+            FacetsCollector facetsCollector, FacetsConfig config, DrillDownQuery drillDownQuery,
+            Facets facets) throws AnalyticsIndexException {
+        try {
+            Map<String, List<DrillDownResultEntry>> result = new LinkedHashMap<>();
+            for (AnalyticsCategoryPath categoryPath : drillDownRequest.getCategoryPaths()) {
+                FacetResult facetResult = facets.getTopChildren(drillDownRequest.getCategoryCount(),
+                                                                categoryPath.getName(), categoryPath.getPath());
+                if (facetResult != null) {
+                    for (int i = 0; i < facetResult.childCount; i++) {
+                        LabelAndValue labelAndValue = facetResult.labelValues[i];
+                        DrillDownResultEntry drillDownResultEntry =
+                                this.createDrillDownResultEntry(drillDownRequest, indexSearcher,
+                                                                facetsCollector, config, drillDownQuery, facetResult, labelAndValue);
+                        List<DrillDownResultEntry> childFacets = result.get(facetResult.dim);
+                        if (childFacets == null) {
+                            childFacets = new ArrayList<>();
+                            result.put(facetResult.dim, childFacets);
+                        }
+                        childFacets.add(drillDownResultEntry);
+                    }
+                }
+            }
+            return result;
+        } catch (IOException e) {
+            throw new AnalyticsIndexException("Error while getting top children of facets");
+        }
+    }
+
+    private DrillDownResultEntry createDrillDownResultEntry(
+            AnalyticsDrillDownRequest drillDownRequest, IndexSearcher indexSearcher,
+            FacetsCollector facetsCollector, FacetsConfig config, DrillDownQuery drillDownQuery,
+            FacetResult facetResult, LabelAndValue labelAndValue) throws AnalyticsIndexException {
+        List<String> strList = new ArrayList<String>(Arrays.asList(facetResult.path));
+        strList.add(labelAndValue.label);
+        DrillDownResultEntry drillDownResultEntry = new DrillDownResultEntry();
+        drillDownResultEntry.setCategory(labelAndValue.label);
+        drillDownResultEntry.setCategoryPath(facetResult.path);
+        drillDownResultEntry.setFacetCount((Float) labelAndValue.value);
+        DrillDownQuery tempDrill = new DrillDownQuery(config, drillDownQuery);
+        tempDrill.add(facetResult.dim, strList.toArray(new String[strList.size()]));
+        try {
+            TopDocs topDocs = FacetsCollector.search(indexSearcher
+                    , tempDrill, drillDownRequest.getRecordCount(), facetsCollector);
+            if (drillDownRequest.isWithIds()) {
+                for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+                    Document document = indexSearcher.doc(scoreDoc.doc);
+                    drillDownResultEntry.addNewFacetId(document.get(INDEX_ID_INTERNAL_FIELD));
+                }
+            }
+            return drillDownResultEntry;
+        } catch (IOException e) {
+            throw new AnalyticsIndexException("Error while creating drilldown result entry");
+        }
+    }
+
+    private DrillDownQuery createDrillDownQuery(AnalyticsDrillDownRequest drillDownRequest,
+                                                Map<String, IndexType> indices, FacetsConfig config)
+            throws AnalyticsIndexException {
+        Query languageQuery = new MatchAllDocsQuery();
+        try {
+            if (drillDownRequest.getLanguageQuery() != null) {
+                languageQuery = new AnalyticsQueryParser(this.luceneAnalyzer,
+                                                         indices).parse(drillDownRequest.getLanguageQuery());
+            }
+            DrillDownQuery drillDownQuery = new DrillDownQuery(config, languageQuery);
+            if (!drillDownRequest.getCategoryPaths().isEmpty()) {
+                for (AnalyticsCategoryPath categoryPath : drillDownRequest.getCategoryPaths()) {
+                    drillDownQuery.add(categoryPath.getName(), categoryPath.getPath());
+                }
+            }
+            return drillDownQuery;
+        } catch (org.apache.lucene.queryparser.classic.ParseException e) {
+            throw new AnalyticsIndexException("Error while parsing lucene query");
+        }
+    }
+
+    private FacetsConfig getFacetsConfigurations(Map<String, IndexType> indices) {
+        FacetsConfig config = new FacetsConfig();
+        for (Map.Entry<String, IndexType> entry : indices.entrySet()) {
+            if (entry.getValue().equals(IndexType.FACET)) {
+                String indexField = entry.getKey();
+                config.setHierarchical(indexField, true);
+                config.setMultiValued(indexField, true);
+            }
+        }
+        return config;
+    }
+
+    private ValueSource getCompiledScoreFunction(AnalyticsScore score)
+            throws AnalyticsIndexException {
+        try {
+            Expression scoreFunction = JavascriptCompiler.compile(score.getFunction());
+            SimpleBindings bindings = new SimpleBindings();
+            bindings.add(new SortField(INDEX_INTERNAL_SCORE_FIELD, SortField.Type.SCORE));
+            if (score.getParams() != null) {
+                for (String param : score.getParams()) {
+                    bindings.add(new SortField(param, SortField.Type.DOUBLE));
+                }
+            }
+            return scoreFunction.getValueSource(bindings);
+        } catch (ParseException e) {
+            throw new AnalyticsIndexException("Error while evaluating the score function");
+        }
+    }
+
+
+    private void mergeTaxnomonyShards(int tenantId, String tableName,
+                                      Directory desIndex, Directory desTaxonomyIndex)
+            throws AnalyticsIndexException {
         List<String> shardIds = this.lookupGloballyExistingShardIds(INDEX_DATA_FS_BASE_PATH,
                                                                     tenantId, tableName);
         List<String> taxonomyShardIds = this.lookupGloballyExistingShardIds(TAXONOMY_INDEX_DATA_FS_BASE_PATH,
                                                                             tenantId,tableName);
-        Map<String, DrillDownResultEntry> result = new LinkedHashMap<>();
-        shardIds.retainAll(taxonomyShardIds);
-
-
-        return null;
-    }
-
-    private void mergeTaxnomonyShards(int tenantId, String tableName, List<String> srcShardIds,
-                                      Directory desIndex, Directory desTaxonomyIndex)
-            throws IOException, AnalyticsIndexException {
-
         FacetsConfig config = new FacetsConfig();
         IndexWriterConfig indexWriterConfig = new IndexWriterConfig(Version.LUCENE_4_10_3,
                                                                     this.luceneAnalyzer);
-        IndexWriter desIndexWriter = new IndexWriter(desIndex, indexWriterConfig);
-        DirectoryTaxonomyWriter desTaxonomyWriter = new DirectoryTaxonomyWriter(desTaxonomyIndex);
-        for (String shardId : srcShardIds) {
-            String shardedTableId = this.generateShardedTableId(tenantId, tableName, shardId);
-            mergeTaxonomyShard(shardedTableId, desIndexWriter, desTaxonomyWriter, config);
+        IndexWriter desIndexWriter = null;
+        DirectoryTaxonomyWriter desTaxonomyWriter = null;
+        try {
+            desIndexWriter = new IndexWriter(desIndex, indexWriterConfig);
+            desTaxonomyWriter = new DirectoryTaxonomyWriter(desTaxonomyIndex);
+            shardIds.retainAll(taxonomyShardIds);
+            for (String shardId : shardIds) {
+                String shardedTableId = this.generateShardedTableId(tenantId, tableName, shardId);
+                mergeTaxonomyShard(shardedTableId, desIndexWriter, desTaxonomyWriter, config);
+            }
+        } catch (IOException e) {
+            throw new AnalyticsIndexException("Error while creating index writer in merging",
+                                              e.getCause());
+        }finally {
+            try {
+                desIndexWriter.close();
+                desTaxonomyWriter.close();
+            } catch (IOException e) {
+                throw new AnalyticsIndexException("Error while closing index writers in merging",
+                                                  e.getCause());
+            }
         }
     }
 
     private void mergeTaxonomyShard(String shardedTableId, IndexWriter desIndexWriter,
                                     DirectoryTaxonomyWriter desTaxonomyWriter, FacetsConfig config)
-            throws AnalyticsIndexException, IOException {
+            throws AnalyticsIndexException {
         Directory shardedIndex = this.lookupIndexDir(shardedTableId);
         Directory shardedTaxonomyIndex = this.lookupTaxonomyIndexDir(shardedTableId);
         mergeTaxonomyDirectory(shardedIndex, shardedTaxonomyIndex, desIndexWriter, desTaxonomyWriter, config);
@@ -688,15 +942,14 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     private void mergeTaxonomyDirectory(Directory srcIndex, Directory srcTaxonomyIndex,
                                         IndexWriter desIndexWriter,
                                         DirectoryTaxonomyWriter desTaxonomyWriter,
-                                        FacetsConfig config)
-            throws IOException {
-        TaxonomyMergeUtils.merge(srcIndex,srcTaxonomyIndex, new DirectoryTaxonomyWriter.MemoryOrdinalMap(),
-                                 desIndexWriter, desTaxonomyWriter, config);
-    }
-
-    private void addDrillDownResults(AnalyticsDrillDownRequest drillDownRequest, Map facetResults,
-                                     String shardId ) {
-
+                                        FacetsConfig config) throws AnalyticsIndexException {
+        try {
+            TaxonomyMergeUtils.merge(srcIndex,srcTaxonomyIndex, new DirectoryTaxonomyWriter.MemoryOrdinalMap(),
+                                     desIndexWriter, desTaxonomyWriter, config);
+        } catch (IOException e) {
+            throw new AnalyticsIndexException("Error occured while merging Taxonomy Directories",
+                                              e.getCause());
+        }
     }
     /**
      * Adds the given records to the index if they are previously scheduled to be indexed.
@@ -755,7 +1008,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 indexWriter.updateDocument(new Term(INDEX_ID_INTERNAL_FIELD, record.getId()),
                                            this.generateIndexDoc(record, columns, taxonomyWriter).getFields());
             }
-            indexWriter.commit();
         } catch (IOException e) {
             throw new AnalyticsIndexException("Error in updating index: " + e.getMessage(), e);
         } finally {
@@ -850,30 +1102,32 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
 
-    private void checkAndAddTaxonomyDocEntries(Document doc, IndexType type,
-                                                String name, Object obj, TaxonomyWriter taxonomyWriter)
-            throws AnalyticsIndexException{
-        if (obj == null) return;
-        switch (type) {
-            case FACET:
-                if (obj instanceof AnalyticsCategoryPath) {
+    private Document checkAndAddTaxonomyDocEntries(Document doc, IndexType type,
+                                                   String name, Object obj,
+                                                   TaxonomyWriter taxonomyWriter)
+            throws AnalyticsIndexException {
+        if (obj == null) {
+            throw new AnalyticsIndexException("Facet value is empty");
+        }
+        if (obj instanceof AnalyticsCategoryPath && type == IndexType.FACET) {
 
-                    FacetsConfig facetsConfig = new FacetsConfig();
-                    AnalyticsCategoryPath analyticsCategoryPath = (AnalyticsCategoryPath) obj;
-                    //the field name for dimensions will be "$ + {name}"
-                    facetsConfig.setIndexFieldName(name, new StringBuilder("$").append(name).toString());
-                    facetsConfig.setMultiValued(name, true);
-                    facetsConfig.setHierarchical(name, true);
-                    doc.add(new FloatAssociationFacetField(analyticsCategoryPath.getWeight(),
-                                                           name,
-                                                           analyticsCategoryPath.getPath()));
-                    try {
-                        doc = facetsConfig.build(taxonomyWriter, doc);
-                    } catch (IOException e) {
-                        throw new AnalyticsIndexException("Error while adding Taxonomy entry", e);
-                    }
-                }
-                break;
+            FacetsConfig facetsConfig = new FacetsConfig();
+            facetsConfig.setMultiValued(name, true);
+            facetsConfig.setHierarchical(name, true);
+            AnalyticsCategoryPath analyticsCategoryPath = (AnalyticsCategoryPath) obj;
+            //the field name for dimensions will be "$ + {name}"
+            //   facetsConfig.setIndexFieldName(name, new StringBuilder("$").append(name).toString());
+            doc.add(new DoubleDocValuesField(INDEX_INTERNAL_WEIGHT_FIELD, analyticsCategoryPath.getWeight()));
+            doc.add(new FacetField(name, analyticsCategoryPath.getPath()));
+            try {
+
+                Document translatedDoc = facetsConfig.build(taxonomyWriter, doc);
+                return translatedDoc;
+            } catch (IOException e) {
+                throw new AnalyticsIndexException("Error while adding Taxonomy entry", e);
+            }
+        }else {
+            return doc;
         }
     }
 
@@ -888,8 +1142,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         for (Map.Entry<String, IndexType> entry : columns.entrySet()) {
             name = entry.getKey();
             this.checkAndAddDocEntry(doc, entry.getValue(), name, record.getValue(name));
-            this.checkAndAddTaxonomyDocEntries(doc, entry.getValue(), name, record.getValue(name),
-                                               taxonomyWriter);
+            doc = this.checkAndAddTaxonomyDocEntries(doc, entry.getValue(), name, record.getValue(name),taxonomyWriter);
         }
         return doc;
     }
@@ -906,6 +1159,14 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
         if (columns.contains(INDEX_INTERNAL_TIMESTAMP_FIELD)) {
             throw new AnalyticsIndexException("The column index '" + INDEX_INTERNAL_TIMESTAMP_FIELD + 
+                    "' is a reserved name");
+        }
+        if (columns.contains(INDEX_INTERNAL_SCORE_FIELD)) {
+            throw new AnalyticsIndexException("The column index '" + INDEX_INTERNAL_SCORE_FIELD +
+                    "' is a reserved name");
+        }
+        if (columns.contains(INDEX_INTERNAL_WEIGHT_FIELD)) {
+            throw new AnalyticsIndexException("The column index '" + INDEX_INTERNAL_WEIGHT_FIELD +
                     "' is a reserved name");
         }
     }

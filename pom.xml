@@ -142,6 +142,11 @@
                 <version>${lucene.orbit.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.wso2.orbit.asm4</groupId>
+                <artifactId>asm-all</artifactId>
+                <version>${asm4.orbit.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-core</artifactId>
                 <version>${lucene.version}</version>
@@ -965,6 +970,7 @@
         <lucene.version>4.10.3</lucene.version>
         <lucene.regex.version>3.0.3</lucene.regex.version>
         <lucene.orbit.version>4.10.3.wso2v1</lucene.orbit.version>
+        <asm4.orbit.version>4.0.0.wso2v1</asm4.orbit.version>
         <carbon.commons.version>4.3.4</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.3.4, 4.4.0)</carbon.commons.imp.pkg.version>
         <carbon.event-processing.version>2.0.2</carbon.event-processing.version>

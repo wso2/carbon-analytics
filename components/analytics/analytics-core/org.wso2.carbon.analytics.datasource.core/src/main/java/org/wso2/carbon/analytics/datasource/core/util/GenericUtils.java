@@ -24,13 +24,18 @@ import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordReader;
-import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Generic utility methods for analytics data source implementations.
@@ -150,12 +155,12 @@ public class GenericUtils {
                 binData = (byte[]) value;
                 buffer.putInt(binData.length);
                 buffer.put(binData);
-            }else if (value instanceof AnalyticsCategoryPath) {
-                buffer.putInt(DATA_TYPE_CATEGORY);
+            } else if (value instanceof AnalyticsCategoryPath) {
+                buffer.put(DATA_TYPE_CATEGORY);
                 AnalyticsCategoryPath analyticsCategoryPath = (AnalyticsCategoryPath) value;
                 buffer.putFloat(analyticsCategoryPath.getWeight());
                 buffer.putInt(AnalyticsCategoryPath.getCombinedPath(analyticsCategoryPath.getPath())
-                                      .getBytes().length);
+                                      .getBytes(DEFAULT_CHARSET).length);
                 buffer.put(AnalyticsCategoryPath.getCombinedPath(analyticsCategoryPath.getPath())
                                    .getBytes(DEFAULT_CHARSET));
             } else if (value == null) {
@@ -271,6 +276,7 @@ public class GenericUtils {
                         value = new String(buff, DEFAULT_CHARSET);
                         value = new AnalyticsCategoryPath(weight, AnalyticsCategoryPath
                                 .getPathAsArray((String) value));
+                        break;
                     case DATA_TYPE_NULL:
                         value = null;
                         break;
