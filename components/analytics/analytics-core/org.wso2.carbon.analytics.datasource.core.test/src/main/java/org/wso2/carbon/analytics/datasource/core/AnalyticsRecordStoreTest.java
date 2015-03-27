@@ -508,6 +508,7 @@ public class AnalyticsRecordStoreTest {
         records.remove(97);
         records.remove(96);
         records.remove(95);
+        Assert.assertEquals(recordsIn.size(), records.size());
         Assert.assertEquals(new HashSet<Record>(records), new HashSet<Record>(recordsIn));
         this.analyticsRS.delete(7, "T1", time + timeOffset * 5 - 2, time + timeOffset * 7 + 4);
         recordsIn = GenericUtils.listRecords(this.analyticsRS,
