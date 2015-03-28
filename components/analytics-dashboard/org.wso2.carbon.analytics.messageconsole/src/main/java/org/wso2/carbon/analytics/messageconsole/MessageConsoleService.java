@@ -26,7 +26,6 @@ import org.wso2.carbon.analytics.dataservice.Constants;
 import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
-import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
@@ -52,6 +51,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This class is the service class for message console. This represent all the message console backend operation.
+ */
+
 public class MessageConsoleService extends AbstractAdmin {
 
     private static final Log logger = LogFactory.getLog(MessageConsoleService.class);
@@ -70,6 +73,13 @@ public class MessageConsoleService extends AbstractAdmin {
         this.analyticsDataService = ServiceHolder.getAnalyticsDataService();
     }
 
+    /**
+     * This method will return PermissionBean that contains permissions regarding message console operations for
+     * logged in user.
+     *
+     * @return PermissionBean instance
+     * @throws MessageConsoleException
+     */
     public PermissionBean getAvailablePermissions() throws MessageConsoleException {
         PermissionBean permission = new PermissionBean();
         String username = super.getUsername();
@@ -106,6 +116,12 @@ public class MessageConsoleService extends AbstractAdmin {
         return permission;
     }
 
+    /**
+     * This will list of name of all the tables.
+     *
+     * @return String list that contains table names.
+     * @throws MessageConsoleException
+     */
     public List<String> listTables() throws MessageConsoleException {
 
         String username = getUsername();
@@ -121,6 +137,20 @@ public class MessageConsoleService extends AbstractAdmin {
         }
     }
 
+    /**
+     * This method will use to get search result from analytics data service. Search query can be either time range
+     * search or lucene based search.
+     *
+     * @param tableName   Table name
+     * @param timeFrom    Starting time that require to search begin
+     * @param timeTo      End time that require to search end
+     * @param startIndex  Staring index of search records
+     * @param recordCount Requested record count
+     * @param searchQuery Lucene search query
+     * @return RecordResultBean instance that contains total count of records that satisfied the search criteria and
+     * the array of RecordBean that less than or equal to record count
+     * @throws MessageConsoleException
+     */
     public RecordResultBean getRecords(String tableName, long timeFrom, long timeTo, int startIndex, int recordCount,
                                        String searchQuery)
             throws MessageConsoleException {
@@ -215,6 +245,13 @@ public class MessageConsoleService extends AbstractAdmin {
         return ids;
     }
 
+    /**
+     * Return table meta information for given table name
+     *
+     * @param tableName The table name
+     * @return TableBean instance that contains array of ColumnBean
+     * @throws MessageConsoleException
+     */
     public TableBean getTableInfo(String tableName) throws MessageConsoleException {
 
         String username = getUsername();
@@ -244,6 +281,13 @@ public class MessageConsoleService extends AbstractAdmin {
         return table;
     }
 
+    /**
+     * This method will return table meta information with indices information.
+     *
+     * @param tableName The table name
+     * @return TableBean instance that contains array of ColumnBean
+     * @throws MessageConsoleException
+     */
     public TableBean getTableInfoWithIndicesInfo(String tableName) throws MessageConsoleException {
 
         TableBean tableBean = getTableInfo(tableName);
@@ -264,6 +308,13 @@ public class MessageConsoleService extends AbstractAdmin {
         return tableBean;
     }
 
+    /**
+     * This operation will remove records from given table with provided record ids.
+     *
+     * @param table     The table name
+     * @param recordIds List of record ids
+     * @throws MessageConsoleException
+     */
     public void deleteRecords(String table, String[] recordIds) throws MessageConsoleException {
 
         String username = getUsername();
@@ -280,6 +331,15 @@ public class MessageConsoleService extends AbstractAdmin {
         }
     }
 
+    /**
+     * This method  will use to add record to given table.
+     *
+     * @param table   The table name
+     * @param columns String array that consists of column name
+     * @param values  String array that consists of values
+     * @return This return RecordBean instance that contains generated record id + values that persisted
+     * @throws MessageConsoleException
+     */
     public RecordBean addRecord(String table, String[] columns, String[] values) throws MessageConsoleException {
 
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
@@ -308,6 +368,16 @@ public class MessageConsoleService extends AbstractAdmin {
         return recordBean;
     }
 
+    /**
+     * This method will use to update single record in given table.
+     *
+     * @param table    The table name
+     * @param recordId RecordId that going to update
+     * @param columns  String array that consists of column name
+     * @param values   String array that consists of values
+     * @return RecordBean instance that contains updated values
+     * @throws MessageConsoleException
+     */
     public RecordBean updateRecord(String table, String recordId, String[] columns, String[] values)
             throws MessageConsoleException {
 
@@ -403,6 +473,15 @@ public class MessageConsoleService extends AbstractAdmin {
         return objectMap;
     }
 
+    /**
+     * This method will use to get all the arbitrary values for given record. This will return all the columns that
+     * not mention in table schema
+     *
+     * @param table    The table name
+     * @param recordId RecordId that need to retrieve arbitrary fields.
+     * @return Array of EntityBean that contains values of arbitrary fields.
+     * @throws MessageConsoleException
+     */
     public EntityBean[] getArbitraryList(String table, String recordId) throws MessageConsoleException {
         String username = getUsername();
         List<EntityBean> entityBeansList = new ArrayList<>();
@@ -447,6 +526,14 @@ public class MessageConsoleService extends AbstractAdmin {
         return null;
     }
 
+    /**
+     * This method will remove given arbitrary field from given record
+     *
+     * @param table     The table name
+     * @param recordId  Record Id of the record
+     * @param fieldName Arbitrary field name
+     * @throws MessageConsoleException
+     */
     public void deleteArbitraryField(String table, String recordId, String fieldName) throws MessageConsoleException {
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
         String username = getUsername();
@@ -470,6 +557,16 @@ public class MessageConsoleService extends AbstractAdmin {
         }
     }
 
+    /**
+     * This method will add or update arbitrary values in given table in give record.
+     *
+     * @param table     The table name
+     * @param recordId  Record Id of the record
+     * @param fieldName Arbitrary field name
+     * @param value     Arbitrary field value
+     * @param type      Arbitrary field type
+     * @throws MessageConsoleException
+     */
     public void putArbitraryField(String table, String recordId, String fieldName, String value, String type)
             throws MessageConsoleException {
 
@@ -540,6 +637,13 @@ public class MessageConsoleService extends AbstractAdmin {
         }
     }
 
+    /**
+     * This method will use to create a new table. This will create new table and a table schema if schema
+     * information available. During the creation user can specify the indices and primary keys.
+     *
+     * @param tableInfo TableBean instance that contains table name and column meta information
+     * @throws MessageConsoleException
+     */
     public void createTable(TableBean tableInfo) throws MessageConsoleException {
 
         String username = getUsername();
@@ -590,6 +694,12 @@ public class MessageConsoleService extends AbstractAdmin {
         }
     }
 
+    /**
+     * This method will use to edit the table. During the edit, it can be add or remove existing columns and indices.
+     *
+     * @param tableInfo TableBean instance that contains table name and column meta information
+     * @throws MessageConsoleException
+     */
     public void editTable(TableBean tableInfo) throws MessageConsoleException {
 
         String username = getUsername();
@@ -674,11 +784,22 @@ public class MessageConsoleService extends AbstractAdmin {
         }
     }
 
+    /**
+     * This method is use to get logged in username with tenant domain
+     *
+     * @return Username with tenant domain
+     */
     @Override
     protected String getUsername() {
         return super.getUsername() + AT_SIGN + getTenantDomain();
     }
 
+    /**
+     * This method use to remove table.
+     *
+     * @param table The table name
+     * @throws MessageConsoleException
+     */
     public void deleteTable(String table) throws MessageConsoleException {
         try {
             String username = getUsername();

@@ -20,6 +20,9 @@ package org.wso2.carbon.analytics.messageconsole.beans;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 
+/**
+ * This class represent user's analytics data service level permissions.
+ */
 public class PermissionBean implements Serializable {
 
     private static final long serialVersionUID = -5034605258834260595L;

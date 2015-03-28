@@ -19,6 +19,9 @@ package org.wso2.carbon.analytics.messageconsole.beans;
 
 import java.io.Serializable;
 
+/**
+ * This class represent column meta information
+ */
 public class ColumnBean implements Serializable {
 
     private static final long serialVersionUID = -7172735025380310413L;

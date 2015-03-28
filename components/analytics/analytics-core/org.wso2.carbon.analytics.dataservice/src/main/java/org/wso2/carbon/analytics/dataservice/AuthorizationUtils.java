@@ -27,7 +27,7 @@ import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 /**
- *
+ * This class provides utils methods that need to validate user authorization
  */
 public class AuthorizationUtils {
 

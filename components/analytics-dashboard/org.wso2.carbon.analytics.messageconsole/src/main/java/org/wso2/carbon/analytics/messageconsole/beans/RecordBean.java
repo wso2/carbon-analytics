@@ -19,6 +19,9 @@ package org.wso2.carbon.analytics.messageconsole.beans;
 
 import java.io.Serializable;
 
+/**
+ * This class represent single record in message console table.
+ */
 public class RecordBean implements Serializable {
 
     private static final long serialVersionUID = 1855853949827443861L;
