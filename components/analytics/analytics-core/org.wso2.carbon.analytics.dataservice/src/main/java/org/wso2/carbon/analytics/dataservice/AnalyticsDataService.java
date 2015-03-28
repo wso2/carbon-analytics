@@ -266,8 +266,7 @@ public interface AnalyticsDataService extends AnalyticsRecordReader {
      * @param recordCount
      * @return
      */
-    Map<String, List<DrillDownResultEntry>> searchRange( AnalyticsDrillDownRequest drillDownRequest,
-                                                         int facetCount, int recordCount)
+    Map<String, List<DrillDownResultEntry>> searchRange( AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException;
 
     /**

@@ -222,9 +222,9 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     @Override
     public Map<String, List<DrillDownResultEntry>> searchRange(
-            AnalyticsDrillDownRequest drillDownRequest, int facetCount, int recordCount)
+            AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
-        return this.getIndexer().searchRanges(drillDownRequest, facetCount, recordCount);
+        return this.getIndexer().searchRanges(drillDownRequest);
     }
 
     @Override
