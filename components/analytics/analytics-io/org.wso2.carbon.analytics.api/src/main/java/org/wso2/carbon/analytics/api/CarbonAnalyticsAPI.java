@@ -58,8 +58,8 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     public CarbonAnalyticsAPI() throws AnalyticsServiceException {
-        this(CarbonUtils.getEtcCarbonConfigDirPath() + File.separator
-                + AnalyticsDataConstants.ANALYTICS_DATA_CONFIGURATION_FILE_NAME);
+        this(CarbonUtils.getCarbonConfigDirPath() + File.separator + AnalyticsDataConstants.ANALYTICS_CONFIG_DIR
+                + File.separator + AnalyticsDataConstants.ANALYTICS_DATA_CONFIGURATION_FILE_NAME);
     }
 
     @Override
