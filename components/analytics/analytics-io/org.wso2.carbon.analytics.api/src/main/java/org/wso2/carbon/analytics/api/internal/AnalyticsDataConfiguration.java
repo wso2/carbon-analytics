@@ -27,11 +27,10 @@ public class AnalyticsDataConfiguration {
     private String username;
     private String password;
     private Mode operationMode;
-    private int maxActive;
-    private int maxIdle;
-    private boolean testOnBorrow;
-    private long timeBetweenEvictionRunsMillis;
-    private long minEvictableIdleTimeMillis;
+    private int maxConnections;
+    private int maxConnectionsPerRoute;
+    private int socketConnectionTimeoutMS;
+    private int connectionTimeoutMS;
 
     @XmlElement(name = "Mode")
     public String getMode() {
@@ -87,49 +86,40 @@ public class AnalyticsDataConfiguration {
         return operationMode;
     }
 
-    @XmlElement(name = "MaxActiveConnections")
-    public int getMaxActive() {
-        return maxActive;
+    @XmlElement(name = "MaxConnections")
+    public int getMaxConnections() {
+        return maxConnections;
     }
 
-    public void setMaxActive(int maxActive) {
-        this.maxActive = maxActive;
+    public void setMaxConnections(int maxConnections) {
+        this.maxConnections = maxConnections;
     }
 
-    @XmlElement(name = "MinIdleTimeMS")
-    public int getMaxIdle() {
-        return maxIdle;
+    @XmlElement(name = "MaxConnectionsPerRoute")
+    public int getMaxConnectionsPerRoute() {
+        return maxConnectionsPerRoute;
     }
 
-    public void setMaxIdle(int maxIdle) {
-        this.maxIdle = maxIdle;
+    public void setMaxConnectionsPerRoute(int maxConnectionsPerRoute) {
+        this.maxConnectionsPerRoute = maxConnectionsPerRoute;
     }
 
-    @XmlElement(name = "TestOnBorrow")
-    public boolean isTestOnBorrow() {
-        return testOnBorrow;
+    @XmlElement(name = "SocketConnectionTimeout")
+    public int getSocketConnectionTimeoutMS() {
+        return socketConnectionTimeoutMS;
     }
 
-    public void setTestOnBorrow(boolean testOnBorrow) {
-        this.testOnBorrow = testOnBorrow;
+    public void setSocketConnectionTimeoutMS(int socketConnectionTimeoutMS) {
+        this.socketConnectionTimeoutMS = socketConnectionTimeoutMS;
     }
 
-    @XmlElement(name = "TimeBetweenEvictionRunMS")
-    public long getTimeBetweenEvictionRunsMillis() {
-        return timeBetweenEvictionRunsMillis;
+    @XmlElement(name = "ConnectionTimeout")
+    public int getConnectionTimeoutMS() {
+        return connectionTimeoutMS;
     }
 
-    public void setTimeBetweenEvictionRunsMillis(long timeBetweenEvictionRunsMillis) {
-        this.timeBetweenEvictionRunsMillis = timeBetweenEvictionRunsMillis;
-    }
-
-    @XmlElement(name = "MinEvictableIdleTimeMS")
-    public long getMinEvictableIdleTimeMillis() {
-        return minEvictableIdleTimeMillis;
-    }
-
-    public void setMinEvictableIdleTimeMillis(long minEvictableIdleTimeMillis) {
-        this.minEvictableIdleTimeMillis = minEvictableIdleTimeMillis;
+    public void setConnectionTimeoutMS(int connectionTimeoutMS) {
+        this.connectionTimeoutMS = connectionTimeoutMS;
     }
 
     public enum Mode {

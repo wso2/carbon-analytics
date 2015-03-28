@@ -19,6 +19,8 @@
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.scheme.PlainSocketFactory;
@@ -28,6 +30,7 @@ import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.params.HttpParams;
@@ -42,70 +45,79 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 public class Test {
 
-    public static void main(String[] args) throws AnalyticsServiceException, AnalyticsException {
-        SchemeRegistry schemeRegistry = new SchemeRegistry();
-        schemeRegistry.register(
-                new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
-        schemeRegistry.register(
-                new Scheme("https", 443, SSLSocketFactory.getSocketFactory()));
-
-        PoolingClientConnectionManager cm = new PoolingClientConnectionManager(schemeRegistry);
-        cm.setDefaultMaxPerRoute(100);
-        cm.setMaxTotal(200);
-
-        HttpParams params = new BasicHttpParams();
-        params.setParameter(CoreConnectionPNames.SO_TIMEOUT, 60000);
-        params.setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 60000);
-        DefaultHttpClient client = new DefaultHttpClient(cm, params);
-
-        HttpGet get = new HttpGet("urllllll");
-
-        HttpResponse response;
-        try {
-            response = client.execute(get);
-            if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-                EntityUtils.consume(response.getEntity());
-                return null;
-            }
-
-            Reader is = new InputStreamReader(response.getEntity().getContent());
-            StringBuffer buf = new StringBuffer();
-
-            while (is.ready()) {
-                char[] b = new char[1024];
-                int c = is.read(b);
-                buf.append(b);
-            }
-            is.close();
-
-        } catch (ClientProtocolException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            get.abort();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            get.abort();
-        }
+    public static void main(String[] args) throws AnalyticsServiceException, AnalyticsException, UnsupportedEncodingException {
+//        SchemeRegistry schemeRegistry = new SchemeRegistry();
+//        schemeRegistry.register(
+//                new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
+//        schemeRegistry.register(
+//                new Scheme("https", 443, SSLSocketFactory.getSocketFactory()));
+//
+//        PoolingClientConnectionManager cm = new PoolingClientConnectionManager(schemeRegistry);
+//        cm.setDefaultMaxPerRoute(100);
+//        cm.setMaxTotal(200);
+//
+//        HttpParams params = new BasicHttpParams();
+//        params.setParameter(CoreConnectionPNames.SO_TIMEOUT, 60000);
+//        params.setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 60000);
+//        DefaultHttpClient client = new DefaultHttpClient(cm, params);
+//
+//        List<NameValuePair> arguments = new ArrayList<>(3);
+//        arguments.add(new BasicNameValuePair("username", "admin"));
+//        arguments.add(new BasicNameValuePair("firstName", "System"));
+//        arguments.add(new BasicNameValuePair("lastName", "Administrator"));
+//
+//        HttpPost get = new HttpPost("urllllll");
+//        get.setEntity(new UrlEncodedFormEntity(arguments));
+//
+//        HttpResponse response;
+//        try {
+//            response = client.execute(get);
+//            if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+//                EntityUtils.consume(response.getEntity());
+//                return null;
+//            }
+//
+//            Reader is = new InputStreamReader(response.getEntity().getContent());
+//            StringBuffer buf = new StringBuffer();
+//
+//            while (is.ready()) {
+//                char[] b = new char[1024];
+//                int c = is.read(b);
+//                buf.append(b);
+//            }
+//            is.close();
+//
+//        } catch (ClientProtocolException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//            get.abort();
+//        } catch (IOException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//            get.abort();
+//        }
 
         CarbonAnalyticsAPI analyticsAPI = new CarbonAnalyticsAPI("/home/sinthuja/projects/my-git-repo/wso2/carbon-analytics/components/analytics/analytics-io/org.wso2.carbon.analytics.api/src/test/resources/analytics-data-config.xml");
-//        Map<String, AnalyticsSchema.ColumnType> columnTypeMap = new HashMap<>();
-//        columnTypeMap.put("ip", AnalyticsSchema.ColumnType.STRING);
-//        columnTypeMap.put("log", AnalyticsSchema.ColumnType.STRING);
-//        columnTypeMap.put("timeStamp", AnalyticsSchema.ColumnType.LONG);
-//
-//        List<String> primaryKeys = new ArrayList<>();
-//        primaryKeys.add("timeStamp");
-//        AnalyticsSchema schema = new AnalyticsSchema(columnTypeMap, primaryKeys);
+        Map<String, AnalyticsSchema.ColumnType> columnTypeMap = new HashMap<>();
+        columnTypeMap.put("ip", AnalyticsSchema.ColumnType.STRING);
+        columnTypeMap.put("log", AnalyticsSchema.ColumnType.STRING);
+        columnTypeMap.put("timeStamp", AnalyticsSchema.ColumnType.LONG);
+
+        List<String> primaryKeys = new ArrayList<>();
+        primaryKeys.add("timeStamp");
+        AnalyticsSchema schema = new AnalyticsSchema(columnTypeMap, primaryKeys);
 //        analyticsAPI.setTableSchema(-1234, "LOGTABLE", schema);
-//        analyticsAPI.createTable(-1234, "LOGTABLE2");
-//        System.out.println(analyticsAPI.listTables(-1234));
-//        analyticsAPI.deleteTable(-1234, "LOGTABLE2");
-//        System.out.println(analyticsAPI.listTables(-1234))
+        analyticsAPI.createTable(-1234, "LOGTABLE2");
+        analyticsAPI.setTableSchema(-1234, "LOGTABLE2", schema);
+        System.out.println(analyticsAPI.listTables(-1234));
+        analyticsAPI.deleteTable(-1234, "LOGTABLE2");
+        System.out.println(analyticsAPI.listTables(-1234));
+
 //
 
 //        List<Record> records = new ArrayList<>();

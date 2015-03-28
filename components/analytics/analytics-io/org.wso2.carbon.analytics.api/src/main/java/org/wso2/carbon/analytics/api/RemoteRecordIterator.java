@@ -27,13 +27,11 @@ import java.io.ObjectInputStream;
 import java.util.Iterator;
 
 public class RemoteRecordIterator<T> implements Iterator {
-    private HttpMethod clientMethod;
     private ObjectInputStream objectInputStream;
     private T nextObject;
     private boolean completed;
 
-    public RemoteRecordIterator(HttpMethod httpMethod, InputStream inputStream) throws IOException {
-        this.clientMethod = httpMethod;
+    public RemoteRecordIterator(InputStream inputStream) throws IOException {
         objectInputStream = new ObjectInputStream(inputStream);
         this.completed = false;
     }
@@ -51,7 +49,6 @@ public class RemoteRecordIterator<T> implements Iterator {
                         this.nextObject = null;
                         completed = true;
                         this.objectInputStream.close();
-                        this.clientMethod.releaseConnection();
                     }
                 }
                 return nextObject != null;

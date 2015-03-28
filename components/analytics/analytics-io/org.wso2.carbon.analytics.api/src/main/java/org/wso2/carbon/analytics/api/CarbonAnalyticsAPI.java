@@ -51,9 +51,8 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             JAXBContext context = JAXBContext.newInstance(AnalyticsDataConfiguration.class);
             Unmarshaller un = context.createUnmarshaller();
             this.analyticsDataConfiguration = (AnalyticsDataConfiguration) un.unmarshal(new File(configFilePath));
-            URL url = new URL(this.analyticsDataConfiguration.getEndpoint());
-            AnalyticsAPIHttpClient.init(url.getHost(), url.getPort());
-        } catch (JAXBException | MalformedURLException ex) {
+            AnalyticsAPIHttpClient.init(analyticsDataConfiguration);
+        } catch (JAXBException ex) {
             throw new AnalyticsServiceException("Error while loading the configuration : " + configFilePath);
         }
     }
