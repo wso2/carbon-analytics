@@ -54,7 +54,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Export-Package>org.wso2.carbon.analytics.api.*, org.wso2.carbon.analytics.api.exception.*</Export-Package>
+                        <Export-Package>org.wso2.carbon.analytics.api.*</Export-Package>
                         <Private-Package>org.wso2.carbon.analytics.api.internal.*</Private-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>

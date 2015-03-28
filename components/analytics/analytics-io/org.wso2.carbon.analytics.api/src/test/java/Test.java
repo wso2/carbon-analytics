@@ -50,7 +50,7 @@ import java.util.*;
 
 public class Test {
 
-    public static void main(String[] args) throws AnalyticsServiceException, AnalyticsException, UnsupportedEncodingException {
+//    public static void main(String[] args) throws AnalyticsServiceException, AnalyticsException, UnsupportedEncodingException {
 //        SchemeRegistry schemeRegistry = new SchemeRegistry();
 //        schemeRegistry.register(
 //                new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
@@ -101,22 +101,22 @@ public class Test {
 //            e.printStackTrace();
 //            get.abort();
 //        }
-
-        CarbonAnalyticsAPI analyticsAPI = new CarbonAnalyticsAPI("/home/sinthuja/projects/my-git-repo/wso2/carbon-analytics/components/analytics/analytics-io/org.wso2.carbon.analytics.api/src/test/resources/analytics-data-config.xml");
-        Map<String, AnalyticsSchema.ColumnType> columnTypeMap = new HashMap<>();
-        columnTypeMap.put("ip", AnalyticsSchema.ColumnType.STRING);
-        columnTypeMap.put("log", AnalyticsSchema.ColumnType.STRING);
-        columnTypeMap.put("timeStamp", AnalyticsSchema.ColumnType.LONG);
-
-        List<String> primaryKeys = new ArrayList<>();
-        primaryKeys.add("timeStamp");
-        AnalyticsSchema schema = new AnalyticsSchema(columnTypeMap, primaryKeys);
-//        analyticsAPI.setTableSchema(-1234, "LOGTABLE", schema);
-        analyticsAPI.createTable(-1234, "LOGTABLE2");
-        analyticsAPI.setTableSchema(-1234, "LOGTABLE2", schema);
-        System.out.println(analyticsAPI.listTables(-1234));
-        analyticsAPI.deleteTable(-1234, "LOGTABLE2");
-        System.out.println(analyticsAPI.listTables(-1234));
+//
+//        CarbonAnalyticsAPI analyticsAPI = new CarbonAnalyticsAPI("/home/sinthuja/projects/my-git-repo/wso2/carbon-analytics/components/analytics/analytics-io/org.wso2.carbon.analytics.api/src/test/resources/analytics-data-config.xml");
+//        Map<String, AnalyticsSchema.ColumnType> columnTypeMap = new HashMap<>();
+//        columnTypeMap.put("ip", AnalyticsSchema.ColumnType.STRING);
+//        columnTypeMap.put("log", AnalyticsSchema.ColumnType.STRING);
+//        columnTypeMap.put("timeStamp", AnalyticsSchema.ColumnType.LONG);
+//
+//        List<String> primaryKeys = new ArrayList<>();
+//        primaryKeys.add("timeStamp");
+//        AnalyticsSchema schema = new AnalyticsSchema(columnTypeMap, primaryKeys);
+////        analyticsAPI.setTableSchema(-1234, "LOGTABLE", schema);
+//        analyticsAPI.createTable(-1234, "LOGTABLE2");
+//        analyticsAPI.setTableSchema(-1234, "LOGTABLE2", schema);
+//        System.out.println(analyticsAPI.listTables(-1234));
+//        analyticsAPI.deleteTable(-1234, "LOGTABLE2");
+//        System.out.println(analyticsAPI.listTables(-1234));
 
 //
 
@@ -160,5 +160,5 @@ public class Test {
 
 //        analyticsAPI
 //        System.out.println(analyticsAPI.listTables(-1234));
-    }
+//    }
 }
