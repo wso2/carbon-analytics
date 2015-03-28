@@ -51,7 +51,7 @@
         };
         $.post( "/carbon/analytics-dashboard/ajax/dashboards_ajaxprocessor.jsp", request,function( data ) {
           console.log("POST sent to server. Received data " + data); 
-          window.location.reload();
+          window.location.reload("/carbon/analytics-dashboard/index_ajaxprocessor.jsp");
           $('#mdlDashboard').modal('hide');
         });
         

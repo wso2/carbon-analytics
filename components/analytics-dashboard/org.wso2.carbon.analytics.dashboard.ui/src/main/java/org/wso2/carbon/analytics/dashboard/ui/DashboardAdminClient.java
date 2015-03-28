@@ -19,19 +19,13 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.wso2.carbon.CarbonConstants;
+import org.wso2.carbon.analytics.dashboard.batch.stub.BatchAnalyticsDashboardAdminServiceStub;
 import org.wso2.carbon.analytics.dashboard.batch.stub.data.Cell;
 import org.wso2.carbon.analytics.dashboard.batch.stub.data.Row;
 import org.wso2.carbon.analytics.dashboard.batch.stub.data.Table;
 import org.wso2.carbon.analytics.dashboard.stub.DashboardAdminServiceStub;
-import org.wso2.carbon.analytics.dashboard.stub.data.Column;
-import org.wso2.carbon.analytics.dashboard.stub.data.DataView;
-import org.wso2.carbon.analytics.dashboard.stub.data.Widget;
-import org.wso2.carbon.analytics.dashboard.ui.dto.ColumnDTO;
-import org.wso2.carbon.analytics.dashboard.ui.dto.DataViewDTO;
-import org.wso2.carbon.analytics.dashboard.ui.dto.TableDTO;
-import org.wso2.carbon.analytics.dashboard.ui.dto.WidgetDTO;
-
-import org.wso2.carbon.analytics.dashboard.batch.stub.BatchAnalyticsDashboardAdminServiceStub;
+import org.wso2.carbon.analytics.dashboard.stub.data.*;
+import org.wso2.carbon.analytics.dashboard.ui.dto.*;
 import org.wso2.carbon.ui.CarbonUIUtil;
 
 import javax.servlet.ServletConfig;
@@ -104,6 +98,7 @@ public class DashboardAdminClient {
         for(Column column : dataView.getColumns()) {
             columnDTOs.add(new ColumnDTO(column.getName(),column.getType()));
         }
+        dto.setDataSource(dataView.getDataSource());
         dto.setColumns(columnDTOs.toArray(new ColumnDTO[columnDTOs.size()]));
         //TODO get rid of the NPE when theres no widgets element set in DV
         if(dataView.getWidgets() != null) {
@@ -146,6 +141,78 @@ public class DashboardAdminClient {
             dto.setData(data);
         }
         return dto;
+    }
+
+    public static DashboardDTO toDashboardDTO(Dashboard dashboard) {
+        DashboardDTO dto = new DashboardDTO(dashboard.getId(),dashboard.getTitle(),dashboard.getGroup());
+        if(dashboard.getWidgets() != null) {
+            List<WidgetInstanceDTO> widgets = new ArrayList<WidgetInstanceDTO>();
+           for(WidgetMetaData meta: dashboard.getWidgets()) {
+               WidgetInstanceDTO widget = new WidgetInstanceDTO(meta.getId());
+               widget.setDimensions(new DimensionDTO(
+                       meta.getDimensions().getRow(),meta.getDimensions().getColumn(),
+                       meta.getDimensions().getWidth(),meta.getDimensions().getHeight())
+               );
+               widgets.add(widget);
+           }
+           dto.setWidgets(widgets.toArray(new WidgetInstanceDTO[widgets.size()]));
+        } else {
+            dto.setWidgets(null);
+        }
+        return dto;
+    }
+
+    public static WidgetAndDataViewDTO toWidgetAndDVDTO(DataView dataView) {
+        Widget widget = dataView.getWidgets()[0];
+        if(widget != null) {
+            WidgetAndDataViewDTO dto = new WidgetAndDataViewDTO();
+            dto.setId(dataView.getId());
+            dto.setName(dataView.getDisplayName());
+            dto.setType(dataView.getType());
+            dto.setDatasource(dataView.getDataSource());
+            dto.setFilter(dataView.getFilter());
+
+            WidgetDTO widgetDTO = new WidgetDTO(widget.getId(),widget.getTitle(),widget.getConfig());
+            dto.setWidget(widgetDTO);
+            if(dataView.getColumns() != null && dataView.getColumns().length > 0) {
+                for (int i = 0; i < dataView.getColumns().length; i++) {
+                    Column column = dataView.getColumns()[i];
+                    dto.getColumns().add(new ColumnDTO(column.getName(),column.getType()));
+                }
+            }
+            return dto;
+        }
+        return null;
+    }
+
+    public static DataView toDataView(DataViewDTO dto) {
+        DataView dataView = new DataView();
+        dataView.setId(dto.getId());
+        dataView.setDisplayName(dto.getName());
+        dataView.setType(dto.getType());
+        dataView.setDataSource(dto.getDataSource());
+        dataView.setFilter(dto.getFilter());
+
+        if(dto.getWidgets() != null && dto.getWidgets().length > 0) {
+            //TODO Should we allow users to create DVs with widgets?
+        }
+        if(dto.getColumns() != null && dto.getColumns().length > 0) {
+            List<Column> columns  = new ArrayList<Column>();
+            for (int i = 0; i < dto.getColumns().length; i++) {
+                ColumnDTO columnDTO = dto.getColumns()[i];
+
+                Column column = new Column();
+                column.setName(columnDTO.getName());
+                column.setType(columnDTO.getType());
+                columns.add(column);
+            }
+            dataView.setColumns(columns.toArray(new Column[dto.getColumns().length]));
+        }
+        return dataView;
+    }
+
+    public static void main(String[] args) {
+
     }
 
 

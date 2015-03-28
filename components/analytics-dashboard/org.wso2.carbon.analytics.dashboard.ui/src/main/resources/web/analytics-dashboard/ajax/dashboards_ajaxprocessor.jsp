@@ -18,6 +18,8 @@
 <%@ page import="com.google.gson.Gson" %>
 <%@ page import="org.wso2.carbon.analytics.dashboard.stub.DashboardAdminServiceStub" %>
 <%@ page import="org.wso2.carbon.analytics.dashboard.stub.data.Dashboard" %>
+<%@ page import="org.wso2.carbon.analytics.dashboard.stub.data.WidgetMetaData" %>
+<%@ page import="org.wso2.carbon.analytics.dashboard.stub.data.WidgetDimensions" %>
 <%@ page import="org.wso2.carbon.analytics.dashboard.ui.DashboardAdminClient" %>
 <%@ page import="org.wso2.carbon.analytics.dashboard.ui.dto.DashboardDTO" %>
 
@@ -44,13 +46,32 @@
     } else if(action.equals("getDashboardById")) {
         String dashboardId = request.getParameter("dashboardId");
         Dashboard dashboard = stub.getDashboard(dashboardId);
-        responseText = gson.toJson(new DashboardDTO(dashboard.getId(),dashboard.getTitle(),dashboard.getGroup()));
+        responseText = gson.toJson(DashboardAdminClient.toDashboardDTO(dashboard));
     }  else if(action.equals("addDashboard")) {
         Dashboard dashboard = new Dashboard();
         dashboard.setId(String.valueOf(System.currentTimeMillis()));
         dashboard.setTitle(request.getParameter("title"));
         dashboard.setGroup(request.getParameter("group"));
         stub.addDashboard(dashboard);
-    } 
+        responseText="OK";
+    } else if(action.equals("addWidget")) {
+        String dashboardId = request.getParameter("dashboardId");
+        String widgetId = request.getParameter("widgetId");
+
+        WidgetDimensions dimensions = new WidgetDimensions();
+        dimensions.setRow(1);
+        dimensions.setColumn(1);
+        dimensions.setWidth(4);
+        dimensions.setHeight(3);
+
+        WidgetMetaData metaData = new WidgetMetaData();
+        metaData.setId(widgetId);
+        metaData.setDimensions(dimensions);
+
+        //finally add it to the dashboard
+        stub.addWidgetToDashboard(dashboardId,metaData);
+        System.out.println("Widget " + widgetId + " added to Dashboard " + dashboardId);
+        responseText="OK";
+}
 %>
 <%=responseText%>

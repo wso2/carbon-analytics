@@ -128,11 +128,11 @@
 			"dashboardId" : dashboardId,
 			"widgetId" : widgetId
 		};
-		$.post( "/dashboard/servlet/dashboard", request,function( data ) {
+		$.post( "/carbon/analytics-dashboard/ajax/dashboards_ajaxprocessor.jsp", request,function( data ) {
 		  console.log("POST sent to server. Received data " + data); 
 		});
 
-		window.location.href = "http://localhost:8080/dashboard";
+		window.location.href = "/carbon/analytics-dashboard/index_ajaxprocessor.jsp";
 
 	};
 
@@ -152,7 +152,7 @@
 			"dataview" : dataview,
 			"widgetDefinition" : JSON.stringify(widgetX)
 		};
-		$.post( "/dashboard/servlet/dataview", request,function( data ) {
+		$.post( "/carbon/analytics-dashboard/ajax/dataviews_ajaxprocessor.jsp", request,function( data ) {
 		  console.log("Widget added to DV"); 
 		  //load the DV content again
 		  renderDVContent(dataview);

@@ -16,13 +16,20 @@
 ~ under the License.
 --%>
 <%@ page import="com.google.gson.Gson" %>
+<%@ page import="com.google.gson.JsonSyntaxException" %>
 <%@ page import="org.wso2.carbon.analytics.dashboard.stub.DashboardAdminServiceStub" %>
 <%@ page import="org.wso2.carbon.analytics.dashboard.stub.data.DataView" %>
+<%@ page import="org.wso2.carbon.analytics.dashboard.stub.data.Widget" %>
 <%@ page import="org.wso2.carbon.analytics.dashboard.ui.DashboardAdminClient" %>
+<%@ page import="org.wso2.carbon.analytics.dashboard.ui.dto.WidgetDTO" %>
 <%@ page import="org.wso2.carbon.analytics.dashboard.ui.dto.DataViewDTO" %>
+<%@ page import="org.wso2.carbon.analytics.dashboard.ui.dto.WidgetAndDataViewDTO" %>
 
 <%
     String responseText = "";
+    String errorResponse = "ERROR:";
+    String errorMessage = "";
+
     String action = request.getParameter("action");
     DashboardAdminServiceStub stub =   DashboardAdminClient.getDashboardAdminService(config, session, request);
     response.setContentType("application/json");
@@ -51,8 +58,53 @@
             responseText = gson.toJson("{}");
         }
         
-    }  else if(action.equals("addDataView")) {
-        
-    }
+    }  else if(action.equals("addWidget")) {
+        String dataview = request.getParameter("dataview");
+        String widgetDefinition = request.getParameter("widgetDefinition");
+
+        WidgetDTO dto = null;
+        try {
+            dto = gson.fromJson(widgetDefinition,WidgetDTO.class);
+        } catch (JsonSyntaxException e) {
+            e.printStackTrace();
+        }
+        if(dto != null) {
+            Widget widget = new Widget();
+            widget.setId(dto.getId());
+            widget.setTitle(dto.getTitle());
+            widget.setConfig(dto.getConfig());
+            stub.addWidget(dataview,widget);
+            responseText = "OK";
+        }
+    }   else if(action.equals("getWidget")) {
+        String dataview = request.getParameter("dataview");
+        String widgetId = request.getParameter("widgetId");
+
+        DataView dataView = stub.getWidgetWithDataViewInfo(dataview,widgetId);
+        WidgetAndDataViewDTO dto = DashboardAdminClient.toWidgetAndDVDTO(dataView);
+        if(dto != null) {
+           responseText = gson.toJson(dto); 
+        }
+
+    } else if(action.equals("addDataView")) {
+        String definition = request.getParameter("definition");
+        if(definition == null) {
+            responseText = "";
+        }
+        DataViewDTO dto = null;
+        try {
+            dto = gson.fromJson(definition,DataViewDTO.class);
+        } catch (JsonSyntaxException e) {
+            errorMessage = e.getMessage();
+            e.printStackTrace();
+        }
+        if(dto != null) {
+            DataView dv = DashboardAdminClient.toDataView(dto);
+            stub.addDataView(dv);
+            responseText = "OK"; 
+        } else {
+            responseText=errorResponse + errorMessage;
+        }
+    }  
 %>
 <%=responseText%>

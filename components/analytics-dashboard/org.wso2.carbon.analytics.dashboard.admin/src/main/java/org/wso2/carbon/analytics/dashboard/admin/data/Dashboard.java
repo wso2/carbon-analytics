@@ -73,14 +73,19 @@ public class Dashboard {
 	}
 
 	public void addWidget(WidgetMetaData widget) throws AxisFault {
-		for (WidgetMetaData existingWidget : widgets) {
-			if (existingWidget.getId().equals(widget.getId())) {
-				throw new AxisFault("Widget with given ID already exists in the dashboard");
-			}
-		}
-		List<WidgetMetaData> widgetMetaDataList = Arrays.asList(widgets);
-		widgetMetaDataList.add(widget);
-		widgets = widgetMetaDataList.toArray(new WidgetMetaData[widgetMetaDataList.size()]);
+        if(widgets != null && widgets.length > 0) {
+            for (WidgetMetaData existingWidget : widgets) {
+                if (existingWidget.getId().equals(widget.getId())) {
+                    throw new AxisFault("Widget with given ID already exists in the dashboard");
+                }
+            }
+            List<WidgetMetaData> widgetMetaDataList = Arrays.asList(widgets);
+            widgetMetaDataList.add(widget);
+            widgets = widgetMetaDataList.toArray(new WidgetMetaData[widgetMetaDataList.size()]);
+        }   else {
+            widgets = new WidgetMetaData[1];
+            widgets[0] = widget;
+        }
 	}
 
 	public boolean updateWidget(WidgetMetaData widget) throws AxisFault {

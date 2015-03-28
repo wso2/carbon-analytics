@@ -4,6 +4,7 @@ public class DashboardDTO {
     private String id;
     private String title;
     private String group;
+    private WidgetInstanceDTO[] widgets;
 
     public DashboardDTO(String id, String title, String group) {
         this.id = id;
@@ -33,5 +34,13 @@ public class DashboardDTO {
 
     public void setGroup(String group) {
         this.group = group;
+    }
+
+    public WidgetInstanceDTO[] getWidgets() {
+        return widgets;
+    }
+
+    public void setWidgets(WidgetInstanceDTO[] widgets) {
+        this.widgets = widgets;
     }
 }

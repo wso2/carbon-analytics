@@ -17,6 +17,7 @@ package org.wso2.carbon.analytics.dashboard.admin.data;
 
 import org.apache.axis2.AxisFault;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -90,14 +91,19 @@ public class DataView {
 	}
 
 	public void addWidget(Widget widget) throws AxisFault {
-		for (Widget ExistingWidget : widgets) {
-			if (ExistingWidget.getId().equals(widget.getId())) {
-				throw new AxisFault("Widget with given ID already exists");
-			}
-		}
-		List<Widget> widgetList = Arrays.asList(widgets);
-		widgetList.add(widget);
-		widgets = widgetList.toArray(new Widget[widgetList.size()]);
+		try {
+            for (Widget ExistingWidget : widgets) {
+                if (ExistingWidget.getId().equals(widget.getId())) {
+                    throw new AxisFault("Widget with given ID already exists");
+                }
+            }
+            List<Widget> widgetList = new ArrayList<Widget>();
+            widgetList.addAll(Arrays.asList(widgets));
+            widgetList.add(widget);
+            widgets = widgetList.toArray(new Widget[widgetList.size()]);
+        } catch(Exception e) {
+            throw new AxisFault("An error occurred adding Widget to DataView",e);
+        }
 	}
 
 	public boolean updateWidget(Widget widget) throws AxisFault {
