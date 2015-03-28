@@ -19,7 +19,6 @@ package org.wso2.carbon.analytics.dataservice;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
@@ -29,7 +28,6 @@ import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutException;
-import org.wso2.carbon.user.api.UserRealm;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
@@ -54,7 +52,7 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     public void createTable(String username, String tableName) throws AnalyticsException {
 
         int tenantId = getTenantId(username);
-        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_CREATE_TABLE)) {
+        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_CREATE_TABLE)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
                                                            "permission to create table");
         }
@@ -66,7 +64,7 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
             throws AnalyticsTableNotAvailableException, AnalyticsException {
 
         int tenantId = getTenantId(username);
-        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_CREATE_TABLE)) {
+        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_CREATE_TABLE)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
                                                            "permission to set table schema");
         }
@@ -78,7 +76,7 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
             throws AnalyticsTableNotAvailableException, AnalyticsException {
 
         int tenantId = getTenantId(username);
-        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_LIST_TABLE)) {
+        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_LIST_TABLE)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
                                                            "permission to get table schema");
         }
@@ -89,7 +87,7 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     public boolean tableExists(String username, String tableName) throws AnalyticsException {
 
         int tenantId = getTenantId(username);
-        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_LIST_TABLE)) {
+        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_LIST_TABLE)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
                                                            "permission to check table status");
         }
@@ -100,7 +98,7 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     public void deleteTable(String username, String tableName) throws AnalyticsException {
 
         int tenantId = getTenantId(username);
-        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_DROP_TABLE)) {
+        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_DROP_TABLE)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
                                                            "permission to delete table");
         }
@@ -111,7 +109,7 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     public List<String> listTables(String username) throws AnalyticsException {
 
         int tenantId = getTenantId(username);
-        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_LIST_TABLE)) {
+        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_LIST_TABLE)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
                                                            "permission to list table information");
         }
@@ -123,7 +121,7 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
             throws AnalyticsException, AnalyticsTableNotAvailableException {
 
         int tenantId = getTenantId(username);
-        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_LIST_RECORD)) {
+        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_LIST_RECORD)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
                                                            "permission to get record count");
         }
@@ -134,7 +132,7 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     public void put(String username, List<Record> records) throws AnalyticsException,
                                                                   AnalyticsTableNotAvailableException {
         int tenantId = getTenantId(username);
-        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_PUT_RECORD)) {
+        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_PUT_RECORD)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
                                                            "permission to put records");
         }
@@ -147,7 +145,7 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
             throws AnalyticsException, AnalyticsTableNotAvailableException {
 
         int tenantId = getTenantId(username);
-        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_GET_RECORD)) {
+        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_GET_RECORD)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
                                                            "permission to get records");
         }
@@ -161,7 +159,7 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
                              List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
 
         int tenantId = getTenantId(username);
-        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_GET_RECORD)) {
+        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_GET_RECORD)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
                                                            "permission to get records");
         }
@@ -183,7 +181,7 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
             throws AnalyticsException, AnalyticsTableNotAvailableException {
 
         int tenantId = getTenantId(username);
-        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_DELETE_RECORD)) {
+        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_DELETE_RECORD)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
                                                            "permission to delete records");
         }
@@ -195,7 +193,7 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
             throws AnalyticsException, AnalyticsTableNotAvailableException {
 
         int tenantId = getTenantId(username);
-        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_DELETE_RECORD)) {
+        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_DELETE_RECORD)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
                                                            "permission to delete records");
         }
@@ -208,7 +206,7 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
 
         try {
             int tenantId = getTenantId(username);
-            if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_SET_INDEXING)) {
+            if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_SET_INDEXING)) {
                 throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
                                                                "permission to set indices");
             }
@@ -223,7 +221,7 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
             throws AnalyticsIndexException, AnalyticsException {
 
         int tenantId = getTenantId(username);
-        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_GET_INDEXING)) {
+        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_GET_INDEXING)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
                                                            "permission to get indices");
         }
@@ -234,7 +232,7 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     public void clearIndices(String username, String tableName) throws AnalyticsIndexException, AnalyticsException {
 
         int tenantId = getTenantId(username);
-        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_DELETE_INDEXING)) {
+        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_DELETE_INDEXING)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
                                                            "permission to clear indices");
         }
@@ -246,7 +244,7 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
                                           int count) throws AnalyticsIndexException, AnalyticsException {
 
         int tenantId = getTenantId(username);
-        if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_SEARCH_RECORD)) {
+        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_SEARCH_RECORD)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
                                                            "permission to search indexed records");
         }
@@ -259,7 +257,7 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
 
         try {
             int tenantId = getTenantId(username);
-            if (!isUserAuthorized(tenantId, username, Constants.PERMISSION_SEARCH_RECORD)) {
+            if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_SEARCH_RECORD)) {
                 throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
                                                                "permission to get search indexed record count");
             }
@@ -288,20 +286,4 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
         }
     }
 
-    private boolean isUserAuthorized(int tenantId, String username, String permission) throws AnalyticsException {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("User[" + username + "] calling method (" + Thread.currentThread().getStackTrace()[2]
-                    .getMethodName() + ") with permission[" + permission + "]");
-        }
-
-        try {
-            UserRealm userRealm = AnalyticsServiceHolder.getRealmService().getTenantUserRealm(tenantId);
-            return userRealm.getAuthorizationManager().isUserAuthorized(MultitenantUtils.getTenantAwareUsername(username), permission,
-                                                                        CarbonConstants.UI_PERMISSION_ACTION);
-        } catch (UserStoreException e) {
-            throw new AnalyticsException("Unable to get user permission information for user[" + username + "] due to " +
-                                         e.getMessage(), e);
-        }
-    }
 }

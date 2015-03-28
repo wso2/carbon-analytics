@@ -1,5 +1,4 @@
 var tableLoaded = false;
-var timestamp;
 var arbitraryColumnName;
 
 function getArbitraryFields(rowData) {
@@ -40,6 +39,18 @@ function getArbitraryFields(rowData) {
                                                  rowsRemoved: function (event, data) {
                                                      arbitraryColumnName = "";
                                                  },
+                                                 formCreated: function (event, data) {
+                                                     data.form.validationEngine();
+                                                 },
+                                                 //Validate form when it is being submitted
+                                                 formSubmitting: function (event, data) {
+                                                     return data.form.validationEngine('validate');
+                                                 },
+                                                 //Dispose validation logic when form is closed
+                                                 formClosed: function (event, data) {
+                                                     data.form.validationEngine('hide');
+                                                     data.form.validationEngine('detach');
+                                                 },
                                                  fields: {
                                                      bam_unique_rec_id: {
                                                          type: 'hidden',
@@ -48,14 +59,16 @@ function getArbitraryFields(rowData) {
                                                          defaultValue: rowData.record.bam_unique_rec_id
                                                      },
                                                      Name: {
-                                                         title: 'Name'
+                                                         title: 'Name',
+                                                         inputClass: 'validate[required]'
                                                      },
                                                      Value: {
                                                          title: 'Value'
                                                      },
                                                      Type: {
                                                          title: 'Type',
-                                                         options: ["STRING", "INTEGER", "LONG", "BOOLEAN", "FLOAT", "DOUBLE"]
+                                                         options: ["STRING", "INTEGER", "LONG", "BOOLEAN", "FLOAT", "DOUBLE"],
+                                                         list: false
                                                      }
                                                  }
                                              }, function (data) { //opened handler
@@ -173,14 +186,32 @@ function createJTable() {
                           }
                       };
                       $.each(data.columns, function (key, val) {
-                          fields[val.name] = {
-                              title: val.name,
-                              list: val.display,
-                              key: val.key
-                          };
-                          if (val.type == 'STRING') {
-                              fields[val.name].type = 'textarea';
+                          if (val.type == 'BOOLEAN') {
+                              fields[val.name] = {
+                                  title: val.name,
+                                  list: val.display,
+                                  key: val.key,
+                                  type: 'checkbox',
+                                  defaultValue: 'false',
+                                  values: {'false': 'False', 'true': 'True'}
+                              };
+                          } else {
+                              fields[val.name] = {
+                                  title: val.name,
+                                  list: val.display,
+                                  key: val.key
+                              };
+                              if (val.type == 'STRING') {
+                                  fields[val.name].type = 'textarea';
+                              } else if (val.type == 'INTEGER') {
+                                  fields[val.name].inputClass = 'validate[custom[integer]]';
+                              } else if (val.type == 'FLOAT') {
+                                  fields[val.name].inputClass = 'validate[custom[number]]';
+                              } else if (val.type == 'DOUBLE') {
+                                  fields[val.name].inputClass = 'validate[custom[number]]';
+                              }
                           }
+
                           if (val.name == 'bam_unique_rec_id' || val.name == 'bam_rec_timestamp') {
                               fields[val.name].edit = false;
                               fields[val.name].create = false;
@@ -243,7 +274,7 @@ function updateActionMethod(postData) {
     return $.Deferred(function ($dfd) {
         $.ajax({
                    url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?' +
-                        'type=' + typeUpdateRecord + '&tableName=' + $("#tableSelect").val() + '&bam_rec_timestamp=' + timestamp,
+                        'type=' + typeUpdateRecord + '&tableName=' + $("#tableSelect").val(),
                    type: 'POST',
                    dataType: 'json',
                    data: postData,

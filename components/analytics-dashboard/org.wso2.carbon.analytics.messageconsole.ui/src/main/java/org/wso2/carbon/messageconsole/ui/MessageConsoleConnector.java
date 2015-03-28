@@ -50,8 +50,10 @@ import org.wso2.carbon.messageconsole.ui.serializers.ResponseRecordSerializer;
 import org.wso2.carbon.messageconsole.ui.serializers.ResponseResultSerializer;
 
 import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 public class MessageConsoleConnector {
@@ -89,6 +91,7 @@ public class MessageConsoleConnector {
             registerTypeAdapter(ResponseArbitraryFieldColumn.class, new ResponseArbitraryFieldSerializer());
     private static final Type TABLE_SCHEMA_TYPE = new TypeToken<List<TableSchemaColumn>>() {
     }.getType();
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 
 
     public MessageConsoleConnector(ConfigurationContext configCtx, String backendServerURL, String cookie) {
@@ -187,7 +190,7 @@ public class MessageConsoleConnector {
         if (recordBean != null) {
             List<Column> columns = new ArrayList<>(recordBean.getEntityBeans().length + 2);
             columns.add(new Column(RECORD_ID, recordBean.getRecordId()));
-            columns.add(new Column(TIMESTAMP, String.valueOf(recordBean.getTimestamp())));
+            columns.add(new Column(TIMESTAMP, DATE_FORMAT.format(new Date(recordBean.getTimestamp()))));
             for (EntityBean entityBean : recordBean.getEntityBeans()) {
                 columns.add(new Column(entityBean.getColumnName(), entityBean.getValue()));
             }
@@ -206,32 +209,34 @@ public class MessageConsoleConnector {
 
             table.setName(tableInfo.getName());
             List<ResponseTable.Column> columns = new ArrayList<>();
-            for (ColumnBean resultColumn : tableInfo.getColumns()) {
-                ResponseTable.Column column = new ResponseTable().new Column();
-                column.setName(resultColumn.getName());
-                column.setPrimary(resultColumn.getPrimary());
-                column.setType(resultColumn.getType());
-                column.setDisplay(resultColumn.getDisplay());
-                columns.add(column);
+            if (tableInfo.getColumns() != null) {
+                for (ColumnBean resultColumn : tableInfo.getColumns()) {
+                    ResponseTable.Column column = new ResponseTable().new Column();
+                    column.setName(resultColumn.getName());
+                    column.setPrimary(resultColumn.getPrimary());
+                    column.setType(resultColumn.getType());
+                    column.setDisplay(resultColumn.getDisplay());
+                    columns.add(column);
+                }
+
+                // Adding recordId column as a hidden field
+                ResponseTable.Column recordId = new ResponseTable().new Column();
+                recordId.setName(RECORD_ID);
+                recordId.setPrimary(false);
+                recordId.setType("STRING");
+                recordId.setDisplay(false);
+                recordId.setKey(true);
+                columns.add(recordId);
+
+                ResponseTable.Column timestamp = new ResponseTable().new Column();
+                timestamp.setName(TIMESTAMP);
+                timestamp.setPrimary(false);
+                timestamp.setType("LONG");
+                timestamp.setDisplay(true);
+                columns.add(timestamp);
+
+                table.setColumns(columns);
             }
-
-            // Adding recordId column as a hidden field
-            ResponseTable.Column recordId = new ResponseTable().new Column();
-            recordId.setName(RECORD_ID);
-            recordId.setPrimary(false);
-            recordId.setType("STRING");
-            recordId.setDisplay(false);
-            recordId.setKey(true);
-            columns.add(recordId);
-
-            ResponseTable.Column timestamp = new ResponseTable().new Column();
-            timestamp.setName(TIMESTAMP);
-            timestamp.setPrimary(false);
-            timestamp.setType("LONG");
-            timestamp.setDisplay(true);
-            columns.add(timestamp);
-
-            table.setColumns(columns);
 
         } catch (Exception e) {
             log.error("Unable to get table information for table:" + tableName, e);
@@ -283,7 +288,7 @@ public class MessageConsoleConnector {
     }
 
 
-    public String updateRecord(String table, String[] columns, String[] values, String recordId, String timestamp) {
+    public String updateRecord(String table, String[] columns, String[] values, String recordId) {
         if (log.isDebugEnabled()) {
             log.debug("Record {id: " + recordId + ", column: " + Arrays.toString(columns) + ", values: " + Arrays.toString(values) + "} going to update to" + table);
         }
@@ -292,7 +297,7 @@ public class MessageConsoleConnector {
         Gson gson = RESPONSE_RECORD_BUILDER.serializeNulls().create();
         responseRecord.setResult(OK);
         try {
-            RecordBean recordBean = stub.updateRecord(table, recordId, columns, values, Long.parseLong(timestamp));
+            RecordBean recordBean = stub.updateRecord(table, recordId, columns, values);
             responseRecord.setRecord(getRecord(recordBean));
         } catch (Exception e) {
             String errorMsg = "Unable to update record {id: " + recordId + ", column: " + Arrays.toString(columns) + ", " +
