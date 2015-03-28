@@ -33,6 +33,7 @@
     <modules>
         <module>org.wso2.carbon.analytics.dashboard.admin</module>
         <module>org.wso2.carbon.analytics.dashboard.ui</module>
+        <module>org.wso2.carbon.analytics.dashboard.batch.admin</module>
     </modules>
 
 </project>
