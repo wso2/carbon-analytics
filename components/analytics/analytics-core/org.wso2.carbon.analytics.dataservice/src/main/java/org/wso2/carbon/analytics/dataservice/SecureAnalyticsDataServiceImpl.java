@@ -17,8 +17,6 @@
 */
 package org.wso2.carbon.analytics.dataservice;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
@@ -39,8 +37,6 @@ import java.util.Map;
  * The implementation of {@link SecureAnalyticsDataService}.
  */
 public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataService {
-
-    private static final Log logger = LogFactory.getLog(SecureAnalyticsDataServiceImpl.class);
 
     private AnalyticsDataService analyticsDataService;
 

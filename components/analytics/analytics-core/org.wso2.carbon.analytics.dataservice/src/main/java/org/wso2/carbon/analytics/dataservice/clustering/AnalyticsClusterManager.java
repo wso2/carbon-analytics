@@ -30,7 +30,8 @@ public interface AnalyticsClusterManager {
     /**
      * Joins a given group.
      * @param groupId The group id of the group
-     * @param groupEventListener The listener class to listen for group events
+     * @param groupEventListener The listener class to listen for group events, this can be null, if you 
+     * do not want to receive group events
      * @throws AnalyticsClusterException
      */
     void joinGroup(String groupId, GroupEventListener groupEventListener) throws AnalyticsClusterException;
