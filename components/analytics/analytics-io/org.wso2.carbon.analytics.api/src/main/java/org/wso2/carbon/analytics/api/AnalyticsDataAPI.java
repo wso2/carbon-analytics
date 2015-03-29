@@ -97,6 +97,10 @@ public interface AnalyticsDataAPI {
      * Returns the number of records in the table with the given category and name.
      * @param tenantId The tenant which this table belongs to
      * @param tableName The name of the table to get the count from
+     * @param timeFrom The starting time to consider the count from, inclusive, relatively to epoch,
+     * Long.MIN_VALUE should signal, this restriction to be disregarded
+     * @param timeTo The ending time to consider the count to, non-inclusive, relatively to epoch,
+     * Long.MAX_VALUE should signal, this restriction to be disregarded
      * @return The record count
      * @throws AnalyticsException
      * @throws AnalyticsTableNotAvailableException
@@ -105,7 +109,9 @@ public interface AnalyticsDataAPI {
 
     /**
      * Adds a new record to the table. If the record id is mentioned,
-     * it will be used to do the insert, or else, the insert will be done with a randomly generated id.
+     * it will be used to do the insert, or else, it will check the table's schema to check for the existence of
+     * primary keys, if there are any, the primary keys will be used to derive the id, or else
+     * the insert will be done with a randomly generated id.
      * If the record already exists, it updates the record store with the given records, matches by its record id,
      * this will be a full replace of the record, where the older record is effectively deleted and the new one is
      * added, there will not be a merge of older record's field's with the new one.
@@ -127,7 +133,7 @@ public interface AnalyticsDataAPI {
      * Long.MAX_VALUE should signal, this restriction to be disregarded
      * @param recordsFrom The paginated index from value, zero based, inclusive
      * @param recordsCount The paginated records count to be read, -1 for infinity
-     * @return An array of {@link org.wso2.carbon.analytics.datasource.commons.RecordGroup} objects, which represents individual data sets in their local location
+     * @return An array of {@link RecordGroup} objects, which represents individual data sets in their local location
      * @throws AnalyticsException
      * @throws AnalyticsTableNotAvailableException
      */
@@ -218,7 +224,7 @@ public interface AnalyticsDataAPI {
      * @param query The search query
      * @param start The start location of the result, 0 based
      * @param count The maximum number of result entries to be returned
-     * @return A list of {@link org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry}s
+     * @return A list of {@link SearchResultEntry}s
      * @throws AnalyticsIndexException
      * @throws AnalyticsException
      */
@@ -240,8 +246,8 @@ public interface AnalyticsDataAPI {
     /**
      * This method waits until the current indexing operations for the system is done.
      * @param maxWait Maximum amount of time in milliseconds, if the time is reached,
-     * an {@link org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutException} will be thrown, -1 for infinity
-     * @throws org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutException
+     * an {@link AnalyticsTimeoutException} will be thrown, -1 for infinity
+     * @throws AnalyticsTimeoutException
      * @throws AnalyticsException
      */
     public void waitForIndexing(long maxWait) throws AnalyticsTimeoutException, AnalyticsException, AnalyticsServiceException;
