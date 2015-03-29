@@ -22,6 +22,7 @@ import com.google.gson.reflect.TypeToken;
 import org.wso2.carbon.analytics.dataservice.api.commons.AnalyticsAPIConstants;
 import org.wso2.carbon.analytics.dataservice.api.commons.RemoteRecordGroup;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.servlet.exception.AnalyticsAPIAuthenticationException;
 import org.wso2.carbon.analytics.dataservice.servlet.internal.ServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
@@ -54,6 +55,11 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
         if (sessionId == null || sessionId.trim().isEmpty()) {
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
         } else {
+            try {
+                ServiceHolder.getAuthenticator().validateSessionId(sessionId);
+            } catch (AnalyticsAPIAuthenticationException e) {
+                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
+            }
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
             Gson gson = new Gson();
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.GET_RANGE_RECORD_GROUP_OPERATION)) {
@@ -140,6 +146,11 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
         if (sessionId == null || sessionId.trim().isEmpty()) {
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
         } else {
+            try {
+                ServiceHolder.getAuthenticator().validateSessionId(sessionId);
+            } catch (AnalyticsAPIAuthenticationException e) {
+                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
+            }
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.READ_RECORD_OPERATION)) {
                 ServletInputStream servletInputStream = req.getInputStream();

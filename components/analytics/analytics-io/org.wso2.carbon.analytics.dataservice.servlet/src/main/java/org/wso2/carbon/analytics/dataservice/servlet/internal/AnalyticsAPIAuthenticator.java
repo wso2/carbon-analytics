@@ -23,17 +23,19 @@ import org.wso2.carbon.analytics.dataservice.servlet.exception.AnalyticsAPIAuthe
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class AnalyticsAPIAuthenticator {
     private static Log log = LogFactory.getLog(AnalyticsAPIAuthenticator.class);
-    //TODO: change to hazelcast
-    private List<String> sessionIds;
+    private static final String SESSION_CACHE_NAME  = "ANALYTICS_API_SERVICE_SESSION_CACHE";
+    private Map<String, Boolean> sessionIds;
 
     public AnalyticsAPIAuthenticator() {
-        sessionIds = new ArrayList<>();
+        if (ServiceHolder.getHazelcastInstance() != null) {
+            sessionIds = ServiceHolder.getHazelcastInstance().getMap(SESSION_CACHE_NAME);
+        }else {
+            sessionIds = new HashMap<>();
+        }
     }
 
     public String authenticate(String username, String password) throws AnalyticsAPIAuthenticationException {
@@ -48,7 +50,7 @@ public class AnalyticsAPIAuthenticator {
             boolean authenticated = ServiceHolder.getAuthenticationService().authenticate(userName, password);
             if (authenticated) {
                 String sessionId = UUID.randomUUID().toString();
-                sessionIds.add(sessionId);
+                sessionIds.put(sessionId, Boolean.TRUE);
                 return sessionId;
             } else {
                 logAndThrowAuthException("Login failed for user :" + userName);
@@ -65,7 +67,7 @@ public class AnalyticsAPIAuthenticator {
     }
 
     public void validateSessionId(String sessionId) throws AnalyticsAPIAuthenticationException {
-        if (!sessionIds.contains(sessionId)) {
+        if (sessionIds.get(sessionId) == null || !sessionIds.get(sessionId)) {
             logAndThrowAuthException("Unauthenticated session Id : " + sessionId);
         }
     }
