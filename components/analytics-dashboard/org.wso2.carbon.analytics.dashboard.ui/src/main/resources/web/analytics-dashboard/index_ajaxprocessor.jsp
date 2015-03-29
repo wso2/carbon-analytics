@@ -193,14 +193,6 @@
 
   // }); 
 
-function fetchData() {
-  var url = "http://localhost:9763/analytics/tables/expenses";
-  $.getJSON(url,function(data) {
-    console.log(data); 
-  });
-};
-
-
 
 </script>
 
@@ -263,7 +255,7 @@ function fetchData() {
           <div class="blank-slate-message">
               <h2>This Dashboard has no widgets.</h2>
               <p>Browse for widgets and add to Dashboard.</p>
-              <a href="dataviews.jsp">
+              <a href="dataviews_ajaxprocessor.jsp">
                   <button type="button" class="btn btn-success">Add Widget</button>
               </a>
           </div>

@@ -21,15 +21,18 @@ package org.wso2.carbon.analytics.dashboard.batch.admin;
 import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
-import org.wso2.carbon.analytics.datasource.commons.Record;
-import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
-import org.wso2.carbon.core.AbstractAdmin;
 import org.wso2.carbon.analytics.dashboard.batch.admin.data.Cell;
+import org.wso2.carbon.analytics.dashboard.batch.admin.data.Column;
 import org.wso2.carbon.analytics.dashboard.batch.admin.data.Row;
 import org.wso2.carbon.analytics.dashboard.batch.admin.data.Table;
 import org.wso2.carbon.analytics.dashboard.batch.admin.internal.ds.BatchAnalyticsDashboardAdminValueHolder;
+import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
+import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.core.AbstractAdmin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +58,35 @@ public class BatchAnalyticsDashboardAdminService extends AbstractAdmin {
         this.analyticsDataService = BatchAnalyticsDashboardAdminValueHolder.getAnalyticsDataService();
     }
 
+    public String[] getTableNames() throws AxisFault {
+        List<String> tables = null;
+        try {
+            tables = this.analyticsDataService.listTables(getUsername());
+        } catch (AnalyticsException e) {
+            logger.error("Unable to get a list of tables from Analytics data layer for tenant: " + getUsername(), e);
+            throw new AxisFault("Unable to get a list of tables from Analytics data layer for tenant: "
+                    + getUsername(), e);
+        }
+        return tables.toArray(new String[tables.size()]);
+    }
+
+    public Column[] getTableSchema(String tableName) throws AxisFault {
+        try {
+            AnalyticsSchema schema = this.analyticsDataService.getTableSchema(getUsername(),tableName);
+            Map <String,AnalyticsSchema.ColumnType> colMap  = schema.getColumns();
+            Column[] columns = new Column[colMap.size()];
+            int i = 0;
+            for(Map.Entry<String, AnalyticsSchema.ColumnType> entry : colMap.entrySet()) {
+                columns[i++] = new Column(entry.getKey(),String.valueOf(entry.getValue()));
+            }
+            return columns;
+        } catch (AnalyticsException e) {
+            logger.error("Unable to get the schema for table: " + tableName +
+                    "from Analytics data layer for tenant: " + getUsername(), e);
+            throw new AxisFault("Unable to get the schema for table: " + tableName +
+                    "from Analytics data layer for tenant: " + getUsername(), e);
+        }
+    }
 
     public Table getRecords(String tableName, long timeFrom, long timeTo, int startIndex, int recordCount,
             String searchQuery)
@@ -105,6 +137,11 @@ public class BatchAnalyticsDashboardAdminService extends AbstractAdmin {
             table.setRows(rows);
         }
         return table;
+    }
+
+    @Override
+    protected String getUsername() {
+        return super.getUsername() + "@" + getTenantDomain();
     }
 
     private Row createRow(Record record) {

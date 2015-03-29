@@ -1,40 +1,7 @@
 function updateWidgetList(data,dataTable) {
     console.log("updateCalled",data);
 
-    // d3.select("#widgets").selectAll('div.col-lg-3').data(data.widgets).enter().append('div').attr('class', 'col-lg-3 views').html(
-    //         function (d) {
-    //             var panel;
-    //             var name;
-    //             var text;
-    //             var image;
-    //             switch (d.config.chartType) {
-    //                 case "bar":
-    //                     panel = "panel-primary";
-    //                     name = "Bar Chart";
-    //                     image = "fa-bar-chart"
-    //                     break;
-    //                 case "line":
-    //                     panel = "panel-green";
-    //                     name = "Line Chart";
-
-    //                     image = "fa-line-chart"
-    //                     break;
-    //                 case "area":
-    //                     panel = "panel-red";
-    //                     name = "Area Chart";
-    //                     image = "fa-area-chart"
-    //                     break;
-    //             }
-    //             name = "";
-    //             text = "<big>" + d.title.substr(0, d.title.lastIndexOf('By') - 1) + "</big><br>" + "<small>Vs</small><br/><big>" + d.title.substr(d.title.lastIndexOf('By') + 2) + "</big>";
-    //             string = '<div class="panel ' + panel + '"><div class="panel-heading"><div class="row"><div class="col-xs-3"><i class="fa ' + image + ' fa-5x"></i></div><div class="col-xs-9 text-right"><div>' + text + '</div><div>' + name + '</div></div></div></div><a href="#"><div class="panel-footer"><span class="pull-left">'+ d.title+'</span><span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span><div class="clearfix"></div></div></a></div>'
-    //             return string
-    //         });
-                
-
-
                 function modelShow() {
-
                     $("#hiddenForm form").get(0).reset();
                     jQuery("#hiddenForm form .attr").hide();
                     jQuery("#chartDiv").empty();
@@ -114,9 +81,6 @@ function updateWidgetList(data,dataTable) {
 
                 Dform = jQuery("#hiddenForm form .attr");
                 Dform.hide();
-
-
-
 
                 jQuery('#chartType').on('change', function (e) {
                     Dform.hide();

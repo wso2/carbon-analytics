@@ -41,6 +41,16 @@ public class RegistryUtils {
      * Logger
      */
     private static Log logger = LogFactory.getLog(RegistryUtils.class);
+    public static final String APPLICATION_JSON = "application/json";
+
+    /**
+     * Creates a collection in the given location.
+     * @param url URL of the collection to be created.
+     */
+    public static void createCollection(String url) throws RegistryException {
+        Collection collection = registry.newCollection();
+        registry.put(url,collection);
+    }
 
     /**
      * Writes an object to the given registry url and registry type as a Json String.
@@ -48,21 +58,12 @@ public class RegistryUtils {
      * @param url     Relative url to where the resource will be saved.
      * @param content Data to be written to the registry as a json string. Must be a bean object(eg- String objects are not supported).
      */
-    protected static void writeResource(String url, Object content) throws AxisFault {
-        try {
-            Gson gson = new Gson();
-
-            Resource resource = registry.newResource(); //new resource in the registry
-            resource.setContent(gson.toJson(content));
-
-            resource.setMediaType("application/json");
-            registry.put(url, resource);
-
-        } catch (Exception re) {
-            String errorMessage = "Unable to write resource at url:" + url;
-            logger.error(errorMessage);
-            throw new AxisFault(errorMessage);
-        }
+    public static void writeResource(String url, Object content) throws RegistryException {
+        Gson gson = new Gson();
+        Resource resource = registry.newResource(); //new resource in the registry
+        resource.setContent(gson.toJson(content));
+        resource.setMediaType(APPLICATION_JSON);
+        registry.put(url, resource);
     }
 
     /**
@@ -72,22 +73,18 @@ public class RegistryUtils {
      * @param targetClass Target object type which the json content will be mapped into.
      * @return Object by mapping into a given class, the json read from the registry.
      */
-    protected static Object readResource(String url, Class targetClass) throws AxisFault {
+    public static Object readResource(String url, Class targetClass) throws RegistryException {
         InputStream contentStream = null;
         InputStreamReader isr = null;
+        Gson gson = new Gson();
         try {
             Resource resource = registry.get(url);
-            Gson gson = new Gson();
-
             contentStream = resource.getContentStream();
             isr = new InputStreamReader(contentStream);
-
             return gson.fromJson(isr, targetClass);
-
-        } catch (Exception e) {
-            String errorMessage = "Unable to read resource from url:" + url;
-            logger.error(errorMessage);
-            throw new AxisFault(errorMessage);
+        } catch (RegistryException e) {
+            logger.error("An error occurred while reading resource [" + url + "] from registry", e);
+            throw e;
         } finally {
             closeQuitely(contentStream);
             closeQuitely(isr);
@@ -103,7 +100,7 @@ public class RegistryUtils {
                 closeable.close();
             }
         } catch (IOException ignore) {
-	    /* ignore */
+            /* ignore */
         }
     }
 
@@ -114,14 +111,8 @@ public class RegistryUtils {
      * @return True if resource exists.
      * @throws AxisFault .
      */
-    protected static boolean isResourceExist(String url) throws AxisFault {
-        try {
-            return registry.resourceExists(url);
-        } catch (RegistryException e) {
-            String errorMessage = "Unable perform isResourceExists check";
-            logger.error(errorMessage);
-            throw new AxisFault(e.getMessage(), e);
-        }
+    public static boolean isResourceExist(String url) throws RegistryException {
+        return registry.resourceExists(url);
     }
 
     /**
@@ -131,7 +122,7 @@ public class RegistryUtils {
      * @return Collection.
      * @throws AxisFault
      */
-    protected static Collection readCollection(String collectionURL) throws AxisFault {
+    public static Collection readCollection(String collectionURL) throws AxisFault {
 
         try {
             return (Collection) registry.get(collectionURL);
@@ -146,7 +137,7 @@ public class RegistryUtils {
      * @param url url of the resource to be deleted from the registry.
      * @throws AxisFault
      */
-    protected static boolean deleteResource(String url) throws AxisFault {
+    public static boolean deleteResource(String url) throws AxisFault {
         try {
             registry.delete(url);
             return true;

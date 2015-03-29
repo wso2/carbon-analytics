@@ -1,5 +1,7 @@
 package org.wso2.carbon.analytics.dashboard.ui.dto;
 
+
+
 public class DimensionDTO {
     private int row;
     private int col;

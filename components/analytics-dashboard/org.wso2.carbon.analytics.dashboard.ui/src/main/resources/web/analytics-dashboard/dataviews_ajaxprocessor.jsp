@@ -24,15 +24,17 @@
 			appendFooter();
 
 			//load the DVContent for the first item in the list
-			renderDVContent($("#dvList a:first-child").attr("data-dataview")); 
+			if(data != null && data.length > 0) {
+				renderDVContent($("#dvList a:first-child").attr("data-dataview")); 
 
-			//Start binding UI events from here onwards
-			$('#dvList a').click(function () {
-				var dataview = $(this).attr('data-dataview');
-				currentDv=dataview;
-				console.log("Loading DV content for " + dataview);
-				renderDVContent(dataview);
-			});
+				//Start binding UI events from here onwards
+				$('#dvList a').click(function () {
+					var dataview = $(this).attr('data-dataview');
+					currentDv=dataview;
+					console.log("Loading DV content for " + dataview);
+					renderDVContent(dataview);
+				});
+			}
 			
 		});
 
@@ -85,7 +87,7 @@
 
 			var dataTable = {}
 			function setType(str) {
-			    if (str == 'STRING' || str == 'BOOL')
+			    if (str == 'STRING' || str == 'BOOL' || str == 'string')
 			        return 'C'
 			    else
 			        return 'N'
@@ -103,13 +105,14 @@
 			dataTable.data = [
 			    [0, 'Books', 'Colombo', "A", "3", 100],
 			    [1, 'Pens', 'Kandy', "B", "4", 500],
-
 			    [2, 'Pencils', 'Gampaha', "C", "5", 300],
-
 			    [3, 'Papers', 'Jaffna', "D", "7", 400],
-
 			    [4, 'Highlighter', 'Gall', "E", "6", 200],
-			]
+			];
+
+			if(data.widgets == null) {
+				data.widgets = [];
+			}
 			updateWidgetList(data,dataTable);
 
 		});
@@ -161,16 +164,7 @@
 		
 	};
 
-	function generateId()
-	{
-	    var text = "";
-	    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-	    for( var i=0; i < 5; i++ )
-	        text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-	    return text;
-	}
 
 
 </script>
@@ -206,8 +200,8 @@
 		    	<div class="blank-slate-message">
 		    	    <h2>You have not created any DataViews.</h2>
 		    	    <p>Get started by creating a new DataView.</p>
-		    	    <a href="#">
-		    	        <button data-toggle="modal" data-target="#mdlDVInfo" type="button" class="btn btn-success">Create New DataView</button>
+		    	    <a href="newDataview_ajaxprocessor.jsp">
+		    	        <button type="button" class="btn btn-success">Create New DataView</button>
 		    	    </a>
 		    	</div>
 		    {{/if}}

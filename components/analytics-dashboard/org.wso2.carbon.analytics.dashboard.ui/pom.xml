@@ -68,6 +68,7 @@
                         </Export-Package>
                         <Import-Package>
                             org.wso2.carbon.analytics.dashboard.stub.*,
+                            org.wso2.carbon.analytics.dashboard.batch.stub.*,
                             org.wso2.carbon.utils,
                             org.apache.axis2.*,
                             org.apache.axiom.*,

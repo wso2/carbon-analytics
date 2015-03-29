@@ -2326,7 +2326,7 @@
     /*************************************************** Bar chart Drill Dowining Function  ***************************************************************************************************/
 
     igviz.drillDown = function drillDown(index, divId, chartConfig, dataTable, originaltable) {
-        //	console.log(dataTable,chartConfig,divId);
+        //  console.log(dataTable,chartConfig,divId);
         if (index == 0) {
             d3.select(divId).append('div').attr({id: 'links', height: 20, 'bgcolor': 'blue'})
             d3.select(divId).append('div').attr({id: 'chartDiv'})

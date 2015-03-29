@@ -22,15 +22,7 @@ public class Widget {
 
 	private String id;
 	private String title;
-	private String config;
-
-	public String getConfig() {
-		return config;
-	}
-
-	public void setConfig(String config) {
-		this.config = config;
-	}
+    private String config;
 
 	public String getId() {
 		return id;
@@ -48,4 +40,11 @@ public class Widget {
 		this.title = title;
 	}
 
+    public String getConfig() {
+        return config;
+    }
+
+    public void setConfig(String config) {
+        this.config = config;
+    }
 }

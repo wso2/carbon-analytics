@@ -12,14 +12,6 @@ public class WidgetDTO {
         this.config = config;
     }
 
-    public String getConfig() {
-        return config;
-    }
-
-    public void setConfig(String config) {
-        this.config = config;
-    }
-
     public String getId() {
         return id;
     }
@@ -36,4 +28,11 @@ public class WidgetDTO {
         this.title = title;
     }
 
+    public String getConfig() {
+        return config;
+    }
+
+    public void setConfig(String config) {
+        this.config = config;
+    }
 }

@@ -22,4 +22,6 @@ public class DashboardAdminComponent {
         BundleContext bundleContext = ctx.getBundleContext();
         bundleContext.registerService(DashboardAdminService.class, new DashboardAdminService(), null);
     }
+
+
 }

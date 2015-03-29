@@ -1,34 +1,12 @@
 {
-    "name": "Sales",
+    "id" : "dv1",
+    "name": "Expenses",
     "type": "batch",
-    "datasource": "sales",
+    "datasource": "expenses",
     "columns": [
-        "Year:string",
-        "Sales:float",
-        "Expenses:float"
+        {"name" : "Year", "type":"string"},
+        {"name" : "Sales", "type":"float"},
+        {"name" : "Expenses", "type":"float"}
     ],
-    "filter": {
-        "language": "lucene",
-        "query": "some lucene query"
-    },
-    "widgets": [
-        {
-            "id": "a",
-            "title": "Sales By Region",
-            "config": {
-                "chartType": "bar",
-                "xAxis": 0,
-                "yAxis": 1
-            }
-        },
-        {
-            "id": "b",
-            "title": "Sales By Employee",
-            "config": {
-                "chartType": "bar",
-                "xAxis": 0,
-                "yAxis": 1
-            }
-        }
-    ]
+    "filter": "some"
 }

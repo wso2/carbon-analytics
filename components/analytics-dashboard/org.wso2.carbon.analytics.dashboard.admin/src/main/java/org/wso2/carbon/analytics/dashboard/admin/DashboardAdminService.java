@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 package org.wso2.carbon.analytics.dashboard.admin;
+
 import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,22 +21,95 @@ import org.wso2.carbon.analytics.dashboard.admin.data.*;
 import org.wso2.carbon.core.AbstractAdmin;
 import org.wso2.carbon.registry.api.Collection;
 import org.wso2.carbon.registry.api.RegistryException;
+
 import java.util.ArrayList;
 import java.util.List;
+
 public class DashboardAdminService extends AbstractAdmin {
 
-    /**
-     * Relative Registry locations for dataViews and dashboards.
-     */
-    private static final String DATAVIEWS_DIR =
-            "/repository/components/org.wso2.carbon.analytics.dataviews/";
-    private static final String DASHBOARDS_DIR =
-            "/repository/components/org.wso2.carbon.analytics.dashboards/";
+
+    private Log logger = LogFactory.getLog(DashboardAdminService.class);
+
 
     /**
-     * Logger
+     * @return All the existing dashboards as an Array-list.
+     * @throws AxisFault
      */
-    private Log logger = LogFactory.getLog(DashboardAdminService.class);
+    public Dashboard[] getDashboards() throws AxisFault {
+        try {
+            createCollections();
+            List<Dashboard> dashboards = new ArrayList<Dashboard>();
+            Collection dashboardsCollection = RegistryUtils.readCollection(DashboardConstants.DASHBOARDS_DIR);
+            String[] resourceNames = dashboardsCollection.getChildren();
+            for (String resourceName : resourceNames) {
+                Dashboard dashboard = getDashboard(resourceName.replace(DashboardConstants.DASHBOARDS_DIR, ""));
+                dashboards.add(dashboard);
+            }
+            Dashboard[] dashboardArray = new Dashboard[dashboards.size()];
+            return dashboards.toArray(dashboardArray);
+        } catch (Exception e) {
+            logger.error("An error occurred while retrieving dashboards.", e);
+            throw new AxisFault("An error occurred while retrieving dashboards.", e);
+        }
+    }
+
+    /**
+     * @param dashboardID Target dashboard ID.
+     * @return Dashboard with widget-meta-Data.
+     * @throws AxisFault
+     */
+    public Dashboard getDashboard(String dashboardID) throws AxisFault {
+        Dashboard dashboard = null;
+        try {
+            dashboard = (Dashboard) RegistryUtils.readResource(DashboardConstants.DASHBOARDS_DIR
+                    + dashboardID, Dashboard.class);
+            if (dashboard.getWidgets() == null) {
+                dashboard.setWidgets(new WidgetMetaData[0]);
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("Returning Dashboard with title " + dashboard.getTitle());
+            }
+        } catch (RegistryException e) {
+            logger.error("Error while reading dashboard with id: " + dashboardID, e);
+            throw new AxisFault("Error while reading dashboard with id: " + dashboardID, e);
+        }
+        return dashboard;
+    }
+
+    /**
+     * Adds a new dashboard to the registry, does not allow to replace existing dashboard.
+     *
+     * @param dashboard Object to be appended to the registry.
+     * @throws AxisFault
+     */
+    public boolean addDashboard(Dashboard dashboard) throws AxisFault {
+        try {
+            if (!RegistryUtils.isResourceExist(DashboardConstants.DASHBOARDS_DIR + dashboard.getId())) {
+                RegistryUtils.writeResource(DashboardConstants.DASHBOARDS_DIR + dashboard.getId(), dashboard);
+                return true;
+            } else {
+                String errorMessage = "Dashboard with id:" + dashboard.getId() + " already exists";
+                logger.error(errorMessage);
+                throw new AxisFault(errorMessage);
+            }
+        } catch (RegistryException e) {
+            String message = "Error occurred while adding dashboard with id: " + dashboard.getId();
+            logger.error(message, e);
+            throw new AxisFault(message, e);
+        }
+    }
+
+    /**
+     * @param dashboardID Id of the dashboard to which the widget-meta-data will be appended.
+     * @param widget      Metadata to be appended.
+     * @throws AxisFault
+     */
+    public boolean addWidgetToDashboard(String dashboardID, WidgetMetaData widget)
+            throws AxisFault {
+        Dashboard dashboard = getDashboard(dashboardID);
+        dashboard.addWidget(widget);
+        return updateDashboard(dashboard);
+    }
 
     /**
      * @return All the dataView objects saved in the registry.
@@ -43,16 +117,17 @@ public class DashboardAdminService extends AbstractAdmin {
      */
     public DataView[] getDataViewsInfo() throws AxisFault {
         ArrayList<DataView> dataViews = new ArrayList<DataView>();
-        Collection dataViewsCollection = RegistryUtils.readCollection(DATAVIEWS_DIR);
+        Collection dataViewsCollection = RegistryUtils.readCollection(DashboardConstants.DATAVIEWS_DIR);
         String[] resourceNames;
         try {
+            createCollections();
             resourceNames = dataViewsCollection.getChildren();
         } catch (RegistryException e) {
             logger.error(e);
             throw new AxisFault(e.getMessage(), e);
         }
         for (String resourceName : resourceNames) {
-            DataView dataView = getDataView(resourceName.replace(DATAVIEWS_DIR, ""));
+            DataView dataView = getDataView(resourceName.replace(DashboardConstants.DATAVIEWS_DIR, ""));
             dataView.setWidgets(new Widget[0]);
             dataViews.add(dataView);
         }
@@ -66,7 +141,22 @@ public class DashboardAdminService extends AbstractAdmin {
      * @throws AxisFault
      */
     public DataView getDataView(String dataViewID) throws AxisFault {
-        return (DataView) RegistryUtils.readResource(DATAVIEWS_DIR + dataViewID, DataView.class);
+        DataView dataView = null;
+        try {
+            dataView = (DataView) RegistryUtils.readResource(DashboardConstants.DATAVIEWS_DIR +
+                    dataViewID, DataView.class);
+            if(dataView.getWidgets() == null) {
+                dataView.setWidgets(new Widget[0]);
+            }
+            if(dataView.getColumns() == null) {
+                dataView.setColumns(new Column[0]);
+            }
+        } catch (RegistryException e) {
+            String message = "Error occurred while retrieving Dataview with id: " + dataViewID;
+            logger.error(message, e);
+            throw new AxisFault(message, e);
+        }
+        return dataView;
     }
 
     /**
@@ -76,13 +166,19 @@ public class DashboardAdminService extends AbstractAdmin {
      * @throws AxisFault
      */
     public boolean addDataView(DataView dataView) throws AxisFault {
-        if (!RegistryUtils.isResourceExist(DATAVIEWS_DIR + dataView.getId())) {
-            RegistryUtils.writeResource(DATAVIEWS_DIR + dataView.getId(), dataView);
-            return true;
-        } else {
-            String errorMessage = "DataView with ID:" + dataView.getId() + " already exists";
-            logger.error(errorMessage);
-            throw new AxisFault(errorMessage);
+        try {
+            if (!RegistryUtils.isResourceExist(DashboardConstants.DATAVIEWS_DIR + dataView.getId())) {
+                RegistryUtils.writeResource(DashboardConstants.DATAVIEWS_DIR + dataView.getId(), dataView);
+                return true;
+            } else {
+                String errorMessage = "DataView with ID:" + dataView.getId() + " already exists";
+                logger.error(errorMessage);
+                throw new AxisFault(errorMessage);
+            }
+        } catch (RegistryException e) {
+            String message = "Error occurred while adding Dataview : " + dataView.getId();
+            logger.error(message, e);
+            throw new AxisFault(message, e);
         }
     }
 
@@ -93,13 +189,18 @@ public class DashboardAdminService extends AbstractAdmin {
      * @throws AxisFault If a matching dataView does not exist.
      */
     public boolean updateDataView(DataView dataView) throws AxisFault {
-        if (RegistryUtils.isResourceExist(DATAVIEWS_DIR + dataView.getId())) {
-            RegistryUtils.writeResource(DATAVIEWS_DIR + dataView.getId(), dataView);
-            return true;
-        } else {
-            String errorMessage = "DataView with ID:" + dataView.getId() + " does not exist";
-            logger.debug(errorMessage);
-            return false;
+        try {
+            if (RegistryUtils.isResourceExist(DashboardConstants.DATAVIEWS_DIR + dataView.getId())) {
+                RegistryUtils.writeResource(DashboardConstants.DATAVIEWS_DIR + dataView.getId(), dataView);
+                return true;
+            } else {
+                String errorMessage = "DataView with ID:" + dataView.getId() + " does not exist";
+                logger.debug(errorMessage);
+                return false;
+            }
+        } catch (RegistryException e) {
+            logger.error("Error occurred while updating the Dataview : " + dataView.getId(), e);
+            throw new AxisFault("Error occurred while updating the Dataview : " + dataView.getId(), e);
         }
     }
 
@@ -109,13 +210,18 @@ public class DashboardAdminService extends AbstractAdmin {
      * @param dataViewID Id of the dataView to be deleted.
      */
     public boolean deleteDataView(String dataViewID) throws AxisFault {
-        if (RegistryUtils.isResourceExist(DATAVIEWS_DIR + dataViewID)) {
-            RegistryUtils.deleteResource(DATAVIEWS_DIR + dataViewID);
-            return true;
-        } else {
-            String errorMessage = "DataView with ID:" + dataViewID + " does not exist";
-            logger.debug(errorMessage);
-            return false;
+        try {
+            if (RegistryUtils.isResourceExist(DashboardConstants.DATAVIEWS_DIR + dataViewID)) {
+                RegistryUtils.deleteResource(DashboardConstants.DATAVIEWS_DIR + dataViewID);
+                return true;
+            } else {
+                String errorMessage = "DataView with ID:" + dataViewID + " does not exist";
+                logger.debug(errorMessage);
+                return false;
+            }
+        } catch (RegistryException e) {
+            logger.error("Error occurred while deleting the Dataview [" + dataViewID + "]", e);
+            throw new AxisFault("Error occurred while deleting the Dataview [" + dataViewID + "]", e);
         }
     }
 
@@ -123,7 +229,7 @@ public class DashboardAdminService extends AbstractAdmin {
      * Appends a widget to an existing DataView.
      *
      * @param dataViewID Existing dataView.
-     * @param widget Widget to be appended.
+     * @param widget     Widget to be appended.
      * @throws AxisFault
      */
     public boolean addWidget(String dataViewID, Widget widget) throws AxisFault {
@@ -136,7 +242,7 @@ public class DashboardAdminService extends AbstractAdmin {
      * Updates a widget of an existing DataView.
      *
      * @param dataViewID Existing dataView object.
-     * @param widget Widget to be updated.
+     * @param widget     Widget to be updated.
      * @throws AxisFault
      */
     public boolean updateWidget(String dataViewID, Widget widget) throws AxisFault {
@@ -150,7 +256,7 @@ public class DashboardAdminService extends AbstractAdmin {
      * Returns a dataView object with a SINGLE widget.
      *
      * @param dataViewID DataView name in which the target widget resides.
-     * @param widgetID Widget to be included in the dataView object.
+     * @param widgetID   Widget to be included in the dataView object.
      * @return DataView object with a single widget in the widget array-list.
      * @throws AxisFault
      */
@@ -171,55 +277,6 @@ public class DashboardAdminService extends AbstractAdmin {
         return getDataView(dataViewID).getWidgets();
     }
 
-    /**
-     * @return All the existing dashboards as an Array-list.
-     * @throws AxisFault
-     */
-    public Dashboard[] getDashboards() throws AxisFault {
-        try {
-            List<Dashboard> dashboards = new ArrayList<Dashboard>();
-            Collection dashboardsCollection = RegistryUtils.readCollection(DASHBOARDS_DIR);
-            String[] resourceNames =
-                    dashboardsCollection.getChildren();
-            for (String resourceName : resourceNames) {
-                Dashboard dashboard = getDashboard(resourceName.replace(DASHBOARDS_DIR, ""));
-                dashboards.add(dashboard);
-            }
-            Dashboard[] dashboardArray = new Dashboard[dashboards.size()];
-            return dashboards.toArray(dashboardArray);
-        } catch (Exception e) {
-            String errorMessage = "Unable to extract resources from collection";
-            logger.error(errorMessage);
-            throw new AxisFault(errorMessage);
-        }
-    }
-
-    /**
-     * @param dashboardID Target dashboard ID.
-     * @return Dashboard with widget-meta-Data.
-     * @throws AxisFault
-     */
-    public Dashboard getDashboard(String dashboardID) throws AxisFault {
-        return (Dashboard) RegistryUtils
-                .readResource(DASHBOARDS_DIR + dashboardID, Dashboard.class);
-    }
-
-    /**
-     * Adds a new dashboard to the registry, does not allow to replace existing dashboard.
-     *
-     * @param dashboard Object to be appended to the registry.
-     * @throws AxisFault
-     */
-    public boolean addDashboard(Dashboard dashboard) throws AxisFault {
-        if (!RegistryUtils.isResourceExist(DASHBOARDS_DIR + dashboard.getId())) {
-            RegistryUtils.writeResource(DASHBOARDS_DIR + dashboard.getId(), dashboard);
-            return true;
-        } else {
-            String errorMessage = "Dashboard with name:" + dashboard.getId() + " already exists";
-            logger.debug(errorMessage);
-            throw new AxisFault(errorMessage);
-        }
-    }
 
     /**
      * Updates an existing dashboard.
@@ -228,31 +285,25 @@ public class DashboardAdminService extends AbstractAdmin {
      * @throws AxisFault If a matching dashboard does not exist.
      */
     public boolean updateDashboard(Dashboard dashboard) throws AxisFault {
-        if (RegistryUtils.isResourceExist(DASHBOARDS_DIR + dashboard.getId())) {
-            RegistryUtils.writeResource(DASHBOARDS_DIR + dashboard.getId(), dashboard);
-            return true;
-        } else {
-            String errorMessage = "Dashboard with name:" + dashboard.getId() + " does not exist";
-            logger.debug(errorMessage);
-            throw new AxisFault(errorMessage);
+        try {
+            if (RegistryUtils.isResourceExist(DashboardConstants.DASHBOARDS_DIR + dashboard.getId())) {
+                RegistryUtils.writeResource(DashboardConstants.DASHBOARDS_DIR + dashboard.getId(), dashboard);
+                return true;
+            } else {
+                String errorMessage = "Dashboard with name:" + dashboard.getId() + " does not exist";
+                logger.debug(errorMessage);
+                throw new AxisFault(errorMessage);
+            }
+        } catch (RegistryException e) {
+            logger.error(e);
+            throw new AxisFault(e.getMessage(), e);
         }
     }
 
-    /**
-     * @param dashboardID Id of the dashboard to which the widget-meta-data will be appended.
-     * @param widget Metadata to be appended.
-     * @throws AxisFault
-     */
-    public boolean addWidgetToDashboard(String dashboardID, WidgetMetaData widget)
-            throws AxisFault {
-        Dashboard dashboard = getDashboard(dashboardID);
-        dashboard.addWidget(widget);
-        return updateDashboard(dashboard);
-    }
 
     /**
      * @param dashboardID Id of the dashboard to which the widget-meta-data will be updated.
-     * @param widget Metadata to be updated.
+     * @param widget      Metadata to be updated.
      * @throws AxisFault
      */
     public boolean updateWidgetInDashboard(String dashboardID, WidgetMetaData widget)
@@ -262,8 +313,15 @@ public class DashboardAdminService extends AbstractAdmin {
         return updateDashboard(dashboard);
     }
 
-    @Override
-    protected String getUsername() {
-        return super.getUsername() + "@" + getTenantDomain();
+    private void createCollections() throws RegistryException {
+        if (!RegistryUtils.isResourceExist(DashboardConstants.DASHBOARDS_DIR)) {
+            logger.info("Creating Registry collection for Dashboards");
+            RegistryUtils.createCollection(DashboardConstants.DASHBOARDS_DIR);
+        }
+        if (!RegistryUtils.isResourceExist(DashboardConstants.DATAVIEWS_DIR)) {
+            logger.info("Creating Registry collection for Dataviews");
+            RegistryUtils.createCollection(DashboardConstants.DATAVIEWS_DIR);
+        }
     }
+
 }

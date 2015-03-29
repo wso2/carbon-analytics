@@ -27,12 +27,9 @@
 
 <%
     String responseText = "";
-    String errorResponse = "ERROR:";
-    String errorMessage = "";
 
     String action = request.getParameter("action");
     DashboardAdminServiceStub stub =   DashboardAdminClient.getDashboardAdminService(config, session, request);
-    response.setContentType("application/json");
     Gson gson = new Gson();
 
     if(action == null) {
@@ -44,6 +41,7 @@
             for(DataView dataview : dataviews) {
                 dataviewsResponse[i++] = DashboardAdminClient.toDataViewDTO(dataview);
             }
+            response.setContentType("application/json");
             responseText = gson.toJson(dataviewsResponse);
         } else {
             responseText = "[]";
@@ -52,6 +50,7 @@
         String dataViewId = request.getParameter("dataViewId");
         DataView dataView = stub.getDataView(dataViewId);
         System.out.println("+++ " + dataView.getDisplayName());
+        response.setContentType("application/json");
         if (dataView != null) {
             responseText = gson.toJson(DashboardAdminClient.toDataViewDTO(dataView));
         } else {
@@ -83,27 +82,24 @@
         DataView dataView = stub.getWidgetWithDataViewInfo(dataview,widgetId);
         WidgetAndDataViewDTO dto = DashboardAdminClient.toWidgetAndDVDTO(dataView);
         if(dto != null) {
+            response.setContentType("application/json");
            responseText = gson.toJson(dto); 
         }
 
     } else if(action.equals("addDataView")) {
         String definition = request.getParameter("definition");
-        if(definition == null) {
-            responseText = "";
-        }
         DataViewDTO dto = null;
         try {
             dto = gson.fromJson(definition,DataViewDTO.class);
+            if(dto != null) {
+                DataView dv = DashboardAdminClient.toDataView(dto);
+                stub.addDataView(dv);
+                responseText = "OK"; 
+            } 
         } catch (JsonSyntaxException e) {
-            errorMessage = e.getMessage();
             e.printStackTrace();
-        }
-        if(dto != null) {
-            DataView dv = DashboardAdminClient.toDataView(dto);
-            stub.addDataView(dv);
-            responseText = "OK"; 
-        } else {
-            responseText=errorResponse + errorMessage;
+            responseText = e.getMessage();
+            response.setStatus(500);
         }
     }  
 %>
