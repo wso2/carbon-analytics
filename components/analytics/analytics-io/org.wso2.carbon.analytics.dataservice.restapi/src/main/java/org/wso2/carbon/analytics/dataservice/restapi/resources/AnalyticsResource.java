@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsScore;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
@@ -479,21 +480,44 @@ public class AnalyticsResource extends AbstractResource {
             throws AnalyticsException {
         AnalyticsDataService ads = Utils.getAnalyticsDataService();
         List<Record> l = new ArrayList<Record>();
-        String[] str = new String[]{"year", "month", "day"};
+
+        String[] str = new String[]{"2015", "Jan", "24"};
         AnalyticsCategoryPath acp = new AnalyticsCategoryPath(str);
         Map<String, Object> values = new HashMap<String, Object>();
         values.put("testField", acp);
+        values.put("number", 1);
+        values.put("number1", 5);
         Record r = new Record(-1234,"test",values);
+
+        String[] str1 = new String[]{"2015", "Feb", "21"};
+        AnalyticsCategoryPath acp1 = new AnalyticsCategoryPath(str1);
+        Map<String, Object> values1 = new HashMap<String, Object>();
+        values1.put("testField", acp1);
+        values1.put("number", 2);
+        values1.put("number1", 2);
+        Record rr = new Record(-1234,"test",values1);
+
+        String[] str2 = new String[]{"2015", "Feb", "23"};
+        AnalyticsCategoryPath acp2 = new AnalyticsCategoryPath(str2);
+        Map<String, Object> values2 = new HashMap<String, Object>();
+        values2.put("testField", acp2);
+        values2.put("number", 3);
+        values2.put("number1", 1);
+        Record rrr = new Record(-1234,"test",values2);
+
         l.add(r);
+        l.add(rr);
+        l.add(rrr);
         ads.put(l);
 
         List<String> ids = new ArrayList<String>();
         ids.add(r.getId());
+        ids.add(rr.getId());
+        ids.add(rrr.getId());
         RecordGroup[] aaaa = ads.get(-1234, "test", 0, null, ids);
         List<Record> ddddd = GenericUtils.listRecords(ads, aaaa);
-        Map<String, Object> hhh = ddddd.get(0).getValues();
-        AnalyticsCategoryPath eeee = (AnalyticsCategoryPath)hhh.get("testField");
-        return Response.ok(eeee.getPath()).build();
+
+        return Response.ok(ddddd).build();
     }
 
     /**
@@ -509,12 +533,10 @@ public class AnalyticsResource extends AbstractResource {
     public Response drilldown(List<RecordBean> recordBeans)
             throws AnalyticsException {
         AnalyticsDataService ads = Utils.getAnalyticsDataService();
-        AnalyticsScore score = new AnalyticsScore("1",null);
-        List<AnalyticsCategoryPath> pathList = new ArrayList<AnalyticsCategoryPath>();
-        AnalyticsCategoryPath path = new AnalyticsCategoryPath("testField", new String[]{"year", "month"});
-        pathList.add(path);
+        AnalyticsScore score = new AnalyticsScore("_weight*2",null);
+        AnalyticsCategoryPath path = new AnalyticsCategoryPath(new String[]{"2015", "Feb"});
         AnalyticsDrillDownRequest anss = new AnalyticsDrillDownRequest();
-        anss.setCategoryPaths(pathList);
+        anss.addCategoryPath("testField", path);
         anss.setScore(score);
         anss.setLanguageQuery(null);
         anss.setLanguage("lucene");
@@ -525,6 +547,34 @@ public class AnalyticsResource extends AbstractResource {
         anss.setWithIds(true);
 
         return Response.ok(ads.drillDown(anss, 10, 10)).build();
+    }
+
+    /**
+     * Inserts or update a list of records. Update only happens if there are matching record ids
+     * @param recordBeans the list of the record beans
+     * @return the response
+     * @throws AnalyticsException
+     */
+    @POST
+    @Consumes({ MediaType.APPLICATION_JSON})
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path("drillrange")
+    public Response drilldownRange(List<RecordBean> recordBeans)
+            throws AnalyticsException {
+        AnalyticsDataService ads = Utils.getAnalyticsDataService();
+        AnalyticsDrillDownRequest anss = new AnalyticsDrillDownRequest();
+        anss.addRange("number", new AnalyticsDrillDownRange("-1 --- 1.5", -1, 1.5));
+        anss.addRange("number", new AnalyticsDrillDownRange("1.5 --- 3.1", 1.5, 3.1));
+        anss.addRange("number1", new AnalyticsDrillDownRange("3 --- 6", 3, 6));
+        anss.setLanguageQuery(null);
+        anss.setLanguage("lucene");
+        anss.setTenantId(-1234);
+        anss.setTableName("test");
+        anss.setCategoryCount(10);
+        anss.setRecordCount(10);
+        anss.setWithIds(true);
+
+        return Response.ok(ads.searchRange(anss)).build();
     }
 
 
