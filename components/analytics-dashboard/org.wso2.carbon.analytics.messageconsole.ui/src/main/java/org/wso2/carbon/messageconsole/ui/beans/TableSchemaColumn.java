@@ -17,6 +17,9 @@
 */
 package org.wso2.carbon.messageconsole.ui.beans;
 
+/**
+ * This class represent column meta information
+ */
 public class TableSchemaColumn {
 
     String column;

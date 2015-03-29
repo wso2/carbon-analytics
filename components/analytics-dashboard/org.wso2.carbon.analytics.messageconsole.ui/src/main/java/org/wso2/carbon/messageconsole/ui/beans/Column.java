@@ -17,6 +17,9 @@
 */
 package org.wso2.carbon.messageconsole.ui.beans;
 
+/**
+ * This class represent the data that hold the single column cell.
+ */
 public class Column {
 
     private String key;

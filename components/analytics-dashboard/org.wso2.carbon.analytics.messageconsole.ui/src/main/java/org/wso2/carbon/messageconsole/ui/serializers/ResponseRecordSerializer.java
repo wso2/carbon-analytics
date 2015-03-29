@@ -26,6 +26,9 @@ import org.wso2.carbon.messageconsole.ui.beans.ResponseRecord;
 
 import java.lang.reflect.Type;
 
+/**
+ * This json serializer class covert ResponseRecord object to JTable required json format.
+ */
 public class ResponseRecordSerializer implements JsonSerializer<ResponseRecord> {
 
     private static final String RESULT = "Result";

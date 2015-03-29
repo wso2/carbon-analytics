@@ -20,6 +20,9 @@ package org.wso2.carbon.messageconsole.ui.beans;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class represent all the arbitrary fields that belongs single record
+ */
 public class ResponseArbitraryField {
 
     private String result;

@@ -20,6 +20,9 @@ package org.wso2.carbon.messageconsole.ui.beans;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class represent single record in message console table.
+ */
 public class Record {
 
     private List<Column> columns = new ArrayList<>();

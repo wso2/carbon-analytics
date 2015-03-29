@@ -17,6 +17,10 @@
 */
 package org.wso2.carbon.messageconsole.ui.beans;
 
+
+/**
+ * This class represent user's analytics data service level permissions.
+ */
 public class Permissions {
 
     private boolean createTable;
