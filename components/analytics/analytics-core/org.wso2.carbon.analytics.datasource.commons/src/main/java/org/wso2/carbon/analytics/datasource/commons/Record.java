@@ -57,9 +57,6 @@ public class Record implements Serializable {
     
     public Record(String id, int tenantId, String tableName, Map<String, Object> values, long timestamp) {
         this.id = id;
-        if (this.id == null) {
-            this.id = this.generateID();
-        }
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.values = values;
@@ -70,11 +67,8 @@ public class Record implements Serializable {
         return id;
     }
     
-    private String generateID() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(System.currentTimeMillis());
-        builder.append(Math.random());
-        return builder.toString();
+    public void setId(String id) {
+        this.id = id;
     }
     
     public int getTenantId() {

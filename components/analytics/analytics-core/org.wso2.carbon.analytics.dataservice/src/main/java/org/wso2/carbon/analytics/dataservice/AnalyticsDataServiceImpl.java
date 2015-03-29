@@ -18,7 +18,17 @@
  */
 package org.wso2.carbon.analytics.dataservice;
 
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import org.apache.lucene.analysis.Analyzer;
+import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.DrillDownResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
@@ -37,12 +47,6 @@ import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 /**
  * The implementation of {@link AnalyticsDataService}.
  */
@@ -51,7 +55,9 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private AnalyticsRecordStore analyticsRecordStore;
         
     private AnalyticsDataIndexer indexer;
-        
+    
+    private Map<String, AnalyticsSchema> schemaMap = new HashMap<String, AnalyticsSchema>();
+    
     public AnalyticsDataServiceImpl(AnalyticsRecordStore analyticsRecordStore,
             AnalyticsFileSystem analyticsFileSystem, int shardCount) throws AnalyticsException {
         this.analyticsRecordStore = analyticsRecordStore;
@@ -108,6 +114,12 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     public void setTableSchema(int tenantId, String tableName, AnalyticsSchema schema)
             throws AnalyticsTableNotAvailableException, AnalyticsException {
         this.getAnalyticsRecordStore().setTableSchema(tenantId, tableName, schema);
+        AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
+        if (acm.isClusteringEnabled()) {
+            /* send cluster message to invalidate */
+        } else {
+            this.schemaMap.remove(GenericUtils.calculateTableIdentity(tenantId, tableName));
+        }
     }
     
     @Override
@@ -137,9 +149,80 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             throws AnalyticsException, AnalyticsTableNotAvailableException {
         return this.getAnalyticsRecordStore().getRecordCount(tenantId, tableName, timeFrom, timeTo);
     }
+    
+    /**
+     * This method preprocesses the records before adding to the record store,
+     * e.g. update the record ids if its not already set by using the table
+     * schema's primary keys.
+     * @param records
+     */
+    private void preprocessRecords(List<Record> records) throws AnalyticsException {
+        Collection<List<Record>> recordBatches = GenericUtils.generateRecordBatches(records);
+        for (List<Record> recordBatch : recordBatches) {
+            this.preprocessRecordBatch(recordBatch);
+        }
+    }
+    
+    private AnalyticsSchema lookupSchema(int tenantId, String tableName) throws AnalyticsException {
+        AnalyticsSchema schema = this.schemaMap.get(GenericUtils.calculateTableIdentity(tenantId, tableName));
+        if (schema == null) {
+            schema = this.getAnalyticsRecordStore().getTableSchema(tenantId, tableName);
+        }
+        return schema;
+    }
+    
+    private void populateWithGenerateIds(List<Record> records) {
+        for (Record record : records) {
+            if (record.getId() == null) {
+                record.setId(GenericUtils.generateRecordID());
+            }
+        }
+    }
+    
+    private void populateRecordWithPrimaryKeyAwareId(Record record, List<String> primaryKeys) {
+        StringBuilder builder = new StringBuilder();
+        Object obj;
+        for (String key : primaryKeys) {
+            obj = record.getValue(key);
+            if (obj != null) {
+                builder.append(obj.toString());
+            }
+        }
+        /* to make sure, we don't have an empty string */
+        builder.append(".");
+        try {
+            byte[] data = builder.toString().getBytes(Constants.DEFAULT_CHARSET);
+            record.setId(UUID.nameUUIDFromBytes(data).toString());
+        } catch (UnsupportedEncodingException e) {
+            /* this wouldn't happen */
+            throw new RuntimeException(e);
+        }
+    }
+    
+    private void populateRecordsWithPrimaryKeyAwareIds(List<Record> records, List<String> primaryKeys) {
+        for (Record record : records) {
+            /* users have the ability to explicitly provide a record id,
+             * in-spite of having primary keys defined to auto generate the id */
+            if (record.getId() == null) {
+                this.populateRecordWithPrimaryKeyAwareId(record, primaryKeys);
+            }
+        }
+    }
+    
+    private void preprocessRecordBatch(List<Record> recordBatch) throws AnalyticsException {
+        Record firstRecord = recordBatch.get(0);
+        AnalyticsSchema schema = this.lookupSchema(firstRecord.getTenantId(), firstRecord.getTableName());
+        List<String> primaryKeys = schema.getPrimaryKeys();
+        if (primaryKeys != null && primaryKeys.size() > 0) {
+            this.populateRecordsWithPrimaryKeyAwareIds(recordBatch, primaryKeys);
+        } else {
+            this.populateWithGenerateIds(recordBatch);
+        }
+    }
 
     @Override
     public void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
+        this.preprocessRecords(records);
         this.getAnalyticsRecordStore().put(records);
         this.getIndexer().put(records);
     }

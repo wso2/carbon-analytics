@@ -316,8 +316,12 @@ public class GenericUtils {
         return tableName.toUpperCase();
     }
     
+    public static String calculateTableIdentity(int tenantId, String tableName) {
+        return tenantId + "_" + normalizeTableName(tableName);
+    }
+    
     public static String calculateRecordIdentity(Record record) {
-        return record.getTenantId() + "_" + normalizeTableName(record.getTableName());
+        return calculateTableIdentity(record.getTenantId(), record.getTableName());
     }
     
     public static Collection<List<Record>> generateRecordBatches(List<Record> records) {
@@ -335,6 +339,13 @@ public class GenericUtils {
             recordBatch.add(record);
         }
         return recordBatches.values();
+    }
+    
+    public static String generateRecordID() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(System.currentTimeMillis());
+        builder.append(Math.random());
+        return builder.toString();
     }
 
 }
