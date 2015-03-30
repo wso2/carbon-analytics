@@ -18,6 +18,10 @@
 package org.wso2.carbon.analytics.datasource.hbase.util;
 
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hbase.Cell;
+import org.apache.hadoop.hbase.CellUtil;
+import org.apache.hadoop.hbase.client.Result;
+import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
@@ -28,36 +32,35 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
+/**
+ * Class containing various utility methods required by classes from the HBase Analytics Datasource implementation
+ */
 public class HBaseUtils {
 
     public static String normalizeTableName(String tableName) {
         return tableName.toUpperCase();
     }
 
-
-    public static String generateTablePrefix(int tenantId, int type) {
+    public static String generateTablePrefix(int tenantId, HBaseAnalyticsDSConstants.TableType type) {
         String output = "";
         switch (type) {
-            case HBaseAnalyticsDSConstants.DATA:
+            case DATA:
                 if (tenantId < 0) {
                     output = HBaseAnalyticsDSConstants.ANALYTICS_USER_TABLE_PREFIX + "_X" + Math.abs(tenantId) + "_";
                 } else {
                     output = HBaseAnalyticsDSConstants.ANALYTICS_USER_TABLE_PREFIX + "_" + tenantId + "_";
                 }
                 break;
-            case HBaseAnalyticsDSConstants.INDEX:
+            case INDEX:
                 if (tenantId < 0) {
                     output = HBaseAnalyticsDSConstants.ANALYTICS_INDEX_TABLE_PREFIX + "_X" + Math.abs(tenantId) + "_";
                 } else {
                     output = HBaseAnalyticsDSConstants.ANALYTICS_INDEX_TABLE_PREFIX + "_" + tenantId + "_";
-                }
-                break;
-            case HBaseAnalyticsDSConstants.META:
-                if (tenantId < 0) {
-                    output = HBaseAnalyticsDSConstants.ANALYTICS_META_TABLE_PREFIX + "_X" + Math.abs(tenantId) + "_";
-                } else {
-                    output = HBaseAnalyticsDSConstants.ANALYTICS_META_TABLE_PREFIX + "_" + tenantId + "_";
                 }
                 break;
         }
@@ -65,7 +68,7 @@ public class HBaseUtils {
 
     }
 
-    public static String generateTableName(int tenantId, String tableName, int type) {
+    public static String generateTableName(int tenantId, String tableName, HBaseAnalyticsDSConstants.TableType type) {
         return generateTablePrefix(tenantId, type) + normalizeTableName(tableName);
     }
 
@@ -90,11 +93,39 @@ public class HBaseUtils {
     }
 
     public static byte[] encodeLong(long value) {
-        return Long.toString(value).getBytes();
+        return Long.toString(value).getBytes(StandardCharsets.UTF_8);
     }
 
     public static long decodeLong(byte[] arr) {
-        return Long.parseLong(new String(arr));
+        return Long.parseLong(new String(arr, StandardCharsets.UTF_8));
+    }
+
+    public static Record constructRecord(Result currentResult, int tenantId, String tableName, Set colSet)
+            throws AnalyticsException {
+        byte[] rowId = currentResult.getRow();
+        Map<String, Object> values;
+        long timestamp;
+        if (currentResult.containsColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME)) {
+            Cell dataCell = currentResult.getColumnLatestCell
+                    (HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                            HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME);
+            values = GenericUtils.decodeRecordValues(CellUtil.cloneValue(dataCell), colSet);
+            Cell timeCell = currentResult.getColumnLatestCell
+                    (HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                            HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
+            timestamp = HBaseUtils.decodeLong(CellUtil.cloneValue(timeCell));
+            return new Record(new String(rowId), tenantId, tableName, values, timestamp);
+        } else if (currentResult.containsColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME)) {
+            Cell timeCell = currentResult.getColumnLatestCell
+                    (HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                            HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
+            values = new HashMap<>();
+            timestamp = HBaseUtils.decodeLong(CellUtil.cloneValue(timeCell));
+            return new Record(new String(rowId), tenantId, tableName, values, timestamp);
+        }
+        return null;
     }
 
     public static HBaseAnalyticsConfigurationEntry lookupConfiguration() throws AnalyticsException {
