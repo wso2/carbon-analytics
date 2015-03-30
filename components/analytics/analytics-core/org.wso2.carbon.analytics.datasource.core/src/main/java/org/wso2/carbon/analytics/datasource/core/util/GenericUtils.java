@@ -24,9 +24,7 @@ import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordReader;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.*;
 
@@ -275,19 +273,19 @@ public class GenericUtils {
             /* ignore */
         }
     }
-    
+
     public static String normalizeTableName(String tableName) {
         return tableName.toUpperCase();
     }
-    
+
     public static String calculateTableIdentity(int tenantId, String tableName) {
         return tenantId + "_" + normalizeTableName(tableName);
     }
-    
+
     public static String calculateRecordIdentity(Record record) {
         return calculateTableIdentity(record.getTenantId(), record.getTableName());
     }
-    
+
     public static Collection<List<Record>> generateRecordBatches(List<Record> records) {
         /* if the records have identities (unique table category and name) as the following
          * "ABABABCCAACBDABCABCDBAC", the job of this method is to make it like the following,
@@ -304,12 +302,45 @@ public class GenericUtils {
         }
         return recordBatches.values();
     }
-    
+
     public static String generateRecordID() {
         StringBuilder builder = new StringBuilder();
         builder.append(System.currentTimeMillis());
         builder.append(Math.random());
         return builder.toString();
+    }
+
+    public static byte[] serializeObject(Object obj) throws AnalyticsException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = null;
+        byte[] result;
+        try {
+            oos = new ObjectOutputStream(baos);
+            oos.writeObject(obj);
+            result = baos.toByteArray();
+        } catch (IOException e) {
+            throw new AnalyticsException("Error serializing object: " + e.getMessage(), e);
+        } finally {
+            GenericUtils.closeQuietly(oos);
+            GenericUtils.closeQuietly(baos);
+        }
+        return result;
+    }
+
+    public static Object deserializeObject(byte[] source) throws AnalyticsException {
+        ByteArrayInputStream bais = new ByteArrayInputStream(source);
+        ObjectInputStream ois = null;
+        Object result;
+        try {
+            ois = new ObjectInputStream(bais);
+            result = ois.readObject();
+        } catch (ClassNotFoundException | IOException e) {
+            throw new AnalyticsException("Error de-serializing object: " + e.getMessage(), e);
+        } finally {
+            GenericUtils.closeQuietly(ois);
+            GenericUtils.closeQuietly(bais);
+        }
+        return result;
     }
 
 }
