@@ -1182,7 +1182,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                                                    TaxonomyWriter taxonomyWriter)
             throws AnalyticsIndexException {
         if (obj == null) {
-            throw new AnalyticsIndexException("Facet value is empty");
+            doc.add(new StringField(name, NULL_INDEX_VALUE, Store.NO));
+            return doc;
         }
         if (obj instanceof AnalyticsCategoryPath && type == IndexType.FACET) {
 
