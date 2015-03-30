@@ -714,9 +714,9 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                             this.addRecordIdsToDrillDownResultEntry(searcher, drillDownResultEntry,topDocs);
                         }
                         drillDownResultEntry.setFacetCount(new Integer(topDocs.totalHits).doubleValue());
-                        Map<String, List<DrillDownResultEntry>> perRangeFacets =
-                                this.drillDown(drillDownRequest, indexDir, taxonomyDir,entry.getKey(), range);
-                        drillDownResultEntry.setHierarchicalFacets(perRangeFacets);
+                     //   Map<String, List<DrillDownResultEntry>> perRangeFacets =
+                     //           this.drillDown(drillDownRequest, indexDir, taxonomyDir,entry.getKey(), range);
+                     //   drillDownResultEntry.setHierarchicalFacets(perRangeFacets);
                         List<DrillDownResultEntry> drilldownRanges = result.get(entry.getKey());
                         if (drilldownRanges == null) {
                             drilldownRanges = new ArrayList<>();
@@ -754,7 +754,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         drillDownQuery.add(entry.getKey(),
                            NumericRangeQuery.newDoubleRange(entry.getKey(),
                                                             range.getFrom(), range.getTo(), true, false));
-        return searcher.search(drillDownQuery, drillDownRequest.getRecordCount());
+        return FacetsCollector.search(searcher,drillDownQuery,drillDownRequest.getRecordCount(),new FacetsCollector());
+//        return searcher.search(drillDownQuery, drillDownRequest.getRecordCount());
     }
 
     private Map<String, List<DrillDownResultEntry>> getRangeFacets(
@@ -847,7 +848,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             DrillDownQuery drillDownQuery = this.createDrillDownQuery(drillDownRequest,
                                 indices, config,rangeField, range);
             drillSideways.search(drillDownQuery, facetsCollector);
-            ValueSource valueSource = this.getCompiledScoreFunction(drillDownRequest.getScore());
+            ValueSource valueSource = this.getCompiledScoreFunction(drillDownRequest.getScore(), indices);
             Facets facets = new TaxonomyFacetSumValueSource(taxonomyReader, config, facetsCollector,
                                                             valueSource);
             Map<String, List<DrillDownResultEntry>> result = this.getDrilldownTopChildren(drillDownRequest,
@@ -975,17 +976,21 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return config;
     }
 
-    private ValueSource getCompiledScoreFunction(AnalyticsScore score)
+    private ValueSource getCompiledScoreFunction(AnalyticsScore score, Map<String, IndexType> indices)
             throws AnalyticsIndexException {
         try {
-            Expression scoreFunction = JavascriptCompiler.compile(score.getFunction());
+            Expression scoreFunction;
+            if (score == null) {
+                scoreFunction = JavascriptCompiler.compile(INDEX_INTERNAL_WEIGHT_FIELD);
+            } else {
+                scoreFunction = JavascriptCompiler.compile(score.getFunction());
+            }
             SimpleBindings bindings = new SimpleBindings();
             bindings.add(new SortField(INDEX_INTERNAL_SCORE_FIELD, SortField.Type.SCORE));
             bindings.add(new SortField(INDEX_INTERNAL_WEIGHT_FIELD, SortField.Type.DOUBLE));
-            if (score.getParams() != null) {
-                for (String param : score.getParams()) {
-                    bindings.add(new SortField(param, SortField.Type.DOUBLE));
-                }
+            for (Map.Entry<String, IndexType> indexDef : indices.entrySet())
+            if (indexDef.getValue() == IndexType.SCOREPARAM) {
+                bindings.add(new SortField(indexDef.getKey(), SortField.Type.DOUBLE));
             }
             return scoreFunction.getValueSource(bindings);
         } catch (ParseException e) {

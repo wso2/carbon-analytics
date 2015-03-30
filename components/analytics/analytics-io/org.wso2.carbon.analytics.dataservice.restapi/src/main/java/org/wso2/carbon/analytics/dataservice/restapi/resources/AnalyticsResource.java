@@ -566,6 +566,8 @@ public class AnalyticsResource extends AbstractResource {
         anss.addRange("number", new AnalyticsDrillDownRange("-1 --- 1.5", -1, 1.5));
         anss.addRange("number", new AnalyticsDrillDownRange("1.5 --- 3.1", 1.5, 3.1));
         anss.addRange("number1", new AnalyticsDrillDownRange("3 --- 6", 3, 6));
+        AnalyticsCategoryPath path = new AnalyticsCategoryPath(new String[]{"2015"});
+        anss.addCategoryPath("testField", path);
         anss.setLanguageQuery(null);
         anss.setLanguage("lucene");
         anss.setTenantId(-1234);
