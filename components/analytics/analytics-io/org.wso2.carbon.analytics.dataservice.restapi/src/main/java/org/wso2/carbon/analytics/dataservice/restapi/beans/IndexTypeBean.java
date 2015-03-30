@@ -48,5 +48,11 @@ public enum IndexTypeBean {
 
 	/** The boolean. */
 	@XmlEnumValue("BOOLEAN")
-	BOOLEAN
+	BOOLEAN,
+
+    @XmlEnumValue("FACET")
+    FACET,
+
+    @XmlEnumValue("SCOREPARAM")
+    SCOREPARAM
 }
