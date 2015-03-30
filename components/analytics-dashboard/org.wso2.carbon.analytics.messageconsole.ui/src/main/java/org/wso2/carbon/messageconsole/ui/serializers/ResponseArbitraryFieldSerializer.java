@@ -25,6 +25,9 @@ import org.wso2.carbon.messageconsole.ui.beans.ResponseArbitraryFieldColumn;
 
 import java.lang.reflect.Type;
 
+/**
+ * This json serializer class covert ResponseArbitraryFieldColumn object to JTable required json format.
+ */
 public class ResponseArbitraryFieldSerializer implements JsonSerializer<ResponseArbitraryFieldColumn> {
 
     private static final String RESULT = "Result";

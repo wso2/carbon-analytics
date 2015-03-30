@@ -20,6 +20,9 @@ package org.wso2.carbon.messageconsole.ui.beans;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This represent result records for search query or time range based search.
+ */
 public class ResponseResult {
 
     private String result;

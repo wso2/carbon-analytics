@@ -19,6 +19,9 @@ package org.wso2.carbon.analytics.messageconsole.beans;
 
 import java.io.Serializable;
 
+/**
+ * This class represent meta information about message console table.
+ */
 public class TableBean implements Serializable {
 
     private static final long serialVersionUID = 5363807857116507258L;

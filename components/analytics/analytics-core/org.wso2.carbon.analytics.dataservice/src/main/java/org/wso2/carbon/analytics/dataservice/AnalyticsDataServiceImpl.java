@@ -18,6 +18,17 @@
  */
 package org.wso2.carbon.analytics.dataservice;
 
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.Callable;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
@@ -52,6 +63,8 @@ import java.util.UUID;
  */
 public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
+    private static final String ANALYTICS_DATASERVICE_GROUP = "__ANALYTICS_DATASERVICE_GROUP__";
+    
     private AnalyticsRecordStore analyticsRecordStore;
         
     private AnalyticsDataIndexer indexer;
@@ -63,6 +76,10 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         this.analyticsRecordStore = analyticsRecordStore;
         this.indexer = new AnalyticsDataIndexer(analyticsRecordStore, analyticsFileSystem, shardCount);
         AnalyticsServiceHolder.setAnalyticsDataService(this);
+        AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
+        if (acm.isClusteringEnabled()) {
+            acm.joinGroup(ANALYTICS_DATASERVICE_GROUP, null);
+        } 
         this.indexer.init();
     }
     
@@ -117,9 +134,14 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         if (acm.isClusteringEnabled()) {
             /* send cluster message to invalidate */
+            acm.executeAll(ANALYTICS_DATASERVICE_GROUP, new AnalyticsSchemaChangeMessage(tenantId, tableName));
         } else {
-            this.schemaMap.remove(GenericUtils.calculateTableIdentity(tenantId, tableName));
+            this.invalidateAnalyticsSchema(tenantId, tableName);
         }
+    }
+    
+    private void invalidateAnalyticsSchema(int tenantId, String tableName) {
+        this.schemaMap.remove(GenericUtils.calculateTableIdentity(tenantId, tableName));
     }
     
     @Override
@@ -332,6 +354,38 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         if (this.indexer != null) {
             this.indexer.close();
         }
+    }
+    
+    /**
+     * This is executed to invalidate the specific analytics schema information at the current node.
+     */
+    public static class AnalyticsSchemaChangeMessage implements Callable<String>, Serializable {
+
+        private static final long serialVersionUID = 299364639589319379L;
+
+        private int tenantId;
+        
+        private String tableName;
+        
+        public AnalyticsSchemaChangeMessage(int tenantId, String tableName) {
+            this.tenantId = tenantId;
+            this.tableName = tableName;
+        }
+        
+        @Override
+        public String call() throws Exception {
+            AnalyticsDataService ads = AnalyticsServiceHolder.getAnalyticsDataService();
+            if (ads == null) {
+                throw new AnalyticsException("The analytics data service implementation is not registered");
+            }
+            /* these cluster messages are specific to AnalyticsDataServiceImpl */
+            if (ads instanceof AnalyticsDataServiceImpl) {
+                AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
+                adsImpl.invalidateAnalyticsSchema(this.tenantId, this.tableName);
+            }
+            return "OK";
+        }
+        
     }
     
 }

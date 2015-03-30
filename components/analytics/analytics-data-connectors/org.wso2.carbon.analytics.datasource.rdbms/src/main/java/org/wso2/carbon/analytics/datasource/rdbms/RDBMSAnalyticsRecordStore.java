@@ -748,11 +748,12 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     public boolean tableExists(int tenantId, String tableName) throws AnalyticsException {
         tableName = GenericUtils.normalizeTableName(tableName);
         Connection conn = null;
+        PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             conn = this.getConnection();
             String query = this.getRecordTableMetaSelectQuery();
-            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt = conn.prepareStatement(query);
             stmt.setInt(1, tenantId);
             stmt.setString(2, tableName);
             rs = stmt.executeQuery();
@@ -760,7 +761,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         } catch (SQLException e) {
             throw new AnalyticsException("Error in checking table existence: " + e.getMessage(), e);
         } finally {
-            RDBMSUtils.cleanupConnection(rs, null, conn);
+            RDBMSUtils.cleanupConnection(rs, stmt, conn);
         }
     }
 

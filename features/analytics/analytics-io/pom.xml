@@ -35,6 +35,9 @@
         <module>org.wso2.carbon.analytics.datasink.feature</module>
         <module>org.wso2.carbon.analytics.datasink.server.feature</module>
         <module>org.wso2.carbon.analytics.dataservice.restapi.feature</module>
+        <module>org.wso2.carbon.analytics.api.server.feature</module>
+        <module>org.wso2.carbon.analytics.api.client.feature</module>
+        <module>org.wso2.carbon.analytics.api.feature</module>
     </modules>
 
 </project>

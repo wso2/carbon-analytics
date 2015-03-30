@@ -19,7 +19,11 @@ package org.wso2.carbon.analytics.messageconsole.beans;
 
 import java.io.Serializable;
 
+/**
+ * This represent result for search query or time range based search.
+ */
 public class RecordResultBean implements Serializable {
+
     private static final long serialVersionUID = -90610112748238438L;
 
     private long totalResultCount;

@@ -19,7 +19,11 @@ package org.wso2.carbon.messageconsole.ui.beans;
 
 import java.io.Serializable;
 
+/**
+ * This class represent single record in message console JTable
+ */
 public class ResponseRecord implements Serializable {
+
     private static final long serialVersionUID = 7839182403507282538L;
 
     private String result;

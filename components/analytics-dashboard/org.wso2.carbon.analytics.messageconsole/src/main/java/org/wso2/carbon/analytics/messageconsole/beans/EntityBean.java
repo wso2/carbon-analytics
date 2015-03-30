@@ -20,6 +20,9 @@ package org.wso2.carbon.analytics.messageconsole.beans;
 
 import java.io.Serializable;
 
+/**
+ * This class represent the data that hold the single column cell.
+ */
 public class EntityBean implements Serializable {
 
     private static final long serialVersionUID = 1928077277570009600L;

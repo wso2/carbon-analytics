@@ -59,8 +59,7 @@
             String[] values = properties.getValues();
 
             String recordID = request.getParameter(MessageConsoleConnector.RECORD_ID);
-            String timestamp = request.getParameter(MessageConsoleConnector.TIMESTAMP);
-            out.print(connector.updateRecord(tableName, columns, values, recordID, timestamp));
+            out.print(connector.updateRecord(tableName, columns, values, recordID));
             break;
         }
         case MessageConsoleConnector.TYPE_CREATE_RECORD: {
@@ -154,8 +153,8 @@
                 columns = new String[parameters.size() - 2];
                 values = new String[parameters.size() - 2];
             } else {
-                columns = new String[parameters.size() - 4];
-                values = new String[parameters.size() - 4];
+                columns = new String[parameters.size() - 3];
+                values = new String[parameters.size() - 3];
             }
             int i = 0;
             for (Map.Entry<String, String[]> column : parameters.entrySet()) {

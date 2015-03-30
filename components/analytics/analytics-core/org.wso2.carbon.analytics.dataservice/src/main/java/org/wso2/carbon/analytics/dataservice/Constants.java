@@ -17,6 +17,9 @@
 */
 package org.wso2.carbon.analytics.dataservice;
 
+/**
+ * This class hold constants that required for data service
+ */
 public class Constants {
 
     public static final String PERMISSION_LIST_TABLE = "/permission/admin/manage/analytics/table/list";

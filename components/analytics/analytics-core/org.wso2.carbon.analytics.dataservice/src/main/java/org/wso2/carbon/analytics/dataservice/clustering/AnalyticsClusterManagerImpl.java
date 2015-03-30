@@ -69,9 +69,6 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
 
     @Override
     public void joinGroup(String groupId, GroupEventListener groupEventListener) throws AnalyticsClusterException {
-        if (groupEventListener == null) {
-            throw new IllegalArgumentException("The group event listener cannot be null");
-        }
         if (!this.isClusteringEnabled()) {
             throw new AnalyticsClusterException("Clustering is not enabled");
         }
@@ -79,18 +76,26 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
             throw new AnalyticsClusterException("This node has already joined the group: " + groupId);
         }
         this.checkAndCleanupGroups(groupId);
-        this.groups.put(groupId, groupEventListener);
+        if (groupEventListener != null) {   
+            this.groups.put(groupId, groupEventListener);
+        }
         List<Member> groupMembers = this.getGroupMembers(groupId);
         Member myself = this.hz.getCluster().getLocalMember();
         groupMembers.add(myself);
         if (this.checkLeader(myself, groupId)) {
             this.leaders.put(groupId, myself);
-            groupEventListener.onBecomingLeader();
+            if (groupEventListener != null) {
+                groupEventListener.onBecomingLeader();
+            }
             this.setLeaderInitDoneFlag(groupId);
-            groupEventListener.onLeaderUpdate();
+            if (groupEventListener != null) {
+                groupEventListener.onLeaderUpdate();
+            }
         } else {
             this.waitForInitialLeader(groupId);
-            groupEventListener.onLeaderUpdate();
+            if (groupEventListener != null) {
+                groupEventListener.onLeaderUpdate();
+            }
             this.sendMemberAddedNotificationToLeader(groupId);
         }
     }

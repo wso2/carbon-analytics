@@ -21,6 +21,9 @@ package org.wso2.carbon.messageconsole.ui.beans;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class represent meta information of a table
+ */
 public class ResponseTable {
 
     private String name;

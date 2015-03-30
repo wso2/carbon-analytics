@@ -32,9 +32,12 @@
     <link href="js/jquery-ui.min.css" rel="stylesheet" type="text/css"/>
     <link href="js/jquery.datetimepicker.css" rel="stylesheet" type="text/css"/>
     <link href="themes/metro/blue/jtable.css" rel="stylesheet" type="text/css"/>
+    <link href="js/validationEngine.jquery.css" rel="stylesheet" type="text/css"/>
 
     <script src="js/jquery-1.11.2.min.js" type="text/javascript"></script>
     <script src="js/jquery-ui.min.js" type="text/javascript"></script>
+    <script src="js/jquery.validationEngine.js" type="text/javascript"></script>
+    <script src="js/jquery.validationEngine-en.js" type="text/javascript"></script>
     <script src="js/jquery.jtable.min.js" type="text/javascript"></script>
     <script src="js/jquery.datetimepicker.js" type="text/javascript"></script>
     <script src="js/messageconsole.js" type="text/javascript"></script>
@@ -85,6 +88,9 @@
             $("#createTableDialog").dialog({
                                                autoOpen: false
                                            });
+
+            $("#tableForm").validationEngine();
+
             $("#addNewTable").on("click", function () {
                 $("#column-details").find('tr').slice(1, document.getElementById('column-details').rows.length - 1).remove();
                 $('#createTableDialog').dialog('option', 'title', 'Create a new table');
@@ -104,7 +110,7 @@
                 $(this).val('Delete');
                 $(this).attr('class', 'del');
                 var appendTxt =
-                        "<tr><td><input type='text' name='column'/></td><td><select><option value='STRING'>STRING</option><option value='INTEGER'>INTEGER</option><option value='LONG'>LONG</option><option value='BOOLEAN'>BOOLEAN</option><option value='FLOAT'>FLOAT</option><option value='DOUBLE'>DOUBLE</option></select></td><td><input type='checkbox' name='primary'/></td><td><input type='checkbox' name='index'/></td><td><input class='add' type='button' value='Add More'/></td></tr>";
+                        "<tr><td><input type='text' name='column'/></td><td><select><option value='STRING'>STRING</option><option value='INTEGER'>INTEGER</option><option value='LONG'>LONG</option><option value='BOOLEAN'>BOOLEAN</option><option value='FLOAT'>FLOAT</option><option value='DOUBLE'>DOUBLE</option></select></td><td><input type='checkbox' name='primary'/></td><c:if test="${permissions != null && permissions.isSetIndex()}"><td><input type='checkbox' name='index'/></td></c:if><td><input class='add' type='button' value='Add More'/></td></tr>";
                 $("tr:last").after(appendTxt);
             });
 
@@ -175,11 +181,13 @@
                                primaryCheckElement.checked = resultArray[i].primary;
                                primaryCell.appendChild(primaryCheckElement);
 
+                               <c:if test="${permissions != null && permissions.isSetIndex()}">
                                var indexCell = row.insertCell(cellNo++);
                                var indexCheckElement = document.createElement('input');
                                indexCheckElement.type = "checkbox";
                                indexCheckElement.checked = resultArray[i].index;
                                indexCell.appendChild(indexCheckElement);
+                               </c:if>
 
                                var buttonCell = row.insertCell(cellNo++);
                                var indexCheckElement = document.createElement('input');
@@ -196,6 +204,10 @@
         });
 
         function createTable() {
+
+            if (!$("#tableForm").validationEngine('validate')) {
+                return false;
+            }
             var result;
             var tableName = document.getElementById('tableName').value;
             var jsonObj = [];
@@ -272,7 +284,16 @@
                                                          </c:if>
                                                      },
                                                      formCreated: function (event, data) {
-                                                         timestamp = data.record.bam_rec_timestamp;
+                                                         data.form.validationEngine();
+                                                     },
+                                                     //Validate form when it is being submitted
+                                                     formSubmitting: function (event, data) {
+                                                         return data.form.validationEngine('validate');
+                                                     },
+                                                     //Dispose validation logic when form is closed
+                                                     formClosed: function (event, data) {
+                                                         data.form.validationEngine('hide');
+                                                         data.form.validationEngine('detach');
                                                      },
                                                      fields: fields
 
@@ -302,10 +323,13 @@
     <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
         This will be permanently delete entire table. Are you sure? </p>
 </div>
+<c:if test="${permissions != null && permissions.isCreateTable()}">
+    <input type="button" id="addNewTable" value="Add New Table">
+</c:if>
 
 <fieldset>
     <legend>Search:</legend>
-    <c:if test="${permissions != null && permissions.isListTable() && permissions.isListRecord()}">
+    <c:if test="${permissions != null && permissions.isListTable()}">
         <label> Table Name*:
             <select id="tableSelect" onchange="tableSelectChange()">
                 <option value="-1">Select a table</option>
@@ -317,11 +341,13 @@
         <c:if test="${permissions != null && permissions.isCreateTable()}">
             <input type="button" id="editTableButton" value="Edit Table" style="display: none">
         </c:if>
-        <fieldset>
-            <legend>By Date Range:</legend>
-            <label> From: <input id="timeFrom" type="text"> </label>
-            <label> To: <input id="timeTo" type="text"> </label>
-        </fieldset>
+        <c:if test="${permissions != null && permissions.isListRecord()}">
+            <fieldset>
+                <legend>By Date Range:</legend>
+                <label> From: <input id="timeFrom" type="text"> </label>
+                <label> To: <input id="timeTo" type="text"> </label>
+            </fieldset>
+        </c:if>
         <c:if test="${permissions != null && permissions.isSearchRecord()}">
             <fieldset>
                 <legend>By Query:</legend>
@@ -330,14 +356,15 @@
                 </label>
             </fieldset>
         </c:if>
-        <input id="search" type="submit" value="Search" onclick="createJTable();">
+        <c:if test="${permissions != null && permissions.isListRecord()}">
+            <input id="search" type="submit" value="Search" onclick="createJTable();">
+        </c:if>
     </c:if>
 </fieldset>
 
 <div id="AnalyticsTableContainer"></div>
-<input type="button" id="DeleteAllButton" value="Delete all selected records">
-<c:if test="${permissions != null && permissions.isCreateTable()}">
-    <input type="button" id="addNewTable" value="Add New Table">
+<c:if test="${permissions != null && permissions.isDeleteRecord()}">
+    <input type="button" id="DeleteAllButton" value="Delete all selected records">
 </c:if>
 
 <div id="createTableDialog" title="Create a new table">
@@ -345,9 +372,9 @@
         <label id="msgLabel" style="display: none"></label>
     </div>
     <div id="createTablePopup">
-        <form class="noteform" id="notesmodal" action="javascript:createTable()">
+        <form class="noteform" id="tableForm" action="javascript:createTable()">
             <label> Table Name:
-                <input type="text" id="tableName">
+                <input type="text" id="tableName" class="validate[required]">
             </label>
             <table id="column-details">
                 <thead>
@@ -355,7 +382,9 @@
                     <th>Column</th>
                     <th>Type</th>
                     <th>Primary key</th>
-                    <th>Index</th>
+                    <c:if test="${permissions != null && permissions.isSetIndex()}">
+                        <th>Index</th>
+                    </c:if>
                     <th></th>
                 </tr>
                 </thead>
@@ -371,7 +400,9 @@
                         <option value="DOUBLE">DOUBLE</option>
                     </select></td>
                     <td><input type="checkbox" name="primary"/></td>
-                    <td><input type="checkbox" name="index"/></td>
+                    <c:if test="${permissions != null && permissions.isSetIndex()}">
+                        <td><input type="checkbox" name="index"/></td>
+                    </c:if>
                     <td><input class="add" type="button" value="Add More"/></td>
                 </tr>
                 </tbody>
