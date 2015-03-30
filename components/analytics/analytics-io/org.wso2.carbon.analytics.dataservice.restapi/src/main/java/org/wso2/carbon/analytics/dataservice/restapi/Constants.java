@@ -21,6 +21,8 @@ package org.wso2.carbon.analytics.dataservice.restapi;
 public class Constants {
 
 	public static final long MILLISECONDSPERSECOND = 1000;
+    public static final String BASIC_AUTH_HEADER = "Basic";
+
 
 	/**
 	 * Instantiates a new constants.

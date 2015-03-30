@@ -17,18 +17,22 @@
 package org.wso2.carbon.analytics.dataservice.restapi;
 
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.ColumnTypeBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.IndexTypeBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.SearchResultEntryBean;
-import org.wso2.carbon.analytics.dataservice.restapi.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,6 +62,22 @@ public class Utils {
 		return analyticsDataService;
 	}
 
+    /**
+	 * Gets the analytics data service.
+	 * @return the analytics data service
+	 * @throws AnalyticsException
+	 */
+	public static SecureAnalyticsDataService getSecureAnalyticsDataService() throws AnalyticsException {
+		SecureAnalyticsDataService analyticsDataService;
+		analyticsDataService = (SecureAnalyticsDataService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+		                                                     .getOSGiService(SecureAnalyticsDataService.class,
+		                                                                     null);
+		if(analyticsDataService == null) {
+			throw new AnalyticsException("AnalyticsDataService is not available.");
+		}
+		return analyticsDataService;
+	}
+
 	/**
 	 * Gets the records from record beans.
 	 * @param recordBeans
@@ -65,14 +85,14 @@ public class Utils {
 	 * @return the records from record beans
 	 * @throws AnalyticsException if the tableName is not specified
 	 */
-	public static List<Record> getRecords(int tenantId, List<RecordBean> recordBeans) throws AnalyticsException {
+	public static List<Record> getRecords(String username, List<RecordBean> recordBeans) throws AnalyticsException {
 		List<Record> records = new ArrayList<Record>();
 		try{
 			for (RecordBean recordBean : recordBeans) {
 				if(recordBean.getTableName().isEmpty()){
 					throw new AnalyticsException("TableName cannot be empty!");
 				}
-			records.add(new Record(recordBean.getId(), tenantId, recordBean.getTableName(),
+			records.add(new Record(recordBean.getId(), getTenantId(username), recordBean.getTableName(),
 		                           recordBean.getValues()));
 			}
 		}catch(NullPointerException e){
@@ -87,10 +107,11 @@ public class Utils {
 	 *            the record beans
 	 * @return the records from record beans
 	 */
-	public static List<Record> getRecordsForTable(int tenantId,String tableName, List<RecordBean> recordBeans) {
+	public static List<Record> getRecordsForTable(String username,String tableName, List<RecordBean> recordBeans)
+            throws AnalyticsException {
 		List<Record> records = new ArrayList<Record>();
 		for (RecordBean recordBean : recordBeans) {
-			records.add(new Record(recordBean.getId(), tenantId, tableName,
+			records.add(new Record(recordBean.getId(), getTenantId(username), tableName,
 		                           recordBean.getValues()));
 		}
 		return records;
@@ -161,6 +182,10 @@ public class Utils {
 				return IndexTypeBean.LONG;
 			case STRING:
 				return IndexTypeBean.STRING;
+            case FACET:
+                return IndexTypeBean.FACET;
+            case SCOREPARAM:
+                return IndexTypeBean.SCOREPARAM;
 			default:
 				return IndexTypeBean.STRING;
 		}
@@ -186,6 +211,10 @@ public class Utils {
 				return IndexType.LONG;
 			case STRING:
 				return IndexType.STRING;
+            case FACET:
+                return IndexType.FACET;
+            case SCOREPARAM:
+                return IndexType.SCOREPARAM;
 			default:
 				return IndexType.STRING;
 		}
@@ -264,7 +293,7 @@ public class Utils {
      * @throws AnalyticsException
      */
     public static List<Iterator<Record>> getRecordIterators(RecordGroup[] recordGroups,
-                                                      AnalyticsDataService analyticsDataService)
+                                                      SecureAnalyticsDataService analyticsDataService)
             throws AnalyticsException {
 
         List<Iterator<Record>> iterators = new ArrayList<Iterator<Record>>();
@@ -277,7 +306,7 @@ public class Utils {
 
     /**
      * Create a Analytics schema from a bean class
-     * @param analyticsSchemaBean bean table schema to be convereted to Analytics Schema.
+     * @param analyticsSchemaBean bean table schema to be converted to Analytics Schema.
      * @return Analytics schema
      */
     public static AnalyticsSchema createAnalyticsSchema(AnalyticsSchemaBean analyticsSchemaBean) {
@@ -295,11 +324,17 @@ public class Utils {
      */
     public static AnalyticsSchemaBean createTableSchemaBean(AnalyticsSchema analyticsSchema) {
         Map<String, ColumnTypeBean> columnTypeBeanTypes = new HashMap<String, ColumnTypeBean>();
-        for (Map.Entry<String, AnalyticsSchema.ColumnType> columnTypeEntry :
-                analyticsSchema.getColumns().entrySet()) {
-            columnTypeBeanTypes.put(columnTypeEntry.getKey(), getColumnTypeBean(columnTypeEntry.getValue()));
+        List<String> primaryKeys = new ArrayList<String>();
+        if (analyticsSchema.getColumns() != null) {
+            for (Map.Entry<String, AnalyticsSchema.ColumnType> columnTypeEntry :
+                    analyticsSchema.getColumns().entrySet()) {
+                columnTypeBeanTypes.put(columnTypeEntry.getKey(), getColumnTypeBean(columnTypeEntry.getValue()));
+            }
         }
-        return new AnalyticsSchemaBean(columnTypeBeanTypes,analyticsSchema.getPrimaryKeys());
+        if (analyticsSchema.getPrimaryKeys() != null) {
+            primaryKeys = analyticsSchema.getPrimaryKeys();
+        }
+        return new AnalyticsSchemaBean(columnTypeBeanTypes,primaryKeys);
     }
 
     /**
@@ -351,6 +386,15 @@ public class Utils {
                 return ColumnTypeBean.BINARY;
             default:
                 return ColumnTypeBean.STRING;
+        }
+    }
+
+    private static int getTenantId(String username) throws AnalyticsException {
+        try {
+            String tenantDomain = MultitenantUtils.getTenantDomain(username);
+            return AnalyticsServiceHolder.getRealmService().getTenantManager().getTenantId(tenantDomain);
+        } catch (UserStoreException e) {
+            throw new AnalyticsException("Unable to get tenantId for user: " + username, e);
         }
     }
 }
