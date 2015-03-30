@@ -17,6 +17,7 @@
 */
 package org.wso2.carbon.analytics.dataservice.servlet;
 
+import org.apache.axiom.om.util.Base64;
 import org.wso2.carbon.analytics.dataservice.api.commons.AnalyticsAPIConstants;
 import org.wso2.carbon.analytics.dataservice.servlet.exception.AnalyticsAPIAuthenticationException;
 import org.wso2.carbon.analytics.dataservice.servlet.internal.ServiceHolder;
@@ -40,20 +41,39 @@ public class AnalyticsAPIAuthenticationProcessor extends HttpServlet {
      */
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
-        if (operation != null && operation.equalsIgnoreCase(AnalyticsAPIConstants.LOGIN_OPERATION)){
-            String userName = req.getParameter(AnalyticsAPIConstants.USERNAME_PARAM);
-            String password = req.getParameter(AnalyticsAPIConstants.PASSWORD_PARAM);
-            try {
-                String sessionId = ServiceHolder.getAuthenticator().authenticate(userName, password);
-                PrintWriter writer = resp.getWriter();
-                writer.print(AnalyticsAPIConstants.SESSION_ID+AnalyticsAPIConstants.SEPARATOR+sessionId);
-                resp.setStatus(HttpServletResponse.SC_ACCEPTED);
-            } catch (AnalyticsAPIAuthenticationException e) {
-                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized user: "+ userName);
+        if (operation != null && operation.equalsIgnoreCase(AnalyticsAPIConstants.LOGIN_OPERATION)) {
+            String[] credentials = getUserPassword(req.getHeader(AnalyticsAPIConstants.AUTHORIZATION_HEADER));
+            if (credentials == null) {
+                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid authentication!");
+            } else {
+                String userName = credentials[0];
+                String password = credentials[1];
+                try {
+                    String sessionId = ServiceHolder.getAuthenticator().authenticate(userName, password);
+                    PrintWriter writer = resp.getWriter();
+                    writer.print(AnalyticsAPIConstants.SESSION_ID + AnalyticsAPIConstants.SEPARATOR + sessionId);
+                    resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+                } catch (AnalyticsAPIAuthenticationException e) {
+                    resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized user: " + userName);
+                }
             }
-        }else {
-            resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Unavailable operation - "+ operation+" provided!");
+        } else {
+            resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Unavailable operation - " + operation + " provided!");
         }
+    }
+
+    private String[] getUserPassword(String authHeader) {
+        if (authHeader == null) {
+            return null;
+        }
+        if (!authHeader.startsWith("Basic ")) {
+            return null;
+        }
+        String[] userPassword = new String(Base64.decode(authHeader.substring(6))).split(":");
+        if (userPassword.length != 2) {
+            return null;
+        }
+        return userPassword;
     }
 
 

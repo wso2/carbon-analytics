@@ -51,6 +51,7 @@ public class AnalyticsAPIConstants {
 
     public static final String OPERATION = "__operation";
     public static final String SESSION_ID = "__sessionId";
+    public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String SEPARATOR = ":";
     public static final String RECORD_COUNT = "__recordCount";
     public static final String SEARCH_COUNT = "__searchCount";

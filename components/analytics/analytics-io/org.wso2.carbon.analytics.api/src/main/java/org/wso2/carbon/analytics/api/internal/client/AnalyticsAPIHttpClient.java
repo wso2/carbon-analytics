@@ -20,7 +20,7 @@ package org.wso2.carbon.analytics.api.internal.client;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.sun.javafx.fxml.builder.URLBuilder;
+import org.apache.axiom.om.util.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
@@ -108,11 +108,12 @@ public class AnalyticsAPIHttpClient {
     public void authenticate(String username, String password) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(this.protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.AUTHENTICATION_SERVICE_URI)
-                .setParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.LOGIN_OPERATION)
-                .setParameter(AnalyticsAPIConstants.USERNAME_PARAM, username)
-                .setParameter(AnalyticsAPIConstants.PASSWORD_PARAM, password);
+                .setParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.LOGIN_OPERATION);
         try {
             HttpGet getMethod = new HttpGet(builder.build().toString());
+            getMethod.addHeader(AnalyticsAPIConstants.AUTHORIZATION_HEADER, "Basic " + Base64.encode(
+                    (username + AnalyticsAPIConstants.SEPARATOR
+                            + password).getBytes()));
             HttpResponse httpResponse = httpClient.execute(getMethod);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_ACCEPTED) {
                 throw new AnalyticsServiceAuthenticationException("Authentication failed for user : " + username);
