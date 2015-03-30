@@ -51,6 +51,7 @@ public class AnalyticsAPIConstants {
 
     public static final String OPERATION = "__operation";
     public static final String SESSION_ID = "__sessionId";
+    public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String SEPARATOR = ":";
     public static final String RECORD_COUNT = "__recordCount";
     public static final String SEARCH_COUNT = "__searchCount";
@@ -76,5 +77,5 @@ public class AnalyticsAPIConstants {
     public static final String READ_RECORD_OPERATION = "__readRecord_opr";
     public static final String GET_RANGE_RECORD_GROUP_OPERATION = "__get_range_record_group_opr";
     public static final String GET_IDS_RECORD_GROUP_OPERATION = "__get_ids_record_group_opr";
-
+    public static final String ANALYTICS_REMOTE_API_INVOCATION_PERMISSION = "/permission/admin/manage/analytics/api";
 }

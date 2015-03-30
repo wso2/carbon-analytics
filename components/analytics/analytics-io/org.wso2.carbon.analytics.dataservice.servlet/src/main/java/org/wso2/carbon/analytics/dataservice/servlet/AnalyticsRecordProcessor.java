@@ -48,7 +48,7 @@ public class AnalyticsRecordProcessor extends HttpServlet {
      */
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String sessionId = req.getParameter(AnalyticsAPIConstants.SESSION_ID);
+        String sessionId = req.getHeader(AnalyticsAPIConstants.SESSION_ID);
         if (sessionId == null || sessionId.trim().isEmpty()) {
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
         } else {
@@ -69,7 +69,7 @@ public class AnalyticsRecordProcessor extends HttpServlet {
                     PrintWriter outputWriter = resp.getWriter();
                     outputWriter.append(AnalyticsAPIConstants.RECORD_COUNT).append(AnalyticsAPIConstants.SEPARATOR).
                             append(String.valueOf(recordCount));
-                    resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+                    resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }
@@ -89,7 +89,7 @@ public class AnalyticsRecordProcessor extends HttpServlet {
      * @throws IOException
      */
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String sessionId = req.getParameter(AnalyticsAPIConstants.SESSION_ID);
+        String sessionId = req.getHeader(AnalyticsAPIConstants.SESSION_ID);
         if (sessionId == null || sessionId.trim().isEmpty()) {
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
         } else {
@@ -106,7 +106,7 @@ public class AnalyticsRecordProcessor extends HttpServlet {
                 List<Record> records = new Gson().fromJson(recordsJson, recordListType);
                 try {
                     ServiceHolder.getAnalyticsDataService().put(records);
-                    resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+                    resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }
@@ -125,7 +125,7 @@ public class AnalyticsRecordProcessor extends HttpServlet {
      * @throws IOException
      */
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String sessionId = req.getParameter(AnalyticsAPIConstants.SESSION_ID);
+        String sessionId = req.getHeader(AnalyticsAPIConstants.SESSION_ID);
         if (sessionId == null || sessionId.trim().isEmpty()) {
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
         } else {
@@ -143,7 +143,7 @@ public class AnalyticsRecordProcessor extends HttpServlet {
                 try {
                      ServiceHolder.getAnalyticsDataService().delete(tenantIdParam, tableName,
                             timeFrom, timeTo);
-                    resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+                    resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }
@@ -156,7 +156,7 @@ public class AnalyticsRecordProcessor extends HttpServlet {
                 List<String> recordIds = new Gson().fromJson(jsonRecordIds, recordIdListType);
                 try {
                     ServiceHolder.getAnalyticsDataService().delete(tenantIdParam, tableName, recordIds);
-                    resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+                    resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }

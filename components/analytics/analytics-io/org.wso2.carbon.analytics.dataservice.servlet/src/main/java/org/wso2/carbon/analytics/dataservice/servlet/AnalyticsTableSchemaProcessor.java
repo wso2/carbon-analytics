@@ -41,7 +41,7 @@ public class AnalyticsTableSchemaProcessor extends HttpServlet {
      * @throws IOException
      */
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String sessionId = req.getParameter(AnalyticsAPIConstants.SESSION_ID);
+        String sessionId = req.getHeader(AnalyticsAPIConstants.SESSION_ID);
         if (sessionId == null || sessionId.trim().isEmpty()){
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
         }else {
@@ -58,7 +58,7 @@ public class AnalyticsTableSchemaProcessor extends HttpServlet {
                 AnalyticsSchema schema = new GsonBuilder().create().fromJson(jsonSchema, AnalyticsSchema.class);
                 try {
                     ServiceHolder.getAnalyticsDataService().setTableSchema(tenantIdParam, tableName, schema);
-                    resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+                    resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }
@@ -70,7 +70,7 @@ public class AnalyticsTableSchemaProcessor extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String sessionId = req.getParameter(AnalyticsAPIConstants.SESSION_ID);
+        String sessionId = req.getHeader(AnalyticsAPIConstants.SESSION_ID);
         if (sessionId == null || sessionId.trim().isEmpty()){
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
         }else {
@@ -87,7 +87,7 @@ public class AnalyticsTableSchemaProcessor extends HttpServlet {
                     AnalyticsSchema schema =  ServiceHolder.getAnalyticsDataService().getTableSchema(tenantIdParam, tableName);
                     PrintWriter outputWriter = resp.getWriter();
                     outputWriter.append(new GsonBuilder().create().toJson(schema));
-                    resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+                    resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }

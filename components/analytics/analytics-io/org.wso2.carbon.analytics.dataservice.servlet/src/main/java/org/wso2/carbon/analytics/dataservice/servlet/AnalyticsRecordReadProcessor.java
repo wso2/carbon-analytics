@@ -51,7 +51,7 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
      */
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String sessionId = req.getParameter(AnalyticsAPIConstants.SESSION_ID);
+        String sessionId = req.getHeader(AnalyticsAPIConstants.SESSION_ID);
         if (sessionId == null || sessionId.trim().isEmpty()) {
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
         } else {
@@ -82,7 +82,7 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
                         remoteRecordGroup[i].setBinaryRecordGroup(getBinaryRecordGroup(recordGroups[i]));
                         remoteRecordGroup[i].setLocations(recordGroups[i].getLocations());
                     }
-                    resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+                    resp.setStatus(HttpServletResponse.SC_OK);
                     ObjectOutputStream objectOutputStream = new ObjectOutputStream(resp.getOutputStream());
                     objectOutputStream.writeObject(remoteRecordGroup);
                     objectOutputStream.close();
@@ -107,7 +107,7 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
                         remoteRecordGroup[i].setBinaryRecordGroup(getBinaryRecordGroup(recordGroups[i]));
                         remoteRecordGroup[i].setLocations(recordGroups[i].getLocations());
                     }
-                    resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+                    resp.setStatus(HttpServletResponse.SC_OK);
                     ObjectOutputStream objectOutputStream = new ObjectOutputStream(resp.getOutputStream());
                     objectOutputStream.writeObject(remoteRecordGroup);
                     objectOutputStream.close();
@@ -121,7 +121,7 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
                 try {
                     RemoteRecordGroup remoteRecordGroupObj = (RemoteRecordGroup) inputStream.readObject();
                     Iterator<Record> records = ServiceHolder.getAnalyticsDataService().readRecords(remoteRecordGroupObj.getRecordGroupFromBinary());
-                    resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+                    resp.setStatus(HttpServletResponse.SC_OK);
                     ObjectOutputStream outputStream = new ObjectOutputStream(resp.getOutputStream());
                     while (records.hasNext()) {
                         Record record = records.next();
@@ -142,7 +142,7 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String sessionId = req.getParameter(AnalyticsAPIConstants.SESSION_ID);
+        String sessionId = req.getHeader(AnalyticsAPIConstants.SESSION_ID);
         if (sessionId == null || sessionId.trim().isEmpty()) {
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
         } else {
@@ -158,7 +158,7 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
                 try {
                     RemoteRecordGroup remoteRecordGroupObj = (RemoteRecordGroup) inputStream.readObject();
                     Iterator<Record> records = ServiceHolder.getAnalyticsDataService().readRecords(remoteRecordGroupObj.getRecordGroupFromBinary());
-                    resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+                    resp.setStatus(HttpServletResponse.SC_OK);
                     ObjectOutputStream outputStream = new ObjectOutputStream(resp.getOutputStream());
                     while (records.hasNext()) {
                         Record record = records.next();

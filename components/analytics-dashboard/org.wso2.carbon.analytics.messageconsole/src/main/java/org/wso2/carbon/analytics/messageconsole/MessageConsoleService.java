@@ -123,7 +123,6 @@ public class MessageConsoleService extends AbstractAdmin {
      * @throws MessageConsoleException
      */
     public List<String> listTables() throws MessageConsoleException {
-
         String username = getUsername();
         if (logger.isDebugEnabled()) {
             logger.debug("Getting table list from data layer for user:" + username);
@@ -154,7 +153,6 @@ public class MessageConsoleService extends AbstractAdmin {
     public RecordResultBean getRecords(String tableName, long timeFrom, long timeTo, int startIndex, int recordCount,
                                        String searchQuery)
             throws MessageConsoleException {
-
         if (logger.isDebugEnabled()) {
             logger.debug("Search Query: " + searchQuery);
             logger.debug("timeFrom: " + timeFrom);
@@ -253,7 +251,6 @@ public class MessageConsoleService extends AbstractAdmin {
      * @throws MessageConsoleException
      */
     public TableBean getTableInfo(String tableName) throws MessageConsoleException {
-
         String username = getUsername();
         TableBean table = new TableBean();
         table.setName(tableName);
@@ -289,7 +286,6 @@ public class MessageConsoleService extends AbstractAdmin {
      * @throws MessageConsoleException
      */
     public TableBean getTableInfoWithIndicesInfo(String tableName) throws MessageConsoleException {
-
         TableBean tableBean = getTableInfo(tableName);
         String username = getUsername();
         try {
@@ -316,9 +312,7 @@ public class MessageConsoleService extends AbstractAdmin {
      * @throws MessageConsoleException
      */
     public void deleteRecords(String table, String[] recordIds) throws MessageConsoleException {
-
         String username = getUsername();
-
         String ids = Arrays.toString(recordIds);
         if (logger.isDebugEnabled()) {
             logger.debug(ids + " are going to delete from " + table + " in tenant:" + username);
@@ -341,7 +335,6 @@ public class MessageConsoleService extends AbstractAdmin {
      * @throws MessageConsoleException
      */
     public RecordBean addRecord(String table, String[] columns, String[] values) throws MessageConsoleException {
-
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
         String username = getUsername();
 
@@ -380,7 +373,6 @@ public class MessageConsoleService extends AbstractAdmin {
      */
     public RecordBean updateRecord(String table, String recordId, String[] columns, String[] values)
             throws MessageConsoleException {
-
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
         String username = getUsername();
 
@@ -390,31 +382,26 @@ public class MessageConsoleService extends AbstractAdmin {
         }
 
         RecordBean recordBean;
-        Record originalRecord;
         try {
-            originalRecord = getRecord(table, recordId, username);
-        } catch (AnalyticsException e) {
-            logger.error("Unable to find record[" + recordId + "] in table[" + table + "]", e);
-            throw new MessageConsoleException("Unable to find record[" + recordId + "] in table[" + table + "]", e);
-        }
-        if (originalRecord != null) {
-            try {
-                Map<String, Object> objectMap = getRecordPropertyMap(table, columns, values, username);
-
-                Record record = new Record(recordId, tenantId, table, objectMap, originalRecord.getTimestamp());
-                recordBean = createRecordBean(record);
-
-                List<Record> records = new ArrayList<>(1);
-                records.add(record);
-                analyticsDataService.put(username, records);
-            } catch (Exception e) {
-                logger.error("Unable to update record {id: " + recordId + ", column: " + Arrays.toString(columns) + ", " +
-                             "values: " + Arrays.toString(values) + " } to table :" + table, e);
-                throw new MessageConsoleException("Unable to update record {id: " + recordId + ", column: " + Arrays
-                        .toString(columns) + ", values: " + Arrays.toString(values) + " } to table :" + table, e);
+            Record originalRecord = getRecord(table, recordId, username);
+            Map<String, Object> objectMap = getRecordPropertyMap(table, columns, values, username);
+            for (Map.Entry<String, Object> newEntry : objectMap.entrySet()) {
+                if (originalRecord.getValues().containsKey(newEntry.getKey())) {
+                    originalRecord.getValues().put(newEntry.getKey(), newEntry.getValue());
+                }
             }
-        } else {
-            throw new MessageConsoleException("Unable to find record[" + recordId + "] in table[" + table + "]");
+
+            Record record = new Record(recordId, tenantId, table, originalRecord.getValues(), System.currentTimeMillis());
+            recordBean = createRecordBean(record);
+
+            List<Record> records = new ArrayList<>(1);
+            records.add(record);
+            analyticsDataService.put(username, records);
+        } catch (Exception e) {
+            logger.error("Unable to update record {id: " + recordId + ", column: " + Arrays.toString(columns) + ", " +
+                         "values: " + Arrays.toString(values) + " } to table :" + table, e);
+            throw new MessageConsoleException("Unable to update record {id: " + recordId + ", column: " + Arrays
+                    .toString(columns) + ", values: " + Arrays.toString(values) + " } to table :" + table, e);
         }
 
         return recordBean;
@@ -489,20 +476,33 @@ public class MessageConsoleService extends AbstractAdmin {
             Record originalRecord = getRecord(table, recordId, username);
             AnalyticsSchema schema = analyticsDataService.getTableSchema(username, table);
 
-            if (originalRecord != null && schema != null && schema.getColumns() != null) {
-                Map<String, AnalyticsSchema.ColumnType> schemaColumns = schema.getColumns();
+            if (originalRecord != null) {
                 Map<String, Object> recordValues = originalRecord.getValues();
-                for (Map.Entry<String, Object> objectEntry : recordValues.entrySet()) {
-                    if (!schemaColumns.containsKey(objectEntry.getKey())) {
-                        EntityBean entityBean;
-                        if (objectEntry.getValue() != null) {
-                            entityBean = new EntityBean(objectEntry.getKey(), String.valueOf(objectEntry.getValue()), objectEntry
-                                    .getValue().getClass().getSimpleName().toUpperCase());
-
-                        } else {
-                            entityBean = new EntityBean(objectEntry.getKey(), "NULL", STRING);
+                if (schema != null) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Table schema[" + table + "] is not null");
+                    }
+                    Map<String, AnalyticsSchema.ColumnType> schemaColumns = schema.getColumns();
+                    if (schemaColumns != null && !schemaColumns.isEmpty()) {
+                        for (Map.Entry<String, Object> objectEntry : recordValues.entrySet()) {
+                            if (!schemaColumns.containsKey(objectEntry.getKey())) {
+                                entityBeansList.add(getEntityBean(objectEntry));
+                            }
                         }
-                        entityBeansList.add(entityBean);
+                    } else {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Table schema[" + table + "] is empty.");
+                        }
+                        for (Map.Entry<String, Object> objectEntry : recordValues.entrySet()) {
+                            entityBeansList.add(getEntityBean(objectEntry));
+                        }
+                    }
+                } else {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Table schema[" + table + "] is null.");
+                    }
+                    for (Map.Entry<String, Object> objectEntry : recordValues.entrySet()) {
+                        entityBeansList.add(getEntityBean(objectEntry));
                     }
                 }
             }
@@ -513,6 +513,18 @@ public class MessageConsoleService extends AbstractAdmin {
 
         EntityBean[] entityBeans = new EntityBean[entityBeansList.size()];
         return entityBeansList.toArray(entityBeans);
+    }
+
+    private EntityBean getEntityBean(Map.Entry<String, Object> objectEntry) {
+        EntityBean entityBean;
+        if (objectEntry.getValue() != null) {
+            entityBean = new EntityBean(objectEntry.getKey(), String.valueOf(objectEntry.getValue()), objectEntry
+                    .getValue().getClass().getSimpleName().toUpperCase());
+
+        } else {
+            entityBean = new EntityBean(objectEntry.getKey(), "NULL", STRING);
+        }
+        return entityBean;
     }
 
     private Record getRecord(String table, String recordId, String username) throws AnalyticsException {
@@ -537,17 +549,13 @@ public class MessageConsoleService extends AbstractAdmin {
     public void deleteArbitraryField(String table, String recordId, String fieldName) throws MessageConsoleException {
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
         String username = getUsername();
-        List<String> ids = new ArrayList<>(1);
-        ids.add(recordId);
         try {
-            RecordGroup[] results = analyticsDataService.get(username, table, 1, null, ids);
-            List<Record> records = GenericUtils.listRecords(analyticsDataService, results);
-            if (records != null && !records.isEmpty()) {
-                Record record = records.get(0);
+            Record record = getRecord(table, recordId, username);
+            if (record != null) {
                 Map<String, Object> recordValues = record.getValues();
                 recordValues.remove(fieldName);
-                Record editedRecord = new Record(recordId, tenantId, table, recordValues, record.getTimestamp());
-                records.clear();
+                Record editedRecord = new Record(recordId, tenantId, table, recordValues, System.currentTimeMillis());
+                List<Record> records = new ArrayList<>(1);
                 records.add(editedRecord);
                 analyticsDataService.put(username, records);
             }
@@ -569,16 +577,11 @@ public class MessageConsoleService extends AbstractAdmin {
      */
     public void putArbitraryField(String table, String recordId, String fieldName, String value, String type)
             throws MessageConsoleException {
-
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
         String username = getUsername();
-        List<String> ids = new ArrayList<>(1);
-        ids.add(recordId);
         try {
-            RecordGroup[] results = analyticsDataService.get(username, table, 1, null, ids);
-            List<Record> records = GenericUtils.listRecords(analyticsDataService, results);
-            if (records != null && !records.isEmpty()) {
-                Record record = records.get(0);
+            Record record = getRecord(table, recordId, username);
+            if (record != null) {
                 Map<String, Object> recordValues = record.getValues();
                 recordValues.remove(fieldName);
                 Object convertedValue;
@@ -626,8 +629,8 @@ public class MessageConsoleService extends AbstractAdmin {
 
                 recordValues.put(fieldName, convertedValue);
 
-                records.clear();
-                Record editedRecord = new Record(recordId, tenantId, table, recordValues, record.getTimestamp());
+                Record editedRecord = new Record(recordId, tenantId, table, recordValues, System.currentTimeMillis());
+                List<Record> records = new ArrayList<>(1);
                 records.add(editedRecord);
                 analyticsDataService.put(username, records);
             }
@@ -645,9 +648,7 @@ public class MessageConsoleService extends AbstractAdmin {
      * @throws MessageConsoleException
      */
     public void createTable(TableBean tableInfo) throws MessageConsoleException {
-
         String username = getUsername();
-
         try {
             analyticsDataService.createTable(username, tableInfo.getName());
         } catch (AnalyticsException e) {
@@ -701,9 +702,7 @@ public class MessageConsoleService extends AbstractAdmin {
      * @throws MessageConsoleException
      */
     public void editTable(TableBean tableInfo) throws MessageConsoleException {
-
         String username = getUsername();
-
         List<String> primaryKeys = new ArrayList<>();
         Map<String, AnalyticsSchema.ColumnType> columns = new HashMap<>();
         Map<String, IndexType> indexColumns = new HashMap<>();
@@ -817,5 +816,14 @@ public class MessageConsoleService extends AbstractAdmin {
         } catch (UserStoreException e) {
             throw new AnalyticsException("Unable to get tenantId for user: " + username, e);
         }
+    }
+
+    /**
+     * To check whether underneath data layer support pagination or not
+     *
+     * @return boolean true or false
+     */
+    public boolean isPaginationSupported() {
+        return analyticsDataService.isPaginationSupported();
     }
 }

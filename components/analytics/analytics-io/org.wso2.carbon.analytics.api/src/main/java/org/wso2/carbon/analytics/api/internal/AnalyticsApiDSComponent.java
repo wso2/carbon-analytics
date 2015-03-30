@@ -41,7 +41,7 @@ public class AnalyticsApiDSComponent {
         BundleContext bundleContext = ctx.getBundleContext();
         try {
             bundleContext.registerService(AnalyticsDataAPI.class, new CarbonAnalyticsAPI(), null);
-        } catch (AnalyticsServiceException e) {
+        } catch (Throwable e) {
             log.error("Error while starting the Analytics API component. " + e.getMessage(), e);
         }
     }

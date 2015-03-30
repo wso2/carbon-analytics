@@ -48,7 +48,6 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
 
     @Override
     public void createTable(String username, String tableName) throws AnalyticsException {
-
         int tenantId = getTenantId(username);
         if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_CREATE_TABLE)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
@@ -60,7 +59,6 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     @Override
     public void setTableSchema(String username, String tableName, AnalyticsSchema schema)
             throws AnalyticsTableNotAvailableException, AnalyticsException {
-
         int tenantId = getTenantId(username);
         if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_CREATE_TABLE)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
@@ -72,7 +70,6 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     @Override
     public AnalyticsSchema getTableSchema(String username, String tableName)
             throws AnalyticsTableNotAvailableException, AnalyticsException {
-
         int tenantId = getTenantId(username);
         if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_LIST_TABLE)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
@@ -83,7 +80,6 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
 
     @Override
     public boolean tableExists(String username, String tableName) throws AnalyticsException {
-
         int tenantId = getTenantId(username);
         if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_LIST_TABLE)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
@@ -94,7 +90,6 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
 
     @Override
     public void deleteTable(String username, String tableName) throws AnalyticsException {
-
         int tenantId = getTenantId(username);
         if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_DROP_TABLE)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
@@ -105,7 +100,6 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
 
     @Override
     public List<String> listTables(String username) throws AnalyticsException {
-
         int tenantId = getTenantId(username);
         if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_LIST_TABLE)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
@@ -117,7 +111,6 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     @Override
     public long getRecordCount(String username, String tableName, long timeFrom, long timeTo)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
-
         int tenantId = getTenantId(username);
         if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_LIST_RECORD)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
@@ -141,7 +134,6 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     public RecordGroup[] get(String username, String tableName, int numPartitionsHint, List<String> columns,
                              long timeFrom, long timeTo, int recordsFrom, int recordsCount)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
-
         int tenantId = getTenantId(username);
         if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_GET_RECORD)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
@@ -155,7 +147,6 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     @Override
     public RecordGroup[] get(String username, String tableName, int numPartitionsHint, List<String> columns,
                              List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
-
         int tenantId = getTenantId(username);
         if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_GET_RECORD)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
@@ -177,7 +168,6 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     @Override
     public void delete(String username, String tableName, long timeFrom, long timeTo)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
-
         int tenantId = getTenantId(username);
         if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_DELETE_RECORD)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
@@ -189,7 +179,6 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     @Override
     public void delete(String username, String tableName, List<String> ids)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
-
         int tenantId = getTenantId(username);
         if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_DELETE_RECORD)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
@@ -201,7 +190,6 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     @Override
     public void setIndices(String username, String tableName, Map<String, IndexType> columns)
             throws AnalyticsIndexException {
-
         try {
             int tenantId = getTenantId(username);
             if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_SET_INDEXING)) {
@@ -217,7 +205,6 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     @Override
     public Map<String, IndexType> getIndices(String username, String tableName)
             throws AnalyticsIndexException, AnalyticsException {
-
         int tenantId = getTenantId(username);
         if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_GET_INDEXING)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
@@ -228,7 +215,6 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
 
     @Override
     public void clearIndices(String username, String tableName) throws AnalyticsIndexException, AnalyticsException {
-
         int tenantId = getTenantId(username);
         if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_DELETE_INDEXING)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
@@ -240,7 +226,6 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     @Override
     public List<SearchResultEntry> search(String username, String tableName, String language, String query, int start,
                                           int count) throws AnalyticsIndexException, AnalyticsException {
-
         int tenantId = getTenantId(username);
         if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_SEARCH_RECORD)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
@@ -252,7 +237,6 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     @Override
     public int searchCount(String username, String tableName, String language, String query)
             throws AnalyticsIndexException {
-
         try {
             int tenantId = getTenantId(username);
             if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_SEARCH_RECORD)) {

@@ -43,7 +43,7 @@ public class AnalyticsSearchProcessor extends HttpServlet {
      * @throws IOException
      */
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String sessionId = req.getParameter(AnalyticsAPIConstants.SESSION_ID);
+        String sessionId = req.getHeader(AnalyticsAPIConstants.SESSION_ID);
         if (sessionId == null || sessionId.trim().isEmpty()) {
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
         } else {
@@ -65,7 +65,7 @@ public class AnalyticsSearchProcessor extends HttpServlet {
                             tableName, language, query, start, count);
                     PrintWriter output = resp.getWriter();
                     output.append(new GsonBuilder().create().toJson(searchResult));
-                    resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+                    resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }
@@ -79,7 +79,7 @@ public class AnalyticsSearchProcessor extends HttpServlet {
                             tableName, language, query);
                     PrintWriter output = resp.getWriter();
                     output.append(AnalyticsAPIConstants.SEARCH_COUNT).append(AnalyticsAPIConstants.SEPARATOR).append(String.valueOf(count));
-                    resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+                    resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }

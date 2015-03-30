@@ -45,7 +45,7 @@ public class AnalyticsIndexProcessor extends HttpServlet {
      * @throws java.io.IOException
      */
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String sessionId = req.getParameter(AnalyticsAPIConstants.SESSION_ID);
+        String sessionId = req.getHeader(AnalyticsAPIConstants.SESSION_ID);
         if (sessionId == null || sessionId.trim().isEmpty()) {
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
         } else {
@@ -64,7 +64,7 @@ public class AnalyticsIndexProcessor extends HttpServlet {
                 Map<String, IndexType> indexTypeMap = new Gson().fromJson(indicesJson, stringStringMap);
                 try {
                     ServiceHolder.getAnalyticsDataService().setIndices(tenantId, tableName, indexTypeMap);
-                    resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+                    resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }
@@ -72,7 +72,7 @@ public class AnalyticsIndexProcessor extends HttpServlet {
                 long maxWait = Long.parseLong(req.getParameter(AnalyticsAPIConstants.MAX_WAIT_PARAM));
                 try {
                     ServiceHolder.getAnalyticsDataService().waitForIndexing(maxWait);
-                    resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+                    resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }
@@ -92,7 +92,7 @@ public class AnalyticsIndexProcessor extends HttpServlet {
      * @throws IOException
      */
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String sessionId = req.getParameter(AnalyticsAPIConstants.SESSION_ID);
+        String sessionId = req.getHeader(AnalyticsAPIConstants.SESSION_ID);
         if (sessionId == null || sessionId.trim().isEmpty()) {
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
         } else {
@@ -109,7 +109,7 @@ public class AnalyticsIndexProcessor extends HttpServlet {
                     Map<String, IndexType> indexTypeMap = ServiceHolder.getAnalyticsDataService().getIndices(tenantIdParam, tableName);
                     PrintWriter output = resp.getWriter();
                     output.append(new GsonBuilder().create().toJson(indexTypeMap));
-                    resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+                    resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }
@@ -129,7 +129,7 @@ public class AnalyticsIndexProcessor extends HttpServlet {
      * @throws IOException
      */
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String sessionId = req.getParameter(AnalyticsAPIConstants.SESSION_ID);
+        String sessionId = req.getHeader(AnalyticsAPIConstants.SESSION_ID);
         if (sessionId == null || sessionId.trim().isEmpty()) {
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
         } else {
@@ -144,7 +144,7 @@ public class AnalyticsIndexProcessor extends HttpServlet {
                 String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
                 try {
                     ServiceHolder.getAnalyticsDataService().clearIndices(tenantIdParam, tableName);
-                    resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+                    resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }

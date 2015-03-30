@@ -19,6 +19,7 @@
     try {
         Permissions permissions = connector.getAvailablePermissionForUser();
         pageContext.setAttribute("permissions", permissions, PageContext.PAGE_SCOPE);
+        pageContext.setAttribute("isPaginationSupported", connector.isPaginationSupported(), PageContext.APPLICATION_SCOPE);
     } catch (MessageConsoleException e) {
         pageContext.setAttribute("permissionError", e, PageContext.PAGE_SCOPE);
     }
@@ -125,6 +126,7 @@
                                                                      function (result) {
                                                                          $("deleteTableMessage").innerHTML = result;
                                                                      });
+                                                              $('#AnalyticsTableContainer').jtable('destroy');
                                                               $(this).dialog("close");
                                                           },
                                                           Cancel: function () {
@@ -257,8 +259,16 @@
         function createMainJTable(fields) {
             $('#AnalyticsTableContainer').jtable({
                                                      title: $("#tableSelect").val(),
+                                                     <c:choose>
+                                                     <c:when test="${isPaginationSupported}">
                                                      paging: true,
                                                      pageSize: 25,
+                                                     </c:when>
+                                                     <c:otherwise>
+                                                     paging: false,
+                                                     pageSize: 500,
+                                                     </c:otherwise>
+                                                     </c:choose>
                                                      selecting: true,
                                                      multiselect: true,
                                                      selectingCheckboxes: true,
@@ -303,8 +313,94 @@
             $("#DeleteAllButton").on("click", function () {
                 var $selectedRows = $('#AnalyticsTableContainer').jtable('selectedRows');
                 $('#AnalyticsTableContainer').jtable('deleteRows', $selectedRows);
+                $('#AnalyticsTableContainer').jtable('reload');
             });
             tableLoaded = true;
+        }
+
+        function getArbitraryFields(rowData) {
+            var $img =
+                    $('<img src="/carbon/messageconsole/themes/metro/list_metro.png" title="Show Arbitrary Fields"/>');
+            $img.click(function () {
+                $('#AnalyticsTableContainer').jtable('openChildTable',
+                                                     $img.closest('tr'), //Parent row
+                                                     {
+                                                         title: 'Arbitrary Fields',
+                                                         paging: false,
+                                                         selecting: true,
+                                                         messages: {
+                                                             addNewRecord: 'Add new arbitrary field'
+                                                         },
+                                                         actions: {
+                                                             // For Details: http://jtable.org/Demo/FunctionsAsActions
+                                                             listAction: function (postData, jtParams) {
+                                                                 var postData = {};
+                                                                 postData['tableName'] = $("#tableSelect").val();
+                                                                 postData['bam_unique_rec_id'] = rowData.record.bam_unique_rec_id;
+                                                                 return arbitraryFieldListActionMethod(postData, jtParams);
+                                                             }
+                                                             <c:if test="${permissions != null && permissions.isPutRecord()}">
+                                                             ,
+                                                             createAction: function (postData) {
+                                                                 return arbitraryFieldCreateActionMethod(postData);
+                                                             },
+                                                             updateAction: function (postData) {
+                                                                 return arbitraryFieldUpdateActionMethod(postData);
+                                                             }
+                                                             </c:if>
+                                                             <c:if test="${permissions != null && permissions.isDeleteRecord()}">,
+                                                             deleteAction: function (postData) {
+                                                                 postData['tableName'] = $("#tableSelect").val();
+                                                                 postData['bam_unique_rec_id'] = rowData.record.bam_unique_rec_id;
+                                                                 return arbitraryFieldDeleteActionMethod(postData);
+                                                             }
+                                                             </c:if>
+                                                         },
+                                                         deleteConfirmation: function (data) {
+                                                             arbitraryColumnName = data.record.Name;
+                                                         },
+                                                         rowsRemoved: function (event, data) {
+                                                             arbitraryColumnName = "";
+                                                         },
+                                                         formCreated: function (event, data) {
+                                                             data.form.validationEngine();
+                                                         },
+                                                         //Validate form when it is being submitted
+                                                         formSubmitting: function (event, data) {
+                                                             return data.form.validationEngine('validate');
+                                                         },
+                                                         //Dispose validation logic when form is closed
+                                                         formClosed: function (event, data) {
+                                                             data.form.validationEngine('hide');
+                                                             data.form.validationEngine('detach');
+                                                         },
+                                                         fields: {
+                                                             bam_unique_rec_id: {
+                                                                 type: 'hidden',
+                                                                 key: true,
+                                                                 list: false,
+                                                                 defaultValue: rowData.record.bam_unique_rec_id
+                                                             },
+                                                             Name: {
+                                                                 title: 'Name',
+                                                                 inputClass: 'validate[required]'
+                                                             },
+                                                             Value: {
+                                                                 title: 'Value'
+                                                             },
+                                                             Type: {
+                                                                 title: 'Type',
+                                                                 options: ["STRING", "INTEGER", "LONG", "BOOLEAN", "FLOAT", "DOUBLE"],
+                                                                 list: false
+                                                             }
+                                                         }
+                                                     },
+                                                     function (data) { //opened handler
+                                                         data.childTable.jtable('load');
+                                                     }
+                );
+            });
+            return $img;
         }
     </script>
 
