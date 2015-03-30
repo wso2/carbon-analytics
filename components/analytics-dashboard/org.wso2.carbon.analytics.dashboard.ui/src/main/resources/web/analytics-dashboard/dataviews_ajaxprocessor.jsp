@@ -21,7 +21,7 @@
 			var source   = $("#tplDataViews").html();
 			var template = Handlebars.compile(source);
 			$("#container").append(template({ dataviews : data}));
-			appendFooter();
+			//appendFooter();
 
 			//load the DVContent for the first item in the list
 			if(data != null && data.length > 0) {
