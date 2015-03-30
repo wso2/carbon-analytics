@@ -33,7 +33,7 @@
             int startIndex = Integer.parseInt(jtStartIndex);
             String jtPageSize = request.getParameter("jtPageSize");
             if (jtPageSize == null || jtPageSize.isEmpty()) {
-                jtPageSize = "25";
+                jtPageSize = "500";
             }
             int pageSize = Integer.parseInt(jtPageSize);
             String query = request.getParameter("query");

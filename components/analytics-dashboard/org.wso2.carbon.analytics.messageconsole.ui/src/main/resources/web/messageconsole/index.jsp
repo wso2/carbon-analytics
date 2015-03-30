@@ -313,6 +313,7 @@
             $("#DeleteAllButton").on("click", function () {
                 var $selectedRows = $('#AnalyticsTableContainer').jtable('selectedRows');
                 $('#AnalyticsTableContainer').jtable('deleteRows', $selectedRows);
+                $('#AnalyticsTableContainer').jtable('reload');
             });
             tableLoaded = true;
         }

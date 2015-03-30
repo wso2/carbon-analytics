@@ -490,12 +490,11 @@ public class MessageConsoleConnector {
 
 
     public boolean isPaginationSupported() {
-        /*try {
+        try {
             return stub.isPaginationSupported();
-            //return stub.isPaginationSupported();
         } catch (RemoteException e) {
             log.error("Unable to check whether pagination support available or not.");
-        }*/
+        }
 
         return false;
     }
