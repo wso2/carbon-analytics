@@ -52,7 +52,7 @@ public class AnalyticsAPIAuthenticationProcessor extends HttpServlet {
                     String sessionId = ServiceHolder.getAuthenticator().authenticate(userName, password);
                     PrintWriter writer = resp.getWriter();
                     writer.print(AnalyticsAPIConstants.SESSION_ID + AnalyticsAPIConstants.SEPARATOR + sessionId);
-                    resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+                    resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsAPIAuthenticationException e) {
                     resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized user: " + userName);
                 }

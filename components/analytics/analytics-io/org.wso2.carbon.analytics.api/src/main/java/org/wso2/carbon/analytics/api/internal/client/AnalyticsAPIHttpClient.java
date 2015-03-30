@@ -115,7 +115,7 @@ public class AnalyticsAPIHttpClient {
                     (username + AnalyticsAPIConstants.SEPARATOR
                             + password).getBytes()));
             HttpResponse httpResponse = httpClient.execute(getMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_ACCEPTED) {
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceAuthenticationException("Authentication failed for user : " + username);
             }
             String response = getResponse(httpResponse);
@@ -176,15 +176,15 @@ public class AnalyticsAPIHttpClient {
                 .TABLE_PROCESSOR_SERVICE_URI);
         try {
             HttpPost postMethod = new HttpPost(builder.build().toString());
+            postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants
                     .CREATE_TABLE_OPERATION));
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.SESSION_ID, sessionId));
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId)));
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName));
             postMethod.setEntity(new UrlEncodedFormEntity(params));
             HttpResponse httpResponse = httpClient.execute(postMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_ACCEPTED) {
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponse(httpResponse);
                 throw new AnalyticsServiceException("Unable to create the table - " + tableName + " for tenant id : "
                         + tenantId + ". " + response);
@@ -207,16 +207,16 @@ public class AnalyticsAPIHttpClient {
         String jsonSchema = new GsonBuilder().create().toJson(schema);
         try {
             HttpPost postMethod = new HttpPost(builder.build().toString());
+            postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.
                     SET_SCHEMA_OPERATION));
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.SESSION_ID, sessionId));
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId)));
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName));
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.SCHEMA_PARAM, jsonSchema));
             postMethod.setEntity(new UrlEncodedFormEntity(params));
             HttpResponse httpResponse = httpClient.execute(postMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_ACCEPTED) {
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponse(httpResponse);
                 throw new AnalyticsServiceException("Unable to set the schema for the table - " + tableName
                         + ", schema - " + jsonSchema + " for tenant id : " + tenantId + ". " + response);
@@ -235,14 +235,14 @@ public class AnalyticsAPIHttpClient {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.SCHEMA_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.GET_SCHEMA_OPERATION)
-                .addParameter(AnalyticsAPIConstants.SESSION_ID, sessionId)
                 .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName);
         try {
             HttpGet getMethod = new HttpGet(builder.build().toString());
+            getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
             String response = getResponse(httpResponse);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_ACCEPTED) {
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to get the schema for the table - " + tableName
                         + " for tenant id : " + tenantId + ". " + response);
             } else {
@@ -261,14 +261,14 @@ public class AnalyticsAPIHttpClient {
         builder.setScheme("http").setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants
                 .TABLE_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.TABLE_EXISTS_OPERATION)
-                .addParameter(AnalyticsAPIConstants.SESSION_ID, sessionId)
                 .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName);
         try {
             HttpGet getMethod = new HttpGet(builder.build().toString());
+            getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
             String response = getResponse(httpResponse);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_ACCEPTED) {
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to check the existence for the table - " + tableName
                         + " for tenant id : " + tenantId + ". " + response);
             } else {
@@ -298,13 +298,13 @@ public class AnalyticsAPIHttpClient {
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants
                 .TABLE_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.LIST_TABLES_OPERATION)
-                .addParameter(AnalyticsAPIConstants.SESSION_ID, sessionId)
                 .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
         try {
             HttpGet getMethod = new HttpGet(builder.build().toString());
+            getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
             String response = getResponse(httpResponse);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_ACCEPTED) {
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to get the list of tables for tenant id : "
                         + tenantId + ". " + response);
             } else {
@@ -325,13 +325,13 @@ public class AnalyticsAPIHttpClient {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.TABLE_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.DELETE_TABLE_OPERATION)
-                .addParameter(AnalyticsAPIConstants.SESSION_ID, sessionId)
                 .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName);
         try {
             HttpDelete deleteMethod = new HttpDelete(builder.build().toString());
+            deleteMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(deleteMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_ACCEPTED) {
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponse(httpResponse);
                 throw new AnalyticsServiceException("Unable to create the table - " + tableName + " for tenant id : " + tenantId + ". " + response);
             } else {
@@ -348,16 +348,16 @@ public class AnalyticsAPIHttpClient {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.RECORD_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.GET_RECORD_COUNT_OPERATION)
-                .addParameter(AnalyticsAPIConstants.SESSION_ID, sessionId)
                 .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
                 .addParameter(AnalyticsAPIConstants.TIME_FROM_PARAM, String.valueOf(timeFrom))
                 .addParameter(AnalyticsAPIConstants.TIME_TO_PARAM, String.valueOf(timeTo));
         try {
             HttpGet getMethod = new HttpGet(builder.build().toString());
+            getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
             String response = getResponse(httpResponse);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_ACCEPTED) {
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to get the record count for the table - " + tableName
                         + ", time from : " + timeFrom + " , timeTo : " + timeTo
                         + " for tenant id : " + tenantId + ". " + response);
@@ -387,14 +387,14 @@ public class AnalyticsAPIHttpClient {
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.RECORD_PROCESSOR_SERVICE_URI);
         try {
             HttpPost postMethod = new HttpPost(builder.build().toString());
+            postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.PUT_RECORD_OPERATION));
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.SESSION_ID, sessionId));
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.RECORDS_PARAM, new Gson().toJson(records)));
             postMethod.setEntity(new UrlEncodedFormEntity(params));
             HttpResponse httpResponse = httpClient.execute(postMethod);
             String response = getResponse(httpResponse);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_ACCEPTED) {
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to put the records. " + response);
             }
         } catch (URISyntaxException e) {
@@ -408,16 +408,16 @@ public class AnalyticsAPIHttpClient {
         URIBuilder builder = new URIBuilder();
         builder.setScheme("http").setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.RECORD_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.DELETE_RECORDS_RANGE_OPERATION)
-                .addParameter(AnalyticsAPIConstants.SESSION_ID, sessionId)
                 .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
                 .addParameter(AnalyticsAPIConstants.TIME_FROM_PARAM, String.valueOf(timeFrom))
                 .addParameter(AnalyticsAPIConstants.TIME_TO_PARAM, String.valueOf(timeTo));
         try {
             HttpDelete deleteMethod = new HttpDelete(builder.build().toString());
+            deleteMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(deleteMethod);
             String response = getResponse(httpResponse);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_ACCEPTED) {
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to delete the record count for the table - " + tableName
                         + ", time from : " + timeFrom + " , timeTo : " + timeTo
                         + " for tenant id : " + tenantId + ". " + response);
@@ -433,15 +433,15 @@ public class AnalyticsAPIHttpClient {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.RECORD_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.DELETE_RECORDS_IDS_OPERATION)
-                .addParameter(AnalyticsAPIConstants.SESSION_ID, sessionId)
                 .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
                 .addParameter(AnalyticsAPIConstants.RECORD_IDS_PARAM, new Gson().toJson(recordIds));
         try {
             HttpDelete deleteMethod = new HttpDelete(builder.build().toString());
+            deleteMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(deleteMethod);
             String response = getResponse(httpResponse);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_ACCEPTED) {
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to delete the record count for the table - " + tableName
                         + ", records - " + recordIds
                         + " for tenant id : " + tenantId + ". " + response);
@@ -458,9 +458,9 @@ public class AnalyticsAPIHttpClient {
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI);
         try {
             HttpPost postMethod = new HttpPost(builder.build().toString());
+            postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.SET_INDICES_OPERATION));
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.SESSION_ID, sessionId));
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId)));
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName));
             String indexJson = new Gson().toJson(columns);
@@ -468,7 +468,7 @@ public class AnalyticsAPIHttpClient {
             postMethod.setEntity(new UrlEncodedFormEntity(params));
             HttpResponse httpResponse = httpClient.execute(postMethod);
             String response = getResponse(httpResponse);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_ACCEPTED) {
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to set the index for table - " + tableName
                         + " with index  - " + indexJson
                         + " for tenant id : " + tenantId + ". " + response);
@@ -484,14 +484,14 @@ public class AnalyticsAPIHttpClient {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.GET_INDICES_OPERATION)
-                .addParameter(AnalyticsAPIConstants.SESSION_ID, sessionId)
                 .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName);
         try {
             HttpGet getMethod = new HttpGet(builder.build().toString());
+            getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
             String response = getResponse(httpResponse);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_ACCEPTED) {
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to get the index for table - " + tableName
                         + " for tenant id : " + tenantId + ". " + response);
             } else {
@@ -511,13 +511,13 @@ public class AnalyticsAPIHttpClient {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.DELETE_INDICES_OPERATION)
-                .addParameter(AnalyticsAPIConstants.SESSION_ID, sessionId)
                 .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName);
         try {
             HttpDelete deleteMethod = new HttpDelete(builder.build().toString());
+            deleteMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(deleteMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_ACCEPTED) {
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponse(httpResponse);
                 throw new AnalyticsServiceException("Unable to get the index for table - " + tableName
                         + " for tenant id : " + tenantId + ". " + response);
@@ -536,7 +536,6 @@ public class AnalyticsAPIHttpClient {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.SEARCH_OPERATION)
-                .addParameter(AnalyticsAPIConstants.SESSION_ID, sessionId)
                 .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
                 .addParameter(AnalyticsAPIConstants.LANGUAGE_PARAM, language)
@@ -545,9 +544,10 @@ public class AnalyticsAPIHttpClient {
                 .addParameter(AnalyticsAPIConstants.COUNT_PARAM, String.valueOf(count));
         try {
             HttpGet getMethod = new HttpGet(builder.build().toString());
+            getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
             String response = getResponse(httpResponse);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_ACCEPTED) {
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to search the table - " + tableName
                         + " for tenant id : " + tenantId + " with language : " + language + ", query : " + query + ". "
                         + response);
@@ -567,16 +567,16 @@ public class AnalyticsAPIHttpClient {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.SEARCH_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.SEARCH_COUNT_OPERATION)
-                .addParameter(AnalyticsAPIConstants.SESSION_ID, sessionId)
                 .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
                 .addParameter(AnalyticsAPIConstants.LANGUAGE_PARAM, language)
                 .addParameter(AnalyticsAPIConstants.QUERY, query);
         try {
             HttpGet getMethod = new HttpGet(builder.build().toString());
+            getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
             String response = getResponse(httpResponse);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_ACCEPTED) {
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to search the table - " + tableName
                         + " for tenant id : " + tenantId + " with language : " + language + ", query : " + query + ". "
                         + response);
@@ -606,14 +606,14 @@ public class AnalyticsAPIHttpClient {
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI);
         try {
             HttpPost postMethod = new HttpPost(builder.build().toString());
+            postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.WAIT_FOR_INDEXING_OPERATION));
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.SESSION_ID, sessionId));
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.MAX_WAIT_PARAM, String.valueOf(maxWait)));
             postMethod.setEntity(new UrlEncodedFormEntity(params));
             HttpResponse httpResponse = httpClient.execute(postMethod);
             String response = getResponse(httpResponse);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_ACCEPTED) {
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to configure max wait: " + maxWait + " for indexing. "
                         + response);
             }
@@ -626,16 +626,16 @@ public class AnalyticsAPIHttpClient {
 
     public void destroy() throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
-        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.ANALYTICS_SERVICE_PROCESSOR_URI)
-                .addParameter(AnalyticsAPIConstants.SESSION_ID, sessionId);
+        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.ANALYTICS_SERVICE_PROCESSOR_URI);
         try {
             HttpPost postMethod = new HttpPost(builder.build().toString());
+            postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.DESTROY_OPERATION));
             postMethod.setEntity(new UrlEncodedFormEntity(params));
             HttpResponse httpResponse = httpClient.execute(postMethod);
             String response = getResponse(httpResponse);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_ACCEPTED) {
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to destroy the process . "
                         + response);
             }
@@ -651,7 +651,6 @@ public class AnalyticsAPIHttpClient {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.ANALYTIC_RECORD_READ_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.GET_RANGE_RECORD_GROUP_OPERATION)
-                .addParameter(AnalyticsAPIConstants.SESSION_ID, sessionId)
                 .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
                 .addParameter(AnalyticsAPIConstants.PARTITIONER_NO_PARAM, String.valueOf(numPartitionsHint))
@@ -663,8 +662,9 @@ public class AnalyticsAPIHttpClient {
         ObjectInputStream objIn = null;
         try {
             HttpGet getMethod = new HttpGet(builder.build().toString());
+            getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_ACCEPTED) {
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponse(httpResponse);
                 throw new AnalyticsServiceException("Unable to destroy the process . "
                         + response);
@@ -697,7 +697,6 @@ public class AnalyticsAPIHttpClient {
         Gson gson = new Gson();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.ANALYTIC_RECORD_READ_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.GET_IDS_RECORD_GROUP_OPERATION)
-                .addParameter(AnalyticsAPIConstants.SESSION_ID, sessionId)
                 .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
                 .addParameter(AnalyticsAPIConstants.PARTITIONER_NO_PARAM, String.valueOf(numPartitionsHint))
@@ -706,8 +705,9 @@ public class AnalyticsAPIHttpClient {
         ObjectInputStream objIn = null;
         try {
             HttpGet getMethod = new HttpGet(builder.build().toString());
+            getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_ACCEPTED) {
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponse(httpResponse);
                 throw new AnalyticsServiceException("Unable to destroy the process . "
                         + response);
@@ -735,18 +735,18 @@ public class AnalyticsAPIHttpClient {
     public Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.ANALYTIC_RECORD_READ_PROCESSOR_SERVICE_URI)
-                .addParameter(AnalyticsAPIConstants.SESSION_ID, sessionId)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.READ_RECORD_OPERATION);
         ByteArrayOutputStream out = null;
         ObjectOutputStream os = null;
         try {
             HttpPost postMethod = new HttpPost(builder.build().toString());
+            postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             out = new ByteArrayOutputStream();
             os = new ObjectOutputStream(out);
             os.writeObject(recordGroup);
             postMethod.setEntity(new ByteArrayEntity(out.toByteArray()));
             HttpResponse httpResponse = httpClient.execute(postMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_ACCEPTED) {
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponse(httpResponse);
                 throw new AnalyticsServiceException("Unable to read the record group. "
                         + response);

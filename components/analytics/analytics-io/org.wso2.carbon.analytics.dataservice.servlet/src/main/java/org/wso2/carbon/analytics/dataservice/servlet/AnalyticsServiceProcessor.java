@@ -31,7 +31,7 @@ import java.io.IOException;
 public class AnalyticsServiceProcessor extends HttpServlet{
 
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String sessionId = req.getParameter(AnalyticsAPIConstants.SESSION_ID);
+        String sessionId = req.getHeader(AnalyticsAPIConstants.SESSION_ID);
         if (sessionId == null || sessionId.trim().isEmpty()) {
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
         } else {
@@ -44,7 +44,7 @@ public class AnalyticsServiceProcessor extends HttpServlet{
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.DESTROY_OPERATION)) {
                 try {
                     ServiceHolder.getAnalyticsDataService().destroy();
-                    resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+                    resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }
