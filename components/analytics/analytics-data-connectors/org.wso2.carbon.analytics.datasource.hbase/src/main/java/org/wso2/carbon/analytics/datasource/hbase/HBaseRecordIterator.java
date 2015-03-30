@@ -26,6 +26,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseAnalyticsDSConstants;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseRuntimeException;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseUtils;
@@ -152,11 +153,7 @@ public class HBaseRecordIterator implements Iterator<Record> {
     }
 
     private void cleanup() {
-        try {
-            this.table.close();
-        } catch (IOException ignore) {
-            /* do nothing, the connection is dead anyway */
-        }
+        GenericUtils.closeQuietly(this.table);
     }
 
 }

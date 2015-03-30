@@ -122,11 +122,7 @@ public class HBaseRegionSplitIterator implements Iterator<Record> {
     }
 
     private void cleanup() {
-        try {
-            this.table.close();
-        } catch (IOException ignore) {
-            /* do nothing, the connection is dead anyway */
-        }
+        GenericUtils.closeQuietly(this.table);
     }
 
 }

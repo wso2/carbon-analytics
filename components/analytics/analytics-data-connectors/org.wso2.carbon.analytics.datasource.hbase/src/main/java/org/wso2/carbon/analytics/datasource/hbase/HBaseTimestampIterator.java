@@ -196,7 +196,7 @@ public class HBaseTimestampIterator implements Iterator<Record> {
     }
 
     private void cleanup() {
-        GenericUtils.closeQuietly(indexTable);
-        GenericUtils.closeQuietly(table);
+        GenericUtils.closeQuietly(this.indexTable);
+        GenericUtils.closeQuietly(this.table);
     }
 }
