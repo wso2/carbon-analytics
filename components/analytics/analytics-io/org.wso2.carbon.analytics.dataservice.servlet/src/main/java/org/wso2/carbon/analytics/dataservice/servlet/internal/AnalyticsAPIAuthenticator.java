@@ -19,7 +19,10 @@ package org.wso2.carbon.analytics.dataservice.servlet.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.CarbonConstants;
+import org.wso2.carbon.analytics.dataservice.api.commons.AnalyticsAPIConstants;
 import org.wso2.carbon.analytics.dataservice.servlet.exception.AnalyticsAPIAuthenticationException;
+import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
@@ -27,13 +30,13 @@ import java.util.*;
 
 public class AnalyticsAPIAuthenticator {
     private static Log log = LogFactory.getLog(AnalyticsAPIAuthenticator.class);
-    private static final String SESSION_CACHE_NAME  = "ANALYTICS_API_SERVICE_SESSION_CACHE";
+    private static final String SESSION_CACHE_NAME = "ANALYTICS_API_SERVICE_SESSION_CACHE";
     private Map<String, Boolean> sessionIds;
 
     public AnalyticsAPIAuthenticator() {
         if (ServiceHolder.getHazelcastInstance() != null) {
             sessionIds = ServiceHolder.getHazelcastInstance().getMap(SESSION_CACHE_NAME);
-        }else {
+        } else {
             sessionIds = new HashMap<>();
         }
     }
@@ -49,9 +52,21 @@ public class AnalyticsAPIAuthenticator {
         if (MultitenantUtils.getTenantDomain(username).equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
             boolean authenticated = ServiceHolder.getAuthenticationService().authenticate(userName, password);
             if (authenticated) {
-                String sessionId = UUID.randomUUID().toString();
-                sessionIds.put(sessionId, Boolean.TRUE);
-                return sessionId;
+                try {
+                    boolean authorized = ServiceHolder.getRealmService().getTenantUserRealm(MultitenantConstants.SUPER_TENANT_ID).
+                            getAuthorizationManager().isUserAuthorized(username,
+                            AnalyticsAPIConstants.ANALYTICS_REMOTE_API_INVOCATION_PERMISSION,
+                            CarbonConstants.UI_PERMISSION_ACTION);
+                    if (authorized) {
+                        String sessionId = UUID.randomUUID().toString();
+                        sessionIds.put(sessionId, Boolean.TRUE);
+                        return sessionId;
+                    }else {
+                        logAndThrowAuthException("User :" + userName + " don't have necessary permissions to connect to remote analytics API.");
+                    }
+                } catch (UserStoreException e) {
+                    logAndThrowAuthException("User :" + userName + " don't have necessary permissions to connect to remote analytics API.");
+                }
             } else {
                 logAndThrowAuthException("Login failed for user :" + userName);
             }
@@ -71,9 +86,4 @@ public class AnalyticsAPIAuthenticator {
             logAndThrowAuthException("Unauthenticated session Id : " + sessionId);
         }
     }
-
-    public void logout(String sessionId){
-        sessionIds.remove(sessionId);
-    }
-
 }

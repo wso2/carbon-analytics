@@ -21,6 +21,7 @@ import com.hazelcast.core.HazelcastInstance;
 import org.osgi.service.http.HttpService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.identity.authentication.AuthenticationService;
+import org.wso2.carbon.user.core.service.RealmService;
 
 public class ServiceHolder {
     private static AuthenticationService authenticationService;
@@ -28,6 +29,7 @@ public class ServiceHolder {
     private static AnalyticsAPIAuthenticator authenticator;
     private static HttpService httpService;
     private static HazelcastInstance hazelcastInstance;
+    private static RealmService realmService;
 
     public static AuthenticationService getAuthenticationService() {
         return authenticationService;
@@ -55,6 +57,14 @@ public class ServiceHolder {
 
     public static HttpService getHttpService() {
         return httpService;
+    }
+
+    public static RealmService getRealmService() {
+        return realmService;
+    }
+
+    public static void setRealmService(RealmService realmService) {
+        ServiceHolder.realmService = realmService;
     }
 
     public static HazelcastInstance getHazelcastInstance() {

@@ -77,5 +77,5 @@ public class AnalyticsAPIConstants {
     public static final String READ_RECORD_OPERATION = "__readRecord_opr";
     public static final String GET_RANGE_RECORD_GROUP_OPERATION = "__get_range_record_group_opr";
     public static final String GET_IDS_RECORD_GROUP_OPERATION = "__get_ids_record_group_opr";
-
+    public static final String ANALYTICS_REMOTE_API_INVOCATION_PERMISSION = "/permission/admin/manage/analytics/api";
 }
