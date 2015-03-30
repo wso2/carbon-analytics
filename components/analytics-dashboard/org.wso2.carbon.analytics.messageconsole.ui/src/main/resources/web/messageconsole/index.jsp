@@ -19,6 +19,7 @@
     try {
         Permissions permissions = connector.getAvailablePermissionForUser();
         pageContext.setAttribute("permissions", permissions, PageContext.PAGE_SCOPE);
+        pageContext.setAttribute("isPaginationSupported", connector.isPaginationSupported(), PageContext.APPLICATION_SCOPE);
     } catch (MessageConsoleException e) {
         pageContext.setAttribute("permissionError", e, PageContext.PAGE_SCOPE);
     }
@@ -125,6 +126,7 @@
                                                                      function (result) {
                                                                          $("deleteTableMessage").innerHTML = result;
                                                                      });
+                                                              $('#AnalyticsTableContainer').jtable('destroy');
                                                               $(this).dialog("close");
                                                           },
                                                           Cancel: function () {
@@ -257,8 +259,16 @@
         function createMainJTable(fields) {
             $('#AnalyticsTableContainer').jtable({
                                                      title: $("#tableSelect").val(),
-                                                     paging: true,
-                                                     pageSize: 25,
+                                                     <c:choose>
+                                                         <c:when test="${isPaginationSupported}">
+                                                         paging: true,
+                                                         pageSize: 25,
+                                                         </c:when>
+                                                         <c:otherwise>
+                                                         paging: false,
+                                                         pageSize: 500,
+                                                         </c:otherwise>
+                                                     </c:choose>
                                                      selecting: true,
                                                      multiselect: true,
                                                      selectingCheckboxes: true,

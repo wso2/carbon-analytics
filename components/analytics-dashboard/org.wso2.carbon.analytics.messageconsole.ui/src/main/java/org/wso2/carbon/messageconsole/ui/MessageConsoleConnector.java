@@ -50,6 +50,7 @@ import org.wso2.carbon.messageconsole.ui.serializers.ResponseRecordSerializer;
 import org.wso2.carbon.messageconsole.ui.serializers.ResponseResultSerializer;
 
 import java.lang.reflect.Type;
+import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -221,25 +222,26 @@ public class MessageConsoleConnector {
                     column.setDisplay(resultColumn.getDisplay());
                     columns.add(column);
                 }
-
-                // Adding recordId column as a hidden field
-                ResponseTable.Column recordId = new ResponseTable().new Column();
-                recordId.setName(RECORD_ID);
-                recordId.setPrimary(false);
-                recordId.setType("STRING");
-                recordId.setDisplay(false);
-                recordId.setKey(true);
-                columns.add(recordId);
-
-                ResponseTable.Column timestamp = new ResponseTable().new Column();
-                timestamp.setName(TIMESTAMP);
-                timestamp.setPrimary(false);
-                timestamp.setType("LONG");
-                timestamp.setDisplay(true);
-                columns.add(timestamp);
-
-                table.setColumns(columns);
             }
+
+            // Adding recordId column as a hidden field
+            ResponseTable.Column recordId = new ResponseTable().new Column();
+            recordId.setName(RECORD_ID);
+            recordId.setPrimary(false);
+            recordId.setType("STRING");
+            recordId.setDisplay(false);
+            recordId.setKey(true);
+            columns.add(recordId);
+
+            ResponseTable.Column timestamp = new ResponseTable().new Column();
+            timestamp.setName(TIMESTAMP);
+            timestamp.setPrimary(false);
+            timestamp.setType("STRING");
+            timestamp.setDisplay(true);
+            columns.add(timestamp);
+
+            table.setColumns(columns);
+
 
         } catch (Exception e) {
             log.error("Unable to get table information for table:" + tableName, e);
@@ -469,18 +471,32 @@ public class MessageConsoleConnector {
         Gson gson = new GsonBuilder().serializeNulls().create();
         try {
             TableBean tableInfo = stub.getTableInfoWithIndicesInfo(table);
-            for (ColumnBean column : tableInfo.getColumns()) {
-                TableSchemaColumn schemaColumn = new TableSchemaColumn();
-                schemaColumn.setColumn(column.getName());
-                schemaColumn.setType(column.getType());
-                schemaColumn.setIndex(column.getIndex());
-                schemaColumn.setPrimary(column.getPrimary());
-                tableSchemaColumns.add(schemaColumn);
+            if (tableInfo != null && tableInfo.getColumns() != null) {
+                for (ColumnBean column : tableInfo.getColumns()) {
+                    TableSchemaColumn schemaColumn = new TableSchemaColumn();
+                    schemaColumn.setColumn(column.getName());
+                    schemaColumn.setType(column.getType());
+                    schemaColumn.setIndex(column.getIndex());
+                    schemaColumn.setPrimary(column.getPrimary());
+                    tableSchemaColumns.add(schemaColumn);
+                }
             }
         } catch (Exception e) {
             log.error("Unable to get table information for table:" + table, e);
         }
 
         return gson.toJson(tableSchemaColumns);
+    }
+
+
+    public boolean isPaginationSupported() {
+        /*try {
+            return stub.isPaginationSupported();
+            //return stub.isPaginationSupported();
+        } catch (RemoteException e) {
+            log.error("Unable to check whether pagination support available or not.");
+        }*/
+
+        return false;
     }
 }

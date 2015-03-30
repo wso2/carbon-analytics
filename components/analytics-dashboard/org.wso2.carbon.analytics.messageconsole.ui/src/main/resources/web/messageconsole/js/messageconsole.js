@@ -71,9 +71,10 @@ function getArbitraryFields(rowData) {
                                                          list: false
                                                      }
                                                  }
-                                             }, function (data) { //opened handler
-                    data.childTable.jtable('load');
-                }
+                                             },
+                                             function (data) { //opened handler
+                                                 data.childTable.jtable('load');
+                                             }
         );
     });
     return $img;
