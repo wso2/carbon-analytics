@@ -645,6 +645,8 @@ public class AnalyticsResource extends AbstractResource {
 
 
     /**
+  
+    /**
 	 * Sets the indices.
 	 * @param tableName the table name
 	 * @param columnsBean the columns bean containing all the indices

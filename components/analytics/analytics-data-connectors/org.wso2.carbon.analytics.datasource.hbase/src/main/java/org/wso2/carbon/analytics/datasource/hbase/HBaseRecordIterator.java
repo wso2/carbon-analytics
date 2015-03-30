@@ -18,8 +18,8 @@
 package org.wso2.carbon.analytics.datasource.hbase;
 
 import com.google.common.collect.Lists;
-import org.apache.hadoop.hbase.Cell;
-import org.apache.hadoop.hbase.CellUtil;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -32,14 +32,20 @@ import org.wso2.carbon.analytics.datasource.hbase.util.HBaseRuntimeException;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseUtils;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+/**
+ * Subclass of java.util.Iterator for streaming in records from ID lookup
+ */
 public class HBaseRecordIterator implements Iterator<Record> {
 
     private List<String> columns;
     private List<List<String>> batchedIds;
 
     private int tenantId, totalBatches, currentBatchIndex;
+
+    private static final Log log = LogFactory.getLog(HBaseRecordIterator.class);
 
     private boolean fullyFetched;
     private String tableName;
@@ -55,7 +61,7 @@ public class HBaseRecordIterator implements Iterator<Record> {
             this.batchedIds = Lists.partition(recordIds, batchSize);
             this.totalBatches = this.batchedIds.size();
             /* pre-fetching from HBase and populating records for the first time */
-            this.preFetch();
+            this.fetch();
         }
     }
 
@@ -64,7 +70,7 @@ public class HBaseRecordIterator implements Iterator<Record> {
         boolean hasMore = this.subIterator.hasNext();
         if (!hasMore) {
             try {
-                this.preFetch();
+                this.fetch();
             } catch (AnalyticsTableNotAvailableException e) {
                 this.subIterator = Collections.emptyIterator();
             }
@@ -77,7 +83,6 @@ public class HBaseRecordIterator implements Iterator<Record> {
         if (this.hasNext()) {
             return this.subIterator.next();
         } else {
-            this.cleanup();
             throw new NoSuchElementException("No further elements exist in iterator");
         }
     }
@@ -87,7 +92,7 @@ public class HBaseRecordIterator implements Iterator<Record> {
             /* nothing to do here, since this is a read-only iterator */
     }
 
-    private void preFetch() throws AnalyticsTableNotAvailableException {
+    private void fetch() throws AnalyticsTableNotAvailableException {
         if (fullyFetched || this.totalBatches == 0) {
             return;
         }
@@ -95,8 +100,6 @@ public class HBaseRecordIterator implements Iterator<Record> {
         List<Record> fetchedRecords = new ArrayList<>();
         List<Get> gets = new ArrayList<>();
         Set<String> colSet = null;
-        Map<String, Object> values;
-        long timestamp;
 
         for (String currentId : currentBatch) {
             Get get = new Get(Bytes.toBytes(currentId));
@@ -113,25 +116,12 @@ public class HBaseRecordIterator implements Iterator<Record> {
         try {
             Result[] results = this.table.get(gets);
             for (Result currentResult : results) {
-                byte[] rowId = currentResult.getRow();
-                if (currentResult.containsColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                        HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME)) {
-                    Cell dataCell = currentResult.getColumnLatestCell
-                            (HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                                    HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME);
-                    values = GenericUtils.decodeRecordValues(CellUtil.cloneValue(dataCell), colSet);
-                    timestamp = dataCell.getTimestamp();
-                    fetchedRecords.add(new Record(new String(rowId), this.tenantId, this.tableName, values, timestamp));
-                } else if (currentResult.containsColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                        HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME)) {
-                    Cell timeCell = currentResult.getColumnLatestCell
-                            (HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                                    HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
-                    values = new HashMap<>();
-                    timestamp = HBaseUtils.decodeLong(CellUtil.cloneValue(timeCell));
-                    fetchedRecords.add(new Record(new String(rowId), this.tenantId, this.tableName, values, timestamp));
+                Record record = HBaseUtils.constructRecord(currentResult, tenantId, tableName, colSet);
+                if(record != null){
+                    fetchedRecords.add(record);
+                } else{
+                    log.warn("Record "+ new String(currentResult.getRow(), StandardCharsets.UTF_8) + " did not have valid data!");
                 }
-                    /* else, No valid data in row, ignore.*/
             }
             this.subIterator = fetchedRecords.iterator();
         } catch (Exception e) {
@@ -143,7 +133,8 @@ public class HBaseRecordIterator implements Iterator<Record> {
                     this.tenantId, e);
         }
         this.currentBatchIndex++;
-        if ((this.totalBatches == 1) || this.currentBatchIndex == this.totalBatches - 1) {
+        if (this.currentBatchIndex >= this.totalBatches) {
+            this.cleanup();
             this.fullyFetched = true;
         }
     }
@@ -154,7 +145,7 @@ public class HBaseRecordIterator implements Iterator<Record> {
         this.columns = columns;
         try {
             this.table = conn.getTable(TableName.valueOf(
-                    HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.DATA)));
+                    HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.DATA)));
         } catch (IOException e) {
             throw new AnalyticsException("The table " + tableName + " for tenant " + tenantId +
                     " could not be initialized for reading: " + e.getMessage(), e);
@@ -162,11 +153,7 @@ public class HBaseRecordIterator implements Iterator<Record> {
     }
 
     private void cleanup() {
-        try {
-            this.table.close();
-        } catch (IOException ignore) {
-            /* do nothing, the connection is dead anyway */
-        }
+        GenericUtils.closeQuietly(this.table);
     }
 
 }

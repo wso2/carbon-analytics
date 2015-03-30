@@ -17,25 +17,32 @@
 */
 package org.wso2.carbon.analytics.datasource.hbase.util;
 
+import java.nio.charset.StandardCharsets;
+
+/**
+ * Class for holding constants required for the HBase Analytics Datasource
+ */
 public class HBaseAnalyticsDSConstants {
 
     public static final String DATASOURCE_NAME = "datasource";
 
     public static final String ANALYTICS_USER_TABLE_PREFIX = "ANX";
     public static final String ANALYTICS_INDEX_TABLE_PREFIX = "IDX";
-    public static final String ANALYTICS_META_TABLE_PREFIX = "META";
 
-    public static final int DATA = 1;
-    public static final int INDEX = 2;
-    public static final int META = 3;
+    public static final String ANALYTICS_META_TABLE_NAME = "ANALYTICS_META_TABLE";
 
-    public static final byte[] ANALYTICS_DATA_COLUMN_FAMILY_NAME = "carbon-analytics-data".getBytes();
-    public static final byte[] ANALYTICS_META_COLUMN_FAMILY_NAME = "carbon-analytics-meta".getBytes();
-    public static final byte[] ANALYTICS_INDEX_COLUMN_FAMILY_NAME = "carbon-analytics-index".getBytes();
+    public enum TableType {
+        DATA,
+        INDEX
+    }
 
-    public static final byte[] ANALYTICS_ROWDATA_QUALIFIER_NAME = "row-values".getBytes();
-    public static final byte[] ANALYTICS_SCHEMA_QUALIFIER_NAME = "database-schema".getBytes();
-    public static final byte[] ANALYTICS_TS_QUALIFIER_NAME = "timestamp".getBytes();
+    public static final byte[] ANALYTICS_DATA_COLUMN_FAMILY_NAME = "carbon-analytics-data".getBytes(StandardCharsets.UTF_8);
+    public static final byte[] ANALYTICS_META_COLUMN_FAMILY_NAME = "carbon-analytics-meta".getBytes(StandardCharsets.UTF_8);
+    public static final byte[] ANALYTICS_INDEX_COLUMN_FAMILY_NAME = "carbon-analytics-index".getBytes(StandardCharsets.UTF_8);
+
+    public static final byte[] ANALYTICS_ROWDATA_QUALIFIER_NAME = "row-values".getBytes(StandardCharsets.UTF_8);
+    public static final byte[] ANALYTICS_SCHEMA_QUALIFIER_NAME = "database-schema".getBytes(StandardCharsets.UTF_8);
+    public static final byte[] ANALYTICS_TS_QUALIFIER_NAME = "timestamp".getBytes(StandardCharsets.UTF_8);
 
     public static final int DEFAULT_QUERY_BATCH_SIZE = 7000;
     public static final String HBASE_ANALYTICS_CONFIG_FILE = "hbase-analytics-config.xml";

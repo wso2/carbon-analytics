@@ -17,8 +17,6 @@
 */
 package org.wso2.carbon.analytics.datasource.hbase;
 
-import org.apache.hadoop.hbase.Cell;
-import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -32,6 +30,10 @@ import org.wso2.carbon.analytics.datasource.hbase.util.HBaseUtils;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * Subclass of java.util.Iterator used for streaming records contained within an HBase region boundary given the start
+ * and end row keys of the region
+ */
 public class HBaseRegionSplitIterator implements Iterator<Record> {
 
     byte[] startRow, endRow;
@@ -52,7 +54,7 @@ public class HBaseRegionSplitIterator implements Iterator<Record> {
         this.endRow = endRow;
         Admin admin = null;
         TableName finalName = TableName.valueOf(
-                HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.DATA));
+                HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.DATA));
         try {
             admin = conn.getAdmin();
             if (!admin.tableExists(finalName)) {
@@ -62,6 +64,8 @@ public class HBaseRegionSplitIterator implements Iterator<Record> {
         } catch (IOException e) {
             throw new AnalyticsException("The table " + tableName + " for tenant " + tenantId +
                     " could not be initialized for reading: " + e.getMessage(), e);
+        } finally {
+            GenericUtils.closeQuietly(admin);
         }
         Scan splitScan = new Scan();
         splitScan.setStartRow(this.startRow);
@@ -83,8 +87,6 @@ public class HBaseRegionSplitIterator implements Iterator<Record> {
             }
             throw new AnalyticsException("The table " + tableName + " for tenant " + tenantId +
                     " could not be read: " + e.getMessage(), e);
-        } finally {
-            GenericUtils.closeQuietly(admin);
         }
     }
 
@@ -95,40 +97,22 @@ public class HBaseRegionSplitIterator implements Iterator<Record> {
 
     @Override
     public Record next() {
-        if (this.hasNext()) {
-            try {
-                Result currentResult = this.resultIterator.next();
-                byte[] rowId = currentResult.getRow();
-                Map<String, Object> values;
-                long timestamp;
-                if (currentResult.containsColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                        HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME)) {
-                    Cell dataCell = currentResult.getColumnLatestCell
-                            (HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                                    HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME);
-                    values = GenericUtils.decodeRecordValues(CellUtil.cloneValue(dataCell), colSet);
-                    timestamp = dataCell.getTimestamp();
-                    return new Record(new String(rowId), this.tenantId, this.tableName, values, timestamp);
-                } else if (currentResult.containsColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                        HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME)) {
-                    Cell timeCell = currentResult.getColumnLatestCell
-                            (HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                                    HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
-                    values = new HashMap<>();
-                    timestamp = HBaseUtils.decodeLong(CellUtil.cloneValue(timeCell));
-                    return new Record(new String(rowId), this.tenantId, this.tableName, values, timestamp);
-                } else {
-                    throw new HBaseRuntimeException("Invalid data found on row " + new String(rowId));
-                }
-
-            } catch (Exception e) {
-                this.cleanup();
-                throw new HBaseRuntimeException("Error reading data from table " + this.tableName + " for tenant " +
-                        this.tenantId, e);
-            }
-        } else {
+        if (!this.hasNext()) {
             this.cleanup();
-            throw new NoSuchElementException("No further elements exist in iterator");
+        }
+        try {
+            Result currentResult = this.resultIterator.next();
+            byte[] rowId = currentResult.getRow();
+            Record record = HBaseUtils.constructRecord(currentResult, tenantId, tableName, colSet);
+            if (record != null) {
+                return record;
+            } else {
+                throw new HBaseRuntimeException("Invalid data found on row " + new String(rowId));
+            }
+        } catch (AnalyticsException e) {
+            this.cleanup();
+            throw new HBaseRuntimeException("Error reading data from table " + this.tableName + " for tenant " +
+                    this.tenantId, e);
         }
     }
 
@@ -138,11 +122,7 @@ public class HBaseRegionSplitIterator implements Iterator<Record> {
     }
 
     private void cleanup() {
-        try {
-            this.table.close();
-        } catch (IOException ignore) {
-            /* do nothing, the connection is dead anyway */
-        }
+        GenericUtils.closeQuietly(this.table);
     }
 
 }

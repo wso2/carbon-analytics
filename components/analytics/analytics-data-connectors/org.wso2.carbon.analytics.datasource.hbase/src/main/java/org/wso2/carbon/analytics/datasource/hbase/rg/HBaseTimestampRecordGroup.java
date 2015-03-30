@@ -17,7 +17,6 @@
 */
 package org.wso2.carbon.analytics.datasource.hbase.rg;
 
-
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
@@ -28,7 +27,7 @@ public class HBaseTimestampRecordGroup implements RecordGroup {
     private int tenantId;
     private String tableName;
     private List<String> columns;
-    long startTime, endTime;
+    private long startTime, endTime;
 
     public HBaseTimestampRecordGroup(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo) {
         this.tenantId = tenantId;
@@ -40,7 +39,7 @@ public class HBaseTimestampRecordGroup implements RecordGroup {
 
     @Override
     public String[] getLocations() throws AnalyticsException {
-        return new String[]{"local"};
+        return new String[] { "localhost" };
     }
 
     public int getTenantId() {

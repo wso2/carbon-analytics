@@ -2,6 +2,9 @@
 <hbase-configuration>
     <!-- Batch size for GET queries from the HBase instance -->
     <query-batch-size>7000</query-batch-size>
+    <hdfs-host>hdfs://localhost:9000</hdfs-host>
+    <hdfs-data-dir>/dfs/data</hdfs-data-dir>
+    <hbase-host>localhost:60000</hbase-host>
 
 </hbase-configuration>
 

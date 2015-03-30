@@ -31,7 +31,7 @@ public class HBaseIDRecordGroup implements RecordGroup {
 
     @Override
     public String[] getLocations() throws AnalyticsException {
-        return new String[]{"local"};
+        return new String[] { "localhost" };
     }
 
     public HBaseIDRecordGroup(int tenantId, String tableName, List<String> columns, List<String> ids) {

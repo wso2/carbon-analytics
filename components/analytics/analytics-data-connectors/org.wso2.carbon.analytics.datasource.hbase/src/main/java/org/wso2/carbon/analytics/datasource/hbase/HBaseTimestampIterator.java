@@ -17,6 +17,8 @@
 */
 package org.wso2.carbon.analytics.datasource.hbase;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.TableName;
@@ -31,8 +33,12 @@ import org.wso2.carbon.analytics.datasource.hbase.util.HBaseRuntimeException;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseUtils;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+/**
+ * Subclass of java.util.Iterator for streaming in records based on timestamp ranges
+ */
 public class HBaseTimestampIterator implements Iterator<Record> {
 
     private List<String> columns;
@@ -47,6 +53,8 @@ public class HBaseTimestampIterator implements Iterator<Record> {
     private Table table, indexTable;
     private Iterator<Record> subIterator = Collections.emptyIterator();
 
+    private static final Log log = LogFactory.getLog(HBaseTimestampIterator.class);
+
     HBaseTimestampIterator(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo,
                            Connection conn, int batchSize) throws AnalyticsException, AnalyticsTableNotAvailableException {
         if ((timeFrom > timeTo) || (batchSize < 0)) {
@@ -58,7 +66,7 @@ public class HBaseTimestampIterator implements Iterator<Record> {
             this.latestRow = HBaseUtils.encodeLong(timeFrom - POSTFIX);
             this.endRow = HBaseUtils.encodeLong(timeTo);
             /* pre-fetching from HBase and populating records for the first time */
-            this.preFetch();
+            this.fetchRecords();
         }
     }
 
@@ -67,7 +75,7 @@ public class HBaseTimestampIterator implements Iterator<Record> {
         boolean hasMore = this.subIterator.hasNext();
         if (!hasMore) {
             try {
-                this.preFetch();
+                this.fetchRecords();
             } catch (AnalyticsTableNotAvailableException e) {
                 this.subIterator = Collections.emptyIterator();
             }
@@ -80,7 +88,6 @@ public class HBaseTimestampIterator implements Iterator<Record> {
         if (this.hasNext()) {
             return this.subIterator.next();
         } else {
-            this.cleanup();
             throw new NoSuchElementException("No further elements exist in iterator");
         }
     }
@@ -90,19 +97,17 @@ public class HBaseTimestampIterator implements Iterator<Record> {
         /* nothing to do here, since this is a read-only iterator */
     }
 
-    private void preFetch() throws AnalyticsTableNotAvailableException {
+    private void fetchRecords() throws AnalyticsTableNotAvailableException {
         if (this.fullyFetched) {
             return;
         }
-        List<String> currentBatch = this.populateRecordBatches();
+        List<String> currentBatch = this.populateNextRecordBatch();
         if (currentBatch.size() == 0) {
             return;
         }
         Set<String> colSet = null;
         List<Record> fetchedRecords = new ArrayList<>();
         List<Get> gets = new ArrayList<>();
-        Map<String, Object> values;
-        long timestamp;
 
         for (String currentId : currentBatch) {
             Get get = new Get(Bytes.toBytes(currentId));
@@ -120,27 +125,12 @@ public class HBaseTimestampIterator implements Iterator<Record> {
 
         try {
             Result[] results = this.table.get(gets);
-
             for (Result currentResult : results) {
-                byte[] rowId = currentResult.getRow();
-                if (currentResult.containsColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                        HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME)) {
-                    Cell dataCell = currentResult.getColumnLatestCell
-                            (HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                                    HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME);
-                    values = GenericUtils.decodeRecordValues(CellUtil.cloneValue(dataCell), colSet);
-                    timestamp = dataCell.getTimestamp();
-                    fetchedRecords.add(new Record(new String(rowId), this.tenantId, this.tableName, values, timestamp));
-                } else if (currentResult.containsColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                        HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME)) {
-                    Cell timeCell = currentResult.getColumnLatestCell
-                            (HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                                    HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
-                    values = new HashMap<>();
-                    timestamp = HBaseUtils.decodeLong(CellUtil.cloneValue(timeCell));
-                    fetchedRecords.add(new Record(new String(rowId), this.tenantId, this.tableName, values, timestamp));
+                Record record = HBaseUtils.constructRecord(currentResult, tenantId, tableName, colSet);
+                if (record != null) {
+                    fetchedRecords.add(record);
                 } else {
-                    /* No valid data in row, ignore.*/
+                    log.warn("Record " + new String(currentResult.getRow(), StandardCharsets.UTF_8) + " did not have valid data!");
                 }
             }
             this.subIterator = fetchedRecords.iterator();
@@ -154,7 +144,7 @@ public class HBaseTimestampIterator implements Iterator<Record> {
         }
     }
 
-    private List<String> populateRecordBatches() {
+    private List<String> populateNextRecordBatch() {
         List<String> currentBatch = new ArrayList<>();
         int counter = 0;
         Scan indexScan = new Scan();
@@ -164,7 +154,7 @@ public class HBaseTimestampIterator implements Iterator<Record> {
         indexScan.addFamily(HBaseAnalyticsDSConstants.ANALYTICS_INDEX_COLUMN_FAMILY_NAME);
         ResultScanner resultScanner;
         try {
-            resultScanner = indexTable.getScanner(indexScan);
+            resultScanner = this.indexTable.getScanner(indexScan);
             for (Result rowResult : resultScanner) {
                 if (counter == this.batchSize) {
                     break;
@@ -183,6 +173,7 @@ public class HBaseTimestampIterator implements Iterator<Record> {
                     this.tenantId, e);
         }
         if (counter == 0) {
+            this.cleanup();
             this.fullyFetched = true;
         }
         return currentBatch;
@@ -195,9 +186,9 @@ public class HBaseTimestampIterator implements Iterator<Record> {
         this.batchSize = batchSize;
         try {
             this.indexTable = conn.getTable(TableName.valueOf(
-                    HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.INDEX)));
+                    HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.INDEX)));
             this.table = conn.getTable(TableName.valueOf(
-                    HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.DATA)));
+                    HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.DATA)));
         } catch (IOException e) {
             throw new AnalyticsException("The table " + tableName + " for tenant " + tenantId +
                     " could not be initialized for reading: " + e.getMessage(), e);
@@ -205,10 +196,7 @@ public class HBaseTimestampIterator implements Iterator<Record> {
     }
 
     private void cleanup() {
-        try {
-            this.table.close();
-        } catch (IOException ignore) {
-            /* do nothing, the connection is dead anyway */
-        }
+        GenericUtils.closeQuietly(this.indexTable);
+        GenericUtils.closeQuietly(this.table);
     }
 }

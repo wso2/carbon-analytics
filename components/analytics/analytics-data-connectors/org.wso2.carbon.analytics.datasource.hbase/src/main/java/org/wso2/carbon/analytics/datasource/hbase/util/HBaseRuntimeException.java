@@ -17,6 +17,9 @@
 */
 package org.wso2.carbon.analytics.datasource.hbase.util;
 
+/**
+ * Standard subclass of java.lang.RuntimeException for HBase Analytics Datasource
+ */
 public class HBaseRuntimeException extends RuntimeException {
     public HBaseRuntimeException(String s, Throwable t) {
         super(s, t);
