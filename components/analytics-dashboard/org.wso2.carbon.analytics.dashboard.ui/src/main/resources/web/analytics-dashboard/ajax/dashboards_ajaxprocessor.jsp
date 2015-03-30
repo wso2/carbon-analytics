@@ -27,7 +27,6 @@
     String responseText = "";
     String action = request.getParameter("action");
     DashboardAdminServiceStub stub =   DashboardAdminClient.getDashboardAdminService(config, session, request);
-    response.setContentType("application/json");
     Gson gson = new Gson();
 
     if(action == null) {
@@ -39,6 +38,7 @@
             for(Dashboard dashboard : dashboards) {
                 dashboardResponse[i++] = new DashboardDTO(dashboard.getId(),dashboard.getTitle(),dashboard.getGroup());
             }
+            response.setContentType("application/json");
             responseText = gson.toJson(dashboardResponse);
         } else {
             responseText = "[]";
@@ -46,6 +46,7 @@
     } else if(action.equals("getDashboardById")) {
         String dashboardId = request.getParameter("dashboardId");
         Dashboard dashboard = stub.getDashboard(dashboardId);
+        response.setContentType("application/json");
         responseText = gson.toJson(DashboardAdminClient.toDashboardDTO(dashboard));
     }  else if(action.equals("addDashboard")) {
         Dashboard dashboard = new Dashboard();

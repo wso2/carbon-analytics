@@ -172,7 +172,7 @@
 <script id="tplDataViews" type="text/x-handlebars-template">
 	<div class="panel panel-default">
 		<div class="panel-heading">
-		    <h2 class="panel-title">Choose Widget(s) from a DataView 
+		    <h2 class="panel-title">Choose Widget(s) from a Dataview 
 		    <span class="pull-right"><a href="index.jsp">Back to Dashboard</a></span></h2>
 
 		  </div>
@@ -240,14 +240,12 @@
         		{{#each widgets}}
 		          <div class="col-sm-6 col-md-4">
 		            <div class="thumbnail">
+		            <img src="http://placehold.it/200x120" alt="...">
 		              <div class="caption">
-		                <h4>{{title}}</h4>
+		                <h5>{{title}}</h5>
 
 		                <button type="button" class="btn btn-default" id="btnTrash">
 		                	<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-		                </button>
-		                <button type="button" class="btn btn-default" id="btnCog">
-		                	<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
 		                </button>
 
 		                <div class="btn-group" role="group">
@@ -275,7 +273,6 @@
     	<div class="blank-slate-message">
     	    <h4>This DataView has no widgets associated.</h4>
     	    <p class="text-muted">Get started by creating a new Widget with DataView data</p>
-    	        
     	</div>
     {{/if}}
 </script>
@@ -292,23 +289,18 @@
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                <h4 class="modal-title" id="myModalLabel">Configure and Preview Widget</h4>
             </div>
             <div class="modal-body">
 
-                <div class="col-md-12">
-
-
                     <div class="row">
                         <div class="col-md-6">
-                            <p>Preview :</p>
-
+                            <h4>Preview</h4>
                             <div id="chartDiv"></div>
-
                         </div>
 
                         <div class="col-md-6">
-                            <p>Configuration :</p>
+                            <h4>Configuration</h4>
 
                             <div id="Attributeform">
 
@@ -340,7 +332,7 @@
 
                                             <div class="col-sm-6">
                                                 <input name='title' type="text" class="form-control"
-                                                       id="title" placeholder="title">
+                                                       id="title" placeholder="Untitled Widget">
                                             </div>
                                         </div>
 
@@ -443,23 +435,21 @@
                         </div>
 
                     </div>
-                    <div class="row">
+                   <!--  <div class="row">
 
                         <p>SampleData :</p>
 
                         <div id="data">
 
                         </div>
-                    </div>
-
-                </div>
+                    </div> -->
 
             </div>
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close
                 </button>
-                <button id="modalSave" type="button" class="btn btn-primary">Save changes</button>
+                <button id="modalSave" type="button" class="btn btn-primary">Save</button>
             </div>
         </div>
 

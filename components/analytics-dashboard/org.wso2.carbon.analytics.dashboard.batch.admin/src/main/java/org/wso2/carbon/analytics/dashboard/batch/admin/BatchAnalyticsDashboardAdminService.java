@@ -62,7 +62,7 @@ public class BatchAnalyticsDashboardAdminService extends AbstractAdmin {
     public String[] getTableNames() throws AxisFault {
         List<String> tables = null;
         try {
-            tables = this.analyticsDataService.listTables(getUsername());
+            tables = analyticsDataService.listTables(getUsername());
         } catch (AnalyticsException e) {
             logger.error("Unable to get a list of tables from Analytics data layer for tenant: " + getUsername(), e);
             throw new AxisFault("Unable to get a list of tables from Analytics data layer for tenant: "
@@ -80,7 +80,7 @@ public class BatchAnalyticsDashboardAdminService extends AbstractAdmin {
      */
     public Column[] getTableSchema(String tableName) throws AxisFault {
         try {
-            AnalyticsSchema schema = this.analyticsDataService.getTableSchema(getUsername(), tableName);
+            AnalyticsSchema schema = analyticsDataService.getTableSchema(getUsername(), tableName);
             Map<String, AnalyticsSchema.ColumnType> colMap = schema.getColumns();
             if (colMap != null) {
                 Column[] columns = new Column[colMap.size()];
@@ -116,6 +116,7 @@ public class BatchAnalyticsDashboardAdminService extends AbstractAdmin {
     public Table getRecords(String tableName, long timeFrom, long timeTo, int startIndex, int recordCount,
                             String searchQuery)
             throws AxisFault {
+        //todo use String.format() to prevent scttering fo log lines
         if (logger.isDebugEnabled()) {
             logger.debug("Search Query: " + searchQuery);
             logger.debug("timeFrom: " + timeFrom);

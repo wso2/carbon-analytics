@@ -28,7 +28,7 @@
             <region>region1</region>
             <order>20</order>
             <style-class>tools</style-class>
-            <icon>../analytics-dashboard/images/dashboard.gif</icon>
+            <icon>../analytics-dashboard/assets/img/dashboard.png</icon>
         </menu>
 	</menus>
 </component>

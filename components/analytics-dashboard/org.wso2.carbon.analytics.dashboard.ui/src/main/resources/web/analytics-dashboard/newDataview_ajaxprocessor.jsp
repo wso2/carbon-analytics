@@ -55,7 +55,7 @@
 			<div class="form-group">
 			  <label class="col-md-4 control-label" for="button1id"></label>
 			  <div class="col-md-8">
-			    <button type="button" id="button1id" name="button1id" class="btn btn-default">Cancel</button>
+			    <button type="button" id="btnCancel" name="button1id" class="btn btn-default">Cancel</button>
 			    <button type="button" id="btnSaveDV" name="button2id" class="btn btn-success">Save</button>
 			  </div>
 			</div>
@@ -71,6 +71,11 @@
 <jsp:include page="includes/footer.jsp" />
 
 <script type="text/javascript">
+	
+	$("#btnCancel").click(function(e){
+		e.preventDefault();
+		window.location.href = "/carbon/analytics-dashboard/dataviews_ajaxprocessor.jsp";
+	});
 
 	$(document).ready(function () {
 		$("#error-alert").hide();

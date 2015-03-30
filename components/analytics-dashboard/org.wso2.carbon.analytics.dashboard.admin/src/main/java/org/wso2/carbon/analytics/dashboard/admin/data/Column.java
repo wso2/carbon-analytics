@@ -15,6 +15,7 @@
  */
 package org.wso2.carbon.analytics.dashboard.admin.data;
 
+//TODO implement hashcode() and equals()
 public class Column {
 	private String name;
 	private String type;

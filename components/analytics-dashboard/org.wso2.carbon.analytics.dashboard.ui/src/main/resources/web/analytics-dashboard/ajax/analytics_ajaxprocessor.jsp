@@ -38,7 +38,6 @@
         String tableName = request.getParameter("table");
         Table table = stub.getRecords(tableName,DashboardAdminClient.timestampFrom("01/09/1985"),DashboardAdminClient.timestampFrom("01/09/2100"),0,10,null);
         TableDTO dto = DashboardAdminClient.toTableDTO(table);
-        System.out.println("+++ Received by FE");
         responseText = gson.toJson(dto);
     } else if(action.equals("getTables")) {
         String[] tables = stub.getTableNames();
