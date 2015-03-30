@@ -20,7 +20,6 @@ package org.wso2.carbon.analytics.messageconsole;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.CarbonConstants;
-import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.AuthorizationUtils;
 import org.wso2.carbon.analytics.dataservice.Constants;
 import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
@@ -59,7 +58,6 @@ public class MessageConsoleService extends AbstractAdmin {
 
     private static final Log logger = LogFactory.getLog(MessageConsoleService.class);
     private static final String LUCENE = "lucene";
-    private static final String AT_SIGN = "@";
     private static final String STRING = "STRING";
     private static final String INTEGER = "INTEGER";
     private static final String LONG = "LONG";
@@ -162,11 +160,9 @@ public class MessageConsoleService extends AbstractAdmin {
         }
 
         String username = getUsername();
-
         RecordResultBean recordResult = new RecordResultBean();
         RecordGroup[] results;
         long searchCount = 0;
-
         if (searchQuery != null && !searchQuery.isEmpty()) {
             try {
                 List<SearchResultEntry> searchResults = analyticsDataService.search(username, tableName, LUCENE,
@@ -174,7 +170,6 @@ public class MessageConsoleService extends AbstractAdmin {
                 List<String> ids = getRecordIds(searchResults);
                 results = analyticsDataService.get(username, tableName, 1, null, ids);
                 searchCount = analyticsDataService.searchCount(username, tableName, LUCENE, searchQuery);
-
                 if (logger.isDebugEnabled()) {
                     logger.debug("Query satisfied result count: " + searchResults.size());
                 }
@@ -195,7 +190,6 @@ public class MessageConsoleService extends AbstractAdmin {
                                                   " and for table:" + tableName, e);
             }
         }
-
         if (results != null) {
             List<RecordBean> recordBeanList = new ArrayList<>();
             List<Record> records;
@@ -216,7 +210,6 @@ public class MessageConsoleService extends AbstractAdmin {
             recordResult.setRecords(recordBeanList.toArray(recordBeans));
             recordResult.setTotalResultCount(searchCount);
         }
-
         return recordResult;
     }
 
@@ -231,7 +224,6 @@ public class MessageConsoleService extends AbstractAdmin {
             entityBeans[i++] = entityBean;
         }
         recordBean.setEntityBeans(entityBeans);
-
         return recordBean;
     }
 
@@ -274,7 +266,6 @@ public class MessageConsoleService extends AbstractAdmin {
             logger.error("Unable to get schema information for table :" + tableName, e);
             throw new MessageConsoleException("Unable to get schema information for table :" + tableName, e);
         }
-
         return table;
     }
 
@@ -289,7 +280,7 @@ public class MessageConsoleService extends AbstractAdmin {
         TableBean tableBean = getTableInfo(tableName);
         String username = getUsername();
         try {
-            if (AuthorizationUtils.isUserAuthorized(getTenantId(username), username, Constants.PERMISSION_GET_INDEXING)) {
+            if (AuthorizationUtils.isUserAuthorized(getTenantId(), username, Constants.PERMISSION_GET_INDEXING)) {
                 Map<String, IndexType> indices = analyticsDataService.getIndices(username, tableName);
                 for (ColumnBean columnBean : tableBean.getColumns()) {
                     if (indices.containsKey(columnBean.getName())) {
@@ -337,19 +328,15 @@ public class MessageConsoleService extends AbstractAdmin {
     public RecordBean addRecord(String table, String[] columns, String[] values) throws MessageConsoleException {
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
         String username = getUsername();
-
         if (logger.isDebugEnabled()) {
             logger.debug("New record {column: " + Arrays.toString(columns) + ", values: " + Arrays.toString(values) +
                          "} going to add to" + table);
         }
-
         RecordBean recordBean;
         try {
             Map<String, Object> objectMap = getRecordPropertyMap(table, columns, values, username);
-
             Record record = new Record(tenantId, table, objectMap, System.currentTimeMillis());
             recordBean = createRecordBean(record);
-
             List<Record> records = new ArrayList<>(1);
             records.add(record);
             analyticsDataService.put(username, records);
@@ -357,7 +344,6 @@ public class MessageConsoleService extends AbstractAdmin {
             logger.error("Unable to add record {column: " + Arrays.toString(columns) + ", values: " + Arrays.toString(values) + " } to table :" + table, e);
             throw new MessageConsoleException("Unable to add record {column: " + Arrays.toString(columns) + ", values: " + Arrays.toString(values) + " } to table :" + table, e);
         }
-
         return recordBean;
     }
 
@@ -375,12 +361,10 @@ public class MessageConsoleService extends AbstractAdmin {
             throws MessageConsoleException {
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
         String username = getUsername();
-
         if (logger.isDebugEnabled()) {
             logger.debug("Record {id: " + recordId + ", column: " + Arrays.toString(columns) + ", values: " + Arrays.toString
                     (values) + "} going to update to" + table);
         }
-
         RecordBean recordBean;
         try {
             Record originalRecord = getRecord(table, recordId, username);
@@ -390,10 +374,8 @@ public class MessageConsoleService extends AbstractAdmin {
                     originalRecord.getValues().put(newEntry.getKey(), newEntry.getValue());
                 }
             }
-
             Record record = new Record(recordId, tenantId, table, originalRecord.getValues(), System.currentTimeMillis());
             recordBean = createRecordBean(record);
-
             List<Record> records = new ArrayList<>(1);
             records.add(record);
             analyticsDataService.put(username, records);
@@ -403,7 +385,6 @@ public class MessageConsoleService extends AbstractAdmin {
             throw new MessageConsoleException("Unable to update record {id: " + recordId + ", column: " + Arrays
                     .toString(columns) + ", values: " + Arrays.toString(values) + " } to table :" + table, e);
         }
-
         return recordBean;
     }
 
@@ -413,45 +394,13 @@ public class MessageConsoleService extends AbstractAdmin {
         AnalyticsSchema schema = analyticsDataService.getTableSchema(username, table);
         if (schema != null && schema.getColumns() != null) {
             Map<String, AnalyticsSchema.ColumnType> columnsMetaInfo = schema.getColumns();
-
             if (columns != null) {
                 for (int i = 0; i < columns.length; i++) {
                     String columnName = columns[i];
                     String stringValue = values[i];
                     if (columnName != null) {
                         AnalyticsSchema.ColumnType columnType = columnsMetaInfo.get(columnName);
-                        Object value = stringValue;
-                        switch (columnType) {
-                            case STRING:
-                                break;
-                            case INTEGER:
-                                if (stringValue == null || stringValue.isEmpty()) {
-                                    stringValue = "0";
-                                }
-                                value = Integer.valueOf(stringValue);
-                                break;
-                            case LONG:
-                                if (stringValue == null || stringValue.isEmpty()) {
-                                    stringValue = "0";
-                                }
-                                value = Long.valueOf(stringValue);
-                                break;
-                            case BOOLEAN:
-                                value = Boolean.valueOf(stringValue);
-                                break;
-                            case FLOAT:
-                                if (stringValue == null || stringValue.isEmpty()) {
-                                    stringValue = "0.0";
-                                }
-                                value = Float.valueOf(stringValue);
-                                break;
-                            case DOUBLE:
-                                if (stringValue == null || stringValue.isEmpty()) {
-                                    stringValue = "0.0";
-                                }
-                                value = Double.valueOf(stringValue);
-                                break;
-                        }
+                        Object value = getObject(stringValue, columnType.name());
                         objectMap.put(columnName, value);
                     }
                 }
@@ -475,7 +424,6 @@ public class MessageConsoleService extends AbstractAdmin {
         try {
             Record originalRecord = getRecord(table, recordId, username);
             AnalyticsSchema schema = analyticsDataService.getTableSchema(username, table);
-
             if (originalRecord != null) {
                 Map<String, Object> recordValues = originalRecord.getValues();
                 if (schema != null) {
@@ -489,17 +437,12 @@ public class MessageConsoleService extends AbstractAdmin {
                                 entityBeansList.add(getEntityBean(objectEntry));
                             }
                         }
-                    } else {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Table schema[" + table + "] is empty.");
-                        }
-                        for (Map.Entry<String, Object> objectEntry : recordValues.entrySet()) {
-                            entityBeansList.add(getEntityBean(objectEntry));
-                        }
                     }
-                } else {
+                }
+                if (entityBeansList.isEmpty()) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Table schema[" + table + "] is null.");
+                        logger.debug("Either table schema[" + table + "] null or empty. Adding all records to " +
+                                     "arbitrary list");
                     }
                     for (Map.Entry<String, Object> objectEntry : recordValues.entrySet()) {
                         entityBeansList.add(getEntityBean(objectEntry));
@@ -510,7 +453,6 @@ public class MessageConsoleService extends AbstractAdmin {
             logger.error("Unable to get arbitrary fields for id [" + recordId + "] from table :" + table, e);
             throw new MessageConsoleException("Unable to get arbitrary fields for id [" + recordId + "] from table :" + table, e);
         }
-
         EntityBean[] entityBeans = new EntityBean[entityBeansList.size()];
         return entityBeansList.toArray(entityBeans);
     }
@@ -584,51 +526,8 @@ public class MessageConsoleService extends AbstractAdmin {
             if (record != null) {
                 Map<String, Object> recordValues = record.getValues();
                 recordValues.remove(fieldName);
-                Object convertedValue;
-                switch (type) {
-                    case STRING: {
-                        convertedValue = String.valueOf(value);
-                        break;
-                    }
-                    case INTEGER: {
-                        if (value == null || value.isEmpty()) {
-                            value = "0";
-                        }
-                        convertedValue = Integer.valueOf(value);
-                        break;
-                    }
-                    case LONG: {
-                        if (value == null || value.isEmpty()) {
-                            value = "0";
-                        }
-                        convertedValue = Integer.valueOf(value);
-                        break;
-                    }
-                    case BOOLEAN: {
-                        convertedValue = Boolean.valueOf(value);
-                        break;
-                    }
-                    case FLOAT: {
-                        if (value == null || value.isEmpty()) {
-                            value = "0.0";
-                        }
-                        convertedValue = Float.valueOf(value);
-                        break;
-                    }
-                    case DOUBLE: {
-                        if (value == null || value.isEmpty()) {
-                            value = "0.0";
-                        }
-                        convertedValue = Double.valueOf(value);
-                        break;
-                    }
-                    default: {
-                        convertedValue = value;
-                    }
-                }
-
+                Object convertedValue = getObject(value, type);
                 recordValues.put(fieldName, convertedValue);
-
                 Record editedRecord = new Record(recordId, tenantId, table, recordValues, System.currentTimeMillis());
                 List<Record> records = new ArrayList<>(1);
                 records.add(editedRecord);
@@ -638,6 +537,52 @@ public class MessageConsoleService extends AbstractAdmin {
             logger.error("Unable to update arbitrary field[" + fieldName + "] for id [" + recordId + "] from table :" + table, e);
             throw new MessageConsoleException("Unable to update arbitrary field[" + fieldName + "] for id [" + recordId + "] from table :" + table, e);
         }
+    }
+
+    private Object getObject(String value, String type) {
+        Object convertedValue;
+        switch (type) {
+            case STRING: {
+                convertedValue = String.valueOf(value);
+                break;
+            }
+            case INTEGER: {
+                if (value == null || value.isEmpty()) {
+                    value = "0";
+                }
+                convertedValue = Integer.valueOf(value);
+                break;
+            }
+            case LONG: {
+                if (value == null || value.isEmpty()) {
+                    value = "0";
+                }
+                convertedValue = Integer.valueOf(value);
+                break;
+            }
+            case BOOLEAN: {
+                convertedValue = Boolean.valueOf(value);
+                break;
+            }
+            case FLOAT: {
+                if (value == null || value.isEmpty()) {
+                    value = "0.0";
+                }
+                convertedValue = Float.valueOf(value);
+                break;
+            }
+            case DOUBLE: {
+                if (value == null || value.isEmpty()) {
+                    value = "0.0";
+                }
+                convertedValue = Double.valueOf(value);
+                break;
+            }
+            default: {
+                convertedValue = value;
+            }
+        }
+        return convertedValue;
     }
 
     /**
@@ -655,7 +600,6 @@ public class MessageConsoleService extends AbstractAdmin {
             logger.error("Unable to create table: " + e.getMessage(), e);
             throw new MessageConsoleException("Unable to create table: " + e.getMessage(), e);
         }
-
         List<String> primaryKeys = new ArrayList<>();
         Map<String, AnalyticsSchema.ColumnType> columns = new HashMap<>();
         Map<String, IndexType> indexColumns = new HashMap<>();
@@ -672,19 +616,16 @@ public class MessageConsoleService extends AbstractAdmin {
                 }
             }
         }
-        if (!primaryKeys.isEmpty()) {
-            try {
-                AnalyticsSchema schema = new AnalyticsSchema(columns, primaryKeys);
-                analyticsDataService.setTableSchema(username, tableInfo.getName(), schema);
-            } catch (AnalyticsException e) {
-                logger.error("Unable to save table schema information: " + e.getMessage(), e);
-                throw new MessageConsoleException("Unable to save table schema information: " + e.getMessage(), e);
-            }
+        try {
+            AnalyticsSchema schema = new AnalyticsSchema(columns, primaryKeys);
+            analyticsDataService.setTableSchema(username, tableInfo.getName(), schema);
+        } catch (AnalyticsException e) {
+            logger.error("Unable to save table schema information: " + e.getMessage(), e);
+            throw new MessageConsoleException("Unable to save table schema information: " + e.getMessage(), e);
         }
-
         if (!indexColumns.isEmpty()) {
             try {
-                if (AuthorizationUtils.isUserAuthorized(getTenantId(username), username, Constants
+                if (AuthorizationUtils.isUserAuthorized(getTenantId(), username, Constants
                         .PERMISSION_SET_INDEXING)) {
                     analyticsDataService.setIndices(username, tableInfo.getName(), indexColumns);
                 }
@@ -719,7 +660,6 @@ public class MessageConsoleService extends AbstractAdmin {
                 }
             }
         }
-
         try {
             AnalyticsSchema schema = new AnalyticsSchema(columns, primaryKeys);
             analyticsDataService.setTableSchema(username, tableInfo.getName(), schema);
@@ -727,13 +667,12 @@ public class MessageConsoleService extends AbstractAdmin {
             logger.error("Unable to save table schema information: " + e.getMessage(), e);
             throw new MessageConsoleException("Unable to save table schema information: " + e.getMessage(), e);
         }
-
         try {
-            if (AuthorizationUtils.isUserAuthorized(getTenantId(username), username, Constants
+            if (AuthorizationUtils.isUserAuthorized(getTenantId(), username, Constants
                     .PERMISSION_DELETE_INDEXING)) {
                 analyticsDataService.clearIndices(username, tableInfo.getName());
                 if (!indexColumns.isEmpty()) {
-                    if (AuthorizationUtils.isUserAuthorized(getTenantId(username), username, Constants
+                    if (AuthorizationUtils.isUserAuthorized(getTenantId(), username, Constants
                             .PERMISSION_SET_INDEXING)) {
                         analyticsDataService.setIndices(username, tableInfo.getName(), indexColumns);
                     }
@@ -790,7 +729,7 @@ public class MessageConsoleService extends AbstractAdmin {
      */
     @Override
     protected String getUsername() {
-        return super.getUsername() + AT_SIGN + getTenantDomain();
+        return MultitenantUtils.getTenantAwareUsername(super.getUsername());
     }
 
     /**
@@ -809,13 +748,8 @@ public class MessageConsoleService extends AbstractAdmin {
         }
     }
 
-    private int getTenantId(String username) throws AnalyticsException {
-        try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(username);
-            return AnalyticsServiceHolder.getRealmService().getTenantManager().getTenantId(tenantDomain);
-        } catch (UserStoreException e) {
-            throw new AnalyticsException("Unable to get tenantId for user: " + username, e);
-        }
+    private int getTenantId() {
+        return CarbonContext.getThreadLocalCarbonContext().getTenantId();
     }
 
     /**
