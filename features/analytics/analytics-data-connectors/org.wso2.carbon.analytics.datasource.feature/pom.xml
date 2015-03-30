@@ -63,6 +63,8 @@
                             <includedFeatures>
                                 <includedFeatureDef>
                                     org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasource.rdbms.server.feature:${carbon.analytics.version}
+                                </includedFeatureDef>
+                                <includedFeatureDef>
                                     org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasource.hbase.server.feature:${carbon.analytics.version}
                                 </includedFeatureDef>
                             </includedFeatures>
