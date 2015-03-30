@@ -38,6 +38,11 @@
             <artifactId>org.wso2.carbon.analytics.datasource.rdbms.server.feature</artifactId>
             <type>zip</type>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.analytics.datasource.hbase.server.feature</artifactId>
+            <type>zip</type>
+        </dependency>
     </dependencies>
 
     <build>
@@ -58,6 +63,7 @@
                             <includedFeatures>
                                 <includedFeatureDef>
                                     org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasource.rdbms.server.feature:${carbon.analytics.version}
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasource.hbase.server.feature:${carbon.analytics.version}
                                 </includedFeatureDef>
                             </includedFeatures>
                         </configuration>
