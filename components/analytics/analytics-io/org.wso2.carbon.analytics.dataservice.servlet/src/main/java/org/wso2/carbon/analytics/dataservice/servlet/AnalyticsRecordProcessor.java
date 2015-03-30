@@ -21,6 +21,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import org.wso2.carbon.analytics.dataservice.api.commons.AnalyticsAPIConstants;
+import org.wso2.carbon.analytics.dataservice.servlet.exception.AnalyticsAPIAuthenticationException;
 import org.wso2.carbon.analytics.dataservice.servlet.internal.ServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -51,6 +52,11 @@ public class AnalyticsRecordProcessor extends HttpServlet {
         if (sessionId == null || sessionId.trim().isEmpty()) {
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
         } else {
+            try {
+                ServiceHolder.getAuthenticator().validateSessionId(sessionId);
+            } catch (AnalyticsAPIAuthenticationException e) {
+                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
+            }
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.GET_RECORD_COUNT_OPERATION)) {
                 int tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
@@ -87,6 +93,11 @@ public class AnalyticsRecordProcessor extends HttpServlet {
         if (sessionId == null || sessionId.trim().isEmpty()) {
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
         } else {
+            try {
+                ServiceHolder.getAuthenticator().validateSessionId(sessionId);
+            } catch (AnalyticsAPIAuthenticationException e) {
+                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
+            }
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.PUT_RECORD_OPERATION)) {
                 String recordsJson = req.getParameter(AnalyticsAPIConstants.RECORDS_PARAM);
@@ -118,6 +129,11 @@ public class AnalyticsRecordProcessor extends HttpServlet {
         if (sessionId == null || sessionId.trim().isEmpty()) {
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
         } else {
+            try {
+                ServiceHolder.getAuthenticator().validateSessionId(sessionId);
+            } catch (AnalyticsAPIAuthenticationException e) {
+                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
+            }
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.DELETE_RECORDS_RANGE_OPERATION)) {
                 int tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));

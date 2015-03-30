@@ -17,6 +17,8 @@
 */
 package org.wso2.carbon.analytics.dataservice.servlet.internal;
 
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
@@ -39,6 +41,8 @@ import java.util.Hashtable;
  * cardinality="1..1" policy="dynamic" bind="setAnalyticsDataService" unbind="unsetAnalyticsDataService"
  * @scr.reference name="http.service" interface="org.osgi.service.http.HttpService"
  * cardinality="1..1" policy="dynamic" bind="setHttpService" unbind="unsetHttpService"
+ * @scr.reference name="hazelcast.instance.service" interface="com.hazelcast.core.HazelcastInstance"
+ * cardinality="0..1" policy="dynamic" bind="setHazelcastInstance" unbind="unsetHazelcastInstance"
  */
 public class AnalyticsDataServiceServletDS {
     private static final Log log = LogFactory.getLog(AnalyticsDataServiceServletDS.class);
@@ -103,5 +107,12 @@ public class AnalyticsDataServiceServletDS {
         ServiceHolder.setHttpService(null);
     }
 
+    protected void setHazelcastInstance(HazelcastInstance hazelcastInstance){
+        ServiceHolder.setHazelcastInstance(hazelcastInstance);
+    }
+
+    protected void unsetHazelcastInstance(HazelcastInstance hazelcastInstance){
+        ServiceHolder.setHazelcastInstance(null);
+    }
 }
 

@@ -390,8 +390,8 @@ public class AnalyticsAPIHttpClient {
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.PUT_RECORD_OPERATION));
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.SESSION_ID, sessionId));
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.RECORDS_PARAM, new Gson().toJson(records)));
-            HttpResponse httpResponse = httpClient.execute(postMethod);
             postMethod.setEntity(new UrlEncodedFormEntity(params));
+            HttpResponse httpResponse = httpClient.execute(postMethod);
             String response = getResponse(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_ACCEPTED) {
                 throw new AnalyticsServiceException("Unable to put the records. " + response);
@@ -750,7 +750,7 @@ public class AnalyticsAPIHttpClient {
                 throw new AnalyticsServiceException("Unable to read the record group. "
                         + response);
             }
-            return new RemoteRecordIterator<Record>(postMethod.getEntity().getContent());
+            return new RemoteRecordIterator<Record>(httpResponse.getEntity().getContent());
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceAuthenticationException("Malformed URL provided. " + e.getMessage(), e);
         } catch (IOException e) {

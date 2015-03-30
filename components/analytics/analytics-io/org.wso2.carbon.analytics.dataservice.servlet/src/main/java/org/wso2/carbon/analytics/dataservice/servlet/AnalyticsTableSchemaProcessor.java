@@ -19,6 +19,7 @@ package org.wso2.carbon.analytics.dataservice.servlet;
 
 import com.google.gson.GsonBuilder;
 import org.wso2.carbon.analytics.dataservice.api.commons.AnalyticsAPIConstants;
+import org.wso2.carbon.analytics.dataservice.servlet.exception.AnalyticsAPIAuthenticationException;
 import org.wso2.carbon.analytics.dataservice.servlet.internal.ServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -44,6 +45,11 @@ public class AnalyticsTableSchemaProcessor extends HttpServlet {
         if (sessionId == null || sessionId.trim().isEmpty()){
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
         }else {
+            try {
+                ServiceHolder.getAuthenticator().validateSessionId(sessionId);
+            } catch (AnalyticsAPIAuthenticationException e) {
+                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
+            }
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.SET_SCHEMA_OPERATION)){
                 int tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
@@ -68,6 +74,11 @@ public class AnalyticsTableSchemaProcessor extends HttpServlet {
         if (sessionId == null || sessionId.trim().isEmpty()){
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
         }else {
+            try {
+                ServiceHolder.getAuthenticator().validateSessionId(sessionId);
+            } catch (AnalyticsAPIAuthenticationException e) {
+                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
+            }
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.GET_SCHEMA_OPERATION)){
                 int tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));

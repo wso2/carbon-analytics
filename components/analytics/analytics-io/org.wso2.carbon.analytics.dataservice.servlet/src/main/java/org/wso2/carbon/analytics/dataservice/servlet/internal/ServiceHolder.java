@@ -17,6 +17,7 @@
 */
 package org.wso2.carbon.analytics.dataservice.servlet.internal;
 
+import com.hazelcast.core.HazelcastInstance;
 import org.osgi.service.http.HttpService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.identity.authentication.AuthenticationService;
@@ -26,6 +27,7 @@ public class ServiceHolder {
     private static AnalyticsDataService analyticsDataService;
     private static AnalyticsAPIAuthenticator authenticator;
     private static HttpService httpService;
+    private static HazelcastInstance hazelcastInstance;
 
     public static AuthenticationService getAuthenticationService() {
         return authenticationService;
@@ -53,6 +55,14 @@ public class ServiceHolder {
 
     public static HttpService getHttpService() {
         return httpService;
+    }
+
+    public static HazelcastInstance getHazelcastInstance() {
+        return hazelcastInstance;
+    }
+
+    public static void setHazelcastInstance(HazelcastInstance hazelcastInstance) {
+        ServiceHolder.hazelcastInstance = hazelcastInstance;
     }
 
     public static void setHttpService(HttpService httpService) {
