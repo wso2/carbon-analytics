@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.analytics.dashboard.batch.admin.data;
 
+/**
+ * Represents a row in a table. Consists of a collection of Cell objects.
+ */
 public class Row {
     private Cell[] cells;
 

@@ -38,26 +38,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Admin service that responds to data requests originated from dashboard frontend.
+ * Basically this service returns records for a given table, table schema and list of table names.
+ */
 public class BatchAnalyticsDashboardAdminService extends AbstractAdmin {
+    private static final String DATAVIEWS_DIR = "/repository/components/org.wso2.carbon.analytics.dataviews/";
+    private static final String DASHBOARDS_DIR = "/repository/components/org.wso2.carbon.analytics.dashboards/";
 
-
-    /**
-     * Relative Registry locations for dataViews and dashboards.
-     */
-    private static final String DATAVIEWS_DIR =
-            "/repository/components/org.wso2.carbon.analytics.dataviews/";
-    private static final String DASHBOARDS_DIR =
-            "/repository/components/org.wso2.carbon.analytics.dashboards/";
     private SecureAnalyticsDataService analyticsDataService;
-    /**
-     * Logger
-     */
     private Log logger = LogFactory.getLog(BatchAnalyticsDashboardAdminService.class);
 
     public BatchAnalyticsDashboardAdminService() {
         this.analyticsDataService = BatchAnalyticsDashboardAdminValueHolder.getAnalyticsDataService();
     }
 
+    /**
+     * Returns a list of analytic tables names.
+     *
+     * @return An array of strings.
+     * @throws AxisFault If something happened during operation.
+     */
     public String[] getTableNames() throws AxisFault {
         List<String> tables = null;
         try {
@@ -70,16 +71,27 @@ public class BatchAnalyticsDashboardAdminService extends AbstractAdmin {
         return tables.toArray(new String[tables.size()]);
     }
 
+    /**
+     * Returns the schema for a given analytic table.
+     *
+     * @param tableName Name of the analytics table.
+     * @return An array of Column objects. Column object consists of a name and type.
+     * @throws AxisFault
+     */
     public Column[] getTableSchema(String tableName) throws AxisFault {
         try {
-            AnalyticsSchema schema = this.analyticsDataService.getTableSchema(getUsername(),tableName);
-            Map <String,AnalyticsSchema.ColumnType> colMap  = schema.getColumns();
-            Column[] columns = new Column[colMap.size()];
-            int i = 0;
-            for(Map.Entry<String, AnalyticsSchema.ColumnType> entry : colMap.entrySet()) {
-                columns[i++] = new Column(entry.getKey(),String.valueOf(entry.getValue()));
+            AnalyticsSchema schema = this.analyticsDataService.getTableSchema(getUsername(), tableName);
+            Map<String, AnalyticsSchema.ColumnType> colMap = schema.getColumns();
+            if (colMap != null) {
+                Column[] columns = new Column[colMap.size()];
+                int i = 0;
+                for (Map.Entry<String, AnalyticsSchema.ColumnType> entry : colMap.entrySet()) {
+                    columns[i++] = new Column(entry.getKey(), String.valueOf(entry.getValue()));
+                }
+                return columns;
+            } else {
+                return new Column[0];
             }
-            return columns;
         } catch (AnalyticsException e) {
             logger.error("Unable to get the schema for table: " + tableName +
                     "from Analytics data layer for tenant: " + getUsername(), e);
@@ -88,8 +100,21 @@ public class BatchAnalyticsDashboardAdminService extends AbstractAdmin {
         }
     }
 
+    /**
+     * Returns a collection of records from an analytic table.
+     *
+     * @param tableName   name of the analytics table data to be read from.
+     * @param timeFrom    starting timestamp.
+     * @param timeTo      end timestamp.
+     * @param startIndex  starting index. Specially when paginating.
+     * @param recordCount how many records required? defaults to all.
+     * @param searchQuery optional lucene query.
+     * @return A Table object filled with records.
+     * @throws AxisFault
+     */
+    //TODO implement pagination based reading, facets
     public Table getRecords(String tableName, long timeFrom, long timeTo, int startIndex, int recordCount,
-            String searchQuery)
+                            String searchQuery)
             throws AxisFault {
         if (logger.isDebugEnabled()) {
             logger.debug("Search Query: " + searchQuery);
@@ -104,7 +129,7 @@ public class BatchAnalyticsDashboardAdminService extends AbstractAdmin {
         RecordGroup[] results = new RecordGroup[0];
         long searchCount = 0;
         if (searchQuery != null && !searchQuery.isEmpty()) {
-            //TODO implement me :(
+            //TODO implement me :(  facets FTW!
         } else {
             try {
                 results = analyticsDataService
@@ -144,6 +169,12 @@ public class BatchAnalyticsDashboardAdminService extends AbstractAdmin {
         return super.getUsername() + "@" + getTenantDomain();
     }
 
+    /**
+     * Returns a Row object from a Record.
+     *
+     * @param record Record object returned from Analytics data service.
+     * @return
+     */
     private Row createRow(Record record) {
         Row row = new Row();
         Cell[] cells = new Cell[record.getValues().size()];

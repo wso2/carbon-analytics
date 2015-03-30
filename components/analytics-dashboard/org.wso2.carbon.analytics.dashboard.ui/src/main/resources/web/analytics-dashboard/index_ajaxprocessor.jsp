@@ -98,6 +98,53 @@
     
   };
    
+  // function drawWidget(gridster,widget) {
+  //   console.log("+++ Drawing widget " + widget.id); 
+  //   var request = {
+  //     "action" : "getWidget",
+  //     "dataview" : widget.dataview,
+  //     "widgetId" : widget.id,
+  //   };
+  //   $.getJSON("/dashboard/servlet/dataview", request,function (data) {
+  //     var dataTable = new igviz.DataTable();
+  //     data.columns.forEach(function (element,index) {
+  //         var type = 'N';
+  //         if(element.type == 'STRING' || element.type == 'BOOL') {
+  //             type = 'C';
+  //         }
+  //         dataTable.addColumn(element.name,type);
+  //     });
+
+  //     //Create the widget canvas first
+  //     var source   = $("#tplWidget").html();
+  //     var template = Handlebars.compile(source);
+  //     var templateCtxt = { "title" : data.widget.title, "id" : data.widget.id };
+  //     gridster.add_widget(template(templateCtxt),widget.dimensions.width, widget.dimensions.height);
+
+  //     //do some width hiegth manipulation
+  //     data.widget.config.width = widget.dimensions.width * 100;        
+  //     data.widget.config.height = widget.dimensions.height * 100;     
+
+  //     // console.log(data); 
+
+  //     // var chart = igviz.plot("#" + data.widget.id,data.widget.config,dataTable);
+  //     var chart = igviz.setUp("#" + data.widget.id,JSON.parse(data.widget.config),dataTable);
+
+  //     bindingSource.addWidget(data.id,chart);
+
+  //     //check for widgets type and set the data access strategy.
+  //     //E.g Poll if type set to batch, subscribe for WS if type set to realtime
+  //     //request data for this widget and register a callback to process them later
+  //     $.getJSON("data/data/" + data.id + ".json",function (d) {
+  //       console.log("+++ Received data for widget " + widget.id); 
+  //       chart.plot(d.data);
+  //     });
+      
+      
+  //   });
+
+  // };
+
   function drawWidget(gridster,widget) {
     console.log("+++ Drawing widget " + widget.id); 
     var request = {
@@ -105,11 +152,11 @@
       "dataview" : widget.dataview,
       "widgetId" : widget.id,
     };
-    $.getJSON("/dashboard/servlet/dataview", request,function (data) {
+    $.getJSON("/carbon/analytics-dashboard/ajax/dataviews_ajaxprocessor.jsp", request,function (data) {
       var dataTable = new igviz.DataTable();
       data.columns.forEach(function (element,index) {
           var type = 'N';
-          if(element.type == 'STRING' || element.type == 'BOOL') {
+          if(element.type == 'STRING' || element.type == 'string' || element.type == 'BOOL') {
               type = 'C';
           }
           dataTable.addColumn(element.name,type);
@@ -119,6 +166,7 @@
       var source   = $("#tplWidget").html();
       var template = Handlebars.compile(source);
       var templateCtxt = { "title" : data.widget.title, "id" : data.widget.id };
+      console.log("gridster received at drawWidget: " + gridster); 
       gridster.add_widget(template(templateCtxt),widget.dimensions.width, widget.dimensions.height);
 
       //do some width hiegth manipulation
@@ -129,14 +177,16 @@
 
       // var chart = igviz.plot("#" + data.widget.id,data.widget.config,dataTable);
       var chart = igviz.setUp("#" + data.widget.id,JSON.parse(data.widget.config),dataTable);
-
+      //subscrubes to the binding source
       bindingSource.addWidget(data.id,chart);
 
       //check for widgets type and set the data access strategy.
       //E.g Poll if type set to batch, subscribe for WS if type set to realtime
       //request data for this widget and register a callback to process them later
-      $.getJSON("data/data/" + data.id + ".json",function (d) {
+      var request = {"table" : data.datasource};
+      $.getJSON("/carbon/analytics-dashboard/ajax/analytics_ajaxprocessor.jsp",request,function (d) {
         console.log("+++ Received data for widget " + widget.id); 
+        // var res = [["2004",1000,"400"],["2005",1170,"460"]];
         chart.plot(d.data);
       });
       

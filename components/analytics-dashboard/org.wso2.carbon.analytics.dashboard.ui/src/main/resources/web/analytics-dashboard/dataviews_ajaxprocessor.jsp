@@ -225,15 +225,11 @@
 	        </tr>
 	        <tr>
 	          <th scope="row">Datasource</th>
-	          <td>{{dataview.datasource}}</td>
+	          <td>{{dataview.dataSource}}</td>
 	        </tr>
 	        <tr>
 	          <th scope="row">Filter</th>
 	          <td>{{dataview.filter}}</td>
-	        </tr>
-	        <tr>
-	          <th scope="row">Columns</th>
-	          <td>{{dataview.columns}}</td>
 	        </tr>
 	      </tbody>
 	</table>
@@ -242,7 +238,7 @@
         <div class="row">
         	<div class="container-fluid">
         		{{#each widgets}}
-		          <div class="col-sm-6 col-md-6">
+		          <div class="col-sm-6 col-md-4">
 		            <div class="thumbnail">
 		              <div class="caption">
 		                <h4>{{title}}</h4>
@@ -279,7 +275,7 @@
     	<div class="blank-slate-message">
     	    <h4>This DataView has no widgets associated.</h4>
     	    <p class="text-muted">Get started by creating a new Widget with DataView data</p>
-    	        <button type="button" class="btn btn-success addNew">Create New Widget</button>
+    	        
     	</div>
     {{/if}}
 </script>

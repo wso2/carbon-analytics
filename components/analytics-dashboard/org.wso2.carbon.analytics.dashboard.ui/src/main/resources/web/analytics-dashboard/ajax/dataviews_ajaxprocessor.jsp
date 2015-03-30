@@ -49,7 +49,7 @@
     } else if(action.equals("getDataViewById")) {
         String dataViewId = request.getParameter("dataViewId");
         DataView dataView = stub.getDataView(dataViewId);
-        System.out.println("+++ " + dataView.getDisplayName());
+        //System.out.println("+++ " + dataView.getDisplayName());
         response.setContentType("application/json");
         if (dataView != null) {
             responseText = gson.toJson(DashboardAdminClient.toDataViewDTO(dataView));

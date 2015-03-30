@@ -18,6 +18,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.log4j.Logger;
 import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.analytics.dashboard.batch.stub.BatchAnalyticsDashboardAdminServiceStub;
 import org.wso2.carbon.analytics.dashboard.batch.stub.data.Cell;
@@ -38,8 +39,21 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Admin client that performs dashboard related operations with DashboardAdminService.
+ */
 public class DashboardAdminClient {
+    private static final Logger logger = Logger.getLogger(DashboardAdminClient.class);
 
+    /**
+     * Acquires DashboardAdminServiceStub stub
+     *
+     * @param config  ServletConfig
+     * @param session
+     * @param request
+     * @return DashboardAdminServiceStub which performs dashboard/dataview related operations.
+     * @throws AxisFault If there are any exceptions.
+     */
     public static DashboardAdminServiceStub getDashboardAdminService(
             ServletConfig config, HttpSession session,
             HttpServletRequest request)
@@ -62,6 +76,16 @@ public class DashboardAdminClient {
         return stub;
     }
 
+    /**
+     * Acquires the BatchAnalyticsDashboardAdminServiceStub which is responsible for responding with analytical (batch)
+     * data from BAM's analytical tables.
+     *
+     * @param config
+     * @param session
+     * @param request
+     * @return
+     * @throws AxisFault
+     */
     public static BatchAnalyticsDashboardAdminServiceStub getDashboardBatchAnalyticsAdminService(
             ServletConfig config, HttpSession session,
             HttpServletRequest request)
@@ -87,53 +111,71 @@ public class DashboardAdminClient {
     }
 
     //TODO rename displayName to name
+
+    /**
+     * Returns a DataViewDTO object from a DataView object.
+     * DataViewDTO is then transformed to JSON using Gson.
+     *
+     * @param dataView
+     * @return
+     */
     public static DataViewDTO toDataViewDTO(DataView dataView) {
         DataViewDTO dto = new DataViewDTO(
-                dataView.getId(),dataView.getDisplayName(),dataView.getType()
+                dataView.getId(), dataView.getDisplayName(), dataView.getType()
         );
         dto.setFilter(dataView.getFilter());
         dto.setDataSource(dataView.getDataSource());
 
         List<ColumnDTO> columnDTOs = new ArrayList<ColumnDTO>();
-        for(Column column : dataView.getColumns()) {
-            columnDTOs.add(new ColumnDTO(column.getName(),column.getType()));
+        for (Column column : dataView.getColumns()) {
+            columnDTOs.add(new ColumnDTO(column.getName(), column.getType()));
         }
         dto.setDataSource(dataView.getDataSource());
         dto.setColumns(columnDTOs.toArray(new ColumnDTO[columnDTOs.size()]));
-        //TODO get rid of the NPE when theres no widgets element set in DV
-        if(dataView.getWidgets() != null) {
+        if (dataView.getWidgets() != null) {
             List<WidgetDTO> widgetDTOs = new ArrayList<WidgetDTO>();
-            for(Widget widget : dataView.getWidgets()) {
-                widgetDTOs.add(new WidgetDTO(widget.getId(),widget.getTitle(),widget.getConfig()));
+            for (Widget widget : dataView.getWidgets()) {
+                widgetDTOs.add(new WidgetDTO(widget.getId(), widget.getTitle(), widget.getConfig()));
             }
             dto.setWidgets(widgetDTOs.toArray(new WidgetDTO[widgetDTOs.size()]));
         }
-
         return dto;
     }
 
+    /**
+     * Creates a timestamp from a given date string.
+     *
+     * @param date date in a string format. e.g 01/09/1985
+     * @return long value
+     */
     public static long timestampFrom(String date) {
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Date dateObj = null;
         try {
-            //            dateObj = dateFormat.parse("23/09/2007");
             dateObj = dateFormat.parse(date);
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
         return dateObj.getTime();
     }
 
+    /**
+     * Returns a TableDTO object from  a Table.
+     * TableDTO is then transformed to JSON using Gson.
+     *
+     * @param table dashboard object that comes from backend.
+     * @return TableDTO
+     */
     public static TableDTO toTableDTO(Table table) {
         TableDTO dto = new TableDTO();
         dto.setName(table.getName());
-        if(table.getRows() != null && table.getRows().length > 0) {
-            int j=0;
+        if (table.getRows() != null && table.getRows().length > 0) {
+            int j = 0;
             Object[] data = new Object[table.getRows().length];
-            for(Row row : table.getRows()) {
-                int i =0;
+            for (Row row : table.getRows()) {
+                int i = 0;
                 Object[] cells = new Object[row.getCells().length];
-                for(Cell cell : row.getCells()) {
+                for (Cell cell : row.getCells()) {
                     cells[i++] = cell.getValue();
                 }
                 data[j++] = cells;
@@ -143,19 +185,26 @@ public class DashboardAdminClient {
         return dto;
     }
 
+    /**
+     * Returns a DashboardDTO object from  a Dashboard.
+     * DashboardDTO is then transformed to JSON using Gson.
+     *
+     * @param dashboard object that comes from backend.
+     * @return DashboardDTO
+     */
     public static DashboardDTO toDashboardDTO(Dashboard dashboard) {
-        DashboardDTO dto = new DashboardDTO(dashboard.getId(),dashboard.getTitle(),dashboard.getGroup());
-        if(dashboard.getWidgets() != null) {
+        DashboardDTO dto = new DashboardDTO(dashboard.getId(), dashboard.getTitle(), dashboard.getGroup());
+        if (dashboard.getWidgets() != null) {
             List<WidgetInstanceDTO> widgets = new ArrayList<WidgetInstanceDTO>();
-           for(WidgetMetaData meta: dashboard.getWidgets()) {
-               WidgetInstanceDTO widget = new WidgetInstanceDTO(meta.getId());
-               widget.setDimensions(new DimensionDTO(
-                       meta.getDimensions().getRow(),meta.getDimensions().getColumn(),
-                       meta.getDimensions().getWidth(),meta.getDimensions().getHeight())
-               );
-               widgets.add(widget);
-           }
-           dto.setWidgets(widgets.toArray(new WidgetInstanceDTO[widgets.size()]));
+            for (WidgetMetaData meta : dashboard.getWidgets()) {
+                WidgetInstanceDTO widget = new WidgetInstanceDTO(meta.getId());
+                widget.setDimensions(new DimensionDTO(
+                        meta.getDimensions().getRow(), meta.getDimensions().getColumn(),
+                        meta.getDimensions().getWidth(), meta.getDimensions().getHeight())
+                );
+                widgets.add(widget);
+            }
+            dto.setWidgets(widgets.toArray(new WidgetInstanceDTO[widgets.size()]));
         } else {
             dto.setWidgets(null);
         }
@@ -164,7 +213,7 @@ public class DashboardAdminClient {
 
     public static WidgetAndDataViewDTO toWidgetAndDVDTO(DataView dataView) {
         Widget widget = dataView.getWidgets()[0];
-        if(widget != null) {
+        if (widget != null) {
             WidgetAndDataViewDTO dto = new WidgetAndDataViewDTO();
             dto.setId(dataView.getId());
             dto.setName(dataView.getDisplayName());
@@ -172,12 +221,12 @@ public class DashboardAdminClient {
             dto.setDatasource(dataView.getDataSource());
             dto.setFilter(dataView.getFilter());
 
-            WidgetDTO widgetDTO = new WidgetDTO(widget.getId(),widget.getTitle(),widget.getConfig());
+            WidgetDTO widgetDTO = new WidgetDTO(widget.getId(), widget.getTitle(), widget.getConfig());
             dto.setWidget(widgetDTO);
-            if(dataView.getColumns() != null && dataView.getColumns().length > 0) {
+            if (dataView.getColumns() != null && dataView.getColumns().length > 0) {
                 for (int i = 0; i < dataView.getColumns().length; i++) {
                     Column column = dataView.getColumns()[i];
-                    dto.getColumns().add(new ColumnDTO(column.getName(),column.getType()));
+                    dto.getColumns().add(new ColumnDTO(column.getName(), column.getType()));
                 }
             }
             return dto;
@@ -185,6 +234,12 @@ public class DashboardAdminClient {
         return null;
     }
 
+    /**
+     * Returns a DataView object from DataViewDTO.
+     *
+     * @param dto object that comes from backend.
+     * @return DataView which is parsed to JSON using Gson.
+     */
     public static DataView toDataView(DataViewDTO dto) {
         DataView dataView = new DataView();
         dataView.setId(dto.getId());
@@ -193,11 +248,10 @@ public class DashboardAdminClient {
         dataView.setDataSource(dto.getDataSource());
         dataView.setFilter(dto.getFilter());
 
-        if(dto.getWidgets() != null && dto.getWidgets().length > 0) {
-            //TODO Should we allow users to create DVs with widgets?
+        if (dto.getWidgets() != null && dto.getWidgets().length > 0) {
         }
-        if(dto.getColumns() != null && dto.getColumns().length > 0) {
-            List<Column> columns  = new ArrayList<Column>();
+        if (dto.getColumns() != null && dto.getColumns().length > 0) {
+            List<Column> columns = new ArrayList<Column>();
             for (int i = 0; i < dto.getColumns().length; i++) {
                 ColumnDTO columnDTO = dto.getColumns()[i];
 
@@ -210,12 +264,6 @@ public class DashboardAdminClient {
         }
         return dataView;
     }
-
-
-
-
-
-
 
 
 }

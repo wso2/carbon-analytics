@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.analytics.dashboard.batch.admin.data;
 
+/**
+ * Lowest level data container. Consists of a key and a value.
+ */
 public class Cell {
     private String key;
     private String value;

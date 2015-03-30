@@ -18,7 +18,10 @@
 
 package org.wso2.carbon.analytics.dashboard.batch.admin.data;
 
-
+/**
+ * Ultimate table data structure which will be returned to data requests.
+ * Consists of a collection of Row objects.
+ */
 public class Table {
     private String name;
     private Row[] rows;

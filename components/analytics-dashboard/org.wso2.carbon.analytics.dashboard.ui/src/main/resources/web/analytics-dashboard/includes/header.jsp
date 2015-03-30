@@ -46,7 +46,7 @@
         <ul class="nav navbar-nav navbar-right">
           <!-- <li><a href="dataviews_ajaxprocessor.jsp">Browse Datasets</a></li> -->
             <li class="dropdown">
-            <a href="dataviews_ajaxprocessor.jsp" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Browse DataViews<span class="caret"></span></a>
+            <a href="dataviews_ajaxprocessor.jsp" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Browse Dataviews<span class="caret"></span></a>
               <ul class="dropdown-menu" role="menu">
                 <li><a href="dataviews_ajaxprocessor.jsp">List All</a></li>
                 <li><a href="newDataview_ajaxprocessor.jsp">Create New</a></li>

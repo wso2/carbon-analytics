@@ -145,10 +145,10 @@ public class DashboardAdminService extends AbstractAdmin {
         try {
             dataView = (DataView) RegistryUtils.readResource(DashboardConstants.DATAVIEWS_DIR +
                     dataViewID, DataView.class);
-            if(dataView.getWidgets() == null) {
+            if (dataView.getWidgets() == null) {
                 dataView.setWidgets(new Widget[0]);
             }
-            if(dataView.getColumns() == null) {
+            if (dataView.getColumns() == null) {
                 dataView.setColumns(new Column[0]);
             }
         } catch (RegistryException e) {

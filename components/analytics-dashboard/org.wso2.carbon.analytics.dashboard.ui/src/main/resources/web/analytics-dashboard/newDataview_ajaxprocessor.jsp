@@ -7,7 +7,7 @@
 			<fieldset>
 
 			<!-- Form Name -->
-			<legend>Create New Dataset</legend>
+			<legend>Create New Dataview</legend>
 
 			<div id="error-alert" class="alert alert-danger alert-dismissible" role="alert">
 			  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -45,7 +45,8 @@
 				<div class="form-group">
 				  <label class="col-md-4 control-label" for="textarea">Filter(Optional)</label>
 				  <div class="col-md-4">                     
-				    <textarea class="form-control" id="txtFilter" name="textarea">Insert a Lucene query here</textarea>
+				    <textarea class="form-control" id="txtFilter" name="textarea"></textarea>
+				    <span class="help-block">E.g Sales By Region</span> 
 				  </div>
 				</div>
 			</div>
@@ -100,7 +101,21 @@
 		if(dsList.val() != "-1" && type == "batch") {
 			console.log("Selected datasource: " + type); 
 			$("#batchContent").show();
-			var columns = [{"name" : "Year","type" : "string"},{"name" : "Expenses","type" : "int"}];
+			// var columns = [{"name" : "Year","type" : "string"},{"name" : "Expenses","type" : "int"}];
+			fetchColumns(dsList.val());
+		}
+		
+
+	});
+
+	function fetchColumns(table) {
+		console.log("Fetching table schema for table: " + table); 
+		var request = {
+			"action" : "getSchema",
+			"table" : table
+		};
+		$.getJSON("/carbon/analytics-dashboard/ajax/analytics_ajaxprocessor.jsp",request,function (columns) {
+			$("#cols").empty();
 			columns.forEach(function(col,i){
 				console.log(col.name + col.type); 
 				var div = $('<div/>').attr("class","checkbox");
@@ -112,11 +127,8 @@
 				label.append(col.name);
 				$("#cols").append(div);
 			});
-
-		}
-		
-
-	});
+		});
+	};
 
 	$("#btnSaveDV").click(function(e){
 		var name = $("#txtName").val();
@@ -131,7 +143,7 @@
 		}
 		var datasource = $("#dsList option:selected").text();
 		
-		var dataview = {id:generateId(),name : name,type: type,datasource:datasource};
+		var dataview = {id:generateId(),name : name,type: type,dataSource:datasource};
 		//construct the columns list if the datasource type is "batch"
 		if(type=="batch") {
 			var columns = [];

@@ -70,7 +70,7 @@
 
         //finally add it to the dashboard
         stub.addWidgetToDashboard(dashboardId,metaData);
-        System.out.println("Widget " + widgetId + " added to Dashboard " + dashboardId);
+        //System.out.println("Widget " + widgetId + " added to Dashboard " + dashboardId);
         responseText="OK";
 }
 %>
