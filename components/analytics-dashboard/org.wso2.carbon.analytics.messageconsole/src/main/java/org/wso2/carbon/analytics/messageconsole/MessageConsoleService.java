@@ -383,9 +383,15 @@ public class MessageConsoleService extends AbstractAdmin {
 
         RecordBean recordBean;
         try {
+            Record originalRecord = getRecord(table, recordId, username);
             Map<String, Object> objectMap = getRecordPropertyMap(table, columns, values, username);
+            for (Map.Entry<String, Object> newEntry : objectMap.entrySet()) {
+                if (originalRecord.getValues().containsKey(newEntry.getKey())) {
+                    originalRecord.getValues().put(newEntry.getKey(), newEntry.getValue());
+                }
+            }
 
-            Record record = new Record(recordId, tenantId, table, objectMap, System.currentTimeMillis());
+            Record record = new Record(recordId, tenantId, table, originalRecord.getValues(), System.currentTimeMillis());
             recordBean = createRecordBean(record);
 
             List<Record> records = new ArrayList<>(1);
@@ -543,17 +549,13 @@ public class MessageConsoleService extends AbstractAdmin {
     public void deleteArbitraryField(String table, String recordId, String fieldName) throws MessageConsoleException {
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
         String username = getUsername();
-        List<String> ids = new ArrayList<>(1);
-        ids.add(recordId);
         try {
-            RecordGroup[] results = analyticsDataService.get(username, table, 1, null, ids);
-            List<Record> records = GenericUtils.listRecords(analyticsDataService, results);
-            if (records != null && !records.isEmpty()) {
-                Record record = records.get(0);
+            Record record = getRecord(table, recordId, username);
+            if (record != null) {
                 Map<String, Object> recordValues = record.getValues();
                 recordValues.remove(fieldName);
                 Record editedRecord = new Record(recordId, tenantId, table, recordValues, System.currentTimeMillis());
-                records.clear();
+                List<Record> records = new ArrayList<>(1);
                 records.add(editedRecord);
                 analyticsDataService.put(username, records);
             }
@@ -577,13 +579,9 @@ public class MessageConsoleService extends AbstractAdmin {
             throws MessageConsoleException {
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
         String username = getUsername();
-        List<String> ids = new ArrayList<>(1);
-        ids.add(recordId);
         try {
-            RecordGroup[] results = analyticsDataService.get(username, table, 1, null, ids);
-            List<Record> records = GenericUtils.listRecords(analyticsDataService, results);
-            if (records != null && !records.isEmpty()) {
-                Record record = records.get(0);
+            Record record = getRecord(table, recordId, username);
+            if (record != null) {
                 Map<String, Object> recordValues = record.getValues();
                 recordValues.remove(fieldName);
                 Object convertedValue;
@@ -631,8 +629,8 @@ public class MessageConsoleService extends AbstractAdmin {
 
                 recordValues.put(fieldName, convertedValue);
 
-                records.clear();
                 Record editedRecord = new Record(recordId, tenantId, table, recordValues, System.currentTimeMillis());
+                List<Record> records = new ArrayList<>(1);
                 records.add(editedRecord);
                 analyticsDataService.put(username, records);
             }
