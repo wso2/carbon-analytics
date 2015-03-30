@@ -20,6 +20,7 @@ package org.wso2.carbon.analytics.api.internal.client;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.sun.javafx.fxml.builder.URLBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
@@ -70,7 +71,6 @@ public class AnalyticsAPIHttpClient {
     private String protocol;
     private String sessionId;
     private DefaultHttpClient httpClient;
-    private URIBuilder urlBuilder;
 
     private AnalyticsAPIHttpClient(String protocol, String hostname, int port,
                                    int maxPerRoute, int maxConnection,
@@ -88,7 +88,6 @@ public class AnalyticsAPIHttpClient {
         params.setParameter(CoreConnectionPNames.SO_TIMEOUT, socketTimeout);
         params.setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, connectionTimeout);
         this.httpClient = new DefaultHttpClient(connectionManager, params);
-        this.urlBuilder = new URIBuilder();
     }
 
     public static void init(AnalyticsDataConfiguration dataConfiguration) throws AnalyticsServiceException {
@@ -107,12 +106,13 @@ public class AnalyticsAPIHttpClient {
     }
 
     public void authenticate(String username, String password) throws AnalyticsServiceException {
-        urlBuilder.setScheme(this.protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.AUTHENTICATION_SERVICE_URI)
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme(this.protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.AUTHENTICATION_SERVICE_URI)
                 .setParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.LOGIN_OPERATION)
                 .setParameter(AnalyticsAPIConstants.USERNAME_PARAM, username)
                 .setParameter(AnalyticsAPIConstants.PASSWORD_PARAM, password);
         try {
-            HttpGet getMethod = new HttpGet(urlBuilder.build().toString());
+            HttpGet getMethod = new HttpGet(builder.build().toString());
             HttpResponse httpResponse = httpClient.execute(getMethod);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_ACCEPTED) {
                 throw new AnalyticsServiceAuthenticationException("Authentication failed for user : " + username);
