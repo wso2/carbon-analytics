@@ -41,8 +41,12 @@ public class MessageConsoleServiceComponent {
         if (logger.isDebugEnabled()) {
             logger.debug("Activating Analytics MessageConsoleServiceComponent module.");
         }
-        BundleContext bundleContext = ctx.getBundleContext();
-        bundleContext.registerService(MessageConsoleService.class, new MessageConsoleService(), null);
+        try {
+            BundleContext bundleContext = ctx.getBundleContext();
+            bundleContext.registerService(MessageConsoleService.class, new MessageConsoleService(), null);
+        } catch (Throwable e) {
+            logger.error("An error occurred while activating the MessageConsoleServiceComponent", e);
+        }
     }
 
     protected void setAnalyticsDataService(SecureAnalyticsDataService secureAnalyticsDataService) {
