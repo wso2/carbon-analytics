@@ -55,6 +55,7 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
 
     @Override
     public void init(Map<String, String> properties) throws AnalyticsException {
+        HBaseAnalyticsConfigurationEntry queryConfig = HBaseUtils.lookupConfiguration();
 /*        String dsName = properties.get(HBaseAnalyticsDSConstants.DATASOURCE_NAME);
         if (dsName == null) {
             throw new AnalyticsException("The property '" + HBaseAnalyticsDSConstants.DATASOURCE_NAME +
@@ -67,6 +68,10 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
         }*/
 
         Configuration conf = new Configuration();
+        String hdfsHost = queryConfig.getHdfsHost();
+        String hdfsDataDir = queryConfig.getHdfsDataDir();
+        conf.set("fs.default.name", hdfsHost);
+        conf.set("dfs.data.dir", hdfsDataDir);
         conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
         conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
         try {
@@ -88,11 +93,13 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
         /* maintaining normalized version of path string, because we'll be doing String operations on it later */
         source = GenericUtils.normalizePath(source);
         if (!(this.fileSystem.exists(path))) {
-            log.debug("Path specified (" + source + ") does not exist in the filesystem");
+            if (log.isDebugEnabled()) {
+                log.debug("Path specified (" + source + ") does not exist in the filesystem");
+            }
         } else {
             FileStatus[] files = this.fileSystem.listStatus(path);
             if (null == files) {
-                throw new IOException("An error occurred while listing files from the specified path.");
+                throw new IOException("An error occurred while listing files from the specified path: " + path);
             } else {
                 for (FileStatus file : files) {
                     if (null != file) {
@@ -109,7 +116,9 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
     public void delete(String source) throws IOException {
         Path path = HBaseUtils.createPath(source);
         if (!(this.fileSystem.exists(path))) {
-            log.debug("Path specified (" + source + ") does not exist in the filesystem");
+            if (log.isDebugEnabled()) {
+                log.debug("Path specified (" + source + ") does not exist in the filesystem");
+            }
         } else {
             /* Directory will be deleted regardless it being empty or not*/
             this.fileSystem.delete(path, true);
@@ -120,7 +129,9 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
     public void mkdir(String source) throws IOException {
         Path path = HBaseUtils.createPath(source);
         if (this.fileSystem.exists(path)) {
-            log.debug("Path specified (" + source + ") already exists in the filesystem");
+            if (log.isDebugEnabled()) {
+                log.debug("Path specified (" + source + ") already exists in the filesystem");
+            }
         } else {
             this.fileSystem.mkdirs(path);
         }
@@ -135,7 +146,9 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
     public OutputStream createOutput(String source) throws IOException {
         Path path = HBaseUtils.createPath(source);
         if (this.fileSystem.exists(path)) {
-            log.debug("Specified path (" + source + ") already exists in filesystem and has been overwritten.");
+            if (log.isDebugEnabled()) {
+                log.debug("Specified path (" + source + ") already exists in filesystem and has been overwritten.");
+            }
             /* Overwriting target path */
             return this.fileSystem.create(path, true);
         } else {
