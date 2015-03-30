@@ -801,7 +801,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                                 Directory indexDir, Directory taxonomyIndexDir, String rangeField,
                                 AnalyticsDrillDownRange range)
             throws AnalyticsIndexException {
-
         IndexReader indexReader = null;
         TaxonomyReader taxonomyReader = null;
         try {
@@ -816,7 +815,9 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             DrillDownQuery drillDownQuery = this.createDrillDownQuery(drillDownRequest,
                                 indices, config,rangeField, range);
             drillSideways.search(drillDownQuery, facetsCollector);
-            ValueSource valueSource = this.getCompiledScoreFunction(drillDownRequest.getScoreFunction(), indices);
+            List<String> scoreParams = this.lookupScoreParams(tenantId, drillDownRequest.getTableName());
+            ValueSource valueSource = this.getCompiledScoreFunction(drillDownRequest.getScoreFunction(),
+                                                                    scoreParams);
             Facets facets = new TaxonomyFacetSumValueSource(taxonomyReader, config, facetsCollector,
                                                             valueSource);
             Map<String, List<DrillDownResultEntry>> result = this.getDrilldownTopChildren(drillDownRequest,
@@ -944,7 +945,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return config;
     }
 
-    private ValueSource getCompiledScoreFunction(String scoreFunction, Map<String, IndexType> indices)
+    private ValueSource getCompiledScoreFunction(String scoreFunction, List<String> scoreParams)
             throws AnalyticsIndexException {
         try {
             Expression funcExpression;
@@ -956,9 +957,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             SimpleBindings bindings = new SimpleBindings();
             bindings.add(new SortField(INDEX_INTERNAL_SCORE_FIELD, SortField.Type.SCORE));
             bindings.add(new SortField(INDEX_INTERNAL_WEIGHT_FIELD, SortField.Type.DOUBLE));
-            for (Map.Entry<String, IndexType> indexDef : indices.entrySet())
-            if (indexDef.getValue() == IndexType.SCOREPARAM) {
-                bindings.add(new SortField(indexDef.getKey(), SortField.Type.DOUBLE));
+            for (String scoreParam : scoreParams) {
+                bindings.add(new SortField(scoreParam, SortField.Type.DOUBLE));
             }
             return funcExpression.getValueSource(bindings);
         } catch (ParseException e) {
@@ -1249,12 +1249,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
 
     private void checkInvalidScoreParams(List<String> scoreParams, Map<String, IndexType> columns) throws
                                                                                                    AnalyticsIndexException {
-
         for (String scoreParam : scoreParams) {
             IndexType type = columns.get(scoreParam);
-            if (type == null) {
-                throw new AnalyticsIndexException("'" + scoreParam + "' is not an indexed column");
-            }
             if (type != IndexType.DOUBLE || type != IndexType.FLOAT || type != IndexType.INTEGER
                 || type != IndexType.LONG) {
                 throw new AnalyticsIndexException("'" + scoreParam + "' is not indexed as a numeric column");
@@ -1262,7 +1258,17 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
     
-    public void setIndices(int tenantId, String tableName, Map<String, IndexType> columns) 
+    public void setIndices(int tenantId, String tableName, Map<String, IndexType> columns, List<String> scoreParams)
+            throws AnalyticsIndexException {
+        this.checkInvalidIndexNames(columns.keySet());
+        String tableId = this.generateTableId(tenantId, tableName);
+        this.indexDefs.put(tableId, columns);
+        this.getRepository().setIndices(tenantId, tableName, columns);
+        this.setScoreParams(tenantId, tableName, scoreParams, columns);
+        this.notifyClusterIndexChange(tenantId, tableName);
+    }
+
+    public void setIndices(int tenantId, String tableName, Map<String, IndexType> columns)
             throws AnalyticsIndexException {
         this.checkInvalidIndexNames(columns.keySet());
         String tableId = this.generateTableId(tenantId, tableName);
@@ -1273,11 +1279,12 @@ public class AnalyticsDataIndexer implements GroupEventListener {
 
     public void setScoreParams(int tenantId, String tableName, List<String> scoreParams, Map<String, IndexType> columns)
             throws AnalyticsIndexException {
-        this.checkInvalidScoreParams(scoreParams, columns);
-        String tableId = this.generateTableId(tenantId, tableName);
-        this.scoreParams.put(tableId, scoreParams);
-        this.getRepository().setIndices(tenantId, tableName, columns);
-        this.notifyClusterIndexChange(tenantId, tableName);
+        if (scoreParams != null) {
+            this.checkInvalidScoreParams(scoreParams, columns);
+            String tableId = this.generateTableId(tenantId, tableName);
+            this.scoreParams.put(tableId, scoreParams);
+            this.getRepository().setScoreParams(tenantId, tableName, scoreParams);
+        }
     }
 
     public Map<String, IndexType> lookupIndices(int tenantId, String tableName) throws AnalyticsIndexException {
@@ -1288,6 +1295,16 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             this.indexDefs.put(tableId, cols);
         }
         return cols; 
+    }
+
+    public List<String> lookupScoreParams(int tenantId, String tableName) throws AnalyticsIndexException {
+        String tableId = this.generateTableId(tenantId, tableName);
+        List<String> scoreParams = this.scoreParams.get(tableId);
+        if (scoreParams == null) {
+            scoreParams = this.getRepository().getScoreParams(tenantId, tableName);
+            this.scoreParams.put(tableId, scoreParams);
+        }
+        return scoreParams;
     }
     
     private String generateDirPath(String tableId) {

@@ -218,6 +218,20 @@ public interface SecureAnalyticsDataService extends AnalyticsRecordReader {
     void setIndices(String username, String tableName, Map<String, IndexType> columns) throws AnalyticsIndexException;
 
     /**
+     * Sets the indices for a given table under the given tenant. The indices must be
+     * saved in a persistent storage under analytics data service, to be able to lookup the
+     * indices later, i.e. these indices should be in-effect after a server restart.
+     *
+     * @param username  The username of the user that invoke this method
+     * @param tableName The table name
+     * @param columns   The set of columns to create indices for, and their data types
+     * @param scoreParams The set of columns which is used as score parameters
+     * @throws org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException
+     */
+    void setIndices(String username, String tableName, Map<String, IndexType> columns, List<String> scoreParams)
+            throws AnalyticsIndexException;
+
+    /**
      * Returns the declared indices for a given table under the given tenant.
      *
      * @param username  The username of the user that invoke this method

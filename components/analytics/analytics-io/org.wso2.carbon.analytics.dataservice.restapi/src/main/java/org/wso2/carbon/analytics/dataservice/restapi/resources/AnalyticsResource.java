@@ -17,6 +17,7 @@
 package org.wso2.carbon.analytics.dataservice.restapi.resources;
 
 import com.google.gson.Gson;
+import org.apache.axiom.om.util.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
@@ -25,7 +26,6 @@ import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
-import org.wso2.carbon.analytics.dataservice.restapi.BasicAuthenticator;
 import org.wso2.carbon.analytics.dataservice.restapi.Constants;
 import org.wso2.carbon.analytics.dataservice.restapi.Utils;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.AnalyticsSchemaBean;
@@ -39,6 +39,12 @@ import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.base.MultitenantConstants;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.user.api.UserRealm;
+import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.user.core.service.RealmService;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -59,6 +65,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -83,6 +90,7 @@ public class AnalyticsResource extends AbstractResource {
     private static final String STR_JSON_COMMA = ",";
     private static final String STR_JSON_ARRAY_CLOSING_SQUARE_BRACKET = "]";
     private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String DEFAUL_CHARSETT = "UTF-8";
 
     /**
 	 * Creates the table.
@@ -101,7 +109,7 @@ public class AnalyticsResource extends AbstractResource {
 			             tableBean.getTableName());
 		}
 		SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
-        String username = BasicAuthenticator.authenticate(authHeader);
+        String username = authenticate(authHeader);
         if (username != null) {
             if (analyticsDataService.tableExists(username, tableBean.getTableName())) {
                 return handleResponse(ResponseStatus.CONFLICT, "table :" + tableBean.getTableName() +
@@ -130,7 +138,7 @@ public class AnalyticsResource extends AbstractResource {
 			logger.debug("Invoking listTables");
 		}
 		SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
-        String username = BasicAuthenticator.authenticate(authHeader);
+        String username = authenticate(authHeader);
         if (username != null) {
             boolean tableExists = analyticsDataService.tableExists(username, tableName);
             if (logger.isDebugEnabled()) {
@@ -161,7 +169,7 @@ public class AnalyticsResource extends AbstractResource {
 			logger.debug("Invoking listTables");
 		}
 		SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
-        String username = BasicAuthenticator.authenticate(authHeader);
+        String username = authenticate(authHeader);
         if (username != null) {
             List<String> tables = analyticsDataService.listTables(username);
             if (logger.isDebugEnabled()) {
@@ -190,7 +198,7 @@ public class AnalyticsResource extends AbstractResource {
 			             tableBean.getTableName());
 		}
 		SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
-        String username = BasicAuthenticator.authenticate(authHeader);
+        String username = authenticate(authHeader);
         if (username != null) {
             if (analyticsDataService.tableExists(username, tableBean.getTableName())) {
                 analyticsDataService.deleteTable(username, tableBean.getTableName());
@@ -221,7 +229,7 @@ public class AnalyticsResource extends AbstractResource {
 			logger.debug("Invoking insertRecordsToTable");
 		}
 		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
-        String username = BasicAuthenticator.authenticate(authHeader);
+        String username = authenticate(authHeader);
         if (username != null) {
             if (logger.isDebugEnabled()) {
                 for (RecordBean recordBean : recordBeans) {
@@ -274,7 +282,7 @@ public class AnalyticsResource extends AbstractResource {
 			             tableName);
 		}
 		SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
-        String username = BasicAuthenticator.authenticate(authHeader);
+        String username = authenticate(authHeader);
         if (username != null) {
             if (logger.isDebugEnabled()) {
                 logger.debug("deleting the records from " + timeFrom + " to " + timeTo);
@@ -306,7 +314,7 @@ public class AnalyticsResource extends AbstractResource {
 			             tableName);
 		}
 		SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
-        String username = BasicAuthenticator.authenticate(authHeader);
+        String username = authenticate(authHeader);
         if (username != null) {
             if (logger.isDebugEnabled()) {
                 logger.debug("deleting the records for ids :" + ids);
@@ -335,7 +343,7 @@ public class AnalyticsResource extends AbstractResource {
 			logger.debug("Invoking getRecordCount for tableName: " + tableName);
 		}
 		SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
-        String username = BasicAuthenticator.authenticate(authHeader);
+        String username = authenticate(authHeader);
         if (username != null) {
             long recordCount = analyticsDataService.getRecordCount(username, tableName,
                                                                    Long.MIN_VALUE, Long.MAX_VALUE);
@@ -370,7 +378,7 @@ public class AnalyticsResource extends AbstractResource {
 			logger.debug("Invoking getRecordGroups for tableName: " + tableName);
 		}
 		SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
-        String username = BasicAuthenticator.authenticate(authHeader);
+        String username = authenticate(authHeader);
         if (username != null) {
             final RecordGroup[] recordGroups;
             recordGroups = analyticsDataService.get(username, tableName, 1, null, timeFrom, timeTo, recordsFrom, count);
@@ -493,7 +501,7 @@ public class AnalyticsResource extends AbstractResource {
 			logger.debug("Invoking insertRecords");
 		}
 		SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
-        String username = BasicAuthenticator.authenticate(authHeader);
+        String username = authenticate(authHeader);
         if (username != null) {
             if (logger.isDebugEnabled()) {
                 for (RecordBean recordBean : recordBeans) {
@@ -656,7 +664,7 @@ public class AnalyticsResource extends AbstractResource {
 			             tableName);
 		}
 		SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
-        String username = BasicAuthenticator.authenticate(authHeader);
+        String username = authenticate(authHeader);
         if (username != null) {
             Map<String, IndexType> columns = Utils.createIndexTypeMap(columnsBean);
             if (logger.isDebugEnabled()) {
@@ -687,7 +695,7 @@ public class AnalyticsResource extends AbstractResource {
 			             tableName);
 		}
 		SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
-        String username = BasicAuthenticator.authenticate(authHeader);
+        String username = authenticate(authHeader);
         if (username != null) {
             Map<String, IndexType> columns = analyticsDataService.getIndices(username, tableName);
             Map<String, IndexTypeBean> columnsBean = Utils.createIndexTypeBeanMap(columns);
@@ -717,7 +725,7 @@ public class AnalyticsResource extends AbstractResource {
 			             tableName);
 		}
 		SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
-        String username = BasicAuthenticator.authenticate(authHeader);
+        String username = authenticate(authHeader);
         if (username != null) {
             analyticsDataService.clearIndices(username, tableName);
             return handleResponse(ResponseStatus.SUCCESS, "Successfully cleared indices in table: " +
@@ -743,7 +751,7 @@ public class AnalyticsResource extends AbstractResource {
 			logger.debug("Invoking search for tableName : " + queryBean.getTableName());
 		}
 		SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
-        String username = BasicAuthenticator.authenticate(authHeader);
+        String username = authenticate(authHeader);
         if (username != null) {
             List<SearchResultEntry> searchResults = analyticsDataService.search(username,
                                                                                 queryBean.getTableName(),
@@ -784,7 +792,7 @@ public class AnalyticsResource extends AbstractResource {
 			logger.debug("Invoking search count for tableName : " + queryBean.getTableName());
 		}
 		SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
-        String username = BasicAuthenticator.authenticate(authHeader);
+        String username = authenticate(authHeader);
         if (username != null) {
             int result = analyticsDataService.searchCount(username, queryBean.getTableName(),
                                                           queryBean.getLanguage(), queryBean.getQuery());
@@ -814,7 +822,7 @@ public class AnalyticsResource extends AbstractResource {
 			logger.debug("Invoking waiting for indexing - timeout : " + seconds + " seconds");
 		}
 		SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
-        String username = BasicAuthenticator.authenticate(authHeader);
+        String username = authenticate(authHeader);
         if (username != null) {
             analyticsDataService.waitForIndexing(seconds * Constants.MILLISECONDSPERSECOND);
             return handleResponse(ResponseStatus.SUCCESS, "Indexing Completed successfully");
@@ -841,7 +849,7 @@ public class AnalyticsResource extends AbstractResource {
             logger.debug("Invoking setTableSchema for tableName : " + tableName);
         }
         SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService() ;
-        String username = BasicAuthenticator.authenticate(authHeader);
+        String username = authenticate(authHeader);
         if (username != null) {
             AnalyticsSchema analyticsSchema = Utils.createAnalyticsSchema(analyticsSchemaBean);
             analyticsDataService.setTableSchema(username, tableName, analyticsSchema);
@@ -867,7 +875,7 @@ public class AnalyticsResource extends AbstractResource {
             logger.debug("Invoking getTableSchema for table : " + tableName);
         }
         SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
-        String username = BasicAuthenticator.authenticate(authHeader);
+        String username = authenticate(authHeader);
         if (username != null) {
             AnalyticsSchema analyticsSchema = analyticsDataService.getTableSchema(username, tableName);
             AnalyticsSchemaBean analyticsSchemaBean = Utils.createTableSchemaBean(analyticsSchema);
@@ -876,4 +884,48 @@ public class AnalyticsResource extends AbstractResource {
             throw new AnalyticsException("Authentication Failed. user name is null");
         }
     }
+
+    private String authenticate(String authHeader) throws AnalyticsException {
+
+        if (authHeader != null && authHeader.startsWith(Constants.BASIC_AUTH_HEADER)) {
+            // Authorization: Basic base64credentials
+            String base64Credentials = authHeader.substring(Constants.BASIC_AUTH_HEADER.length()).trim();
+            String credentials = new String(Base64.decode(base64Credentials),
+                                            Charset.forName(DEFAUL_CHARSETT));
+            // credentials = username:password
+            final String[] values = credentials.split(":", 2);
+            String username = values[0];
+            String password = values[1];
+            if ("".equals(username) || username == null || "".equals(password) || password == null) {
+                throw new AnalyticsException("Username and password cannot be empty");
+            }
+            String tenantDomain = MultitenantUtils.getTenantDomain(username);
+            String tenantLessUserName = MultitenantUtils.getTenantAwareUsername(username);
+            try {
+                // get super tenant context and get realm service which is an osgi service
+                RealmService realmService = (RealmService) PrivilegedCarbonContext
+                        .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+                if (realmService != null) {
+                    int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+                    if (tenantId == MultitenantConstants.INVALID_TENANT_ID) {
+                        throw new AnalyticsException("Authentication failed - Invalid domain");
+
+                    }
+                    // get tenant's user realm
+                    UserRealm userRealm = realmService.getTenantUserRealm(tenantId);
+                    boolean isAuthenticated = userRealm.getUserStoreManager()
+                            .authenticate(tenantLessUserName, password);
+                    if (!isAuthenticated) {
+                        throw  new AnalyticsException("User is not authenticated!");
+                    } else {
+                        return username;
+                    }
+                }
+            } catch (UserStoreException e) {
+                throw new AnalyticsException("Error while accessing the user realm of user :" + username, e);
+            }
+        }
+        return null;
+    }
+
 }

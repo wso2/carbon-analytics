@@ -298,6 +298,12 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     @Override
+    public void setIndices(int tenantId, String tableName, Map<String, IndexType> columns,
+                           List<String> scoreParams) throws AnalyticsIndexException {
+        this.getIndexer().setIndices(tenantId, tableName, columns, scoreParams);
+    }
+
+    @Override
     public List<SearchResultEntry> search(int tenantId, String tableName, String language, String query,
             int start, int count) throws AnalyticsIndexException, AnalyticsException {
         return this.getIndexer().search(tenantId, tableName, language, query, start, count);

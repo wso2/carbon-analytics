@@ -203,6 +203,21 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     }
 
     @Override
+    public void setIndices(String username, String tableName, Map<String, IndexType> columns,
+                           List<String> scoreParams) throws AnalyticsIndexException {
+        try {
+            int tenantId = getTenantId(username);
+            if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_SET_INDEXING)) {
+                throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                               "permission to set indices");
+            }
+            analyticsDataService.setIndices(tenantId, tableName, columns, scoreParams);
+        } catch (AnalyticsException e) {
+            throw new AnalyticsIndexException(e.getMessage(), e);
+        }
+    }
+
+    @Override
     public Map<String, IndexType> getIndices(String username, String tableName)
             throws AnalyticsIndexException, AnalyticsException {
         int tenantId = getTenantId(username);
