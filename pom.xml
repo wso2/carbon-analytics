@@ -137,6 +137,12 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.datasource.hbase.server.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.core.server.feature</artifactId>
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
@@ -199,6 +205,11 @@
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.datasource.rdbms</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.datasource.hbase</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
@@ -562,6 +573,10 @@
                 <version>${netty-all.version}</version>
             </dependency>
 
+            <!-- Note:-
+                    groupId "org.wso2.orbit.org.apache.hadoop" for Hadoop client 2.6.0
+                    and groupId "org.wso2.apache.hadoop" for Hadoop client 2.2.0
+                -->
             <dependency>
                 <groupId>org.wso2.apache.hadoop</groupId>
                 <artifactId>hadoop-client</artifactId>
@@ -746,6 +761,47 @@
                 <version>${carbon.analytics.version}</version>
             </dependency>
 
+            <!-- START hbase + hadoop client dependencies -->
+            <dependency>
+                <groupId>org.wso2.orbit.org.apache.hbase</groupId>
+                <artifactId>hbase-client</artifactId>
+                <version>${hbase.client.orbit.version}</version>
+            </dependency>
+                <!-- Note:-
+                    groupId "org.wso2.orbit.org.apache.hadoop" for Hadoop client 2.6.0
+                    and groupId "org.wso2.apache.hadoop" for Hadoop client 2.2.0
+                -->
+            <dependency>
+                <groupId>org.wso2.orbit.org.apache.hadoop</groupId>
+                <artifactId>hadoop-client</artifactId>
+                <version>${hadoop.client.260.orbit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.zookeeper.wso2</groupId>
+                <artifactId>apache-zookeeper</artifactId>
+                <version>${zookeeper.orbit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-codec.wso2</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>${commons.codec.orbit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.orbit.org.apache.htrace</groupId>
+                <artifactId>htrace-core-apache</artifactId>
+                <version>${apache.htrace.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.orbit.org.htrace</groupId>
+                <artifactId>htrace-core</artifactId>
+                <version>${htrace.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.orbit.com.google.protobuf.fragment</groupId>
+                <artifactId>protobuf-java-fragment</artifactId>
+                <version>${protobuf.fragment.version}</version>
+            </dependency>
+            <!-- END hbase + hadoop client dependencies -->
         </dependencies>
     </dependencyManagement>
 
@@ -970,6 +1026,14 @@
         <asm.orbit.version>3.1.wso2v1</asm.orbit.version>
         <commons.codec.orbit.version>1.4.0.wso2v1</commons.codec.orbit.version>
         <commons.collections.orbit.version>3.2.0.wso2v1</commons.collections.orbit.version>
+
+        <!-- Orbits for HBase client -->
+        <hbase.client.orbit.version>1.0.0.wso2v1</hbase.client.orbit.version>
+        <hadoop.client.260.orbit.version>2.6.0.wso2v1</hadoop.client.260.orbit.version>
+        <zookeeper.orbit.version>3.4.5.wso2v1</zookeeper.orbit.version>
+        <htrace.version>3.0.4.wso2v1</htrace.version>
+        <apache.htrace.version>3.1.0-incubating.wso2v1</apache.htrace.version>
+        <protobuf.fragment.version>2.5.0.wso2v1</protobuf.fragment.version>
 
         <!-- Equinox -->
         <version.equinox.osgi.services>3.3.100.v20120522-1822</version.equinox.osgi.services>
