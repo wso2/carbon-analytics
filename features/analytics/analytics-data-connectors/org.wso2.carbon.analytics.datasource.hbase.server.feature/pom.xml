@@ -38,7 +38,6 @@
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.datasource.hbase</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -47,7 +46,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.wso2.orbit.org.apache.hbase</groupId>
             <artifactId>hbase-client</artifactId>
@@ -59,7 +57,7 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.orbit.org.apache.htrace</groupId>
-            <artifactId>htrace-core</artifactId>
+            <artifactId>htrace-core-apache</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.orbit.org.htrace</groupId>
@@ -67,7 +65,11 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.orbit.com.google.protobuf.fragment</groupId>
-            <artifactId>protobuf-java</artifactId>
+            <artifactId>protobuf-java-fragment</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -85,7 +87,6 @@
             <groupId>commons-codec.wso2</groupId>
             <artifactId>commons-codec</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.core.server.feature</artifactId>
@@ -125,8 +126,10 @@
                                 </bundleDef>
                                 <bundleDef>org.wso2.orbit.org.apache.hadoop:hadoop-client</bundleDef>
                                 <bundleDef>org.wso2.orbit.org.apache.hbase:hbase-client</bundleDef>
-                                <bundleDef>org.wso2.orbit.com.google.protobuf.fragment:protobuf-java</bundleDef>
-                                <bundleDef>org.wso2.orbit.org.apache.htrace:htrace-core</bundleDef>
+                                <bundleDef>
+                                    org.wso2.orbit.com.google.protobuf.fragment:protobuf-java-fragment
+                                </bundleDef>
+                                <bundleDef>org.wso2.orbit.org.apache.htrace:htrace-core-apache</bundleDef>
                                 <bundleDef>org.wso2.orbit.org.htrace:htrace-core</bundleDef>
                                 <bundleDef>org.slf4j:slf4j-api</bundleDef>
                                 <bundleDef>org.slf4j:slf4j-log4j12</bundleDef>

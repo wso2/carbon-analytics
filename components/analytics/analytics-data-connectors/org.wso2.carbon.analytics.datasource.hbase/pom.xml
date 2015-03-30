@@ -24,8 +24,21 @@
             <artifactId>org.wso2.carbon.analytics.datasource.core.test</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.wso2.orbit.org.apache.hbase</groupId>
+            <artifactId>hbase-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.apache.hadoop</groupId>
+            <artifactId>hadoop-client</artifactId>
+            <version>2.6.0.wso2v1</version>
+        </dependency>
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
@@ -39,22 +52,6 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-
-        <!-- TODO: Move version information to parent. Kept here for the time being to avoid build breaks. -->
-        <dependency>
-            <groupId>org.wso2.orbit.org.apache.hbase</groupId>
-            <artifactId>hbase-client</artifactId>
-            <version>1.0.0.wso2v1</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.wso2.orbit.org.apache.hadoop</groupId>
-            <artifactId>hadoop-client</artifactId>
-            <version>2.6.0.wso2v1</version>
-        </dependency>
-
-        <!-- TODO -->
-
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
