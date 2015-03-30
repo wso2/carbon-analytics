@@ -57,7 +57,6 @@
             <ul class="dropdown-menu" role="menu">
               <li><a href="#">Preferences</a></li>
               <li class="divider"></li>
-              <li class="dropdown-header">Nav header</li>
               <li><a href="/carbon/admin/index.jsp">Sign Out</a></li>
             </ul>
         </li>

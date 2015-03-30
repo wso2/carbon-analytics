@@ -24,7 +24,7 @@
 				drawSidebar(data);
 
 			}
-				appendFooter();
+				// appendFooter();
 		});
 	});
 
