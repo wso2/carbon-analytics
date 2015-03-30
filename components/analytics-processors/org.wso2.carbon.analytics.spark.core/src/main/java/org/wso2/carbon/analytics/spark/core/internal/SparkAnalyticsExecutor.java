@@ -130,6 +130,12 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private void startMaster(String host, int port, int webUIport) {
         Master.startSystemAndActor(host, port, webUIport, this.sparkConf);
     }
+    
+    private void startWorker(String workerHost, String masterHost, int masterPort, int p1, int p2) {
+        this.workerActorSystem = Worker.startSystemAndActor(workerHost, p1, p2, 2, 1000000, new String[] { "spark://" + masterHost + ":" + masterPort },
+                null, new Option<Object>() {
+            
+                    private static final long serialVersionUID = 3087598975952096368L;
 
     private void startWorker(String workerHost, String masterHost, int masterPort, int p1, int p2) {
         this.workerActorSystem = Worker.startSystemAndActor(workerHost, p1, p2, 2, 1000000, new String[]{"spark://" + masterHost + ":" + masterPort},
@@ -379,7 +385,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private static byte[] tableKeysToBinary(String[] keys) throws AnalyticsException {
         return GenericUtils.serializeObject(keys);
     }
-
+    
     private static String[] binaryToTableKeys(byte[] data) throws AnalyticsException {
         return (String[]) GenericUtils.deserializeObject(data);
     }
