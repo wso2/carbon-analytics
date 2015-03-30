@@ -17,17 +17,25 @@
 */
 package org.wso2.carbon.analytics.datasource.hbase.util;
 
+/**
+ * Class for holding constants required for the HBase Analytics Datasource
+ */
 public class HBaseAnalyticsDSConstants {
 
     public static final String DATASOURCE_NAME = "datasource";
 
     public static final String ANALYTICS_USER_TABLE_PREFIX = "ANX";
     public static final String ANALYTICS_INDEX_TABLE_PREFIX = "IDX";
-    public static final String ANALYTICS_META_TABLE_PREFIX = "META";
+
+    public static final String ANALYTICS_META_TABLE_NAME = "ANALYTICS_META_TABLE";
+
+    public enum TableType {
+        DATA,
+        INDEX
+    }
 
     public static final int DATA = 1;
     public static final int INDEX = 2;
-    public static final int META = 3;
 
     public static final byte[] ANALYTICS_DATA_COLUMN_FAMILY_NAME = "carbon-analytics-data".getBytes();
     public static final byte[] ANALYTICS_META_COLUMN_FAMILY_NAME = "carbon-analytics-meta".getBytes();
