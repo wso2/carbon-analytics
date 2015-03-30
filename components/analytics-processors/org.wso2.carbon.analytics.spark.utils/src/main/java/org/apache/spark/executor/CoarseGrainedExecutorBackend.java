@@ -20,24 +20,38 @@ package org.apache.spark.executor;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
+import java.util.List;
 import java.util.UUID;
 
 /**
  * a proxy class to mimic the CoarseGrainedExecutorBackend class in spark
  */
 public class CoarseGrainedExecutorBackend {
-    
-    private static final String DIR_RELATIVE_PATH = "../../../repository/data/spark-data";
+
+    private static final String IN_DIR_RELATIVE_PATH = "../../../repository/data/spark-data/in";
+
+    private static final String OUT_DIR_RELATIVE_PATH = "../../../repository/data/spark-data/out";
+    private static final String FILE_CONTENT = "EXITED";
+
+//    private static String fileUUID = null;
+
 
     public static void main(String[] args) {
         BufferedWriter writer = null;
+        String fileUUID = UUID.randomUUID().toString();
         try {
-            UUID uuid = UUID.randomUUID();
-            File destDir = new File(DIR_RELATIVE_PATH);
-            if (!destDir.exists()){
+            File destDir = new File(IN_DIR_RELATIVE_PATH);
+            if (!destDir.exists()) {
                 destDir.mkdirs();
             }
-            File file = new File(destDir.getPath() + "/" + uuid.toString());
+            File file = new File(destDir.getPath() + File.separator + fileUUID);
             writer = new BufferedWriter(new FileWriter(file));
             for (String line : args) {
                 writer.write(line + "\n");
@@ -50,6 +64,41 @@ public class CoarseGrainedExecutorBackend {
                 writer.close();
             } catch (Exception ignored) {
             }
+        }
+
+
+        String outDirPath = OUT_DIR_RELATIVE_PATH;
+        if (!new File(outDirPath).exists()) {
+            new File(outDirPath).mkdirs();
+        }
+        Path dir = Paths.get(outDirPath);
+        try {
+            WatchService watcher = FileSystems.getDefault().newWatchService();
+            dir.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY);
+            while (true) {
+                WatchKey watckKey = watcher.take();
+                List<WatchEvent<?>> events = watckKey.pollEvents();
+                boolean finished = false;
+                for (WatchEvent<?> event : events) {
+                    if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
+                        String fileName = event.context().toString();
+                        if (fileName.equals(fileUUID)) {
+                            finished = true;
+                            System.out.println("#################### Coarse Grained Executor dummy ended!");
+                            break;
+                        }
+                    }
+                }
+                if (finished) {
+                    break;
+                }
+                boolean valid = watckKey.reset();
+                if (!valid) {
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error in SparkDataListener: " + e.toString());
         }
     }
 }

@@ -20,19 +20,54 @@ package org.wso2.carbon.analytics.spark.core.internal;
 
 import org.apache.spark.executor.CoarseGrainedExecutorBackend;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.util.UUID;
+
 /**
  * Creates different threads for each executor
  */
 public class SparkBackendExecutor implements Runnable {
 
-    private final String [] argArray;
+    private final String[] argArray;
 
-    public SparkBackendExecutor(String [] argArray){
-        this.argArray= argArray;
+    private final String fileUUID;
+
+    private static final String OUT_DIR_RELATIVE_PATH = "repository/data/spark-data/out";
+
+    public SparkBackendExecutor(String[] argArray, String fileUUID) {
+        this.argArray = argArray;
+        this.fileUUID = fileUUID;
     }
 
     @Override
     public void run() {
-        CoarseGrainedExecutorBackend.main(argArray);
+
+        try {
+            CoarseGrainedExecutorBackend.main(argArray);
+        } finally {
+            System.out.println("######################## Spark backend executor ended!!!!");
+            BufferedWriter writer = null;
+            try {
+                File destDir = new File(OUT_DIR_RELATIVE_PATH);
+                if (!destDir.exists()) {
+                    destDir.mkdirs();
+                }
+                File file = new File(destDir.getPath() + File.separator + fileUUID);
+                System.out.println("##################### Writing to the file " + file.getName());
+                writer = new BufferedWriter(new FileWriter(file));
+                writer.write("EXITED" + "\n");
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    assert writer != null;
+                    writer.close();
+                } catch (Exception ignored) {
+                }
+            }
+        }
+
     }
 }
