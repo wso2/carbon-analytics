@@ -17,6 +17,7 @@ package org.wso2.carbon.analytics.dashboard.admin.data;
 
 import org.apache.axis2.AxisFault;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -79,7 +80,8 @@ public class Dashboard {
                     throw new AxisFault("Widget with given ID already exists in the dashboard");
                 }
             }
-            List<WidgetMetaData> widgetMetaDataList = Arrays.asList(widgets);
+            List<WidgetMetaData> widgetMetaDataList = new ArrayList<WidgetMetaData>();
+            widgetMetaDataList.addAll(Arrays.asList(widgets));
             widgetMetaDataList.add(widget);
             widgets = widgetMetaDataList.toArray(new WidgetMetaData[widgetMetaDataList.size()]);
         }   else {
