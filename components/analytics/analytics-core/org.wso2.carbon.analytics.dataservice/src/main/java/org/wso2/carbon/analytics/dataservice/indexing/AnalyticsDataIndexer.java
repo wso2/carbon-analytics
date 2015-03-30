@@ -691,42 +691,10 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 indexQuery = new AnalyticsQueryParser(this.luceneAnalyzer,
                                                       indices).parse(drillDownRequest.getLanguageQuery());
             }
+            indexReader = this.getCombinedIndexReader(tenantId, tableName);
+            IndexSearcher searcher = new IndexSearcher(indexReader);
+            return this.getRangeFacets(drillDownRequest, searcher, indexQuery, ranges, fc);
 
-            if (drillDownRequest.getCategoryPaths() == null) {
-                indexReader = this.getCombinedIndexReader(tenantId, tableName);
-                IndexSearcher searcher = new IndexSearcher(indexReader);
-                return this.getRangeFacets(drillDownRequest, searcher, indexQuery, ranges, fc);
-            } else if (drillDownRequest.getCategoryPaths().size() > 0){
-                Directory indexDir = new RAMDirectory();
-                Directory taxonomyDir = new RAMDirectory();
-                FacetsConfig config = this.getFacetsConfigurations(indices);
-                Map<String, List<DrillDownResultEntry>> result = new LinkedHashMap<>();
-                this.mergeTaxnomonyShards(tenantId, tableName, indexDir, taxonomyDir);
-                for (Map.Entry<String, List<AnalyticsDrillDownRange>> entry : ranges.entrySet()) {
-                    for (AnalyticsDrillDownRange range : entry.getValue()) {
-                        IndexSearcher searcher = new IndexSearcher(DirectoryReader.open(indexDir));
-                        TopDocs topDocs = this.getTopDocsForRange(drillDownRequest,
-                                                                  indices, config, entry, range, searcher);
-                        DrillDownResultEntry drillDownResultEntry = new DrillDownResultEntry();
-                        drillDownResultEntry.setCategory(range.getLabel());
-
-                        if (drillDownRequest.isWithIds()) {
-                            this.addRecordIdsToDrillDownResultEntry(searcher, drillDownResultEntry,topDocs);
-                        }
-                        drillDownResultEntry.setFacetCount(new Integer(topDocs.totalHits).doubleValue());
-                     //   Map<String, List<DrillDownResultEntry>> perRangeFacets =
-                     //           this.drillDown(drillDownRequest, indexDir, taxonomyDir,entry.getKey(), range);
-                     //   drillDownResultEntry.setHierarchicalFacets(perRangeFacets);
-                        List<DrillDownResultEntry> drilldownRanges = result.get(entry.getKey());
-                        if (drilldownRanges == null) {
-                            drilldownRanges = new ArrayList<>();
-                        }
-                        drilldownRanges.add(drillDownResultEntry);
-                    }
-                }
-                return  result;
-            }
-            return new HashMap<>(0);
         } catch (IOException e) {
             throw new AnalyticsIndexException("Error in opening Index for range searches",
                                               e.getCause());
@@ -755,7 +723,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                            NumericRangeQuery.newDoubleRange(entry.getKey(),
                                                             range.getFrom(), range.getTo(), true, false));
         return FacetsCollector.search(searcher,drillDownQuery,drillDownRequest.getRecordCount(),new FacetsCollector());
-//        return searcher.search(drillDownQuery, drillDownRequest.getRecordCount());
+
     }
 
     private Map<String, List<DrillDownResultEntry>> getRangeFacets(
