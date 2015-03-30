@@ -17,6 +17,8 @@
 */
 package org.wso2.carbon.analytics.dataservice;
 
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
+import org.wso2.carbon.analytics.dataservice.commons.DrillDownResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
@@ -266,6 +268,38 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     @Override
     public void waitForIndexing(long maxWait) throws AnalyticsTimeoutException, AnalyticsException {
         analyticsDataService.waitForIndexing(maxWait);
+    }
+
+    @Override
+    public Map<String, List<DrillDownResultEntry>> drillDown(String username,
+                                                             AnalyticsDrillDownRequest drillDownRequest)
+            throws AnalyticsIndexException {
+        try {
+            int tenantId = getTenantId(username);
+            if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_SEARCH_RECORD)) {
+                throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                               "permission to perform faceted drilldown");
+            }
+            return analyticsDataService.drillDown(tenantId, drillDownRequest);
+        } catch (AnalyticsException e) {
+            throw new AnalyticsIndexException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public Map<String, List<DrillDownResultEntry>> searchRange(String username,
+                                                               AnalyticsDrillDownRequest drillDownRequest)
+            throws AnalyticsIndexException {
+        try {
+            int tenantId = getTenantId(username);
+            if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_SEARCH_RECORD)) {
+                throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                               "permission to perform faceted range search");
+            }
+            return analyticsDataService.searchRange(tenantId, drillDownRequest);
+        } catch (AnalyticsException e) {
+            throw new AnalyticsIndexException(e.getMessage(), e);
+        }
     }
 
     @Override

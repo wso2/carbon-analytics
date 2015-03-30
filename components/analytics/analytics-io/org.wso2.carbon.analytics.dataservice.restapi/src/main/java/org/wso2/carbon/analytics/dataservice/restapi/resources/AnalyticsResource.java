@@ -597,16 +597,15 @@ public class AnalyticsResource extends AbstractResource {
         AnalyticsCategoryPath path = new AnalyticsCategoryPath(new String[]{"2015", "Feb"});
         AnalyticsDrillDownRequest anss = new AnalyticsDrillDownRequest();
         anss.addCategoryPath("testField", path);
-        anss.setScore(score);
+        anss.setScoreFunction(score);
         anss.setLanguageQuery(null);
         anss.setLanguage("lucene");
-        anss.setTenantId(-1234);
         anss.setTableName("test");
         anss.setCategoryCount(10);
         anss.setRecordCount(10);
         anss.setWithIds(true);
 
-        return Response.ok(ads.drillDown(anss, 10, 10)).build();
+        return Response.ok(ads.drillDown(-1234,anss)).build();
     }
 
     /**
@@ -623,20 +622,19 @@ public class AnalyticsResource extends AbstractResource {
             throws AnalyticsException {
         AnalyticsDataService ads = Utils.getAnalyticsDataService();
         AnalyticsDrillDownRequest anss = new AnalyticsDrillDownRequest();
-        anss.addRange("number", new AnalyticsDrillDownRange("-1 --- 1.5", -1, 1.5));
-        anss.addRange("number", new AnalyticsDrillDownRange("1.5 --- 3.1", 1.5, 3.1));
-        anss.addRange("number1", new AnalyticsDrillDownRange("3 --- 6", 3, 6));
+        anss.addRangeFacet("number", new AnalyticsDrillDownRange("-1 --- 1.5", -1, 1.5));
+        anss.addRangeFacet("number", new AnalyticsDrillDownRange("1.5 --- 3.1", 1.5, 3.1));
+        anss.addRangeFacet("number1", new AnalyticsDrillDownRange("3 --- 6", 3, 6));
         AnalyticsCategoryPath path = new AnalyticsCategoryPath(new String[]{"2015"});
         anss.addCategoryPath("testField", path);
         anss.setLanguageQuery(null);
         anss.setLanguage("lucene");
-        anss.setTenantId(-1234);
         anss.setTableName("test");
         anss.setCategoryCount(10);
         anss.setRecordCount(10);
         anss.setWithIds(true);
 
-        return Response.ok(ads.searchRange(anss)).build();
+        return Response.ok(ads.searchRange(-1234, anss)).build();
     }
 
 

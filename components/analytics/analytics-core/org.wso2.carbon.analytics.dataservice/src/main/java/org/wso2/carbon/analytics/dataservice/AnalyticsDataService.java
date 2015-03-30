@@ -258,17 +258,14 @@ public interface AnalyticsDataService extends AnalyticsRecordReader {
      * @return the results containing field names and respective facets
      * @throws AnalyticsIndexException
      */
-    Map<String, List<DrillDownResultEntry>> drillDown( AnalyticsDrillDownRequest drillDownRequest,
-             int facetCount, int recordCount) throws AnalyticsIndexException;
+    Map<String, List<DrillDownResultEntry>> drillDown(int tenantId, AnalyticsDrillDownRequest drillDownRequest) throws AnalyticsIndexException;
 
     /**
-     * Returns the drilldown result
-     * @param drillDownRequest
-     * @param facetCount
-     * @param recordCount
-     * @return
+     * Returns the drilldown results for ranges of numeric values, given {@link org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest}
+     * @param drillDownRequest The drilldown object which contains the drilldown information
+     * @return return the results containing the names and the respective facets.
      */
-    Map<String, List<DrillDownResultEntry>> searchRange( AnalyticsDrillDownRequest drillDownRequest)
+    Map<String, List<DrillDownResultEntry>> searchRange(int tenantId, AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException;
 
     /**

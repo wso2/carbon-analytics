@@ -78,7 +78,6 @@ import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
-import org.wso2.carbon.analytics.dataservice.commons.AnalyticsScore;
 import org.wso2.carbon.analytics.dataservice.commons.DrillDownResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
@@ -156,8 +155,11 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     private AnalyticsIndexDefinitionRepository repository;
     
     private Map<String, Map<String, IndexType>> indexDefs = new HashMap<String, Map<String, IndexType>>();
+
+    private Map<String, List<String>> scoreParams = new HashMap<>(0);
     
     private Map<String, Directory> indexDirs = new HashMap<String, Directory>();
+
     private Map<String, Directory> indexTaxonomyDirs = new HashMap<String, Directory>();
     
     private Analyzer luceneAnalyzer;
@@ -676,16 +678,15 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
 
-    public Map<String,List<DrillDownResultEntry>> searchRanges(AnalyticsDrillDownRequest drillDownRequest)
+    public Map<String,List<DrillDownResultEntry>> searchRanges(int tenantId, AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
 
-        int tenantId = drillDownRequest.getTenantId();
         String tableName = drillDownRequest.getTableName();
         IndexReader indexReader= null;
         FacetsCollector fc = new FacetsCollector();
         Query indexQuery = new MatchAllDocsQuery();
         Map<String, IndexType> indices = this.lookupIndices(tenantId, tableName);
-        Map<String, List<AnalyticsDrillDownRange>> ranges = drillDownRequest.getRanges();
+        Map<String, List<AnalyticsDrillDownRange>> ranges = drillDownRequest.getRangeFacets();
         try {
             if (drillDownRequest.getLanguageQuery() != null) {
                 indexQuery = new AnalyticsQueryParser(this.luceneAnalyzer,
@@ -787,17 +788,16 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return new MultiReader(indexReaders.toArray(new IndexReader[indexReaders.size()]));
     }
 
-    public Map<String, List<DrillDownResultEntry>> drillDown(AnalyticsDrillDownRequest drillDownRequest)
+    public Map<String, List<DrillDownResultEntry>> drillDown(int tenantId, AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
-        int tenantId = drillDownRequest.getTenantId();
         String tableName = drillDownRequest.getTableName();
         Directory desIndex = new RAMDirectory();
         Directory desTaxonomyIndex = new RAMDirectory();
         this.mergeTaxnomonyShards(tenantId, tableName, desIndex, desTaxonomyIndex);
-        return drillDown(drillDownRequest, desIndex, desTaxonomyIndex,null, null);
+        return drillDown(tenantId, drillDownRequest, desIndex, desTaxonomyIndex,null, null);
     }
 
-    private Map<String, List<DrillDownResultEntry>> drillDown(AnalyticsDrillDownRequest drillDownRequest,
+    private Map<String, List<DrillDownResultEntry>> drillDown(int tenantId, AnalyticsDrillDownRequest drillDownRequest,
                                 Directory indexDir, Directory taxonomyIndexDir, String rangeField,
                                 AnalyticsDrillDownRange range)
             throws AnalyticsIndexException {
@@ -809,14 +809,14 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             taxonomyReader = new DirectoryTaxonomyReader(taxonomyIndexDir);
             IndexSearcher indexSearcher = new IndexSearcher(indexReader);
             FacetsCollector facetsCollector = new FacetsCollector(true);
-            Map<String, IndexType> indices = this.lookupIndices(drillDownRequest.getTenantId(),
+            Map<String, IndexType> indices = this.lookupIndices(tenantId,
                                                                 drillDownRequest.getTableName());
             FacetsConfig config = this.getFacetsConfigurations(indices);
             DrillSideways drillSideways = new DrillSideways(indexSearcher, config, taxonomyReader);
             DrillDownQuery drillDownQuery = this.createDrillDownQuery(drillDownRequest,
                                 indices, config,rangeField, range);
             drillSideways.search(drillDownQuery, facetsCollector);
-            ValueSource valueSource = this.getCompiledScoreFunction(drillDownRequest.getScore(), indices);
+            ValueSource valueSource = this.getCompiledScoreFunction(drillDownRequest.getScoreFunction(), indices);
             Facets facets = new TaxonomyFacetSumValueSource(taxonomyReader, config, facetsCollector,
                                                             valueSource);
             Map<String, List<DrillDownResultEntry>> result = this.getDrilldownTopChildren(drillDownRequest,
@@ -944,14 +944,14 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return config;
     }
 
-    private ValueSource getCompiledScoreFunction(AnalyticsScore score, Map<String, IndexType> indices)
+    private ValueSource getCompiledScoreFunction(String scoreFunction, Map<String, IndexType> indices)
             throws AnalyticsIndexException {
         try {
-            Expression scoreFunction;
-            if (score == null) {
-                scoreFunction = JavascriptCompiler.compile(INDEX_INTERNAL_WEIGHT_FIELD);
+            Expression funcExpression;
+            if (scoreFunction == null) {
+                funcExpression = JavascriptCompiler.compile(INDEX_INTERNAL_WEIGHT_FIELD);
             } else {
-                scoreFunction = JavascriptCompiler.compile(score.getFunction());
+                funcExpression = JavascriptCompiler.compile(scoreFunction);
             }
             SimpleBindings bindings = new SimpleBindings();
             bindings.add(new SortField(INDEX_INTERNAL_SCORE_FIELD, SortField.Type.SCORE));
@@ -960,7 +960,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             if (indexDef.getValue() == IndexType.SCOREPARAM) {
                 bindings.add(new SortField(indexDef.getKey(), SortField.Type.DOUBLE));
             }
-            return scoreFunction.getValueSource(bindings);
+            return funcExpression.getValueSource(bindings);
         } catch (ParseException e) {
             throw new AnalyticsIndexException("Error while evaluating the score function",
                                               e.getCause());
@@ -1246,6 +1246,21 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                     "' is a reserved name");
         }
     }
+
+    private void checkInvalidScoreParams(List<String> scoreParams, Map<String, IndexType> columns) throws
+                                                                                                   AnalyticsIndexException {
+
+        for (String scoreParam : scoreParams) {
+            IndexType type = columns.get(scoreParam);
+            if (type == null) {
+                throw new AnalyticsIndexException("'" + scoreParam + "' is not an indexed column");
+            }
+            if (type != IndexType.DOUBLE || type != IndexType.FLOAT || type != IndexType.INTEGER
+                || type != IndexType.LONG) {
+                throw new AnalyticsIndexException("'" + scoreParam + "' is not indexed as a numeric column");
+            }
+        }
+    }
     
     public void setIndices(int tenantId, String tableName, Map<String, IndexType> columns) 
             throws AnalyticsIndexException {
@@ -1255,7 +1270,16 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         this.getRepository().setIndices(tenantId, tableName, columns);
         this.notifyClusterIndexChange(tenantId, tableName);
     }
-    
+
+    public void setScoreParams(int tenantId, String tableName, List<String> scoreParams, Map<String, IndexType> columns)
+            throws AnalyticsIndexException {
+        this.checkInvalidScoreParams(scoreParams, columns);
+        String tableId = this.generateTableId(tenantId, tableName);
+        this.scoreParams.put(tableId, scoreParams);
+        this.getRepository().setIndices(tenantId, tableName, columns);
+        this.notifyClusterIndexChange(tenantId, tableName);
+    }
+
     public Map<String, IndexType> lookupIndices(int tenantId, String tableName) throws AnalyticsIndexException {
         String tableId = this.generateTableId(tenantId, tableName);
         Map<String, IndexType> cols = this.indexDefs.get(tableId);

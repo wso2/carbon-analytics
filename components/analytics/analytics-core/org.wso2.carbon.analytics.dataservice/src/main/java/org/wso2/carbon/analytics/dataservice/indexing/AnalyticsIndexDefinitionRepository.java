@@ -18,18 +18,18 @@
  */
 package org.wso2.carbon.analytics.dataservice.indexing;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.analytics.dataservice.commons.IndexType;
+import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
+import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
+import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem.DataInput;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
-import org.wso2.carbon.analytics.dataservice.commons.IndexType;
-import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
-import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem.DataInput;
 
 /**
  * This class represents a repository for storing index definitions.
@@ -39,7 +39,9 @@ public class AnalyticsIndexDefinitionRepository {
     private static final Log log = LogFactory.getLog(AnalyticsIndexDefinitionRepository.class);
     
     private static final String INDEX_DEFINITION_FS_ROOT = "/_meta/index/";
-    
+
+    private static final String INDEX_SCORE_PARAM_FS_ROOT = "/_meta/score_params/";
+
     private static final String DEFAULT_CHARSET = "UTF8";
     
     private AnalyticsFileSystem analyticsFileSystem;

@@ -310,17 +310,16 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     @Override
-    public Map<String, List<DrillDownResultEntry>> drillDown(AnalyticsDrillDownRequest drillDownRequest,
-                                                             int facetCount, int recordCount)
+    public Map<String, List<DrillDownResultEntry>> drillDown(int tenantId, AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
-        return this.getIndexer().drillDown(drillDownRequest);
+        return this.getIndexer().drillDown(tenantId, drillDownRequest);
     }
 
     @Override
-    public Map<String, List<DrillDownResultEntry>> searchRange(
+    public Map<String, List<DrillDownResultEntry>> searchRange(int tenantId,
             AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
-        return this.getIndexer().searchRanges(drillDownRequest);
+        return this.getIndexer().searchRanges(tenantId, drillDownRequest);
     }
 
     @Override

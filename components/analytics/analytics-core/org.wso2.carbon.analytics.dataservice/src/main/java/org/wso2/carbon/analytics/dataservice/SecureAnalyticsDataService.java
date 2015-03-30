@@ -17,6 +17,8 @@
 */
 package org.wso2.carbon.analytics.dataservice;
 
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
+import org.wso2.carbon.analytics.dataservice.commons.DrillDownResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
@@ -276,6 +278,24 @@ public interface SecureAnalyticsDataService extends AnalyticsRecordReader {
      * @throws AnalyticsException
      */
     public void waitForIndexing(long maxWait) throws AnalyticsTimeoutException, AnalyticsException;
+
+    /**
+     * Returns the drill down results of a search query, given {@link org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest}
+     * @param drillDownRequest The drilldown object which contains the drilldown information
+     * @param facetCount nunber of maximum facets per each field
+     * @param recordCount number of each records in each facet
+     * @return the results containing field names and respective facets
+     * @throws AnalyticsIndexException
+     */
+    Map<String, List<DrillDownResultEntry>> drillDown(String username, AnalyticsDrillDownRequest drillDownRequest) throws AnalyticsIndexException;
+
+    /**
+     * Returns the drilldown results for ranges of numeric values, given {@link org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest}
+     * @param drillDownRequest The drilldown object which contains the drilldown information
+     * @return return the results containing the names and the respective facets.
+     */
+    Map<String, List<DrillDownResultEntry>> searchRange(String username, AnalyticsDrillDownRequest drillDownRequest)
+            throws AnalyticsIndexException;
 
     /**
      * Destroys and frees any resources taken up by the analytics data service implementation.

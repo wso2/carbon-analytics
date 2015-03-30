@@ -29,8 +29,6 @@ import java.util.Map;
  */
 public class AnalyticsDrillDownRequest {
 
-    //tenantId of the tenant of which the table being queried, belongs to.
-    private int tenantId;
     //table name on which the drill down is performed
     private String tableName;
     //List of facets / List of category path to drill down
@@ -42,7 +40,7 @@ public class AnalyticsDrillDownRequest {
     // language query
     private  String languageQuery;
     // represents the score function and the values
-    private AnalyticsScore score;
+    private String scoreFunction;
     //maximun number of categories for each facet field
     private int categoryCount;
     // maximum records for each category in each facet
@@ -60,20 +58,22 @@ public class AnalyticsDrillDownRequest {
         this.withIds = withIds;
     }
 
-    /**
-     * Get the tenantId.
-     * @return the tenant ID
-     */
-    public int getTenantId() {
-        return tenantId;
-    }
-
-    /**
-     * Sets the tenantId.
-     * @param tenantId tenant ID
-     */
-    public void setTenantId(int tenantId) {
-        this.tenantId = tenantId;
+    public AnalyticsDrillDownRequest(String tableName,
+                                     Map<String, AnalyticsCategoryPath> categoryPaths,
+                                     Map<String, List<AnalyticsDrillDownRange>> ranges,
+                                     String language, String languageQuery,
+                                     String scoreFunction, int categoryCount, int recordCount,
+                                     int recordStart, boolean withIds) {
+        this.tableName = tableName;
+        this.categoryPaths = categoryPaths;
+        this.ranges = ranges;
+        this.language = language;
+        this.languageQuery = languageQuery;
+        this.scoreFunction = scoreFunction;
+        this.categoryCount = categoryCount;
+        this.recordCount = recordCount;
+        this.recordStart = recordStart;
+        this.withIds = withIds;
     }
 
     /**
@@ -123,16 +123,16 @@ public class AnalyticsDrillDownRequest {
      * Returns the Scoring function.
      * @return The score function
      */
-    public AnalyticsScore getScore() {
-        return score;
+    public String getScoreFunction() {
+        return scoreFunction;
     }
 
     /**
      * Sets the score function.
      * @param score the score function
      */
-    public void setScore(AnalyticsScore score) {
-        this.score = score;
+    public void setScoreFunction(String score) {
+        this.scoreFunction = scoreFunction;
     }
 
     /**
@@ -172,7 +172,7 @@ public class AnalyticsDrillDownRequest {
      * drilldown mechanism is not ranged based.
      * @return The map of ranges with the fields
      */
-    public Map<String, List<AnalyticsDrillDownRange>> getRanges() {
+    public Map<String, List<AnalyticsDrillDownRange>> getRangeFacets() {
         return ranges;
     }
 
@@ -181,7 +181,7 @@ public class AnalyticsDrillDownRequest {
      * @param ranges The map of ranges, the key of the map represents the field bieng range-queried
      *                and value represents a list which can have several ranges for one field.
      */
-    public void setRanges(Map<String, List<AnalyticsDrillDownRange >> ranges) {
+    public void setRangeFacets(Map<String, List<AnalyticsDrillDownRange>> ranges) {
         this.ranges = ranges;
     }
 
@@ -189,11 +189,11 @@ public class AnalyticsDrillDownRequest {
      * Inserts a single range to existing List of ranges.
      * @param range A drill down range being inserted
      */
-    public  void addRange(String field, AnalyticsDrillDownRange range) {
+    public  void addRangeFacet(String field, AnalyticsDrillDownRange range) {
         if (this.ranges == null) {
             this.ranges = new LinkedHashMap<>();
         }
-        List<AnalyticsDrillDownRange> ranges = this.getRanges().get(field);
+        List<AnalyticsDrillDownRange> ranges = this.getRangeFacets().get(field);
 
         if (ranges == null) {
             ranges = new ArrayList<>();
