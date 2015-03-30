@@ -23,7 +23,6 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
-import org.wso2.carbon.analytics.dataservice.commons.AnalyticsScore;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.restapi.BasicAuthenticator;
@@ -593,11 +592,10 @@ public class AnalyticsResource extends AbstractResource {
     public Response drilldown(List<RecordBean> recordBeans)
             throws AnalyticsException {
         AnalyticsDataService ads = Utils.getAnalyticsDataService();
-        AnalyticsScore score = new AnalyticsScore("_weight*2",null);
         AnalyticsCategoryPath path = new AnalyticsCategoryPath(new String[]{"2015", "Feb"});
         AnalyticsDrillDownRequest anss = new AnalyticsDrillDownRequest();
         anss.addCategoryPath("testField", path);
-        anss.setScoreFunction(score);
+        anss.setScoreFunction("2*_weight");
         anss.setLanguageQuery(null);
         anss.setLanguage("lucene");
         anss.setTableName("test");
