@@ -26,10 +26,40 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class HBaseAnalyticsConfigurationEntry {
 
     private int batchSize = HBaseAnalyticsDSConstants.DEFAULT_QUERY_BATCH_SIZE;
+    private String hdfsHost = "hdfs://localhost:9000";
+    private String hbaseHost = "localhost:60000";
+    private String hdfsDataDir = "/dfs/data";
 
     @XmlElement(name = "query-batch-size")
     public int getBatchSize() {
         return batchSize;
+    }
+
+    @XmlElement(name = "hbase-host")
+    public String getHbaseHost() {
+        return hbaseHost;
+    }
+
+    @XmlElement(name = "hdfs-data-dir")
+    public String getHdfsDataDir() {
+        return hdfsDataDir;
+    }
+
+    public void setHdfsDataDir(String hdfsDataDir) {
+        this.hdfsDataDir = hdfsDataDir;
+    }
+
+    @XmlElement(name = "hdfs-host")
+    public String getHdfsHost() {
+        return hdfsHost;
+    }
+
+    public void setHdfsHost(String hdfsHost) {
+        this.hdfsHost = hdfsHost;
+    }
+
+    public void setHbaseHost(String hbaseHost) {
+        this.hbaseHost = hbaseHost;
     }
 
     public void setBatchSize(int batchSize) {
