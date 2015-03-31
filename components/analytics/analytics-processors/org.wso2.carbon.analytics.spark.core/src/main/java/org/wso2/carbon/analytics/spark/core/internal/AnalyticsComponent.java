@@ -46,32 +46,36 @@ import org.wso2.carbon.utils.NetworkUtils;
  * cardinality="1..1" policy="dynamic" bind="setTenantRegistryLoader" unbind="unsetTenantRegistryLoader"
  */
 public class AnalyticsComponent {
-    
+
     private static final String PORT_OFFSET_SERVER_PROP = "Ports.Offset";
-    
+
     private static final Log log = LogFactory.getLog(AnalyticsComponent.class);
 
     protected void activate(ComponentContext ctx) {
-        if (log.isDebugEnabled()) { 
+        if (log.isDebugEnabled()) {
             log.debug("Activating Analytics Spark Core");
         }
         try {
-            int portOffset = Integer.parseInt(ServerConfiguration.getInstance().getFirstProperty(PORT_OFFSET_SERVER_PROP));
-            ServiceHolder.setAnalyticskExecutor(new SparkAnalyticsExecutor(
-                    NetworkUtils.getLocalHostname(), portOffset));
-        } catch (AnalyticsClusterException | SocketException e) {
-            String msg = "Error initializing analytics executor: " + e.getMessage();
-            log.error(msg, e);
-            throw new RuntimeException(msg, e);
-        }
-        AnalyticsProcessorService analyticsProcessorService = new CarbonAnalyticsProcessorService();
-        ctx.getBundleContext().registerService(AnalyticsProcessorService.class, analyticsProcessorService, null);
-        ServiceHolder.setAnalyticsProcessorService(analyticsProcessorService);
-        if (log.isDebugEnabled()) { 
-            log.debug("Finished activating Analytics Spark Core");
+            try {
+                int portOffset = Integer.parseInt(ServerConfiguration.getInstance().getFirstProperty(PORT_OFFSET_SERVER_PROP));
+                ServiceHolder.setAnalyticskExecutor(new SparkAnalyticsExecutor(
+                        NetworkUtils.getLocalHostname(), portOffset));
+            } catch (Throwable e) {
+                String msg = "Error initializing analytics executor: " + e.getMessage();
+                log.error(msg, e);
+//            throw new RuntimeException(msg, e);
+            }
+            AnalyticsProcessorService analyticsProcessorService = new CarbonAnalyticsProcessorService();
+            ctx.getBundleContext().registerService(AnalyticsProcessorService.class, analyticsProcessorService, null);
+            ServiceHolder.setAnalyticsProcessorService(analyticsProcessorService);
+            if (log.isDebugEnabled()) {
+                log.debug("Finished activating Analytics Spark Core");
+            }
+        }catch (Throwable throwable){
+            log.error("Error in registering the analytics processor service! ", throwable);
         }
     }
-    
+
     protected void deactivate(ComponentContext ctx) {
         ServiceHolder.getAnalyticskExecutor().stop();
     }
