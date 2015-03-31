@@ -25,8 +25,21 @@ import org.wso2.carbon.analytics.dashboard.batch.stub.data.Cell;
 import org.wso2.carbon.analytics.dashboard.batch.stub.data.Row;
 import org.wso2.carbon.analytics.dashboard.batch.stub.data.Table;
 import org.wso2.carbon.analytics.dashboard.stub.DashboardAdminServiceStub;
-import org.wso2.carbon.analytics.dashboard.stub.data.*;
-import org.wso2.carbon.analytics.dashboard.ui.dto.*;
+import org.wso2.carbon.analytics.dashboard.stub.data.Column;
+import org.wso2.carbon.analytics.dashboard.stub.data.Dashboard;
+import org.wso2.carbon.analytics.dashboard.stub.data.DataView;
+import org.wso2.carbon.analytics.dashboard.stub.data.Widget;
+import org.wso2.carbon.analytics.dashboard.stub.data.WidgetMetaData;
+import org.wso2.carbon.analytics.dashboard.ui.dto.ColumnDTO;
+import org.wso2.carbon.analytics.dashboard.ui.dto.DashboardDTO;
+import org.wso2.carbon.analytics.dashboard.ui.dto.DataViewDTO;
+import org.wso2.carbon.analytics.dashboard.ui.dto.DimensionDTO;
+import org.wso2.carbon.analytics.dashboard.ui.dto.TableDTO;
+import org.wso2.carbon.analytics.dashboard.ui.dto.WidgetAndDataViewDTO;
+import org.wso2.carbon.analytics.dashboard.ui.dto.WidgetDTO;
+import org.wso2.carbon.analytics.dashboard.ui.dto.WidgetInstanceDTO;
+import org.wso2.carbon.event.publisher.stub.EventPublisherAdminServiceStub;
+import org.wso2.carbon.event.stream.stub.EventStreamAdminServiceStub;
 import org.wso2.carbon.ui.CarbonUIUtil;
 
 import javax.servlet.ServletConfig;
@@ -99,6 +112,52 @@ public class DashboardAdminClient {
                 ".BatchAnalyticsDashboardAdminServiceHttpsSoap12Endpoint";
         BatchAnalyticsDashboardAdminServiceStub stub = new BatchAnalyticsDashboardAdminServiceStub
                 (configContext, serverURL);
+
+        String cookie = (String) session.getAttribute(org.wso2.carbon.utils.ServerConstants.ADMIN_SERVICE_COOKIE);
+
+        ServiceClient client = stub._getServiceClient();
+        Options option = client.getOptions();
+        option.setManageSession(true);
+        option.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING, cookie);
+
+        return stub;
+    }
+
+    public static EventStreamAdminServiceStub getEventStreamAdminService(
+            ServletConfig config, HttpSession session,
+            HttpServletRequest request)
+            throws AxisFault {
+
+        ConfigurationContext configContext = (ConfigurationContext) config.getServletContext()
+                .getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
+        //Server URL which is defined in the server.xml
+        String serverURL = CarbonUIUtil.getServerURL(config.getServletContext(),
+                session) + "EventStreamAdminService" +
+                ".EventStreamAdminServiceHttpsSoap12Endpoint";
+        EventStreamAdminServiceStub stub = new EventStreamAdminServiceStub
+                (configContext, serverURL);
+
+        String cookie = (String) session.getAttribute(org.wso2.carbon.utils.ServerConstants.ADMIN_SERVICE_COOKIE);
+
+        ServiceClient client = stub._getServiceClient();
+        Options option = client.getOptions();
+        option.setManageSession(true);
+        option.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING, cookie);
+
+        return stub;
+    }
+
+    public static EventPublisherAdminServiceStub getEventPublisherAdminService(
+            ServletConfig config, HttpSession session,
+            HttpServletRequest request)
+            throws AxisFault {
+
+        ConfigurationContext configContext = (ConfigurationContext) config.getServletContext()
+                .getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
+        //Server URL which is defined in the server.xml
+        String serverURL = CarbonUIUtil.getServerURL(config.getServletContext(),
+                session) + "EventPublisherAdminService.EventPublisherAdminServiceHttpsSoap12Endpoint";
+        EventPublisherAdminServiceStub stub = new EventPublisherAdminServiceStub(configContext, serverURL);
 
         String cookie = (String) session.getAttribute(org.wso2.carbon.utils.ServerConstants.ADMIN_SERVICE_COOKIE);
 
@@ -199,8 +258,8 @@ public class DashboardAdminClient {
             for (WidgetMetaData meta : dashboard.getWidgets()) {
                 WidgetInstanceDTO widget = new WidgetInstanceDTO(meta.getId());
                 widget.setDimensions(new DimensionDTO(
-                        meta.getDimensions().getRow(), meta.getDimensions().getColumn(),
-                        meta.getDimensions().getWidth(), meta.getDimensions().getHeight())
+                                meta.getDimensions().getRow(), meta.getDimensions().getColumn(),
+                                meta.getDimensions().getWidth(), meta.getDimensions().getHeight())
                 );
                 widgets.add(widget);
             }
