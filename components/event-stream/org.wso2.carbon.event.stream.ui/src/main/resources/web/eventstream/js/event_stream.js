@@ -476,7 +476,7 @@ function convertStringToEventStreamInfoDto() {
                     streamAttributeTable.style.display = "";
                 }
 
-                document.getElementById("sourceWorkArea").style.display = "";
+                document.getElementById("sourceWorkArea").style.display = "none";
                 document.getElementById("designWorkArea").style.display = "inline";
 
 
