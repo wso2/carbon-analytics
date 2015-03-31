@@ -56,8 +56,12 @@ public abstract class AbstractResource {
 				response = Response.status(Status.BAD_REQUEST.getStatusCode()).entity(invalid).build();
 				break;
 			case FORBIDDEN:
-				ResponseBean forbidden = getResponseMessage(Constants.Status.FAILED, message);
+				ResponseBean forbidden = getResponseMessage(Constants.Status.UNAUTHORIZED, message);
 				response = Response.status(Status.FORBIDDEN.getStatusCode()).entity(forbidden).build();
+				break;
+            case UNAUTHENTICATED:
+				ResponseBean unauthenticated = getResponseMessage(Constants.Status.UNAUTHORIZED, message);
+				response = Response.status(Status.FORBIDDEN.getStatusCode()).entity(unauthenticated).build();
 				break;
 			case NON_EXISTENT:
 				ResponseBean nonExistent =
@@ -102,6 +106,8 @@ public abstract class AbstractResource {
 		INVALID,
 		/** The "forbidden" response. */
 		FORBIDDEN,
+        /** The "forbidden" response. */
+        UNAUTHENTICATED,
 		/** The "non existent" response. */
 		NON_EXISTENT
 	}

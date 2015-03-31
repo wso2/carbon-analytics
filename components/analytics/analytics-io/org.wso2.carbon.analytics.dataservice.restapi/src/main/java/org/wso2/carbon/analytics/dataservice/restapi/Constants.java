@@ -46,6 +46,12 @@ public class Constants {
 		/** The Constant NON_EXISTENT. */
 		public static final String NON_EXISTENT = "non-existent";
 
+        /** The Constant UNAUTHORIZED. */
+        public static final String UNAUTHORIZED = "unauthorized";
+
+        /** The Constant NON_EXISTENT. */
+        public static final String UNAUTHENTICATED = "unauthenticated";
+
 		/**
 		 * Instantiates a new status.
 		 */

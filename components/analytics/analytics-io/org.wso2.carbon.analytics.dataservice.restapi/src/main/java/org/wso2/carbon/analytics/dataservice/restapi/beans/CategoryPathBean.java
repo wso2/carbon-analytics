@@ -54,7 +54,6 @@ public class CategoryPathBean {
      * @param path array of strings representing the category path.
      */
     public CategoryPathBean(String[] path) {
-        this.weight = 1.0f;
         this.path = path;
     }
     /**
