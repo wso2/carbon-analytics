@@ -51,6 +51,14 @@
 				</div>
 			</div>
 
+            <div id="realTimeContent">
+                <!-- Multiple Checkboxes -->
+                <div class="form-group" >
+                    <label class="col-md-4 control-label" for="checkboxes">Available Stream Attributes</label>
+                        <div class="col-md-4" id="colsRealTime"></div>
+                </div>
+            </div>
+
 			<!-- Button (Double) -->
 			<div class="form-group">
 			  <label class="col-md-4 control-label" for="button1id"></label>
@@ -82,6 +90,7 @@
 	});
 
 	$("#batchContent").hide();
+    $("#realTimeContent").hide();
 
 	var request = {action : "getTables"};
 	$.getJSON("/carbon/analytics-dashboard/ajax/analytics_ajaxprocessor.jsp",request,function (data) {
@@ -103,12 +112,18 @@
 		var item = this;
 		var dsList = $("#dsList option:selected");
 		var type = dsList.attr("data-type");
+
 		if(dsList.val() != "-1" && type == "batch") {
 			console.log("Selected datasource: " + type); 
 			$("#batchContent").show();
 			// var columns = [{"name" : "Year","type" : "string"},{"name" : "Expenses","type" : "int"}];
 			fetchColumns(dsList.val());
-		}
+		} else if(dsList.val() != "-1" && type == "realTime"){
+		 //construct the columns list if the datasource type is "realTime"
+            $("#realTimeContent").show();
+            fetchStreamDefinitonDetails(dsList.val())
+
+        }
 		
 
 	});
@@ -135,9 +150,32 @@
 		});
 	};
 
+    function fetchStreamDefinitonDetails(streamId){
+
+        var request = {action : "getStreamDefinition",streamId : streamId};
+
+        $.getJSON("/carbon/analytics-dashboard/ajax/analytics_ajaxprocessor.jsp",request,function (data) {
+            $("#colsRealTime").empty();
+            data.forEach(function(col,i){
+                console.log(col.name + col.type);
+                var div = $('<div/>').attr("class","checkbox");
+                var label = $("<label/>").attr("for",col.name).appendTo(div);
+                var input = $("<input/>").attr("type","checkbox")
+                        .attr("name","columns").attr("value",col.name)
+                        .attr("id",col.name).attr("data-type",col.type)
+                        .prop("checked",true)
+                        .attr('readonly',true)
+                        .appendTo(label);
+                label.append(col.name);
+                $("#colsRealTime").append(div);
+            });
+        });
+    }
+
 	$("#btnSaveDV").click(function(e){
 		var name = $("#txtName").val();
 		var type = $("#dsList option:selected").attr("data-type");
+        var uiPublisherAdapterAlreadyExists = false;
 		if(!name) {
 			alert("Dataview must have a unique name!");
 			return false;
@@ -168,8 +206,31 @@
 			}
 			var filter = $("#txtFilter").text();
 			dataview.filter = filter;
-		}
-		console.log(dataview); 
+		} else if(type == "realTime"){ //construct the columns list if the datasource type is "realTime"
+
+            var columns = [];
+            var checked = $('input[name="columns"]:checked');
+            checked.each(function() {
+                // console.log(this.attr("data-type"));
+                columns.push({
+                    "name" : this.value,
+                    "type" : "string"
+                });
+            });
+            dataview.columns = columns;
+
+            //deploying event Publsiher for selected Stream
+            var request = {action : "deployOutputAdapterUIPublisher",streamId : datasource};
+
+            $.getJSON("/carbon/analytics-dashboard/ajax/analytics_ajaxprocessor.jsp",request,function (data) {
+
+                if(!data.isDeployedSuccess){
+                    console.log(data.message);
+                }
+
+            });
+        }
+		console.log(dataview);
 		//finally send the created DataView object to server
 		$.ajax({
 		   type: 'POST',
@@ -184,6 +245,7 @@
 		   		}
 		   },
 		   success: function(data) {
+               alert(6555);
 		   		console.log("Data received from server: " + data); 
 		   		window.location.href = "/carbon/analytics-dashboard/dataviews_ajaxprocessor.jsp";
 		   		return false;

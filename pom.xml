@@ -315,6 +315,17 @@
                 <artifactId>org.wso2.carbon.analytics.dashboard.ui</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.event-processing</groupId>
+                <artifactId>org.wso2.carbon.event.publisher.stub</artifactId>
+                <version>${carbon.event.processing.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.stream.stub</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+
 
             <!--carbon analytics common dependencies stop-->
 
@@ -601,6 +612,7 @@
 
     <properties>
         <carbon.analytics.common.version>1.0.0-SNAPSHOT</carbon.analytics.common.version>
+        <carbon.event.processing.version>2.0.4-SNAPSHOT</carbon.event.processing.version>
 
         <!-- Carbon kernel version -->
         <carbon.kernel.version>4.3.0</carbon.kernel.version>
