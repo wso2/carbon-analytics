@@ -88,7 +88,6 @@
 
     } else if(action.equals("addDataView")) {
         String definition = request.getParameter("definition");
-        System.out.println(definition);
         DataViewDTO dto = null;
         try {
             dto = gson.fromJson(definition,DataViewDTO.class);

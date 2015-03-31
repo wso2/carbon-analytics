@@ -245,7 +245,6 @@
 		   		}
 		   },
 		   success: function(data) {
-               alert(6555);
 		   		console.log("Data received from server: " + data); 
 		   		window.location.href = "/carbon/analytics-dashboard/dataviews_ajaxprocessor.jsp";
 		   		return false;
