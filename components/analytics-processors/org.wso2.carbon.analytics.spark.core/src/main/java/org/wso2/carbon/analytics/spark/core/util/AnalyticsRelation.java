@@ -20,9 +20,8 @@ package org.wso2.carbon.analytics.spark.core.util;
 
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.SQLContext;
-import org.apache.spark.sql.api.java.JavaSQLContext;
-import org.apache.spark.sql.catalyst.expressions.Row;
-import org.apache.spark.sql.catalyst.types.StructType;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.types.StructType;
 import org.apache.spark.sql.sources.TableScan;
 import scala.reflect.ClassTag$;
 
@@ -38,7 +37,7 @@ public class AnalyticsRelation extends TableScan implements Serializable {
 
     private static final long serialVersionUID = -7773419083178608517L;
 
-    private JavaSQLContext sqlContext;
+    private SQLContext sqlContext;
     
     private StructType schema;
         
@@ -49,7 +48,7 @@ public class AnalyticsRelation extends TableScan implements Serializable {
     public AnalyticsRelation() { }
     
     public AnalyticsRelation(int tenantId, String tableName, 
-            JavaSQLContext sqlContext, String schemaString) {
+            SQLContext sqlContext, String schemaString) {
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.sqlContext = sqlContext;
@@ -60,14 +59,14 @@ public class AnalyticsRelation extends TableScan implements Serializable {
     @Override
     public RDD<Row> buildScan() {
         return new AnalyticsRDD(this.tenantId, this.tableName,
-                new ArrayList<String>(asJavaCollection(this.schema.fieldNames().toList())), 
-                sqlContext.sqlContext().sparkContext(), scala.collection.Seq$.MODULE$.empty(), 
+                new ArrayList<String>(asJavaCollection(this.schema.fieldNames().toList())),
+                sqlContext.sparkContext(), scala.collection.Seq$.MODULE$.empty(),
                 ClassTag$.MODULE$.<Row>apply(Row.class));
     }
 
     @Override
     public SQLContext sqlContext() {
-        return this.sqlContext.sqlContext();
+        return this.sqlContext;
     }
 
     @Override
