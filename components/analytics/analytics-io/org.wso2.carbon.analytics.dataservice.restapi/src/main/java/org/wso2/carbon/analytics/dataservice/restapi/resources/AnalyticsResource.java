@@ -22,6 +22,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.restapi.Constants;
@@ -562,8 +564,9 @@ public class AnalyticsResource extends AbstractResource {
         ids.add(rrr.getId());
         RecordGroup[] aaaa = ads.get(-1234, "test", 0, null, ids);
         List<Record> ddddd = GenericUtils.listRecords(ads, aaaa);
+        List<RecordBean> fff = Utils.createRecordBeans(ddddd);
 
-        return Response.ok(ddddd).build();
+        return Response.ok(fff).build();
     }
 
     /**
@@ -848,7 +851,7 @@ public class AnalyticsResource extends AbstractResource {
 
     private String authenticate(String authHeader) throws AnalyticsException {
 
-        String username = null;
+        String username;
         if (authHeader != null && authHeader.startsWith(Constants.BASIC_AUTH_HEADER)) {
             // Authorization: Basic base64credentials
             String base64Credentials = authHeader.substring(Constants.BASIC_AUTH_HEADER.length()).trim();
@@ -886,6 +889,8 @@ public class AnalyticsResource extends AbstractResource {
             } catch (UserStoreException e) {
                 throw new AnalyticsException("Error while accessing the user realm of user :" + username, e);
             }
+        } else {
+            throw new UnauthenticatedUserException("Invalid authentication header");
         }
         return username;
     }
