@@ -110,8 +110,12 @@
             <artifactId>netty-all</artifactId>
         </dependency>
 
-        <dependency>
+        <!--<dependency>
             <groupId>org.wso2.apache.hadoop</groupId>
+            <artifactId>hadoop-client</artifactId>
+        </dependency>-->
+        <dependency>
+            <groupId>org.wso2.orbit.org.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
         </dependency>
 
@@ -284,7 +288,7 @@
                                 <bundleDef>io.netty.wso2:netty-all</bundleDef>
                                 <bundleDef>javax.servlet.jsp:javax.servlet.jsp-api</bundleDef>
                                 <bundleDef>org.apache.tomcat.wso2:tomcat-servlet-api</bundleDef>
-                                <bundleDef>org.wso2.apache.hadoop:hadoop-client</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.apache.hadoop:hadoop-client</bundleDef>
                                 <bundleDef>org.wso2.json4s:json4s-jackson_2.10</bundleDef>
                                 <bundleDef>org.eclipse.jetty:jetty-continuation</bundleDef>
                                 <bundleDef>org.eclipse.jetty:jetty-http</bundleDef>
