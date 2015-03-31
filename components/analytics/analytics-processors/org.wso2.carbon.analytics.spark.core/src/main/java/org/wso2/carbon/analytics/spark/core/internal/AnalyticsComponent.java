@@ -56,19 +56,23 @@ public class AnalyticsComponent {
             log.debug("Activating Analytics Spark Core");
         }
         try {
-            int portOffset = Integer.parseInt(ServerConfiguration.getInstance().getFirstProperty(PORT_OFFSET_SERVER_PROP));
-            ServiceHolder.setAnalyticskExecutor(new SparkAnalyticsExecutor(
-                    NetworkUtils.getLocalHostname(), portOffset));
-        } catch (Throwable e) {
-            String msg = "Error initializing analytics executor: " + e.getMessage();
-            log.error(msg, e);
+            try {
+                int portOffset = Integer.parseInt(ServerConfiguration.getInstance().getFirstProperty(PORT_OFFSET_SERVER_PROP));
+                ServiceHolder.setAnalyticskExecutor(new SparkAnalyticsExecutor(
+                        NetworkUtils.getLocalHostname(), portOffset));
+            } catch (Throwable e) {
+                String msg = "Error initializing analytics executor: " + e.getMessage();
+                log.error(msg, e);
 //            throw new RuntimeException(msg, e);
-        }
-        AnalyticsProcessorService analyticsProcessorService = new CarbonAnalyticsProcessorService();
-        ctx.getBundleContext().registerService(AnalyticsProcessorService.class, analyticsProcessorService, null);
-        ServiceHolder.setAnalyticsProcessorService(analyticsProcessorService);
-        if (log.isDebugEnabled()) {
-            log.debug("Finished activating Analytics Spark Core");
+            }
+            AnalyticsProcessorService analyticsProcessorService = new CarbonAnalyticsProcessorService();
+            ctx.getBundleContext().registerService(AnalyticsProcessorService.class, analyticsProcessorService, null);
+            ServiceHolder.setAnalyticsProcessorService(analyticsProcessorService);
+            if (log.isDebugEnabled()) {
+                log.debug("Finished activating Analytics Spark Core");
+            }
+        }catch (Throwable throwable){
+            log.error("Error in registering the analytics processor service! ", throwable);
         }
     }
 
