@@ -36,6 +36,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static scala.collection.JavaConversions.asJavaCollection;
+
 /**
  * This class represents a Spark SQL relation.
  */
