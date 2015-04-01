@@ -207,15 +207,6 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         }
     }
 
-    public void close() {
-        try {
-            this.conn.close();
-        } catch (IOException ignore) {
-                /* do nothing, the connection is dead anyway */
-        }
-        log.debug("Closed HBase connection transients successfully.");
-    }
-
     @Override
     public List<String> listTables(int tenantId) throws AnalyticsException {
         Admin admin = null;
@@ -564,6 +555,16 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             GenericUtils.closeQuietly(dataTable);
         }
         this.deleteIndexEntries(tenantId, tableName, timestamps);
+    }
+
+    @Override
+    public void destroy() throws AnalyticsException {
+        try {
+            this.conn.close();
+            log.debug("Closed HBase connection transients successfully.");
+        } catch (IOException ignore) {
+                /* do nothing, the connection is dead anyway */
+        }
     }
 
     private void deleteIndexEntries(int tenantId, String tableName, List<Long> timestamps) throws AnalyticsException {

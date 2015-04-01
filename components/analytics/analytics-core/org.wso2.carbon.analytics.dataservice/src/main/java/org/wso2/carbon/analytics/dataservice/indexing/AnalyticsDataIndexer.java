@@ -1062,7 +1062,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     * Deletes the given records in the index.
     * @param tenantId The tenant id
     * @param tableName The table name
-    * @param The ids of the records to be deleted
+    * @param ids The ids of the records to be deleted
     * @throws AnalyticsException
     */
     public void delete(int tenantId, String tableName, List<String> ids) throws AnalyticsException {
@@ -1503,11 +1503,17 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             this.shardWorkerExecutor = null;
         }
     }
-    
+
     public void close() throws AnalyticsIndexException {
         this.indexDefs.clear();
         this.closeAndRemoveIndexDirs(new HashSet<String>(this.indexDirs.keySet()));
         this.stopAndCleanupIndexProcessing();
+        try {
+            this.analyticsFileSystem.destroy();
+            this.analyticsRecordStore.destroy();
+        } catch (IOException | AnalyticsException e) {
+            throw new AnalyticsIndexException("Error cleaning up Analytics Data Indexer: " + e.getMessage(), e);
+        }
     }
     
     private List<String> extractRecordIds(List<Record> records) {

@@ -589,7 +589,12 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
     }
-    
+
+    @Override
+    public void destroy() throws AnalyticsException {
+        /* do nothing */
+    }
+
     private void delete(Connection conn, int tenantId, String tableName, 
             List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
         String sql = this.generateRecordDeletionRecordsWithIdsQuery(tenantId, tableName, ids.size());

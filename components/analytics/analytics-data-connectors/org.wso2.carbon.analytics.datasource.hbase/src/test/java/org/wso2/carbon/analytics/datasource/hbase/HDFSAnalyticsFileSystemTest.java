@@ -54,7 +54,7 @@ public class HDFSAnalyticsFileSystemTest extends AnalyticsFileSystemTest {
     @AfterClass
     public void destroy() throws IOException {
         if (this.afs != null) {
-            this.afs.close();
+            this.afs.destroy();
         }
     }
 

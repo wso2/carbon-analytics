@@ -215,7 +215,6 @@ public class MessageConsoleService extends AbstractAdmin {
 
     private RecordBean createRecordBean(Record record) {
         RecordBean recordBean = new RecordBean();
-        recordBean.setRecordId(record.getId());
         recordBean.setTimestamp(record.getTimestamp());
         EntityBean[] entityBeans = new EntityBean[record.getValues().size()];
         int i = 0;
@@ -340,6 +339,7 @@ public class MessageConsoleService extends AbstractAdmin {
             List<Record> records = new ArrayList<>(1);
             records.add(record);
             analyticsDataService.put(username, records);
+            recordBean.setRecordId(records.get(0).getId());
         } catch (Exception e) {
             logger.error("Unable to add record {column: " + Arrays.toString(columns) + ", values: " + Arrays.toString(values) + " } to table :" + table, e);
             throw new MessageConsoleException("Unable to add record {column: " + Arrays.toString(columns) + ", values: " + Arrays.toString(values) + " } to table :" + table, e);

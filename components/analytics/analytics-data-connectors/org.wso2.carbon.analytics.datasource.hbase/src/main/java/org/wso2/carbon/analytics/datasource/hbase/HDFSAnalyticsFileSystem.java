@@ -168,8 +168,13 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
         return status.getLen();
     }
 
-    public void close() throws IOException {
-        this.fileSystem.close();
+    @Override
+    public void destroy() throws IOException {
+        try {
+            this.fileSystem.close();
+        } catch (IOException ignore) {
+            /* ignore, we'll no longer use the fileSystem instance anyway */
+        }
     }
 
     /**

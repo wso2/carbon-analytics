@@ -309,7 +309,12 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
     }
-    
+
+    @Override
+    public void destroy() throws IOException {
+        /* do nothing */
+    }
+
     protected long lengthImpl(Connection conn, String path) throws SQLException {
         PreparedStatement stmt = null;
         ResultSet rs = null;

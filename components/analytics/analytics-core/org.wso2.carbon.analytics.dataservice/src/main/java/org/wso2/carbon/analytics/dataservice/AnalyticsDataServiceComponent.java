@@ -76,6 +76,14 @@ public class AnalyticsDataServiceComponent {
         }
     }
 
+    protected void deactivate(ComponentContext ctx) {
+        try {
+            AnalyticsServiceHolder.getAnalyticsDataService().destroy();
+        } catch (Throwable e) {
+            log.error("Error in deactivating analytics data service: " + e.getMessage(), e);
+        }
+    }
+
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private void loadHazelcast() {
         BundleContext ctx = FrameworkUtil.getBundle(AnalyticsServiceHolder.class).getBundleContext();
