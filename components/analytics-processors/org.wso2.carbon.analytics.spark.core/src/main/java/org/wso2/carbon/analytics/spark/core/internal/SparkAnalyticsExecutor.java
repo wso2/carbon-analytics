@@ -24,10 +24,10 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.deploy.master.Master;
 import org.apache.spark.deploy.worker.Worker;
-import org.apache.spark.sql.api.java.JavaSQLContext;
-import org.apache.spark.sql.api.java.JavaSchemaRDD;
-import org.apache.spark.sql.api.java.Row;
-import org.apache.spark.sql.api.java.StructField;
+import org.apache.spark.sql.DataFrame;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SQLContext;
+import org.apache.spark.sql.types.StructField;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterException;
@@ -38,18 +38,20 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionCall;
-import org.wso2.carbon.analytics.spark.core.internal.SparkDataListener;
-
-import scala.Option;
-
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsRelation;
 import org.wso2.carbon.utils.CarbonUtils;
+import scala.None$;
+import scala.Option;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
@@ -92,9 +94,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     
     private SparkConf sparkConf;
     
-    private JavaSparkContext sparkCtx;
+    private JavaSparkContext javaSparkCtx;
 
-    private JavaSQLContext sqlCtx;
+    private SQLContext sqlCtx;
     
     private String myHost;
     
@@ -119,8 +121,10 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     
     private void initClient(String masterUrl) {
         this.sparkConf.setMaster(masterUrl).setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
-        this.sparkCtx = new JavaSparkContext(this.sparkConf);
-        this.sqlCtx = new JavaSQLContext(this.sparkCtx);
+        this.sparkConf.set("spark.scheduler.mode", "FAIR");
+
+        this.javaSparkCtx = new JavaSparkContext(this.sparkConf);
+        this.sqlCtx = new SQLContext(this.javaSparkCtx);
     }
 
     private void startMaster(String host, int port, int webUIport){
@@ -129,40 +133,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     
     private void startWorker(String workerHost, String masterHost, int masterPort, int p1, int p2) {
         this.workerActorSystem = Worker.startSystemAndActor(workerHost, p1, p2, 2, 1000000, new String[] { "spark://" + masterHost + ":" + masterPort },
-                null, new Option<Object>() {
-            
-                    private static final long serialVersionUID = 3087598975952096368L;
-
-                    @Override
-                    public boolean isEmpty() {
-                        return false;
-                    }
-
-                    @Override
-                    public Object get() {
-                        return new Integer(1);
-                    }
-
-                    @Override
-                    public Object productElement(int n) {
-                        return null;
-                    }
-
-                    @Override
-                    public int productArity() {
-                        return 0;
-                    }
-
-                    @Override
-                    public boolean canEqual(Object that) {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean equals(Object that) {
-                        return false;
-                    }
-                })._1;
+                null, (Option)None$.MODULE$, sparkConf)._1();
     }
 
     private void initSparkDataListener() {
@@ -193,11 +164,11 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     public void stop() {
         if (this.sqlCtx != null) {
-            this.sqlCtx.sqlContext().sparkContext().stop();
-            this.sparkCtx.close();
+            this.sqlCtx.sparkContext().stop();
+            this.javaSparkCtx.close();
         }
     }
-    
+
     private void shutdownWorker() {
         if (this.workerActorSystem == null) {
             return;
@@ -348,17 +319,17 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private static String[] extractColumns(StructField[] fields) {
         String[] columns = new String[fields.length];
         for (int i = 0; i < fields.length; i++) {
-            columns[i] = fields[i].getName();
+            columns[i] = fields[i].name();
         }
         return columns;
     }
     
-    private static AnalyticsQueryResult toResult(JavaSchemaRDD schemaRDD) throws AnalyticsExecutionException {
-        return new AnalyticsQueryResult(extractColumns(schemaRDD.schema().getFields()), 
-                convertRowsToObjects(schemaRDD.collect()));
+    private static AnalyticsQueryResult toResult(DataFrame dataFrame) throws AnalyticsExecutionException {
+        return new AnalyticsQueryResult(dataFrame.schema().fieldNames(),
+                convertRowsToObjects(dataFrame.collect()));
     }
     
-    private static List<List<Object>> convertRowsToObjects(List<Row> rows) {
+    private static List<List<Object>> convertRowsToObjects(Row[] rows) {
         List<List<Object>> result = new ArrayList<List<Object>>();
         List<Object> objects;
         for (Row row : rows) {
@@ -463,8 +434,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             ads.createTable(tenantId, tableName);
         }
         AnalyticsRelation table = new AnalyticsRelation(tenantId, tableName, this.sqlCtx, schemaString);
-        JavaSchemaRDD schemaRDD = this.sqlCtx.baseRelationToSchemaRDD(table);
-        schemaRDD.registerTempTable(alias);
+        DataFrame dataFrame = this.sqlCtx.baseRelationToDataFrame(table);
+        dataFrame.registerTempTable(alias);
     }
 
     @Override

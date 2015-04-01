@@ -27,6 +27,7 @@ import org.apache.spark.SparkContext;
 import org.apache.spark.TaskContext;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Row;
+import org.apache.spark.sql.catalyst.expressions.GenericRow;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -120,7 +121,7 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
     /**
      * Row iterator implementation to act as an adaptor for a record iterator.
      */
-    private class RowRecordIteratorAdaptor implements Iterator<Row>, Serializable {
+    private class RowRecordIteratorAdaptor implements Iterator<GenericRow>, Serializable {
 
         private static final long serialVersionUID = -8866801517386445810L;
         
@@ -136,11 +137,11 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
         }
 
         @Override
-        public Row next() {
+        public GenericRow next() {
             return this.recordToRow(this.recordItr.next());           
         }
         
-        private Row recordToRow(Record record) {
+        private GenericRow recordToRow(Record record) {
             if (record == null) {
                 return null;
             }
@@ -149,7 +150,8 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
             for (int i = 0; i < columns.size(); i++) {
                 rowVals[i] = recordVals.get(columns.get(i));
             }
-            return org.apache.spark.sql.api.java.Row.create(rowVals).row();
+//            return org.apache.spark.sql.api.java.Row.create(rowVals).row();
+            return new GenericRow(rowVals);
         }
 
         @Override
