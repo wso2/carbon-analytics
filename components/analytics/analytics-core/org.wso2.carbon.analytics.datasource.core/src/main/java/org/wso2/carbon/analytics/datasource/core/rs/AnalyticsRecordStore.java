@@ -189,5 +189,13 @@ public interface AnalyticsRecordStore extends AnalyticsRecordReader {
      */
     void delete(int tenantId, String tableName, List<String> ids) 
             throws AnalyticsException, AnalyticsTableNotAvailableException;
+
+    /**
+     *  Destroys the AnalyticsRecordStore implementation and closes
+     *  all connection transients initiated by the AnalyticsRecordStore
+     *  implementation
+     *  @throws AnalyticsException
+     */
+    void destroy() throws AnalyticsException;
     
 }

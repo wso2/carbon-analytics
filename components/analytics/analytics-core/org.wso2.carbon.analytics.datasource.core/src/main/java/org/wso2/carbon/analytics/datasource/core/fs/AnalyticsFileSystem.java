@@ -99,6 +99,14 @@ public interface AnalyticsFileSystem {
      * @throws IOException
      */
     long length(String path) throws IOException;
+
+    /**
+     *  Destroys the AnalyticsFileSystem implementation and closes
+     *  all connection transients initiated by the AnalyticsFileSystem
+     *  implementation
+     *  @throws IOException
+     */
+    void destroy() throws IOException;
     
     /**
      * Represents file data stream reading operations.
