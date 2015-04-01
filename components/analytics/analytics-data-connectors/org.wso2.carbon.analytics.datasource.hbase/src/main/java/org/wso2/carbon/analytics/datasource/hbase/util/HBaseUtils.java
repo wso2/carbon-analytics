@@ -21,6 +21,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
@@ -32,7 +33,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -93,11 +93,11 @@ public class HBaseUtils {
     }
 
     public static byte[] encodeLong(long value) {
-        return Long.toString(value).getBytes(StandardCharsets.UTF_8);
+        return Bytes.toBytes(value);
     }
 
     public static long decodeLong(byte[] arr) {
-        return Long.parseLong(new String(arr, StandardCharsets.UTF_8));
+        return Bytes.toLong(arr);
     }
 
     public static Record constructRecord(Result currentResult, int tenantId, String tableName, Set colSet)
