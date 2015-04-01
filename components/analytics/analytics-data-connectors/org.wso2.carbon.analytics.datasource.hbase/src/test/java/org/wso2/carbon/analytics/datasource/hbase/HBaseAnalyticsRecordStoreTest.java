@@ -54,9 +54,9 @@ public class HBaseAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
     }
 
     @AfterClass
-    public void destroy() throws IOException {
+    public void destroy() throws AnalyticsException {
         if (this.store != null) {
-            this.store.close();
+            this.store.destroy();
         }
     }
 
