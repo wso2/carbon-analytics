@@ -43,6 +43,8 @@ public class AnalyticsDrillDownRequest {
     private String scoreFunction;
     //maximun number of categories for each facet field
     private int categoryCount;
+
+    private int categoryStart;
     // maximum records for each category in each facet
     private int recordCount;
     //Records start index
@@ -208,6 +210,9 @@ public class AnalyticsDrillDownRequest {
      * @return The number of maximum child facets
      */
     public int getCategoryCount() {
+        if (categoryCount < 0) {
+            return 0;
+        }
         return categoryCount;
     }
 
@@ -224,6 +229,9 @@ public class AnalyticsDrillDownRequest {
      * @return the number of records in a child facet in max.
      */
     public int getRecordCount() {
+        if (recordCount < 0) {
+            return 0;
+        }
         return recordCount;
     }
 
@@ -253,10 +261,32 @@ public class AnalyticsDrillDownRequest {
     }
 
     public int getRecordStartIndex() {
+        if (recordStart < 0) {
+            return 0;
+        }
         return recordStart;
     }
 
+    /**
+     * Set the starting index of the records under each cateogry
+     * @param recordStart 0 based index
+     */
     public void setRecordStartIndex(int recordStart) {
         this.recordStart = recordStart;
+    }
+
+    public int getCategoryStartIndex() {
+        if (categoryStart < 0) {
+            return 0;
+        }
+        return categoryStart;
+    }
+
+    /**
+     * set the starting index of the categories
+     * @param categoryStart 0 based index
+     */
+    public void setCategoryStartIndex(int categoryStart) {
+        this.categoryStart = categoryStart;
     }
 }

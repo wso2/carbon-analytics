@@ -762,15 +762,28 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         TopDocs topDocs = FacetsCollector.search(searcher, drillDownQuery, drillDownRequest.getRecordCount(), fc);
         drillDownResultEntry.setFacetCount(new Integer(topDocs.totalHits).doubleValue());
         if(drillDownRequest.isWithIds()) {
-            this.addRecordIdsToDrillDownResultEntry(searcher, drillDownResultEntry, topDocs);
+            int start = drillDownRequest.getRecordStartIndex();
+            int count = drillDownRequest.getRecordCount();
+            this.addRecordIdsToDrillDownResultEntry(searcher, drillDownResultEntry, topDocs,
+                                                    start, count);
         }
         return drillDownResultEntry;
     }
 
     private void addRecordIdsToDrillDownResultEntry(IndexSearcher searcher,
                                                     DrillDownResultEntry drillDownResultEntry,
-                                                    TopDocs topDocs) throws IOException {
-        for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+                                                    TopDocs topDocs, int start, int count)
+            throws IOException {
+        int startingIndex = start;
+        if (startingIndex > topDocs.scoreDocs.length) {
+            startingIndex = topDocs.scoreDocs.length;
+        }
+        int upperLimit = startingIndex + count;
+        if (upperLimit > topDocs.scoreDocs.length) {
+            upperLimit = topDocs.scoreDocs.length;
+        }
+        for (int i = startingIndex; i < upperLimit; i++) {
+            ScoreDoc scoreDoc = topDocs.scoreDocs[i];
             Document document = searcher.doc(scoreDoc.doc);
             drillDownResultEntry.addNewFacetId(document.get(INDEX_ID_INTERNAL_FIELD));
         }
@@ -853,11 +866,18 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             Map<String, List<DrillDownResultEntry>> result = new LinkedHashMap<>();
             for (Map.Entry<String, AnalyticsCategoryPath> entry : drillDownRequest
                     .getCategoryPaths().entrySet()) {
-                FacetResult facetResult = facets.getTopChildren(drillDownRequest.getCategoryCount(),
+                FacetResult facetResult = facets.getTopChildren(Integer.MAX_VALUE,
                                                                 entry.getKey(),
                                                                 entry.getValue().getPath());
                 if (facetResult != null) {
-                    for (int i = 0; i < facetResult.childCount; i++) {
+                    int start = drillDownRequest.getCategoryStartIndex();
+                    int count = drillDownRequest.getCategoryCount();
+                    int startingIndex = start > facetResult.labelValues.length ?
+                                        facetResult.labelValues.length : start;
+                    int upperLimit = (startingIndex + count) > facetResult.labelValues.length ?
+                                     facetResult.labelValues.length : startingIndex + count;
+
+                    for (int i = startingIndex; i < upperLimit; i++) {
                         LabelAndValue labelAndValue = facetResult.labelValues[i];
                         DrillDownResultEntry drillDownResultEntry =
                                 this.createDrillDownResultEntry(drillDownRequest, indexSearcher,
@@ -889,13 +909,16 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         drillDownResultEntry.setCategory(labelAndValue.label);
         drillDownResultEntry.setCategoryPath(facetResult.path);
         drillDownResultEntry.setFacetCount( labelAndValue.value.doubleValue());
-        DrillDownQuery tempDrill = new DrillDownQuery(config, drillDownQuery);
-        tempDrill.add(facetResult.dim, strList.toArray(new String[strList.size()]));
+        DrillDownQuery recordIdDrillQuery = new DrillDownQuery(config, drillDownQuery);
+        recordIdDrillQuery.add(facetResult.dim, strList.toArray(new String[strList.size()]));
         try {
             TopDocs topDocs = FacetsCollector.search(indexSearcher
-                    , tempDrill, drillDownRequest.getRecordCount(), facetsCollector);
+                    , recordIdDrillQuery, drillDownRequest.getRecordCount(), facetsCollector);
             if (drillDownRequest.isWithIds()) {
-                this.addRecordIdsToDrillDownResultEntry(indexSearcher, drillDownResultEntry, topDocs);
+                int start = drillDownRequest.getRecordStartIndex();
+                int count = drillDownRequest.getRecordCount();
+                this.addRecordIdsToDrillDownResultEntry(indexSearcher, drillDownResultEntry, topDocs,
+                                                        start, count);
             }
             return drillDownResultEntry;
         } catch (IOException e) {

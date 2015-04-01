@@ -15,11 +15,15 @@
  */
 package org.wso2.carbon.analytics.dataservice.restapi.beans;
 
+import org.wso2.carbon.analytics.dataservice.restapi.adapters.RecordValuesAdapter;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -47,7 +51,8 @@ public class RecordBean {
     private Long timestamp;
 
 	/** The values. */
-	@XmlElement(required = true, name = "values")
+    @XmlJavaTypeAdapter(RecordValuesAdapter.class)
+	@XmlElementWrapper(required = true, name = "values")
 	private Map<String, Object> values;
 
 	/**

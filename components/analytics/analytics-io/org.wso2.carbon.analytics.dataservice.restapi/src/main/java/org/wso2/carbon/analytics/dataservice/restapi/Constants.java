@@ -37,6 +37,7 @@ public class Constants {
 
 		/** The Constant CREATED. */
 		public static final String CREATED = "created";
+
 		/** The Constant FAILED. */
 		public static final String FAILED = "failed";
 
@@ -58,6 +59,15 @@ public class Constants {
 		private Status() {
 		}
 	}
+
+    public final static class FacetAttributes {
+
+        /** The constant representing weight attribute */
+        public static final String WEIGHT = "weight";
+
+        /**The constant representing path attribute */
+        public static final String PATH = "path";
+    }
 
     /**
      * The Class ResourcePath.
