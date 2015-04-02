@@ -31,8 +31,10 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
     <link href="js/jquery-ui.min.css" rel="stylesheet" type="text/css"/>
+    <link href="../dialog/css/jqueryui/jqueryui-themeroller.css" rel="stylesheet" type="text/css"/>
+    <link href="../dialog/css/dialog.css" rel="stylesheet" type="text/css"/>
     <link href="js/jquery.datetimepicker.css" rel="stylesheet" type="text/css"/>
-    <link href="themes/lightcolor/red/jtable.css" rel="stylesheet" type="text/css"/>
+    <link href="themes/metro/blue/jtable.css" rel="stylesheet" type="text/css"/>
     <link href="js/validationEngine.jquery.css" rel="stylesheet" type="text/css"/>
 
     <script src="js/jquery-1.11.2.min.js" type="text/javascript"></script>
@@ -101,7 +103,13 @@
 
             $("#addNewTable").on("click", function () {
                 $("#column-details").find('tr').slice(1, document.getElementById('column-details').rows.length - 1).remove();
-                $('#createTableDialog').dialog('option', 'title', 'Create a new table');
+                $('#createTableDialog').dialog({
+                    title: 'Create a new table...',
+                    height: 300,
+                    width: 500,
+                    modal: true,
+                    resizable: true
+                });
                 $("#createTableDialog").dialog("open");
                 document.getElementById("tableName").readOnly = false;
                 document.getElementById("tableName").value = "";
@@ -119,28 +127,29 @@
                 $(this).attr('class', 'del');
                 var appendTxt =
                         "<tr><td><input type='text' name='column'/></td><td><select><option value='STRING'>STRING</option><option value='INTEGER'>INTEGER</option><option value='LONG'>LONG</option><option value='BOOLEAN'>BOOLEAN</option><option value='FLOAT'>FLOAT</option><option value='DOUBLE'>DOUBLE</option></select></td><td><input type='checkbox' name='primary'/></td><c:if test="${permissions != null && permissions.isSetIndex()}"><td><input type='checkbox' name='index'/></td></c:if><td><input class='add' type='button' value='Add More'/></td></tr>";
-                $("tr:last").after(appendTxt);
+                $("#column-details tbody tr:last").after(appendTxt);
             });
 
             $("#deleteTableButton").on("click", function () {
                 $("#table-delete-confirm").dialog({
-                    resizable: false,
-                    height: 140,
-                    modal: true,
-                    buttons: {
-                        "Delete Table": function () {
-                            $.post('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeDeleteTable, {tableName: $("#tableSelect").val()},
-                                   function (result) {
-                                       $("deleteTableMessage").innerHTML = result;
-                                   });
+                                                      height: 300,
+                                                      width: 500,
+                                                      modal: true,
+                                                      resizable: true,
+                                                      buttons: {
+                                                          "Delete Table": function () {
+                                                              $.post('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeDeleteTable, {tableName: $("#tableSelect").val()},
+                                                                     function (result) {
+                                                                         $("deleteTableMessage").innerHTML = result;
+                                                                     });
                             $('#AnalyticsTableContainer').jtable('destroy');
-                            $(this).dialog("close");
-                        },
-                        Cancel: function () {
-                            $(this).dialog("close");
-                        }
-                    }
-                });
+                                                              $(this).dialog("close");
+                                                          },
+                                                          Cancel: function () {
+                                                              $(this).dialog("close");
+                                                          }
+                                                      }
+                                                  });
                 $("#table-delete-confirm").dialog("open");
                 return false;
             });
@@ -156,7 +165,13 @@
                            var arrayLength = resultArray.length;
                            $("#column-details").find('tr').slice(1, document.getElementById('column-details').rows.length - 1).remove();
                            var table = document.getElementById('column-details');
-                           $('#createTableDialog').dialog('option', 'title', 'Edit table');
+                           $('#createTableDialog').dialog({
+                                 title: 'Edit table',
+                                 height: 300,
+                                 width: 500,
+                                 modal: true,
+                                 resizable: true
+                             });
                            document.getElementById('createTablePopup').style.display = 'block';
                            document.getElementById('msgLabel').style.display = 'none';
 
@@ -337,6 +352,7 @@
                 $('#AnalyticsTableContainer').jtable('reload');
             });
             tableLoaded = true;
+             $("#resultsTable").show();
         }
 
         function getArbitraryFields(rowData) {
@@ -425,8 +441,10 @@
         }
 
         function createJTable() {
+        console.log("in.. create");
             var table = $("#tableSelect").val();
             if (table != '-1') {
+            console.log("in.. if");
                 $.getJSON("/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=" + typeTableInfo + "&tableName=" + table,
                           function (data, status) {
                               var fields = {
@@ -484,65 +502,121 @@
 
 </head>
 <body>
-<c:if test="${permissionError != null}">
-    <div>
-        <p><c:out value="${permissionError.message}"/></p>
-    </div>
-</c:if>
-<div>
-    <label id="deleteTableMessage"></label>
-</div>
-
-<div id="table-delete-confirm" title="Remove entire table?" style="display: none">
-    <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-        This will be permanently delete entire table. Are you sure? </p>
-</div>
-<c:if test="${permissions != null && permissions.isCreateTable()}">
-    <input type="button" id="addNewTable" value="Add New Table">
-</c:if>
-
-<fieldset>
-    <legend>Search:</legend>
-    <c:if test="${permissions != null && permissions.isListTable()}">
-        <label> Table Name*:
-            <select id="tableSelect" onchange="tableSelectChange()">
-                <option value="-1">Select a table</option>
-            </select>
-        </label>
-        <c:if test="${permissions != null && permissions.isDropTable()}">
-            <input type="button" id="deleteTableButton" value="Delete Table" style="display: none">
+<div id="middle">
+        <h2>Message Console</h2>
+        <div id="workArea">
+        <c:if test="${permissionError != null}">
+            <div>
+                <p><c:out value="${permissionError.message}"/></p>
+            </div>
         </c:if>
+        <div>
+            <label id="deleteTableMessage"></label>
+        </div>
+        <div id="table-delete-confirm" title="Remove entire table?" style="display: none">
+            <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+                This will be permanently delete entire table. Are you sure? </p>
+        </div>
         <c:if test="${permissions != null && permissions.isCreateTable()}">
-            <input type="button" id="editTableButton" value="Edit Table" style="display: none">
+            <table class="normal" width="100%">
+                <tbody>
+                    <tr>
+                        <td><input type="button" id="addNewTable" value="Add New Table" class="button"></td>
+                        <td>&nbsp;</td>
+                    </tr>
+                </tbody>
+            </table>
+            <br/>
         </c:if>
-        <c:if test="${permissions != null && permissions.isDeleteRecord()}">
-            <input type="button" id="purgeRecordButton" value="Schedule Data Purging" style="display: none">
-        </c:if>
-        <c:if test="${permissions != null && permissions.isListRecord()}">
-            <fieldset>
-                <legend>By Date Range:</legend>
-                <label> From: <input id="timeFrom" type="text"> </label>
-                <label> To: <input id="timeTo" type="text"> </label>
-            </fieldset>
-        </c:if>
-        <c:if test="${permissions != null && permissions.isSearchRecord()}">
-            <fieldset>
-                <legend>By Query:</legend>
-                <label> Search Query:
-                    <textarea id="query" rows="4" cols="50"></textarea>
-                </label>
-            </fieldset>
-        </c:if>
-        <c:if test="${permissions != null && permissions.isListRecord()}">
-            <input id="search" type="submit" value="Search" onclick="createJTable();">
-        </c:if>
-    </c:if>
-</fieldset>
+        <table class="styledLeft">
+            <thead>
+                <tr>
+                    <th>Search</th>
+                </tr>
+            </thead>
+            <tbody>
 
-<div id="AnalyticsTableContainer"></div>
-<c:if test="${permissions != null && permissions.isDeleteRecord()}">
-    <input type="button" id="DeleteAllButton" value="Delete all selected records">
-</c:if>
+            <c:if test="${permissions != null && permissions.isListTable()}">
+                <tr>
+                    <td class="formRow">
+                        <table class="normal" width="100%">
+                            <tbody>
+                            <tr>
+                                <td width="10%">Table Name*</td>
+                                <td>
+                                    <select id="tableSelect" onchange="tableSelectChange()">
+                                        <option value="-1">Select a Table</option>
+                                    </select>
+                                    <c:if test="${permissions != null && permissions.isDropTable()}">
+                                        <input type="button" id="deleteTableButton" value="Delete Table" class="button" style="display: none">
+                                    </c:if>
+                                    <c:if test="${permissions != null && permissions.isCreateTable()}">
+                                        <input type="button" id="editTableButton" value="Edit Table" class="button" style="display: none">
+                                    </c:if>
+                                    <c:if test="${permissions != null && permissions.isDeleteRecord()}">
+                                                <input type="button" id="purgeRecordButton" value="Schedule Data Purging" style="display: none">
+                                            </c:if>
+                                </td>
+                            </tr>
+                            <c:if test="${permissions != null && permissions.isListRecord()}">
+                            <tr>
+                                <td>By Date Range</td>
+                                <td>
+                                    <label> From: <input id="timeFrom" type="text"> </label>
+                                    <label> To: <input id="timeTo" type="text"> </label>
+                                </td>
+                            </tr>
+                            </c:if>
+                            <c:if test="${permissions != null && permissions.isSearchRecord()}">
+                            <tr>
+                                <td>By Query</td>
+                                <td>
+                                    Search Query: <textarea id="query" rows="1" cols="100"></textarea>
+                                </td>
+                            </tr>
+                            </c:if>
+                        </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <c:if test="${permissions != null && permissions.isListRecord()}">
+                <tr>
+                    <td class="buttonRow">
+                        <input id="search" type="button" value="Search" onclick="createJTable();" class="button">
+                    </td>
+                </tr>
+                </c:if>
+            </c:if>
+            </tbody>
+        </table>
+        <br/>
+        <table id="resultsTable" class="styledLeft">
+            <thead>
+                <tr>
+                    <th>Results</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div id="AnalyticsTableContainer" class="overflowAuto"></div>
+                    </td>
+                </tr>
+                <c:if test="${permissions != null && permissions.isDeleteRecord()}">
+                <tr>
+                    <td class="buttonRow">
+                        <input type="button" id="DeleteAllButton" value="Delete all selected records" class="button">
+                    </td>
+                </tr>
+                </c:if>
+            </tbody>
+        </table>
+        <br/>
+</div>
+<br/>
+
+
+
 
 <div id="createTableDialog" title="Create a new table">
     <div id="msg">
@@ -550,10 +624,18 @@
     </div>
     <div id="createTablePopup">
         <form class="noteform" id="tableForm" action="javascript:createTable()">
-            <label> Table Name:
-                <input type="text" id="tableName" class="validate[required]">
-            </label>
-            <table id="column-details">
+            <table class="normal">
+                <tbody>
+                <tr>
+                    <td>Table Name</td>
+                    <td>
+                        <input type="text" id="tableName" class="validate[required]">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <br/>
+            <table id="column-details" class="styledLeft">
                 <thead>
                 <tr>
                     <th>Column</th>
@@ -562,7 +644,7 @@
                     <c:if test="${permissions != null && permissions.isSetIndex()}">
                         <th>Index</th>
                     </c:if>
-                    <th></th>
+                    <th>&nbsp;</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -584,11 +666,18 @@
                 </tr>
                 </tbody>
             </table>
-            <input type="submit" value="Submit">
+            <table class="styledLeft">
+                <tbody>
+                <tr>
+                    <td class="buttonRow">
+                        <input type="submit" value="Submit" class="button">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </form>
     </div>
 </div>
-
 <div id="purgeRecordDialog" title="Schedule Data Purging">
     <div id="dataPurgingMsg">
         <label id="dataPurgingMsgLabel" style="display: none"></label>

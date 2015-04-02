@@ -20,10 +20,10 @@ package org.wso2.carbon.analytics.messageconsole.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
-import org.wso2.carbon.analytics.messageconsole.MessageConsoleService;
+import org.wso2.carbon.ntask.common.TaskException;
+import org.wso2.carbon.ntask.core.service.TaskService;
 
 /**
  * This class represents the analytics message console service declarative services component.
@@ -31,21 +31,22 @@ import org.wso2.carbon.analytics.messageconsole.MessageConsoleService;
  * @scr.component name="messageconsole.component" immediate="true"
  * @scr.reference name="analytics.component" interface="org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService"
  * cardinality="1..1" policy="dynamic" bind="setAnalyticsDataService" unbind="unsetAnalyticsDataService"
+ * @scr.reference name="ntask.component" interface="org.wso2.carbon.ntask.core.service.TaskService"
+ * cardinality="1..1" policy="dynamic" bind="setTaskService" unbind="unsetTaskService"
  */
 public class MessageConsoleServiceComponent {
 
     private static final Log logger = LogFactory.getLog(MessageConsoleServiceComponent.class);
+    private static final String ANALYTICS_DATA_PURGING = "ANALYTICS_DATA_PURGING";
 
     protected void activate(ComponentContext ctx) {
-
         if (logger.isDebugEnabled()) {
             logger.debug("Activating Analytics MessageConsoleServiceComponent module.");
         }
         try {
-            BundleContext bundleContext = ctx.getBundleContext();
-            bundleContext.registerService(MessageConsoleService.class, new MessageConsoleService(), null);
-        } catch (Throwable e) {
-            logger.error("An error occurred while activating the MessageConsoleServiceComponent", e);
+            ServiceHolder.getTaskService().registerTaskType(ANALYTICS_DATA_PURGING);
+        } catch (TaskException e) {
+            logger.error("Unable to register data purging task type", e);
         }
     }
 
@@ -61,5 +62,19 @@ public class MessageConsoleServiceComponent {
             logger.info("Unsetting the Secure Analytics Data Service");
         }
         ServiceHolder.setAnalyticsDataService(null);
+    }
+
+    protected void setTaskService(TaskService taskService) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Setting the Task Service");
+        }
+        ServiceHolder.setTaskService(taskService);
+    }
+
+    protected void unsetTaskService(TaskService taskService) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Unsetting the Task Service");
+        }
+        ServiceHolder.setTaskService(null);
     }
 }
