@@ -70,25 +70,32 @@
             </c:if>
             $("#DeleteAllButton").hide();
             jQuery('#timeFrom').datetimepicker({
-                                                   format: 'unixtime',
-                                                   onShow: function (ct) {
-                                                       this.setOptions({
-                                                                           maxDate: jQuery('#timeTo').val() ? jQuery('#timeTo').val() : false
-                                                                       })
-                                                   }
-                                               });
+                format: 'unixtime',
+                onShow: function (ct) {
+                    this.setOptions({
+                        maxDate: jQuery('#timeTo').val() ? jQuery('#timeTo').val() : false
+                    })
+                }
+            });
             jQuery('#timeTo').datetimepicker({
-                                                 format: 'unixtime',
-                                                 onShow: function (ct) {
-                                                     this.setOptions({
-                                                                         minDate: jQuery('#timeFrom').val() ? jQuery('#timeFrom').val() : false
-                                                                     })
-                                                 }
-                                             });
+                format: 'unixtime',
+                onShow: function (ct) {
+                    this.setOptions({
+                        minDate: jQuery('#timeFrom').val() ? jQuery('#timeFrom').val() : false
+                    })
+                }
+            });
+            jQuery('#dataPurgingScheudleTime').datetimepicker({
+                datepicker: false,
+                format: 'H:i'
+            });
 
             $("#createTableDialog").dialog({
-                                               autoOpen: false
-                                           });
+                autoOpen: false
+            });
+            $("#purgeRecordDialog").dialog({
+                autoOpen: false
+            });
 
             $("#tableForm").validationEngine();
 
@@ -117,25 +124,29 @@
 
             $("#deleteTableButton").on("click", function () {
                 $("#table-delete-confirm").dialog({
-                                                      resizable: false,
-                                                      height: 140,
-                                                      modal: true,
-                                                      buttons: {
-                                                          "Delete Table": function () {
-                                                              $.post('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeDeleteTable, {tableName: $("#tableSelect").val()},
-                                                                     function (result) {
-                                                                         $("deleteTableMessage").innerHTML = result;
-                                                                     });
-                                                              $('#AnalyticsTableContainer').jtable('destroy');
-                                                              $(this).dialog("close");
-                                                          },
-                                                          Cancel: function () {
-                                                              $(this).dialog("close");
-                                                          }
-                                                      }
-                                                  });
+                    resizable: false,
+                    height: 140,
+                    modal: true,
+                    buttons: {
+                        "Delete Table": function () {
+                            $.post('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeDeleteTable, {tableName: $("#tableSelect").val()},
+                                   function (result) {
+                                       $("deleteTableMessage").innerHTML = result;
+                                   });
+                            $('#AnalyticsTableContainer').jtable('destroy');
+                            $(this).dialog("close");
+                        },
+                        Cancel: function () {
+                            $(this).dialog("close");
+                        }
+                    }
+                });
                 $("#table-delete-confirm").dialog("open");
                 return false;
+            });
+
+            $("#purgeRecordButton").on("click", function () {
+                $("#purgeRecordDialog").dialog("open");
             });
 
             $("#editTableButton").on("click", function () {
@@ -203,6 +214,16 @@
                        });
                 return true;
             });
+
+            $('#dataPurgingCheckBox').change(function () {
+                if ($(this).is(":checked")) {
+                    $("#dataPurgingScheudleTime").prop('disabled', false);
+                    $("#dataPurgingDay").prop('disabled', false);
+                } else {
+                    $("#dataPurgingScheudleTime").prop('disabled', true);
+                    $("#dataPurgingDay").prop('disabled', true);
+                }
+            });
         });
 
         function createTable() {
@@ -234,80 +255,80 @@
             var values = {};
             values.tableInfo = JSON.stringify(jsonObj);
             $.ajax({
-                       type: 'POST',
-                       url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' +
-                            typeCreateTable + "&tableName=" + tableName + "&action=" + tablePopupAction,
-                       data: values,
-                       success: function (data) {
-                           result = true;
-                           var label = document.getElementById('msgLabel');
-                           label.style.display = 'block';
-                           label.innerHTML = data;
-                           document.getElementById('createTablePopup').style.display = 'none';
-                       },
-                       error: function (data) {
-                           result = false;
-                           var label = document.getElementById('msgLabel');
-                           label.style.display = 'block';
-                           label.innerHTML = data;
-                       }
-                   });
+                type: 'POST',
+                url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' +
+                     typeCreateTable + "&tableName=" + tableName + "&action=" + tablePopupAction,
+                data: values,
+                success: function (data) {
+                    result = true;
+                    var label = document.getElementById('msgLabel');
+                    label.style.display = 'block';
+                    label.innerHTML = data;
+                    document.getElementById('createTablePopup').style.display = 'none';
+                },
+                error: function (data) {
+                    result = false;
+                    var label = document.getElementById('msgLabel');
+                    label.style.display = 'block';
+                    label.innerHTML = data;
+                }
+            });
 
             return result;
         }
 
         function createMainJTable(fields) {
             $('#AnalyticsTableContainer').jtable({
-                                                     title: $("#tableSelect").val(),
-                                                     <c:choose>
-                                                     <c:when test="${isPaginationSupported}">
-                                                     paging: true,
-                                                     pageSize: 25,
-                                                     </c:when>
-                                                     <c:otherwise>
-                                                     paging: false,
-                                                     pageSize: 500,
-                                                     </c:otherwise>
-                                                     </c:choose>
-                                                     selecting: true,
-                                                     multiselect: true,
-                                                     selectingCheckboxes: true,
-                                                     actions: {
-                                                         // For Details: http://jtable.org/Demo/FunctionsAsActions
-                                                         listAction: function (postData, jtParams) {
-                                                             return listActionMethod(jtParams);
-                                                         }
-                                                         <c:if test="${permissions != null && permissions.isPutRecord()}">
-                                                         // Don't remove this leading comma
-                                                         , createAction: function (postData) {
-                                                             return createActionMethod(postData);
-                                                         },
-                                                         updateAction: function (postData) {
-                                                             return updateActionMethod(postData);
-                                                         }
-                                                         </c:if>
-                                                         <c:if test="${permissions != null && permissions.isDeleteRecord()}">
-                                                         // Don't remove this leading comma
-                                                         , deleteAction: function (postData) {
-                                                             return deleteActionMethod(postData);
-                                                         }
-                                                         </c:if>
-                                                     },
-                                                     formCreated: function (event, data) {
-                                                         data.form.validationEngine();
-                                                     },
-                                                     //Validate form when it is being submitted
-                                                     formSubmitting: function (event, data) {
-                                                         return data.form.validationEngine('validate');
-                                                     },
-                                                     //Dispose validation logic when form is closed
-                                                     formClosed: function (event, data) {
-                                                         data.form.validationEngine('hide');
-                                                         data.form.validationEngine('detach');
-                                                     },
-                                                     fields: fields
+                title: $("#tableSelect").val(),
+                <c:choose>
+                <c:when test="${isPaginationSupported}">
+                paging: true,
+                pageSize: 25,
+                </c:when>
+                <c:otherwise>
+                paging: false,
+                pageSize: 500,
+                </c:otherwise>
+                </c:choose>
+                selecting: true,
+                multiselect: true,
+                selectingCheckboxes: true,
+                actions: {
+                    // For Details: http://jtable.org/Demo/FunctionsAsActions
+                    listAction: function (postData, jtParams) {
+                        return listActionMethod(jtParams);
+                    }
+                    <c:if test="${permissions != null && permissions.isPutRecord()}">
+                    // Don't remove this leading comma
+                    , createAction: function (postData) {
+                        return createActionMethod(postData);
+                    },
+                    updateAction: function (postData) {
+                        return updateActionMethod(postData);
+                    }
+                    </c:if>
+                    <c:if test="${permissions != null && permissions.isDeleteRecord()}">
+                    // Don't remove this leading comma
+                    , deleteAction: function (postData) {
+                        return deleteActionMethod(postData);
+                    }
+                    </c:if>
+                },
+                formCreated: function (event, data) {
+                    data.form.validationEngine();
+                },
+                //Validate form when it is being submitted
+                formSubmitting: function (event, data) {
+                    return data.form.validationEngine('validate');
+                },
+                //Dispose validation logic when form is closed
+                formClosed: function (event, data) {
+                    data.form.validationEngine('hide');
+                    data.form.validationEngine('detach');
+                },
+                fields: fields
 
-                                                 });
+            });
             $('#AnalyticsTableContainer').jtable('load');
             $("#DeleteAllButton").show();
             $("#DeleteAllButton").on("click", function () {
@@ -324,77 +345,77 @@
             $img.click(function () {
                 $('#AnalyticsTableContainer').jtable('openChildTable',
                                                      $img.closest('tr'), //Parent row
-                                                     {
-                                                         title: 'Arbitrary Fields',
-                                                         paging: false,
-                                                         selecting: true,
-                                                         messages: {
-                                                             addNewRecord: 'Add new arbitrary field'
-                                                         },
-                                                         actions: {
-                                                             // For Details: http://jtable.org/Demo/FunctionsAsActions
-                                                             listAction: function (postData, jtParams) {
-                                                                 var postData = {};
-                                                                 postData['tableName'] = $("#tableSelect").val();
-                                                                 postData['bam_unique_rec_id'] = rowData.record.bam_unique_rec_id;
-                                                                 return arbitraryFieldListActionMethod(postData, jtParams);
-                                                             }
-                                                             <c:if test="${permissions != null && permissions.isPutRecord()}">
-                                                             ,
-                                                             createAction: function (postData) {
-                                                                 return arbitraryFieldCreateActionMethod(postData);
-                                                             },
-                                                             updateAction: function (postData) {
-                                                                 return arbitraryFieldUpdateActionMethod(postData);
-                                                             }
-                                                             </c:if>
-                                                             <c:if test="${permissions != null && permissions.isDeleteRecord()}">,
-                                                             deleteAction: function (postData) {
-                                                                 postData['tableName'] = $("#tableSelect").val();
-                                                                 postData['bam_unique_rec_id'] = rowData.record.bam_unique_rec_id;
-                                                                 return arbitraryFieldDeleteActionMethod(postData);
-                                                             }
-                                                             </c:if>
-                                                         },
-                                                         deleteConfirmation: function (data) {
-                                                             arbitraryColumnName = data.record.Name;
-                                                         },
-                                                         rowsRemoved: function (event, data) {
-                                                             arbitraryColumnName = "";
-                                                         },
-                                                         formCreated: function (event, data) {
-                                                             data.form.validationEngine();
-                                                         },
-                                                         //Validate form when it is being submitted
-                                                         formSubmitting: function (event, data) {
-                                                             return data.form.validationEngine('validate');
-                                                         },
-                                                         //Dispose validation logic when form is closed
-                                                         formClosed: function (event, data) {
-                                                             data.form.validationEngine('hide');
-                                                             data.form.validationEngine('detach');
-                                                         },
-                                                         fields: {
-                                                             bam_unique_rec_id: {
-                                                                 type: 'hidden',
-                                                                 key: true,
-                                                                 list: false,
-                                                                 defaultValue: rowData.record.bam_unique_rec_id
-                                                             },
-                                                             Name: {
-                                                                 title: 'Name',
-                                                                 inputClass: 'validate[required]'
-                                                             },
-                                                             Value: {
-                                                                 title: 'Value'
-                                                             },
-                                                             Type: {
-                                                                 title: 'Type',
-                                                                 options: ["STRING", "INTEGER", "LONG", "BOOLEAN", "FLOAT", "DOUBLE"],
-                                                                 list: false
-                                                             }
-                                                         }
-                                                     },
+                        {
+                            title: 'Arbitrary Fields',
+                            paging: false,
+                            selecting: true,
+                            messages: {
+                                addNewRecord: 'Add new arbitrary field'
+                            },
+                            actions: {
+                                // For Details: http://jtable.org/Demo/FunctionsAsActions
+                                listAction: function (postData, jtParams) {
+                                    var postData = {};
+                                    postData['tableName'] = $("#tableSelect").val();
+                                    postData['bam_unique_rec_id'] = rowData.record.bam_unique_rec_id;
+                                    return arbitraryFieldListActionMethod(postData, jtParams);
+                                }
+                                <c:if test="${permissions != null && permissions.isPutRecord()}">
+                                ,
+                                createAction: function (postData) {
+                                    return arbitraryFieldCreateActionMethod(postData);
+                                },
+                                updateAction: function (postData) {
+                                    return arbitraryFieldUpdateActionMethod(postData);
+                                }
+                                </c:if>
+                                <c:if test="${permissions != null && permissions.isDeleteRecord()}">,
+                                deleteAction: function (postData) {
+                                    postData['tableName'] = $("#tableSelect").val();
+                                    postData['bam_unique_rec_id'] = rowData.record.bam_unique_rec_id;
+                                    return arbitraryFieldDeleteActionMethod(postData);
+                                }
+                                </c:if>
+                            },
+                            deleteConfirmation: function (data) {
+                                arbitraryColumnName = data.record.Name;
+                            },
+                            rowsRemoved: function (event, data) {
+                                arbitraryColumnName = "";
+                            },
+                            formCreated: function (event, data) {
+                                data.form.validationEngine();
+                            },
+                            //Validate form when it is being submitted
+                            formSubmitting: function (event, data) {
+                                return data.form.validationEngine('validate');
+                            },
+                            //Dispose validation logic when form is closed
+                            formClosed: function (event, data) {
+                                data.form.validationEngine('hide');
+                                data.form.validationEngine('detach');
+                            },
+                            fields: {
+                                bam_unique_rec_id: {
+                                    type: 'hidden',
+                                    key: true,
+                                    list: false,
+                                    defaultValue: rowData.record.bam_unique_rec_id
+                                },
+                                Name: {
+                                    title: 'Name',
+                                    inputClass: 'validate[required]'
+                                },
+                                Value: {
+                                    title: 'Value'
+                                },
+                                Type: {
+                                    title: 'Type',
+                                    options: ["STRING", "INTEGER", "LONG", "BOOLEAN", "FLOAT", "DOUBLE"],
+                                    list: false
+                                }
+                            }
+                        },
                                                      function (data) { //opened handler
                                                          data.childTable.jtable('load');
                                                      }
@@ -444,7 +465,6 @@
                                           fields[val.name].inputClass = 'validate[custom[number]]';
                                       }
                                   }
-
                                   if (val.name == 'bam_unique_rec_id' || val.name == 'bam_rec_timestamp') {
                                       fields[val.name].edit = false;
                                       fields[val.name].create = false;
@@ -494,6 +514,9 @@
         </c:if>
         <c:if test="${permissions != null && permissions.isCreateTable()}">
             <input type="button" id="editTableButton" value="Edit Table" style="display: none">
+        </c:if>
+        <c:if test="${permissions != null && permissions.isDeleteRecord()}">
+            <input type="button" id="purgeRecordButton" value="Schedule Data Purging" style="display: none">
         </c:if>
         <c:if test="${permissions != null && permissions.isListRecord()}">
             <fieldset>
@@ -561,6 +584,28 @@
                 </tr>
                 </tbody>
             </table>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</div>
+
+<div id="purgeRecordDialog" title="Schedule Data Purging">
+    <div id="dataPurgingMsg">
+        <label id="dataPurgingMsgLabel" style="display: none"></label>
+    </div>
+    <div id="purgeRecordPopup">
+        <form id="dataPurgingForm" action="javascript:scheduleDataPurge()">
+            <label> Enable Data Purging:
+                <input type="checkbox" id="dataPurgingCheckBox">
+            </label>
+            <br/>
+            <label> Schedule Time:
+                <input type="text" id="dataPurgingScheudleTime" disabled="disabled">
+            </label>
+            <br/>
+            <label> Purge Record Older Than (Days):
+                <input type="text" id="dataPurgingDay" disabled="disabled">
+            </label>
             <input type="submit" value="Submit">
         </form>
     </div>
