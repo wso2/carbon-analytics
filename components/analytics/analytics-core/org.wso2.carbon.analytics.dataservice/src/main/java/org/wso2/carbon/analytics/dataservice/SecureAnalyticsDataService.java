@@ -243,6 +243,9 @@ public interface SecureAnalyticsDataService extends AnalyticsRecordReader {
     Map<String, IndexType> getIndices(String username, String tableName)
             throws AnalyticsIndexException, AnalyticsException;
 
+
+    List<String> getScoreParams(String username, String tableName) throws AnalyticsException,
+                                                                          AnalyticsIndexException;
     /**
      * Clears all the indices for the given table.
      *

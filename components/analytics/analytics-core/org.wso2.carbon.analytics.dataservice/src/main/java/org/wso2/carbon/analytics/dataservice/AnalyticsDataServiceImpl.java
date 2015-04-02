@@ -335,6 +335,12 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     @Override
+    public List<String> getScoreParams(int tenantId, String tableName)
+            throws AnalyticsIndexException, AnalyticsException {
+        return this.getIndexer().lookupScoreParams(tenantId, tableName);
+    }
+
+    @Override
     public void clearIndices(int tenantId, String tableName) throws AnalyticsIndexException, AnalyticsException {
         this.getIndexer().clearIndices(tenantId, tableName);
     }

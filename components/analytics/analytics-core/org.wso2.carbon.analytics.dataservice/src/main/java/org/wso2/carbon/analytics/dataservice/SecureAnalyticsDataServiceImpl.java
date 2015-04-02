@@ -229,6 +229,17 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     }
 
     @Override
+    public List<String> getScoreParams(String username, String tableName)
+            throws AnalyticsException, AnalyticsIndexException {
+        int tenantId = getTenantId(username);
+        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_GET_INDEXING)) {
+            throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                           "permission to get score parameters");
+        }
+        return analyticsDataService.getScoreParams(tenantId, tableName);
+    }
+
+    @Override
     public void clearIndices(String username, String tableName) throws AnalyticsIndexException, AnalyticsException {
         int tenantId = getTenantId(username);
         if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_DELETE_INDEXING)) {

@@ -21,5 +21,6 @@ package org.wso2.carbon.analytics.dataservice.commons;
  */
 public class Constants {
     public static final String QUERY_LANGUAGE_LUCENE = "lucene";
+    public static final String QUERY_LANGUAGE_REGEX = "REGEX";
 }
 

@@ -226,6 +226,17 @@ public interface AnalyticsDataService extends AnalyticsRecordReader {
      * @throws AnalyticsException 
      */
     Map<String, IndexType> getIndices(int tenantId, String tableName) throws AnalyticsIndexException, AnalyticsException;
+
+
+    /**
+     * Returns the list of scoring parameters which were defined for scoring function, if any.
+     * @param tenantId the tenant id
+     * @param tableName the table name
+     * @return The list of scoring parameters
+     * @throws AnalyticsIndexException
+     * @throws AnalyticsException
+     */
+    List<String> getScoreParams(int tenantId, String tableName) throws AnalyticsIndexException, AnalyticsException;
     
     /**
      * Clears all the indices for the given table.

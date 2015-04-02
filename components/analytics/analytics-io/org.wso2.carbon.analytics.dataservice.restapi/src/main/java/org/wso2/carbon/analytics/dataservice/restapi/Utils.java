@@ -21,11 +21,13 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.ColumnTypeBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.IndexTypeBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.SearchResultEntryBean;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
@@ -37,6 +39,7 @@ import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -89,19 +92,59 @@ public class Utils {
 		List<Record> records = new ArrayList<Record>();
 		try{
 			for (RecordBean recordBean : recordBeans) {
-				if(recordBean.getTableName().isEmpty()){
+				if(recordBean.getTableName().isEmpty() || recordBean.getTableName() == null){
 					throw new AnalyticsException("TableName cannot be empty!");
 				}
 			records.add(new Record(recordBean.getId(), getTenantId(username), recordBean.getTableName(),
-		                           recordBean.getValues()));
+		                           validateAndReturn(recordBean.getValues())));
 			}
 		}catch(NullPointerException e){
 			throw new AnalyticsException("TableName cannot be null");
 		}
 		return records;
 	}
-	
-	/**
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, Object> validateAndReturn(Map<String, Object> values)
+            throws AnalyticsIndexException {
+        Map<String, Object> valueMap = new LinkedHashMap<String, Object>(0);
+        for (Map.Entry<String, Object> recordEntry : values.entrySet()){
+            //TODO : AnalyticsCategoryPath is mapped to a linkedList by jackson json.
+            // Currently checking the type and convert it manually to categoryPath type.
+            if (recordEntry.getValue() instanceof LinkedHashMap) {
+                Map<String, Object> keyValPairMap = (LinkedHashMap<String, Object>) recordEntry.getValue();
+                List<String> pathList = (ArrayList<String>) keyValPairMap.get(Constants.FacetAttributes.PATH);
+                Object weightObj = keyValPairMap.get(Constants.FacetAttributes.WEIGHT);
+                Number weight;
+                if (weightObj instanceof Integer) {
+                    weight = (Integer) weightObj;
+                } else if (weightObj instanceof Double) {
+                    weight = (Double) weightObj;
+                } else if (weightObj == null) {
+                    weight = 1.0f;
+                }
+                else {
+                    throw new AnalyticsIndexException("Category Weight should be a float/integer value");
+                }
+                if (pathList != null && pathList.size() > 0) {
+                    String[] path = pathList.toArray(new String[pathList.size()]);
+                    if (keyValPairMap.keySet().size() <= 2) {
+                        AnalyticsCategoryPath categoryPath = new
+                                AnalyticsCategoryPath(path);
+                        categoryPath.setWeight(weight.floatValue());
+                        valueMap.put(recordEntry.getKey(), categoryPath);
+                    }
+                } else {
+                    throw new AnalyticsIndexException("Category path cannot be empty");
+                }
+            } else {
+                valueMap.put(recordEntry.getKey(),recordEntry.getValue());
+            }
+        }
+        return valueMap;
+    }
+
+    /**
 	 * Gets the records from record beans belongs to a specific table.
 	 * @param recordBeans
 	 *            the record beans
@@ -112,7 +155,7 @@ public class Utils {
 		List<Record> records = new ArrayList<Record>();
 		for (RecordBean recordBean : recordBeans) {
 			records.add(new Record(recordBean.getId(), getTenantId(username), tableName,
-		                           recordBean.getValues()));
+		                           validateAndReturn(recordBean.getValues())));
 		}
 		return records;
 	}

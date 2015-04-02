@@ -240,5 +240,4 @@ public class AnalyticsIndexDefinitionRepository {
             throw new AnalyticsIndexException("Error in clearing indices: " + e.getMessage(), e);
         }
     }
-            
 }

@@ -30,7 +30,7 @@ import org.wso2.carbon.analytics.dataservice.restapi.Constants;
 import org.wso2.carbon.analytics.dataservice.restapi.UnauthenticatedUserException;
 import org.wso2.carbon.analytics.dataservice.restapi.Utils;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.AnalyticsSchemaBean;
-import org.wso2.carbon.analytics.dataservice.restapi.beans.IndexTypeBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.IndexConfigurationBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.QueryBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.TableBean;
@@ -589,8 +589,8 @@ public class AnalyticsResource extends AbstractResource {
         anss.setLanguageQuery(null);
         anss.setLanguage("lucene");
         anss.setTableName("test");
-        anss.setCategoryCount(10);
-        anss.setRecordCount(10);
+        anss.setCategoryCount(1);
+        anss.setRecordCount(2);
         anss.setWithIds(true);
 
         return Response.ok(ads.drillDown(-1234,anss)).build();
@@ -628,7 +628,7 @@ public class AnalyticsResource extends AbstractResource {
     /**
 	 * Sets the indices.
 	 * @param tableName the table name
-	 * @param columnsBean the columns bean containing all the indices
+	 * @param indexInfo the columns bean containing all the indices
 	 * @return the response
 	 * @throws AnalyticsException
 	 */
@@ -637,7 +637,7 @@ public class AnalyticsResource extends AbstractResource {
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}/indices")
 	public Response setIndices(@PathParam("tableName") String tableName,
-	                           Map<String, IndexTypeBean> columnsBean,
+	                           IndexConfigurationBean indexInfo,
                                @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
             throws AnalyticsException {
         if (logger.isDebugEnabled()) {
@@ -646,12 +646,12 @@ public class AnalyticsResource extends AbstractResource {
         }
         SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
         String username = authenticate(authHeader);
-        if (columnsBean != null) {
-            Map<String, IndexType> columns = Utils.createIndexTypeMap(columnsBean);
+        if (indexInfo != null) {
+            Map<String, IndexType> columns = Utils.createIndexTypeMap(indexInfo.getIndices());
             if (logger.isDebugEnabled()) {
                 logger.debug("Setting indices : " + columns.keySet());
             }
-            analyticsDataService.setIndices(username, tableName, columns);
+            analyticsDataService.setIndices(username, tableName, columns,indexInfo.getScoreParams());
             return handleResponse(ResponseStatus.CREATED, "Successfully set indices in table: " +
                                                           tableName);
         } else {
@@ -678,11 +678,14 @@ public class AnalyticsResource extends AbstractResource {
         SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
         String username = authenticate(authHeader);
         Map<String, IndexType> columns = analyticsDataService.getIndices(username, tableName);
-        Map<String, IndexTypeBean> columnsBean = Utils.createIndexTypeBeanMap(columns);
+        List<String> scoreParams = analyticsDataService.getScoreParams(username, tableName);
+        IndexConfigurationBean indexConfigurationBean = new IndexConfigurationBean();
+        indexConfigurationBean.setIndices(Utils.createIndexTypeBeanMap(columns));
+        indexConfigurationBean.setScoreParams(scoreParams);
         if (logger.isDebugEnabled()) {
-            logger.debug("Getting indices : " + columnsBean.keySet());
+            logger.debug("Getting indices : " + indexConfigurationBean.getIndices().keySet());
         }
-        return Response.ok(columnsBean).build();
+        return Response.ok(indexConfigurationBean).build();
 	}
 
 	/**
