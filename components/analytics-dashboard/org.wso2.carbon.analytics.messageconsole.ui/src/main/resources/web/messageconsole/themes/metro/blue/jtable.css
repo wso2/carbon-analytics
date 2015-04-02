@@ -2,54 +2,101 @@
  * Created by Halil İbrahim Kalkan
  * http://www.jtable.org
  */
-@font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 300;
-  src: local('Open Sans Light'), local('OpenSans-Light'), url(http://themes.googleusercontent.com/static/fonts/opensans/v6/DXI1ORHCpsQm3Vp6mXoaTRa1RVmPjeKy21_GQJaLlJI.woff) format('woff');
-}
-@font-face {
-  font-family: 'Open Sans';
-  font-style: italic;
-  font-weight: 300;
-  src: local('Open Sans Light Italic'), local('OpenSansLight-Italic'), url(http://themes.googleusercontent.com/static/fonts/opensans/v6/PRmiXeptR36kaC0GEAetxrsuoFAk0leveMLeqYtnfAY.woff) format('woff');
-}
-@font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Open Sans'), local('OpenSans'), url(http://themes.googleusercontent.com/static/fonts/opensans/v6/u-WUoqrET9fUeobQW7jkRT8E0i7KZn-EPnyo3HZu7kw.woff) format('woff');
-}
-@font-face {
-  font-family: 'Open Sans';
-  font-style: italic;
-  font-weight: 400;
-  src: local('Open Sans Italic'), local('OpenSans-Italic'), url(http://themes.googleusercontent.com/static/fonts/opensans/v6/xjAJXh38I15wypJXxuGMBtIh4imgI8P11RFo6YPCPC0.woff) format('woff');
-}
-@font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 600;
-  src: local('Open Sans Semibold'), local('OpenSans-Semibold'), url(http://themes.googleusercontent.com/static/fonts/opensans/v6/MTP_ySUJH_bn48VBG8sNSha1RVmPjeKy21_GQJaLlJI.woff) format('woff');
-}
-@font-face {
-  font-family: 'Open Sans';
-  font-style: italic;
-  font-weight: 600;
-  src: local('Open Sans Semibold Italic'), local('OpenSans-SemiboldItalic'), url(http://themes.googleusercontent.com/static/fonts/opensans/v6/PRmiXeptR36kaC0GEAetxmWeb5PoA5ztb49yLyUzH1A.woff) format('woff');
-}
-@font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 700;
-  src: local('Open Sans Bold'), local('OpenSans-Bold'), url(http://themes.googleusercontent.com/static/fonts/opensans/v6/k3k702ZOKiLJc3WVjuplzBa1RVmPjeKy21_GQJaLlJI.woff) format('woff');
-}
-@font-face {
-  font-family: 'Open Sans';
-  font-style: italic;
-  font-weight: 700;
-  src: local('Open Sans Bold Italic'), local('OpenSans-BoldItalic'), url(http://themes.googleusercontent.com/static/fonts/opensans/v6/PRmiXeptR36kaC0GEAetxoUt79146ZFaIJxILcpzmhI.woff) format('woff');
-}
+ .ui-widget-overlay {
+      background-image:url(../../../img/overlay.png);
+      opacity: 0.1;
+  }
+  .ui-dialog-content table.styledLeft {
+      border-collapse: collapse;
+      margin-left: 2px;
+      width: 100%;
+  }
+.ui-dialog-content table.normal {
+      width: 100%;
+  }
+  .ui-dialog-content table.normal td{
+        vertical-align:middle;
+   }
+  .ui-dialog-content table.styledLeft thead th {
+      background-image:url(../../../images/table-header.gif);
+      background-position: left bottom;
+      background-repeat:repeat-x;
+      border:1px solid #cccccc;
+      font-weight:normal;
+      height:22px;
+      line-height:20px;
+      margin-bottom:5px;
+      padding-left:8px;
+  }
+
+  .ui-dialog-content table.styledLeft tbody tr td.middle-header {
+      background-image:url(../../../images/table-header.gif);
+      background-position: left bottom;
+      background-repeat:repeat-x;
+      border:1px solid #cccccc;
+      font-weight:normal;
+      height:22px;
+      line-height:20px;
+      margin-bottom:5px;
+      padding-left:8px;
+  }
+
+  .ui-dialog-content table.styledLeft tbody tr td.sub-header {
+  	background-image:url(../../../images/table-header.gif);
+      background-position: left bottom;
+      background-repeat:repeat-x;
+      border:1px solid #cccccc;
+      border-bottom: 0px solid #666;
+      border-top: 1px solid #666;
+      font-weight:normal;
+      height:22px;
+      line-height:20px;
+      margin-bottom:5px;
+      padding-left:8px;
+  }
+
+  .ui-dialog-content table.styledLeft tbody tr td {
+      border: solid 1px #cccccc;
+      height: 25px;
+      padding-top: 2px;
+      padding-bottom: 2px;
+      padding-left: 8px !important;
+      padding-right: 8px !important;
+      vertical-align: middle !important;
+  }
+
+  .ui-dialog-content table.styledLeft tbody tr td.nopadding {
+      border: solid 1px #cccccc;
+      height: 25px;
+      padding-top: 0px;
+      padding-bottom: 0px;
+      padding-left: 0px !important;
+      padding-right: 0px !important;
+      vertical-align: middle !important;
+  }
+  .ui-dialog-content table.styledLeft tbody tr td.formRow {
+       padding-top: 10px;
+       padding-bottom: 10px;
+       border-right: solid 1px #cccccc;
+   }
+  .ui-dialog-content table.styledLeft tbody tr td.buttonRow {
+      padding-top: 5px;
+      padding-bottom: 5px;
+      background-image: url(../../../images/buttonRow-bg.gif);
+      background-position: left top;
+      background-repeat: repeat-x;
+  }
+
+ #createTablePopup{
+  padding-top:40px; 
+ }
+ #resultsTable{
+  padding:10px 0px;
+  display:none;
+ }
+ .overflowAuto{
+  overflow:auto;
+ }
 div.jtable-main-container {
   position: relative;
 }
@@ -294,20 +341,17 @@ div.jtable-contextmenu-overlay {
   z-index: 100;
 }
 div.jtable-main-container {
-  font-family: 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
-  font-weight: 300;
-  font-size: 14px;
   background: #fff;
-  line-height: 1.3;
 }
 div.jtable-main-container > div.jtable-title {
-  background-color: #0b67cd;
   padding-left: 10px;
+  background: #c0c0c0;
+  border: 1px solid #cccccc;
+  font-weight: normal;
+  line-height: 20px;
 }
 div.jtable-main-container > div.jtable-title div.jtable-title-text {
-  font-family: 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 300;
-  font-size: 19px;
   line-height: 34px;
   color: #fff;
 }
@@ -332,8 +376,11 @@ div.jtable-main-container > div.jtable-title div.jtable-toolbar {
   position: absolute;
 }
 div.jtable-main-container > div.jtable-title div.jtable-toolbar span.jtable-toolbar-item {
-  background-color: #1571d7;
-  color: white;
+  background: -webkit-gradient(linear, 0 0, 0 100%, from(#f7f7f7), to(#cccccc));
+    background: -moz-linear-gradient(top, #f7f7f7, #cccccc);
+    -ms-filter: progid:DXImageTransform.Microsoft.gradient(startColorStr=#f7f7f7, endColorStr=#cccccc);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr=#f7f7f7, endColorStr=#cccccc);
+  color: #333;
 }
 div.jtable-main-container > div.jtable-title div.jtable-toolbar span.jtable-toolbar-item.jtable-toolbar-item-add-record span.jtable-toolbar-item-icon {
   background-image: url('../../metro/add.png');
@@ -343,18 +390,15 @@ div.jtable-main-container > div.jtable-title div.jtable-toolbar span.jtable-tool
   padding-bottom: 6px;
 }
 div.jtable-main-container > table.jtable {
-  border: 1px solid #2d89ef;
   border-collapse: collapse;
   border-spacing: 0;
 }
 div.jtable-main-container > table.jtable > thead {
-  background-color: #2d89ef;
+  background-color: #eeeeee;
 }
 div.jtable-main-container > table.jtable > thead th {
-  font-family: 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 300;
-  font-size: 15px;
-  color: #fff;
+  color: #333;
 }
 div.jtable-main-container > table.jtable > thead th.jtable-column-header div.jtable-column-header-container {
   height: 24px;
@@ -427,11 +471,10 @@ div.jtable-main-container > table.jtable > tbody > tr.jtable-child-row > td {
   background-color: #fff;
 }
 div.jtable-main-container > div.jtable-bottom-panel {
-  background-color: #1c78de;
+  background-color: #c0c0c0;
   color: #fff;
   min-height: 22.900000000000002px;
   font-size: 13px;
-  border: 1px solid #2d89ef;
   border-top: none;
 }
 div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list {
@@ -444,7 +487,7 @@ div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-pa
 div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-previous,
 div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-next,
 div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-active {
-  background-color: #2d89ef;
+  background-color: #c0c0c0;
   margin: 1px;
   padding: 2px 5px;
   color: #fff;
@@ -454,7 +497,7 @@ div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-pa
 div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-last:hover,
 div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-previous:hover,
 div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-next:hover {
-  background-color: #4fabff;
+  background-color: #d8d8d8;
 }
 div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-disabled {
   opacity: 0.75;
@@ -463,7 +506,7 @@ div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-pa
   cursor: default;
 }
 div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-disabled:hover {
-  background-color: #2d89ef;
+  background-color: #c0c0c0;
 }
 div.jtable-main-container > div.jtable-bottom-panel span.jtable-page-info {
   display: inline-block;
@@ -478,12 +521,10 @@ div.jtable-main-container > div.jtable-bottom-panel span.jtable-goto-page {
   padding: 2px 0px 2px 0px;
 }
 form.jtable-dialog-form {
-  font-family: 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 400;
   font-size: 14px;
 }
 div.jtable-busy-message {
-  font-family: 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 300;
   font-size: 16px;
   border: 1px solid #fff;
