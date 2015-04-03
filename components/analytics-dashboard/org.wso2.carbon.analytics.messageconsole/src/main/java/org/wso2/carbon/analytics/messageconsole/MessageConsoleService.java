@@ -64,6 +64,7 @@ public class MessageConsoleService extends AbstractAdmin {
     private static final String FLOAT = "FLOAT";
     private static final String DOUBLE = "DOUBLE";
     private static final String BOOLEAN = "BOOLEAN";
+    public static final String AT_SIGN = "@";
 
     private SecureAnalyticsDataService analyticsDataService;
 
@@ -729,7 +730,7 @@ public class MessageConsoleService extends AbstractAdmin {
      */
     @Override
     protected String getUsername() {
-        return MultitenantUtils.getTenantAwareUsername(super.getUsername());
+        return super.getUsername() + AT_SIGN + super.getTenantDomain();
     }
 
     /**
