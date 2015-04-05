@@ -56,7 +56,6 @@ public class AnalyticsRelation extends BaseRelation implements TableScan, Serial
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.sqlContext = sqlContext;
-//        this.schema = new AnalyticsSchema(schemaString);
         this.schema = new StructType(extractFields(schemaString));
     }
 
@@ -65,7 +64,7 @@ public class AnalyticsRelation extends BaseRelation implements TableScan, Serial
     public RDD<Row> buildScan() {
         return new AnalyticsRDD(this.tenantId, this.tableName,
                 new ArrayList<>(Arrays.asList(this.schema.fieldNames())),
-                sqlContext.sparkContext(), scala.collection.Seq$.MODULE$.empty(),
+                this.sqlContext.sparkContext(), scala.collection.Seq$.MODULE$.empty(),
                 ClassTag$.MODULE$.<Row>apply(Row.class));
     }
 
@@ -79,12 +78,11 @@ public class AnalyticsRelation extends BaseRelation implements TableScan, Serial
         return schema;
     }
 
-    private static StructField[] extractFields(String schemaString) {
+    private StructField[] extractFields(String schemaString) {
         String[] strFields = schemaString.split(",");
         StructField[] resFields = new StructField[(strFields.length)];
         String name, type;
         String[] strFieldTokens;
-//        StructField field;
         for (int i = 0; i < strFields.length; i++) {
             strFieldTokens = strFields[i].trim().split(" ");
             name = strFieldTokens[0].trim();
@@ -95,7 +93,7 @@ public class AnalyticsRelation extends BaseRelation implements TableScan, Serial
         return resFields;
     }
 
-    private static DataType parseDataType(String strType) {
+    private DataType parseDataType(String strType) {
         switch (strType) {
             case AnalyticsConstants.INTEGER_TYPE:
                 return DataTypes.IntegerType;
