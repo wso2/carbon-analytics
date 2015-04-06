@@ -49,7 +49,10 @@ import java.util.Set;
  */
 public class Utils {
 
-	/**
+    public static final int CATEGORYPATH_FIELD_COUNT = 2;
+    public static final float DEFAUL_CATEGORYPATH_WEIGHT = 1.0f;
+
+    /**
 	 * Gets the analytics data service.
 	 * @return the analytics data service
 	 * @throws AnalyticsException
@@ -92,7 +95,7 @@ public class Utils {
 		List<Record> records = new ArrayList<Record>();
 		try{
 			for (RecordBean recordBean : recordBeans) {
-				if(recordBean.getTableName().isEmpty() || recordBean.getTableName() == null){
+				if(recordBean.getTableName().isEmpty()){
 					throw new AnalyticsException("TableName cannot be empty!");
 				}
 			records.add(new Record(recordBean.getId(), getTenantId(username), recordBean.getTableName(),
@@ -121,14 +124,14 @@ public class Utils {
                 } else if (weightObj instanceof Double) {
                     weight = (Double) weightObj;
                 } else if (weightObj == null) {
-                    weight = 1.0f;
+                    weight = DEFAUL_CATEGORYPATH_WEIGHT;
                 }
                 else {
                     throw new AnalyticsIndexException("Category Weight should be a float/integer value");
                 }
                 if (pathList != null && pathList.size() > 0) {
                     String[] path = pathList.toArray(new String[pathList.size()]);
-                    if (keyValPairMap.keySet().size() <= 2) {
+                    if (keyValPairMap.keySet().size() <= CATEGORYPATH_FIELD_COUNT) {
                         AnalyticsCategoryPath categoryPath = new
                                 AnalyticsCategoryPath(path);
                         categoryPath.setWeight(weight.floatValue());
@@ -194,7 +197,8 @@ public class Utils {
 	 *            the search results
 	 * @return the list
 	 */
-	public static List<SearchResultEntryBean> createSearchResultBeansFromSearchResults(List<SearchResultEntry> searchResults) {
+	public static List<SearchResultEntryBean> createSearchResultBeansFromSearchResults(List<SearchResultEntry>
+                                                                                               searchResults) {
 		List<SearchResultEntryBean> searchResultBeanList = new ArrayList<SearchResultEntryBean>();
 		for (SearchResultEntry searchResult : searchResults) {
 			SearchResultEntryBean searchResultEntryBean = new SearchResultEntryBean();

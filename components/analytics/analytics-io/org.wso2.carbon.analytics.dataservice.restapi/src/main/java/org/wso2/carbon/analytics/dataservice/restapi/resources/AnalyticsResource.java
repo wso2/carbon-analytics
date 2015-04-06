@@ -578,8 +578,8 @@ public class AnalyticsResource extends AbstractResource {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON})
     @Produces({ MediaType.APPLICATION_JSON })
-    @Path("drill")
-    public Response drilldown(List<RecordBean> recordBeans)
+    @Path("drill/{categories}/{records}")
+    public Response drilldown(@PathParam("categories")int categories, @PathParam("records")int records, List<RecordBean> recordBeans)
             throws AnalyticsException {
         AnalyticsDataService ads = Utils.getAnalyticsDataService();
         AnalyticsCategoryPath path = new AnalyticsCategoryPath(new String[]{"2015", "Feb"});
@@ -589,8 +589,8 @@ public class AnalyticsResource extends AbstractResource {
         anss.setLanguageQuery(null);
         anss.setLanguage("lucene");
         anss.setTableName("test");
-        anss.setCategoryCount(1);
-        anss.setRecordCount(2);
+        anss.setCategoryCount(categories);
+        anss.setRecordCount(records);
         anss.setWithIds(true);
 
         return Response.ok(ads.drillDown(-1234,anss)).build();
@@ -618,8 +618,8 @@ public class AnalyticsResource extends AbstractResource {
         anss.setLanguageQuery(null);
         anss.setLanguage("lucene");
         anss.setTableName("test");
-        anss.setCategoryCount(10);
-        anss.setRecordCount(10);
+        anss.setCategoryCount(1);
+        anss.setRecordCount(1);
         anss.setWithIds(true);
 
         return Response.ok(ads.searchRange(-1234, anss)).build();
@@ -730,13 +730,11 @@ public class AnalyticsResource extends AbstractResource {
         String username = authenticate(authHeader);
         if (queryBean != null) {
             List<SearchResultEntry> searchResults = analyticsDataService.search(username,
-                                                                                queryBean.getTableName(),
-                                                                                queryBean.getLanguage(),
-                                                                                queryBean.getQuery(),
-                                                                                queryBean.getStart(),
-                                                                                queryBean.getCount());
+                     queryBean.getTableName(), queryBean.getLanguage(), queryBean.getQuery(),
+                     queryBean.getStart(), queryBean.getCount());
             List<String> ids = Utils.getRecordIds(searchResults);
-            RecordGroup[] recordGroups = analyticsDataService.get(username, queryBean.getTableName(), 1, null, ids);
+            RecordGroup[] recordGroups = analyticsDataService.get(username,
+                                                                  queryBean.getTableName(), 1, null, ids);
             List<RecordBean> recordBeans = Utils.createRecordBeans(GenericUtils.listRecords(analyticsDataService,
                                                                                             recordGroups));
             if (logger.isDebugEnabled()) {
@@ -813,7 +811,8 @@ public class AnalyticsResource extends AbstractResource {
     @Consumes({MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_JSON})
     @Path("tables/{tableName}/schema")
-    public Response setTableSchema(@PathParam("tableName") String tableName, AnalyticsSchemaBean analyticsSchemaBean,
+    public Response setTableSchema(@PathParam("tableName") String tableName,
+                                   AnalyticsSchemaBean analyticsSchemaBean,
                                    @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
             throws AnalyticsException {
         if (logger.isDebugEnabled()) {
@@ -824,7 +823,8 @@ public class AnalyticsResource extends AbstractResource {
         if (analyticsSchemaBean != null) {
             AnalyticsSchema analyticsSchema = Utils.createAnalyticsSchema(analyticsSchemaBean);
             analyticsDataService.setTableSchema(username, tableName, analyticsSchema);
-            return handleResponse(ResponseStatus.SUCCESS, "Successfully set table schema for table: " + tableName);
+            return handleResponse(ResponseStatus.SUCCESS, "Successfully set table schema for table: "
+                                                          + tableName);
         } else {
             throw new AnalyticsException("Table schema is not provided");
         }
@@ -890,7 +890,8 @@ public class AnalyticsResource extends AbstractResource {
                     }
                 }
             } catch (UserStoreException e) {
-                throw new AnalyticsException("Error while accessing the user realm of user :" + username, e);
+                throw new AnalyticsException("Error while accessing the user realm of user :"
+                                             + username, e);
             }
         } else {
             throw new UnauthenticatedUserException("Invalid authentication header");

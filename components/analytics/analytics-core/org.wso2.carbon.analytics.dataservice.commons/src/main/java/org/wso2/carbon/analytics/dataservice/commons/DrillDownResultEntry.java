@@ -28,46 +28,39 @@ import java.util.Map;
 public class DrillDownResultEntry {
     private String category;
     private String[] categoryPath;
-    private List<String> facetedIds;
-    private Double facetCount;
+    private List<String> recordIds;
+    private Double recordCount;
     private Map<String, List<DrillDownResultEntry>> hierarchicalFacets;
 
     public DrillDownResultEntry() {
-        this.facetedIds = new ArrayList<>();
-        this.facetCount = 0.0;
+        this.recordIds = new ArrayList<>();
     }
 
     public DrillDownResultEntry(
-            List<String> facetedIds,
-            Double facetCount) {
-        this.facetedIds = facetedIds;
-        this.facetCount = facetCount;
+            List<String> recordIds) {
+        this.recordIds = recordIds;
     }
 
-    public void addNewFacetId(String id) {
-        if (facetedIds == null) {
-            facetedIds = new ArrayList<>();
+    public void addNewRecordId(String id) {
+        if (recordIds == null) {
+            recordIds = new ArrayList<>();
         }
-        facetedIds.add(id);
+        recordIds.add(id);
     }
 
-    public void setFacetedIds( List<String> facetedIds) {
-        this.facetedIds = facetedIds;
-    }
-
-    public List<String> getFacetIds() {
-        return facetedIds;
-    }
-
-    public void setFacetCount(Double facetedCount) {
-        this.facetCount = facetedCount;
-    }
-
-    public  double getFacetCount() {
-        if (facetCount == null) {
-            facetCount = 0.0;
+    public void addNewRecordIds(List<String> facetedIds) {
+        if (recordIds == null) {
+            recordIds = new ArrayList<>();
         }
-        return facetCount;
+        recordIds.addAll(facetedIds);
+    }
+
+    public void setRecordIds(List<String> recordIds) {
+        this.recordIds = recordIds;
+    }
+
+    public List<String> getRecordIds() {
+        return recordIds;
     }
 
     public String getCategory() {
@@ -86,6 +79,12 @@ public class DrillDownResultEntry {
         this.categoryPath = categoryPath;
     }
 
+    /**
+     * adds a child facet to this facet field. Use this one only if this object use as a range
+     * facet result.Otherwise this method makes no sense.
+     * @param fieldName indexed Field
+     * @param facet child facet result. this should be a categorical facets, not a range facet result
+     */
     public void addHierarchicalFacets(String fieldName, DrillDownResultEntry facet) {
         if (this.hierarchicalFacets == null) {
             this.hierarchicalFacets = new LinkedHashMap<>();
@@ -104,5 +103,17 @@ public class DrillDownResultEntry {
 
     public void setHierarchicalFacets(Map<String, List<DrillDownResultEntry>> hierarchicalFacets) {
         this.hierarchicalFacets = hierarchicalFacets;
+    }
+
+    public Double getRecordCount() {
+        return recordCount;
+    }
+
+    public void setRecordCount(Double recordCount) {
+        this.recordCount = recordCount;
+    }
+
+    public void incrementRecordCount(Double recordCount) {
+        this.recordCount += recordCount;
     }
 }
