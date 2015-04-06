@@ -6,16 +6,13 @@
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
 <%
     String serverURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);
     ConfigurationContext configContext = (ConfigurationContext) config.getServletContext().
             getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
     String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
-
     MessageConsoleConnector connector = new MessageConsoleConnector(configContext, serverURL, cookie);
     pageContext.setAttribute("connector", connector, PageContext.PAGE_SCOPE);
-
     try {
         Permissions permissions = connector.getAvailablePermissionForUser();
         pageContext.setAttribute("permissions", permissions, PageContext.PAGE_SCOPE);
@@ -24,12 +21,15 @@
         pageContext.setAttribute("permissionError", e, PageContext.PAGE_SCOPE);
     }
 %>
-
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
     <link href="js/jquery-ui.min.css" rel="stylesheet" type="text/css"/>
     <link href="../dialog/css/jqueryui/jqueryui-themeroller.css" rel="stylesheet" type="text/css"/>
     <link href="../dialog/css/dialog.css" rel="stylesheet" type="text/css"/>
@@ -51,7 +51,6 @@
         var typeDeleteRecord = '<%= MessageConsoleConnector.TYPE_DELETE_RECORD%>';
         var typeUpdateRecord = '<%= MessageConsoleConnector.TYPE_UPDATE_RECORD%>';
         var typeTableInfo = '<%= MessageConsoleConnector.TYPE_TABLE_INFO%>';
-
         var typeListArbitraryRecord = '<%= MessageConsoleConnector.TYPE_LIST_ARBITRARY_RECORD%>';
         var typeCreateArbitraryRecord = '<%= MessageConsoleConnector.TYPE_CRATE_ARBITRARY_RECORD%>';
         var typeUpdateArbitraryRecord = '<%= MessageConsoleConnector.TYPE_UPDATE_ARBITRARY_RECORD%>';
@@ -59,17 +58,40 @@
         var typeCreateTable = '<%= MessageConsoleConnector.TYPE_CREATE_TABLE%>';
         var typeDeleteTable = '<%= MessageConsoleConnector.TYPE_DELETE_TABLE%>';
         var typeGetTableInfo = '<%= MessageConsoleConnector.TYPE_GET_TABLE_INFO%>';
+        var typeGetPurgingTask = '<%= MessageConsoleConnector.TYPE_GET_PURGING_TASK_INFO%>';
+        var typeSavePurgingTask = '<%= MessageConsoleConnector.TYPE_SAVE_PURGING_TASK_INFO%>';
+        var typeListTable = '<%= MessageConsoleConnector.TYPE_LIST_TABLE%>';
 
         var tablePopupAction;
 
-        $(document).ready(function () {
+        function loadTableSelect() {
+            $('#tableSelect').find('option:gt(0)').remove();
             <c:if test="${permissions != null && permissions.isListTable()}">
-            var tableNames = "";
-            <c:forEach var='tableName' items='${connector.getTableList()}'>
-            tableNames += "<option value='${tableName}'>" + '${tableName}' + "</option>";
-            </c:forEach>
-            $("#tableSelect").append(tableNames);
+            $.get('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeListTable,
+                  function (result) {
+                      var resultObj = jQuery.parseJSON(result);
+                      var tableNames = "";
+                      $(resultObj).each(function (key, tableName) {
+                          tableNames += "<option value=" + tableName + ">" + tableName + "</option>";
+                      });
+                      $("#tableSelect").append(tableNames);
+                  });
             </c:if>
+            $("#deleteTableButton").hide();
+            $("#editTableButton").hide();
+            $("#purgeRecordButton").hide();
+            try {
+                $('#DeleteAllButton').hide();
+                if (tableLoaded == true) {
+                    $('#AnalyticsTableContainer').jtable('destroy');
+                    tableLoaded = false;
+                }
+            } catch (err) {
+            }
+        }
+
+        $(document).ready(function () {
+            loadTableSelect();
             $("#DeleteAllButton").hide();
             jQuery('#timeFrom').datetimepicker({
                 format: 'unixtime',
@@ -100,6 +122,7 @@
             });
 
             $("#tableForm").validationEngine();
+            $("#dataPurgingForm").validationEngine();
 
             $("#addNewTable").on("click", function () {
                 $("#column-details").find('tr').slice(1, document.getElementById('column-details').rows.length - 1).remove();
@@ -140,9 +163,21 @@
                                                           "Delete Table": function () {
                                                               $.post('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeDeleteTable, {tableName: $("#tableSelect").val()},
                                                                      function (result) {
-                                                                         $("deleteTableMessage").innerHTML = result;
+                                                                         var label = document.getElementById('deleteTableMsgLabel');
+                                                                         label.style.display = 'block';
+                                                                         label.innerHTML = result;
+                                                                         loadTableSelect();
+                                                                         $('#deleteTableMsg').fadeOut(10000);
+                                                                         $('#DeleteAllButton').hide();
+                                                                         try {
+                                                                             if (tableLoaded == true) {
+                                                                                 $('#AnalyticsTableContainer').jtable('destroy');
+                                                                                 tableLoaded = false;
+                                                                             }
+                                                                         } catch (err) {
+                                                                         }
+
                                                                      });
-                            $('#AnalyticsTableContainer').jtable('destroy');
                                                               $(this).dialog("close");
                                                           },
                                                           Cancel: function () {
@@ -151,11 +186,25 @@
                                                       }
                                                   });
                 $("#table-delete-confirm").dialog("open");
-                return false;
+                return true;
             });
 
             $("#purgeRecordButton").on("click", function () {
-                $("#purgeRecordDialog").dialog("open");
+                var label = document.getElementById('dataPurgingMsgLabel');
+                label.style.display = 'none';
+                $.post('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeGetPurgingTask,
+                        {tableName: $("#tableSelect").val()},
+                       function (result) {
+                           var resultObj = jQuery.parseJSON(result);
+                           $("#purgeRecordDialog").dialog("open");
+                           $('#dataPurgingScheudleTime').val(resultObj.cronString);
+                           $('#dataPurgingScheudleTime').prop('disabled', false);
+                           $('#dataPurgingDay').val(resultObj.retentionPeriod);
+                           $('#dataPurgingDay').prop('disabled', false);
+                           $('#dataPurgingCheckBox').prop("checked", true);
+                           $('#dataPurgingScheudleTime').datepicker("destroy");
+                       });
+                return true;
             });
 
             $("#editTableButton").on("click", function () {
@@ -280,6 +329,7 @@
                     label.style.display = 'block';
                     label.innerHTML = data;
                     document.getElementById('createTablePopup').style.display = 'none';
+                    loadTableSelect();
                 },
                 error: function (data) {
                     result = false;
@@ -441,10 +491,8 @@
         }
 
         function createJTable() {
-        console.log("in.. create");
             var table = $("#tableSelect").val();
             if (table != '-1') {
-            console.log("in.. if");
                 $.getJSON("/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=" + typeTableInfo + "&tableName=" + table,
                           function (data, status) {
                               var fields = {
@@ -491,6 +539,7 @@
                               if (data) {
                                   if (tableLoaded == true) {
                                       $('#AnalyticsTableContainer').jtable('destroy');
+                                      tableLoaded = false;
                                   }
                                   createMainJTable(fields);
                               }
@@ -502,9 +551,14 @@
 
 </head>
 <body>
+<fmt:bundle basename="org.wso2.carbon.analytics.messageconsole.ui.i18n.Resources">
+<carbon:breadcrumb label="MenuName"
+                   resourceBundle="org.wso2.carbon.analytics.messageconsole.ui.i18n.Resources"
+                   topPage="true" request="<%=request%>"/>
 <div id="middle">
-        <h2>Message Console</h2>
-        <div id="workArea">
+    <h2>Message Console</h2>
+
+    <div id="workArea">
         <c:if test="${permissionError != null}">
             <div>
                 <p><c:out value="${permissionError.message}"/></p>
@@ -520,19 +574,22 @@
         <c:if test="${permissions != null && permissions.isCreateTable()}">
             <table class="normal" width="100%">
                 <tbody>
-                    <tr>
-                        <td><input type="button" id="addNewTable" value="Add New Table" class="button"></td>
-                        <td>&nbsp;</td>
-                    </tr>
+                <tr>
+                    <td><input type="button" id="addNewTable" value="Add New Table" class="button"></td>
+                    <td>&nbsp;</td>
+                </tr>
                 </tbody>
             </table>
             <br/>
         </c:if>
+        <div id="deleteTableMsg">
+            <label id="deleteTableMsgLabel" style="display: none"></label>
+        </div>
         <table class="styledLeft">
             <thead>
-                <tr>
-                    <th>Search</th>
-                </tr>
+            <tr>
+                <th>Search</th>
+            </tr>
             </thead>
             <tbody>
 
@@ -548,43 +605,46 @@
                                         <option value="-1">Select a Table</option>
                                     </select>
                                     <c:if test="${permissions != null && permissions.isDropTable()}">
-                                        <input type="button" id="deleteTableButton" value="Delete Table" class="button" style="display: none">
+                                        <input type="button" id="deleteTableButton" value="Delete Table" class="button"
+                                               style="display: none">
                                     </c:if>
                                     <c:if test="${permissions != null && permissions.isCreateTable()}">
-                                        <input type="button" id="editTableButton" value="Edit Table" class="button" style="display: none">
+                                        <input type="button" id="editTableButton" value="Edit Table" class="button"
+                                               style="display: none">
                                     </c:if>
                                     <c:if test="${permissions != null && permissions.isDeleteRecord()}">
-                                                <input type="button" id="purgeRecordButton" value="Schedule Data Purging" style="display: none">
-                                            </c:if>
+                                        <input type="button" id="purgeRecordButton" value="Schedule Data Purging"
+                                               style="display: none">
+                                    </c:if>
                                 </td>
                             </tr>
                             <c:if test="${permissions != null && permissions.isListRecord()}">
-                            <tr>
-                                <td>By Date Range</td>
-                                <td>
-                                    <label> From: <input id="timeFrom" type="text"> </label>
-                                    <label> To: <input id="timeTo" type="text"> </label>
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td>By Date Range</td>
+                                    <td>
+                                        <label> From: <input id="timeFrom" type="text"> </label>
+                                        <label> To: <input id="timeTo" type="text"> </label>
+                                    </td>
+                                </tr>
                             </c:if>
                             <c:if test="${permissions != null && permissions.isSearchRecord()}">
-                            <tr>
-                                <td>By Query</td>
-                                <td>
-                                    Search Query: <textarea id="query" rows="1" cols="100"></textarea>
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td>By Query</td>
+                                    <td>
+                                        Search Query: <textarea id="query" rows="1" cols="100"></textarea>
+                                    </td>
+                                </tr>
                             </c:if>
-                        </tbody>
+                            </tbody>
                         </table>
                     </td>
                 </tr>
                 <c:if test="${permissions != null && permissions.isListRecord()}">
-                <tr>
-                    <td class="buttonRow">
-                        <input id="search" type="button" value="Search" onclick="createJTable();" class="button">
-                    </td>
-                </tr>
+                    <tr>
+                        <td class="buttonRow">
+                            <input id="search" type="button" value="Search" onclick="createJTable();" class="button">
+                        </td>
+                    </tr>
                 </c:if>
             </c:if>
             </tbody>
@@ -592,112 +652,111 @@
         <br/>
         <table id="resultsTable" class="styledLeft">
             <thead>
-                <tr>
-                    <th>Results</th>
-                </tr>
+            <tr>
+                <th>Results</th>
+            </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>
-                        <div id="AnalyticsTableContainer" class="overflowAuto"></div>
-                    </td>
-                </tr>
-                <c:if test="${permissions != null && permissions.isDeleteRecord()}">
+            <tr>
+                <td>
+                    <div id="AnalyticsTableContainer" class="overflowAuto"></div>
+                </td>
+            </tr>
+            <c:if test="${permissions != null && permissions.isDeleteRecord()}">
                 <tr>
                     <td class="buttonRow">
                         <input type="button" id="DeleteAllButton" value="Delete all selected records" class="button">
                     </td>
                 </tr>
-                </c:if>
+            </c:if>
             </tbody>
         </table>
         <br/>
-</div>
-<br/>
-
-
-
-
-<div id="createTableDialog" title="Create a new table">
-    <div id="msg">
-        <label id="msgLabel" style="display: none"></label>
     </div>
-    <div id="createTablePopup">
-        <form class="noteform" id="tableForm" action="javascript:createTable()">
-            <table class="normal">
-                <tbody>
-                <tr>
-                    <td>Table Name</td>
-                    <td>
-                        <input type="text" id="tableName" class="validate[required]">
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-            <br/>
-            <table id="column-details" class="styledLeft">
-                <thead>
-                <tr>
-                    <th>Column</th>
-                    <th>Type</th>
-                    <th>Primary key</th>
-                    <c:if test="${permissions != null && permissions.isSetIndex()}">
-                        <th>Index</th>
-                    </c:if>
-                    <th>&nbsp;</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td><input type="text" name="column"/></td>
-                    <td><select>
-                        <option value="STRING">STRING</option>
-                        <option value="INTEGER">INTEGER</option>
-                        <option value="LONG">LONG</option>
-                        <option value="BOOLEAN">BOOLEAN</option>
-                        <option value="FLOAT">FLOAT</option>
-                        <option value="DOUBLE">DOUBLE</option>
-                    </select></td>
-                    <td><input type="checkbox" name="primary"/></td>
-                    <c:if test="${permissions != null && permissions.isSetIndex()}">
-                        <td><input type="checkbox" name="index"/></td>
-                    </c:if>
-                    <td><input class="add" type="button" value="Add More"/></td>
-                </tr>
-                </tbody>
-            </table>
-            <table class="styledLeft">
-                <tbody>
-                <tr>
-                    <td class="buttonRow">
-                        <input type="submit" value="Submit" class="button">
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </form>
+    <br/>
+
+    <div id="createTableDialog" title="Create a new table">
+        <div id="msg">
+            <label id="msgLabel" style="display: none"></label>
+        </div>
+        <div id="createTablePopup">
+            <form class="noteform" id="tableForm" action="javascript:createTable()">
+                <table class="normal">
+                    <tbody>
+                    <tr>
+                        <td>Table Name</td>
+                        <td>
+                            <input type="text" id="tableName" class="validate[required]">
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <br/>
+                <table id="column-details" class="styledLeft">
+                    <thead>
+                    <tr>
+                        <th>Column</th>
+                        <th>Type</th>
+                        <th>Primary key</th>
+                        <c:if test="${permissions != null && permissions.isSetIndex()}">
+                            <th>Index</th>
+                        </c:if>
+                        <th>&nbsp;</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><input type="text" name="column"/></td>
+                        <td><select>
+                            <option value="STRING">STRING</option>
+                            <option value="INTEGER">INTEGER</option>
+                            <option value="LONG">LONG</option>
+                            <option value="BOOLEAN">BOOLEAN</option>
+                            <option value="FLOAT">FLOAT</option>
+                            <option value="DOUBLE">DOUBLE</option>
+                        </select></td>
+                        <td><input type="checkbox" name="primary"/></td>
+                        <c:if test="${permissions != null && permissions.isSetIndex()}">
+                            <td><input type="checkbox" name="index"/></td>
+                        </c:if>
+                        <td><input class="add" type="button" value="Add More"/></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <table class="styledLeft">
+                    <tbody>
+                    <tr>
+                        <td class="buttonRow">
+                            <input type="submit" value="Submit" class="button">
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
     </div>
-</div>
-<div id="purgeRecordDialog" title="Schedule Data Purging">
-    <div id="dataPurgingMsg">
-        <label id="dataPurgingMsgLabel" style="display: none"></label>
+    <div id="purgeRecordDialog" title="Schedule Data Purging">
+        <div id="dataPurgingMsg">
+            <label id="dataPurgingMsgLabel" style="display: none"></label>
+        </div>
+        <div id="purgeRecordPopup">
+            <form id="dataPurgingForm" action="javascript:scheduleDataPurge()">
+                <label> Enable Data Purging:
+                    <input type="checkbox" id="dataPurgingCheckBox">
+                </label>
+                <br/>
+                <label> Schedule Time:
+                    <input type="text" id="dataPurgingScheudleTime" disabled="disabled" class="validate[required]">
+                </label>
+                <br/>
+                <label> Purge Record Older Than (Days):
+                    <input type="text" id="dataPurgingDay" disabled="disabled"
+                           class="validate[custom[integer],min[1]]" value="1">
+                </label>
+                <input type="submit" value="Save">
+            </form>
+        </div>
     </div>
-    <div id="purgeRecordPopup">
-        <form id="dataPurgingForm" action="javascript:scheduleDataPurge()">
-            <label> Enable Data Purging:
-                <input type="checkbox" id="dataPurgingCheckBox">
-            </label>
-            <br/>
-            <label> Schedule Time:
-                <input type="text" id="dataPurgingScheudleTime" disabled="disabled">
-            </label>
-            <br/>
-            <label> Purge Record Older Than (Days):
-                <input type="text" id="dataPurgingDay" disabled="disabled">
-            </label>
-            <input type="submit" value="Submit">
-        </form>
-    </div>
-</div>
+    </fmt:bundle>
 </body>
 </html>

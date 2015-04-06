@@ -12,16 +12,17 @@
     String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
 
     MessageConsoleConnector connector = new MessageConsoleConnector(configContext, serverURL, cookie);
-
-    String tableName = request.getParameter("tableName");
-
-    if (tableName == null || tableName.isEmpty()) {
-        out.print("{ \"Result\": \"ERROR\", \"Message\": \"Table name param is empty\" }");
-    }
     String typeParam = request.getParameter("type");
     int type = 0;
     if (typeParam != null && !typeParam.isEmpty()) {
         type = Integer.parseInt(typeParam);
+    }
+
+    String tableName = request.getParameter("tableName");
+    if (MessageConsoleConnector.TYPE_LIST_TABLE != type) {
+        if (tableName == null || tableName.isEmpty()) {
+            out.print("{ \"Result\": \"ERROR\", \"Message\": \"Table name param is empty\" }");
+        }
     }
 
     switch (type) {
@@ -126,7 +127,26 @@
             out.print(connector.getTableInfoWithIndexInfo(tableName));
             break;
         }
+        case MessageConsoleConnector.TYPE_GET_PURGING_TASK_INFO: {
+            out.print(connector.getDataPurgingDetails(tableName));
+            break;
+        }
+        case MessageConsoleConnector.TYPE_SAVE_PURGING_TASK_INFO: {
+            out.print(connector.scheduleDataPurging(tableName, request.getParameter("cron"),
+                                                    request.getParameter("retention"),
+                                                    Boolean.parseBoolean(request.getParameter("enable"))));
+            break;
+        }
+        case MessageConsoleConnector.TYPE_LIST_TABLE: {
+            out.print(connector.getTableList());
+            break;
+        }
     }
+
+    // Preventing page getting cache
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
+    response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
+    response.setDateHeader("Expires", 0); // Proxies.
 
 %><%! public static final int UPDATE_RECORD_ACTION = 2;
     public static final int CREATE_RECORD_ACTION = 1;

@@ -1,5 +1,5 @@
 
-<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ax29="http://exception.messageconsole.analytics.carbon.wso2.org/xsd" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://messageconsole.analytics.carbon.wso2.org" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:ax211="http://beans.messageconsole.analytics.carbon.wso2.org/xsd" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://messageconsole.analytics.carbon.wso2.org">
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ax215="http://beans.messageconsole.analytics.carbon.wso2.org/xsd" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://messageconsole.analytics.carbon.wso2.org" xmlns:ax213="http://exception.messageconsole.analytics.carbon.wso2.org/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://messageconsole.analytics.carbon.wso2.org">
     <wsdl:documentation>MessageConsole</wsdl:documentation>
     <wsdl:types>
         <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://beans.messageconsole.analytics.carbon.wso2.org/xsd">
@@ -17,29 +17,9 @@
                     <xs:element minOccurs="0" name="setIndex" type="xs:boolean"></xs:element>
                 </xs:sequence>
             </xs:complexType>
-            <xs:complexType name="RecordResultBean">
-                <xs:sequence>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="records" nillable="true" type="ax211:RecordBean"></xs:element>
-                    <xs:element minOccurs="0" name="totalResultCount" type="xs:long"></xs:element>
-                </xs:sequence>
-            </xs:complexType>
-            <xs:complexType name="RecordBean">
-                <xs:sequence>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="entityBeans" nillable="true" type="ax211:EntityBean"></xs:element>
-                    <xs:element minOccurs="0" name="recordId" nillable="true" type="xs:string"></xs:element>
-                    <xs:element minOccurs="0" name="timestamp" type="xs:long"></xs:element>
-                </xs:sequence>
-            </xs:complexType>
-            <xs:complexType name="EntityBean">
-                <xs:sequence>
-                    <xs:element minOccurs="0" name="columnName" nillable="true" type="xs:string"></xs:element>
-                    <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"></xs:element>
-                    <xs:element minOccurs="0" name="value" nillable="true" type="xs:string"></xs:element>
-                </xs:sequence>
-            </xs:complexType>
             <xs:complexType name="TableBean">
                 <xs:sequence>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="ax211:ColumnBean"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="ax215:ColumnBean"></xs:element>
                     <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
                 </xs:sequence>
             </xs:complexType>
@@ -52,14 +32,40 @@
                     <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"></xs:element>
                 </xs:sequence>
             </xs:complexType>
+            <xs:complexType name="RecordBean">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="entityBeans" nillable="true" type="ax215:EntityBean"></xs:element>
+                    <xs:element minOccurs="0" name="recordId" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="timestamp" type="xs:long"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="EntityBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="columnName" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="value" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ScheduleTaskInfo">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="cronString" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="retentionPeriod" type="xs:int"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="RecordResultBean">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="records" nillable="true" type="ax215:RecordBean"></xs:element>
+                    <xs:element minOccurs="0" name="totalResultCount" type="xs:long"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
         </xs:schema>
-        <xs:schema xmlns:ax212="http://beans.messageconsole.analytics.carbon.wso2.org/xsd" xmlns:ax210="http://exception.messageconsole.analytics.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://messageconsole.analytics.carbon.wso2.org">
+        <xs:schema xmlns:ax214="http://exception.messageconsole.analytics.carbon.wso2.org/xsd" xmlns:ax216="http://beans.messageconsole.analytics.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://messageconsole.analytics.carbon.wso2.org">
             <xs:import namespace="http://exception.messageconsole.analytics.carbon.wso2.org/xsd"></xs:import>
             <xs:import namespace="http://beans.messageconsole.analytics.carbon.wso2.org/xsd"></xs:import>
             <xs:element name="MessageConsoleMessageConsoleException">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="MessageConsoleException" nillable="true" type="ax29:MessageConsoleException"></xs:element>
+                        <xs:element minOccurs="0" name="MessageConsoleException" nillable="true" type="ax214:MessageConsoleException"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -71,19 +77,133 @@
             <xs:element name="getAvailablePermissionsResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax212:PermissionBean"></xs:element>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax215:PermissionBean"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="listTables">
-                <xs:complexType>
-                    <xs:sequence></xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="listTablesResponse">
+            <xs:element name="putArbitraryField">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="table" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="recordId" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="fieldName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="value" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTableInfo">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTableInfoResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax215:TableBean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTableInfoWithIndicesInfo">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTableInfoWithIndicesInfoResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax215:TableBean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addRecord">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="table" nillable="true" type="xs:string"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="xs:string"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="values" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addRecordResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax215:RecordBean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="updateRecord">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="table" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="recordId" nillable="true" type="xs:string"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="xs:string"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="values" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="updateRecordResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax215:RecordBean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getArbitraryList">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="table" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="recordId" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getArbitraryListResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax215:EntityBean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteArbitraryField">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="table" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="recordId" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="fieldName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="editTable">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableInfo" nillable="true" type="ax215:TableBean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="scheduleDataPurging">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="table" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="cronString" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="retentionPeriod" type="xs:int"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getDataPurgingDetails">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="table" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getDataPurgingDetailsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax215:ScheduleTaskInfo"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -102,111 +222,14 @@
             <xs:element name="getRecordsResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax212:RecordResultBean"></xs:element>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax215:RecordResultBean"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getTableInfoWithIndicesInfo">
+            <xs:element name="createTable">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getTableInfoWithIndicesInfoResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax212:TableBean"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deleteRecords">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="table" nillable="true" type="xs:string"></xs:element>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="recordIds" nillable="true" type="xs:string"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="addRecord">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="table" nillable="true" type="xs:string"></xs:element>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="xs:string"></xs:element>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="values" nillable="true" type="xs:string"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="addRecordResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax212:RecordBean"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="updateRecord">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="table" nillable="true" type="xs:string"></xs:element>
-                        <xs:element minOccurs="0" name="recordId" nillable="true" type="xs:string"></xs:element>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="xs:string"></xs:element>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="values" nillable="true" type="xs:string"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="updateRecordResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax212:RecordBean"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getArbitraryList">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="table" nillable="true" type="xs:string"></xs:element>
-                        <xs:element minOccurs="0" name="recordId" nillable="true" type="xs:string"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getArbitraryListResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax212:EntityBean"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deleteArbitraryField">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="table" nillable="true" type="xs:string"></xs:element>
-                        <xs:element minOccurs="0" name="recordId" nillable="true" type="xs:string"></xs:element>
-                        <xs:element minOccurs="0" name="fieldName" nillable="true" type="xs:string"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="putArbitraryField">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="table" nillable="true" type="xs:string"></xs:element>
-                        <xs:element minOccurs="0" name="recordId" nillable="true" type="xs:string"></xs:element>
-                        <xs:element minOccurs="0" name="fieldName" nillable="true" type="xs:string"></xs:element>
-                        <xs:element minOccurs="0" name="value" nillable="true" type="xs:string"></xs:element>
-                        <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="editTable">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="tableInfo" nillable="true" type="ax212:TableBean"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deleteTable">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="table" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="tableInfo" nillable="true" type="ax215:TableBean"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -222,24 +245,30 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getTableInfo">
+            <xs:element name="deleteRecords">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="table" nillable="true" type="xs:string"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="recordIds" nillable="true" type="xs:string"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getTableInfoResponse">
+            <xs:element name="deleteTable">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax212:TableBean"></xs:element>
+                        <xs:element minOccurs="0" name="table" nillable="true" type="xs:string"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="createTable">
+            <xs:element name="listTables">
+                <xs:complexType>
+                    <xs:sequence></xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="listTablesResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="tableInfo" nillable="true" type="ax212:TableBean"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -262,17 +291,17 @@
     <wsdl:message name="getArbitraryListResponse">
         <wsdl:part name="parameters" element="ns:getArbitraryListResponse"></wsdl:part>
     </wsdl:message>
-    <wsdl:message name="getTableInfoRequest">
-        <wsdl:part name="parameters" element="ns:getTableInfo"></wsdl:part>
-    </wsdl:message>
-    <wsdl:message name="getTableInfoResponse">
-        <wsdl:part name="parameters" element="ns:getTableInfoResponse"></wsdl:part>
-    </wsdl:message>
     <wsdl:message name="getTableInfoWithIndicesInfoRequest">
         <wsdl:part name="parameters" element="ns:getTableInfoWithIndicesInfo"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getTableInfoWithIndicesInfoResponse">
         <wsdl:part name="parameters" element="ns:getTableInfoWithIndicesInfoResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getTableInfoRequest">
+        <wsdl:part name="parameters" element="ns:getTableInfo"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getTableInfoResponse">
+        <wsdl:part name="parameters" element="ns:getTableInfoResponse"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="listTablesRequest">
         <wsdl:part name="parameters" element="ns:listTables"></wsdl:part>
@@ -291,6 +320,12 @@
     </wsdl:message>
     <wsdl:message name="addRecordResponse">
         <wsdl:part name="parameters" element="ns:addRecordResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getDataPurgingDetailsRequest">
+        <wsdl:part name="parameters" element="ns:getDataPurgingDetails"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getDataPurgingDetailsResponse">
+        <wsdl:part name="parameters" element="ns:getDataPurgingDetailsResponse"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="deleteTableRequest">
         <wsdl:part name="parameters" element="ns:deleteTable"></wsdl:part>
@@ -312,6 +347,9 @@
     </wsdl:message>
     <wsdl:message name="getAvailablePermissionsResponse">
         <wsdl:part name="parameters" element="ns:getAvailablePermissionsResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="scheduleDataPurgingRequest">
+        <wsdl:part name="parameters" element="ns:scheduleDataPurging"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="updateRecordRequest">
         <wsdl:part name="parameters" element="ns:updateRecord"></wsdl:part>
@@ -335,15 +373,15 @@
             <wsdl:output message="ns:getArbitraryListResponse" wsaw:Action="urn:getArbitraryListResponse"></wsdl:output>
             <wsdl:fault message="ns:MessageConsoleMessageConsoleException" name="MessageConsoleMessageConsoleException" wsaw:Action="urn:getArbitraryListMessageConsoleMessageConsoleException"></wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getTableInfo">
-            <wsdl:input message="ns:getTableInfoRequest" wsaw:Action="urn:getTableInfo"></wsdl:input>
-            <wsdl:output message="ns:getTableInfoResponse" wsaw:Action="urn:getTableInfoResponse"></wsdl:output>
-            <wsdl:fault message="ns:MessageConsoleMessageConsoleException" name="MessageConsoleMessageConsoleException" wsaw:Action="urn:getTableInfoMessageConsoleMessageConsoleException"></wsdl:fault>
-        </wsdl:operation>
         <wsdl:operation name="getTableInfoWithIndicesInfo">
             <wsdl:input message="ns:getTableInfoWithIndicesInfoRequest" wsaw:Action="urn:getTableInfoWithIndicesInfo"></wsdl:input>
             <wsdl:output message="ns:getTableInfoWithIndicesInfoResponse" wsaw:Action="urn:getTableInfoWithIndicesInfoResponse"></wsdl:output>
             <wsdl:fault message="ns:MessageConsoleMessageConsoleException" name="MessageConsoleMessageConsoleException" wsaw:Action="urn:getTableInfoWithIndicesInfoMessageConsoleMessageConsoleException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getTableInfo">
+            <wsdl:input message="ns:getTableInfoRequest" wsaw:Action="urn:getTableInfo"></wsdl:input>
+            <wsdl:output message="ns:getTableInfoResponse" wsaw:Action="urn:getTableInfoResponse"></wsdl:output>
+            <wsdl:fault message="ns:MessageConsoleMessageConsoleException" name="MessageConsoleMessageConsoleException" wsaw:Action="urn:getTableInfoMessageConsoleMessageConsoleException"></wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="listTables">
             <wsdl:input message="ns:listTablesRequest" wsaw:Action="urn:listTables"></wsdl:input>
@@ -362,6 +400,11 @@
             <wsdl:input message="ns:addRecordRequest" wsaw:Action="urn:addRecord"></wsdl:input>
             <wsdl:output message="ns:addRecordResponse" wsaw:Action="urn:addRecordResponse"></wsdl:output>
             <wsdl:fault message="ns:MessageConsoleMessageConsoleException" name="MessageConsoleMessageConsoleException" wsaw:Action="urn:addRecordMessageConsoleMessageConsoleException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getDataPurgingDetails">
+            <wsdl:input message="ns:getDataPurgingDetailsRequest" wsaw:Action="urn:getDataPurgingDetails"></wsdl:input>
+            <wsdl:output message="ns:getDataPurgingDetailsResponse" wsaw:Action="urn:getDataPurgingDetailsResponse"></wsdl:output>
+            <wsdl:fault message="ns:MessageConsoleMessageConsoleException" name="MessageConsoleMessageConsoleException" wsaw:Action="urn:getDataPurgingDetailsMessageConsoleMessageConsoleException"></wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="deleteTable">
             <wsdl:input message="ns:deleteTableRequest" wsaw:Action="urn:deleteTable"></wsdl:input>
@@ -383,6 +426,10 @@
             <wsdl:input message="ns:getAvailablePermissionsRequest" wsaw:Action="urn:getAvailablePermissions"></wsdl:input>
             <wsdl:output message="ns:getAvailablePermissionsResponse" wsaw:Action="urn:getAvailablePermissionsResponse"></wsdl:output>
             <wsdl:fault message="ns:MessageConsoleMessageConsoleException" name="MessageConsoleMessageConsoleException" wsaw:Action="urn:getAvailablePermissionsMessageConsoleMessageConsoleException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="scheduleDataPurging">
+            <wsdl:input message="ns:scheduleDataPurgingRequest" wsaw:Action="urn:scheduleDataPurging"></wsdl:input>
+            <wsdl:fault message="ns:MessageConsoleMessageConsoleException" name="MessageConsoleMessageConsoleException" wsaw:Action="urn:scheduleDataPurgingMessageConsoleMessageConsoleException"></wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="updateRecord">
             <wsdl:input message="ns:updateRecordRequest" wsaw:Action="urn:updateRecord"></wsdl:input>
@@ -418,8 +465,8 @@
                 <soap:fault use="literal" name="MessageConsoleMessageConsoleException"></soap:fault>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getTableInfoWithIndicesInfo">
-            <soap:operation soapAction="urn:getTableInfoWithIndicesInfo" style="document"></soap:operation>
+        <wsdl:operation name="getTableInfo">
+            <soap:operation soapAction="urn:getTableInfo" style="document"></soap:operation>
             <wsdl:input>
                 <soap:body use="literal"></soap:body>
             </wsdl:input>
@@ -430,8 +477,8 @@
                 <soap:fault use="literal" name="MessageConsoleMessageConsoleException"></soap:fault>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getTableInfo">
-            <soap:operation soapAction="urn:getTableInfo" style="document"></soap:operation>
+        <wsdl:operation name="getTableInfoWithIndicesInfo">
+            <soap:operation soapAction="urn:getTableInfoWithIndicesInfo" style="document"></soap:operation>
             <wsdl:input>
                 <soap:body use="literal"></soap:body>
             </wsdl:input>
@@ -484,6 +531,18 @@
                 <soap:fault use="literal" name="MessageConsoleMessageConsoleException"></soap:fault>
             </wsdl:fault>
         </wsdl:operation>
+        <wsdl:operation name="getDataPurgingDetails">
+            <soap:operation soapAction="urn:getDataPurgingDetails" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+            <wsdl:fault name="MessageConsoleMessageConsoleException">
+                <soap:fault use="literal" name="MessageConsoleMessageConsoleException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
         <wsdl:operation name="deleteTable">
             <soap:operation soapAction="urn:deleteTable" style="document"></soap:operation>
             <wsdl:input>
@@ -528,6 +587,15 @@
             <wsdl:output>
                 <soap:body use="literal"></soap:body>
             </wsdl:output>
+            <wsdl:fault name="MessageConsoleMessageConsoleException">
+                <soap:fault use="literal" name="MessageConsoleMessageConsoleException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="scheduleDataPurging">
+            <soap:operation soapAction="urn:scheduleDataPurging" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
             <wsdl:fault name="MessageConsoleMessageConsoleException">
                 <soap:fault use="literal" name="MessageConsoleMessageConsoleException"></soap:fault>
             </wsdl:fault>
@@ -580,8 +648,8 @@
                 <soap12:fault use="literal" name="MessageConsoleMessageConsoleException"></soap12:fault>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getTableInfoWithIndicesInfo">
-            <soap12:operation soapAction="urn:getTableInfoWithIndicesInfo" style="document"></soap12:operation>
+        <wsdl:operation name="getTableInfo">
+            <soap12:operation soapAction="urn:getTableInfo" style="document"></soap12:operation>
             <wsdl:input>
                 <soap12:body use="literal"></soap12:body>
             </wsdl:input>
@@ -592,8 +660,8 @@
                 <soap12:fault use="literal" name="MessageConsoleMessageConsoleException"></soap12:fault>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getTableInfo">
-            <soap12:operation soapAction="urn:getTableInfo" style="document"></soap12:operation>
+        <wsdl:operation name="getTableInfoWithIndicesInfo">
+            <soap12:operation soapAction="urn:getTableInfoWithIndicesInfo" style="document"></soap12:operation>
             <wsdl:input>
                 <soap12:body use="literal"></soap12:body>
             </wsdl:input>
@@ -646,6 +714,18 @@
                 <soap12:fault use="literal" name="MessageConsoleMessageConsoleException"></soap12:fault>
             </wsdl:fault>
         </wsdl:operation>
+        <wsdl:operation name="getDataPurgingDetails">
+            <soap12:operation soapAction="urn:getDataPurgingDetails" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+            <wsdl:fault name="MessageConsoleMessageConsoleException">
+                <soap12:fault use="literal" name="MessageConsoleMessageConsoleException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
         <wsdl:operation name="deleteTable">
             <soap12:operation soapAction="urn:deleteTable" style="document"></soap12:operation>
             <wsdl:input>
@@ -694,6 +774,15 @@
                 <soap12:fault use="literal" name="MessageConsoleMessageConsoleException"></soap12:fault>
             </wsdl:fault>
         </wsdl:operation>
+        <wsdl:operation name="scheduleDataPurging">
+            <soap12:operation soapAction="urn:scheduleDataPurging" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:fault name="MessageConsoleMessageConsoleException">
+                <soap12:fault use="literal" name="MessageConsoleMessageConsoleException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
         <wsdl:operation name="updateRecord">
             <soap12:operation soapAction="urn:updateRecord" style="document"></soap12:operation>
             <wsdl:input>
@@ -736,8 +825,8 @@
                 <mime:content type="text/xml" part="parameters"></mime:content>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="getTableInfoWithIndicesInfo">
-            <http:operation location="getTableInfoWithIndicesInfo"></http:operation>
+        <wsdl:operation name="getTableInfo">
+            <http:operation location="getTableInfo"></http:operation>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"></mime:content>
             </wsdl:input>
@@ -745,8 +834,8 @@
                 <mime:content type="text/xml" part="parameters"></mime:content>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="getTableInfo">
-            <http:operation location="getTableInfo"></http:operation>
+        <wsdl:operation name="getTableInfoWithIndicesInfo">
+            <http:operation location="getTableInfoWithIndicesInfo"></http:operation>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"></mime:content>
             </wsdl:input>
@@ -784,6 +873,15 @@
                 <mime:content type="text/xml" part="parameters"></mime:content>
             </wsdl:input>
         </wsdl:operation>
+        <wsdl:operation name="getDataPurgingDetails">
+            <http:operation location="getDataPurgingDetails"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="deleteTable">
             <http:operation location="deleteTable"></http:operation>
             <wsdl:input>
@@ -820,6 +918,12 @@
                 <mime:content type="text/xml" part="parameters"></mime:content>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="scheduleDataPurging">
+            <http:operation location="scheduleDataPurging"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+        </wsdl:operation>
         <wsdl:operation name="updateRecord">
             <http:operation location="updateRecord"></http:operation>
             <wsdl:input>
@@ -841,13 +945,13 @@
     </wsdl:binding>
     <wsdl:service name="MessageConsole">
         <wsdl:port name="MessageConsoleHttpsSoap11Endpoint" binding="ns:MessageConsoleSoap11Binding">
-            <soap:address location="https://10.100.0.46:9443/services/MessageConsole.MessageConsoleHttpsSoap11Endpoint/"></soap:address>
+            <soap:address location="https://192.168.1.5:9443/services/MessageConsole.MessageConsoleHttpsSoap11Endpoint/"></soap:address>
         </wsdl:port>
         <wsdl:port name="MessageConsoleHttpsSoap12Endpoint" binding="ns:MessageConsoleSoap12Binding">
-            <soap12:address location="https://10.100.0.46:9443/services/MessageConsole.MessageConsoleHttpsSoap12Endpoint/"></soap12:address>
+            <soap12:address location="https://192.168.1.5:9443/services/MessageConsole.MessageConsoleHttpsSoap12Endpoint/"></soap12:address>
         </wsdl:port>
         <wsdl:port name="MessageConsoleHttpsEndpoint" binding="ns:MessageConsoleHttpBinding">
-            <http:address location="https://10.100.0.46:9443/services/MessageConsole.MessageConsoleHttpsEndpoint/"></http:address>
+            <http:address location="https://192.168.1.5:9443/services/MessageConsole.MessageConsoleHttpsEndpoint/"></http:address>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

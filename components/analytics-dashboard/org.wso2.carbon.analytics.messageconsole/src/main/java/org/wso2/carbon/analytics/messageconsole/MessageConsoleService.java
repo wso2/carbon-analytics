@@ -35,14 +35,18 @@ import org.wso2.carbon.analytics.messageconsole.beans.EntityBean;
 import org.wso2.carbon.analytics.messageconsole.beans.PermissionBean;
 import org.wso2.carbon.analytics.messageconsole.beans.RecordBean;
 import org.wso2.carbon.analytics.messageconsole.beans.RecordResultBean;
+import org.wso2.carbon.analytics.messageconsole.beans.ScheduleTaskInfo;
 import org.wso2.carbon.analytics.messageconsole.beans.TableBean;
 import org.wso2.carbon.analytics.messageconsole.exception.MessageConsoleException;
 import org.wso2.carbon.analytics.messageconsole.internal.ServiceHolder;
+import org.wso2.carbon.analytics.messageconsole.purging.AnalyticsDataPurgingTask;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.core.AbstractAdmin;
+import org.wso2.carbon.ntask.common.TaskException;
+import org.wso2.carbon.ntask.core.TaskInfo;
+import org.wso2.carbon.ntask.core.TaskManager;
 import org.wso2.carbon.user.api.AuthorizationManager;
 import org.wso2.carbon.user.api.UserStoreException;
-import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -69,7 +73,7 @@ public class MessageConsoleService extends AbstractAdmin {
     private SecureAnalyticsDataService analyticsDataService;
 
     public MessageConsoleService() {
-        this.analyticsDataService = ServiceHolder.getAnalyticsDataService();
+        this.analyticsDataService = ServiceHolder.getSecureAnalyticsDataService();
     }
 
     /**
@@ -501,6 +505,10 @@ public class MessageConsoleService extends AbstractAdmin {
                 List<Record> records = new ArrayList<>(1);
                 records.add(editedRecord);
                 analyticsDataService.put(username, records);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Arbitrary field[" + fieldName + "] removed from record[" + recordId + "] in the" +
+                                 table + " successfully.");
+                }
             }
         } catch (AnalyticsException e) {
             logger.error("Unable to delete arbitrary field[" + fieldName + "] for id [" + recordId + "] from table :" + table, e);
@@ -533,6 +541,10 @@ public class MessageConsoleService extends AbstractAdmin {
                 List<Record> records = new ArrayList<>(1);
                 records.add(editedRecord);
                 analyticsDataService.put(username, records);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Updated arbitrary field[" + fieldName + "] in record[" + recordId + "] in the  " +
+                                 table + " successfully.");
+                }
             }
         } catch (AnalyticsException e) {
             logger.error("Unable to update arbitrary field[" + fieldName + "] for id [" + recordId + "] from table :" + table, e);
@@ -743,6 +755,18 @@ public class MessageConsoleService extends AbstractAdmin {
         try {
             String username = getUsername();
             analyticsDataService.deleteTable(username, table);
+            try {
+                TaskManager taskManager = ServiceHolder.getTaskService().getTaskManager(org.wso2.carbon.analytics.messageconsole.Constants
+                                                                                                .ANALYTICS_DATA_PURGING);
+                if (taskManager.isTaskScheduled(getDataPurgingTaskName(table))) {
+                    taskManager.deleteTask(getDataPurgingTaskName(table));
+                }
+            } catch (TaskException e) {
+                logger.error(e);
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug(table + " deleted successfully");
+            }
         } catch (AnalyticsException e) {
             logger.error("Unable to delete table: " + table, e);
             throw new MessageConsoleException("Unable to delete table: " + table, e);
@@ -760,5 +784,67 @@ public class MessageConsoleService extends AbstractAdmin {
      */
     public boolean isPaginationSupported() {
         return analyticsDataService.isPaginationSupported();
+    }
+
+    /**
+     * Scheduling data purging task for given table
+     *
+     * @param table           Table name that need to purge
+     * @param cronString      Task cron schedule  information
+     * @param retentionPeriod Data retention period
+     * @throws MessageConsoleException
+     */
+    public void scheduleDataPurging(String table, String cronString, int retentionPeriod)
+            throws MessageConsoleException {
+        try {
+            TaskManager taskManager = ServiceHolder.getTaskService().getTaskManager(org.wso2.carbon.analytics.messageconsole.Constants
+                                                                                            .ANALYTICS_DATA_PURGING);
+            TaskInfo taskInfo = createDataPurgingTask(table, cronString, retentionPeriod);
+            taskManager.deleteTask(taskInfo.getName());
+            if (cronString != null) {
+                taskManager.registerTask(taskInfo);
+                taskManager.scheduleTask(taskInfo.getName());
+            }
+        } catch (TaskException e) {
+            throw new MessageConsoleException("Unable to schedule a purging task for " + table + " with corn " +
+                                              "schedule[" + cronString + "] due to " + e.getMessage(), e);
+        }
+    }
+
+    public ScheduleTaskInfo getDataPurgingDetails(String table) throws MessageConsoleException {
+        ScheduleTaskInfo taskInfo = new ScheduleTaskInfo();
+        try {
+            TaskManager taskManager = ServiceHolder.getTaskService().getTaskManager(org.wso2.carbon.analytics.messageconsole.Constants
+                                                                                            .ANALYTICS_DATA_PURGING);
+            if (taskManager.isTaskScheduled(getDataPurgingTaskName(table))) {
+                TaskInfo task = taskManager.getTask(getDataPurgingTaskName(table));
+                if (task != null) {
+                    taskInfo.setCronString(task.getProperties().get(org.wso2.carbon.analytics.messageconsole.Constants.CRON_STRING));
+                    taskInfo.setRetentionPeriod(Integer.parseInt(task.getProperties().get(org.wso2.carbon.analytics.messageconsole.Constants
+                                                                                                  .RETENTION_PERIOD)));
+                }
+            }
+        } catch (TaskException e) {
+            throw new MessageConsoleException("Unable to get schedule details for " + table + " due to " + e
+                    .getMessage(), e);
+        }
+
+        return taskInfo;
+    }
+
+    private TaskInfo createDataPurgingTask(String table, String cronString, int retentionPeriod) {
+        String taskName = getDataPurgingTaskName(table);
+        TaskInfo.TriggerInfo triggerInfo = new TaskInfo.TriggerInfo(cronString);
+        Map<String, String> taskProperties = new HashMap<>(4);
+        taskProperties.put(org.wso2.carbon.analytics.messageconsole.Constants.RETENTION_PERIOD, String
+                .valueOf(retentionPeriod));
+        taskProperties.put(org.wso2.carbon.analytics.messageconsole.Constants.TABLE, table);
+        taskProperties.put(org.wso2.carbon.analytics.messageconsole.Constants.TENANT_ID, String.valueOf(CarbonContext.getThreadLocalCarbonContext().getTenantId()));
+        taskProperties.put(org.wso2.carbon.analytics.messageconsole.Constants.CRON_STRING, cronString);
+        return new TaskInfo(taskName, AnalyticsDataPurgingTask.class.getName(), taskProperties, triggerInfo);
+    }
+
+    private String getDataPurgingTaskName(String table) {
+        return getTenantDomain() + "_" + table + "_" + "data_purging_task";
     }
 }

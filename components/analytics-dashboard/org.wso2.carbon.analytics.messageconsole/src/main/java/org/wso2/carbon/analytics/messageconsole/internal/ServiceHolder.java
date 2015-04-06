@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.analytics.messageconsole.internal;
 
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 import org.wso2.carbon.ntask.core.service.TaskService;
 
@@ -26,15 +27,24 @@ import org.wso2.carbon.ntask.core.service.TaskService;
  */
 public class ServiceHolder {
 
-    private static SecureAnalyticsDataService analyticsDataService;
+    private static SecureAnalyticsDataService secureAnalyticsDataService;
+    private static AnalyticsDataService analyticsDataService;
     private static TaskService taskService;
 
-    public static void setAnalyticsDataService(SecureAnalyticsDataService analyticsDataService) {
-        ServiceHolder.analyticsDataService = analyticsDataService;
+    public static void setSecureAnalyticsDataService(SecureAnalyticsDataService secureAnalyticsDataService) {
+        ServiceHolder.secureAnalyticsDataService = secureAnalyticsDataService;
     }
 
-    public static SecureAnalyticsDataService getAnalyticsDataService() {
+    public static SecureAnalyticsDataService getSecureAnalyticsDataService() {
+        return secureAnalyticsDataService;
+    }
+
+    public static AnalyticsDataService getAnalyticsDataService() {
         return analyticsDataService;
+    }
+
+    public static void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {
+        ServiceHolder.analyticsDataService = analyticsDataService;
     }
 
     public static TaskService getTaskService() {
