@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.messageconsole.ui.beans;
 
+/**
+ * This class represent data purging schedule information
+ */
 public class ScheduleTask {
 
     private String cronString;

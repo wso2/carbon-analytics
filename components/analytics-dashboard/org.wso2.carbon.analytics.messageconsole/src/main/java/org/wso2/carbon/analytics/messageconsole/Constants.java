@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.analytics.messageconsole;
 
+/**
+ * This class holds constants values for message console.
+ */
 public class Constants {
 
     public static final String RETENTION_PERIOD = "retention_period";

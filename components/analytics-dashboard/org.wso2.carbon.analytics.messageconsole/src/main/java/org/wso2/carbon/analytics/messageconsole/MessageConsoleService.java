@@ -835,7 +835,7 @@ public class MessageConsoleService extends AbstractAdmin {
     private TaskInfo createDataPurgingTask(String table, String cronString, int retentionPeriod) {
         String taskName = getDataPurgingTaskName(table);
         TaskInfo.TriggerInfo triggerInfo = new TaskInfo.TriggerInfo(cronString);
-        Map<String, String> taskProperties = new HashMap<>(3);
+        Map<String, String> taskProperties = new HashMap<>(4);
         taskProperties.put(org.wso2.carbon.analytics.messageconsole.Constants.RETENTION_PERIOD, String
                 .valueOf(retentionPeriod));
         taskProperties.put(org.wso2.carbon.analytics.messageconsole.Constants.TABLE, table);

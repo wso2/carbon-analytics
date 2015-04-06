@@ -47,7 +47,7 @@ public class MessageConsoleServiceComponent {
         try {
             ServiceHolder.getTaskService().registerTaskType(Constants.ANALYTICS_DATA_PURGING);
         } catch (TaskException e) {
-            logger.error("Unable to register data purging task type", e);
+            logger.error("Unable to register analytics data purging task type", e);
         }
     }
 
