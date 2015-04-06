@@ -33,6 +33,7 @@ import org.wso2.carbon.analytics.messageconsole.stub.beans.EntityBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.PermissionBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.RecordBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.RecordResultBean;
+import org.wso2.carbon.analytics.messageconsole.stub.beans.ScheduleTaskInfo;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.TableBean;
 import org.wso2.carbon.messageconsole.ui.beans.Column;
 import org.wso2.carbon.messageconsole.ui.beans.Permissions;
@@ -42,6 +43,7 @@ import org.wso2.carbon.messageconsole.ui.beans.ResponseArbitraryFieldColumn;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseRecord;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseResult;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseTable;
+import org.wso2.carbon.messageconsole.ui.beans.ScheduleTask;
 import org.wso2.carbon.messageconsole.ui.beans.TableSchemaColumn;
 import org.wso2.carbon.messageconsole.ui.exception.MessageConsoleException;
 import org.wso2.carbon.messageconsole.ui.serializers.ResponseArbitraryFieldSerializer;
@@ -83,6 +85,9 @@ public class MessageConsoleConnector {
     public static final int TYPE_CREATE_TABLE = 10;
     public static final int TYPE_DELETE_TABLE = 11;
     public static final int TYPE_GET_TABLE_INFO = 12;
+    public static final int TYPE_GET_PURGING_TASK_INFO = 13;
+    public static final int TYPE_SAVE_PURGING_TASK_INFO = 14;
+    public static final int TYPE_LIST_TABLE = 15;
 
     private MessageConsoleStub stub;
     private static final GsonBuilder RESPONSE_RESULT_BUILDER = new GsonBuilder().registerTypeAdapter(ResponseResult.class,
@@ -132,7 +137,8 @@ public class MessageConsoleConnector {
         return permissions;
     }
 
-    public String[] getTableList() {
+    public String getTableList() {
+        Gson gson = new Gson();
         String[] tableList = null;
         try {
             tableList = stub.listTables();
@@ -147,7 +153,7 @@ public class MessageConsoleConnector {
             tableList = new String[0];
         }
 
-        return tableList;
+        return gson.toJson(tableList);
     }
 
     public String getRecords(String tableName, long timeFrom, long timeTo, int startIndex, int pageSize, String
@@ -462,7 +468,6 @@ public class MessageConsoleConnector {
             log.error("Unable to delete table due to " + e.getMessage(), e);
             msg = "Unable to delete table due to " + e.getMessage();
         }
-
         return msg;
     }
 
@@ -484,7 +489,6 @@ public class MessageConsoleConnector {
         } catch (Exception e) {
             log.error("Unable to get table information for table:" + table, e);
         }
-
         return gson.toJson(tableSchemaColumns);
     }
 
@@ -495,7 +499,47 @@ public class MessageConsoleConnector {
         } catch (RemoteException e) {
             log.error("Unable to check whether pagination support available or not.");
         }
-
         return false;
+    }
+
+    public String scheduleDataPurging(String table, String time, String retentionPeriod, boolean enable) {
+        String cron = null;
+        String msg;
+        if (enable) {
+            if (time != null && time.length() == 5) {
+                int hour = Integer.parseInt(time.substring(0, 2));
+                int min = Integer.parseInt(time.substring(3));
+                cron = "0 " + min + " " + hour + " * * ?";
+            } else {
+                cron = time;
+            }
+        }
+        try {
+            stub.scheduleDataPurging(table, cron, Integer.parseInt(retentionPeriod));
+            if (enable) {
+                msg = "Data purging task for " + table + " scheduled successfully.";
+            } else {
+                msg = "Data purging task for " + table + " removed successfully.";
+            }
+        } catch (Exception e) {
+            msg = "Unable to schedule task due to " + e.getMessage();
+            log.error("Unable to schedule data puring task for " + table, e);
+        }
+        return msg;
+    }
+
+    public String getDataPurgingDetails(String table) {
+        Gson gson = new Gson();
+        ScheduleTask scheduleTask = new ScheduleTask();
+        try {
+            ScheduleTaskInfo dataPurgingDetails = stub.getDataPurgingDetails(table);
+            if (dataPurgingDetails != null) {
+                scheduleTask.setCronString(dataPurgingDetails.getCronString());
+                scheduleTask.setRetentionPeriod(dataPurgingDetails.getRetentionPeriod());
+            }
+        } catch (Exception e) {
+            log.error("Unable to get schedule task information for table:" + table, e);
+        }
+        return gson.toJson(scheduleTask);
     }
 }
