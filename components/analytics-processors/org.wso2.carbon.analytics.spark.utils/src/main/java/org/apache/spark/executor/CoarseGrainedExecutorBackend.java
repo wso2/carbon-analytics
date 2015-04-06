@@ -72,8 +72,9 @@ public class CoarseGrainedExecutorBackend {
             new File(outDirPath).mkdirs();
         }
         Path dir = Paths.get(outDirPath);
+        WatchService watcher = null;
         try {
-            WatchService watcher = FileSystems.getDefault().newWatchService();
+            watcher = FileSystems.getDefault().newWatchService();
             dir.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY);
             while (true) {
                 WatchKey watckKey = watcher.take();
@@ -84,7 +85,7 @@ public class CoarseGrainedExecutorBackend {
                         String fileName = event.context().toString();
                         if (fileName.equals(fileUUID)) {
                             finished = true;
-                            System.out.println("#################### Coarse Grained Executor dummy ended!");
+//                            System.out.println("#################### Coarse Grained Executor dummy ended!");
                             break;
                         }
                     }
@@ -99,6 +100,13 @@ public class CoarseGrainedExecutorBackend {
             }
         } catch (Exception e) {
             System.out.println("Error in SparkDataListener: " + e.toString());
+        }finally {
+            try {
+                assert watcher != null;
+                watcher.close();
+            } catch (Exception ignored) {
+
+            }
         }
     }
 }

@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.analytics.spark.core.internal;
 
-import org.apache.spark.executor.CoarseGrainedExecutorBackend2;
+import org.apache.spark.executor.CoarseGrainedExecutorBackend;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -44,9 +44,9 @@ public class SparkBackendExecutor implements Runnable {
     public void run() {
 
         try {
-            CoarseGrainedExecutorBackend2.main(argArray);
+            CoarseGrainedExecutorBackend.main(argArray);
         } finally {
-            System.out.println("######################## Spark backend executor ended!!!!");
+//            System.out.println("######################## Spark backend executor ended!!!!");
             BufferedWriter writer = null;
             try {
                 File destDir = new File(OUT_DIR_RELATIVE_PATH);
@@ -54,8 +54,9 @@ public class SparkBackendExecutor implements Runnable {
                     destDir.mkdirs();
                 }
                 File file = new File(destDir.getPath() + File.separator + fileUUID);
-                System.out.println("##################### Writing to the file " + file.getName());
+//                System.out.println("##################### Writing to the file " + file.getName());
                 writer = new BufferedWriter(new FileWriter(file));
+
                 writer.write("EXITED" + "\n");
             } catch (Exception e) {
                 e.printStackTrace();
