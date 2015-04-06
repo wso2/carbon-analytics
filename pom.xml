@@ -310,16 +310,16 @@
                 <artifactId>org.wso2.carbon.analytics.dashboard.batch.admin</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.analytics.dashboard.ui</artifactId>
-                <version>${carbon.analytics.common.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.event-processing</groupId>
-                <artifactId>org.wso2.carbon.event.publisher.stub</artifactId>
-                <version>${carbon.event.processing.version}</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>org.wso2.carbon.analytics-common</groupId>-->
+                <!--<artifactId>org.wso2.carbon.analytics.dashboard.ui</artifactId>-->
+                <!--<version>${carbon.analytics.common.version}</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>org.wso2.carbon.event-processing</groupId>-->
+                <!--<artifactId>org.wso2.carbon.event.publisher.stub</artifactId>-->
+                <!--<version>${carbon.event.processing.version}</version>-->
+            <!--</dependency>-->
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.event.stream.stub</artifactId>
@@ -402,12 +402,12 @@
                 <version>${carbon.analytics.common.version}</version>
                 <type>zip</type>
             </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.analytics.dashboard.ui.feature</artifactId>
-                <version>${carbon.analytics.common.version}</version>
-                <type>zip</type>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>org.wso2.carbon.analytics-common</groupId>-->
+                <!--<artifactId>org.wso2.carbon.analytics.dashboard.ui.feature</artifactId>-->
+                <!--<version>${carbon.analytics.common.version}</version>-->
+                <!--<type>zip</type>-->
+            <!--</dependency>-->
             <!--features end-->
         </dependencies>
     </dependencyManagement>
