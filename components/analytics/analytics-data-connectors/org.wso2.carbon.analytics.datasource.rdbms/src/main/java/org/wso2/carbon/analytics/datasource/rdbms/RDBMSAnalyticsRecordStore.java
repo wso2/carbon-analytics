@@ -626,6 +626,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         try {
             ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
             DataOutputStream dout = new DataOutputStream(byteOut);
+            dout.writeInt(tenantId);
             /* we've to limit it to 64 bits */
             dout.writeInt(tableName.hashCode());
             dout.close();
