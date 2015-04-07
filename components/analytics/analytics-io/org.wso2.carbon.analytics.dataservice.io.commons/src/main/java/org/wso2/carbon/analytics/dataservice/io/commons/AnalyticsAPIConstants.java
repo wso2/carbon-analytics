@@ -15,7 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.analytics.dataservice.api.commons;
+package org.wso2.carbon.analytics.dataservice.io.commons;
 
 public class AnalyticsAPIConstants {
     public static final String DATASERVICE_API_URI = "/analytics-api/";

@@ -293,6 +293,7 @@ function updateActionMethod(postData) {
 }
 
 function deleteRecords(postData) {
+    console.log(postData);
     postData["tableName"] = $("#tableSelect").val();
     return $.Deferred(function ($dfd) {
         $.ajax({

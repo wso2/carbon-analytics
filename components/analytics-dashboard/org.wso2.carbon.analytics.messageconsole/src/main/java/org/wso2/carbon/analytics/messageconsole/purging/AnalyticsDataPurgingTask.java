@@ -32,13 +32,12 @@ import java.util.Map;
  * This class responsible to execute purging task operation
  */
 public class AnalyticsDataPurgingTask extends AbstractTask {
-
     private static final Log logger = LogFactory.getLog(AnalyticsDataPurgingTask.class);
 
     @Override
     public void execute() {
         if (logger.isDebugEnabled()) {
-            logger.debug("Staring execute puring task");
+            logger.debug("Staring execute analytics data puring task");
         }
         Map<String, String> taskProperties = this.getProperties();
         String retention = taskProperties.get(Constants.RETENTION_PERIOD);

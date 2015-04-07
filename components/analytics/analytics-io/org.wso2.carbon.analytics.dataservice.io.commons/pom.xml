@@ -9,7 +9,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>org.wso2.carbon.analytics.dataservice.api.commons</artifactId>
+    <artifactId>org.wso2.carbon.analytics.dataservice.io.commons</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Analytics Data Service API Commons</name>
 
@@ -33,7 +33,9 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Export-Package>org.wso2.carbon.analytics.dataservice.api.*</Export-Package>
+                        <Export-Package>
+                            org.wso2.carbon.analytics.dataservice.io.*;version="${carbon.analytics.version}"
+                        </Export-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>

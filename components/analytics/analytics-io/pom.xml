@@ -36,7 +36,7 @@
         <module>org.wso2.carbon.analytics.dataservice.restapi</module>
         <module>org.wso2.carbon.analytics.datasink</module>
         <module>org.wso2.carbon.analytics.dataservice.servlet</module>
-        <module>org.wso2.carbon.analytics.dataservice.api.commons</module>
+        <module>org.wso2.carbon.analytics.dataservice.io.commons</module>
         <module>org.wso2.carbon.analytics.api</module>
     </modules>
 

@@ -220,6 +220,7 @@ public class MessageConsoleService extends AbstractAdmin {
 
     private RecordBean createRecordBean(Record record) {
         RecordBean recordBean = new RecordBean();
+        recordBean.setRecordId(record.getId());
         recordBean.setTimestamp(record.getTimestamp());
         EntityBean[] entityBeans = new EntityBean[record.getValues().size()];
         int i = 0;
@@ -370,20 +371,22 @@ public class MessageConsoleService extends AbstractAdmin {
             logger.debug("Record {id: " + recordId + ", column: " + Arrays.toString(columns) + ", values: " + Arrays.toString
                     (values) + "} going to update to" + table);
         }
-        RecordBean recordBean;
+        RecordBean recordBean = new RecordBean();
         try {
             Record originalRecord = getRecord(table, recordId, username);
-            Map<String, Object> objectMap = getRecordPropertyMap(table, columns, values, username);
-            for (Map.Entry<String, Object> newEntry : objectMap.entrySet()) {
-                if (originalRecord.getValues().containsKey(newEntry.getKey())) {
-                    originalRecord.getValues().put(newEntry.getKey(), newEntry.getValue());
+            if (originalRecord != null) {
+                Map<String, Object> objectMap = getRecordPropertyMap(table, columns, values, username);
+                for (Map.Entry<String, Object> newEntry : objectMap.entrySet()) {
+                    if (originalRecord.getValues().containsKey(newEntry.getKey())) {
+                        originalRecord.getValues().put(newEntry.getKey(), newEntry.getValue());
+                    }
                 }
+                Record record = new Record(recordId, tenantId, table, originalRecord.getValues(), System.currentTimeMillis());
+                recordBean = createRecordBean(record);
+                List<Record> records = new ArrayList<>(1);
+                records.add(record);
+                analyticsDataService.put(username, records);
             }
-            Record record = new Record(recordId, tenantId, table, originalRecord.getValues(), System.currentTimeMillis());
-            recordBean = createRecordBean(record);
-            List<Record> records = new ArrayList<>(1);
-            records.add(record);
-            analyticsDataService.put(username, records);
         } catch (Exception e) {
             logger.error("Unable to update record {id: " + recordId + ", column: " + Arrays.toString(columns) + ", " +
                          "values: " + Arrays.toString(values) + " } to table :" + table, e);

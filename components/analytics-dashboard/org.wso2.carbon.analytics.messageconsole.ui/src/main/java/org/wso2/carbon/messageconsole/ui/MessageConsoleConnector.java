@@ -145,20 +145,17 @@ public class MessageConsoleConnector {
         } catch (Exception e) {
             log.error("Unable to get table list:" + e.getMessage(), e);
         }
-
         if (tableList == null) {
             if (log.isDebugEnabled()) {
                 log.debug("Received an empty table name list!");
             }
             tableList = new String[0];
         }
-
         return gson.toJson(tableList);
     }
 
     public String getRecords(String tableName, long timeFrom, long timeTo, int startIndex, int pageSize, String
             searchQuery) {
-
         if (log.isDebugEnabled()) {
             log.debug("Search Query: " + searchQuery);
             log.debug("timeFrom: " + timeFrom);
@@ -191,7 +188,6 @@ public class MessageConsoleConnector {
             responseResult.setResult(ERROR);
             responseResult.setMessage(errorMsg);
         }
-
         return gson.toJson(responseResult);
     }
 
@@ -210,13 +206,11 @@ public class MessageConsoleConnector {
     }
 
     public String getTableInfo(String tableName) {
-
         Gson gson = new GsonBuilder().serializeNulls().create();
         TableBean tableInfo;
         ResponseTable table = new ResponseTable();
         try {
             tableInfo = stub.getTableInfo(tableName);
-
             table.setName(tableInfo.getName());
             List<ResponseTable.Column> columns = new ArrayList<>();
             if (tableInfo.getColumns() != null) {
@@ -229,7 +223,6 @@ public class MessageConsoleConnector {
                     columns.add(column);
                 }
             }
-
             // Adding recordId column as a hidden field
             ResponseTable.Column recordId = new ResponseTable().new Column();
             recordId.setName(RECORD_ID);
@@ -238,26 +231,20 @@ public class MessageConsoleConnector {
             recordId.setDisplay(false);
             recordId.setKey(true);
             columns.add(recordId);
-
             ResponseTable.Column timestamp = new ResponseTable().new Column();
             timestamp.setName(TIMESTAMP);
             timestamp.setPrimary(false);
             timestamp.setType("STRING");
             timestamp.setDisplay(true);
             columns.add(timestamp);
-
             table.setColumns(columns);
-
-
         } catch (Exception e) {
             log.error("Unable to get table information for table:" + tableName, e);
         }
-
         return gson.toJson(table);
     }
 
     public String deleteRecords(String table, String[] recordIds) {
-
         if (log.isDebugEnabled()) {
             log.debug("Records[" + Arrays.toString(recordIds) + "] going to delete from" + table);
         }
@@ -272,12 +259,10 @@ public class MessageConsoleConnector {
             responseResult.setResult(ERROR);
             responseResult.setMessage(errorMsg);
         }
-
         return gson.toJson(responseResult);
     }
 
     public String addRecord(String table, String[] columns, String[] values) {
-
         if (log.isDebugEnabled()) {
             log.debug("New record {column: " + Arrays.toString(columns) + ", values: " + Arrays.toString(values) +
                       "} going to add to" + table);
@@ -303,7 +288,6 @@ public class MessageConsoleConnector {
         if (log.isDebugEnabled()) {
             log.debug("Record {id: " + recordId + ", column: " + Arrays.toString(columns) + ", values: " + Arrays.toString(values) + "} going to update to" + table);
         }
-
         ResponseRecord responseRecord = new ResponseRecord();
         Gson gson = RESPONSE_RECORD_BUILDER.serializeNulls().create();
         responseRecord.setResult(OK);
@@ -330,14 +314,12 @@ public class MessageConsoleConnector {
         try {
             List<Column> resultColumns = new ArrayList<>();
             EntityBean[] entityBeans = stub.getArbitraryList(table, recordId);
-
             if (entityBeans != null) {
                 for (EntityBean entityBean : entityBeans) {
                     Column column = new Column(entityBean.getColumnName(), entityBean.getValue(), entityBean.getType());
                     resultColumns.add(column);
                 }
             }
-
             responseArbitraryField.setColumns(resultColumns);
         } catch (Exception e) {
             String errorMsg = "Unable to get arbitrary fields for record[" + recordId + "] in table[" + table + "]";
@@ -345,7 +327,6 @@ public class MessageConsoleConnector {
             responseArbitraryField.setResult(ERROR);
             responseArbitraryField.setMessage(errorMsg);
         }
-
         return gson.toJson(responseArbitraryField);
     }
 
@@ -356,7 +337,6 @@ public class MessageConsoleConnector {
         ResponseArbitraryField responseArbitraryField = new ResponseArbitraryField();
         Gson gson = RESPONSE_ARBITRARY_FIELD_BUILDER.serializeNulls().create();
         responseArbitraryField.setResult(OK);
-
         try {
             stub.deleteArbitraryField(table, recordId, fieldName);
         } catch (Exception e) {
@@ -365,7 +345,6 @@ public class MessageConsoleConnector {
             responseArbitraryField.setResult(ERROR);
             responseArbitraryField.setMessage(errorMsg);
         }
-
         return gson.toJson(responseArbitraryField);
     }
 
@@ -397,7 +376,6 @@ public class MessageConsoleConnector {
         String msg;
         TableBean tableBean = new TableBean();
         tableBean.setName(table);
-
         Gson gson = new Gson();
         List<TableSchemaColumn> columnList = gson.fromJson(detailsJsonString, TABLE_SCHEMA_TYPE);
         ColumnBean[] columns = new ColumnBean[columnList.size()];
@@ -430,7 +408,6 @@ public class MessageConsoleConnector {
         String msg;
         TableBean tableBean = new TableBean();
         tableBean.setName(table);
-
         Gson gson = new Gson();
         List<TableSchemaColumn> columnList = gson.fromJson(detailsJsonString, TABLE_SCHEMA_TYPE);
         ColumnBean[] columns = new ColumnBean[columnList.size()];
