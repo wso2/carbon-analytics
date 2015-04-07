@@ -267,11 +267,11 @@
                                </c:if>
 
                                var buttonCell = row.insertCell(cellNo++);
-                               var indexCheckElement = document.createElement('input');
-                               indexCheckElement.type = "button";
-                               indexCheckElement.value = "Delete";
-                               indexCheckElement.className = "del";
-                               buttonCell.appendChild(indexCheckElement);
+                               var delButtonElement = document.createElement('input');
+                               delButtonElement.type = "button";
+                               delButtonElement.value = "Delete";
+                               delButtonElement.className = "del";
+                               buttonCell.appendChild(delButtonElement);
                            }
                            tablePopupAction = 'edit';
                            $("#createTableDialog").dialog("open");
@@ -291,7 +291,6 @@
         });
 
         function createTable() {
-
             if (!$("#tableForm").validationEngine('validate')) {
                 return false;
             }

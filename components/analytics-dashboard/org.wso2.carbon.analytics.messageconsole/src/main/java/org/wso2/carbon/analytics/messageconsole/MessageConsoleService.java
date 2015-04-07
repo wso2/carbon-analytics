@@ -220,6 +220,7 @@ public class MessageConsoleService extends AbstractAdmin {
 
     private RecordBean createRecordBean(Record record) {
         RecordBean recordBean = new RecordBean();
+        recordBean.setRecordId(record.getId());
         recordBean.setTimestamp(record.getTimestamp());
         EntityBean[] entityBeans = new EntityBean[record.getValues().size()];
         int i = 0;
