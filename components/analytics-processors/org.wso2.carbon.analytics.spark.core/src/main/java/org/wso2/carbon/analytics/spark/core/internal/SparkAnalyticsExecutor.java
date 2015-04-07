@@ -207,7 +207,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         String tableName = tokens[2].trim();
         String selectQuery = query.substring(query.indexOf(tableName) + tableName.length()).trim();
         try {
-            insertIntoTable(tenantId, tableName, toResult(this.sqlCtx.sql(selectQuery)));
+            insertIntoTable(tenantId, tableName, toResult(this.sqlCtx.sql
+                    (encodeQueryWithTenantId(tenantId, selectQuery.split(" ")))));
         } catch (AnalyticsException e) {
             throw new AnalyticsExecutionException("Error in executing insert into query: " + e.getMessage(), e);
         }
