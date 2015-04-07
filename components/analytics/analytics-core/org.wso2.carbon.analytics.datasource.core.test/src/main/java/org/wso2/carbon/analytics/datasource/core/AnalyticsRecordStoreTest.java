@@ -223,6 +223,33 @@ public class AnalyticsRecordStoreTest {
     }
 
     @Test
+    public void testTableMT() throws AnalyticsException {
+        int t1 = 10;
+        int t2 = 11;
+        String tableName = "Table";
+        this.analyticsRS.deleteTable(t1, tableName);
+        this.analyticsRS.deleteTable(t2, tableName);
+        this.analyticsRS.createTable(t1, tableName);
+        this.analyticsRS.createTable(t2, tableName);
+        List<Record> records1 = generateRecords(t1, tableName, 1, 30, -1, -1);
+        List<Record> records2 = generateRecords(t2, tableName, 1, 40, -1, -1);
+        this.analyticsRS.put(records1);
+        this.analyticsRS.put(records2);
+        List<Record> recordsIn1 = GenericUtils.listRecords(
+                this.analyticsRS, this.analyticsRS.get(t1, tableName, 1, null,
+                Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+        List<Record> recordsIn2 = GenericUtils.listRecords(
+                this.analyticsRS, this.analyticsRS.get(t2, tableName, 1, null,
+                Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+        Assert.assertEquals(records1.size(), recordsIn1.size());
+        Assert.assertEquals(records2.size(), recordsIn2.size());
+        Assert.assertEquals(new HashSet<Record>(records1), new HashSet<Record>(recordsIn1));
+        Assert.assertEquals(new HashSet<Record>(records2), new HashSet<Record>(recordsIn2));
+        this.analyticsRS.deleteTable(t1, tableName);
+        this.analyticsRS.deleteTable(t2, tableName);
+    }
+
+    @Test
     public void testMultipleDataRecordAddRetieve() throws AnalyticsException {
         this.cleanupT1();
         this.analyticsRS.createTable(7, "T1");
