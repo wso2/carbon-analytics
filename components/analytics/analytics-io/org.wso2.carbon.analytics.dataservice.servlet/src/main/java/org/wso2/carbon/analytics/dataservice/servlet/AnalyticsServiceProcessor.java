@@ -17,7 +17,7 @@
 */
 package org.wso2.carbon.analytics.dataservice.servlet;
 
-import org.wso2.carbon.analytics.dataservice.api.commons.AnalyticsAPIConstants;
+import org.wso2.carbon.analytics.dataservice.io.commons.AnalyticsAPIConstants;
 import org.wso2.carbon.analytics.dataservice.servlet.exception.AnalyticsAPIAuthenticationException;
 import org.wso2.carbon.analytics.dataservice.servlet.internal.ServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;

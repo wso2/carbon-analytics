@@ -19,9 +19,8 @@ package org.wso2.carbon.analytics.dataservice.servlet;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import org.wso2.carbon.analytics.dataservice.api.commons.AnalyticsAPIConstants;
-import org.wso2.carbon.analytics.dataservice.api.commons.RemoteRecordGroup;
-import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.io.commons.AnalyticsAPIConstants;
+import org.wso2.carbon.analytics.dataservice.io.commons.RemoteRecordGroup;
 import org.wso2.carbon.analytics.dataservice.servlet.exception.AnalyticsAPIAuthenticationException;
 import org.wso2.carbon.analytics.dataservice.servlet.internal.ServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -30,7 +29,6 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

@@ -33,7 +33,7 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.analytics.dataservice.api.commons</artifactId>
+            <artifactId>org.wso2.carbon.analytics.dataservice.io.commons</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>

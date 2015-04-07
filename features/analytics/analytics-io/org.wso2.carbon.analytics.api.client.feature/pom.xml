@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.analytics.dataservice.api.commons</artifactId>
+            <artifactId>org.wso2.carbon.analytics.dataservice.io.commons</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
@@ -40,7 +40,9 @@
                             <propertiesFile>../../../../etc/feature.properties</propertiesFile>
                             <bundles>
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.dataservice.servlet</bundleDef>
-                                <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.dataservice.api.commons</bundleDef>
+                                <bundleDef>
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.dataservice.io.commons
+                                </bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}</importFeatureDef>
