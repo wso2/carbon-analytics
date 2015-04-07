@@ -19,13 +19,28 @@
 package org.wso2.carbon.analytics.datasource.core.util;
 
 import org.apache.commons.collections.IteratorUtils;
+import org.w3c.dom.Document;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordReader;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.ndatasource.common.DataSourceConstants;
+import org.wso2.carbon.ndatasource.common.DataSourceException;
+import org.wso2.carbon.ndatasource.core.CarbonDataSource;
+import org.wso2.carbon.ndatasource.core.DataSourceManager;
+import org.wso2.carbon.ndatasource.core.DataSourceMetaInfo;
+import org.wso2.carbon.ndatasource.core.DataSourceRepository;
+import org.wso2.carbon.ndatasource.core.DataSourceService;
+import org.wso2.carbon.ndatasource.core.SystemDataSourcesConfiguration;
+import org.wso2.carbon.ndatasource.core.utils.DataSourceUtils;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,10 +50,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.bind.JAXBContext;
+
 /**
  * Generic utility methods for analytics data source implementations.
  */
 public class GenericUtils {
+
+    private static final String ADD_DATA_SOURCE_PROVIDERS_METHOD = "addDataSourceProviders";
 
     private static final byte BOOLEAN_TRUE = 1;
 
@@ -63,6 +82,10 @@ public class GenericUtils {
     private static final byte DATA_TYPE_CATEGORY = 0x10;
 
     private static final String DEFAULT_CHARSET = "UTF8";
+    
+    private static final String WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP = "wso2-analytics-conf-dir";
+    
+    private static DataSourceRepository globalCustomRepo;
 
     public static String getParentPath(String path) {
         if (path.equals("/")) {
@@ -378,5 +401,84 @@ public class GenericUtils {
         }
         return result;
     }
+    
+    private static void addDataSourceProviders(List<String> providers) throws DataSourceException {
+        DataSourceManager dsm = DataSourceManager.getInstance();
+        try {
+            Method method = DataSourceManager.class.getDeclaredMethod(ADD_DATA_SOURCE_PROVIDERS_METHOD, List.class);
+            method.setAccessible(true);
+            method.invoke(dsm, providers);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | 
+                IllegalArgumentException | InvocationTargetException e) {
+            throw new DataSourceException("Error in adding data source providers: " + e.getMessage(), e);
+        }
+    }
+    
+    private static void populateSystemDataSource(DataSourceRepository dsRepo, File sysDSFile) throws DataSourceException {
+        try {
+            JAXBContext ctx = JAXBContext.newInstance(SystemDataSourcesConfiguration.class);
+            Document doc = DataSourceUtils.convertToDocument(sysDSFile);
+            DataSourceUtils.secureResolveDocument(doc, true);
+            SystemDataSourcesConfiguration sysDS = (SystemDataSourcesConfiguration) ctx.createUnmarshaller().
+                    unmarshal(doc);
+            addDataSourceProviders(sysDS.getProviders());
+            for (DataSourceMetaInfo dsmInfo : sysDS.getDataSources()) {
+                dsmInfo.setSystem(true);
+                dsRepo.addDataSource(dsmInfo);
+            }
+        } catch (Exception e) {
+            throw new DataSourceException("Error in initializing system data sources at '" +
+                    sysDSFile.getAbsolutePath() + "' - " + e.getMessage(), e);
+        }
+    }
+    
+    private static DataSourceRepository createGlobalCustomDataSourceRepo() throws DataSourceException {
+        String confDir = System.getProperty(WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP);
+        if (confDir == null || confDir.isEmpty()) {
+            throw new IllegalStateException("The Java system property '" + WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP + 
+                    "' must be set to initialize non-Carbon env analytics");
+        }
+        String dataSourcesDir = confDir + File.separator + DataSourceConstants.DATASOURCES_DIRECTORY_NAME;
+        DataSourceRepository repo = new DataSourceRepository(MultitenantConstants.SUPER_TENANT_ID);
+        File masterDSFile = new File(dataSourcesDir + File.separator + 
+                DataSourceConstants.MASTER_DS_FILE_NAME);
+        /* initialize the master data sources first */
+        if (masterDSFile.exists()) {
+            populateSystemDataSource(repo, masterDSFile);
+        }
+        /* then rest of the system data sources */
+        File dataSourcesFolder = new File(dataSourcesDir);
+        for (File sysDSFile : dataSourcesFolder.listFiles()) {
+            if (sysDSFile.getName().endsWith(DataSourceConstants.SYS_DS_FILE_NAME_SUFFIX)
+                    && !sysDSFile.getName().equals(DataSourceConstants.MASTER_DS_FILE_NAME)) {
+                populateSystemDataSource(repo, sysDSFile);
+            }
+        }
+        return null;
+    }
 
+    public static Object loadGlobalDataSource(String dsName) throws DataSourceException {
+        DataSourceService service = ServiceHolder.getDataSourceService();
+        if (service != null) {
+            try {
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(
+                        MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
+                CarbonDataSource ds = service.getDataSource(dsName);
+                return ds.getDSObject();
+            } finally {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        } else {
+            if (globalCustomRepo == null) {
+                synchronized (GenericUtils.class) {
+                    if (globalCustomRepo == null) {
+                        globalCustomRepo = createGlobalCustomDataSourceRepo();
+                    }
+                }
+            }
+            return globalCustomRepo.getDataSource(dsName).getDSObject();
+        }
+    }
+    
 }
