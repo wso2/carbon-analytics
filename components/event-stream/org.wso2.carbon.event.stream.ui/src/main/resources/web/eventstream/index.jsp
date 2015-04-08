@@ -71,30 +71,6 @@
     <div id="middle">
         <h2><fmt:message key="available.event.streams"/></h2>
 
-        <table border="0">
-            <tr>
-                <td><a href="create_event_stream.jsp?ordinal=1"
-                       style="background-image:url(images/add.gif);"
-                       class="icon-link">
-                    Add Event Stream
-                </a></td>
-                <td width="10%">
-                    <a href="../eventbuilder/index.jsp?ordinal=1"
-                       style="background-image:url(images/eventBuilder.gif);"
-                       class="icon-link">
-                        All Event Builders
-                    </a>
-
-                </td>
-                <td width="10%">
-                    <a href="../eventformatter/index.jsp?ordinal=1"
-                       style="background-image:url(images/event_formatter.gif);"
-                       class="icon-link">
-                        All Event Formatters
-                    </a>
-            </tr>
-        </table>
-
         <br/>
 
         <div id="workArea">
