@@ -44,7 +44,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     private AnalyticsDataConfiguration analyticsDataConfiguration;
 
-    public CarbonAnalyticsAPI(String configFilePath) throws AnalyticsServiceException {
+    public CarbonAnalyticsAPI(String configFilePath) {
         try {
             JAXBContext context = JAXBContext.newInstance(AnalyticsDataConfiguration.class);
             Unmarshaller un = context.createUnmarshaller();
@@ -55,13 +55,13 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
         }
     }
 
-    public CarbonAnalyticsAPI() throws AnalyticsServiceException {
+    public CarbonAnalyticsAPI() {
         this(CarbonUtils.getCarbonConfigDirPath() + File.separator + AnalyticsDataConstants.ANALYTICS_CONFIG_DIR
                 + File.separator + AnalyticsDataConstants.ANALYTICS_DATA_CONFIGURATION_FILE_NAME);
     }
 
     @Override
-    public void createTable(int tenantId, String tableName) throws AnalyticsException, AnalyticsServiceException {
+    public void createTable(int tenantId, String tableName) throws AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             ServiceHolder.getAnalyticsDataService().createTable(tenantId, tableName);
         } else {
@@ -73,7 +73,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public void setTableSchema(int tenantId, String tableName, AnalyticsSchema schema) throws
-            AnalyticsException, AnalyticsServiceException {
+            AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             ServiceHolder.getAnalyticsDataService().setTableSchema(tenantId, tableName, schema);
         } else {
@@ -85,7 +85,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public AnalyticsSchema getTableSchema(int tenantId, String tableName) throws
-            AnalyticsException, AnalyticsServiceException {
+            AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             return ServiceHolder.getAnalyticsDataService().getTableSchema(tenantId, tableName);
         } else {
@@ -96,7 +96,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public boolean tableExists(int tenantId, String tableName) throws AnalyticsException, AnalyticsServiceException {
+    public boolean tableExists(int tenantId, String tableName) throws AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             return ServiceHolder.getAnalyticsDataService().tableExists(tenantId, tableName);
         } else {
@@ -107,7 +107,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public void deleteTable(int tenantId, String tableName) throws AnalyticsException, AnalyticsServiceException {
+    public void deleteTable(int tenantId, String tableName) throws AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             ServiceHolder.getAnalyticsDataService().deleteTable(tenantId, tableName);
         } else {
@@ -118,7 +118,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public List<String> listTables(int tenantId) throws AnalyticsException, AnalyticsServiceException {
+    public List<String> listTables(int tenantId) throws AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             return ServiceHolder.getAnalyticsDataService().listTables(tenantId);
         } else {
@@ -130,7 +130,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public long getRecordCount(int tenantId, String tableName, long timeFrom, long timeTo) throws
-            AnalyticsException, AnalyticsServiceException {
+            AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             return ServiceHolder.getAnalyticsDataService().getRecordCount(tenantId, tableName, timeFrom, timeTo);
         } else {
@@ -141,7 +141,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public void put(List<Record> records) throws AnalyticsException, AnalyticsServiceException {
+    public void put(List<Record> records) throws AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             ServiceHolder.getAnalyticsDataService().put(records);
         } else {
@@ -153,8 +153,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, long timeFrom,
-                             long timeTo, int recordsFrom, int recordsCount) throws AnalyticsException,
-            AnalyticsServiceException {
+                             long timeTo, int recordsFrom, int recordsCount) throws AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             return ServiceHolder.getAnalyticsDataService().get(tenantId, tableName, numPartitionsHint, columns, timeFrom, timeTo, recordsFrom, recordsCount);
         } else {
@@ -166,7 +165,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, List<String> ids)
-            throws AnalyticsException, AnalyticsServiceException {
+            throws AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             return ServiceHolder.getAnalyticsDataService().get(tenantId, tableName, numPartitionsHint, columns, ids);
         } else {
@@ -189,7 +188,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException, AnalyticsServiceException {
+    public Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             return ServiceHolder.getAnalyticsDataService().readRecords(recordGroup);
         } else {
@@ -200,8 +199,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public void delete(int tenantId, String tableName, long timeFrom, long timeTo) throws AnalyticsException,
-            AnalyticsServiceException {
+    public void delete(int tenantId, String tableName, long timeFrom, long timeTo) throws AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             ServiceHolder.getAnalyticsDataService().delete(tenantId, tableName, timeFrom, timeTo);
         } else {
@@ -212,8 +210,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public void delete(int tenantId, String tableName, List<String> ids) throws AnalyticsException,
-            AnalyticsServiceException {
+    public void delete(int tenantId, String tableName, List<String> ids) throws AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             ServiceHolder.getAnalyticsDataService().delete(tenantId, tableName, ids);
         } else {
@@ -224,8 +221,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public void setIndices(int tenantId, String tableName, Map<String, IndexType> columns) throws AnalyticsIndexException,
-            AnalyticsServiceException {
+    public void setIndices(int tenantId, String tableName, Map<String, IndexType> columns) throws AnalyticsIndexException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             ServiceHolder.getAnalyticsDataService().setIndices(tenantId, tableName, columns);
         } else {
@@ -249,7 +245,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public Map<String, IndexType> getIndices(int tenantId, String tableName) throws
-            AnalyticsException, AnalyticsServiceException {
+            AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             return ServiceHolder.getAnalyticsDataService().getIndices(tenantId, tableName);
         } else {
@@ -271,8 +267,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public void clearIndices(int tenantId, String tableName) throws AnalyticsException,
-            AnalyticsServiceException {
+    public void clearIndices(int tenantId, String tableName) throws AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             ServiceHolder.getAnalyticsDataService().clearIndices(tenantId, tableName);
         } else {
@@ -284,8 +279,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     @Override
     public List<SearchResultEntry> search(int tenantId, String tableName, String language, String query, int start,
-                                          int count) throws AnalyticsException,
-            AnalyticsServiceException {
+                                          int count) throws AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             return ServiceHolder.getAnalyticsDataService().search(tenantId, tableName, language, query, start, count);
         } else {
@@ -296,8 +290,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public int searchCount(int tenantId, String tableName, String language, String query) throws AnalyticsIndexException,
-            AnalyticsServiceException {
+    public int searchCount(int tenantId, String tableName, String language, String query) throws AnalyticsIndexException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             return ServiceHolder.getAnalyticsDataService().searchCount(tenantId, tableName, language, query);
         } else {
@@ -320,7 +313,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public void waitForIndexing(long maxWait) throws AnalyticsException, AnalyticsServiceException {
+    public void waitForIndexing(long maxWait) throws AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             ServiceHolder.getAnalyticsDataService().waitForIndexing(maxWait);
         } else {
@@ -331,7 +324,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public void destroy() throws AnalyticsException, AnalyticsServiceException {
+    public void destroy() throws AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             ServiceHolder.getAnalyticsDataService().destroy();
         } else {
