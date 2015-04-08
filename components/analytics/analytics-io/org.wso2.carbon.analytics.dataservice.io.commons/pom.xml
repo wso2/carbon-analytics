@@ -43,7 +43,7 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Export-Package>
-                            org.wso2.carbon.analytics.dataservice.io.*;version="${carbon.analytics.version}"
+                            org.wso2.carbon.analytics.dataservice.io.commons.*;version="${carbon.analytics.version}"
                         </Export-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>

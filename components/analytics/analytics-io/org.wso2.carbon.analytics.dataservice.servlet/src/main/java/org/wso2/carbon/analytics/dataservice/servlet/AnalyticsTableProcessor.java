@@ -22,6 +22,7 @@ import org.wso2.carbon.analytics.dataservice.io.commons.AnalyticsAPIConstants;
 import org.wso2.carbon.analytics.dataservice.servlet.exception.AnalyticsAPIAuthenticationException;
 import org.wso2.carbon.analytics.dataservice.servlet.internal.ServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -55,11 +56,19 @@ public class AnalyticsTableProcessor extends HttpServlet {
                 resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
             }
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
+            boolean securityEnabled = Boolean.parseBoolean(req.getParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM));
+            int tenantIdParam = MultitenantConstants.INVALID_TENANT_ID;
+            if (!securityEnabled)
+                tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
+            String userName = req.getParameter(AnalyticsAPIConstants.USERNAME_PARAM);
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.TABLE_EXISTS_OPERATION)) {
-                int tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
                 String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
                 try {
-                    boolean tableExists = ServiceHolder.getAnalyticsDataService().tableExists(tenantIdParam, tableName);
+                    boolean tableExists;
+                    if (!securityEnabled)
+                        tableExists = ServiceHolder.getAnalyticsDataService().tableExists(tenantIdParam, tableName);
+                    else
+                        tableExists = ServiceHolder.getSecureAnalyticsDataService().tableExists(userName, tableName);
                     PrintWriter output = resp.getWriter();
                     output.append(AnalyticsAPIConstants.TABLE_EXISTS).append(AnalyticsAPIConstants.SEPARATOR).
                             append(String.valueOf(tableExists));
@@ -68,9 +77,11 @@ public class AnalyticsTableProcessor extends HttpServlet {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }
             } else if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.LIST_TABLES_OPERATION)) {
-                int tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
                 try {
-                    List<String> tableNames = ServiceHolder.getAnalyticsDataService().listTables(tenantIdParam);
+                    List<String> tableNames;
+                    if (!securityEnabled)
+                        tableNames = ServiceHolder.getAnalyticsDataService().listTables(tenantIdParam);
+                    else tableNames = ServiceHolder.getSecureAnalyticsDataService().listTables(userName);
                     PrintWriter output = resp.getWriter();
                     output.append(new GsonBuilder().create().toJson(tableNames));
                     resp.setStatus(HttpServletResponse.SC_OK);
@@ -103,11 +114,16 @@ public class AnalyticsTableProcessor extends HttpServlet {
                 resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
             }
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
+            boolean securityEnabled = Boolean.parseBoolean(req.getParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM));
+            int tenantId = MultitenantConstants.INVALID_TENANT_ID;
+            if (!securityEnabled)
+                tenantId = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
+            String userName = req.getParameter(AnalyticsAPIConstants.USERNAME_PARAM);
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.CREATE_TABLE_OPERATION)) {
-                int tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
                 String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
                 try {
-                    ServiceHolder.getAnalyticsDataService().createTable(tenantIdParam, tableName);
+                    if (!securityEnabled) ServiceHolder.getAnalyticsDataService().createTable(tenantId, tableName);
+                    else ServiceHolder.getSecureAnalyticsDataService().createTable(userName, tableName);
                     resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
@@ -138,11 +154,16 @@ public class AnalyticsTableProcessor extends HttpServlet {
                 resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
             }
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
+            boolean securityEnabled = Boolean.parseBoolean(req.getParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM));
+            int tenantId = MultitenantConstants.INVALID_TENANT_ID;
+            if (!securityEnabled)
+                tenantId = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
+            String userName = req.getParameter(AnalyticsAPIConstants.USERNAME_PARAM);
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.DELETE_TABLE_OPERATION)) {
-                int tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
                 String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
                 try {
-                    ServiceHolder.getAnalyticsDataService().deleteTable(tenantIdParam, tableName);
+                    if (!securityEnabled) ServiceHolder.getAnalyticsDataService().deleteTable(tenantId, tableName);
+                    else ServiceHolder.getSecureAnalyticsDataService().deleteTable(userName, tableName);
                     resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());

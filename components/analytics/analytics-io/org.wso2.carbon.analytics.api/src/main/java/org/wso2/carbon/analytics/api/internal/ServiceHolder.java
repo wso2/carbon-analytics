@@ -18,9 +18,11 @@
 package org.wso2.carbon.analytics.api.internal;
 
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 
 public class ServiceHolder {
     private static AnalyticsDataService analyticsDataService;
+    private static SecureAnalyticsDataService secureAnalyticsDataService;
 
     private ServiceHolder() {
         //Avoid Instantiation
@@ -32,5 +34,13 @@ public class ServiceHolder {
 
     public static void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {
         ServiceHolder.analyticsDataService = analyticsDataService;
+    }
+
+    public static SecureAnalyticsDataService getSecureAnalyticsDataService() {
+        return secureAnalyticsDataService;
+    }
+
+    public static void setSecureAnalyticsDataService(SecureAnalyticsDataService secureAnalyticsDataService) {
+        ServiceHolder.secureAnalyticsDataService = secureAnalyticsDataService;
     }
 }

@@ -24,6 +24,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.io.commons.AnalyticsAPIConstants;
 import org.wso2.carbon.analytics.dataservice.servlet.*;
 import org.wso2.carbon.identity.authentication.AuthenticationService;
@@ -45,6 +46,8 @@ import java.util.Hashtable;
  * cardinality="0..1" policy="dynamic" bind="setHazelcastInstance" unbind="unsetHazelcastInstance"
  * @scr.reference name="user.realmservice.default" interface="org.wso2.carbon.user.core.service.RealmService"
  * cardinality="1..1" policy="dynamic" bind="setRealmService" unbind="unsetRealmService"
+ * @scr.reference name="analytics.secure.component" interface="org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService"
+ * cardinality="1..1" policy="dynamic"  bind="setSecureAnalyticsDataService" unbind="unsetSecureAnalyticsDataService"
  */
 public class AnalyticsDataServiceServletDS {
     private static final Log log = LogFactory.getLog(AnalyticsDataServiceServletDS.class);
@@ -52,32 +55,32 @@ public class AnalyticsDataServiceServletDS {
     protected void activate(ComponentContext context) {
         ServiceHolder.setAuthenticator(new AnalyticsAPIAuthenticator());
         try {
-            ServiceHolder.getHttpService().registerServlet(AnalyticsAPIConstants.AUTHENTICATION_SERVICE_URI,
-                    new AnalyticsAPIAuthenticationProcessor(),new Hashtable(),
+            ServiceHolder.getHttpService().registerServlet(AnalyticsAPIConstants.MANAGEMENT_SERVICE_URI,
+                    new AnalyticsManagementProcessor(), new Hashtable(),
                     ServiceHolder.getHttpService().createDefaultHttpContext());
             ServiceHolder.getHttpService().registerServlet(AnalyticsAPIConstants.TABLE_PROCESSOR_SERVICE_URI,
-                    new AnalyticsTableProcessor(),new Hashtable(),
+                    new AnalyticsTableProcessor(), new Hashtable(),
                     ServiceHolder.getHttpService().createDefaultHttpContext());
             ServiceHolder.getHttpService().registerServlet(AnalyticsAPIConstants.SCHEMA_PROCESSOR_SERVICE_URI,
-                    new AnalyticsTableSchemaProcessor(),new Hashtable(),
+                    new AnalyticsTableSchemaProcessor(), new Hashtable(),
                     ServiceHolder.getHttpService().createDefaultHttpContext());
             ServiceHolder.getHttpService().registerServlet(AnalyticsAPIConstants.ANALYTICS_SERVICE_PROCESSOR_URI,
-                    new AnalyticsServiceProcessor(),new Hashtable(),
+                    new AnalyticsServiceProcessor(), new Hashtable(),
                     ServiceHolder.getHttpService().createDefaultHttpContext());
             ServiceHolder.getHttpService().registerServlet(AnalyticsAPIConstants.SEARCH_PROCESSOR_SERVICE_URI,
-                    new AnalyticsSearchProcessor(),new Hashtable(),
+                    new AnalyticsSearchProcessor(), new Hashtable(),
                     ServiceHolder.getHttpService().createDefaultHttpContext());
             ServiceHolder.getHttpService().registerServlet(AnalyticsAPIConstants.ANALYTIC_RECORD_READ_PROCESSOR_SERVICE_URI,
-                    new AnalyticsRecordReadProcessor(),new Hashtable(),
+                    new AnalyticsRecordReadProcessor(), new Hashtable(),
                     ServiceHolder.getHttpService().createDefaultHttpContext());
             ServiceHolder.getHttpService().registerServlet(AnalyticsAPIConstants.RECORD_PROCESSOR_SERVICE_URI,
-                    new AnalyticsRecordProcessor(),new Hashtable(),
+                    new AnalyticsRecordProcessor(), new Hashtable(),
                     ServiceHolder.getHttpService().createDefaultHttpContext());
             ServiceHolder.getHttpService().registerServlet(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI,
-                    new AnalyticsIndexProcessor(),new Hashtable(),
+                    new AnalyticsIndexProcessor(), new Hashtable(),
                     ServiceHolder.getHttpService().createDefaultHttpContext());
         } catch (ServletException | NamespaceException e) {
-            log.error("Error while registering the servlet. "+ e.getMessage(), e);
+            log.error("Error while registering the servlet. " + e.getMessage(), e);
         }
     }
 
@@ -101,28 +104,36 @@ public class AnalyticsDataServiceServletDS {
         ServiceHolder.setAnalyticsDataService(null);
     }
 
-    protected void setHttpService(HttpService httpService){
+    protected void setHttpService(HttpService httpService) {
         ServiceHolder.setHttpService(httpService);
     }
 
-    protected void unsetHttpService(HttpService httpService){
+    protected void unsetHttpService(HttpService httpService) {
         ServiceHolder.setHttpService(null);
     }
 
-    protected void setHazelcastInstance(HazelcastInstance hazelcastInstance){
+    protected void setHazelcastInstance(HazelcastInstance hazelcastInstance) {
         ServiceHolder.setHazelcastInstance(hazelcastInstance);
     }
 
-    protected void unsetHazelcastInstance(HazelcastInstance hazelcastInstance){
+    protected void unsetHazelcastInstance(HazelcastInstance hazelcastInstance) {
         ServiceHolder.setHazelcastInstance(null);
     }
 
-    protected void setRealmService(RealmService realmService){
+    protected void setRealmService(RealmService realmService) {
         ServiceHolder.setRealmService(realmService);
     }
 
-    protected void unsetRealmService(RealmService realmService){
+    protected void unsetRealmService(RealmService realmService) {
         ServiceHolder.setRealmService(null);
+    }
+
+    protected void setSecureAnalyticsDataService(SecureAnalyticsDataService secureAnalyticsDataService) {
+        ServiceHolder.setSecureAnalyticsDataService(secureAnalyticsDataService);
+    }
+
+    protected void unsetSecureAnalyticsDataService(SecureAnalyticsDataService secureAnalyticsDataService) {
+        ServiceHolder.setSecureAnalyticsDataService(null);
     }
 }
 

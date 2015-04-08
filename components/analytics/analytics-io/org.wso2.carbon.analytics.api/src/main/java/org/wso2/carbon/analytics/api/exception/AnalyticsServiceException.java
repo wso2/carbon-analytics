@@ -17,7 +17,7 @@
 */
 package org.wso2.carbon.analytics.api.exception;
 
-public class AnalyticsServiceException extends Exception {
+public class AnalyticsServiceException extends RuntimeException {
 
     public AnalyticsServiceException(String msg) {
         super(msg);
