@@ -17,16 +17,25 @@
 package org.wso2.carbon.analytics.dataservice.io.commons.beans;
 
 /**
- * The bean class for column types
+ * This class represents columns in SchemaBean
  */
-public class  ColumnTypeBean {
+public class SchemaColumnBean {
+    private String columnName;
+    private String columnType;
 
-    public static String STRING = "STRING";
-    public static String LONG = "LONG";
-    public static String FLOAT = "FLOAT";
-    public static String DOUBLE = "DOUBLE";
-    public static String BOOLEAN = "BOOLEAN";
-    public static String BINARY = "BINARY";
-    public static String INTEGER = "INTEGER";
+    public String getColumnName() {
+        return columnName;
+    }
 
+    public void setColumnName(String columnName) {
+        this.columnName = columnName;
+    }
+
+    public String getColumnType() {
+        return columnType;
+    }
+
+    public void setColumnType(String columnType) {
+        this.columnType = columnType;
+    }
 }

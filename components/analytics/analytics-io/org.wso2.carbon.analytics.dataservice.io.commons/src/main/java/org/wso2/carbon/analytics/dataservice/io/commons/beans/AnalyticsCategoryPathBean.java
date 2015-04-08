@@ -17,16 +17,25 @@
 package org.wso2.carbon.analytics.dataservice.io.commons.beans;
 
 /**
- * The bean class for column types
+ * This class represents a  facet value object in a row. use this object to insert facet values in a record
  */
-public class  ColumnTypeBean {
+public class AnalyticsCategoryPathBean {
+    private float weight;
+    private String[] path;
 
-    public static String STRING = "STRING";
-    public static String LONG = "LONG";
-    public static String FLOAT = "FLOAT";
-    public static String DOUBLE = "DOUBLE";
-    public static String BOOLEAN = "BOOLEAN";
-    public static String BINARY = "BINARY";
-    public static String INTEGER = "INTEGER";
+    public float getWeight() {
+        return weight;
+    }
 
+    public void setWeight(float weight) {
+        this.weight = weight;
+    }
+
+    public String[] getPath() {
+        return path;
+    }
+
+    public void setPath(String[] path) {
+        this.path = path;
+    }
 }

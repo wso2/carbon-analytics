@@ -16,39 +16,23 @@
 
 package org.wso2.carbon.analytics.dataservice.io.commons.beans;
 
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
-
 /**
  * This bean class represents the drill down information to perform drilldown operations
  * (search and count)
  */
-@XmlRootElement(name = "drillDownInfo")
-@XmlAccessorType(XmlAccessType.FIELD)
 public class DrillDownRequestBean {
 
-    @XmlElement(name = "tableName")
     private String tableName;
-    @XmlElement(name = "categories")
-    private List<CategoryPathBean> categories;
-    @XmlElement(name = "language")
+    private DrillDownPathBean[] categories;
     private String language;
-    @XmlElement(name = "query")
     private String query;
-    @XmlElement(name = "scoreFunction")
     private String scoreFunction;
-    @XmlElement(name = "recordCount")
     private int recordCount;
-    @XmlElement(name = "facetCount")
-    private int facetCount;
-    @XmlElement(name = "recordStart")
-    private int recordStart;
-    @XmlElement(name = "includeIds")
+    private int categoryCount;
+    private  int recordStart;
+    private  int categoryStart;
     private boolean includeIds;
+    private DrillDownFieldRangeBean[] ranges;
 
     public String getTableName() {
         return tableName;
@@ -58,11 +42,11 @@ public class DrillDownRequestBean {
         this.tableName = tableName;
     }
 
-    public List<CategoryPathBean> getCategories() {
+    public DrillDownPathBean[] getCategories() {
         return categories;
     }
 
-    public void setCategories(List<CategoryPathBean> categories) {
+    public void setCategories(DrillDownPathBean[] categories) {
         this.categories = categories;
     }
 
@@ -98,12 +82,12 @@ public class DrillDownRequestBean {
         this.recordCount = recordCount;
     }
 
-    public int getFacetCount() {
-        return facetCount;
+    public int getCategoryCount() {
+        return categoryCount;
     }
 
-    public void setFacetCount(int facetCount) {
-        this.facetCount = facetCount;
+    public void setCategoryCount(int categoryCount) {
+        this.categoryCount = categoryCount;
     }
 
     public int getRecordStart() {
@@ -120,5 +104,21 @@ public class DrillDownRequestBean {
 
     public void setIncludeIds(boolean includeIds) {
         this.includeIds = includeIds;
+    }
+
+    public DrillDownFieldRangeBean[] getRanges() {
+        return ranges;
+    }
+
+    public void setRanges(DrillDownFieldRangeBean[] ranges) {
+        this.ranges = ranges;
+    }
+
+    public int getCategoryStart() {
+        return categoryStart;
+    }
+
+    public void setCategoryStart(int categoryStart) {
+        this.categoryStart = categoryStart;
     }
 }

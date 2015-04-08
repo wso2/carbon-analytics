@@ -17,16 +17,26 @@
 package org.wso2.carbon.analytics.dataservice.io.commons.beans;
 
 /**
- * The bean class for column types
+ * This class represents a single entry/a single field in a drilldownresult,
  */
-public class  ColumnTypeBean {
+public class PerFieldDrillDownResultBean {
 
-    public static String STRING = "STRING";
-    public static String LONG = "LONG";
-    public static String FLOAT = "FLOAT";
-    public static String DOUBLE = "DOUBLE";
-    public static String BOOLEAN = "BOOLEAN";
-    public static String BINARY = "BINARY";
-    public static String INTEGER = "INTEGER";
+    private String fieldName;
+    private PerCategoryDrillDownResultBean[] categories;
 
+    public String getFieldName() {
+        return fieldName;
+    }
+
+    public void setFieldName(String fieldName) {
+        this.fieldName = fieldName;
+    }
+
+    public PerCategoryDrillDownResultBean[] getCategories() {
+        return categories;
+    }
+
+    public void setCategories(PerCategoryDrillDownResultBean[] categories) {
+        this.categories = categories;
+    }
 }

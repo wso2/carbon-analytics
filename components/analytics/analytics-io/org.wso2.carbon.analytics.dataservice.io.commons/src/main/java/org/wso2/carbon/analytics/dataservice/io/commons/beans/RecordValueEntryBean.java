@@ -17,16 +17,26 @@
 package org.wso2.carbon.analytics.dataservice.io.commons.beans;
 
 /**
- * The bean class for column types
+ * This class represents a single vlaue entry in a record
  */
-public class  ColumnTypeBean {
+public class RecordValueEntryBean {
 
-    public static String STRING = "STRING";
-    public static String LONG = "LONG";
-    public static String FLOAT = "FLOAT";
-    public static String DOUBLE = "DOUBLE";
-    public static String BOOLEAN = "BOOLEAN";
-    public static String BINARY = "BINARY";
-    public static String INTEGER = "INTEGER";
+    private String fieldName;
+    private Object value;
 
+    public String getFieldName() {
+        return fieldName;
+    }
+
+    public void setFieldName(String fieldName) {
+        this.fieldName = fieldName;
+    }
+
+    public Object getValue() {
+        return value;
+    }
+
+    public void setValue(Object value) {
+        this.value = value;
+    }
 }

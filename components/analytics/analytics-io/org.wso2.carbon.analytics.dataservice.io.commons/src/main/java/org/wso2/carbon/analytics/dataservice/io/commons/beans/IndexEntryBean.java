@@ -17,16 +17,30 @@
 package org.wso2.carbon.analytics.dataservice.io.commons.beans;
 
 /**
- * The bean class for column types
+ * This class represents the bean for a single index entry definition
  */
-public class  ColumnTypeBean {
+public class IndexEntryBean {
+    private String fieldName;
+    private String indexType;
 
-    public static String STRING = "STRING";
-    public static String LONG = "LONG";
-    public static String FLOAT = "FLOAT";
-    public static String DOUBLE = "DOUBLE";
-    public static String BOOLEAN = "BOOLEAN";
-    public static String BINARY = "BINARY";
-    public static String INTEGER = "INTEGER";
+    public String getFieldName() {
+        return fieldName;
+    }
 
+    public void setFieldName(String fieldName) {
+        this.fieldName = fieldName;
+    }
+
+    public String getIndexType() {
+        return indexType;
+    }
+
+    public void setIndexType(String indexType) {
+        this.indexType = indexType;
+    }
+
+    @Override
+    public String toString(){
+        return "fieldName: " + fieldName + ", indexType: " + indexType;
+    }
 }

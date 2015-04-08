@@ -16,48 +16,41 @@
 
 package org.wso2.carbon.analytics.dataservice.io.commons.beans;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * This class represents the index configuration bean which contains the index column definition and
  * scoring parameters for scoring function.
  */
-@XmlRootElement(name = "indexConfiguration")
-@XmlAccessorType(XmlAccessType.FIELD)
 public class IndexConfigurationBean {
 
-    @XmlElement(name = "indices", required = true)
-    private Map<String, IndexTypeBean> indices;
+    private IndexEntryBean[] indices;
+    private String[] scoreParams;
 
-    @XmlElement(name = "scoreParams", required = false)
-    private List<String> scoreParams;
-
-    public Map<String, IndexTypeBean> getIndices() {
+    public IndexEntryBean[] getIndices() {
         if (indices == null) {
-            return new HashMap<String, IndexTypeBean>(0);
+            return new ArrayList<IndexEntryBean>(0).toArray(new IndexEntryBean[0]);
         }
         return indices;
     }
 
-    public void setIndices(Map<String, IndexTypeBean> indices) {
+    public void setIndices(IndexEntryBean[] indices) {
         this.indices = indices;
     }
 
-    public List<String> getScoreParams() {
+    public String[] getScoreParams() {
         if (scoreParams == null) {
-            return new ArrayList<String>(0);
+            return new ArrayList<String>(0).toArray(new String[0]);
         }
         return scoreParams;
     }
 
-    public void setScoreParams(List<String> scoreParams) {
+    public void setScoreParams(String[] scoreParams) {
         this.scoreParams = scoreParams;
+    }
+
+    @Override
+    public String toString() {
+        return "indices: " + indices.toString() + ", score params: " + scoreParams;
     }
 }

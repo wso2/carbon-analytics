@@ -1,12 +1,12 @@
-/**
+/*
  * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,44 +15,18 @@
  */
 package org.wso2.carbon.analytics.dataservice.io.commons.beans;
 
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlEnumValue;
-import javax.xml.bind.annotation.XmlType;
-
 /**
  * The Enum IndexTypeBean.
  */
-@XmlType(name = "indexType")
-@XmlEnum
-public enum IndexTypeBean {
+public class IndexTypeBean {
 
-	/** The string. */
-	@XmlEnumValue("STRING")
-	STRING,
-
-	/** The integer. */
-	@XmlEnumValue("INTEGER")
-	INTEGER,
-
-	/** The long. */
-	@XmlEnumValue("LONG")
-	LONG,
-
-	/** The float. */
-	@XmlEnumValue("FLOAT")
-	FLOAT,
-
-	/** The double. */
-	@XmlEnumValue("DOUBLE")
-	DOUBLE,
-
-	/** The boolean. */
-	@XmlEnumValue("BOOLEAN")
-	BOOLEAN,
-
-    @XmlEnumValue("FACET")
-    FACET,
-
-    @XmlEnumValue("SCOREPARAM")
-    SCOREPARAM
+    public static String STRING = "STRING";
+    public static String LONG = "LONG";
+    public static String FLOAT = "FLOAT";
+    public static String DOUBLE = "DOUBLE";
+    public static String BOOLEAN = "BOOLEAN";
+    public static String BINARY = "BINARY";
+    public static String INTEGER = "INTEGER";
+    public static String FACET = "FACET";
+    public static String SCOREPARAM = "SCOREPARAM";
 }

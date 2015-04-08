@@ -17,16 +17,26 @@
 package org.wso2.carbon.analytics.dataservice.io.commons.beans;
 
 /**
- * The bean class for column types
+ * This class represents the bean class for containing the drilldown ranges per a field.
  */
-public class  ColumnTypeBean {
+public class DrillDownFieldRangeBean {
 
-    public static String STRING = "STRING";
-    public static String LONG = "LONG";
-    public static String FLOAT = "FLOAT";
-    public static String DOUBLE = "DOUBLE";
-    public static String BOOLEAN = "BOOLEAN";
-    public static String BINARY = "BINARY";
-    public static String INTEGER = "INTEGER";
+    private String fieldName;
+    private DrillDownRangeBean[] ranges;
 
+    public String getFieldName() {
+        return fieldName;
+    }
+
+    public void setFieldName(String fieldName) {
+        this.fieldName = fieldName;
+    }
+
+    public DrillDownRangeBean[] getRanges() {
+        return ranges;
+    }
+
+    public void setRanges(DrillDownRangeBean[] ranges) {
+        this.ranges = ranges;
+    }
 }
