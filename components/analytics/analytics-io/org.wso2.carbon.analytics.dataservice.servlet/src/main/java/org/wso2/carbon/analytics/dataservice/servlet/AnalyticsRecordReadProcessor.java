@@ -96,6 +96,7 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
                 }.getType();
                 List<String> columns = gson.fromJson(req.getParameter(AnalyticsAPIConstants.COLUMNS_PARAM), columnsList);
                 List<String> ids = gson.fromJson(req.getParameter(AnalyticsAPIConstants.RECORD_IDS_PARAM), columnsList);
+                ObjectOutputStream objectOutputStream = null;
                 try {
                     RecordGroup[] recordGroups = ServiceHolder.getAnalyticsDataService().get(tenantId, tableName,
                             partitionHint, columns, ids);
@@ -106,31 +107,46 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
                         remoteRecordGroup[i].setLocations(recordGroups[i].getLocations());
                     }
                     resp.setStatus(HttpServletResponse.SC_OK);
-                    ObjectOutputStream objectOutputStream = new ObjectOutputStream(resp.getOutputStream());
+                    objectOutputStream = new ObjectOutputStream(resp.getOutputStream());
                     objectOutputStream.writeObject(remoteRecordGroup);
-                    objectOutputStream.close();
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+                } finally {
+                    if (objectOutputStream != null) {
+                        objectOutputStream.close();
+                    }
                 }
 
             } else if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.READ_RECORD_OPERATION)) {
                 ServletInputStream servletInputStream = req.getInputStream();
-                ObjectInputStream inputStream = new ObjectInputStream(servletInputStream);
+                ObjectInputStream inputStream = null;
+                ObjectOutputStream outputStream = null;
                 try {
+                    inputStream = new ObjectInputStream(servletInputStream);
                     RemoteRecordGroup remoteRecordGroupObj = (RemoteRecordGroup) inputStream.readObject();
-                    Iterator<Record> records = ServiceHolder.getAnalyticsDataService().readRecords(remoteRecordGroupObj.getRecordGroupFromBinary());
+                    Iterator<Record> records = ServiceHolder.getAnalyticsDataService().readRecords(remoteRecordGroupObj.
+                            getRecordGroupFromBinary());
                     resp.setStatus(HttpServletResponse.SC_OK);
-                    ObjectOutputStream outputStream = new ObjectOutputStream(resp.getOutputStream());
+                    outputStream = new ObjectOutputStream(resp.getOutputStream());
                     while (records.hasNext()) {
                         Record record = records.next();
                         outputStream.writeObject(record);
                     }
-                    outputStream.close();
                 } catch (ClassNotFoundException e) {
                     resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No class found for the " +
                             "record group implementation : " + ". " + e.getMessage());
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+                } finally {
+                    if (inputStream != null) {
+                        inputStream.close();
+                    }
+                    if (servletInputStream != null) {
+                        servletInputStream.close();
+                    }
+                    if (outputStream != null) {
+                        outputStream.close();
+                    }
                 }
             } else {
                 resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : " + operation

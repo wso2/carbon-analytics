@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.analytics.datasource.commons;
 
+import java.io.Serializable;
+
 /**
  * This class represents a facet object. facet object defines the hierarchical category,
  * which can be drilled down. This can be used as a value in a record.
@@ -33,7 +35,7 @@ package org.wso2.carbon.analytics.datasource.commons;
  * and categorizes by each level.
  *
  */
-public class AnalyticsCategoryPath {
+public class AnalyticsCategoryPath implements Serializable{
 
     private String[] path;
     private  float weight;

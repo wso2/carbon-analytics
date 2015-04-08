@@ -25,6 +25,7 @@ import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
 import org.wso2.carbon.analytics.api.CarbonAnalyticsAPI;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceException;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 
 /**
  * This class represents the analytics api declarative services component.
@@ -32,6 +33,8 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
  * @scr.component name="analytics.api.component" immediate="true"
  * @scr.reference name="analytics.component" interface="org.wso2.carbon.analytics.dataservice.AnalyticsDataService"
  * cardinality="0..1" policy="dynamic"  bind="setAnalyticsDataService" unbind="unsetAnalyticsDataService"
+ * @scr.reference name="analytics.secure.component" interface="org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService"
+ * cardinality="0..1" policy="dynamic"  bind="setSecureAnalyticsDataService" unbind="unsetSecureAnalyticsDataService"
  */
 public class AnalyticsApiDSComponent {
     private static final Log log = LogFactory.getLog(AnalyticsApiDSComponent.class);
@@ -52,5 +55,13 @@ public class AnalyticsApiDSComponent {
 
     protected void unsetAnalyticsDataService(AnalyticsDataService analyticsDataService) {
         ServiceHolder.setAnalyticsDataService(null);
+    }
+
+    protected void setSecureAnalyticsDataService(SecureAnalyticsDataService secureAnalyticsDataService) {
+        ServiceHolder.setSecureAnalyticsDataService(secureAnalyticsDataService);
+    }
+
+    protected void unsetSecureAnalyticsDataService(SecureAnalyticsDataService secureAnalyticsDataService) {
+        ServiceHolder.setSecureAnalyticsDataService(null);
     }
 }

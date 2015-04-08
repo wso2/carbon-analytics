@@ -16,11 +16,13 @@
 
 package org.wso2.carbon.analytics.dataservice.commons;
 
+import java.io.Serializable;
+
 /**
  * This class represents a range for numbers, includes details about the bounds of the range.
  * To cover all cases, double values are used
  */
-public class AnalyticsDrillDownRange {
+public class AnalyticsDrillDownRange implements Serializable{
 
     private String label;
     private double from;

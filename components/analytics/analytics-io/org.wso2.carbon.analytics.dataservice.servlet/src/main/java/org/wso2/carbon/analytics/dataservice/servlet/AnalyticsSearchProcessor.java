@@ -18,19 +18,26 @@
 package org.wso2.carbon.analytics.dataservice.servlet;
 
 import com.google.gson.GsonBuilder;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
+import org.wso2.carbon.analytics.dataservice.commons.DrillDownResultEntry;
 import org.wso2.carbon.analytics.dataservice.io.commons.AnalyticsAPIConstants;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.io.commons.RemoteRecordGroup;
 import org.wso2.carbon.analytics.dataservice.servlet.exception.AnalyticsAPIAuthenticationException;
 import org.wso2.carbon.analytics.dataservice.servlet.internal.ServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Map;
 
 public class AnalyticsSearchProcessor extends HttpServlet {
 
@@ -82,6 +89,57 @@ public class AnalyticsSearchProcessor extends HttpServlet {
                     resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
+                }
+            } else {
+                resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : " + operation
+                        + " with get request!");
+            }
+        }
+    }
+
+    /**
+     * Send a drill down request and get the results.
+     *
+     * @param req
+     * @param resp
+     * @throws ServletException
+     * @throws IOException
+     */
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String sessionId = req.getHeader(AnalyticsAPIConstants.SESSION_ID);
+        if (sessionId == null || sessionId.trim().isEmpty()) {
+            resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
+        } else {
+            try {
+                ServiceHolder.getAuthenticator().validateSessionId(sessionId);
+            } catch (AnalyticsAPIAuthenticationException e) {
+                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
+            }
+            String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
+            if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.DRILL_DOWN_OPERATION)) {
+                int tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
+                ServletInputStream servletInputStream = req.getInputStream();
+                ObjectInputStream inputStream = new ObjectInputStream(servletInputStream);
+                ObjectOutputStream objectOutputStream = null;
+                try {
+                    AnalyticsDrillDownRequest drillDownRequest = (AnalyticsDrillDownRequest) inputStream.readObject();
+                    Map<String, List<DrillDownResultEntry>> drillDownResult = ServiceHolder.getAnalyticsDataService().
+                            drillDown(tenantIdParam, drillDownRequest);
+                    objectOutputStream = new ObjectOutputStream(resp.getOutputStream());
+                    objectOutputStream.writeObject(drillDownResult);
+                    resp.setStatus(HttpServletResponse.SC_OK);
+                } catch (AnalyticsException | ClassNotFoundException e) {
+                    resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
+                } finally {
+                    if (servletInputStream != null) {
+                        servletInputStream.close();
+                    }
+                    if (inputStream != null) {
+                        inputStream.close();
+                    }
+                    if (objectOutputStream != null) {
+                        objectOutputStream.close();
+                    }
                 }
             } else {
                 resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : " + operation

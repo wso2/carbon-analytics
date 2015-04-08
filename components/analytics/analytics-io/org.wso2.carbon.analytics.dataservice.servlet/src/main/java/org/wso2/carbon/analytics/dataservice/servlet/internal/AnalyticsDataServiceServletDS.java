@@ -52,8 +52,8 @@ public class AnalyticsDataServiceServletDS {
     protected void activate(ComponentContext context) {
         ServiceHolder.setAuthenticator(new AnalyticsAPIAuthenticator());
         try {
-            ServiceHolder.getHttpService().registerServlet(AnalyticsAPIConstants.AUTHENTICATION_SERVICE_URI,
-                    new AnalyticsAPIAuthenticationProcessor(),new Hashtable(),
+            ServiceHolder.getHttpService().registerServlet(AnalyticsAPIConstants.MANAGEMENT_SERVICE_URI,
+                    new AnalyticsManagementProcessor(),new Hashtable(),
                     ServiceHolder.getHttpService().createDefaultHttpContext());
             ServiceHolder.getHttpService().registerServlet(AnalyticsAPIConstants.TABLE_PROCESSOR_SERVICE_URI,
                     new AnalyticsTableProcessor(),new Hashtable(),

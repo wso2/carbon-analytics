@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Map;
 
 public class AnalyticsIndexProcessor extends HttpServlet {
@@ -56,17 +57,31 @@ public class AnalyticsIndexProcessor extends HttpServlet {
             }
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.SET_INDICES_OPERATION)) {
+                Gson gson = new Gson();
                 int tenantId = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
                 String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
                 String indicesJson = req.getParameter(AnalyticsAPIConstants.INDEX_PARAM);
                 Type stringStringMap = new TypeToken<Map<String, IndexType>>() {
                 }.getType();
-                Map<String, IndexType> indexTypeMap = new Gson().fromJson(indicesJson, stringStringMap);
-                try {
-                    ServiceHolder.getAnalyticsDataService().setIndices(tenantId, tableName, indexTypeMap);
-                    resp.setStatus(HttpServletResponse.SC_OK);
-                } catch (AnalyticsException e) {
-                    resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
+                Map<String, IndexType> indexTypeMap = gson.fromJson(indicesJson, stringStringMap);
+                String scoreJson = req.getParameter(AnalyticsAPIConstants.SCORE_PARAM);
+                if (scoreJson != null) {
+                    Type scoreLisType = new TypeToken<List<String>>() {
+                    }.getType();
+                    List<String> scoreParams = gson.fromJson(scoreJson, scoreLisType);
+                    try {
+                        ServiceHolder.getAnalyticsDataService().setIndices(tenantId, tableName, indexTypeMap, scoreParams);
+                        resp.setStatus(HttpServletResponse.SC_OK);
+                    } catch (AnalyticsException e) {
+                        resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
+                    }
+                } else {
+                    try {
+                        ServiceHolder.getAnalyticsDataService().setIndices(tenantId, tableName, indexTypeMap);
+                        resp.setStatus(HttpServletResponse.SC_OK);
+                    } catch (AnalyticsException e) {
+                        resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
+                    }
                 }
             } else if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.WAIT_FOR_INDEXING_OPERATION)) {
                 long maxWait = Long.parseLong(req.getParameter(AnalyticsAPIConstants.MAX_WAIT_PARAM));
@@ -109,6 +124,17 @@ public class AnalyticsIndexProcessor extends HttpServlet {
                     Map<String, IndexType> indexTypeMap = ServiceHolder.getAnalyticsDataService().getIndices(tenantIdParam, tableName);
                     PrintWriter output = resp.getWriter();
                     output.append(new GsonBuilder().create().toJson(indexTypeMap));
+                    resp.setStatus(HttpServletResponse.SC_OK);
+                } catch (AnalyticsException e) {
+                    resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
+                }
+            } else if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.GET_SCORE_PARAMS_OPERATION)) {
+                int tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
+                String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
+                try {
+                    List<String> scoreParams = ServiceHolder.getAnalyticsDataService().getScoreParams(tenantIdParam, tableName);
+                    PrintWriter output = resp.getWriter();
+                    output.append(new GsonBuilder().create().toJson(scoreParams));
                     resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());

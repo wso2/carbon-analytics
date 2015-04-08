@@ -42,6 +42,8 @@ import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.util.EntityUtils;
 import org.wso2.carbon.analytics.api.RemoteRecordIterator;
 import org.wso2.carbon.analytics.api.internal.AnalyticsDataConfiguration;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
+import org.wso2.carbon.analytics.dataservice.commons.DrillDownResultEntry;
 import org.wso2.carbon.analytics.dataservice.io.commons.RemoteRecordGroup;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceAuthenticationException;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceException;
@@ -107,7 +109,7 @@ public class AnalyticsAPIHttpClient {
 
     public void authenticate(String username, String password) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
-        builder.setScheme(this.protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.AUTHENTICATION_SERVICE_URI)
+        builder.setScheme(this.protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.MANAGEMENT_SERVICE_URI)
                 .setParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.LOGIN_OPERATION);
         try {
             HttpGet getMethod = new HttpGet(builder.build().toString());
@@ -116,6 +118,7 @@ public class AnalyticsAPIHttpClient {
                             + password).getBytes()));
             HttpResponse httpResponse = httpClient.execute(getMethod);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                EntityUtils.consume(httpResponse.getEntity());
                 throw new AnalyticsServiceAuthenticationException("Authentication failed for user : " + username);
             }
             String response = getResponse(httpResponse);
@@ -258,7 +261,7 @@ public class AnalyticsAPIHttpClient {
 
     public boolean isTableExists(int tenantId, String tableName) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
-        builder.setScheme("http").setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants
+        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants
                 .TABLE_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.TABLE_EXISTS_OPERATION)
                 .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
@@ -406,7 +409,7 @@ public class AnalyticsAPIHttpClient {
 
     public void deleteRecords(int tenantId, String tableName, long timeFrom, long timeTo) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
-        builder.setScheme("http").setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.RECORD_PROCESSOR_SERVICE_URI)
+        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.RECORD_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.DELETE_RECORDS_RANGE_OPERATION)
                 .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
@@ -453,8 +456,9 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public void setIndices(int tenantId, String tableName, Map<String, IndexType> columns) throws AnalyticsServiceException {
+    public void setIndices(int tenantId, String tableName, Map<String, IndexType> columns, List<String> scoreParams) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
+        Gson gson = new Gson();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI);
         try {
             HttpPost postMethod = new HttpPost(builder.build().toString());
@@ -463,8 +467,11 @@ public class AnalyticsAPIHttpClient {
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.SET_INDICES_OPERATION));
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId)));
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName));
-            String indexJson = new Gson().toJson(columns);
+            String indexJson = gson.toJson(columns);
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.INDEX_PARAM, indexJson));
+            if (scoreParams != null) {
+                params.add(new BasicNameValuePair(AnalyticsAPIConstants.SCORE_PARAM, gson.toJson(scoreParams)));
+            }
             postMethod.setEntity(new UrlEncodedFormEntity(params));
             HttpResponse httpResponse = httpClient.execute(postMethod);
             String response = getResponse(httpResponse);
@@ -498,6 +505,32 @@ public class AnalyticsAPIHttpClient {
                 Type indexMap = new TypeToken<Map<String, IndexType>>() {
                 }.getType();
                 return new Gson().fromJson(response, indexMap);
+            }
+        } catch (URISyntaxException e) {
+            throw new AnalyticsServiceAuthenticationException("Malformed URL provided. " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new AnalyticsServiceAuthenticationException("Error while connecting to the remote service. " + e.getMessage(), e);
+        }
+    }
+
+    public List<String> getScoreParams(int tenantId, String tableName) throws AnalyticsServiceException {
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI)
+                .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.GET_SCORE_PARAMS_OPERATION)
+                .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
+                .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName);
+        try {
+            HttpGet getMethod = new HttpGet(builder.build().toString());
+            getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
+            HttpResponse httpResponse = httpClient.execute(getMethod);
+            String response = getResponse(httpResponse);
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                throw new AnalyticsServiceException("Unable to get the index for table - " + tableName
+                        + " for tenant id : " + tenantId + ". " + response);
+            } else {
+                Type scoreListType = new TypeToken<List<String>>() {
+                }.getType();
+                return new Gson().fromJson(response, scoreListType);
             }
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceAuthenticationException("Malformed URL provided. " + e.getMessage(), e);
@@ -774,4 +807,100 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
+    public boolean isPaginationSupported() {
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme(this.protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.MANAGEMENT_SERVICE_URI)
+                .setParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.IS_PAGINATION_SUPPORTED_OPERATION);
+        try {
+            HttpGet getMethod = new HttpGet(builder.build().toString());
+            getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
+            HttpResponse httpResponse = httpClient.execute(getMethod);
+            String response = getResponse(httpResponse);
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                throw new AnalyticsServiceException("Error while checking the pagination support. " + response);
+            }
+            if (response.startsWith(AnalyticsAPIConstants.PAGINATION_SUPPORT)) {
+                String[] reponseElements = response.split(AnalyticsAPIConstants.SEPARATOR);
+                if (reponseElements.length == 2) {
+                    return Boolean.parseBoolean(reponseElements[1]);
+                } else {
+                    throw new AnalyticsServiceAuthenticationException("Invalid response returned, cannot find " +
+                            "pagination support element. Response:" + response);
+                }
+            } else {
+                throw new AnalyticsServiceAuthenticationException("Invalid response returned, no pagination support found!"
+                        + response);
+            }
+        } catch (URISyntaxException e) {
+            throw new AnalyticsServiceException("Malformed URL provided for pagination support checking. "
+                    + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new AnalyticsServiceException("Error while connecting to the remote service. "
+                    + e.getMessage(), e);
+        }
+    }
+
+    public Map<String, List<DrillDownResultEntry>> drillDown(int tenantId, AnalyticsDrillDownRequest drillDownRequest) {
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.SEARCH_PROCESSOR_SERVICE_URI)
+                .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.DRILL_DOWN_OPERATION)
+                .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
+        ByteArrayOutputStream out = null;
+        ObjectOutputStream os = null;
+        InputStream is = null;
+        ObjectInputStream oi = null;
+        try {
+            HttpPost postMethod = new HttpPost(builder.build().toString());
+            postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
+            out = new ByteArrayOutputStream();
+            os = new ObjectOutputStream(out);
+            os.writeObject(drillDownRequest);
+            postMethod.setEntity(new ByteArrayEntity(out.toByteArray()));
+            HttpResponse httpResponse = httpClient.execute(postMethod);
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                String response = getResponse(httpResponse);
+                throw new AnalyticsServiceException("Unable to read the record group. "
+                        + response);
+            }
+            is = httpResponse.getEntity().getContent();
+            oi = new ObjectInputStream(is);
+            return (Map<String, List<DrillDownResultEntry>>) oi.readObject();
+        } catch (URISyntaxException e) {
+            throw new AnalyticsServiceException("Malformed URL provided. " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new AnalyticsServiceException("Error while connecting to the remote service. " + e.getMessage(), e);
+        } catch (ClassNotFoundException e) {
+            throw new AnalyticsServiceException("Unable to de serialize the object as the class is not found in " +
+                    "this instance. " + e.getMessage(), e);
+        } finally {
+            if (os != null) {
+                try {
+                    os.close();
+                } catch (IOException e) {
+                    log.warn("Error while closing object stream! " + e.getMessage());
+                }
+            }
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    log.warn("Error while closing output stream! " + e.getMessage());
+                }
+            }
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    log.warn("Error while closing input stream! " + e.getMessage());
+                }
+            }
+            if (oi != null) {
+                try {
+                    oi.close();
+                } catch (IOException e) {
+                    log.warn("Error while closing input stream! " + e.getMessage());
+                }
+            }
+        }
+    }
 }
