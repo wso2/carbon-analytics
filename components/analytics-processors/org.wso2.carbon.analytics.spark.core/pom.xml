@@ -23,14 +23,14 @@
             <groupId>org.wso2.carbon.commons</groupId>
             <artifactId>org.wso2.carbon.ntask.core</artifactId>
         </dependency>
-        <!--        <dependency>
-                    <groupId>org.wso2.orbit.org.apache.spark</groupId>
-                    <artifactId>spark-core_2.10</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>org.wso2.orbit.org.apache.spark</groupId>
-                    <artifactId>spark-sql_2.10</artifactId>
-                </dependency>-->
+        <dependency>
+            <groupId>org.wso2.orbit.org.apache.spark</groupId>
+            <artifactId>spark-core_2.10</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.apache.spark</groupId>
+            <artifactId>spark-sql_2.10</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_2.10</artifactId>

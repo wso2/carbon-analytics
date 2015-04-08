@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.analytics.spark.core.internal;
 
-import org.apache.spark.executor.CoarseGrainedExecutorBackend;
+import org.apache.spark.executor.CoarseGrainedExecutorBackend2;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -44,7 +44,7 @@ public class SparkBackendExecutor implements Runnable {
     public void run() {
 
         try {
-            CoarseGrainedExecutorBackend.main(argArray);
+            CoarseGrainedExecutorBackend2.main(argArray);
         } finally {
 //            System.out.println("######################## Spark backend executor ended!!!!");
             BufferedWriter writer = null;

@@ -91,7 +91,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private static final String CARBON_ANALYTICS_SPARK_APP_NAME = "CarbonAnalytics";
 
     private static final Log log = LogFactory.getLog(SparkAnalyticsExecutor.class);
-
+    
     private SparkConf sparkConf;
 
     private JavaSparkContext javaSparkCtx;
@@ -130,14 +130,13 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private void startMaster(String host, int port, int webUIport) {
         Master.startSystemAndActor(host, port, webUIport, this.sparkConf);
     }
-    
-    private void startWorker(String workerHost, String masterHost, int masterPort, int p1, int p2) {
-        this.workerActorSystem = Worker.startSystemAndActor(workerHost, p1, p2, 2, 1000000, new String[] { "spark://" + masterHost + ":" + masterPort },
-                null, new Option<Object>() {
-            
-                    private static final long serialVersionUID = 3087598975952096368L;
 
     private void startWorker(String workerHost, String masterHost, int masterPort, int p1, int p2) {
+        this.sparkConf = new SparkConf();
+        this.sparkConf.setMaster("spark://" + masterHost + ":" + masterPort)
+                .setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
+        this.sparkConf.set("spark.scheduler.mode", "FAIR");
+
         this.workerActorSystem = Worker.startSystemAndActor(workerHost, p1, p2, 2, 1000000, new String[]{"spark://" + masterHost + ":" + masterPort},
                                                             null, (Option) None$.MODULE$, sparkConf)._1();
     }
@@ -150,7 +149,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
 
     private void validateSparkScriptPathPermission() {
-        Set<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
+        Set<PosixFilePermission> perms = new HashSet<>();
         //add owners permission
         perms.add(PosixFilePermission.OWNER_READ);
         perms.add(PosixFilePermission.OWNER_WRITE);
@@ -258,7 +257,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private String encodeQueryWithTenantId(int tenantId, String query) {
         String result = query;
         String[] tokens = query.split("\\s+");
-        ArrayList<String> tableNames = new ArrayList<String>();
+        ArrayList<String> tableNames = new ArrayList<>();
         for (int i = 0; i < tokens.length; i++) {
             if ((tokens[i].compareToIgnoreCase(AnalyticsConstants.TERM_FROM) == 0 ||
                  tokens[i].compareToIgnoreCase(AnalyticsConstants.TERM_JOIN) == 0)
@@ -277,14 +276,14 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private void insertIntoTable(int tenantId, String tableName,
                                  AnalyticsQueryResult data)
-            throws AnalyticsTableNotAvailableException, AnalyticsException {
+            throws AnalyticsException {
         AnalyticsDataService ads = ServiceHolder.getAnalyticsDataService();
         List<Record> records = this.generateInsertRecordsForTable(tenantId, tableName, data);
         ads.put(records);
     }
     
     private Integer[] generateTableKeyIndices(String[] keys, String[] columns) {
-        List<Integer> result = new ArrayList<Integer>();
+        List<Integer> result = new ArrayList<>();
         for (String key : keys) {
             for (int i = 0; i < columns.length; i++) {
                 if (key.equals(columns[i])) {
@@ -324,7 +323,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         List<List<Object>> rows = data.getRows();
         String[] columns = data.getColumns();
         Integer[] keyIndices = this.generateTableKeyIndices(keys, columns);
-        List<Record> result = new ArrayList<Record>(rows.size());
+        List<Record> result = new ArrayList<>(rows.size());
         Record record;
         for (List<Object> row : rows) {
             if (primaryKeysExists) {
@@ -339,19 +338,11 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
     
     private static Map<String, Object> extractValuesFromRow(List<Object> row, String[] columns) {
-        Map<String, Object> result = new HashMap<String, Object>(row.size());
+        Map<String, Object> result = new HashMap<>(row.size());
         for (int i = 0; i < row.size(); i++) {
             result.put(columns[i], row.get(i));
         }
         return result;
-    }
-    
-    private static String[] extractColumns(StructField[] fields) {
-        String[] columns = new String[fields.length];
-        for (int i = 0; i < fields.length; i++) {
-            columns[i] = fields[i].getName();
-        }
-        return columns;
     }
 
     private static AnalyticsQueryResult toResult(DataFrame dataFrame)
@@ -361,10 +352,10 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
 
     private static List<List<Object>> convertRowsToObjects(Row[] rows) {
-        List<List<Object>> result = new ArrayList<List<Object>>();
+        List<List<Object>> result = new ArrayList<>();
         List<Object> objects;
         for (Row row : rows) {
-            objects = new ArrayList<Object>();
+            objects = new ArrayList<>();
             for (int i = 0; i < row.length(); i++) {
                 objects.add(row.get(i));
             }
@@ -393,7 +384,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private static String[] loadTableKeys(int tenantId, String tableName)
             throws AnalyticsException {
         AnalyticsDataService ads = ServiceHolder.getAnalyticsDataService();
-        List<String> ids = new ArrayList<String>(1);
+        List<String> ids = new ArrayList<>(1);
         ids.add(generateTableKeysId(tenantId, tableName));
         List<Record> records = GenericUtils.listRecords(ads, ads.get(
                 AnalyticsConstants.TABLE_INFO_TENANT_ID,
@@ -412,11 +403,11 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private static void registerTableKeys(int tenantId, String tableName,
                                           String[] keys) throws AnalyticsException {
         AnalyticsDataService ads = ServiceHolder.getAnalyticsDataService();
-        Map<String, Object> values = new HashMap<String, Object>();
+        Map<String, Object> values = new HashMap<>();
         values.put(AnalyticsConstants.OBJECT, tableKeysToBinary(keys));
-        Record record = new Record(generateTableKeysId(tenantId, tableName),
-                                   AnalyticsConstants.TABLE_INFO_TENANT_ID, AnalyticsConstants.TABLE_INFO_TABLE_NAME, values);
-        List<Record> records = new ArrayList<Record>(1);
+        Record record = new Record(generateTableKeysId(tenantId, tableName), 
+                AnalyticsConstants.TABLE_INFO_TENANT_ID, AnalyticsConstants.TABLE_INFO_TABLE_NAME, values);
+        List<Record> records = new ArrayList<>(1);
         records.add(record);
         try {
             ads.put(records);
