@@ -18,13 +18,6 @@
  */
 package org.wso2.carbon.analytics.datasource.rdbms.mysql;
 
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.testng.annotations.AfterClass;
@@ -35,6 +28,12 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.rdbms.RDBMSQueryConfigurationEntry;
+
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * MySQL implementation of analytics record store tests.
@@ -85,12 +84,12 @@ public class MySQLInnoDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTes
     private RDBMSQueryConfigurationEntry generateQueryConfiguration() {
         RDBMSQueryConfigurationEntry conf = new RDBMSQueryConfigurationEntry();
         String[] recordMetaTableInitQueries = new String[1];
-        recordMetaTableInitQueries[0] = "CREATE TABLE AN_TABLE_META (tenantId INTEGER, tableName VARCHAR(256), schema BINARY, PRIMARY KEY(tenantId, tableName))";
+        recordMetaTableInitQueries[0] = "CREATE TABLE AN_TABLE_META (tenantId INTEGER, tableName VARCHAR(256), tableSchema BINARY, PRIMARY KEY(tenantId, tableName))";
         conf.setRecordMetaTableInitQueries(recordMetaTableInitQueries);
-        conf.setRecordMetaTableSelectQuery("SELECT schema FROM AN_TABLE_META WHERE tenantId = ? AND tableName = ?");
+        conf.setRecordMetaTableSelectQuery("SELECT tableSchema FROM AN_TABLE_META WHERE tenantId = ? AND tableName = ?");
         conf.setRecordMetaTablesSelectByTenantQuery("SELECT tableName FROM AN_TABLE_META WHERE tenantId = ?");
         conf.setRecordMetaTableInsertQuery("INSERT INTO AN_TABLE_META (tenantId, tableName) VALUES (?, ?)");
-        conf.setRecordMetaTableUpdateQuery("UPDATE AN_TABLE_META SET schema = ? WHERE tenantId = ? AND tableName = ?");
+        conf.setRecordMetaTableUpdateQuery("UPDATE AN_TABLE_META SET tableSchema = ? WHERE tenantId = ? AND tableName = ?");
         conf.setRecordMetaTableDeleteQuery("DELETE AN_TABLE_META WHERE tenantId = ? AND tableName = ?");
         conf.setRecordMetaTableCheckQuery("SELECT * FROM AN_TABLE_META WHERE tenantId = -1 AND tableName = '_X_'");
         String[] recordTableInitQueries = new String[2];
