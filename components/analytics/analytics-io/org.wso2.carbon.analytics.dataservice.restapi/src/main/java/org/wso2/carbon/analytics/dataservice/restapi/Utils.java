@@ -1,12 +1,12 @@
 /**
  * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,14 +19,22 @@ package org.wso2.carbon.analytics.dataservice.restapi;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
+import org.wso2.carbon.analytics.dataservice.commons.DrillDownResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.AnalyticsSchemaBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownPathBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.ColumnTypeBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownRangeBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownRequestBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownResultBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.IndexTypeBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.PerCategoryDrillDownResultBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.PerFieldDrillDownResultBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordBean;
-import org.wso2.carbon.analytics.dataservice.restapi.beans.SearchResultEntryBean;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -162,7 +170,7 @@ public class Utils {
 		}
 		return records;
 	}
-	
+
 	/**
 	 * Creates the record beans from records.
 	 * @param records the records
@@ -190,24 +198,6 @@ public class Utils {
         recordBean.setValues(record.getValues());
         return recordBean;
     }
-	
-	/**
-	 * Creates the search result beans from search results.
-	 * @param searchResults
-	 *            the search results
-	 * @return the list
-	 */
-	public static List<SearchResultEntryBean> createSearchResultBeansFromSearchResults(List<SearchResultEntry>
-                                                                                               searchResults) {
-		List<SearchResultEntryBean> searchResultBeanList = new ArrayList<SearchResultEntryBean>();
-		for (SearchResultEntry searchResult : searchResults) {
-			SearchResultEntryBean searchResultEntryBean = new SearchResultEntryBean();
-			searchResultEntryBean.setId(searchResult.getId());
-			searchResultEntryBean.setScore(searchResult.getScore());
-			searchResultBeanList.add(searchResultEntryBean);
-		}
-		return searchResultBeanList;
-	}
 
 	/**
 	 * Creates the index type bean from index type.
@@ -296,7 +286,7 @@ public class Utils {
 		}
 		return indexTypeMap;
 	}
-	
+
 	/**
 	 * Gets the record ids from search results.
 	 * @param searchResults the search results
@@ -320,7 +310,7 @@ public class Utils {
 	 */
 	public static String getCompleteErrorMessage(String msg, Exception e) {
 		StringBuilder message = new StringBuilder(msg);
-		if (e.getCause() != null) { 
+		if (e.getCause() != null) {
 			message.append(". (");
             message.append(e.getCause().getMessage());
             message.append(")");
@@ -382,6 +372,90 @@ public class Utils {
             primaryKeys = analyticsSchema.getPrimaryKeys();
         }
         return new AnalyticsSchemaBean(columnTypeBeanTypes,primaryKeys);
+    }
+
+    public static DrillDownResultBean createDrillDownResultBean(Map<String, List<DrillDownResultEntry>> result) {
+        DrillDownResultBean resultBean = new DrillDownResultBean();
+        resultBean.setPerFieldEntries(createPerFieldDrillDownResultBean(result));
+        return  resultBean;
+    }
+
+    private static PerFieldDrillDownResultBean[] createPerFieldDrillDownResultBean(Map<String
+            , List<DrillDownResultEntry>> result) {
+        List<PerFieldDrillDownResultBean> resultBeans = new ArrayList<PerFieldDrillDownResultBean>(0);
+        for (Map.Entry<String, List<DrillDownResultEntry>> entry : result.entrySet()) {
+            PerFieldDrillDownResultBean entryBean = new PerFieldDrillDownResultBean();
+            entryBean.setFieldName(entry.getKey());
+            entryBean.setCategories(createPerCategoryDrillDownResultBean(entry.getValue()));
+            resultBeans.add(entryBean);
+        }
+        return resultBeans.toArray(new PerFieldDrillDownResultBean[resultBeans.size()]);
+    }
+
+    private static PerCategoryDrillDownResultBean[] createPerCategoryDrillDownResultBean
+            (List<DrillDownResultEntry> result) {
+        List<PerCategoryDrillDownResultBean> beans = new ArrayList<PerCategoryDrillDownResultBean>(0);
+        for (DrillDownResultEntry entry : result) {
+            PerCategoryDrillDownResultBean bean = new PerCategoryDrillDownResultBean();
+            bean.setCategory(entry.getCategory());
+            bean.setCategoryPath(entry.getCategoryPath());
+            bean.setRecordCount(entry.getRecordCount());
+            bean.setRecordIds(entry.getRecordIds().toArray(new String[entry.getRecordIds().size()]));
+            beans.add(bean);
+        }
+        return beans.toArray(new PerCategoryDrillDownResultBean[beans.size()]);
+    }
+
+    /**
+     * Creates the AnalyticsDrilldownRequest object given a drilldownrequestBean class
+     * @param bean bean class which represents the drilldown request.
+     * @param withIds whether to include the matching ids or not. this will be false if the user only needs the counts
+     * @return Equivalent AnalyticsDrilldownRequest object.
+     */
+    public static AnalyticsDrillDownRequest createDrilldownRequest(DrillDownRequestBean bean, boolean withIds) {
+        AnalyticsDrillDownRequest drillDownRequest = new AnalyticsDrillDownRequest();
+        drillDownRequest.setWithIds(withIds);
+        drillDownRequest.setTableName(bean.getTableName());
+        drillDownRequest.setCategoryCount(bean.getCategoryCount());
+        drillDownRequest.setRecordCount(bean.getRecordCount());
+        drillDownRequest.setCategoryStartIndex(bean.getCategoryStart());
+        drillDownRequest.setRecordStartIndex(bean.getRecordStart());
+        drillDownRequest.setLanguage(bean.getLanguage());
+        drillDownRequest.setLanguageQuery(bean.getQuery());
+        drillDownRequest.setScoreFunction(bean.getScoreFunction());
+        drillDownRequest.setCategoryPaths(createCategoryPaths(bean.getCategories()));
+        drillDownRequest.setRangeFacets(createDrillDownRanges(bean.getRanges()));
+        return drillDownRequest;
+    }
+
+    private static Map<String, List<AnalyticsDrillDownRange>> createDrillDownRanges(
+            Map<String, List<DrillDownRangeBean>> ranges) {
+        Map<String, List<AnalyticsDrillDownRange>> result = new LinkedHashMap<String,
+                List<AnalyticsDrillDownRange>>(0);
+        for (Map.Entry<String, List<DrillDownRangeBean>> entry : ranges.entrySet()) {
+            result.put(entry.getKey(), createDrillDownRanges(entry.getValue()));
+        }
+        return  result;
+    }
+
+    private static List<AnalyticsDrillDownRange> createDrillDownRanges(List<DrillDownRangeBean> ranges) {
+        List<AnalyticsDrillDownRange> result = new ArrayList<AnalyticsDrillDownRange>(0);
+        for (DrillDownRangeBean rangeBean : ranges) {
+            AnalyticsDrillDownRange range = new AnalyticsDrillDownRange(rangeBean.getLabel(),
+                                             rangeBean.getFrom(), rangeBean.getTo());
+            result.add(range);
+        }
+        return result;
+    }
+
+
+    private static Map<String , AnalyticsCategoryPath> createCategoryPaths(List<DrillDownPathBean> bean) {
+        Map<String, AnalyticsCategoryPath> categoryPaths = new LinkedHashMap<String, AnalyticsCategoryPath>(0);
+        for (DrillDownPathBean drillDownPathBean : bean) {
+            categoryPaths.put(drillDownPathBean.getCategoryName(),
+                              new AnalyticsCategoryPath(drillDownPathBean.getPath()));
+        }
+        return categoryPaths;
     }
 
     /**

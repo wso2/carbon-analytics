@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * This class represents a facet object bean. facet object defines the hierarchical category,
+ * This class represents a facet object bean. facet object defines the hierarchical categoryName,
  * which can be drilled down. This can be used as a value in a record.
  * Example :
  *   Assume a record represents a book.
@@ -40,30 +40,30 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "categoryPath")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class CategoryPathBean {
+public class DrillDownPathBean {
 
     @XmlElement(name = "path")
     private String[] path;
-    @XmlElement(name = "weight")
-    private  float weight;
+    @XmlElement(name = "categoryName", required = false, defaultValue = "1.0")
+    private  String categoryName;
 
     /**
-     * Create a hierarchical category with a given path and weight with 1.0.
+     * Create a hierarchical categoryName with a given path and categoryName with 1.0.
      * Use this constructor when the categoryPaths need to be given for drill down search
      * in DrillDownRequest objects
-     * @param path array of strings representing the category path.
+     * @param path array of strings representing the categoryName path.
      */
-    public CategoryPathBean(String[] path) {
+    public DrillDownPathBean(String[] path) {
         this.path = path;
     }
     /**
-     * Creates a hierarchical Category with the given weight and the array of Strings representing
-     * the hierarchical category
-     * @param weight Weight of the category, set it to 1.0 if weights are not necessary
-     * @param path String array which represent the category path.
+     * Creates a hierarchical Category with the given categoryName and the array of Strings representing
+     * the hierarchical categoryName
+     * @param categoryName Weight of the categoryName, set it to 1.0 if weights are not necessary
+     * @param path String array which represent the categoryName path.
      */
-    public CategoryPathBean(float weight, String[] path) {
-        this.weight = weight;
+    public DrillDownPathBean(String categoryName, String[] path) {
+        this.categoryName = categoryName;
         this.path = path;
     }
 
@@ -75,15 +75,15 @@ public class CategoryPathBean {
         this.path = path;
     }
 
-    public float getWeight() {
-        return weight;
+    public String getCategoryName() {
+        return categoryName;
     }
 
     /**
-     * Set a weight for the facet category
-     * @param weight weight in float ( set is as 1.0 if weights are not needed)
+     * Set a categoryName for the facet categoryName
+     * @param categoryName categoryName in float ( set is as 1.0 if weights are not needed)
      */
-    public void setWeight(float weight) {
-        this.weight = weight;
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 }

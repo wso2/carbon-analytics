@@ -24,13 +24,18 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
+import org.wso2.carbon.analytics.dataservice.commons.DrillDownResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.restapi.Constants;
 import org.wso2.carbon.analytics.dataservice.restapi.UnauthenticatedUserException;
 import org.wso2.carbon.analytics.dataservice.restapi.Utils;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.AnalyticsSchemaBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownRequestBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownResultBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.IndexConfigurationBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.PerCategoryDrillDownResultBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.PerFieldDrillDownResultBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.QueryBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.TableBean;
@@ -622,7 +627,23 @@ public class AnalyticsResource extends AbstractResource {
         anss.setRecordCount(1);
         anss.setWithIds(true);
 
-        return Response.ok(ads.searchRange(-1234, anss)).build();
+        DrillDownResultBean dd = new DrillDownResultBean();
+        PerCategoryDrillDownResultBean cc1 = new PerCategoryDrillDownResultBean();
+        cc1.setCategory("fdfdf");
+        cc1.setRecordIds(new String[]{"gf", "fdf"});
+        cc1.setRecordCount(2);
+        cc1.setCategoryPath(new String[]{"gf", "fdf"});
+        PerCategoryDrillDownResultBean cc2 = new PerCategoryDrillDownResultBean();
+        cc2.setCategory("fdfdf");
+        cc2.setRecordIds(new String[]{"gf", "fdf"});
+        cc2.setRecordCount(2);
+        cc2.setCategoryPath(new String[]{"gf", "fdf"});
+
+        PerFieldDrillDownResultBean pp = new PerFieldDrillDownResultBean();
+        pp.setFieldName("testffff");
+        pp.setCategories(new PerCategoryDrillDownResultBean[]{cc1, cc2});
+        dd.setPerFieldEntries(new PerFieldDrillDownResultBean[]{pp});
+        return Response.ok(dd).build();
     }
 
     /**
@@ -746,6 +767,64 @@ public class AnalyticsResource extends AbstractResource {
             return Response.ok(recordBeans).build();
         } else {
             throw new AnalyticsException("Search parameters not provided");
+        }
+    }
+
+    /**
+     * Performs the drilldown operation on a given table.
+     * @param requestBean request for drilldown which contains all the details to be drilled down
+     * @param authHeader basic authentication header base64 encoded
+     * @return Map containing with each field and respective list of results
+     * @throws AnalyticsException
+     */
+	@POST
+	@Consumes({ MediaType.APPLICATION_JSON})
+	@Produces({ MediaType.APPLICATION_JSON })
+	@Path(Constants.ResourcePath.DRILLDOWN)
+	public Response drillDown(DrillDownRequestBean requestBean,
+                              @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
+            throws AnalyticsException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Invoking drilldown for tableName : " + requestBean.getTableName());
+        }
+        SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
+        String username = authenticate(authHeader);
+        if (requestBean != null) {
+            AnalyticsDrillDownRequest request = Utils.createDrilldownRequest(requestBean, true);
+            Map<String, List<DrillDownResultEntry>> result = analyticsDataService.drillDown(username, request);
+            DrillDownResultBean resultBean = Utils.createDrillDownResultBean(result);
+            return Response.ok(resultBean).build();
+        } else {
+            throw new AnalyticsException("Drilldown parameters not provided");
+        }
+    }
+
+    /**
+     * Performs the drilldown operation on a given table.
+     * @param requestBean request for drilldown which contains all the details to be drilled down
+     * @param authHeader basic authentication header base64 encoded
+     * @return Map containing with each field and respective list of results
+     * @throws AnalyticsException
+     */
+	@POST
+	@Consumes({ MediaType.APPLICATION_JSON})
+	@Produces({ MediaType.APPLICATION_JSON })
+	@Path(Constants.ResourcePath.DRILLDOWNCOUNT)
+	public Response drillDownCount(DrillDownRequestBean requestBean,
+                              @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
+            throws AnalyticsException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Invoking drilldownCount for tableName : " + requestBean.getTableName());
+        }
+        SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
+        String username = authenticate(authHeader);
+        if (requestBean != null) {
+            AnalyticsDrillDownRequest request = Utils.createDrilldownRequest(requestBean, false);
+            Map<String, List<DrillDownResultEntry>> result = analyticsDataService.drillDown(username, request);
+            DrillDownResultBean resultBean = Utils.createDrillDownResultBean(result);
+            return Response.ok(resultBean).build();
+        } else {
+            throw new AnalyticsException("Drilldown parameters not provided");
         }
     }
 

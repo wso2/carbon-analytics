@@ -97,5 +97,8 @@ public class Constants {
 
 		public static final String INDEXING_DONE = "indexing_done";
 
+		public static final String DRILLDOWN = "drilldown";
+
+		public static final String DRILLDOWNCOUNT = "drilldowncount";
     }
 }

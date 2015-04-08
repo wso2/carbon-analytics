@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.XmlType;
 })
 
 @XmlRootElement( name = "SearchResultEntry")
-public class SearchResultEntryBean implements Comparable<SearchResultEntryBean> {
+public class SearchResultEntryBean {
 	
 	/** The id. */
 	@XmlElement(required = true)
@@ -72,17 +72,4 @@ public class SearchResultEntryBean implements Comparable<SearchResultEntryBean> 
 	public float getScore() {
 		return score;
 	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
-	public int compareTo(SearchResultEntryBean obj) {
-		if (this.score > obj.score) {
-			return 1;
-		} else if (this.score < obj.score) {
-			return -1;
-		} else {
-			return 0;
-		}
-    }
 }
