@@ -27,6 +27,11 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerImpl;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
+import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
+import org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsFileSystemTest;
+import org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.*;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
@@ -34,7 +39,6 @@ import org.wso2.carbon.analytics.spark.core.internal.SparkAnalyticsExecutor;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 
 import javax.naming.NamingException;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -142,6 +146,57 @@ public class AnalyticsSparkSQLTest {
         this.service.deleteTable(1, "ESBLogs");
         this.service.deleteTable(1, "ESBLogsBackup");
         this.service.deleteTable(1, "org_wso2_logs_esb_100");
+    }
+
+    @Test
+    public void testMultiTenantQueryExecution() throws AnalyticsException{
+        SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
+        String commonTableName = "log";
+        List<Record> records1 = AnalyticsRecordStoreTest.generateRecords(-1234, commonTableName, 0, 1000, -1, -1);
+        List<Record> records2 = AnalyticsRecordStoreTest.generateRecords(2, commonTableName, 0, 2000, -1, -1);
+
+        this.service.deleteTable(-1234, commonTableName);
+        this.service.deleteTable(2, commonTableName);
+        this.service.createTable(-1234, commonTableName);
+        this.service.createTable(2, commonTableName);
+        this.service.put(records1);
+        this.service.put(records2);
+
+        //test supertenant queries
+        ex.executeQuery(-1234, "define table log (server_name STRING, "
+                           + "ip STRING, tenant INTEGER, sequence LONG, summary STRING, log STRING)");
+        AnalyticsQueryResult result = ex.executeQuery(-1234, "SELECT * FROM log");
+        Assert.assertEquals(result.getRows().size(), 1000);
+
+        //test tenant queries
+        ex.executeQuery(2, "define table log (server_name STRING, "
+                           + "ip STRING, tenant INTEGER, sequence LONG, summary STRING, log STRING)");
+        result = ex.executeQuery(2, "SELECT * FROM log");
+        Assert.assertEquals(result.getRows().size(), 2000);
+
+        //test <table>.<column name> queries
+        ex.executeQuery(-1234, "define table log (server_name STRING, "
+                               + "ip STRING, tenant INTEGER, sequence LONG, summary STRING, log STRING) "
+                               + "as log2");
+        result = ex.executeQuery(-1234, "SELECT log.ip FROM log UNION SELECT log2.ip FROM log2");
+        Assert.assertEquals(result.getRows().size(), 1);
+
+        //test single letter table queries ex; table name = "t"
+        ex.executeQuery(-1234, "define table log (server_name STRING, "
+                               + "ip STRING, tenant INTEGER, sequence LONG, summary STRING, log STRING)"
+                               + " as t");
+        result = ex.executeQuery(-1234, "SELECT t.ip FROM t");
+        Assert.assertEquals(result.getRows().size(), 1000);
+
+        //test queries with table names and tables alias
+        result = ex.executeQuery(-1234, "select * from ( select * from log ) t1 full outer join " +
+                               "( select * from log2 ) t2 on t1.ip = t2.ip");
+        Assert.assertEquals(result.getRows().size(), 1000*1000);
+
+        this.service.deleteTable(-1234, "log");
+        this.service.deleteTable(-1234, "log2");
+        this.service.deleteTable(-1234, "t");
+        this.service.deleteTable(2, "log");
     }
     
 }
