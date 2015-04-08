@@ -26,6 +26,7 @@ import org.wso2.carbon.analytics.dataservice.io.commons.RemoteRecordGroup;
 import org.wso2.carbon.analytics.dataservice.servlet.exception.AnalyticsAPIAuthenticationException;
 import org.wso2.carbon.analytics.dataservice.servlet.internal.ServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
@@ -60,16 +61,23 @@ public class AnalyticsSearchProcessor extends HttpServlet {
                 resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
             }
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
+            boolean securityEnabled = Boolean.parseBoolean(req.getParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM));
+            int tenantIdParam = MultitenantConstants.INVALID_TENANT_ID;
+            if (!securityEnabled)
+                tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
+            String userName = req.getParameter(AnalyticsAPIConstants.USERNAME_PARAM);
+            String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
+            String language = req.getParameter(AnalyticsAPIConstants.LANGUAGE_PARAM);
+            String query = req.getParameter(AnalyticsAPIConstants.QUERY);
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.SEARCH_OPERATION)) {
-                int tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
-                String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
-                String language = req.getParameter(AnalyticsAPIConstants.LANGUAGE_PARAM);
-                String query = req.getParameter(AnalyticsAPIConstants.QUERY);
                 int start = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.START_PARAM));
                 int count = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.COUNT_PARAM));
                 try {
-                    List<SearchResultEntry> searchResult = ServiceHolder.getAnalyticsDataService().search(tenantIdParam,
+                    List<SearchResultEntry> searchResult;
+                    if (!securityEnabled) searchResult = ServiceHolder.getAnalyticsDataService().search(tenantIdParam,
                             tableName, language, query, start, count);
+                    else searchResult = ServiceHolder.getSecureAnalyticsDataService().search(userName, tableName,
+                            language, query, start, count);
                     PrintWriter output = resp.getWriter();
                     output.append(new GsonBuilder().create().toJson(searchResult));
                     resp.setStatus(HttpServletResponse.SC_OK);
@@ -77,13 +85,13 @@ public class AnalyticsSearchProcessor extends HttpServlet {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }
             } else if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.SEARCH_COUNT_OPERATION)) {
-                int tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
-                String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
-                String language = req.getParameter(AnalyticsAPIConstants.LANGUAGE_PARAM);
-                String query = req.getParameter(AnalyticsAPIConstants.QUERY);
                 try {
-                    int count = ServiceHolder.getAnalyticsDataService().searchCount(tenantIdParam,
+                    int count;
+                    if (!securityEnabled) count = ServiceHolder.getAnalyticsDataService().searchCount(tenantIdParam,
                             tableName, language, query);
+                    else
+                        count = ServiceHolder.getSecureAnalyticsDataService().searchCount(userName, tableName, language,
+                                query);
                     PrintWriter output = resp.getWriter();
                     output.append(AnalyticsAPIConstants.SEARCH_COUNT).append(AnalyticsAPIConstants.SEPARATOR).append(String.valueOf(count));
                     resp.setStatus(HttpServletResponse.SC_OK);
@@ -116,15 +124,22 @@ public class AnalyticsSearchProcessor extends HttpServlet {
                 resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
             }
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
+            boolean securityEnabled = Boolean.parseBoolean(req.getParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM));
+            int tenantIdParam = MultitenantConstants.INVALID_TENANT_ID;
+            if (!securityEnabled)
+                tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
+            String userName = req.getParameter(AnalyticsAPIConstants.USERNAME_PARAM);
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.DRILL_DOWN_OPERATION)) {
-                int tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
                 ServletInputStream servletInputStream = req.getInputStream();
                 ObjectInputStream inputStream = new ObjectInputStream(servletInputStream);
                 ObjectOutputStream objectOutputStream = null;
                 try {
                     AnalyticsDrillDownRequest drillDownRequest = (AnalyticsDrillDownRequest) inputStream.readObject();
-                    Map<String, List<DrillDownResultEntry>> drillDownResult = ServiceHolder.getAnalyticsDataService().
+                    Map<String, List<DrillDownResultEntry>> drillDownResult;
+                    if (!securityEnabled) drillDownResult = ServiceHolder.getAnalyticsDataService().
                             drillDown(tenantIdParam, drillDownRequest);
+                    else
+                        drillDownResult = ServiceHolder.getSecureAnalyticsDataService().drillDown(userName, drillDownRequest);
                     objectOutputStream = new ObjectOutputStream(resp.getOutputStream());
                     objectOutputStream.writeObject(drillDownResult);
                     resp.setStatus(HttpServletResponse.SC_OK);

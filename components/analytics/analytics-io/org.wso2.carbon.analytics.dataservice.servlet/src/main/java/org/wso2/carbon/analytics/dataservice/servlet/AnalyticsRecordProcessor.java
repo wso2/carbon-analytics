@@ -24,6 +24,7 @@ import org.wso2.carbon.analytics.dataservice.servlet.exception.AnalyticsAPIAuthe
 import org.wso2.carbon.analytics.dataservice.servlet.internal.ServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -56,14 +57,23 @@ public class AnalyticsRecordProcessor extends HttpServlet {
                 resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
             }
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
+            boolean securityEnabled = Boolean.parseBoolean(req.getParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM));
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.GET_RECORD_COUNT_OPERATION)) {
-                int tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
+                int tenantIdParam = MultitenantConstants.INVALID_TENANT_ID;
+                if (!securityEnabled)
+                    tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
+                String userName = req.getParameter(AnalyticsAPIConstants.USERNAME_PARAM);
                 String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
                 long timeFrom = Long.parseLong(req.getParameter(AnalyticsAPIConstants.TIME_FROM_PARAM));
                 long timeTo = Long.parseLong(req.getParameter(AnalyticsAPIConstants.TIME_TO_PARAM));
                 try {
-                    long recordCount = ServiceHolder.getAnalyticsDataService().getRecordCount(tenantIdParam, tableName,
-                            timeFrom, timeTo);
+                    long recordCount;
+                    if (!securityEnabled)
+                        recordCount = ServiceHolder.getAnalyticsDataService().getRecordCount(tenantIdParam, tableName,
+                                timeFrom, timeTo);
+                    else
+                        recordCount = ServiceHolder.getSecureAnalyticsDataService().getRecordCount(userName, tableName,
+                                timeFrom, timeTo);
                     PrintWriter outputWriter = resp.getWriter();
                     outputWriter.append(AnalyticsAPIConstants.RECORD_COUNT).append(AnalyticsAPIConstants.SEPARATOR).
                             append(String.valueOf(recordCount));
@@ -71,7 +81,7 @@ public class AnalyticsRecordProcessor extends HttpServlet {
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }
-            }else {
+            } else {
                 resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : " + operation
                         + " with get request!");
             }
@@ -97,18 +107,21 @@ public class AnalyticsRecordProcessor extends HttpServlet {
                 resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
             }
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
+            boolean securityEnabled = Boolean.parseBoolean(req.getParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM));
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.PUT_RECORD_OPERATION)) {
                 String recordsJson = req.getParameter(AnalyticsAPIConstants.RECORDS_PARAM);
+                String username = req.getParameter(AnalyticsAPIConstants.USERNAME_PARAM);
                 Type recordListType = new TypeToken<List<Record>>() {
                 }.getType();
                 List<Record> records = new Gson().fromJson(recordsJson, recordListType);
                 try {
-                    ServiceHolder.getAnalyticsDataService().put(records);
+                    if (!securityEnabled) ServiceHolder.getAnalyticsDataService().put(records);
+                    else ServiceHolder.getSecureAnalyticsDataService().put(username, records);
                     resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }
-            }else {
+            } else {
                 resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : " + operation
                         + " with get request!");
             }
@@ -117,6 +130,7 @@ public class AnalyticsRecordProcessor extends HttpServlet {
 
     /**
      * delete records for range and given ids..
+     *
      * @param req
      * @param resp
      * @throws ServletException
@@ -133,32 +147,37 @@ public class AnalyticsRecordProcessor extends HttpServlet {
                 resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
             }
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
+            boolean securityEnabled = Boolean.parseBoolean(req.getParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM));
+            int tenantIdParam = MultitenantConstants.INVALID_TENANT_ID;
+            if (!securityEnabled)
+                tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
+            String userName = req.getParameter(AnalyticsAPIConstants.USERNAME_PARAM);
+            String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.DELETE_RECORDS_RANGE_OPERATION)) {
-                int tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
-                String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
                 long timeFrom = Long.parseLong(req.getParameter(AnalyticsAPIConstants.TIME_FROM_PARAM));
                 long timeTo = Long.parseLong(req.getParameter(AnalyticsAPIConstants.TIME_TO_PARAM));
                 try {
-                     ServiceHolder.getAnalyticsDataService().delete(tenantIdParam, tableName,
+                    if (!securityEnabled) ServiceHolder.getAnalyticsDataService().delete(tenantIdParam, tableName,
                             timeFrom, timeTo);
+                    else ServiceHolder.getSecureAnalyticsDataService().delete(userName, tableName, timeFrom, timeTo);
                     resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }
-            }else if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.DELETE_RECORDS_IDS_OPERATION)){
-                int tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
-                String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
+            } else if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.DELETE_RECORDS_IDS_OPERATION)) {
                 String jsonRecordIds = req.getParameter(AnalyticsAPIConstants.RECORD_IDS_PARAM);
                 Type recordIdListType = new TypeToken<List<String>>() {
                 }.getType();
                 List<String> recordIds = new Gson().fromJson(jsonRecordIds, recordIdListType);
                 try {
-                    ServiceHolder.getAnalyticsDataService().delete(tenantIdParam, tableName, recordIds);
+                    if (!securityEnabled)
+                        ServiceHolder.getAnalyticsDataService().delete(tenantIdParam, tableName, recordIds);
+                    else ServiceHolder.getSecureAnalyticsDataService().delete(userName, tableName, recordIds);
                     resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }
-            }else {
+            } else {
                 resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : " + operation
                         + " with get request!");
             }

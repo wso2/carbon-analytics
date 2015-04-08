@@ -25,6 +25,7 @@ import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.servlet.exception.AnalyticsAPIAuthenticationException;
 import org.wso2.carbon.analytics.dataservice.servlet.internal.ServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -56,10 +57,14 @@ public class AnalyticsIndexProcessor extends HttpServlet {
                 resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
             }
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
+            boolean enableSecurity = Boolean.parseBoolean(req.getParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM));
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.SET_INDICES_OPERATION)) {
                 Gson gson = new Gson();
-                int tenantId = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
+                int tenantId = MultitenantConstants.INVALID_TENANT_ID;
+                if (!enableSecurity)
+                    tenantId = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
                 String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
+                String username = req.getParameter(AnalyticsAPIConstants.USERNAME_PARAM);
                 String indicesJson = req.getParameter(AnalyticsAPIConstants.INDEX_PARAM);
                 Type stringStringMap = new TypeToken<Map<String, IndexType>>() {
                 }.getType();
@@ -70,14 +75,20 @@ public class AnalyticsIndexProcessor extends HttpServlet {
                     }.getType();
                     List<String> scoreParams = gson.fromJson(scoreJson, scoreLisType);
                     try {
-                        ServiceHolder.getAnalyticsDataService().setIndices(tenantId, tableName, indexTypeMap, scoreParams);
+                        if (!enableSecurity) ServiceHolder.getAnalyticsDataService().setIndices(tenantId, tableName,
+                                indexTypeMap, scoreParams);
+                        else ServiceHolder.getSecureAnalyticsDataService().setIndices(username, tableName, indexTypeMap,
+                                scoreParams);
                         resp.setStatus(HttpServletResponse.SC_OK);
                     } catch (AnalyticsException e) {
                         resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                     }
                 } else {
                     try {
-                        ServiceHolder.getAnalyticsDataService().setIndices(tenantId, tableName, indexTypeMap);
+                        if (!enableSecurity)
+                            ServiceHolder.getAnalyticsDataService().setIndices(tenantId, tableName, indexTypeMap);
+                        else
+                            ServiceHolder.getSecureAnalyticsDataService().setIndices(username, tableName, indexTypeMap);
                         resp.setStatus(HttpServletResponse.SC_OK);
                     } catch (AnalyticsException e) {
                         resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
@@ -117,11 +128,18 @@ public class AnalyticsIndexProcessor extends HttpServlet {
                 resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
             }
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
+            boolean securityEnabled = Boolean.parseBoolean(req.getParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM));
+            int tenantIdParam = MultitenantConstants.INVALID_TENANT_ID;
+            if (!securityEnabled)
+                tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
+            String username = req.getParameter(AnalyticsAPIConstants.USERNAME_PARAM);
+            String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.GET_INDICES_OPERATION)) {
-                int tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
-                String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
                 try {
-                    Map<String, IndexType> indexTypeMap = ServiceHolder.getAnalyticsDataService().getIndices(tenantIdParam, tableName);
+                    Map<String, IndexType> indexTypeMap;
+                    if (!securityEnabled)
+                        indexTypeMap = ServiceHolder.getAnalyticsDataService().getIndices(tenantIdParam, tableName);
+                    else indexTypeMap = ServiceHolder.getSecureAnalyticsDataService().getIndices(username, tableName);
                     PrintWriter output = resp.getWriter();
                     output.append(new GsonBuilder().create().toJson(indexTypeMap));
                     resp.setStatus(HttpServletResponse.SC_OK);
@@ -129,10 +147,12 @@ public class AnalyticsIndexProcessor extends HttpServlet {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }
             } else if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.GET_SCORE_PARAMS_OPERATION)) {
-                int tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
-                String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
                 try {
-                    List<String> scoreParams = ServiceHolder.getAnalyticsDataService().getScoreParams(tenantIdParam, tableName);
+                    List<String> scoreParams;
+                    if (!securityEnabled)
+                        scoreParams = ServiceHolder.getAnalyticsDataService().getScoreParams(tenantIdParam, tableName);
+                    else
+                        scoreParams = ServiceHolder.getSecureAnalyticsDataService().getScoreParams(username, tableName);
                     PrintWriter output = resp.getWriter();
                     output.append(new GsonBuilder().create().toJson(scoreParams));
                     resp.setStatus(HttpServletResponse.SC_OK);
@@ -165,11 +185,19 @@ public class AnalyticsIndexProcessor extends HttpServlet {
                 resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
             }
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
+            boolean securityEnabled = Boolean.parseBoolean(req.getParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM));
+            int tenantIdParam = MultitenantConstants.INVALID_TENANT_ID;
+            if (!securityEnabled)
+                tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
+            String username = req.getParameter(AnalyticsAPIConstants.USERNAME_PARAM);
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.DELETE_INDICES_OPERATION)) {
-                int tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
                 String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
                 try {
-                    ServiceHolder.getAnalyticsDataService().clearIndices(tenantIdParam, tableName);
+                    if (!securityEnabled) {
+                        ServiceHolder.getAnalyticsDataService().clearIndices(tenantIdParam, tableName);
+                    } else {
+                        ServiceHolder.getSecureAnalyticsDataService().clearIndices(username, tableName);
+                    }
                     resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());

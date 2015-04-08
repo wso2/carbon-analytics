@@ -19,6 +19,7 @@ package org.wso2.carbon.analytics.api;
 
 
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 
 /**
  * This is the interface which expose the operations to perform on the Analytics.
@@ -26,7 +27,7 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
  * and managing the execution plans and spark queries.
  */
 
-public interface AnalyticsDataAPI extends AnalyticsDataService{
+public interface AnalyticsDataAPI extends AnalyticsDataService, SecureAnalyticsDataService{
 
    //TODO: methods related streams, etc.
 }
