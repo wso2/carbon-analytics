@@ -307,14 +307,6 @@ public interface SecureAnalyticsDataService extends AnalyticsRecordReader {
     Map<String, List<DrillDownResultEntry>> drillDown(String username, AnalyticsDrillDownRequest drillDownRequest) throws AnalyticsIndexException;
 
     /**
-     * Returns the drilldown results for ranges of numeric values, given {@link org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest}
-     * @param drillDownRequest The drilldown object which contains the drilldown information
-     * @return return the results containing the names and the respective facets.
-     */
-    Map<String, List<DrillDownResultEntry>> searchRange(String username, AnalyticsDrillDownRequest drillDownRequest)
-            throws AnalyticsIndexException;
-
-    /**
      * Destroys and frees any resources taken up by the analytics data service implementation.
      */
     void destroy() throws AnalyticsException;

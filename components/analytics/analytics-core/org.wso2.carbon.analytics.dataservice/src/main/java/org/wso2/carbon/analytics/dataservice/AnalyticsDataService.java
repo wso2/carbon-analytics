@@ -276,6 +276,8 @@ public interface AnalyticsDataService extends AnalyticsRecordReader {
 
     /**
      * Returns the drill down results of a search query, given {@link org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest}
+     * If the numeric ranges need to be drilled down. set the facet ranges in the drilldownRequest object using method "setRangeFacets"
+     * Otherwise set it to null.
      * @param drillDownRequest The drilldown object which contains the drilldown information
      * @param facetCount nunber of maximum facets per each field
      * @param recordCount number of each records in each facet
@@ -283,14 +285,6 @@ public interface AnalyticsDataService extends AnalyticsRecordReader {
      * @throws AnalyticsIndexException
      */
     Map<String, List<DrillDownResultEntry>> drillDown(int tenantId, AnalyticsDrillDownRequest drillDownRequest) throws AnalyticsIndexException;
-
-    /**
-     * Returns the drilldown results for ranges of numeric values, given {@link org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest}
-     * @param drillDownRequest The drilldown object which contains the drilldown information
-     * @return return the results containing the names and the respective facets.
-     */
-    Map<String, List<DrillDownResultEntry>> searchRange(int tenantId, AnalyticsDrillDownRequest drillDownRequest)
-            throws AnalyticsIndexException;
 
     /**
      * This method waits until the current indexing operations for the system is done.
