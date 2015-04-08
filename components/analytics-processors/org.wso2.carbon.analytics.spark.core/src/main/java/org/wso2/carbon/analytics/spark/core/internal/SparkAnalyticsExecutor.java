@@ -251,8 +251,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
 
     private String encodeQueryWithTenantId(int tenantId, String query) {
-        String result = "";
-        String [] tokens = query.split("\\s+");
+        String result = query;
+        String[] tokens = query.split("\\s+");
         ArrayList<String> tableNames = new ArrayList<String>();
         for (int i = 0; i < tokens.length; i++) {
             if ((tokens[i].compareToIgnoreCase(AnalyticsConstants.TERM_FROM) == 0 ||
@@ -263,8 +263,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             }
         }
 
-        for (String name: tableNames){
-            result= result.replaceAll(name, encodeTableName(tenantId, name));
+        for (String name : tableNames) {
+            result = result.replaceAll("\\b" + name + "\\b", encodeTableName(tenantId, name));
         }
 
         return result.trim();
@@ -467,10 +467,12 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
 
     private String encodeTableName(int tenantId, String tableName) {
-        String tenantStr = String.valueOf(tenantId);
+        String tenantStr;
         String delimiter = "_";
         if (tenantId < 0) {
             tenantStr = "X" + String.valueOf(-tenantId);
+        } else {
+            tenantStr = "T" + String.valueOf(tenantId);
         }
         return tenantStr + delimiter + tableName;
     }
