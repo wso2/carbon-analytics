@@ -51,6 +51,7 @@ public class EventStreamServiceDS {
 
     protected void setConfigurationContextService(ConfigurationContextService configurationContextService) {
         EventStreamServiceValueHolder.registerConfigurationContextService(configurationContextService);
+        EventStreamServiceValueHolder.getCarbonEventStreamService().addPendingStreams();
     }
 
     protected void unsetConfigurationContextService(ConfigurationContextService configurationContextService) {
