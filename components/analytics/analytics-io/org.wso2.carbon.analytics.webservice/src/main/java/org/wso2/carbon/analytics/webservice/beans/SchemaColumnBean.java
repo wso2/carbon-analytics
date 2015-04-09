@@ -14,29 +14,28 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.analytics.dataservice.io.commons.beans;
+package org.wso2.carbon.analytics.webservice.beans;
 
 /**
- * This class represents a single value entry in a record
+ * This class represents columns in SchemaBean
  */
-public class RecordValueEntryBean {
+public class SchemaColumnBean {
+    private String columnName;
+    private String columnType;
 
-    private String fieldName;
-    private Object value;
-
-    public String getFieldName() {
-        return fieldName;
+    public String getColumnName() {
+        return columnName;
     }
 
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
+    public void setColumnName(String columnName) {
+        this.columnName = columnName;
     }
 
-    public Object getValue() {
-        return value;
+    public String getColumnType() {
+        return columnType;
     }
 
-    public void setValue(Object value) {
-        this.value = value;
+    public void setColumnType(String columnType) {
+        this.columnType = columnType;
     }
 }

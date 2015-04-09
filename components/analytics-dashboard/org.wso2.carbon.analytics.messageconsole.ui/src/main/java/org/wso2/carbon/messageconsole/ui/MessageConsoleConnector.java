@@ -32,9 +32,12 @@ import org.wso2.carbon.analytics.messageconsole.stub.beans.ColumnBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.EntityBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.PermissionBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.RecordBean;
-import org.wso2.carbon.analytics.messageconsole.stub.beans.RecordResultBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.ScheduleTaskInfo;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.TableBean;
+import org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceStub;
+import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsSchemaBean;
+import org.wso2.carbon.analytics.webservice.stub.beans.RecordValueEntryBean;
+import org.wso2.carbon.analytics.webservice.stub.beans.SchemaColumnBean;
 import org.wso2.carbon.messageconsole.ui.beans.Column;
 import org.wso2.carbon.messageconsole.ui.beans.Permissions;
 import org.wso2.carbon.messageconsole.ui.beans.Record;
@@ -66,18 +69,18 @@ public class MessageConsoleConnector {
 
     private static final Log log = LogFactory.getLog(MessageConsoleConnector.class);
     private static final String MESSAGE_CONSOLE = "MessageConsole";
+    private static final String ANALYTICS_WEB_SERVICE = "AnalyticsWebService";
     private static final String OK = "OK";
+    private static final String LUCENE = "lucene";
     private static final String ERROR = "ERROR";
 
     public static final String RECORD_ID = "bam_unique_rec_id";
     public static final String TIMESTAMP = "bam_rec_timestamp";
-
     public static final int TYPE_LIST_RECORD = 1;
     public static final int TYPE_CREATE_RECORD = 2;
     public static final int TYPE_UPDATE_RECORD = 3;
     public static final int TYPE_DELETE_RECORD = 4;
     public static final int TYPE_TABLE_INFO = 5;
-
     public static final int TYPE_LIST_ARBITRARY_RECORD = 6;
     public static final int TYPE_CRATE_ARBITRARY_RECORD = 7;
     public static final int TYPE_UPDATE_ARBITRARY_RECORD = 8;
@@ -89,7 +92,6 @@ public class MessageConsoleConnector {
     public static final int TYPE_SAVE_PURGING_TASK_INFO = 14;
     public static final int TYPE_LIST_TABLE = 15;
 
-    private MessageConsoleStub stub;
     private static final GsonBuilder RESPONSE_RESULT_BUILDER = new GsonBuilder().registerTypeAdapter(ResponseResult.class,
                                                                                                      new ResponseResultSerializer());
     private static final GsonBuilder RESPONSE_RECORD_BUILDER = new GsonBuilder().registerTypeAdapter(ResponseRecord.class,
@@ -102,13 +104,23 @@ public class MessageConsoleConnector {
     }.getType();
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 
+    private MessageConsoleStub messageConsoleStub;
+    private AnalyticsWebServiceStub analyticsWebServiceStub;
+
 
     public MessageConsoleConnector(ConfigurationContext configCtx, String backendServerURL, String cookie) {
-        String serviceURL = backendServerURL + MESSAGE_CONSOLE;
         try {
-            stub = new MessageConsoleStub(configCtx, serviceURL);
-            ServiceClient client = stub._getServiceClient();
-            Options options = client.getOptions();
+            String messageConsoleServiceUrl = backendServerURL + MESSAGE_CONSOLE;
+            messageConsoleStub = new MessageConsoleStub(configCtx, messageConsoleServiceUrl);
+            ServiceClient messageConsoleServiceClient = messageConsoleStub._getServiceClient();
+            Options options = messageConsoleServiceClient.getOptions();
+            options.setManageSession(true);
+            options.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING, cookie);
+
+            String analyticsWebServiceUrl = backendServerURL + ANALYTICS_WEB_SERVICE;
+            analyticsWebServiceStub = new AnalyticsWebServiceStub(configCtx, analyticsWebServiceUrl);
+            ServiceClient analyticsServiceClient = analyticsWebServiceStub._getServiceClient();
+            options = analyticsServiceClient.getOptions();
             options.setManageSession(true);
             options.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING, cookie);
         } catch (AxisFault axisFault) {
@@ -119,7 +131,7 @@ public class MessageConsoleConnector {
     public Permissions getAvailablePermissionForUser() throws MessageConsoleException {
         Permissions permissions = new Permissions();
         try {
-            PermissionBean permissionBean = stub.getAvailablePermissions();
+            PermissionBean permissionBean = messageConsoleStub.getAvailablePermissions();
             permissions.setCreateTable(permissionBean.getCreateTable());
             permissions.setListTable(permissionBean.getListTable());
             permissions.setDropTable(permissionBean.getDropTable());
@@ -141,7 +153,7 @@ public class MessageConsoleConnector {
         Gson gson = new Gson();
         String[] tableList = null;
         try {
-            tableList = stub.listTables();
+            tableList = analyticsWebServiceStub.listTables();
         } catch (Exception e) {
             log.error("Unable to get table list:" + e.getMessage(), e);
         }
@@ -154,8 +166,8 @@ public class MessageConsoleConnector {
         return gson.toJson(tableList);
     }
 
-    public String getRecords(String tableName, long timeFrom, long timeTo, int startIndex, int pageSize, String
-            searchQuery) {
+    public String getRecords(String tableName, long timeFrom, long timeTo, int startIndex, int pageSize,
+                             String searchQuery) {
         if (log.isDebugEnabled()) {
             log.debug("Search Query: " + searchQuery);
             log.debug("timeFrom: " + timeFrom);
@@ -164,41 +176,48 @@ public class MessageConsoleConnector {
             log.debug("Page Size: " + pageSize);
         }
         ResponseResult responseResult = new ResponseResult();
-        Gson gson = RESPONSE_RESULT_BUILDER.serializeNulls().create();
         try {
-            RecordResultBean recordBeans = stub.getRecords(tableName, timeFrom, timeTo, startIndex, pageSize, searchQuery);
-            responseResult.setResult(OK);
-            List<Record> records = new ArrayList<>();
-            if (recordBeans != null) {
-                if (recordBeans.getRecords() != null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Result size: " + recordBeans.getRecords().length);
-                    }
-                    for (RecordBean recordBean : recordBeans.getRecords()) {
-                        Record record = getRecord(recordBean);
-                        records.add(record);
-                    }
-                    responseResult.setRecords(records);
-                }
-                responseResult.setTotalRecordCount(recordBeans.getTotalResultCount());
+
+            org.wso2.carbon.analytics.webservice.stub.beans.RecordBean[] resultRecordBeans;
+            if (searchQuery != null && !searchQuery.isEmpty()) {
+                resultRecordBeans = analyticsWebServiceStub.search(tableName, LUCENE, searchQuery, startIndex, pageSize);
+                responseResult.setTotalRecordCount(analyticsWebServiceStub.searchCount(tableName, LUCENE, searchQuery));
+            } else {
+                resultRecordBeans = analyticsWebServiceStub.getByRange(tableName, 1, null, timeFrom, timeTo, startIndex, pageSize);
+                responseResult.setTotalRecordCount(analyticsWebServiceStub.getRecordCount(tableName, timeFrom, timeTo));
             }
+            List<Record> records = new ArrayList<>();
+            if (resultRecordBeans != null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Result size: " + resultRecordBeans.length);
+                }
+                for (org.wso2.carbon.analytics.webservice.stub.beans.RecordBean recordBean : resultRecordBeans) {
+                    Record record = getRecord(recordBean);
+                    records.add(record);
+                }
+                responseResult.setRecords(records);
+
+            }
+            responseResult.setResult(OK);
         } catch (Exception e) {
             String errorMsg = "Unable to get records for table:" + tableName;
             log.error(errorMsg, e);
             responseResult.setResult(ERROR);
             responseResult.setMessage(errorMsg);
         }
-        return gson.toJson(responseResult);
+        return RESPONSE_RESULT_BUILDER.serializeNulls().create().toJson(responseResult);
     }
 
-    private Record getRecord(RecordBean recordBean) {
+    private Record getRecord(org.wso2.carbon.analytics.webservice.stub.beans.RecordBean recordBean) {
         Record record = new Record();
         if (recordBean != null) {
-            List<Column> columns = new ArrayList<>(recordBean.getEntityBeans().length + 2);
-            columns.add(new Column(RECORD_ID, recordBean.getRecordId()));
+            List<Column> columns = new ArrayList<>();
+            columns.add(new Column(RECORD_ID, recordBean.getId()));
             columns.add(new Column(TIMESTAMP, DATE_FORMAT.format(new Date(recordBean.getTimestamp()))));
-            for (EntityBean entityBean : recordBean.getEntityBeans()) {
-                columns.add(new Column(entityBean.getColumnName(), entityBean.getValue()));
+            if (recordBean.getValues() != null) {
+                for (RecordValueEntryBean entityBean : recordBean.getValues()) {
+                    columns.add(new Column(entityBean.getFieldName(), String.valueOf(entityBean.getValue())));
+                }
             }
             record.setColumns(columns);
         }
@@ -206,20 +225,24 @@ public class MessageConsoleConnector {
     }
 
     public String getTableInfo(String tableName) {
-        Gson gson = new GsonBuilder().serializeNulls().create();
-        TableBean tableInfo;
         ResponseTable table = new ResponseTable();
         try {
-            tableInfo = stub.getTableInfo(tableName);
-            table.setName(tableInfo.getName());
+            AnalyticsSchemaBean tableSchema = analyticsWebServiceStub.getTableSchema(tableName);
+            table.setName(tableName);
             List<ResponseTable.Column> columns = new ArrayList<>();
-            if (tableInfo.getColumns() != null) {
-                for (ColumnBean resultColumn : tableInfo.getColumns()) {
+            if (tableSchema.getColumns() != null) {
+                List<String> primaryKeys = null;
+                if (tableSchema.getPrimaryKeys() != null) {
+                    primaryKeys = Arrays.asList(tableSchema.getPrimaryKeys());
+                }
+                for (SchemaColumnBean resultColumn : tableSchema.getColumns()) {
                     ResponseTable.Column column = new ResponseTable().new Column();
-                    column.setName(resultColumn.getName());
-                    column.setPrimary(resultColumn.getPrimary());
-                    column.setType(resultColumn.getType());
-                    column.setDisplay(resultColumn.getDisplay());
+                    column.setName(resultColumn.getColumnName());
+                    column.setType(resultColumn.getColumnType());
+                    column.setDisplay(Boolean.TRUE);
+                    if (primaryKeys != null && primaryKeys.contains(resultColumn.getColumnName())) {
+                        column.setPrimary(Boolean.TRUE);
+                    }
                     columns.add(column);
                 }
             }
@@ -241,7 +264,7 @@ public class MessageConsoleConnector {
         } catch (Exception e) {
             log.error("Unable to get table information for table:" + tableName, e);
         }
-        return gson.toJson(table);
+        return new GsonBuilder().serializeNulls().create().toJson(table);
     }
 
     public String deleteRecords(String table, String[] recordIds) {
@@ -249,17 +272,16 @@ public class MessageConsoleConnector {
             log.debug("Records[" + Arrays.toString(recordIds) + "] going to delete from" + table);
         }
         ResponseResult responseResult = new ResponseResult();
-        Gson gson = RESPONSE_RESULT_BUILDER.serializeNulls().create();
-        responseResult.setResult(OK);
         try {
-            stub.deleteRecords(table, recordIds);
+            analyticsWebServiceStub.deleteByIds(table, recordIds);
+            responseResult.setResult(OK);
         } catch (Exception e) {
             String errorMsg = "Unable to delete records" + Arrays.toString(recordIds) + " from table :" + table;
             log.error(errorMsg, e);
             responseResult.setResult(ERROR);
             responseResult.setMessage(errorMsg);
         }
-        return gson.toJson(responseResult);
+        return RESPONSE_RESULT_BUILDER.serializeNulls().create().toJson(responseResult);
     }
 
     public String addRecord(String table, String[] columns, String[] values) {
@@ -271,8 +293,9 @@ public class MessageConsoleConnector {
         Gson gson = RESPONSE_RECORD_BUILDER.serializeNulls().create();
         responseRecord.setResult(OK);
         try {
-            RecordBean recordBean = stub.addRecord(table, columns, values);
-            responseRecord.setRecord(getRecord(recordBean));
+//            org.wso2.carbon.analytics.webservice.stub.beans.RecordBean
+            RecordBean recordBean = messageConsoleStub.addRecord(table, columns, values);
+//            responseRecord.setRecord(getRecord(recordBean));
         } catch (Exception e) {
             String errorMsg = "Unable to add record {column: " + Arrays.toString(columns) + ", values: " + Arrays
                     .toString(values) + " } to table :" + table;
@@ -292,8 +315,8 @@ public class MessageConsoleConnector {
         Gson gson = RESPONSE_RECORD_BUILDER.serializeNulls().create();
         responseRecord.setResult(OK);
         try {
-            RecordBean recordBean = stub.updateRecord(table, recordId, columns, values);
-            responseRecord.setRecord(getRecord(recordBean));
+            RecordBean recordBean = messageConsoleStub.updateRecord(table, recordId, columns, values);
+//            responseRecord.setRecord(getRecord(recordBean));
         } catch (Exception e) {
             String errorMsg = "Unable to update record {id: " + recordId + ", column: " + Arrays.toString(columns) + ", " +
                               "values: " + Arrays.toString(values) + " } to table :" + table;
@@ -313,7 +336,7 @@ public class MessageConsoleConnector {
         responseArbitraryField.setResult(OK);
         try {
             List<Column> resultColumns = new ArrayList<>();
-            EntityBean[] entityBeans = stub.getArbitraryList(table, recordId);
+            EntityBean[] entityBeans = messageConsoleStub.getArbitraryList(table, recordId);
             if (entityBeans != null) {
                 for (EntityBean entityBean : entityBeans) {
                     Column column = new Column(entityBean.getColumnName(), entityBean.getValue(), entityBean.getType());
@@ -338,7 +361,7 @@ public class MessageConsoleConnector {
         Gson gson = RESPONSE_ARBITRARY_FIELD_BUILDER.serializeNulls().create();
         responseArbitraryField.setResult(OK);
         try {
-            stub.deleteArbitraryField(table, recordId, fieldName);
+            messageConsoleStub.deleteArbitraryField(table, recordId, fieldName);
         } catch (Exception e) {
             String errorMsg = "Unable to delete arbitrary field with record[" + recordId + "] in table[" + table + "]";
             log.error(errorMsg, e);
@@ -357,7 +380,7 @@ public class MessageConsoleConnector {
         Gson gson = RESPONSE_ARBITRARY_FIELD_COLUMN_BUILDER.serializeNulls().create();
         responseArbitraryFieldColumn.setResult(OK);
         try {
-            stub.putArbitraryField(table, recordId, fieldName, value, type);
+            messageConsoleStub.putArbitraryField(table, recordId, fieldName, value, type);
             responseArbitraryFieldColumn.setColumn(new Column(fieldName, value, type));
         } catch (Exception e) {
             String errorMsg = "Unable to save arbitrary field[" + fieldName + "] with record[" + recordId + "] in " +
@@ -393,7 +416,7 @@ public class MessageConsoleConnector {
         tableBean.setColumns(columns);
         msg = "Successfully saved table information";
         try {
-            stub.createTable(tableBean);
+            messageConsoleStub.createTable(tableBean);
         } catch (Exception e) {
             log.error("Unable to save table information: " + e.getMessage(), e);
             msg = "Unable to save table information: " + e.getMessage();
@@ -425,7 +448,7 @@ public class MessageConsoleConnector {
         tableBean.setColumns(columns);
         msg = "Successfully saved table information";
         try {
-            stub.editTable(tableBean);
+            messageConsoleStub.editTable(tableBean);
         } catch (Exception e) {
             log.error("Unable to save table information: " + e.getMessage(), e);
             msg = "Unable to save table information: " + e.getMessage();
@@ -439,7 +462,7 @@ public class MessageConsoleConnector {
         }
         String msg;
         try {
-            stub.deleteTable(table);
+            analyticsWebServiceStub.deleteTable(table);
             msg = "Table " + table + " deleted successfully";
         } catch (Exception e) {
             log.error("Unable to delete table due to " + e.getMessage(), e);
@@ -452,7 +475,7 @@ public class MessageConsoleConnector {
         List<TableSchemaColumn> tableSchemaColumns = new ArrayList<>();
         Gson gson = new GsonBuilder().serializeNulls().create();
         try {
-            TableBean tableInfo = stub.getTableInfoWithIndicesInfo(table);
+            TableBean tableInfo = messageConsoleStub.getTableInfoWithIndicesInfo(table);
             if (tableInfo != null && tableInfo.getColumns() != null) {
                 for (ColumnBean column : tableInfo.getColumns()) {
                     TableSchemaColumn schemaColumn = new TableSchemaColumn();
@@ -472,7 +495,7 @@ public class MessageConsoleConnector {
 
     public boolean isPaginationSupported() {
         try {
-            return stub.isPaginationSupported();
+            return messageConsoleStub.isPaginationSupported();
         } catch (RemoteException e) {
             log.error("Unable to check whether pagination support available or not.");
         }
@@ -492,7 +515,7 @@ public class MessageConsoleConnector {
             }
         }
         try {
-            stub.scheduleDataPurging(table, cron, Integer.parseInt(retentionPeriod));
+            messageConsoleStub.scheduleDataPurging(table, cron, Integer.parseInt(retentionPeriod));
             if (enable) {
                 msg = "Data purging task for " + table + " scheduled successfully.";
             } else {
@@ -509,7 +532,7 @@ public class MessageConsoleConnector {
         Gson gson = new Gson();
         ScheduleTask scheduleTask = new ScheduleTask();
         try {
-            ScheduleTaskInfo dataPurgingDetails = stub.getDataPurgingDetails(table);
+            ScheduleTaskInfo dataPurgingDetails = messageConsoleStub.getDataPurgingDetails(table);
             if (dataPurgingDetails != null) {
                 scheduleTask.setCronString(dataPurgingDetails.getCronString());
                 scheduleTask.setRetentionPeriod(dataPurgingDetails.getRetentionPeriod());

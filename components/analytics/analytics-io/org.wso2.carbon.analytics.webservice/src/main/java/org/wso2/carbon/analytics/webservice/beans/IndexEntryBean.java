@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.analytics.dataservice.io.commons.beans;
+package org.wso2.carbon.analytics.webservice.beans;
 
 /**
- * This class represents a single value entry in a record
+ * This class represents the bean for a single index entry definition
  */
-public class RecordValueEntryBean {
-
+public class IndexEntryBean {
     private String fieldName;
-    private Object value;
+    private String indexType;
 
     public String getFieldName() {
         return fieldName;
@@ -32,11 +31,16 @@ public class RecordValueEntryBean {
         this.fieldName = fieldName;
     }
 
-    public Object getValue() {
-        return value;
+    public String getIndexType() {
+        return indexType;
     }
 
-    public void setValue(Object value) {
-        this.value = value;
+    public void setIndexType(String indexType) {
+        this.indexType = indexType;
+    }
+
+    @Override
+    public String toString(){
+        return "fieldName: " + fieldName + ", indexType: " + indexType;
     }
 }

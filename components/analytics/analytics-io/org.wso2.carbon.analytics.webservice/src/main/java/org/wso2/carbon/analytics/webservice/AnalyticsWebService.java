@@ -23,14 +23,12 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
-import org.wso2.carbon.analytics.dataservice.io.commons.Utils;
-import org.wso2.carbon.analytics.dataservice.io.commons.beans.AnalyticsSchemaBean;
-import org.wso2.carbon.analytics.dataservice.io.commons.beans.IndexConfigurationBean;
-import org.wso2.carbon.analytics.dataservice.io.commons.beans.RecordBean;
-import org.wso2.carbon.analytics.dataservice.io.commons.beans.RecordGroupBean;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.analytics.webservice.beans.AnalyticsSchemaBean;
+import org.wso2.carbon.analytics.webservice.beans.IndexConfigurationBean;
+import org.wso2.carbon.analytics.webservice.beans.RecordBean;
 import org.wso2.carbon.analytics.webservice.exception.AnalyticsWebServiceException;
 import org.wso2.carbon.analytics.webservice.internal.ServiceHolder;
 import org.wso2.carbon.core.AbstractAdmin;
@@ -216,10 +214,10 @@ public class AnalyticsWebService extends AbstractAdmin {
      *                          Long.MAX_VALUE should signal, this restriction to be disregarded
      * @param recordsFrom       The paginated index from value, zero based, inclusive
      * @param recordsCount      The paginated records count to be read, -getUsername() for infinity
-     * @return An array of {@link RecordGroupBean} objects, which represents individual data sets in their local location
+     * @return An array of {@link RecordBean} objects, which represents individual data sets in their local location
      * @throws AnalyticsWebServiceException
      */
-    public RecordBean[] get(String tableName, int numPartitionsHint, String[] columns, long timeFrom,
+    public RecordBean[] getByRange(String tableName, int numPartitionsHint, String[] columns, long timeFrom,
                                  long timeTo, int recordsFrom, int recordsCount) throws AnalyticsWebServiceException {
 
         try {
@@ -249,7 +247,7 @@ public class AnalyticsWebService extends AbstractAdmin {
      * @return An array of {@link RecordBean} objects, which contains individual data sets in their local location
      * @throws AnalyticsWebServiceException
      */
-    public RecordBean[] get(String tableName, int numPartitionsHint, String[] columns, String[] ids)
+    public RecordBean[] getById(String tableName, int numPartitionsHint, String[] columns, String[] ids)
             throws AnalyticsWebServiceException {
         try {
             List<String> columnList = null;
@@ -280,7 +278,7 @@ public class AnalyticsWebService extends AbstractAdmin {
      * @param timeTo    The ending time to get records to for deletion
      * @throws AnalyticsWebServiceException
      */
-    public void delete(String tableName, long timeFrom, long timeTo) throws AnalyticsWebServiceException {
+    public void deleteByRange(String tableName, long timeFrom, long timeTo) throws AnalyticsWebServiceException {
         try {
             analyticsDataAPI.delete(getUsername(), tableName, timeFrom, timeTo);
         } catch (AnalyticsException e) {
@@ -296,7 +294,7 @@ public class AnalyticsWebService extends AbstractAdmin {
      * @param ids       The list of ids of the records to be deleted
      * @throws AnalyticsWebServiceException
      */
-    public void delete(String tableName, String[] ids) throws AnalyticsWebServiceException {
+    public void deleteByIds(String tableName, String[] ids) throws AnalyticsWebServiceException {
         try {
             analyticsDataAPI.delete(getUsername(), tableName, Arrays.asList(ids));
         } catch (AnalyticsException e) {

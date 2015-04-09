@@ -56,7 +56,7 @@
                                 </path>
                                 <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
                                     <arg
-                                            line="-uri src/main/resources/AnalyticsWebService.wsdl -u -uw -o target/generated-code -p org.wso2.carbon.analytics.webservice.stub -ns2p http://org.apache.axis2/xsd=org.wso2.carbon.analytics.webservice.stub.axis2,http://exception.webservice.analytics.carbon.wso2.org/xsd=org.wso2.carbon.analytics.webservice.stub.exception,http://beans.commons.io.dataservice.analytics.carbon.wso2.org/xsd=org.wso2.carbon.analytics.webservice.stub.beans"/>
+                                            line="-uri src/main/resources/AnalyticsWebService.wsdl -u -uw -o target/generated-code -p org.wso2.carbon.analytics.webservice.stub -ns2p http://org.apache.axis2/xsd=org.wso2.carbon.analytics.webservice.stub.axis2,http://exception.webservice.analytics.carbon.wso2.org/xsd=org.wso2.carbon.analytics.webservice.stub.exception,http://beans.webservice.analytics.carbon.wso2.org/xsd=org.wso2.carbon.analytics.webservice.stub.beans"/>
                                     <classpath refid="wsdl2java.classpath"/>
                                 </java>
                             </tasks>
