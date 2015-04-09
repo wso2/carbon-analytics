@@ -71,15 +71,13 @@
     <div id="middle">
         <h2><fmt:message key="available.event.streams"/></h2>
 
-        <table border="0">
-            <tr>
-                <td><a href="create_event_stream.jsp?ordinal=1"
-                       style="background-image:url(images/add.gif);"
-                       class="icon-link">
-                    Add Event Stream
-                </a></td>
-        </table>
+        <a href="create_event_stream.jsp?ordinal=1"
+           style="background-image:url(images/add.gif);"
+           class="icon-link">
+            Add Event Stream
+        </a>
 
+        <br/>
         <br/>
 
         <div id="workArea">
