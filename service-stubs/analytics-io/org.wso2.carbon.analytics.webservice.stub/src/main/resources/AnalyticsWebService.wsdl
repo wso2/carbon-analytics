@@ -1,0 +1,867 @@
+
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://webservice.analytics.carbon.wso2.org" xmlns:ax221="http://exception.webservice.analytics.carbon.wso2.org/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:ax223="http://beans.commons.io.dataservice.analytics.carbon.wso2.org/xsd" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://webservice.analytics.carbon.wso2.org">
+    <wsdl:documentation>AnalyticsWebService</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://exception.webservice.analytics.carbon.wso2.org/xsd">
+            <xs:complexType name="AnalyticsWebServiceException">
+                <xs:sequence></xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://beans.commons.io.dataservice.analytics.carbon.wso2.org/xsd">
+            <xs:complexType name="AnalyticsSchemaBean">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="ax223:SchemaColumnBean"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="primaryKeys" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="SchemaColumnBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="columnName" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="columnType" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="IndexConfigurationBean">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="indices" nillable="true" type="ax223:IndexEntryBean"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="scoreParams" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="IndexEntryBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="fieldName" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="indexType" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="RecordBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="id" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="timestamp" type="xs:long"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="values" nillable="true" type="ax223:RecordValueEntryBean"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="RecordValueEntryBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="fieldName" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="value" nillable="true" type="xs:anyType"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema xmlns:ax222="http://exception.webservice.analytics.carbon.wso2.org/xsd" xmlns:ax224="http://beans.commons.io.dataservice.analytics.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://webservice.analytics.carbon.wso2.org">
+            <xs:import namespace="http://exception.webservice.analytics.carbon.wso2.org/xsd"></xs:import>
+            <xs:import namespace="http://beans.commons.io.dataservice.analytics.carbon.wso2.org/xsd"></xs:import>
+            <xs:element name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="AnalyticsWebServiceException" nillable="true" type="ax221:AnalyticsWebServiceException"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="searchCount">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="language" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="query" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="searchCountResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:int"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="waitForIndexing">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="maxWait" type="xs:long"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTableSchema">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTableSchemaResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax223:AnalyticsSchemaBean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="tableExists">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="tableExistsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteTable">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="listTables">
+                <xs:complexType>
+                    <xs:sequence></xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="listTablesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getRecordCount">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="timeFrom" type="xs:long"></xs:element>
+                        <xs:element minOccurs="0" name="timeTo" type="xs:long"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getRecordCountResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:long"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setIndices">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="indexConfigurationBean" nillable="true" type="ax223:IndexConfigurationBean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getIndices">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getIndicesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax223:IndexConfigurationBean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="clearIndices">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="createTable">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setTableSchema">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="schema" nillable="true" type="ax223:AnalyticsSchemaBean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="get">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="numPartitionsHint" type="xs:int"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="xs:string"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="timeFrom" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax223:RecordBean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="put">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="records" nillable="true" type="ax223:RecordBean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="delete">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="timeFrom" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="search">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="language" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="query" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="start" type="xs:int"></xs:element>
+                        <xs:element minOccurs="0" name="count" type="xs:int"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="searchResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax223:RecordBean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="deleteRequest">
+        <wsdl:part name="parameters" element="ns:delete"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="AnalyticsWebServiceAnalyticsWebServiceException">
+        <wsdl:part name="parameters" element="ns:AnalyticsWebServiceAnalyticsWebServiceException"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="putRequest">
+        <wsdl:part name="parameters" element="ns:put"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="createTableRequest">
+        <wsdl:part name="parameters" element="ns:createTable"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="listTablesRequest">
+        <wsdl:part name="parameters" element="ns:listTables"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="listTablesResponse">
+        <wsdl:part name="parameters" element="ns:listTablesResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="searchCountRequest">
+        <wsdl:part name="parameters" element="ns:searchCount"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="searchCountResponse">
+        <wsdl:part name="parameters" element="ns:searchCountResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getRequest">
+        <wsdl:part name="parameters" element="ns:get"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getResponse">
+        <wsdl:part name="parameters" element="ns:getResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getTableSchemaRequest">
+        <wsdl:part name="parameters" element="ns:getTableSchema"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getTableSchemaResponse">
+        <wsdl:part name="parameters" element="ns:getTableSchemaResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="setTableSchemaRequest">
+        <wsdl:part name="parameters" element="ns:setTableSchema"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getRecordCountRequest">
+        <wsdl:part name="parameters" element="ns:getRecordCount"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getRecordCountResponse">
+        <wsdl:part name="parameters" element="ns:getRecordCountResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="searchRequest">
+        <wsdl:part name="parameters" element="ns:search"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="searchResponse">
+        <wsdl:part name="parameters" element="ns:searchResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getIndicesRequest">
+        <wsdl:part name="parameters" element="ns:getIndices"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getIndicesResponse">
+        <wsdl:part name="parameters" element="ns:getIndicesResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deleteTableRequest">
+        <wsdl:part name="parameters" element="ns:deleteTable"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="tableExistsRequest">
+        <wsdl:part name="parameters" element="ns:tableExists"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="tableExistsResponse">
+        <wsdl:part name="parameters" element="ns:tableExistsResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="setIndicesRequest">
+        <wsdl:part name="parameters" element="ns:setIndices"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="waitForIndexingRequest">
+        <wsdl:part name="parameters" element="ns:waitForIndexing"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="clearIndicesRequest">
+        <wsdl:part name="parameters" element="ns:clearIndices"></wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="AnalyticsWebServicePortType">
+        <wsdl:operation name="delete">
+            <wsdl:input message="ns:deleteRequest" wsaw:Action="urn:delete"></wsdl:input>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:deleteAnalyticsWebServiceAnalyticsWebServiceException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="put">
+            <wsdl:input message="ns:putRequest" wsaw:Action="urn:put"></wsdl:input>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:putAnalyticsWebServiceAnalyticsWebServiceException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="createTable">
+            <wsdl:input message="ns:createTableRequest" wsaw:Action="urn:createTable"></wsdl:input>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:createTableAnalyticsWebServiceAnalyticsWebServiceException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="listTables">
+            <wsdl:input message="ns:listTablesRequest" wsaw:Action="urn:listTables"></wsdl:input>
+            <wsdl:output message="ns:listTablesResponse" wsaw:Action="urn:listTablesResponse"></wsdl:output>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:listTablesAnalyticsWebServiceAnalyticsWebServiceException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="searchCount">
+            <wsdl:input message="ns:searchCountRequest" wsaw:Action="urn:searchCount"></wsdl:input>
+            <wsdl:output message="ns:searchCountResponse" wsaw:Action="urn:searchCountResponse"></wsdl:output>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:searchCountAnalyticsWebServiceAnalyticsWebServiceException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="get">
+            <wsdl:input message="ns:getRequest" wsaw:Action="urn:get"></wsdl:input>
+            <wsdl:output message="ns:getResponse" wsaw:Action="urn:getResponse"></wsdl:output>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getAnalyticsWebServiceAnalyticsWebServiceException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getTableSchema">
+            <wsdl:input message="ns:getTableSchemaRequest" wsaw:Action="urn:getTableSchema"></wsdl:input>
+            <wsdl:output message="ns:getTableSchemaResponse" wsaw:Action="urn:getTableSchemaResponse"></wsdl:output>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getTableSchemaAnalyticsWebServiceAnalyticsWebServiceException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="setTableSchema">
+            <wsdl:input message="ns:setTableSchemaRequest" wsaw:Action="urn:setTableSchema"></wsdl:input>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:setTableSchemaAnalyticsWebServiceAnalyticsWebServiceException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getRecordCount">
+            <wsdl:input message="ns:getRecordCountRequest" wsaw:Action="urn:getRecordCount"></wsdl:input>
+            <wsdl:output message="ns:getRecordCountResponse" wsaw:Action="urn:getRecordCountResponse"></wsdl:output>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getRecordCountAnalyticsWebServiceAnalyticsWebServiceException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="search">
+            <wsdl:input message="ns:searchRequest" wsaw:Action="urn:search"></wsdl:input>
+            <wsdl:output message="ns:searchResponse" wsaw:Action="urn:searchResponse"></wsdl:output>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:searchAnalyticsWebServiceAnalyticsWebServiceException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getIndices">
+            <wsdl:input message="ns:getIndicesRequest" wsaw:Action="urn:getIndices"></wsdl:input>
+            <wsdl:output message="ns:getIndicesResponse" wsaw:Action="urn:getIndicesResponse"></wsdl:output>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getIndicesAnalyticsWebServiceAnalyticsWebServiceException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteTable">
+            <wsdl:input message="ns:deleteTableRequest" wsaw:Action="urn:deleteTable"></wsdl:input>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:deleteTableAnalyticsWebServiceAnalyticsWebServiceException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="tableExists">
+            <wsdl:input message="ns:tableExistsRequest" wsaw:Action="urn:tableExists"></wsdl:input>
+            <wsdl:output message="ns:tableExistsResponse" wsaw:Action="urn:tableExistsResponse"></wsdl:output>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:tableExistsAnalyticsWebServiceAnalyticsWebServiceException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="setIndices">
+            <wsdl:input message="ns:setIndicesRequest" wsaw:Action="urn:setIndices"></wsdl:input>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:setIndicesAnalyticsWebServiceAnalyticsWebServiceException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="waitForIndexing">
+            <wsdl:input message="ns:waitForIndexingRequest" wsaw:Action="urn:waitForIndexing"></wsdl:input>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:waitForIndexingAnalyticsWebServiceAnalyticsWebServiceException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="clearIndices">
+            <wsdl:input message="ns:clearIndicesRequest" wsaw:Action="urn:clearIndices"></wsdl:input>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:clearIndicesAnalyticsWebServiceAnalyticsWebServiceException"></wsdl:fault>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="AnalyticsWebServiceSoap11Binding" type="ns:AnalyticsWebServicePortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"></soap:binding>
+        <wsdl:operation name="delete">
+            <soap:operation soapAction="urn:delete" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="put">
+            <soap:operation soapAction="urn:put" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="createTable">
+            <soap:operation soapAction="urn:createTable" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="searchCount">
+            <soap:operation soapAction="urn:searchCount" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="listTables">
+            <soap:operation soapAction="urn:listTables" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="get">
+            <soap:operation soapAction="urn:get" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getTableSchema">
+            <soap:operation soapAction="urn:getTableSchema" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getRecordCount">
+            <soap:operation soapAction="urn:getRecordCount" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="setTableSchema">
+            <soap:operation soapAction="urn:setTableSchema" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteTable">
+            <soap:operation soapAction="urn:deleteTable" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getIndices">
+            <soap:operation soapAction="urn:getIndices" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="search">
+            <soap:operation soapAction="urn:search" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="tableExists">
+            <soap:operation soapAction="urn:tableExists" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="setIndices">
+            <soap:operation soapAction="urn:setIndices" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="waitForIndexing">
+            <soap:operation soapAction="urn:waitForIndexing" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="clearIndices">
+            <soap:operation soapAction="urn:clearIndices" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="AnalyticsWebServiceSoap12Binding" type="ns:AnalyticsWebServicePortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"></soap12:binding>
+        <wsdl:operation name="delete">
+            <soap12:operation soapAction="urn:delete" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="put">
+            <soap12:operation soapAction="urn:put" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="createTable">
+            <soap12:operation soapAction="urn:createTable" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="searchCount">
+            <soap12:operation soapAction="urn:searchCount" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="listTables">
+            <soap12:operation soapAction="urn:listTables" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="get">
+            <soap12:operation soapAction="urn:get" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getTableSchema">
+            <soap12:operation soapAction="urn:getTableSchema" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getRecordCount">
+            <soap12:operation soapAction="urn:getRecordCount" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="setTableSchema">
+            <soap12:operation soapAction="urn:setTableSchema" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteTable">
+            <soap12:operation soapAction="urn:deleteTable" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getIndices">
+            <soap12:operation soapAction="urn:getIndices" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="search">
+            <soap12:operation soapAction="urn:search" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="tableExists">
+            <soap12:operation soapAction="urn:tableExists" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="setIndices">
+            <soap12:operation soapAction="urn:setIndices" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="waitForIndexing">
+            <soap12:operation soapAction="urn:waitForIndexing" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="clearIndices">
+            <soap12:operation soapAction="urn:clearIndices" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="AnalyticsWebServiceHttpBinding" type="ns:AnalyticsWebServicePortType">
+        <http:binding verb="POST"></http:binding>
+        <wsdl:operation name="delete">
+            <http:operation location="delete"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="put">
+            <http:operation location="put"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="createTable">
+            <http:operation location="createTable"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="searchCount">
+            <http:operation location="searchCount"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="listTables">
+            <http:operation location="listTables"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="get">
+            <http:operation location="get"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getTableSchema">
+            <http:operation location="getTableSchema"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getRecordCount">
+            <http:operation location="getRecordCount"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setTableSchema">
+            <http:operation location="setTableSchema"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="deleteTable">
+            <http:operation location="deleteTable"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getIndices">
+            <http:operation location="getIndices"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="search">
+            <http:operation location="search"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="tableExists">
+            <http:operation location="tableExists"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setIndices">
+            <http:operation location="setIndices"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="waitForIndexing">
+            <http:operation location="waitForIndexing"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="clearIndices">
+            <http:operation location="clearIndices"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="AnalyticsWebService">
+        <wsdl:port name="AnalyticsWebServiceHttpsSoap11Endpoint" binding="ns:AnalyticsWebServiceSoap11Binding">
+            <soap:address location="https://10.100.0.46:9443/services/AnalyticsWebService.AnalyticsWebServiceHttpsSoap11Endpoint/"></soap:address>
+        </wsdl:port>
+        <wsdl:port name="AnalyticsWebServiceHttpsSoap12Endpoint" binding="ns:AnalyticsWebServiceSoap12Binding">
+            <soap12:address location="https://10.100.0.46:9443/services/AnalyticsWebService.AnalyticsWebServiceHttpsSoap12Endpoint/"></soap12:address>
+        </wsdl:port>
+        <wsdl:port name="AnalyticsWebServiceHttpsEndpoint" binding="ns:AnalyticsWebServiceHttpBinding">
+            <http:address location="https://10.100.0.46:9443/services/AnalyticsWebService.AnalyticsWebServiceHttpsEndpoint/"></http:address>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

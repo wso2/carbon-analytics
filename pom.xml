@@ -473,12 +473,12 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.analytics.dataservice.webservice</artifactId>
+                <artifactId>org.wso2.carbon.analytics.webservice</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.analytics.dataservice.webservice.server.feature</artifactId>
+                <artifactId>org.wso2.carbon.analytics.webservice.server.feature</artifactId>
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
@@ -791,6 +791,11 @@
                 <artifactId>org.wso2.carbon.analytics.messageconsole.stub</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.webservice.stub</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
 
             <!-- START hbase + hadoop client dependencies -->
             <dependency>
@@ -1088,6 +1093,7 @@
         <carbon.event-processing.version>2.0.2</carbon.event-processing.version>
 
         <carbon.analytics.version>1.0.3-SNAPSHOT</carbon.analytics.version>
+        <carbon.analytics.imp.pkg.version>[1.0.3-SNAPSHOT, 1.1.0)</carbon.analytics.imp.pkg.version>
 
         <!--analytics processors -->
         <spark.orbit.version>1.2.1.wso2v1</spark.orbit.version>

@@ -27,7 +27,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>org.wso2.carbon.analytics.dataservice.webservice.server.feature</artifactId>
+    <artifactId>org.wso2.carbon.analytics.webservice.server.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Analytics Web Service Server Feature</name>
     <description>This feature contains the analytics web service server feature</description>
@@ -35,7 +35,7 @@
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.analytics.dataservice.webservice</artifactId>
+            <artifactId>org.wso2.carbon.analytics.webservice</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
@@ -56,10 +56,10 @@
                             <goal>p2-feature-gen</goal>
                         </goals>
                         <configuration>
-                            <id>org.wso2.carbon.analytics.dataservice.webservice.server</id>
+                            <id>org.wso2.carbon.analytics.webservice.server</id>
                             <bundles>
                                 <bundleDef>
-                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.dataservice.webservice:${carbon.analytics.version}
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.webservice:${carbon.analytics.version}
                                 </bundleDef>
                                 <bundleDef>
                                     org.wso2.carbon.analytics:org.wso2.carbon.analytics.dataservice.io.commons:${carbon.analytics.version}

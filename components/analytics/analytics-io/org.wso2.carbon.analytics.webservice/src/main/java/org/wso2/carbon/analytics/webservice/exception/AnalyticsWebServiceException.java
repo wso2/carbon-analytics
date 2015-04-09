@@ -16,21 +16,19 @@
 * under the License.
 */
 
-package org.wso2.carbon.analytics.dataservice.webservice.internal;
-
-import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
+package org.wso2.carbon.analytics.webservice.exception;
 
 /**
- * This class represents the service holder for data service web service
+ * This class represents analytics web service related exceptions.
  */
-public class ServiceHolder {
-    private static AnalyticsDataAPI analyticsDataAPI;
+public class AnalyticsWebServiceException extends Exception {
+    private static final long serialVersionUID = -7927112708244405107L;
 
-    public static void setAnalyticsDataAPIService(AnalyticsDataAPI analyticsDataAPI) {
-        ServiceHolder.analyticsDataAPI = analyticsDataAPI;
+    public AnalyticsWebServiceException(String message) {
+        super(message);
     }
 
-    public static AnalyticsDataAPI getAnalyticsDataAPI() {
-        return analyticsDataAPI;
+    public AnalyticsWebServiceException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

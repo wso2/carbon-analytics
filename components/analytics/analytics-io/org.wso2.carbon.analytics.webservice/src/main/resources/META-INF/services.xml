@@ -16,11 +16,11 @@
  ~ under the License.
 -->
 <serviceGroup>
-    <service name="MessageConsole" scope="transportsession">
+    <service name="AnalyticsWebService" scope="transportsession">
         <transports>
             <transport>https</transport>
         </transports>
-        <parameter name="ServiceClass">org.wso2.carbon.analytics.dataservice.webservice.AnalyticsWebService</parameter>
+        <parameter name="ServiceClass">org.wso2.carbon.analytics.webservice.AnalyticsWebService</parameter>
     </service>
 
     <parameter name="adminService" locked="true">true</parameter>

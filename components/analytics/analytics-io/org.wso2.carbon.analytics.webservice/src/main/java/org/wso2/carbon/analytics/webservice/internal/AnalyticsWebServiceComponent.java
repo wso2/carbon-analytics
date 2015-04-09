@@ -16,7 +16,7 @@
 * under the License.
 */
 
-package org.wso2.carbon.analytics.dataservice.webservice.internal;
+package org.wso2.carbon.analytics.webservice.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,12 +30,12 @@ import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
  * @scr.reference name="analytics.api.component" interface="org.wso2.carbon.analytics.api.AnalyticsDataAPI"
  * cardinality="1..1" policy="dynamic" bind="setAnalyticsDataAPIService" unbind="unsetAnalyticsDataAPIService"
  */
-public class AnalyticsDataServiceWebServiceComponent {
-    private static final Log logger = LogFactory.getLog(AnalyticsDataServiceWebServiceComponent.class);
+public class AnalyticsWebServiceComponent {
+    private static final Log logger = LogFactory.getLog(AnalyticsWebServiceComponent.class);
 
     protected void activate(ComponentContext ctx) {
         if (logger.isDebugEnabled()) {
-            logger.debug("Activating AnalyticsDataServiceWebServiceComponent");
+            logger.debug("Activating AnalyticsWebServiceComponent");
         }
     }
 

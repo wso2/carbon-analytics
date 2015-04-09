@@ -39,6 +39,10 @@
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.messageconsole.stub</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.analytics.webservice.stub</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -69,6 +73,9 @@
                                 </bundleDef>
                                 <bundleDef>
                                     org.wso2.carbon.analytics:org.wso2.carbon.analytics.messageconsole.stub:${carbon.analytics.version}
+                                </bundleDef>
+                                <bundleDef>
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.webservice.stub:${carbon.analytics.version}
                                 </bundleDef>
                             </bundles>
                             <importFeatures>

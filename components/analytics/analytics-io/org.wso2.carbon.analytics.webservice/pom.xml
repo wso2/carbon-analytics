@@ -27,10 +27,10 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>org.wso2.carbon.analytics.dataservice.webservice</artifactId>
+    <artifactId>org.wso2.carbon.analytics.webservice</artifactId>
     <packaging>bundle</packaging>
-    <name>WSO2 Carbon - Analytics Data Service Web Service</name>
-    <description>Analytics Data Service Web Service</description>
+    <name>WSO2 Carbon - Analytics Web Service</name>
+    <description>Analytics Web Service</description>
 
     <dependencies>
         <dependency>
@@ -57,8 +57,8 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Private-Package>org.wso2.carbon.analytics.dataservice.webservice.internal.*</Private-Package>
-                        <Export-Package>org.wso2.carbon.analytics.dataservice.webservice.*</Export-Package>
+                        <Private-Package>org.wso2.carbon.analytics.webservice.internal.*</Private-Package>
+                        <Export-Package>org.wso2.carbon.analytics.webservice.*</Export-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>

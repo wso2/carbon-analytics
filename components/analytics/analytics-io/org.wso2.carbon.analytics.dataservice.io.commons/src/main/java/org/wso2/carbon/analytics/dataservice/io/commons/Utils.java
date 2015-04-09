@@ -31,6 +31,7 @@ import org.wso2.carbon.analytics.dataservice.io.commons.beans.DrillDownPathBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.DrillDownRangeBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.DrillDownResultBean;
+import org.wso2.carbon.analytics.dataservice.io.commons.beans.IndexConfigurationBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.IndexEntryBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.PerCategoryDrillDownResultBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.PerFieldDrillDownResultBean;
@@ -66,21 +67,21 @@ public class Utils {
 	 * @return the records from record beans
 	 * @throws org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException if the tableName is not specified
 	 */
-	public static List<Record> getRecords(String username, List<RecordBean> recordBeans) throws AnalyticsException {
-		List<Record> records = new ArrayList<>();
-		try{
-			for (RecordBean recordBean : recordBeans) {
-				if(recordBean.getTableName().isEmpty()){
-					throw new AnalyticsException("TableName cannot be empty!");
-				}
-			records.add(new Record(recordBean.getId(), getTenantId(username), recordBean.getTableName(),
-		                           validateAndReturn(recordBean.getValues())));
-			}
-		}catch(NullPointerException e){
-			throw new AnalyticsException("TableName cannot be null");
-		}
-		return records;
-	}
+    public static List<Record> getRecords(String username, List<RecordBean> recordBeans) throws AnalyticsException {
+        List<Record> records = new ArrayList<>();
+        try {
+            int tenantId = getTenantId(username);
+            for (RecordBean recordBean : recordBeans) {
+                if (recordBean.getTableName().isEmpty()) {
+                    throw new AnalyticsException("TableName cannot be empty!");
+                }
+                records.add(new Record(recordBean.getId(), tenantId, recordBean.getTableName(), validateAndReturn(recordBean.getValues())));
+            }
+        } catch (NullPointerException e) {
+            throw new AnalyticsException("TableName cannot be null");
+        }
+        return records;
+    }
 
     @SuppressWarnings("unchecked")
     private static Map<String, Object> validateAndReturn(RecordValueEntryBean[] values)
@@ -321,17 +322,19 @@ public class Utils {
     public static AnalyticsSchemaBean createTableSchemaBean(AnalyticsSchema analyticsSchema) {
         List<SchemaColumnBean> columnBeans = new ArrayList<>(0);
         List<String> primaryKeys = new ArrayList<>(0);
-        if (analyticsSchema.getColumns() != null) {
-            for (Map.Entry<String, AnalyticsSchema.ColumnType> columnTypeEntry :
-                    analyticsSchema.getColumns().entrySet()) {
-                SchemaColumnBean bean = new SchemaColumnBean();
-                bean.setColumnName(columnTypeEntry.getKey());
-                bean.setColumnType(getColumnTypeBean(columnTypeEntry.getValue()));
-                columnBeans.add(bean);
+        if (analyticsSchema != null) {
+            if (analyticsSchema.getColumns() != null) {
+                for (Map.Entry<String, AnalyticsSchema.ColumnType> columnTypeEntry :
+                        analyticsSchema.getColumns().entrySet()) {
+                    SchemaColumnBean bean = new SchemaColumnBean();
+                    bean.setColumnName(columnTypeEntry.getKey());
+                    bean.setColumnType(getColumnTypeBean(columnTypeEntry.getValue()));
+                    columnBeans.add(bean);
+                }
             }
-        }
-        if (analyticsSchema.getPrimaryKeys() != null) {
-            primaryKeys = analyticsSchema.getPrimaryKeys();
+            if (analyticsSchema.getPrimaryKeys() != null) {
+                primaryKeys = analyticsSchema.getPrimaryKeys();
+            }
         }
         return new AnalyticsSchemaBean(columnBeans.toArray(new SchemaColumnBean[columnBeans.size()]),
                                        primaryKeys.toArray(new String[primaryKeys.size()]));
@@ -504,5 +507,43 @@ public class Utils {
         public static final String BINARY = "BINARY";
         public static final String INTEGER = "INTEGER";
 
+    }
+
+    public static IndexConfigurationBean getIndexConfiguration(Map<String, IndexType> indices, List<String>
+            scoreParams) {
+        IndexConfigurationBean indexConfigurationBean = new IndexConfigurationBean();
+        IndexEntryBean[] indexEntryBeans = new IndexEntryBean[indices.size()];
+        int i = 0;
+        for (Map.Entry<String, IndexType> index : indices.entrySet()) {
+            IndexEntryBean indexEntryBean = new IndexEntryBean();
+            indexEntryBean.setFieldName(index.getKey());
+            indexEntryBean.setIndexType(index.getValue().name());
+            indexEntryBeans[i++] = indexEntryBean;
+        }
+        indexConfigurationBean.setIndices(indexEntryBeans);
+        if (scoreParams != null) {
+            String[] scoreParamsArray = new String[scoreParams.size()];
+            scoreParamsArray = scoreParams.toArray(scoreParamsArray);
+            indexConfigurationBean.setScoreParams(scoreParamsArray);
+        }
+        return indexConfigurationBean;
+    }
+
+    public static Map<String, IndexType> getIndices(IndexConfigurationBean indexConfigurationBean) {
+        Map<String, IndexType> indexTypeMap = new HashMap<>();
+        if (indexConfigurationBean.getIndices() != null) {
+            for (IndexEntryBean indexEntryBean : indexConfigurationBean.getIndices()) {
+                indexTypeMap.put(indexEntryBean.getFieldName(), createIndexType(indexEntryBean.getIndexType()));
+            }
+        }
+        return indexTypeMap;
+    }
+
+    public static List<String> getScoreParam(IndexConfigurationBean indexConfigurationBean) {
+        List<String> scoreParams = null;
+        if (indexConfigurationBean.getScoreParams() != null) {
+            scoreParams = Arrays.asList(indexConfigurationBean.getScoreParams());
+        }
+        return scoreParams;
     }
 }
