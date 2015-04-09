@@ -176,8 +176,7 @@ public class CarbonEventStreamService implements EventStreamService {
         if (tenantId == MultitenantConstants.SUPER_TENANT_ID) {
             axisConfig = EventStreamServiceValueHolder.getConfigurationContextService().getServerConfigContext().getAxisConfiguration();
         } else {
-            axisConfig = TenantAxisUtils.getTenantAxisConfiguration(Integer.toString(tenantId),
-                    EventStreamServiceValueHolder.getConfigurationContextService().getServerConfigContext());
+            axisConfig = TenantAxisUtils.getTenantAxisConfiguration(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(), EventStreamServiceValueHolder.getConfigurationContextService().getServerConfigContext());
         }
         return axisConfig;
     }

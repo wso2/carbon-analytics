@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
  import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
+import org.wso2.carbon.event.application.deployer.EventProcessingDeployer;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 import org.wso2.carbon.event.stream.core.internal.CarbonEventStreamService;
 import org.wso2.carbon.event.stream.core.internal.ds.EventStreamServiceValueHolder;
@@ -38,7 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Deploy query plans as axis2 service
  */
 
-public class EventStreamDeployer extends AbstractDeployer {
+public class EventStreamDeployer extends AbstractDeployer implements EventProcessingDeployer {
 
     private static Log log = LogFactory.getLog(org.wso2.carbon.event.stream.core.EventStreamDeployer.class);
     private ConfigurationContext configurationContext;

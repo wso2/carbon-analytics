@@ -36,9 +36,11 @@
         <module>components/analytics-dashboard</module>
         <module>components/data-bridge</module>
         <module>components/event-stream</module>
+        <module>components/application-deployer</module>
         <module>features/event-stream</module>
         <module>features/data-bridge</module>
         <module>features/analytics-dashboard</module>
+        <module>features/application-deployer</module>
     </modules>
 
     <dependencyManagement>
@@ -311,15 +313,26 @@
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
             <!--<dependency>-->
-                <!--<groupId>org.wso2.carbon.analytics-common</groupId>-->
-                <!--<artifactId>org.wso2.carbon.analytics.dashboard.ui</artifactId>-->
-                <!--<version>${carbon.analytics.common.version}</version>-->
+            <!--<groupId>org.wso2.carbon.analytics-common</groupId>-->
+            <!--<artifactId>org.wso2.carbon.analytics.dashboard.ui</artifactId>-->
+            <!--<version>${carbon.analytics.common.version}</version>-->
             <!--</dependency>-->
             <!--<dependency>-->
-                <!--<groupId>org.wso2.carbon.event-processing</groupId>-->
-                <!--<artifactId>org.wso2.carbon.event.publisher.stub</artifactId>-->
-                <!--<version>${carbon.event.processing.version}</version>-->
+            <!--<groupId>org.wso2.carbon.event-processing</groupId>-->
+            <!--<artifactId>org.wso2.carbon.event.publisher.stub</artifactId>-->
+            <!--<version>${carbon.event.processing.version}</version>-->
             <!--</dependency>-->
+
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.application.deployer</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.application.deployer</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
 
             <!--carbon analytics common dependencies stop-->
 
@@ -396,11 +409,13 @@
                 <version>${carbon.analytics.common.version}</version>
                 <type>zip</type>
             </dependency>
+
+
             <!--<dependency>-->
-                <!--<groupId>org.wso2.carbon.analytics-common</groupId>-->
-                <!--<artifactId>org.wso2.carbon.analytics.dashboard.ui.feature</artifactId>-->
-                <!--<version>${carbon.analytics.common.version}</version>-->
-                <!--<type>zip</type>-->
+            <!--<groupId>org.wso2.carbon.analytics-common</groupId>-->
+            <!--<artifactId>org.wso2.carbon.analytics.dashboard.ui.feature</artifactId>-->
+            <!--<version>${carbon.analytics.common.version}</version>-->
+            <!--<type>zip</type>-->
             <!--</dependency>-->
             <!--features end-->
         </dependencies>
@@ -664,5 +679,3 @@
     </properties>
 
 </project>
-
-
