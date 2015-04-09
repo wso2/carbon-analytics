@@ -16,7 +16,6 @@
 
 package org.wso2.carbon.analytics.dataservice.io.commons;
 
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
@@ -45,7 +44,6 @@ import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
@@ -62,41 +60,6 @@ import java.util.Set;
  * This class represents a set of utility functionalities for the analytics REST API.
  */
 public class Utils {
-
-    public static final int CATEGORYPATH_FIELD_COUNT = 2;
-    public static final float DEFAUL_CATEGORYPATH_WEIGHT = 1.0f;
-
-    /**
-	 * Gets the analytics data service.
-	 * @return the analytics data service
-	 * @throws org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
-	 */
-	public static AnalyticsDataService getAnalyticsDataService() throws AnalyticsException {
-		AnalyticsDataService analyticsDataService;
-		analyticsDataService = (AnalyticsDataService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
-		                                                     .getOSGiService(AnalyticsDataService.class,
-		                                                                     null);
-		if(analyticsDataService == null) {
-			throw new AnalyticsException("AnalyticsDataService is not available.");
-		}
-		return analyticsDataService;
-	}
-
-    /**
-	 * Gets the analytics data service.
-	 * @return the analytics data service
-	 * @throws org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
-	 */
-	public static SecureAnalyticsDataService getSecureAnalyticsDataService() throws AnalyticsException {
-		SecureAnalyticsDataService analyticsDataService;
-		analyticsDataService = (SecureAnalyticsDataService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
-		                                                     .getOSGiService(SecureAnalyticsDataService.class,
-		                                                                     null);
-		if(analyticsDataService == null) {
-			throw new AnalyticsException("AnalyticsDataService is not available.");
-		}
-		return analyticsDataService;
-	}
 
 	/**
 	 * Gets the records from record beans.
@@ -126,37 +89,7 @@ public class Utils {
             throws AnalyticsIndexException {
         Map<String, Object> valueMap = new LinkedHashMap<>(0);
         for (RecordValueEntryBean recordEntry : values){
-            //TODO : AnalyticsCategoryPath is mapped to a linkedList by jackson json.
-            // Currently checking the type and convert it manually to categoryPath type.
-            if (recordEntry.getValue() instanceof LinkedHashMap) {
-                Map<String, Object> keyValPairMap = (LinkedHashMap<String, Object>) recordEntry.getValue();
-                List<String> pathList = (ArrayList<String>) keyValPairMap.get(Constants.FacetAttributes.PATH);
-                Object weightObj = keyValPairMap.get(Constants.FacetAttributes.WEIGHT);
-                Number weight;
-                if (weightObj instanceof Integer) {
-                    weight = (Integer) weightObj;
-                } else if (weightObj instanceof Double) {
-                    weight = (Double) weightObj;
-                } else if (weightObj == null) {
-                    weight = DEFAUL_CATEGORYPATH_WEIGHT;
-                }
-                else {
-                    throw new AnalyticsIndexException("Category Weight should be a float/integer value");
-                }
-                if (pathList != null && pathList.size() > 0) {
-                    String[] path = pathList.toArray(new String[pathList.size()]);
-                    if (keyValPairMap.keySet().size() <= CATEGORYPATH_FIELD_COUNT) {
-                        AnalyticsCategoryPath categoryPath = new
-                                AnalyticsCategoryPath(path);
-                        categoryPath.setWeight(weight.floatValue());
-                        valueMap.put(recordEntry.getFieldName(), categoryPath);
-                    }
-                } else {
-                    throw new AnalyticsIndexException("Category path cannot be empty");
-                }
-            } else {
                 valueMap.put(recordEntry.getFieldName(),recordEntry.getValue());
-            }
         }
         return valueMap;
     }
@@ -217,7 +150,6 @@ public class Utils {
                 bean.setFieldName(entry.getKey());
                 bean.setValue(categoryPathBean);
                 beans.add(bean);
-
             } else {
                 bean.setFieldName(entry.getKey());
                 bean.setValue(entry.getValue());
@@ -363,12 +295,10 @@ public class Utils {
     public static List<Iterator<Record>> getRecordIterators(RecordGroup[] recordGroups,
                                                       SecureAnalyticsDataService analyticsDataService)
             throws AnalyticsException {
-
         List<Iterator<Record>> iterators = new ArrayList<>();
         for (RecordGroup recordGroup : recordGroups) {
             iterators.add(analyticsDataService.readRecords(recordGroup));
         }
-
         return iterators;
     }
 

@@ -1314,8 +1314,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             throws AnalyticsIndexException {
         for (String scoreParam : scoreParams) {
             IndexType type = columns.get(scoreParam);
-            if (type != IndexType.DOUBLE || type != IndexType.FLOAT || type != IndexType.INTEGER
-                || type != IndexType.LONG) {
+            if (type != IndexType.DOUBLE && type != IndexType.FLOAT && type != IndexType.INTEGER
+                && type != IndexType.LONG) {
                 throw new AnalyticsIndexException("'" + scoreParam +
                                                   "' is not indexed as a numeric column");
             }

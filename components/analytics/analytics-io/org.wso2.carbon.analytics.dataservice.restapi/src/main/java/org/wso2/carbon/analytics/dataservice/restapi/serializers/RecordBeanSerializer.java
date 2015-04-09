@@ -17,11 +17,15 @@
 
 package org.wso2.carbon.analytics.dataservice.restapi.serializers;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordBean;
+import org.wso2.carbon.analytics.dataservice.io.commons.beans.AnalyticsCategoryPathBean;
+import org.wso2.carbon.analytics.dataservice.io.commons.beans.RecordBean;
+import org.wso2.carbon.analytics.dataservice.io.commons.beans.RecordValueEntryBean;
 
 import java.lang.reflect.Type;
 
@@ -36,7 +40,27 @@ public class RecordBeanSerializer implements JsonSerializer<RecordBean> {
     @Override
     public JsonElement serialize(RecordBean recordBean, Type type,
                                  JsonSerializationContext jsonSerializationContext) {
-        JsonObject jsonObject = new JsonObject();
-        return null;
+        JsonObject record = new JsonObject();
+        record.addProperty("id", recordBean.getId());
+        record.addProperty("tableName", recordBean.getTableName());
+        record.addProperty("timestamp", recordBean.getTimestamp());
+        JsonObject values = new JsonObject();
+        for (RecordValueEntryBean entryBean : recordBean.getValues()) {
+            if (!(entryBean.getValue() instanceof AnalyticsCategoryPathBean)) {
+                values.addProperty(entryBean.getFieldName(), entryBean.getValue().toString());
+            } else {
+                JsonObject facetValue = new JsonObject();
+                AnalyticsCategoryPathBean bean = (AnalyticsCategoryPathBean)entryBean.getValue();
+                JsonArray jsonPath = new JsonArray();
+                for (String pathTerm : bean.getPath()) {
+                    jsonPath.add(new JsonPrimitive(pathTerm));
+                }
+                facetValue.add("path", jsonPath);
+                facetValue.addProperty("weight", bean.getWeight());
+                values.add(entryBean.getFieldName(), facetValue);
+            }
+        }
+        record.add("values", values);
+        return record;
     }
 }

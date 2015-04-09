@@ -18,6 +18,7 @@ package org.wso2.carbon.analytics.dataservice.restapi;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.wso2.carbon.analytics.dataservice.io.commons.Utils;
 
 /**
  * The Class AnalyticsRESTUtilsTest represents the test cases for {@link Utils}. DTO class conversions 
