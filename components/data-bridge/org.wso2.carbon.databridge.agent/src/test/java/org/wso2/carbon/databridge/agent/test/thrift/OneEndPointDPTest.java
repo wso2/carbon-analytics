@@ -135,7 +135,7 @@ public class OneEndPointDPTest extends TestCase {
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
         try {
-            DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":7611, ssl://", hostName + ":7612",
+            DataPublisher dataPublisher = new DataPublisher("thrift", "tcp://" + hostName + ":7611, ssl://" + hostName + ":7612",
                     "ssl://" + hostName + ":7711", "admin", "admin");
 
         } catch (DataEndpointConfigurationException ex) {
