@@ -16,7 +16,6 @@
 
 package org.wso2.carbon.analytics.dataservice.io.commons;
 
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
@@ -27,14 +26,12 @@ import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.AnalyticsCategoryPathBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.AnalyticsSchemaBean;
-import org.wso2.carbon.analytics.dataservice.io.commons.beans.ColumnTypeBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.DrillDownFieldRangeBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.DrillDownPathBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.DrillDownRangeBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.DrillDownResultBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.IndexEntryBean;
-import org.wso2.carbon.analytics.dataservice.io.commons.beans.IndexTypeBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.PerCategoryDrillDownResultBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.PerFieldDrillDownResultBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.RecordBean;
@@ -45,7 +42,6 @@ import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
@@ -62,41 +58,6 @@ import java.util.Set;
  * This class represents a set of utility functionalities for the analytics REST API.
  */
 public class Utils {
-
-    public static final int CATEGORYPATH_FIELD_COUNT = 2;
-    public static final float DEFAUL_CATEGORYPATH_WEIGHT = 1.0f;
-
-    /**
-	 * Gets the analytics data service.
-	 * @return the analytics data service
-	 * @throws org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
-	 */
-	public static AnalyticsDataService getAnalyticsDataService() throws AnalyticsException {
-		AnalyticsDataService analyticsDataService;
-		analyticsDataService = (AnalyticsDataService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
-		                                                     .getOSGiService(AnalyticsDataService.class,
-		                                                                     null);
-		if(analyticsDataService == null) {
-			throw new AnalyticsException("AnalyticsDataService is not available.");
-		}
-		return analyticsDataService;
-	}
-
-    /**
-	 * Gets the analytics data service.
-	 * @return the analytics data service
-	 * @throws org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
-	 */
-	public static SecureAnalyticsDataService getSecureAnalyticsDataService() throws AnalyticsException {
-		SecureAnalyticsDataService analyticsDataService;
-		analyticsDataService = (SecureAnalyticsDataService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
-		                                                     .getOSGiService(SecureAnalyticsDataService.class,
-		                                                                     null);
-		if(analyticsDataService == null) {
-			throw new AnalyticsException("AnalyticsDataService is not available.");
-		}
-		return analyticsDataService;
-	}
 
 	/**
 	 * Gets the records from record beans.
@@ -126,37 +87,7 @@ public class Utils {
             throws AnalyticsIndexException {
         Map<String, Object> valueMap = new LinkedHashMap<>(0);
         for (RecordValueEntryBean recordEntry : values){
-            //TODO : AnalyticsCategoryPath is mapped to a linkedList by jackson json.
-            // Currently checking the type and convert it manually to categoryPath type.
-            if (recordEntry.getValue() instanceof LinkedHashMap) {
-                Map<String, Object> keyValPairMap = (LinkedHashMap<String, Object>) recordEntry.getValue();
-                List<String> pathList = (ArrayList<String>) keyValPairMap.get(Constants.FacetAttributes.PATH);
-                Object weightObj = keyValPairMap.get(Constants.FacetAttributes.WEIGHT);
-                Number weight;
-                if (weightObj instanceof Integer) {
-                    weight = (Integer) weightObj;
-                } else if (weightObj instanceof Double) {
-                    weight = (Double) weightObj;
-                } else if (weightObj == null) {
-                    weight = DEFAUL_CATEGORYPATH_WEIGHT;
-                }
-                else {
-                    throw new AnalyticsIndexException("Category Weight should be a float/integer value");
-                }
-                if (pathList != null && pathList.size() > 0) {
-                    String[] path = pathList.toArray(new String[pathList.size()]);
-                    if (keyValPairMap.keySet().size() <= CATEGORYPATH_FIELD_COUNT) {
-                        AnalyticsCategoryPath categoryPath = new
-                                AnalyticsCategoryPath(path);
-                        categoryPath.setWeight(weight.floatValue());
-                        valueMap.put(recordEntry.getFieldName(), categoryPath);
-                    }
-                } else {
-                    throw new AnalyticsIndexException("Category path cannot be empty");
-                }
-            } else {
                 valueMap.put(recordEntry.getFieldName(),recordEntry.getValue());
-            }
         }
         return valueMap;
     }
@@ -217,7 +148,6 @@ public class Utils {
                 bean.setFieldName(entry.getKey());
                 bean.setValue(categoryPathBean);
                 beans.add(bean);
-
             } else {
                 bean.setFieldName(entry.getKey());
                 bean.setValue(entry.getValue());
@@ -236,23 +166,23 @@ public class Utils {
 	public static String createIndexTypeBean(IndexType indexType) {
 		switch (indexType) {
 			case BOOLEAN:
-				return IndexTypeBean.BOOLEAN;
+				return BeanIndexType.BOOLEAN;
 			case FLOAT:
-				return IndexTypeBean.FLOAT;
+				return BeanIndexType.FLOAT;
 			case DOUBLE:
-				return IndexTypeBean.DOUBLE;
+				return BeanIndexType.DOUBLE;
 			case INTEGER:
-				return IndexTypeBean.INTEGER;
+				return BeanIndexType.INTEGER;
 			case LONG:
-				return IndexTypeBean.LONG;
+				return BeanIndexType.LONG;
 			case STRING:
-				return IndexTypeBean.STRING;
+				return BeanIndexType.STRING;
             case FACET:
-                return IndexTypeBean.FACET;
+                return BeanIndexType.FACET;
             case SCOREPARAM:
-                return IndexTypeBean.SCOREPARAM;
+                return BeanIndexType.SCOREPARAM;
 			default:
-				return IndexTypeBean.STRING;
+				return BeanIndexType.STRING;
 		}
 	}
 
@@ -265,21 +195,21 @@ public class Utils {
 
 	public static IndexType createIndexType(String type) {
 		switch (type) {
-			case "BOOLEAN":
+			case BeanIndexType.BOOLEAN:
 				return IndexType.BOOLEAN;
-			case "FLOAT":
+			case BeanIndexType.FLOAT:
 				return IndexType.FLOAT;
-			case "DOUBLE":
+			case BeanIndexType.DOUBLE:
 				return IndexType.DOUBLE;
-			case "INTEGER":
+			case BeanIndexType.INTEGER:
 				return IndexType.INTEGER;
-			case "LONG":
+			case BeanIndexType.LONG:
 				return IndexType.LONG;
-			case "STRING":
+			case BeanIndexType.STRING:
 				return IndexType.STRING;
-            case "FACET":
+            case BeanIndexType.FACET:
                 return IndexType.FACET;
-            case "SCOREPARAM":
+            case BeanIndexType.SCOREPARAM:
                 return IndexType.SCOREPARAM;
 			default:
 				return IndexType.STRING;
@@ -363,12 +293,10 @@ public class Utils {
     public static List<Iterator<Record>> getRecordIterators(RecordGroup[] recordGroups,
                                                       SecureAnalyticsDataService analyticsDataService)
             throws AnalyticsException {
-
         List<Iterator<Record>> iterators = new ArrayList<>();
         for (RecordGroup recordGroup : recordGroups) {
             iterators.add(analyticsDataService.readRecords(recordGroup));
         }
-
         return iterators;
     }
 
@@ -499,19 +427,19 @@ public class Utils {
      */
     private static AnalyticsSchema.ColumnType getColumnType(String type) {
         switch (type) {
-            case "STRING":
+            case BeanColumnType.STRING:
                 return AnalyticsSchema.ColumnType.STRING;
-            case "INTEGER":
+            case BeanColumnType.INTEGER:
                 return AnalyticsSchema.ColumnType.INTEGER;
-            case "LONG":
+            case BeanColumnType.LONG:
                 return AnalyticsSchema.ColumnType.LONG;
-            case "FLOAT":
+            case BeanColumnType.FLOAT:
                 return AnalyticsSchema.ColumnType.FLOAT;
-            case "DOUBLE":
+            case BeanColumnType.DOUBLE:
                 return AnalyticsSchema.ColumnType.DOUBLE;
-            case "BOOLEAN":
+            case BeanColumnType.BOOLEAN:
                 return AnalyticsSchema.ColumnType.BOOLEAN;
-            case "BINARY":
+            case BeanColumnType.BINARY:
                 return AnalyticsSchema.ColumnType.BINARY;
             default:
                 return AnalyticsSchema.ColumnType.STRING;
@@ -526,21 +454,21 @@ public class Utils {
     private static String getColumnTypeBean(AnalyticsSchema.ColumnType columnType) {
         switch (columnType) {
             case STRING:
-                return ColumnTypeBean.STRING;
+                return BeanColumnType.STRING;
             case INTEGER:
-                return ColumnTypeBean.INTEGER;
+                return BeanColumnType.INTEGER;
             case LONG:
-                return ColumnTypeBean.LONG;
+                return BeanColumnType.LONG;
             case FLOAT:
-                return ColumnTypeBean.FLOAT;
+                return BeanColumnType.FLOAT;
             case DOUBLE:
-                return ColumnTypeBean.DOUBLE;
+                return BeanColumnType.DOUBLE;
             case BOOLEAN:
-                return ColumnTypeBean.BOOLEAN;
+                return BeanColumnType.BOOLEAN;
             case BINARY:
-                return ColumnTypeBean.BINARY;
+                return BeanColumnType.BINARY;
             default:
-                return ColumnTypeBean.STRING;
+                return BeanColumnType.STRING;
         }
     }
 
@@ -551,5 +479,30 @@ public class Utils {
         } catch (UserStoreException e) {
             throw new AnalyticsException("Unable to get tenantId for user: " + username, e);
         }
+    }
+
+    private static class BeanIndexType {
+
+        public static final String STRING = "STRING";
+        public static final String LONG = "LONG";
+        public static final String FLOAT = "FLOAT";
+        public static final String DOUBLE = "DOUBLE";
+        public static final String BOOLEAN = "BOOLEAN";
+        public static final String BINARY = "BINARY";
+        public static final String INTEGER = "INTEGER";
+        public static final String FACET = "FACET";
+        public static final String SCOREPARAM = "SCOREPARAM";
+    }
+
+    private class  BeanColumnType {
+
+        public static final String STRING = "STRING";
+        public static final String LONG = "LONG";
+        public static final String FLOAT = "FLOAT";
+        public static final String DOUBLE = "DOUBLE";
+        public static final String BOOLEAN = "BOOLEAN";
+        public static final String BINARY = "BINARY";
+        public static final String INTEGER = "INTEGER";
+
     }
 }
