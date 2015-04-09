@@ -18,6 +18,11 @@
  */
 package org.wso2.carbon.analytics.datasource.core.internal;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.ComponentContext;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceService;
 import org.wso2.carbon.ndatasource.core.DataSourceService;
 
 /**
@@ -27,6 +32,19 @@ import org.wso2.carbon.ndatasource.core.DataSourceService;
  * cardinality="1..1" policy="dynamic"  bind="setDataSourceService" unbind="unsetDataSourceService"
  */
 public class AnalyticsDataSourceComponent {
+    
+    private static final Log log = LogFactory.getLog(AnalyticsDataSourceComponent.class);
+    
+    protected void activate(ComponentContext ctx) {
+        if (log.isDebugEnabled()) {
+            log.debug("Starting AnalyticsDataSourceComponent#activate");
+        }
+        BundleContext bundleContext = ctx.getBundleContext();
+        bundleContext.registerService(AnalyticsDataSourceService.class, new AnalyticsDataSourceService() { }, null);
+        if (log.isDebugEnabled()) {
+            log.debug("Finished AnalyticsDataSourceComponent#activate");
+        }
+    }
     
     protected void setDataSourceService(DataSourceService service) {
         ServiceHolder.setDataSourceService(service);

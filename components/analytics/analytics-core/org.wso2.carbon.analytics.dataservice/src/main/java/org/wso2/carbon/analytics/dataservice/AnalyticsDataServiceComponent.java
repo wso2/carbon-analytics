@@ -19,6 +19,7 @@
 package org.wso2.carbon.analytics.dataservice;
 
 import com.hazelcast.core.HazelcastInstance;
+
 import org.apache.axis2.engine.ListenerManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,12 +32,14 @@ import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerI
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfiguration;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceService;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.utils.CarbonUtils;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
 import java.io.File;
 
 /**
@@ -46,6 +49,8 @@ import java.io.File;
  * cardinality="1..1" policy="dynamic"  bind="setListenerManager" unbind="unsetListenerManager"
  * @scr.reference name="user.realmservice.default" interface="org.wso2.carbon.user.core.service.RealmService"
  * cardinality="1..1" policy="dynamic" bind="setRealmService" unbind="unsetRealmService"
+ * @scr.reference name="analytics.datasource.service" interface="org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceService"
+ * cardinality="1..1" policy="dynamic" bind="setAnalyticsDataSourceService" unbind="unsetAnalyticsDataSourceService"
  */
 public class AnalyticsDataServiceComponent {
 
@@ -65,6 +70,7 @@ public class AnalyticsDataServiceComponent {
             bundleContext.registerService(AnalyticsClusterManager.class, clusterManager, null);
             AnalyticsServiceHolder.setAnalyticsClusterManager(clusterManager);
             AnalyticsDataService analyticsDataService = new AnalyticsDataServiceImpl(config);
+            AnalyticsServiceHolder.setAnalyticsDataService(analyticsDataService);
             SecureAnalyticsDataServiceImpl secureAnalyticsDataService = new SecureAnalyticsDataServiceImpl(analyticsDataService);
             bundleContext.registerService(AnalyticsDataService.class, analyticsDataService, null);
             bundleContext.registerService(SecureAnalyticsDataService.class, secureAnalyticsDataService, null);
@@ -78,7 +84,10 @@ public class AnalyticsDataServiceComponent {
 
     protected void deactivate(ComponentContext ctx) {
         try {
-            AnalyticsServiceHolder.getAnalyticsDataService().destroy();
+            AnalyticsDataService service = AnalyticsServiceHolder.getAnalyticsDataService();
+            if (service != null) {
+                service.destroy();
+            }            
         } catch (Throwable e) {
             log.error("Error in deactivating analytics data service: " + e.getMessage(), e);
         }
@@ -119,6 +128,14 @@ public class AnalyticsDataServiceComponent {
     }
 
     protected void unsetListenerManager(ListenerManager lm) {
+        /* empty */
+    }
+    
+    protected void setAnalyticsDataSourceService(AnalyticsDataSourceService service) {
+        /* just to make sure analytics data source component is initialized first */
+    }
+    
+    protected void unsetAnalyticsDataSourceService(AnalyticsDataSourceService service) {
         /* empty */
     }
 

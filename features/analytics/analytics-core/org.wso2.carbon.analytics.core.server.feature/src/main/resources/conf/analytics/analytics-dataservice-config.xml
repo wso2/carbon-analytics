@@ -4,15 +4,15 @@
    <analytics-file-system>
       <implementation>org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsFileSystem</implementation>
       <properties>
-            <!-- JNDI lookup name, by default uses the default (Carbon in-memory) provider -->
-            <property name="datasource">jdbc/AnalyticsFileSystemDB</property>
+            <!-- the data source name mentioned in data sources configuration -->
+            <property name="datasource">WSO2_ANALYTICS_FS_DB</property>
       </properties>
    </analytics-file-system>
    <!-- Analytics Record Store - properties related to record storage implementation -->
    <analytics-record-store>
       <implementation>org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore</implementation>
       <properties>
-            <property name="datasource">jdbc/AnalyticsRecordStoreDB</property>
+            <property name="datasource">WSO2_ANALYTICS_RS_DB</property>
       </properties>
    </analytics-record-store>
    <!-- The data indexing analyzer implementation -->

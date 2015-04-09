@@ -18,22 +18,18 @@
  */
 package org.wso2.carbon.analytics.datasource.rdbms.mysql;
 
-import org.apache.tomcat.jdbc.pool.DataSource;
-import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.Parameters;
+import org.testng.annotations.BeforeClass;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsFileSystemTest;
 import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.rdbms.RDBMSQueryConfigurationEntry;
 
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
+
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,63 +38,28 @@ import java.util.Map;
  */
 public class MySQLInnoDBAnalyticsFileSystemTest extends AnalyticsFileSystemTest {
 
-    private DataSource dataSource;
-
     private AnalyticsFileSystem afs;
+    
+    public MySQLInnoDBAnalyticsFileSystemTest() {
+        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf");
+    }
 
+    @BeforeClass
+    public void setup() throws NamingException, AnalyticsException, IOException {
+        this.afs = new RDBMSAnalyticsFileSystem(this.generateQueryConfiguration());
+        Map<String, String> props = new HashMap<String, String>();
+        props.put("datasource", "WSO2_ANALYTICS_FS_DB");
+        this.afs.init(props);
+        this.init("MySQLDBAnalyticsDataSource", this.afs);
+    }
+    
     public AnalyticsFileSystem getAFS() {
         return this.afs;
     }
-
-    @BeforeSuite
-    @Parameters({"mysql.url", "mysql.username", "mysql.password"})
-    public void setup(String url, String username, String password)
-            throws NamingException, AnalyticsException, SQLException, IOException {
-
-        this.dataSource = createDataSource(url, username, password);
-        this.dropSystemTables();
-        new InitialContext().bind("DSFS", this.dataSource);
-        this.afs = new RDBMSAnalyticsFileSystem(this.generateQueryConfiguration());
-        Map<String, String> props = new HashMap<String, String>();
-        props.put("datasource", "DSFS");
-        this.afs.init(props);
-        this.init("MySQLInnoDBAnalyticsDataSource", afs);
-    }
-
-    @AfterClass
-    public void destroy() throws AnalyticsException, SQLException {
-        try {
-            new InitialContext().unbind("DSFS");
-        } catch (NamingException ignore) { }
-        if (this.dataSource != null) {
-            this.dataSource.close(true);
-        }
-        this.dropSystemTables();
-    }
-
-    private DataSource createDataSource(String url, String username, String password) {
-        PoolProperties pps = new PoolProperties();
-        pps.setDriverClassName("com.mysql.jdbc.Driver");
-        pps.setUrl(url);
-        pps.setUsername(username);
-        pps.setPassword(password);
-        pps.setDefaultAutoCommit(false);
-        return new DataSource(pps);
-    }
     
-    private void dropSystemTables() throws SQLException {
-        Connection conn = null;
-        try {
-            conn = this.dataSource.getConnection();
-            conn.prepareStatement("DROP TABLE IF EXISTS AN_FS_DATA").executeUpdate();
-            conn.prepareStatement("DROP TABLE IF EXISTS AN_FS_PATH").executeUpdate();
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException ignore) { } 
-            }
-        }
+    @AfterClass
+    public void destroy() {
+        this.cleanup();
     }
     
     private RDBMSQueryConfigurationEntry generateQueryConfiguration() {

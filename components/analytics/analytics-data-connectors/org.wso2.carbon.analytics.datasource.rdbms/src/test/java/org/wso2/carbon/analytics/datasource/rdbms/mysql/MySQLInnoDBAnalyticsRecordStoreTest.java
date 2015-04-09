@@ -18,20 +18,17 @@
  */
 package org.wso2.carbon.analytics.datasource.rdbms.mysql;
 
-import org.apache.tomcat.jdbc.pool.DataSource;
-import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.Parameters;
+import org.testng.annotations.BeforeClass;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.rdbms.RDBMSQueryConfigurationEntry;
 
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import java.sql.SQLException;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,45 +37,28 @@ import java.util.Map;
  */
 public class MySQLInnoDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
 
-    private DataSource dataSource;
-
     private AnalyticsRecordStore ars;
-
-    @BeforeSuite
-    @Parameters({"mysql.url", "mysql.username", "mysql.password"})
-    public void setup(String url, String username, 
-            String password) throws NamingException, AnalyticsException, SQLException {
-        this.dataSource = createDataSource(url, username, password);
-        new InitialContext().bind("DSRS", this.dataSource);
+    
+    public MySQLInnoDBAnalyticsRecordStoreTest() {
+        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf");
+    }
+        
+    @BeforeClass
+    public void setup() throws NamingException, AnalyticsException {
         this.ars = new RDBMSAnalyticsRecordStore(this.generateQueryConfiguration());
         Map<String, String> props = new HashMap<String, String>();
-        props.put("datasource", "DSRS");
+        props.put("datasource", "WSO2_ANALYTICS_RS_DB");
         this.ars.init(props);
-        this.init("MySQLInnoDBAnalyticsDataSource", ars);
+        this.init("MySQLDBAnalyticsDataSource", ars);
     }
-
+    
     public AnalyticsRecordStore getARS() {
         return this.ars;
     }
-
-    private DataSource createDataSource(String url, String username, String password) {
-        PoolProperties pps = new PoolProperties();
-        pps.setDriverClassName("com.mysql.jdbc.Driver");
-        pps.setUrl(url);
-        pps.setUsername(username);
-        pps.setPassword(password);
-        pps.setDefaultAutoCommit(false);
-        return new DataSource(pps);
-    }
-
+    
     @AfterClass
-    public void destroy() {
-        try {
-            new InitialContext().unbind("DSRS");
-        } catch (NamingException ignore) { }
-        if (this.dataSource != null) {
-            this.dataSource.close(true);
-        }
+    public void destroy() throws AnalyticsException {
+        this.cleanup();
     }
     
     private RDBMSQueryConfigurationEntry generateQueryConfiguration() {

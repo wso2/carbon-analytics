@@ -27,10 +27,10 @@ import org.wso2.carbon.analytics.datasource.core.fs.ChunkedDataOutput;
 import org.wso2.carbon.analytics.datasource.core.fs.ChunkedStream;
 import org.wso2.carbon.analytics.datasource.core.fs.ChunkedStream.DataChunk;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.ndatasource.common.DataSourceException;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.sql.DataSource;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -67,10 +67,9 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
                     RDBMSAnalyticsDSConstants.DATASOURCE + "' is required");
         }
         try {
-            this.dataSource = (DataSource) InitialContext.doLookup(dsName);
-        } catch (NamingException e) {
-            throw new AnalyticsException("Error in looking up data source: " + 
-                    e.getMessage(), e);
+            this.dataSource = (DataSource) GenericUtils.loadGlobalDataSource(dsName);
+        } catch (DataSourceException e) {
+            throw new AnalyticsException("Error in loading data source: " + e.getMessage(), e);
         }
         if (this.rdbmsQueryConfigurationEntry == null) {
             this.rdbmsQueryConfigurationEntry = RDBMSUtils.lookupCurrentQueryConfigurationEntry(this.dataSource);

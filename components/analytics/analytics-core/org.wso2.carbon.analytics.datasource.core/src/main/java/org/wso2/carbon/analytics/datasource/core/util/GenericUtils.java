@@ -502,6 +502,9 @@ public class GenericUtils {
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(
                         MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
                 CarbonDataSource ds = service.getDataSource(dsName);
+                if (ds == null) {
+                    return null;
+                }
                 return ds.getDSObject();
             } finally {
                 PrivilegedCarbonContext.endTenantFlow();
