@@ -322,13 +322,7 @@
             <!--<artifactId>org.wso2.carbon.event.publisher.stub</artifactId>-->
             <!--<version>${carbon.event.processing.version}</version>-->
             <!--</dependency>-->
-            <!--
-            <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.event.stream.stub</artifactId>
-                <version>${carbon.analytics.common.version}</version>
-            </dependency>
-            -->
+
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.application.deployer</artifactId>
@@ -339,7 +333,6 @@
                 <artifactId>org.wso2.carbon.event.application.deployer</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
-
 
             <!--carbon analytics common dependencies stop-->
 
