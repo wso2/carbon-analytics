@@ -19,12 +19,12 @@
             <query>DROP INDEX IF EXISTS {{TABLE_NAME}}_TIMESTAMP</query>
         </recordTableDeleteQueries>
         <recordMetaTableInitQueries>
-            <query>CREATE TABLE AN_TABLE_META (tenantId INTEGER, tableName VARCHAR(256), schema BINARY, PRIMARY KEY(tenantId, tableName))</query>
+            <query>CREATE TABLE AN_TABLE_META (tenantId INTEGER, tableName VARCHAR(256), tableSchema BINARY, PRIMARY KEY(tenantId, tableName))</query>
         </recordMetaTableInitQueries>
-        <recordMetaTableSelectQuery>SELECT schema FROM AN_TABLE_META WHERE tenantId = ? AND tableName = ?</recordMetaTableSelectQuery>
+        <recordMetaTableSelectQuery>SELECT tableSchema FROM AN_TABLE_META WHERE tenantId = ? AND tableName = ?</recordMetaTableSelectQuery>
         <recordMetaTablesSelectByTenantQuery>SELECT tableName FROM AN_TABLE_META WHERE tenantId = ?</recordMetaTablesSelectByTenantQuery>
         <recordMetaTableInsertQuery>INSERT INTO AN_TABLE_META (tenantId, tableName) VALUES (?, ?)</recordMetaTableInsertQuery>
-        <recordMetaTableUpdateQuery>UPDATE AN_TABLE_META SET schema = ? WHERE tenantId = ? AND tableName = ?</recordMetaTableUpdateQuery>
+        <recordMetaTableUpdateQuery>UPDATE AN_TABLE_META SET tableSchema = ? WHERE tenantId = ? AND tableName = ?</recordMetaTableUpdateQuery>
         <recordMetaTableDeleteQuery>DELETE AN_TABLE_META WHERE tenantId = ? AND tableName = ?</recordMetaTableDeleteQuery>
         <recordMetaTableCheckQuery>SELECT * FROM AN_TABLE_META WHERE tenantId = -1 AND tableName = '_X_'</recordMetaTableCheckQuery>
         <recordTableInitQueries>
@@ -67,12 +67,12 @@
             <query>DROP INDEX IF EXISTS {{TABLE_NAME}}_TIMESTAMP</query>
         </recordTableDeleteQueries>
         <recordMetaTableInitQueries>
-            <query>CREATE TABLE AN_TABLE_META (tenantId INTEGER, tableName VARCHAR(256), schema BINARY, PRIMARY KEY(tenantId, tableName))</query>
+            <query>CREATE TABLE AN_TABLE_META (tenantId INTEGER, tableName VARCHAR(256), tableSchema BINARY, PRIMARY KEY(tenantId, tableName))</query>
         </recordMetaTableInitQueries>
-        <recordMetaTableSelectQuery>SELECT schema FROM AN_TABLE_META WHERE tenantId = ? AND tableName = ?</recordMetaTableSelectQuery>
+        <recordMetaTableSelectQuery>SELECT tableSchema FROM AN_TABLE_META WHERE tenantId = ? AND tableName = ?</recordMetaTableSelectQuery>
         <recordMetaTablesSelectByTenantQuery>SELECT tableName FROM AN_TABLE_META WHERE tenantId = ?</recordMetaTablesSelectByTenantQuery>
         <recordMetaTableInsertQuery>INSERT INTO AN_TABLE_META (tenantId, tableName) VALUES (?, ?)</recordMetaTableInsertQuery>
-        <recordMetaTableUpdateQuery>UPDATE AN_TABLE_META SET schema = ? WHERE tenantId = ? AND tableName = ?</recordMetaTableUpdateQuery>
+        <recordMetaTableUpdateQuery>UPDATE AN_TABLE_META SET tableSchema = ? WHERE tenantId = ? AND tableName = ?</recordMetaTableUpdateQuery>
         <recordMetaTableDeleteQuery>DELETE AN_TABLE_META WHERE tenantId = ? AND tableName = ?</recordMetaTableDeleteQuery>
         <recordMetaTableCheckQuery>SELECT * FROM AN_TABLE_META WHERE tenantId = -1 AND tableName = '_X_'</recordMetaTableCheckQuery>
         <recordTableInitQueries>

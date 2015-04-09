@@ -49,7 +49,7 @@ public class H2MemDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
         Map<String, String> props = new HashMap<String, String>();
         props.put("datasource", "WSO2_ANALYTICS_RS_DB_MEM");
         this.ars.init(props);
-        this.init("H2FileDBAnalyticsDataSource", ars);
+        this.init("H2InMemoryDBAnalyticsDataSource", ars);
     }
     
     public AnalyticsRecordStore getARS() {
@@ -60,16 +60,16 @@ public class H2MemDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
     public void destroy() throws AnalyticsException {
         this.cleanup();
     }
-    
+
     private RDBMSQueryConfigurationEntry generateQueryConfiguration() {
         RDBMSQueryConfigurationEntry conf = new RDBMSQueryConfigurationEntry();
         String[] recordMetaTableInitQueries = new String[1];
-        recordMetaTableInitQueries[0] = "CREATE TABLE AN_TABLE_META (tenantId INTEGER, tableName VARCHAR(256), schema BINARY, PRIMARY KEY(tenantId, tableName))";
+        recordMetaTableInitQueries[0] = "CREATE TABLE AN_TABLE_META (tenantId INTEGER, tableName VARCHAR(256), tableSchema BINARY, PRIMARY KEY(tenantId, tableName))";
         conf.setRecordMetaTableInitQueries(recordMetaTableInitQueries);
-        conf.setRecordMetaTableSelectQuery("SELECT schema FROM AN_TABLE_META WHERE tenantId = ? AND tableName = ?");
+        conf.setRecordMetaTableSelectQuery("SELECT tableSchema FROM AN_TABLE_META WHERE tenantId = ? AND tableName = ?");
         conf.setRecordMetaTablesSelectByTenantQuery("SELECT tableName FROM AN_TABLE_META WHERE tenantId = ?");
         conf.setRecordMetaTableInsertQuery("INSERT INTO AN_TABLE_META (tenantId, tableName) VALUES (?, ?)");
-        conf.setRecordMetaTableUpdateQuery("UPDATE AN_TABLE_META SET schema = ? WHERE tenantId = ? AND tableName = ?");
+        conf.setRecordMetaTableUpdateQuery("UPDATE AN_TABLE_META SET tableSchema = ? WHERE tenantId = ? AND tableName = ?");
         conf.setRecordMetaTableDeleteQuery("DELETE AN_TABLE_META WHERE tenantId = ? AND tableName = ?");
         conf.setRecordMetaTableCheckQuery("SELECT * FROM AN_TABLE_META WHERE tenantId = -1 AND tableName = '_X_'");
         String[] recordTableInitQueries = new String[2];

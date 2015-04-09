@@ -326,13 +326,6 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     @Override
-    public Map<String, List<DrillDownResultEntry>> searchRange(int tenantId,
-            AnalyticsDrillDownRequest drillDownRequest)
-            throws AnalyticsIndexException {
-        return this.getIndexer().searchRanges(tenantId, drillDownRequest);
-    }
-
-    @Override
     public Map<String, IndexType> getIndices(int tenantId, 
             String tableName) throws AnalyticsIndexException, AnalyticsException {
         return this.getIndexer().lookupIndices(tenantId, tableName);

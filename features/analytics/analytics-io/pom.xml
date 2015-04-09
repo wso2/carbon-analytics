@@ -38,6 +38,8 @@
         <module>org.wso2.carbon.analytics.api.server.feature</module>
         <module>org.wso2.carbon.analytics.api.client.feature</module>
         <module>org.wso2.carbon.analytics.api.feature</module>
+        <module>org.wso2.carbon.analytics.dataservice.webservice.server.feature</module>
+        <module>org.wso2.carbon.analytics.dataservice.webservice.feature</module>
     </modules>
 
 </project>

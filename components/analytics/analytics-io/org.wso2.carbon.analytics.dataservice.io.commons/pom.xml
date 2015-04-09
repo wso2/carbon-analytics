@@ -14,9 +14,18 @@
     <name>WSO2 Carbon - Analytics Data Service API Commons</name>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.analytics.dataservice</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.datasource.commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.analytics.dataservice.commons</artifactId>
         </dependency>
     </dependencies>
 
@@ -34,7 +43,7 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Export-Package>
-                            org.wso2.carbon.analytics.dataservice.io.*;version="${carbon.analytics.version}"
+                            org.wso2.carbon.analytics.dataservice.io.commons.*;version="${carbon.analytics.version}"
                         </Export-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>

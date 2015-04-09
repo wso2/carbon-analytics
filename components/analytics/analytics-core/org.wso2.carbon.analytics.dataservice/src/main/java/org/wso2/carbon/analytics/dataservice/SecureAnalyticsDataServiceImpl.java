@@ -297,22 +297,6 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     }
 
     @Override
-    public Map<String, List<DrillDownResultEntry>> searchRange(String username,
-                                                               AnalyticsDrillDownRequest drillDownRequest)
-            throws AnalyticsIndexException {
-        try {
-            int tenantId = getTenantId(username);
-            if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_SEARCH_RECORD)) {
-                throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
-                                                               "permission to perform faceted range search");
-            }
-            return analyticsDataService.searchRange(tenantId, drillDownRequest);
-        } catch (AnalyticsException e) {
-            throw new AnalyticsIndexException(e.getMessage(), e);
-        }
-    }
-
-    @Override
     public void destroy() throws AnalyticsException {
         analyticsDataService.destroy();
     }

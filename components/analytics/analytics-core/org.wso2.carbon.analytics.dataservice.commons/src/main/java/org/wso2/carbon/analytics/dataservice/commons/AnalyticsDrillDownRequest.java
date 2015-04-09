@@ -18,6 +18,7 @@ package org.wso2.carbon.analytics.dataservice.commons;
 
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,7 +28,7 @@ import java.util.Map;
  * This class contains the details about Drill down search. Use this class when you need to query
  * faceted/categorized information
  */
-public class AnalyticsDrillDownRequest {
+public class AnalyticsDrillDownRequest implements Serializable{
 
     //table name on which the drill down is performed
     private String tableName;

@@ -16,13 +16,12 @@
 
 package org.wso2.carbon.analytics.dataservice.restapi.beans;
 
-import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This bean class represents the drill down information to perform drilldown operations
@@ -35,23 +34,25 @@ public class DrillDownRequestBean {
     @XmlElement(name = "tableName")
     private String tableName;
     @XmlElement(name = "categories")
-    private List<CategoryPathBean> categories;
+    private List<DrillDownPathBean> categories;
     @XmlElement(name = "language")
     private String language;
     @XmlElement(name = "query")
     private String query;
-    @XmlElement(name = "scoreFunction")
+    @XmlElement(name = "scoreFunction", required = false)
     private String scoreFunction;
     @XmlElement(name = "recordCount")
     private int recordCount;
-    @XmlElement(name = "facetCount")
-    private int facetCount;
+    @XmlElement(name = "categoryCount")
+    private int categoryCount;
     @XmlElement(name = "recordStart")
     private  int recordStart;
+    @XmlElement(name = "categoryStart")
+    private  int categoryStart;
     @XmlElement(name = "includeIds")
     private boolean includeIds;
-    @XmlElement(name = "ranges")
-    private List<AnalyticsDrillDownRange> ranges;
+    @XmlElement(name = "ranges", required = false)
+    private Map<String, List<DrillDownRangeBean>> ranges;
 
     public String getTableName() {
         return tableName;
@@ -61,11 +62,11 @@ public class DrillDownRequestBean {
         this.tableName = tableName;
     }
 
-    public List<CategoryPathBean> getCategories() {
+    public List<DrillDownPathBean> getCategories() {
         return categories;
     }
 
-    public void setCategories(List<CategoryPathBean> categories) {
+    public void setCategories(List<DrillDownPathBean> categories) {
         this.categories = categories;
     }
 
@@ -101,12 +102,12 @@ public class DrillDownRequestBean {
         this.recordCount = recordCount;
     }
 
-    public int getFacetCount() {
-        return facetCount;
+    public int getCategoryCount() {
+        return categoryCount;
     }
 
-    public void setFacetCount(int facetCount) {
-        this.facetCount = facetCount;
+    public void setCategoryCount(int categoryCount) {
+        this.categoryCount = categoryCount;
     }
 
     public int getRecordStart() {
@@ -125,11 +126,19 @@ public class DrillDownRequestBean {
         this.includeIds = includeIds;
     }
 
-    public List<AnalyticsDrillDownRange> getRanges() {
+    public Map<String, List<DrillDownRangeBean>> getRanges() {
         return ranges;
     }
 
-    public void setRanges(List<AnalyticsDrillDownRange> ranges) {
+    public void setRanges(Map<String, List<DrillDownRangeBean>> ranges) {
         this.ranges = ranges;
+    }
+
+    public int getCategoryStart() {
+        return categoryStart;
+    }
+
+    public void setCategoryStart(int categoryStart) {
+        this.categoryStart = categoryStart;
     }
 }

@@ -684,7 +684,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
 
-    public Map<String,List<DrillDownResultEntry>> searchRanges(int tenantId,
+    private Map<String,List<DrillDownResultEntry>> searchRanges(int tenantId,
             AnalyticsDrillDownRequest drillDownRequest) throws AnalyticsIndexException {
 
         String tableName = drillDownRequest.getTableName();
@@ -794,11 +794,15 @@ public class AnalyticsDataIndexer implements GroupEventListener {
 
     public Map<String, List<DrillDownResultEntry>> drillDown(int tenantId,
             AnalyticsDrillDownRequest drillDownRequest) throws AnalyticsIndexException {
-        List<Map<String, Map<String, DrillDownResultEntry>>> perShardResults =
-                this.getDrillDownResultsPerShard(tenantId, drillDownRequest);
-        Map<String, Map<String, DrillDownResultEntry>> mergedResults =
-                this.mergeShardedFacetResults(perShardResults);
-        return this.formatDrillDownResults(mergedResults, drillDownRequest);
+        if (drillDownRequest.getRangeFacets() != null) {
+            List<Map<String, Map<String, DrillDownResultEntry>>> perShardResults =
+                    this.getDrillDownResultsPerShard(tenantId, drillDownRequest);
+            Map<String, Map<String, DrillDownResultEntry>> mergedResults =
+                    this.mergeShardedFacetResults(perShardResults);
+            return this.formatDrillDownResults(mergedResults, drillDownRequest);
+        } else {
+            return this.searchRanges(tenantId, drillDownRequest);
+        }
     }
 
     private Map<String, Map<String, DrillDownResultEntry>> drillDown(int tenantId,

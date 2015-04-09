@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-public class AnalyticsAPIAuthenticationProcessor extends HttpServlet {
+public class AnalyticsManagementProcessor extends HttpServlet {
 
     /**
      * Login operation.
@@ -57,6 +57,21 @@ public class AnalyticsAPIAuthenticationProcessor extends HttpServlet {
                     resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized user: " + userName);
                 }
             }
+        } else if (operation != null && operation.equalsIgnoreCase(AnalyticsAPIConstants.IS_PAGINATION_SUPPORTED_OPERATION)) {
+            String sessionId = req.getHeader(AnalyticsAPIConstants.SESSION_ID);
+            if (sessionId == null || sessionId.trim().isEmpty()) {
+                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
+            } else {
+                try {
+                    ServiceHolder.getAuthenticator().validateSessionId(sessionId);
+                } catch (AnalyticsAPIAuthenticationException e) {
+                    resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
+                }
+            }
+            boolean isSupported = ServiceHolder.getAnalyticsDataService().isPaginationSupported();
+            PrintWriter writer = resp.getWriter();
+            writer.print(AnalyticsAPIConstants.PAGINATION_SUPPORT + AnalyticsAPIConstants.SEPARATOR + isSupported);
+            resp.setStatus(HttpServletResponse.SC_OK);
         } else {
             resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Unavailable operation - " + operation + " provided!");
         }

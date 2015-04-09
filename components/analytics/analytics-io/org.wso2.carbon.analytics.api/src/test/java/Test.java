@@ -35,6 +35,7 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
+import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
 import org.wso2.carbon.analytics.api.CarbonAnalyticsAPI;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceException;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
@@ -50,7 +51,7 @@ import java.util.*;
 
 public class Test {
 
-//    public static void main(String[] args) throws AnalyticsServiceException, AnalyticsException, UnsupportedEncodingException {
+    public static void main(String[] args) throws AnalyticsServiceException, AnalyticsException, UnsupportedEncodingException {
 //        SchemeRegistry schemeRegistry = new SchemeRegistry();
 //        schemeRegistry.register(
 //                new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
@@ -101,25 +102,37 @@ public class Test {
 //            e.printStackTrace();
 //            get.abort();
 //        }
-//
-//        CarbonAnalyticsAPI analyticsAPI = new CarbonAnalyticsAPI("/home/sinthuja/projects/my-git-repo/wso2/carbon-analytics/components/analytics/analytics-io/org.wso2.carbon.analytics.api/src/test/resources/analytics-data-config.xml");
-//        Map<String, AnalyticsSchema.ColumnType> columnTypeMap = new HashMap<>();
-//        columnTypeMap.put("ip", AnalyticsSchema.ColumnType.STRING);
-//        columnTypeMap.put("log", AnalyticsSchema.ColumnType.STRING);
-//        columnTypeMap.put("timeStamp", AnalyticsSchema.ColumnType.LONG);
-//
-//        List<String> primaryKeys = new ArrayList<>();
-//        primaryKeys.add("timeStamp");
-//        AnalyticsSchema schema = new AnalyticsSchema(columnTypeMap, primaryKeys);
-////        analyticsAPI.setTableSchema(-1234, "LOGTABLE", schema);
-//        analyticsAPI.createTable(-1234, "LOGTABLE2");
+
+        CarbonAnalyticsAPI analyticsAPI = new CarbonAnalyticsAPI("/home/sinthuja/projects/my-git-repo/wso2/carbon-analytics/components/analytics/analytics-io/org.wso2.carbon.analytics.api/src/test/resources/analytics-data-config.xml");
+        Map<String, AnalyticsSchema.ColumnType> columnTypeMap = new HashMap<>();
+        columnTypeMap.put("ip", AnalyticsSchema.ColumnType.STRING);
+        columnTypeMap.put("log", AnalyticsSchema.ColumnType.STRING);
+        columnTypeMap.put("timeStamp", AnalyticsSchema.ColumnType.LONG);
+
+        List<String> primaryKeys = new ArrayList<>();
+        primaryKeys.add("timeStamp");
+        AnalyticsSchema schema = new AnalyticsSchema(columnTypeMap, primaryKeys);
+        ThreadGroup threadGroup = new ThreadGroup("ThreadGroup");
+        MyThread thread1 = new MyThread(threadGroup,1, analyticsAPI);
+        MyThread thread2 = new MyThread(threadGroup,2, analyticsAPI);
+        MyThread thread3 = new MyThread(threadGroup, 3, analyticsAPI);
+        thread1.start();
+        thread2.start();
+        thread3.start();
+
+//        analyticsAPI.setTableSchema(-1234, "LOGTABLE", schema);
+//        System.out.println("calling 1..");
+//        analyticsAPI.tableExists(-1234, "LOGTABLE2");
+//        System.out.println("calling 2..");
+//        analyticsAPI.tableExists(-1234, "TableOne");
+//        System.out.println("calling 3..");
 //        analyticsAPI.setTableSchema(-1234, "LOGTABLE2", schema);
 //        System.out.println(analyticsAPI.listTables(-1234));
 //        analyticsAPI.deleteTable(-1234, "LOGTABLE2");
 //        System.out.println(analyticsAPI.listTables(-1234));
-
 //
-
+//
+//
 //        List<Record> records = new ArrayList<>();
 //        Map<String, Object> values = new HashMap<>();
 //        values.put("ip", "127.0.0.1");
@@ -146,10 +159,10 @@ public class Test {
 //            System.out.println(count);
 //            count++;
 //        }
-
+//
 //        analyticsAPI.delete(-1234, "LOGTABLE", ids);
 //        System.out.println(analyticsAPI.getRecordCount(-1234, "LOGTABLE", Long.MIN_VALUE, Long.MAX_VALUE));
-
+//
 //        Map<String, IndexType> indexTypeMap = new HashMap<>();
 //        indexTypeMap.put("ip", IndexType.STRING);
 //        indexTypeMap.put("log", IndexType.STRING);
@@ -157,8 +170,31 @@ public class Test {
 //        analyticsAPI.setIndices(-1234, "LOGTABLE", indexTypeMap);
 //        analyticsAPI.clearIndices(-1234, "LOGTABLE");
 //        System.out.println(analyticsAPI.getIndices(-1234, "LOGTABLE"));
-
+//
 //        analyticsAPI
 //        System.out.println(analyticsAPI.listTables(-1234));
-//    }
+    }
+}
+
+class MyThread extends Thread {
+    private int id;
+    private AnalyticsDataAPI api;
+
+    public MyThread(ThreadGroup threadGroup, int id, AnalyticsDataAPI dataAPI) {
+        super(threadGroup, "MyThread-"+id);
+        this.id = id;
+        this.api = dataAPI;
+    }
+
+    public void run() {
+        try {
+            System.out.print("Calling - "+ id);
+            this.api.tableExists(-1234, "LOGTABLE2");
+            System.out.print("Successfully called - "+ id);
+        } catch (AnalyticsException e) {
+            e.printStackTrace();
+        } catch (AnalyticsServiceException e) {
+            e.printStackTrace();
+        }
+    }
 }

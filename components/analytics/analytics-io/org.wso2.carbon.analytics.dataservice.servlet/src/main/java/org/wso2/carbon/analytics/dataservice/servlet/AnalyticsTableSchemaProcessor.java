@@ -23,6 +23,7 @@ import org.wso2.carbon.analytics.dataservice.servlet.exception.AnalyticsAPIAuthe
 import org.wso2.carbon.analytics.dataservice.servlet.internal.ServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -35,6 +36,7 @@ public class AnalyticsTableSchemaProcessor extends HttpServlet {
 
     /**
      * set schema
+     *
      * @param req
      * @param resp
      * @throws ServletException
@@ -42,27 +44,34 @@ public class AnalyticsTableSchemaProcessor extends HttpServlet {
      */
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String sessionId = req.getHeader(AnalyticsAPIConstants.SESSION_ID);
-        if (sessionId == null || sessionId.trim().isEmpty()){
+        if (sessionId == null || sessionId.trim().isEmpty()) {
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
-        }else {
+        } else {
             try {
                 ServiceHolder.getAuthenticator().validateSessionId(sessionId);
             } catch (AnalyticsAPIAuthenticationException e) {
                 resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
             }
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
-            if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.SET_SCHEMA_OPERATION)){
-                int tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
+            boolean securityEnabled = Boolean.parseBoolean(req.getParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM));
+            int tenantId = MultitenantConstants.INVALID_TENANT_ID;
+            if (!securityEnabled)
+                tenantId = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
+            String userName = req.getParameter(AnalyticsAPIConstants.USERNAME_PARAM);
+            if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.SET_SCHEMA_OPERATION)) {
                 String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
                 String jsonSchema = req.getParameter(AnalyticsAPIConstants.SCHEMA_PARAM);
                 AnalyticsSchema schema = new GsonBuilder().create().fromJson(jsonSchema, AnalyticsSchema.class);
                 try {
-                    ServiceHolder.getAnalyticsDataService().setTableSchema(tenantIdParam, tableName, schema);
+                    if (!securityEnabled)
+                        ServiceHolder.getAnalyticsDataService().setTableSchema(tenantId, tableName, schema);
+                    else
+                        ServiceHolder.getSecureAnalyticsDataService().setTableSchema(userName, tableName, schema);
                     resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }
-            }else {
+            } else {
                 resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : " + operation
                         + " with get request!");
             }
@@ -71,27 +80,35 @@ public class AnalyticsTableSchemaProcessor extends HttpServlet {
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String sessionId = req.getHeader(AnalyticsAPIConstants.SESSION_ID);
-        if (sessionId == null || sessionId.trim().isEmpty()){
+        if (sessionId == null || sessionId.trim().isEmpty()) {
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
-        }else {
+        } else {
             try {
                 ServiceHolder.getAuthenticator().validateSessionId(sessionId);
             } catch (AnalyticsAPIAuthenticationException e) {
                 resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
             }
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
-            if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.GET_SCHEMA_OPERATION)){
-                int tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
+            boolean securityEnabled = Boolean.parseBoolean(req.getParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM));
+            int tenantId = MultitenantConstants.INVALID_TENANT_ID;
+            if (!securityEnabled)
+                tenantId = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
+            String userName = req.getParameter(AnalyticsAPIConstants.USERNAME_PARAM);
+            if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.GET_SCHEMA_OPERATION)) {
                 String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
                 try {
-                    AnalyticsSchema schema =  ServiceHolder.getAnalyticsDataService().getTableSchema(tenantIdParam, tableName);
+                    AnalyticsSchema schema;
+                    if (!securityEnabled)
+                        schema = ServiceHolder.getAnalyticsDataService().getTableSchema(tenantId, tableName);
+                    else
+                        schema = ServiceHolder.getSecureAnalyticsDataService().getTableSchema(userName, tableName);
                     PrintWriter outputWriter = resp.getWriter();
                     outputWriter.append(new GsonBuilder().create().toJson(schema));
                     resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
                 }
-            }else {
+            } else {
                 resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : " + operation
                         + " with get request!");
             }

@@ -26,6 +26,7 @@ import org.wso2.carbon.analytics.dataservice.servlet.internal.ServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
@@ -59,9 +60,14 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
                 resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
             }
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
+            boolean securityEnabled = Boolean.parseBoolean(req.getParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM));
+
             Gson gson = new Gson();
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.GET_RANGE_RECORD_GROUP_OPERATION)) {
-                int tenantId = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
+                int tenantId = MultitenantConstants.INVALID_TENANT_ID;
+                if (!securityEnabled)
+                    tenantId = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
+                String userName = req.getParameter(AnalyticsAPIConstants.USERNAME_PARAM);
                 String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
                 int partitionHint = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.PARTITIONER_NO_PARAM));
                 Type columnsList = new TypeToken<List<String>>() {
@@ -72,8 +78,12 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
                 int recordFrom = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.RECORD_FROM_PARAM));
                 int recordsCount = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.COUNT_PARAM));
                 try {
-                    RecordGroup[] recordGroups = ServiceHolder.getAnalyticsDataService().get(tenantId, tableName, partitionHint, list, timeFrom, timeTo,
-                            recordFrom, recordsCount);
+                    RecordGroup[] recordGroups;
+                    if (!securityEnabled)
+                        recordGroups = ServiceHolder.getAnalyticsDataService().get(tenantId, tableName, partitionHint,
+                                list, timeFrom, timeTo, recordFrom, recordsCount);
+                    else recordGroups = ServiceHolder.getSecureAnalyticsDataService().get(userName, tableName,
+                            partitionHint, list, timeFrom, timeTo, recordFrom, recordsCount);
                     RemoteRecordGroup[] remoteRecordGroup = new RemoteRecordGroup[recordGroups.length];
                     for (int i = 0; i < recordGroups.length; i++) {
                         remoteRecordGroup[i] = new RemoteRecordGroup();
@@ -89,15 +99,23 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
                 }
 
             } else if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.GET_IDS_RECORD_GROUP_OPERATION)) {
-                int tenantId = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
+                int tenantId = MultitenantConstants.INVALID_TENANT_ID;
+                if (!securityEnabled)
+                    tenantId = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
+                String userName = req.getParameter(AnalyticsAPIConstants.USERNAME_PARAM);
                 String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
                 int partitionHint = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.PARTITIONER_NO_PARAM));
                 Type columnsList = new TypeToken<List<String>>() {
                 }.getType();
                 List<String> columns = gson.fromJson(req.getParameter(AnalyticsAPIConstants.COLUMNS_PARAM), columnsList);
                 List<String> ids = gson.fromJson(req.getParameter(AnalyticsAPIConstants.RECORD_IDS_PARAM), columnsList);
+                ObjectOutputStream objectOutputStream = null;
                 try {
-                    RecordGroup[] recordGroups = ServiceHolder.getAnalyticsDataService().get(tenantId, tableName,
+                    RecordGroup[] recordGroups;
+                    if (!securityEnabled)
+                        recordGroups = ServiceHolder.getAnalyticsDataService().get(tenantId, tableName,
+                                partitionHint, columns, ids);
+                    else recordGroups = ServiceHolder.getSecureAnalyticsDataService().get(userName, tableName,
                             partitionHint, columns, ids);
                     RemoteRecordGroup[] remoteRecordGroup = new RemoteRecordGroup[recordGroups.length];
                     for (int i = 0; i < recordGroups.length; i++) {
@@ -106,31 +124,46 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
                         remoteRecordGroup[i].setLocations(recordGroups[i].getLocations());
                     }
                     resp.setStatus(HttpServletResponse.SC_OK);
-                    ObjectOutputStream objectOutputStream = new ObjectOutputStream(resp.getOutputStream());
+                    objectOutputStream = new ObjectOutputStream(resp.getOutputStream());
                     objectOutputStream.writeObject(remoteRecordGroup);
-                    objectOutputStream.close();
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+                } finally {
+                    if (objectOutputStream != null) {
+                        objectOutputStream.close();
+                    }
                 }
 
             } else if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.READ_RECORD_OPERATION)) {
                 ServletInputStream servletInputStream = req.getInputStream();
-                ObjectInputStream inputStream = new ObjectInputStream(servletInputStream);
+                ObjectInputStream inputStream = null;
+                ObjectOutputStream outputStream = null;
                 try {
+                    inputStream = new ObjectInputStream(servletInputStream);
                     RemoteRecordGroup remoteRecordGroupObj = (RemoteRecordGroup) inputStream.readObject();
-                    Iterator<Record> records = ServiceHolder.getAnalyticsDataService().readRecords(remoteRecordGroupObj.getRecordGroupFromBinary());
+                    Iterator<Record> records = ServiceHolder.getAnalyticsDataService().readRecords(remoteRecordGroupObj.
+                            getRecordGroupFromBinary());
                     resp.setStatus(HttpServletResponse.SC_OK);
-                    ObjectOutputStream outputStream = new ObjectOutputStream(resp.getOutputStream());
+                    outputStream = new ObjectOutputStream(resp.getOutputStream());
                     while (records.hasNext()) {
                         Record record = records.next();
                         outputStream.writeObject(record);
                     }
-                    outputStream.close();
                 } catch (ClassNotFoundException e) {
                     resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No class found for the " +
                             "record group implementation : " + ". " + e.getMessage());
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+                } finally {
+                    if (inputStream != null) {
+                        inputStream.close();
+                    }
+                    if (servletInputStream != null) {
+                        servletInputStream.close();
+                    }
+                    if (outputStream != null) {
+                        outputStream.close();
+                    }
                 }
             } else {
                 resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : " + operation

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,47 +15,30 @@
  */
 package org.wso2.carbon.analytics.dataservice.io.commons.beans;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
-import java.util.Map;
-
 /**
  * The Class QueryBean.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(propOrder = { "tenantId", "tableName", "columns", "language", "query", "start", "count" })
-@XmlRootElement(name = "query")
 public class QueryBean {
 	
 	/** The tenant id. */
-	@XmlElement(required = true)
 	private int tenantId;
 	
 	/** The table name. */
-	@XmlElement(required = true)
 	private String tableName;
 	
 	/** The columns. */
-	@XmlElement(required = false)
-	private Map<String, IndexTypeBean> columns;
+	private IndexEntryBean[] columns;
 	
 	/** The language. */
-	@XmlElement(required = false)
 	private String language;
 	
 	/** The query. */
-	@XmlElement(required = false)
 	private String query;
 	
 	/** The start. */
-	@XmlElement(required = false)
 	private int start;
 	
 	/** The count. */
-	@XmlElement(required = false)
 	private int count;
 
 	/**
@@ -94,7 +77,7 @@ public class QueryBean {
 	 * Gets the columns.
 	 * @return the columns
 	 */
-	public Map<String, IndexTypeBean> getColumns() {
+	public IndexEntryBean[] getColumns() {
 		return columns;
 	}
 
@@ -102,7 +85,7 @@ public class QueryBean {
 	 * Sets the columns.
 	 * @param columns the columns
 	 */
-	public void setColumns(Map<String, IndexTypeBean> columns) {
+	public void setColumns(IndexEntryBean[] columns) {
 		this.columns = columns;
 	}
 

@@ -42,6 +42,8 @@ import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.util.EntityUtils;
 import org.wso2.carbon.analytics.api.RemoteRecordIterator;
 import org.wso2.carbon.analytics.api.internal.AnalyticsDataConfiguration;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
+import org.wso2.carbon.analytics.dataservice.commons.DrillDownResultEntry;
 import org.wso2.carbon.analytics.dataservice.io.commons.RemoteRecordGroup;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceAuthenticationException;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceException;
@@ -107,7 +109,7 @@ public class AnalyticsAPIHttpClient {
 
     public void authenticate(String username, String password) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
-        builder.setScheme(this.protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.AUTHENTICATION_SERVICE_URI)
+        builder.setScheme(this.protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.MANAGEMENT_SERVICE_URI)
                 .setParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.LOGIN_OPERATION);
         try {
             HttpGet getMethod = new HttpGet(builder.build().toString());
@@ -116,6 +118,7 @@ public class AnalyticsAPIHttpClient {
                             + password).getBytes()));
             HttpResponse httpResponse = httpClient.execute(getMethod);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                EntityUtils.consume(httpResponse.getEntity());
                 throw new AnalyticsServiceAuthenticationException("Authentication failed for user : " + username);
             }
             String response = getResponse(httpResponse);
@@ -170,7 +173,7 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public void createTable(int tenantId, String tableName) throws AnalyticsServiceException {
+    public void createTable(int tenantId, String username, String tableName, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants
                 .TABLE_PROCESSOR_SERVICE_URI);
@@ -180,7 +183,12 @@ public class AnalyticsAPIHttpClient {
             List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants
                     .CREATE_TABLE_OPERATION));
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId)));
+            if (!securityEnabled) {
+                params.add(new BasicNameValuePair(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId)));
+            } else {
+                params.add(new BasicNameValuePair(AnalyticsAPIConstants.USERNAME_PARAM, username));
+            }
+            params.add(new BasicNameValuePair(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled)));
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName));
             postMethod.setEntity(new UrlEncodedFormEntity(params));
             HttpResponse httpResponse = httpClient.execute(postMethod);
@@ -199,8 +207,8 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public void setTableSchema(int tenantId, String tableName,
-                               AnalyticsSchema schema) throws AnalyticsServiceException {
+    public void setTableSchema(int tenantId, String username, String tableName,
+                               AnalyticsSchema schema, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants
                 .SCHEMA_PROCESSOR_SERVICE_URI);
@@ -211,7 +219,12 @@ public class AnalyticsAPIHttpClient {
             List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.
                     SET_SCHEMA_OPERATION));
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId)));
+            if (!securityEnabled) {
+                params.add(new BasicNameValuePair(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId)));
+            } else {
+                params.add(new BasicNameValuePair(AnalyticsAPIConstants.USERNAME_PARAM, username));
+            }
+            params.add(new BasicNameValuePair(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled)));
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName));
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.SCHEMA_PARAM, jsonSchema));
             postMethod.setEntity(new UrlEncodedFormEntity(params));
@@ -231,12 +244,17 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public AnalyticsSchema getTableSchema(int tenantId, String tableName) throws AnalyticsServiceException {
+    public AnalyticsSchema getTableSchema(int tenantId, String username, String tableName, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.SCHEMA_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.GET_SCHEMA_OPERATION)
-                .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
-                .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName);
+                .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
+                .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
+        if (!securityEnabled) {
+            builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
+        } else {
+            builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
+        }
         try {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
@@ -256,13 +274,18 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public boolean isTableExists(int tenantId, String tableName) throws AnalyticsServiceException {
+    public boolean isTableExists(int tenantId, String username, String tableName, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
-        builder.setScheme("http").setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants
+        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants
                 .TABLE_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.TABLE_EXISTS_OPERATION)
-                .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
-                .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName);
+                .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
+                .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
+        if (!securityEnabled) {
+            builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
+        } else {
+            builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
+        }
         try {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
@@ -293,12 +316,17 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public List<String> listTables(int tenantId) throws AnalyticsServiceException {
+    public List<String> listTables(int tenantId, String username, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants
                 .TABLE_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.LIST_TABLES_OPERATION)
-                .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
+                .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
+        if (!securityEnabled) {
+            builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
+        } else {
+            builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
+        }
         try {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
@@ -321,12 +349,17 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public void deleteTable(int tenantId, String tableName) throws AnalyticsServiceException {
+    public void deleteTable(int tenantId, String username, String tableName, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.TABLE_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.DELETE_TABLE_OPERATION)
-                .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
-                .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName);
+                .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
+                .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
+        if (!securityEnabled) {
+            builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
+        } else {
+            builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
+        }
         try {
             HttpDelete deleteMethod = new HttpDelete(builder.build().toString());
             deleteMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
@@ -344,14 +377,19 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public long getRecordCount(int tenantId, String tableName, long timeFrom, long timeTo) throws AnalyticsServiceException {
+    public long getRecordCount(int tenantId, String username, String tableName, long timeFrom, long timeTo, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.RECORD_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.GET_RECORD_COUNT_OPERATION)
-                .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
                 .addParameter(AnalyticsAPIConstants.TIME_FROM_PARAM, String.valueOf(timeFrom))
-                .addParameter(AnalyticsAPIConstants.TIME_TO_PARAM, String.valueOf(timeTo));
+                .addParameter(AnalyticsAPIConstants.TIME_TO_PARAM, String.valueOf(timeTo))
+                .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
+        if (!securityEnabled) {
+            builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
+        } else {
+            builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
+        }
         try {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
@@ -382,7 +420,7 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public void putRecords(List<Record> records) throws AnalyticsServiceException {
+    public void putRecords(String username, List<Record> records, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.RECORD_PROCESSOR_SERVICE_URI);
         try {
@@ -391,6 +429,10 @@ public class AnalyticsAPIHttpClient {
             List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.PUT_RECORD_OPERATION));
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.RECORDS_PARAM, new Gson().toJson(records)));
+            if (securityEnabled) {
+                params.add(new BasicNameValuePair(AnalyticsAPIConstants.USERNAME_PARAM, username));
+            }
+            params.add(new BasicNameValuePair(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled)));
             postMethod.setEntity(new UrlEncodedFormEntity(params));
             HttpResponse httpResponse = httpClient.execute(postMethod);
             String response = getResponse(httpResponse);
@@ -404,14 +446,19 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public void deleteRecords(int tenantId, String tableName, long timeFrom, long timeTo) throws AnalyticsServiceException {
+    public void deleteRecords(int tenantId, String username, String tableName, long timeFrom, long timeTo, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
-        builder.setScheme("http").setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.RECORD_PROCESSOR_SERVICE_URI)
+        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.RECORD_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.DELETE_RECORDS_RANGE_OPERATION)
-                .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
                 .addParameter(AnalyticsAPIConstants.TIME_FROM_PARAM, String.valueOf(timeFrom))
-                .addParameter(AnalyticsAPIConstants.TIME_TO_PARAM, String.valueOf(timeTo));
+                .addParameter(AnalyticsAPIConstants.TIME_TO_PARAM, String.valueOf(timeTo))
+                .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
+        if (!securityEnabled) {
+            builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
+        } else {
+            builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
+        }
         try {
             HttpDelete deleteMethod = new HttpDelete(builder.build().toString());
             deleteMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
@@ -429,13 +476,18 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public void deleteRecords(int tenantId, String tableName, List<String> recordIds) throws AnalyticsServiceException {
+    public void deleteRecords(int tenantId, String username, String tableName, List<String> recordIds, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.RECORD_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.DELETE_RECORDS_IDS_OPERATION)
-                .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
-                .addParameter(AnalyticsAPIConstants.RECORD_IDS_PARAM, new Gson().toJson(recordIds));
+                .addParameter(AnalyticsAPIConstants.RECORD_IDS_PARAM, new Gson().toJson(recordIds))
+                .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
+        if (!securityEnabled) {
+            builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
+        } else {
+            builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
+        }
         try {
             HttpDelete deleteMethod = new HttpDelete(builder.build().toString());
             deleteMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
@@ -453,25 +505,39 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public void setIndices(int tenantId, String tableName, Map<String, IndexType> columns) throws AnalyticsServiceException {
+    public void setIndices(int tenantId, String username, String tableName, Map<String, IndexType> columns,
+                           List<String> scoreParams, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
+        Gson gson = new Gson();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI);
         try {
             HttpPost postMethod = new HttpPost(builder.build().toString());
             postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.SET_INDICES_OPERATION));
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId)));
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName));
-            String indexJson = new Gson().toJson(columns);
+            String indexJson = gson.toJson(columns);
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.INDEX_PARAM, indexJson));
+            if (scoreParams != null) {
+                params.add(new BasicNameValuePair(AnalyticsAPIConstants.SCORE_PARAM, gson.toJson(scoreParams)));
+            }
+            if (!securityEnabled) {
+                params.add(new BasicNameValuePair(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId)));
+            } else {
+                params.add(new BasicNameValuePair(AnalyticsAPIConstants.USERNAME_PARAM, username));
+            }
+            params.add(new BasicNameValuePair(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled)));
             postMethod.setEntity(new UrlEncodedFormEntity(params));
             HttpResponse httpResponse = httpClient.execute(postMethod);
             String response = getResponse(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
-                throw new AnalyticsServiceException("Unable to set the index for table - " + tableName
+                String errorMsg = "Unable to set the index for table - " + tableName
                         + " with index  - " + indexJson
-                        + " for tenant id : " + tenantId + ". " + response);
+                        + " for tenant id : " + tenantId + ". " + response;
+                if (securityEnabled) errorMsg = "Unable to set the index for table - " + tableName
+                        + " with index  - " + indexJson
+                        + " for username : " + username + ". " + response;
+                throw new AnalyticsServiceException(errorMsg);
             }
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceAuthenticationException("Malformed URL provided. " + e.getMessage(), e);
@@ -480,12 +546,17 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public Map<String, IndexType> getIndices(int tenantId, String tableName) throws AnalyticsServiceException {
+    public Map<String, IndexType> getIndices(int tenantId, String username, String tableName, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.GET_INDICES_OPERATION)
-                .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
-                .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName);
+                .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
+                .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
+        if (!securityEnabled) {
+            builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
+        } else {
+            builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
+        }
         try {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
@@ -506,13 +577,49 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
+    public List<String> getScoreParams(int tenantId, String username, String tableName, boolean securityEnabled) throws AnalyticsServiceException {
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI)
+                .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.GET_SCORE_PARAMS_OPERATION)
+                .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
+                .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
+        if (!securityEnabled) {
+            builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
+        } else {
+            builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
+        }
+        try {
+            HttpGet getMethod = new HttpGet(builder.build().toString());
+            getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
+            HttpResponse httpResponse = httpClient.execute(getMethod);
+            String response = getResponse(httpResponse);
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                throw new AnalyticsServiceException("Unable to get the index for table - " + tableName
+                        + " for tenant id : " + tenantId + ". " + response);
+            } else {
+                Type scoreListType = new TypeToken<List<String>>() {
+                }.getType();
+                return new Gson().fromJson(response, scoreListType);
+            }
+        } catch (URISyntaxException e) {
+            throw new AnalyticsServiceAuthenticationException("Malformed URL provided. " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new AnalyticsServiceAuthenticationException("Error while connecting to the remote service. " + e.getMessage(), e);
+        }
+    }
 
-    public void clearIndices(int tenantId, String tableName) throws AnalyticsServiceException {
+
+    public void clearIndices(int tenantId, String username, String tableName, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.DELETE_INDICES_OPERATION)
-                .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
-                .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName);
+                .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
+                .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
+        if (!securityEnabled) {
+            builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
+        } else {
+            builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
+        }
         try {
             HttpDelete deleteMethod = new HttpDelete(builder.build().toString());
             deleteMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
@@ -531,17 +638,22 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public List<SearchResultEntry> search(int tenantId, String tableName, String language, String query,
-                                          int start, int count) throws AnalyticsServiceException {
+    public List<SearchResultEntry> search(int tenantId, String username, String tableName, String language, String query,
+                                          int start, int count, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.SEARCH_OPERATION)
-                .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
                 .addParameter(AnalyticsAPIConstants.LANGUAGE_PARAM, language)
                 .addParameter(AnalyticsAPIConstants.QUERY, query)
                 .addParameter(AnalyticsAPIConstants.START_PARAM, String.valueOf(start))
-                .addParameter(AnalyticsAPIConstants.COUNT_PARAM, String.valueOf(count));
+                .addParameter(AnalyticsAPIConstants.COUNT_PARAM, String.valueOf(count))
+                .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
+        if (!securityEnabled) {
+            builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
+        } else {
+            builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
+        }
         try {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
@@ -563,14 +675,20 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public int searchCount(int tenantId, String tableName, String language, String query) throws AnalyticsServiceException {
+    public int searchCount(int tenantId, String username, String tableName, String language, String query,
+                           boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.SEARCH_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.SEARCH_COUNT_OPERATION)
-                .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
                 .addParameter(AnalyticsAPIConstants.LANGUAGE_PARAM, language)
-                .addParameter(AnalyticsAPIConstants.QUERY, query);
+                .addParameter(AnalyticsAPIConstants.QUERY, query)
+                .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
+        if (!securityEnabled) {
+            builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
+        } else {
+            builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
+        }
         try {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
@@ -646,19 +764,24 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public RecordGroup[] getRecordGroup(int tenantId, String tableName, int numPartitionsHint, List<String> columns, long timeFrom,
-                                        long timeTo, int recordsFrom, int recordsCount) throws AnalyticsServiceException {
+    public RecordGroup[] getRecordGroup(int tenantId, String username, String tableName, int numPartitionsHint, List<String> columns, long timeFrom,
+                                        long timeTo, int recordsFrom, int recordsCount, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.ANALYTIC_RECORD_READ_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.GET_RANGE_RECORD_GROUP_OPERATION)
-                .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
                 .addParameter(AnalyticsAPIConstants.PARTITIONER_NO_PARAM, String.valueOf(numPartitionsHint))
                 .addParameter(AnalyticsAPIConstants.COLUMNS_PARAM, new Gson().toJson(columns))
                 .addParameter(AnalyticsAPIConstants.TIME_FROM_PARAM, String.valueOf(timeFrom))
                 .addParameter(AnalyticsAPIConstants.TIME_TO_PARAM, String.valueOf(timeTo))
                 .addParameter(AnalyticsAPIConstants.RECORD_FROM_PARAM, String.valueOf(recordsFrom))
-                .addParameter(AnalyticsAPIConstants.COUNT_PARAM, String.valueOf(recordsCount));
+                .addParameter(AnalyticsAPIConstants.COUNT_PARAM, String.valueOf(recordsCount))
+                .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
+        if (!securityEnabled) {
+            builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
+        } else {
+            builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
+        }
         ObjectInputStream objIn = null;
         try {
             HttpGet getMethod = new HttpGet(builder.build().toString());
@@ -691,17 +814,22 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public RecordGroup[] getRecordGroup(int tenantId, String tableName, int numPartitionsHint, List<String> columns,
-                                        List<String> ids) throws AnalyticsServiceException {
+    public RecordGroup[] getRecordGroup(int tenantId, String username, String tableName, int numPartitionsHint, List<String> columns,
+                                        List<String> ids, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         Gson gson = new Gson();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.ANALYTIC_RECORD_READ_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.GET_IDS_RECORD_GROUP_OPERATION)
-                .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
                 .addParameter(AnalyticsAPIConstants.PARTITIONER_NO_PARAM, String.valueOf(numPartitionsHint))
                 .addParameter(AnalyticsAPIConstants.COLUMNS_PARAM, gson.toJson(columns))
-                .addParameter(AnalyticsAPIConstants.RECORD_IDS_PARAM, gson.toJson(ids));
+                .addParameter(AnalyticsAPIConstants.RECORD_IDS_PARAM, gson.toJson(ids))
+                .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
+        if (!securityEnabled) {
+            builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
+        } else {
+            builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
+        }
         ObjectInputStream objIn = null;
         try {
             HttpGet getMethod = new HttpGet(builder.build().toString());
@@ -774,4 +902,106 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
+    public boolean isPaginationSupported() {
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme(this.protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.MANAGEMENT_SERVICE_URI)
+                .setParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.IS_PAGINATION_SUPPORTED_OPERATION);
+        try {
+            HttpGet getMethod = new HttpGet(builder.build().toString());
+            getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
+            HttpResponse httpResponse = httpClient.execute(getMethod);
+            String response = getResponse(httpResponse);
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                throw new AnalyticsServiceException("Error while checking the pagination support. " + response);
+            }
+            if (response.startsWith(AnalyticsAPIConstants.PAGINATION_SUPPORT)) {
+                String[] reponseElements = response.split(AnalyticsAPIConstants.SEPARATOR);
+                if (reponseElements.length == 2) {
+                    return Boolean.parseBoolean(reponseElements[1]);
+                } else {
+                    throw new AnalyticsServiceAuthenticationException("Invalid response returned, cannot find " +
+                            "pagination support element. Response:" + response);
+                }
+            } else {
+                throw new AnalyticsServiceAuthenticationException("Invalid response returned, no pagination support found!"
+                        + response);
+            }
+        } catch (URISyntaxException e) {
+            throw new AnalyticsServiceException("Malformed URL provided for pagination support checking. "
+                    + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new AnalyticsServiceException("Error while connecting to the remote service. "
+                    + e.getMessage(), e);
+        }
+    }
+
+    public Map<String, List<DrillDownResultEntry>> drillDown(int tenantId, String username,
+                                                             AnalyticsDrillDownRequest drillDownRequest, boolean securityEnabled) {
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.SEARCH_PROCESSOR_SERVICE_URI)
+                .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.DRILL_DOWN_OPERATION)
+                .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
+        if (!securityEnabled) {
+            builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
+        } else {
+            builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
+        }
+        ByteArrayOutputStream out = null;
+        ObjectOutputStream os = null;
+        InputStream is = null;
+        ObjectInputStream oi = null;
+        try {
+            HttpPost postMethod = new HttpPost(builder.build().toString());
+            postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
+            out = new ByteArrayOutputStream();
+            os = new ObjectOutputStream(out);
+            os.writeObject(drillDownRequest);
+            postMethod.setEntity(new ByteArrayEntity(out.toByteArray()));
+            HttpResponse httpResponse = httpClient.execute(postMethod);
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                String response = getResponse(httpResponse);
+                throw new AnalyticsServiceException("Unable to read the record group. "
+                        + response);
+            }
+            is = httpResponse.getEntity().getContent();
+            oi = new ObjectInputStream(is);
+            return (Map<String, List<DrillDownResultEntry>>) oi.readObject();
+        } catch (URISyntaxException e) {
+            throw new AnalyticsServiceException("Malformed URL provided. " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new AnalyticsServiceException("Error while connecting to the remote service. " + e.getMessage(), e);
+        } catch (ClassNotFoundException e) {
+            throw new AnalyticsServiceException("Unable to de serialize the object as the class is not found in " +
+                    "this instance. " + e.getMessage(), e);
+        } finally {
+            if (os != null) {
+                try {
+                    os.close();
+                } catch (IOException e) {
+                    log.warn("Error while closing object stream! " + e.getMessage());
+                }
+            }
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    log.warn("Error while closing output stream! " + e.getMessage());
+                }
+            }
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    log.warn("Error while closing input stream! " + e.getMessage());
+                }
+            }
+            if (oi != null) {
+                try {
+                    oi.close();
+                } catch (IOException e) {
+                    log.warn("Error while closing input stream! " + e.getMessage());
+                }
+            }
+        }
+    }
 }
