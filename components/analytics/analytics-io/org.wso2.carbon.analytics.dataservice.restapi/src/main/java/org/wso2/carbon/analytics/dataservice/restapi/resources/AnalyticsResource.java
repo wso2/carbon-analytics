@@ -245,6 +245,9 @@ public class AnalyticsResource extends AbstractResource {
         }
         SecureAnalyticsDataService analyticsDataService = getSecureAnalyticsDataService();
         String username = authenticate(authHeader);
+        if (inputStream == null) {
+            throw new AnalyticsException("Records are empty");
+        }
         Reader jsonReader = new BufferedReader(new InputStreamReader(inputStream));
         Type listType = new TypeToken<List<RecordBean>>() {}.getType();
         List<RecordBean> recordBeans = gson.fromJson(jsonReader, listType);

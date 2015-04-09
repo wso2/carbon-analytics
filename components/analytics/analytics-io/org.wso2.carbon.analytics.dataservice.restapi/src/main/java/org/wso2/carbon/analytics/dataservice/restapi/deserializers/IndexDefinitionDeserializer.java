@@ -24,6 +24,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.IndexConfigurationBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.IndexEntryBean;
+import org.wso2.carbon.analytics.dataservice.restapi.Constants;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ public class IndexDefinitionDeserializer implements JsonDeserializer<IndexConfig
         IndexConfigurationBean indexConf = new IndexConfigurationBean();
         if (jsonElement instanceof JsonObject) {
             JsonObject indexConfObject = (JsonObject) jsonElement;
-            JsonElement indices = indexConfObject.get("indices");
+            JsonElement indices = indexConfObject.get(Constants.JsonElements.INDICES);
             if (indices instanceof JsonObject) {
                 JsonObject indicesObj = (JsonObject)indices;
                 List<IndexEntryBean> indexEntryBeans = new ArrayList<>(0);
@@ -53,7 +54,7 @@ public class IndexDefinitionDeserializer implements JsonDeserializer<IndexConfig
                 }
                 indexConf.setIndices(indexEntryBeans.toArray(new IndexEntryBean[indexEntryBeans.size()]));
             }
-            JsonElement scoreParams = indexConfObject.get("scoreParams");
+            JsonElement scoreParams = indexConfObject.get(Constants.JsonElements.SCORE_PARAMS);
             if (scoreParams instanceof JsonArray) {
                 JsonArray scoreParamsArray = (JsonArray)scoreParams;
                 List<String> scoreParamBeans = new ArrayList<>(0);

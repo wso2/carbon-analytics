@@ -24,6 +24,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.IndexConfigurationBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.IndexEntryBean;
+import org.wso2.carbon.analytics.dataservice.restapi.Constants;
 
 import java.lang.reflect.Type;
 
@@ -44,8 +45,8 @@ public class IndexDefinitionSerializer implements JsonSerializer<IndexConfigurat
         for (String scoreParam : indexConfigurationBean.getScoreParams()) {
             scoreParams.add(new JsonPrimitive(scoreParam));
         }
-        indexConf.add("indices", indexObject);
-        indexConf.add("scoreParams", scoreParams);
+        indexConf.add(Constants.JsonElements.INDICES, indexObject);
+        indexConf.add(Constants.JsonElements.SCORE_PARAMS, scoreParams);
         return indexConf;
     }
 }

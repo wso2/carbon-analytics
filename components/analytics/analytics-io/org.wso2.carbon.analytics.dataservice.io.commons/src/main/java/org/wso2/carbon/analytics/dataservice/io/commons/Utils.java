@@ -26,14 +26,12 @@ import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.AnalyticsCategoryPathBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.AnalyticsSchemaBean;
-import org.wso2.carbon.analytics.dataservice.io.commons.beans.ColumnTypeBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.DrillDownFieldRangeBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.DrillDownPathBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.DrillDownRangeBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.DrillDownResultBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.IndexEntryBean;
-import org.wso2.carbon.analytics.dataservice.io.commons.beans.IndexTypeBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.PerCategoryDrillDownResultBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.PerFieldDrillDownResultBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.RecordBean;
@@ -168,23 +166,23 @@ public class Utils {
 	public static String createIndexTypeBean(IndexType indexType) {
 		switch (indexType) {
 			case BOOLEAN:
-				return IndexTypeBean.BOOLEAN;
+				return BeanIndexType.BOOLEAN;
 			case FLOAT:
-				return IndexTypeBean.FLOAT;
+				return BeanIndexType.FLOAT;
 			case DOUBLE:
-				return IndexTypeBean.DOUBLE;
+				return BeanIndexType.DOUBLE;
 			case INTEGER:
-				return IndexTypeBean.INTEGER;
+				return BeanIndexType.INTEGER;
 			case LONG:
-				return IndexTypeBean.LONG;
+				return BeanIndexType.LONG;
 			case STRING:
-				return IndexTypeBean.STRING;
+				return BeanIndexType.STRING;
             case FACET:
-                return IndexTypeBean.FACET;
+                return BeanIndexType.FACET;
             case SCOREPARAM:
-                return IndexTypeBean.SCOREPARAM;
+                return BeanIndexType.SCOREPARAM;
 			default:
-				return IndexTypeBean.STRING;
+				return BeanIndexType.STRING;
 		}
 	}
 
@@ -197,21 +195,21 @@ public class Utils {
 
 	public static IndexType createIndexType(String type) {
 		switch (type) {
-			case "BOOLEAN":
+			case BeanIndexType.BOOLEAN:
 				return IndexType.BOOLEAN;
-			case "FLOAT":
+			case BeanIndexType.FLOAT:
 				return IndexType.FLOAT;
-			case "DOUBLE":
+			case BeanIndexType.DOUBLE:
 				return IndexType.DOUBLE;
-			case "INTEGER":
+			case BeanIndexType.INTEGER:
 				return IndexType.INTEGER;
-			case "LONG":
+			case BeanIndexType.LONG:
 				return IndexType.LONG;
-			case "STRING":
+			case BeanIndexType.STRING:
 				return IndexType.STRING;
-            case "FACET":
+            case BeanIndexType.FACET:
                 return IndexType.FACET;
-            case "SCOREPARAM":
+            case BeanIndexType.SCOREPARAM:
                 return IndexType.SCOREPARAM;
 			default:
 				return IndexType.STRING;
@@ -429,19 +427,19 @@ public class Utils {
      */
     private static AnalyticsSchema.ColumnType getColumnType(String type) {
         switch (type) {
-            case "STRING":
+            case BeanColumnType.STRING:
                 return AnalyticsSchema.ColumnType.STRING;
-            case "INTEGER":
+            case BeanColumnType.INTEGER:
                 return AnalyticsSchema.ColumnType.INTEGER;
-            case "LONG":
+            case BeanColumnType.LONG:
                 return AnalyticsSchema.ColumnType.LONG;
-            case "FLOAT":
+            case BeanColumnType.FLOAT:
                 return AnalyticsSchema.ColumnType.FLOAT;
-            case "DOUBLE":
+            case BeanColumnType.DOUBLE:
                 return AnalyticsSchema.ColumnType.DOUBLE;
-            case "BOOLEAN":
+            case BeanColumnType.BOOLEAN:
                 return AnalyticsSchema.ColumnType.BOOLEAN;
-            case "BINARY":
+            case BeanColumnType.BINARY:
                 return AnalyticsSchema.ColumnType.BINARY;
             default:
                 return AnalyticsSchema.ColumnType.STRING;
@@ -456,21 +454,21 @@ public class Utils {
     private static String getColumnTypeBean(AnalyticsSchema.ColumnType columnType) {
         switch (columnType) {
             case STRING:
-                return ColumnTypeBean.STRING;
+                return BeanColumnType.STRING;
             case INTEGER:
-                return ColumnTypeBean.INTEGER;
+                return BeanColumnType.INTEGER;
             case LONG:
-                return ColumnTypeBean.LONG;
+                return BeanColumnType.LONG;
             case FLOAT:
-                return ColumnTypeBean.FLOAT;
+                return BeanColumnType.FLOAT;
             case DOUBLE:
-                return ColumnTypeBean.DOUBLE;
+                return BeanColumnType.DOUBLE;
             case BOOLEAN:
-                return ColumnTypeBean.BOOLEAN;
+                return BeanColumnType.BOOLEAN;
             case BINARY:
-                return ColumnTypeBean.BINARY;
+                return BeanColumnType.BINARY;
             default:
-                return ColumnTypeBean.STRING;
+                return BeanColumnType.STRING;
         }
     }
 
@@ -481,5 +479,30 @@ public class Utils {
         } catch (UserStoreException e) {
             throw new AnalyticsException("Unable to get tenantId for user: " + username, e);
         }
+    }
+
+    private static class BeanIndexType {
+
+        public static final String STRING = "STRING";
+        public static final String LONG = "LONG";
+        public static final String FLOAT = "FLOAT";
+        public static final String DOUBLE = "DOUBLE";
+        public static final String BOOLEAN = "BOOLEAN";
+        public static final String BINARY = "BINARY";
+        public static final String INTEGER = "INTEGER";
+        public static final String FACET = "FACET";
+        public static final String SCOREPARAM = "SCOREPARAM";
+    }
+
+    private class  BeanColumnType {
+
+        public static final String STRING = "STRING";
+        public static final String LONG = "LONG";
+        public static final String FLOAT = "FLOAT";
+        public static final String DOUBLE = "DOUBLE";
+        public static final String BOOLEAN = "BOOLEAN";
+        public static final String BINARY = "BINARY";
+        public static final String INTEGER = "INTEGER";
+
     }
 }

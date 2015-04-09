@@ -25,6 +25,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.RecordBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.RecordValueEntryBean;
+import org.wso2.carbon.analytics.dataservice.restapi.Constants;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
 
 import java.lang.reflect.Type;
@@ -44,13 +45,13 @@ public class RecordBeanDeserializer implements JsonDeserializer<RecordBean> {
         RecordBean recordBean = new RecordBean();
         List<RecordValueEntryBean> valueEntryBeans = new ArrayList<>(0);
         JsonObject jsonRecord = (JsonObject) jsonElement;
-        if (jsonRecord.get("id") != null) {
-            recordBean.setId(jsonRecord.get("id").getAsString());
+        if (jsonRecord.get(Constants.JsonElements.ID) != null) {
+            recordBean.setId(jsonRecord.get(Constants.JsonElements.ID).getAsString());
         }
-        if (jsonRecord.get("tableName") != null) {
-            recordBean.setTableName(jsonRecord.get("tableName").getAsString());
+        if (jsonRecord.get(Constants.JsonElements.TABLENAME) != null) {
+            recordBean.setTableName(jsonRecord.get(Constants.JsonElements.TABLENAME).getAsString());
         }
-        JsonObject values = jsonRecord.getAsJsonObject("values");
+        JsonObject values = jsonRecord.getAsJsonObject(Constants.JsonElements.VALUES);
         for (Map.Entry<String, JsonElement> entry : values.entrySet()) {
             RecordValueEntryBean bean = new RecordValueEntryBean();
             bean.setFieldName(entry.getKey());
@@ -64,13 +65,13 @@ public class RecordBeanDeserializer implements JsonDeserializer<RecordBean> {
     private Object validateObject(JsonElement value) {
         if (value.isJsonObject()) {
             JsonObject jsonValue = (JsonObject)value;
-            JsonArray path = jsonValue.getAsJsonArray("path");
+            JsonArray path = jsonValue.getAsJsonArray(Constants.JsonElements.PATH);
             List<String> pathArray = new ArrayList<>(0);
             for (int i = 0; i < path.size(); i ++) {
                 pathArray.add(path.get(i).getAsString());
             }
-            if (jsonValue.get("weight") != null) {
-                float weight = jsonValue.getAsJsonPrimitive("weight").getAsFloat();
+            if (jsonValue.get(Constants.JsonElements.WEIGHT) != null) {
+                float weight = jsonValue.getAsJsonPrimitive(Constants.JsonElements.WEIGHT).getAsFloat();
                 return new AnalyticsCategoryPath(weight, pathArray.toArray(new String[pathArray.size()]));
             } else {
                 return new AnalyticsCategoryPath(pathArray.toArray(new String[pathArray.size()]));

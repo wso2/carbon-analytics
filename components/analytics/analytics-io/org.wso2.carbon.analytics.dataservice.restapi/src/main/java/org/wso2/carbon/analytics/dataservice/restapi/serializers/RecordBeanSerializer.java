@@ -26,6 +26,7 @@ import com.google.gson.JsonSerializer;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.AnalyticsCategoryPathBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.RecordBean;
 import org.wso2.carbon.analytics.dataservice.io.commons.beans.RecordValueEntryBean;
+import org.wso2.carbon.analytics.dataservice.restapi.Constants;
 
 import java.lang.reflect.Type;
 
@@ -41,9 +42,9 @@ public class RecordBeanSerializer implements JsonSerializer<RecordBean> {
     public JsonElement serialize(RecordBean recordBean, Type type,
                                  JsonSerializationContext jsonSerializationContext) {
         JsonObject record = new JsonObject();
-        record.addProperty("id", recordBean.getId());
-        record.addProperty("tableName", recordBean.getTableName());
-        record.addProperty("timestamp", recordBean.getTimestamp());
+        record.addProperty(Constants.JsonElements.ID, recordBean.getId());
+        record.addProperty(Constants.JsonElements.TABLENAME, recordBean.getTableName());
+        record.addProperty(Constants.JsonElements.TIMESTAMP, recordBean.getTimestamp());
         JsonObject values = new JsonObject();
         for (RecordValueEntryBean entryBean : recordBean.getValues()) {
             if (!(entryBean.getValue() instanceof AnalyticsCategoryPathBean)) {
@@ -55,12 +56,12 @@ public class RecordBeanSerializer implements JsonSerializer<RecordBean> {
                 for (String pathTerm : bean.getPath()) {
                     jsonPath.add(new JsonPrimitive(pathTerm));
                 }
-                facetValue.add("path", jsonPath);
-                facetValue.addProperty("weight", bean.getWeight());
+                facetValue.add(Constants.JsonElements.PATH, jsonPath);
+                facetValue.addProperty(Constants.JsonElements.WEIGHT, bean.getWeight());
                 values.add(entryBean.getFieldName(), facetValue);
             }
         }
-        record.add("values", values);
+        record.add(Constants.JsonElements.VALUES, values);
         return record;
     }
 }
