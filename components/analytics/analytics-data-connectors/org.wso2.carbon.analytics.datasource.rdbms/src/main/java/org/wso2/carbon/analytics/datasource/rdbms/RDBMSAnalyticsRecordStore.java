@@ -26,10 +26,10 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.ndatasource.common.DataSourceException;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.sql.DataSource;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -87,10 +87,9 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
                     RDBMSAnalyticsDSConstants.DATASOURCE + "' is required");
         }
         try {
-            this.dataSource = (DataSource) InitialContext.doLookup(dsName);
-        } catch (NamingException e) {
-            throw new AnalyticsException("Error in looking up data source: " + 
-                    e.getMessage(), e);
+            this.dataSource = (DataSource) GenericUtils.loadGlobalDataSource(dsName);
+        } catch (DataSourceException e) {
+            throw new AnalyticsException("Error in loading data source: " + e.getMessage(), e);
         }
         if (this.rdbmsQueryConfigurationEntry == null) {
             this.rdbmsQueryConfigurationEntry = RDBMSUtils.lookupCurrentQueryConfigurationEntry(this.dataSource);

@@ -21,16 +21,14 @@ package org.wso2.carbon.analytics.datasource.rdbms.h2;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.apache.tomcat.jdbc.pool.DataSource;
-import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.rdbms.RDBMSQueryConfigurationEntry;
 
@@ -38,22 +36,18 @@ import org.wso2.carbon.analytics.datasource.rdbms.RDBMSQueryConfigurationEntry;
  * H2 implementation of analytics record store tests.
  */
 public class H2FileDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
-    
-    private final static String DB_DIR_NAME = "bam_test_ars_db";
-
-    private DataSource dataSource;
-    
+        
     private AnalyticsRecordStore ars;
+    
+    public H2FileDBAnalyticsRecordStoreTest() {
+        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf");
+    }
         
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException {
-        String dbPath = H2FileUtils.generateDatabaseTempPathWithDirName(DB_DIR_NAME);
-        this.cleanupDB();
-        this.dataSource = createDataSource("jdbc:h2:" + dbPath, "wso2carbon", "wso2carbon");
-        new InitialContext().bind("DSRS", this.dataSource);
         this.ars = new RDBMSAnalyticsRecordStore(this.generateQueryConfiguration());
         Map<String, String> props = new HashMap<String, String>();
-        props.put("datasource", "DSRS");
+        props.put("datasource", "WSO2_ANALYTICS_RS_DB");
         this.ars.init(props);
         this.init("H2FileDBAnalyticsDataSource", ars);
     }
@@ -65,27 +59,6 @@ public class H2FileDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
     @AfterClass
     public void destroy() throws AnalyticsException {
         this.cleanup();
-        try {
-            new InitialContext().unbind("DSRS");
-        } catch (NamingException ignore) { }
-        if (this.dataSource != null) {
-            this.dataSource.close(true);
-        }
-        this.cleanupDB();
-    }
-    
-    private void cleanupDB() {
-        H2FileUtils.deleteDatabaseTempDir(DB_DIR_NAME);
-    }
-    
-    private DataSource createDataSource(String url, String username, String password) {
-        PoolProperties pps = new PoolProperties();
-        pps.setDriverClassName("org.h2.Driver");
-        pps.setUrl(url);
-        pps.setUsername(username);
-        pps.setPassword(password);
-        pps.setDefaultAutoCommit(false);
-        return new DataSource(pps);
     }
     
     private RDBMSQueryConfigurationEntry generateQueryConfiguration() {

@@ -72,6 +72,7 @@ public class H2FileDBAnalyticsFileSystemTest extends AnalyticsFileSystemTest {
             this.dataSource.close(true);
         }
         this.cleanupDB();
+        this.cleanup();
     }
     
     private void cleanupDB() {

@@ -28,6 +28,8 @@ import java.util.List;
 
 import javax.naming.Context;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -39,6 +41,8 @@ import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem.DataInpu
  */
 public class AnalyticsFileSystemTest {
 
+    private static final Log log = LogFactory.getLog(AnalyticsFileSystemTest.class);
+    
     private AnalyticsFileSystem analyticsFileSystem;
     
     private String implementationName;
@@ -54,6 +58,14 @@ public class AnalyticsFileSystemTest {
     
     public String getImplementationName() {
         return implementationName;
+    }
+    
+    public void cleanup() {
+        try {
+            this.analyticsFileSystem.destroy();
+        } catch (IOException e) {
+            log.error("Error in cleanup: " + e.getMessage(), e);
+        }
     }
     
     private void addFilesToDir(String dir, String...files) throws IOException {

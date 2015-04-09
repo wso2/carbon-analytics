@@ -1,13 +1,14 @@
 <datasources-configuration xmlns:svns="http://org.wso2.securevault/configuration">
 
+    <providers>
+        <provider>org.wso2.carbon.ndatasource.rdbms.RDBMSDataSourceReader</provider>
+    </providers>
+
     <datasources>
      
         <datasource>
             <name>WSO2_ANALYTICS_FS_DB</name>
             <description>The datasource used for analytics file system</description>
-            <jndiConfig>
-                <name>jdbc/AnalyticsFileSystemDB</name>
-            </jndiConfig>
             <definition type="RDBMS">
                 <configuration>
                     <url>jdbc:h2:repository/database/ANALYTICS_FS_DB;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000</url>
@@ -27,9 +28,6 @@
         <datasource>
             <name>WSO2_ANALYTICS_RS_DB</name>
             <description>The datasource used for analytics record store</description>
-            <jndiConfig>
-                <name>jdbc/AnalyticsRecordStoreDB</name>
-            </jndiConfig>
             <definition type="RDBMS">
                 <configuration>
                     <url>jdbc:h2:repository/database/ANALYTICS_RS_DB;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000</url>
@@ -49,3 +47,4 @@
     </datasources>
 
 </datasources-configuration>
+

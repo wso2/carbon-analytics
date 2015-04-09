@@ -58,8 +58,6 @@ public class AnalyticsDataServiceStandaloneTest extends AnalyticsDataServiceTest
     @AfterClass
     public void done() throws NamingException, AnalyticsException, IOException {
         this.service.destroy();
-        this.h2arstest.destroy();
-        this.h2afstest.destroy();
     }
     
 }

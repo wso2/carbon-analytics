@@ -67,6 +67,7 @@ public class H2MemDBAnalyticsFileSystemTest extends AnalyticsFileSystemTest {
         if (this.dataSource != null) {
             this.dataSource.close(true);
         }
+        this.cleanup();
     }
     
     private DataSource createDataSource(String url, String username, String password) {

@@ -21,16 +21,14 @@ package org.wso2.carbon.analytics.datasource.rdbms.h2;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.apache.tomcat.jdbc.pool.DataSource;
-import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.rdbms.RDBMSQueryConfigurationEntry;
 
@@ -39,19 +37,19 @@ import org.wso2.carbon.analytics.datasource.rdbms.RDBMSQueryConfigurationEntry;
  */
 public class H2MemDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
     
-    private DataSource dataSource;
-    
     private AnalyticsRecordStore ars;
-        
+    
+    public H2MemDBAnalyticsRecordStoreTest() {
+        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf");
+    }
+    
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException {
-        this.dataSource = this.createDataSource("jdbc:h2:mem:bam_test_ars_db", "wso2carbon", "wso2carbon");
-        new InitialContext().bind("DSRS", this.dataSource);
         this.ars = new RDBMSAnalyticsRecordStore(this.generateQueryConfiguration());
         Map<String, String> props = new HashMap<String, String>();
-        props.put("datasource", "DSRS");
+        props.put("datasource", "WSO2_ANALYTICS_RS_DB_MEM");
         this.ars.init(props);
-        this.init("H2InMemoryDBAnalyticsDataSource", ars);
+        this.init("H2FileDBAnalyticsDataSource", ars);
     }
     
     public AnalyticsRecordStore getARS() {
@@ -61,22 +59,6 @@ public class H2MemDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
     @AfterClass
     public void destroy() throws AnalyticsException {
         this.cleanup();
-        try {
-            new InitialContext().unbind("DSRS");
-        } catch (NamingException ignore) { }
-        if (this.dataSource != null) {
-            this.dataSource.close(true);
-        }
-    }
-    
-    private DataSource createDataSource(String url, String username, String password) {
-        PoolProperties pps = new PoolProperties();
-        pps.setDriverClassName("org.h2.Driver");
-        pps.setUrl(url);
-        pps.setUsername(username);
-        pps.setPassword(password);
-        pps.setDefaultAutoCommit(false);
-        return new DataSource(pps);
     }
     
     private RDBMSQueryConfigurationEntry generateQueryConfiguration() {

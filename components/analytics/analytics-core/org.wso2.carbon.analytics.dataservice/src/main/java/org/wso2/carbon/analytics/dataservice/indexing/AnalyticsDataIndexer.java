@@ -111,12 +111,15 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class represents the indexing functionality.
  */
 public class AnalyticsDataIndexer implements GroupEventListener {
     
+    private static final int INDEX_WORKER_STOP_WAIT_TIME = 60;
+
     private static final int INDEXING_SCHEDULE_PLAN_RETRY_COUNT = 3;
 
     private static final String DISABLE_INDEXING_ENV_PROP = "disableIndexing";
@@ -149,8 +152,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     
     private static final String NULL_INDEX_VALUE = "";
 
-
-
     private AnalyticsIndexDefinitionRepository repository;
     
     private Map<String, Map<String, IndexType>> indexDefs = new HashMap<String, Map<String, IndexType>>();
@@ -170,6 +171,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     private int shardCount;
     
     private ExecutorService shardWorkerExecutor;
+    
+    private List<IndexWorker> workers;
 
     public AnalyticsDataIndexer(AnalyticsRecordStore analyticsRecordStore, 
             AnalyticsFileSystem analyticsFileSystem, int shardCount) throws AnalyticsException {
@@ -227,10 +230,14 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     private void scheduleWorkers(List<Integer> shardIndices) throws AnalyticsException {
         this.stopAndCleanupIndexProcessing();
         this.shardWorkerExecutor = Executors.newFixedThreadPool(shardIndices.size());
+        this.workers = new ArrayList<IndexWorker>(shardIndices.size());
+        IndexWorker worker;
         for (int shardIndex : shardIndices) {
-            this.shardWorkerExecutor.execute(new IndexWorker(shardIndex));
+            worker = new IndexWorker(shardIndex);
+            this.workers.add(worker);
+            this.shardWorkerExecutor.execute(worker);
         }
-        log.info("Scheduled Analytics Indexing Shards " + shardIndices);
+        log.info("Processing Analytics Indexing Shards " + shardIndices);
     }
     
     public AnalyticsFileSystem getFileSystem() {
@@ -1220,17 +1227,19 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             break;
         case SCOREPARAM:
             if (obj instanceof Float) {
-                doc.add(new DoubleDocValuesField(name,((Float)obj).doubleValue()));
+                doc.add(new DoubleDocValuesField(name,((Float) obj).doubleValue()));
             } else if (obj instanceof Integer) {
-                doc.add(new DoubleDocValuesField(name,((Integer)obj).doubleValue()));
+                doc.add(new DoubleDocValuesField(name,((Integer) obj).doubleValue()));
             } else if (obj instanceof Long) {
-                doc.add(new DoubleDocValuesField(name,((Long)obj).doubleValue()));
+                doc.add(new DoubleDocValuesField(name,((Long) obj).doubleValue()));
             } else if (obj instanceof Double) {
-                doc.add(new DoubleDocValuesField(name,((Double)obj).doubleValue()));
+                doc.add(new DoubleDocValuesField(name,((Double) obj).doubleValue()));
             } else {
-                throw new AnalyticsIndexException(name + ": " +obj.toString() +
+                throw new AnalyticsIndexException(name + ": " + obj.toString() +
                                                   " is not a SCOREPARAM");
             }
+            break;
+        default:
             break;
         }
     }
@@ -1539,22 +1548,27 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     
     public void stopAndCleanupIndexProcessing() {
         if (this.shardWorkerExecutor != null) {
-            this.shardWorkerExecutor.shutdownNow();
+            this.shardWorkerExecutor.shutdown();
+            for (IndexWorker worker : this.workers) {
+                worker.stop();
+            }
+            try {
+                if (!this.shardWorkerExecutor.awaitTermination(INDEX_WORKER_STOP_WAIT_TIME, TimeUnit.SECONDS)) {
+                    this.shardWorkerExecutor.shutdownNow();
+                }
+            } catch (InterruptedException ignore) {
+                /* ignore */
+            }
+            this.workers = null;
             this.shardWorkerExecutor = null;
         }
     }
 
     public void close() throws AnalyticsIndexException {
+        this.stopAndCleanupIndexProcessing();
+        this.closeAndRemoveIndexDirs(new HashSet<String>(this.indexDirs.keySet()));
         this.indexDefs.clear();
         this.scoreParams.clear();
-        this.closeAndRemoveIndexDirs(new HashSet<String>(this.indexDirs.keySet()));
-        this.stopAndCleanupIndexProcessing();
-        try {
-            this.analyticsFileSystem.destroy();
-            this.analyticsRecordStore.destroy();
-        } catch (IOException | AnalyticsException e) {
-            throw new AnalyticsIndexException("Error cleaning up Analytics Data Indexer: " + e.getMessage(), e);
-        }
     }
     
     private List<String> extractRecordIds(List<Record> records) {
@@ -1804,6 +1818,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         
         private int shardIndex;
         
+        private boolean stop;
+        
         public IndexWorker(int shardIndex) {
             this.shardIndex = shardIndex;
         }
@@ -1812,9 +1828,13 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             return shardIndex;
         }
         
+        public void stop() {
+            this.stop = true;
+        }
+        
         @Override
         public void run() {
-            while (true) {
+            while (!this.stop) {
                 try {
                     processIndexOperations(this.getShardIndex());
                     Thread.sleep(INDEX_WORKER_SLEEP_TIME);
@@ -1830,11 +1850,11 @@ public class AnalyticsDataIndexer implements GroupEventListener {
 
     private class DrillDownCountComparator implements Comparator<DrillDownResultEntry> {
 
-
         @Override
         public int compare(DrillDownResultEntry entry1, DrillDownResultEntry entry2) {
             return entry1.getRecordCount().compareTo(entry2.getRecordCount());
         }
+        
     }
     
 }

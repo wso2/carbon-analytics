@@ -29,16 +29,19 @@ import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordReader;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.ndatasource.common.DataSourceConstants;
 import org.wso2.carbon.ndatasource.common.DataSourceException;
+import org.wso2.carbon.ndatasource.common.DataSourceConstants.DataSourceStatusModes;
 import org.wso2.carbon.ndatasource.core.CarbonDataSource;
 import org.wso2.carbon.ndatasource.core.DataSourceManager;
 import org.wso2.carbon.ndatasource.core.DataSourceMetaInfo;
 import org.wso2.carbon.ndatasource.core.DataSourceRepository;
 import org.wso2.carbon.ndatasource.core.DataSourceService;
+import org.wso2.carbon.ndatasource.core.DataSourceStatus;
 import org.wso2.carbon.ndatasource.core.SystemDataSourcesConfiguration;
 import org.wso2.carbon.ndatasource.core.utils.DataSourceUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
@@ -56,6 +59,10 @@ import javax.xml.bind.JAXBContext;
  * Generic utility methods for analytics data source implementations.
  */
 public class GenericUtils {
+
+    private static final String DATA_SOURCES_FIELD = "dataSources";
+
+    private static final String CREATE_DATA_SOURCE_OBJECT_METHOD = "createDataSourceObject";
 
     private static final String ADD_DATA_SOURCE_PROVIDERS_METHOD = "addDataSourceProviders";
 
@@ -83,7 +90,7 @@ public class GenericUtils {
 
     private static final String DEFAULT_CHARSET = "UTF8";
     
-    private static final String WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP = "wso2-analytics-conf-dir";
+    public static final String WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP = "wso2-analytics-conf-dir";
     
     private static DataSourceRepository globalCustomRepo;
 
@@ -414,17 +421,44 @@ public class GenericUtils {
         }
     }
     
+    private static Object createDataSourceObject(DataSourceRepository dsRepo, 
+            DataSourceMetaInfo dsmInfo) throws DataSourceException {
+        try {
+            Method method = DataSourceRepository.class.getDeclaredMethod(CREATE_DATA_SOURCE_OBJECT_METHOD, DataSourceMetaInfo.class, boolean.class);
+            method.setAccessible(true);
+            return method.invoke(dsRepo, dsmInfo, false);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | 
+                IllegalArgumentException | InvocationTargetException e) {
+            throw new DataSourceException("Error in creating data source object: " + e.getMessage(), e);
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    private static void addDataSource(DataSourceRepository dsRepo, CarbonDataSource cds) throws DataSourceException {
+        Field field;
+        try {
+            field = DataSourceRepository.class.getDeclaredField(DATA_SOURCES_FIELD);            
+            field.setAccessible(true);
+            Map<String, CarbonDataSource> dataSources = (Map<String, CarbonDataSource>) field.get(dsRepo);
+            dataSources.put(cds.getDSMInfo().getName(), cds);
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+            throw new DataSourceException("Error in accessing data source map: " + e.getMessage(), e);
+        }
+    }
+    
     private static void populateSystemDataSource(DataSourceRepository dsRepo, File sysDSFile) throws DataSourceException {
         try {
             JAXBContext ctx = JAXBContext.newInstance(SystemDataSourcesConfiguration.class);
             Document doc = DataSourceUtils.convertToDocument(sysDSFile);
-            DataSourceUtils.secureResolveDocument(doc, true);
             SystemDataSourcesConfiguration sysDS = (SystemDataSourcesConfiguration) ctx.createUnmarshaller().
                     unmarshal(doc);
             addDataSourceProviders(sysDS.getProviders());
+            CarbonDataSource cds;
             for (DataSourceMetaInfo dsmInfo : sysDS.getDataSources()) {
                 dsmInfo.setSystem(true);
-                dsRepo.addDataSource(dsmInfo);
+                cds = new CarbonDataSource(dsmInfo, new DataSourceStatus(DataSourceStatusModes.ACTIVE, null), 
+                        createDataSourceObject(dsRepo, dsmInfo));
+                addDataSource(dsRepo, cds);
             }
         } catch (Exception e) {
             throw new DataSourceException("Error in initializing system data sources at '" +
@@ -439,6 +473,10 @@ public class GenericUtils {
                     "' must be set to initialize non-Carbon env analytics");
         }
         String dataSourcesDir = confDir + File.separator + DataSourceConstants.DATASOURCES_DIRECTORY_NAME;
+        File dataSourcesFolder = new File(dataSourcesDir);
+        if (!dataSourcesFolder.isDirectory()) {
+            throw new IllegalStateException("Invalid directory: " + dataSourcesFolder.getAbsolutePath());
+        }
         DataSourceRepository repo = new DataSourceRepository(MultitenantConstants.SUPER_TENANT_ID);
         File masterDSFile = new File(dataSourcesDir + File.separator + 
                 DataSourceConstants.MASTER_DS_FILE_NAME);
@@ -447,14 +485,13 @@ public class GenericUtils {
             populateSystemDataSource(repo, masterDSFile);
         }
         /* then rest of the system data sources */
-        File dataSourcesFolder = new File(dataSourcesDir);
         for (File sysDSFile : dataSourcesFolder.listFiles()) {
             if (sysDSFile.getName().endsWith(DataSourceConstants.SYS_DS_FILE_NAME_SUFFIX)
                     && !sysDSFile.getName().equals(DataSourceConstants.MASTER_DS_FILE_NAME)) {
                 populateSystemDataSource(repo, sysDSFile);
             }
         }
-        return null;
+        return repo;
     }
 
     public static Object loadGlobalDataSource(String dsName) throws DataSourceException {
@@ -477,7 +514,11 @@ public class GenericUtils {
                     }
                 }
             }
-            return globalCustomRepo.getDataSource(dsName).getDSObject();
+            CarbonDataSource cds = globalCustomRepo.getDataSource(dsName);
+            if (cds == null) {
+                return null;
+            }
+            return cds.getDSObject();
         }
     }
     

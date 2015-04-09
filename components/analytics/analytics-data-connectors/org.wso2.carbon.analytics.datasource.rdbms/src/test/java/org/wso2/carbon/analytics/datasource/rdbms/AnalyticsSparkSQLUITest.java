@@ -79,8 +79,6 @@ public class AnalyticsSparkSQLUITest {
     public void done() throws NamingException, AnalyticsException, IOException {
         ServiceHolder.getAnalyticskExecutor().stop();        
         this.service.destroy();
-        this.h2arstest.destroy();
-        this.h2afstest.destroy();
     }
 
     @Test(expectedExceptions = RuntimeException.class)

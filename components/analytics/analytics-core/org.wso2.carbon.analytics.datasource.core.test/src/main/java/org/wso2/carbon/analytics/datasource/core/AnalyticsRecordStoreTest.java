@@ -48,12 +48,12 @@ public class AnalyticsRecordStoreTest {
     protected void init(String implementationName, AnalyticsRecordStore analyticsRS) throws AnalyticsException {
         this.implementationName = implementationName;
         this.analyticsRS = analyticsRS;
-        this.cleanup();
     }
 
     protected void cleanup() throws AnalyticsException {
         this.analyticsRS.deleteTable(7, "MYTABLE1");
         this.analyticsRS.deleteTable(7, "T1");
+        this.analyticsRS.destroy();
     }
 
     public String getImplementationName() {

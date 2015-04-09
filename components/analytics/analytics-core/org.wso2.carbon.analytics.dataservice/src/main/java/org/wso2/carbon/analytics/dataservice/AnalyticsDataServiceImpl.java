@@ -38,6 +38,7 @@ import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -57,6 +58,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private static final String ANALYTICS_DATASERVICE_GROUP = "__ANALYTICS_DATASERVICE_GROUP__";
     
     private AnalyticsRecordStore analyticsRecordStore;
+    
+    private AnalyticsFileSystem analyticsFileSystem;
         
     private AnalyticsDataIndexer indexer;
     
@@ -65,7 +68,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     public AnalyticsDataServiceImpl(AnalyticsRecordStore analyticsRecordStore,
             AnalyticsFileSystem analyticsFileSystem, int shardCount) throws AnalyticsException {
         this.analyticsRecordStore = analyticsRecordStore;
-        this.indexer = new AnalyticsDataIndexer(analyticsRecordStore, analyticsFileSystem, shardCount);
+        this.analyticsFileSystem = analyticsFileSystem;
+        this.indexer = new AnalyticsDataIndexer(this.analyticsRecordStore, this.analyticsFileSystem, shardCount);
         AnalyticsServiceHolder.setAnalyticsDataService(this);
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         if (acm.isClusteringEnabled()) {
@@ -355,6 +359,12 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     public void destroy() throws AnalyticsException {
         if (this.indexer != null) {
             this.indexer.close();
+        }
+        this.analyticsRecordStore.destroy();
+        try {
+            this.analyticsFileSystem.destroy();
+        } catch (IOException e) {
+            throw new AnalyticsException("Error in ADS destroy: " + e.getMessage(), e);
         }
     }
     
