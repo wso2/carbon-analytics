@@ -37,7 +37,7 @@ import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 import java.net.SocketException;
 
 
-public class OneEndPointDPTest extends TestCase{
+public class OneEndPointDPTest extends TestCase {
     Logger log = Logger.getLogger(OneEndPointDPTest.class);
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
@@ -77,7 +77,7 @@ public class OneEndPointDPTest extends TestCase{
         startServer(7611);
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
-        DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":7611",
+        DataPublisher dataPublisher = new DataPublisher("Thrift", "tcp://" + hostName + ":7611",
                 "ssl://" + hostName + ":7711", "admin", "admin");
         Event event = new Event();
         event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
@@ -109,7 +109,7 @@ public class OneEndPointDPTest extends TestCase{
         startServer(7621);
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
-        DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":7621, ssl://" + hostName + ":7612",
+        DataPublisher dataPublisher = new DataPublisher("Thrift", "tcp://" + hostName + ":7621, ssl://" + hostName + ":7612",
                 "ssl://" + hostName + ":7721, ssl://" + hostName + ":7712", "admin", "admin");
         Event event = new Event();
         event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
@@ -135,7 +135,7 @@ public class OneEndPointDPTest extends TestCase{
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
         try {
-            DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":7611, ssl://" + hostName + ":7612",
+            DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":7611, ssl://", hostName + ":7612",
                     "ssl://" + hostName + ":7711", "admin", "admin");
 
         } catch (DataEndpointConfigurationException ex) {
@@ -154,7 +154,7 @@ public class OneEndPointDPTest extends TestCase{
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
         try {
-            DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":7611",
+            DataPublisher dataPublisher = new DataPublisher("Thrift", "tcp://" + hostName + ":7611",
                     "ssl://" + hostName + ":7711, ssl://" + hostName + ":7712", "admin", "admin");
         } catch (DataEndpointConfigurationException ex) {
             expected = true;
@@ -166,7 +166,7 @@ public class OneEndPointDPTest extends TestCase{
         startServer(7661);
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
-        DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":7661",
+        DataPublisher dataPublisher = new DataPublisher("Thrift", "tcp://" + hostName + ":7661",
                 "ssl://" + hostName + ":7761", "admin", "admin");
         Event event = new Event();
         event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));

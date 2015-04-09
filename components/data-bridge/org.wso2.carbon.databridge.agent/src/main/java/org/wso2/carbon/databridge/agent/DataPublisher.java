@@ -19,10 +19,10 @@ package org.wso2.carbon.databridge.agent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.databridge.agent.exception.*;
 import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
 import org.wso2.carbon.databridge.agent.endpoint.DataEndpoint;
 import org.wso2.carbon.databridge.agent.endpoint.DataEndpointGroup;
+import org.wso2.carbon.databridge.agent.exception.*;
 import org.wso2.carbon.databridge.agent.util.DataPublisherUtil;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
@@ -56,32 +56,6 @@ public class DataPublisher {
      *
      * @param receiverURLSet The receiving endpoint URL Set. This can be either load balancing URL set,
      *                       or Failover URL set.
-     * @param authURLSet     The authenticating URL Set for the endpoints given in receiverURLSet parameter.
-     *                       This should be in the same format as receiverURL set parameter.
-     * @param username       Authorized username at receiver.
-     * @param password       The password of the username provided.
-     * @throws DataEndpointAgentConfigurationException
-     * @throws DataEndpointException
-     * @throws DataEndpointConfigurationException
-     * @throws DataEndpointAuthenticationException
-     * @throws TransportException
-     */
-    public DataPublisher(String receiverURLSet, String authURLSet, String username, String password)
-            throws DataEndpointAgentConfigurationException,
-            DataEndpointException, DataEndpointConfigurationException,
-            DataEndpointAuthenticationException, TransportException {
-        dataEndpointAgent = AgentHolder.getInstance().getDefaultDataEndpointAgent();
-        if (authURLSet == null) authURLSet = DataPublisherUtil.getDefaultAuthURLSet(receiverURLSet);
-        processEndpoints(dataEndpointAgent, receiverURLSet, authURLSet, username, password);
-        dataEndpointAgent.addDataPublisher(this);
-    }
-
-    /**
-     * Creates the DataPublisher instance for a specific user, and the it creates
-     * connection asynchronously to receiver endpoint.
-     *
-     * @param receiverURLSet The receiving endpoint URL Set. This can be either load balancing URL set,
-     *                       or Failover URL set.
      * @param username       Authorized username at receiver.
      * @param password       The password of the username provided.
      * @throws DataEndpointAgentConfigurationException
@@ -106,11 +80,12 @@ public class DataPublisher {
      *
      * @param type           The Agent name from which the DataPublisher that needs to be created. By default Thrift,
      *                       and Binary is supported. The type should match with the <Name>
-     *                       element in the <data-agent-config.xml>.
+     *                       element in the <data-agent-config.xml>, if null is passed one of the default type will be picked
      * @param receiverURLSet The receiving endpoint URL Set. This can be either load balancing URL set,
      *                       or Failover URL set.
      * @param authURLSet     The authenticating URL Set for the endpoints given in receiverURLSet parameter.
-     *                       This should be in the same format as receiverURL set parameter.
+     *                       This should be in the same format as receiverURL set parameter. If null is passed
+     *                       the authURLs will be offsetted by value of 100.
      * @param username       Authorized username at receiver.
      * @param password       The password of the username provided.
      * @throws DataEndpointAgentConfigurationException
@@ -123,7 +98,14 @@ public class DataPublisher {
             throws DataEndpointAgentConfigurationException,
             DataEndpointException, DataEndpointConfigurationException,
             DataEndpointAuthenticationException, TransportException {
-        dataEndpointAgent = AgentHolder.getInstance().getDataEndpointAgent(type);
+        if (type == null) {
+            dataEndpointAgent = AgentHolder.getInstance().getDefaultDataEndpointAgent();
+        } else {
+            dataEndpointAgent = AgentHolder.getInstance().getDataEndpointAgent(type);
+        }
+        if (authURLSet == null) {
+            authURLSet = DataPublisherUtil.getDefaultAuthURLSet(receiverURLSet);
+        }
         processEndpoints(dataEndpointAgent, receiverURLSet, authURLSet, username, password);
         dataEndpointAgent.addDataPublisher(this);
     }

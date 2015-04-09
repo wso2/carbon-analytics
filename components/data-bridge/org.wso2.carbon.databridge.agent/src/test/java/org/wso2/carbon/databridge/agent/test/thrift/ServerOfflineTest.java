@@ -77,7 +77,7 @@ public class ServerOfflineTest extends TestCase{
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
         DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":7611",
-                "ssl://" + hostName + ":7711", "admin", "admin");
+                "admin", "admin");
         Event event = new Event();
         event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
         event.setMetaData(new Object[]{"127.0.0.1"});
@@ -99,7 +99,7 @@ public class ServerOfflineTest extends TestCase{
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
         DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":7631",
-                "ssl://" + hostName + ":7731", "admin", "admin");
+                "admin", "admin");
         Event event = new Event();
         event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
         event.setMetaData(new Object[]{"127.0.0.1"});
@@ -133,7 +133,7 @@ public class ServerOfflineTest extends TestCase{
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
         DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":7651",
-                "ssl://" + hostName + ":7751", "admin", "admin");
+                "admin", "admin");
         Event event = new Event();
         event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
         event.setMetaData(new Object[]{"127.0.0.1"});
