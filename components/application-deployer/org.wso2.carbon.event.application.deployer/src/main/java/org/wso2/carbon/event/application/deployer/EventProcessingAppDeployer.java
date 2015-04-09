@@ -65,7 +65,6 @@ public class EventProcessingAppDeployer implements AppDeploymentHandler {
         }
 
         try {
-            //deployEventStreams();
             deployTypeSpecifiedArtifacts(eventStreams, axisConfig, EventProcessingAppDeployerConstants.CEP_EVENT_STREAM_DIR,
                     EventProcessingAppDeployerConstants.FILE_TYPE_JSON);
             deployTypeSpecifiedArtifacts(eventReceivers, axisConfig, EventProcessingAppDeployerConstants.CEP_EVENT_RECEIVER_DIR,
@@ -81,23 +80,6 @@ public class EventProcessingAppDeployer implements AppDeploymentHandler {
             eventPublishers.clear();
         }
     }
-
-    /*private void deployEventStreams() throws DeploymentException {
-        for(Artifact artifact: eventStreams) {
-            String path = artifact.getExtractedPath() + File.separator + artifact.getFiles().get(0).getName();
-            try {
-                String content = new Scanner(new File(path)).useDelimiter("\\Z").next();
-                StreamDefinition streamDefinition = EventDefinitionConverterUtils.convertFromJson(content);
-                ServiceHolder.getEventStreamStoreService().addEventStreamDefinition(streamDefinition,
-                        PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
-            } catch (Exception e) {
-                artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_FAILED);
-                log.error("Deployment is failed due to " + e.getMessage(), e);
-                throw new DeploymentException("Failed deploying event stream file "
-                        + artifact.getName() + " due to " + e.getMessage(), e);
-            }
-        }
-    }*/
 
     private void deployTypeSpecifiedArtifacts(List<Artifact> artifacts, AxisConfiguration axisConfig, String directory,
                                               String fileType) throws DeploymentException {
