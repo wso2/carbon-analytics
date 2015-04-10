@@ -15,9 +15,7 @@
 			<ref bean="analyticsExceptionMapper"/>
 			<ref bean="analyticsIndexExceptionMapper"/>
 			<ref bean="analyticsTableNotFoundExceptionMapper"/>
-			<ref bean="analyticsTimeoutExceptionMapper"/>
-            <ref bean="UnauthorizedUserExceptionMapper"/>
-            <ref bean="UserNotAuthenticatedExceptionMapper"/>
+			<ref bean="analyticsTimeoutExceptionMapper"/>				
 		</jaxrs:providers>
 	</jaxrs:server>
 	
@@ -30,10 +28,5 @@
 			class="org.wso2.carbon.analytics.dataservice.restapi.providers.AnalyticsTableNotFoundExceptionMapper"/>
 	<bean id="analyticsTimeoutExceptionMapper" 
 			class="org.wso2.carbon.analytics.dataservice.restapi.providers.AnalyticsTimeoutExceptionMapper"/>
-    <bean id="UnauthorizedUserExceptionMapper"
-			class="org.wso2.carbon.analytics.dataservice.restapi.providers.UnauthorizedUserExceptionMapper"/>
-    <bean id="UserNotAuthenticatedExceptionMapper"
-			class="org.wso2.carbon.analytics.dataservice.restapi.providers.UserNotAuthenticatedExceptionMapper"/>
-
 	<bean id="jacksonJsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider"/>
 </beans>

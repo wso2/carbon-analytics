@@ -63,7 +63,7 @@
                             <propertiesFile>../feature.properties</propertiesFile>
                             <adviceFile>
                                 <properties>
-                                    <propertyDef>org.wso2.carbon.p2.categoryName.type:console</propertyDef>
+                                    <propertyDef>org.wso2.carbon.p2.fieldName.type:console</propertyDef>
                                     <propertyDef>org.eclipse.equinox.p2.type.group:false</propertyDef>
                                 </properties>
                             </adviceFile>

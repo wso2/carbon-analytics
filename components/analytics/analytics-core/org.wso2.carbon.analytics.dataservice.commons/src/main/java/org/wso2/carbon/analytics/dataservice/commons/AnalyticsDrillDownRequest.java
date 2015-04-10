@@ -135,7 +135,7 @@ public class AnalyticsDrillDownRequest implements Serializable{
      * @param score the score function
      */
     public void setScoreFunction(String score) {
-        this.scoreFunction = scoreFunction;
+        this.scoreFunction = score;
     }
 
     /**

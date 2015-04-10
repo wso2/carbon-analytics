@@ -15,15 +15,15 @@
  */
 package org.wso2.carbon.analytics.dataservice.restapi.providers;
 
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.restapi.Constants;
-import org.wso2.carbon.analytics.dataservice.io.commons.beans.ResponseBean;
-
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.ResponseBean;
 
 /**
  * The Class AnalyticsIndexExceptionMapper triggers when AnalyticsIndexException occurred.

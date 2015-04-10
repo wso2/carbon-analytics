@@ -16,7 +16,7 @@
 package org.wso2.carbon.analytics.dataservice.restapi.resources;
 
 import org.wso2.carbon.analytics.dataservice.restapi.Constants;
-import org.wso2.carbon.analytics.dataservice.io.commons.beans.ResponseBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.ResponseBean;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;

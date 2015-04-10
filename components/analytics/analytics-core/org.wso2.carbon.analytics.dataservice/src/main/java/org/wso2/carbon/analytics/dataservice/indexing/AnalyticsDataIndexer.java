@@ -794,7 +794,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
 
     public Map<String, List<DrillDownResultEntry>> drillDown(int tenantId,
             AnalyticsDrillDownRequest drillDownRequest) throws AnalyticsIndexException {
-        if (drillDownRequest.getRangeFacets() != null) {
+        if (drillDownRequest.getRangeFacets() == null || drillDownRequest.getRangeFacets().isEmpty()) {
             List<Map<String, Map<String, DrillDownResultEntry>>> perShardResults =
                     this.getDrillDownResultsPerShard(tenantId, drillDownRequest);
             Map<String, Map<String, DrillDownResultEntry>> mergedResults =

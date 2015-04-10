@@ -17,8 +17,6 @@
 package org.wso2.carbon.analytics.dataservice.restapi.resources;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import org.apache.axiom.om.util.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,21 +28,18 @@ import org.wso2.carbon.analytics.dataservice.commons.DrillDownResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.restapi.Constants;
-import org.wso2.carbon.analytics.dataservice.io.commons.Utils;
-import org.wso2.carbon.analytics.dataservice.io.commons.beans.AnalyticsSchemaBean;
-import org.wso2.carbon.analytics.dataservice.io.commons.beans.DrillDownRequestBean;
-import org.wso2.carbon.analytics.dataservice.io.commons.beans.DrillDownResultBean;
-import org.wso2.carbon.analytics.dataservice.io.commons.beans.IndexConfigurationBean;
-import org.wso2.carbon.analytics.dataservice.io.commons.beans.PerCategoryDrillDownResultBean;
-import org.wso2.carbon.analytics.dataservice.io.commons.beans.PerFieldDrillDownResultBean;
-import org.wso2.carbon.analytics.dataservice.io.commons.beans.QueryBean;
-import org.wso2.carbon.analytics.dataservice.io.commons.beans.RecordBean;
-import org.wso2.carbon.analytics.dataservice.io.commons.beans.TableBean;
 import org.wso2.carbon.analytics.dataservice.restapi.UnauthenticatedUserException;
-import org.wso2.carbon.analytics.dataservice.restapi.deserializers.IndexDefinitionDeserializer;
-import org.wso2.carbon.analytics.dataservice.restapi.deserializers.RecordBeanDeserializer;
-import org.wso2.carbon.analytics.dataservice.restapi.serializers.IndexDefinitionSerializer;
-import org.wso2.carbon.analytics.dataservice.restapi.serializers.RecordBeanSerializer;
+import org.wso2.carbon.analytics.dataservice.restapi.Utils;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.AnalyticsSchemaBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownPathBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownPerFieldResultBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownRequestBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownResultBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownResultEntryBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.IndexConfigurationBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.QueryBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.TableBean;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -72,16 +67,11 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Reader;
 import java.io.Writer;
-import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -101,12 +91,7 @@ public class AnalyticsResource extends AbstractResource {
 	private static final int DEFAULT_INFINITY_INDEX = -1;
     private static final long DEFAULT_FROM_TIME = Long.MIN_VALUE;
     private static final long DEFAULT_TO_TIME = Long.MAX_VALUE;
-    private static final Gson gson = new GsonBuilder()
-            .registerTypeAdapter(RecordBean.class, new RecordBeanSerializer())
-            .registerTypeAdapter(RecordBean.class, new RecordBeanDeserializer())
-            .registerTypeAdapter(IndexConfigurationBean.class, new IndexDefinitionSerializer())
-            .registerTypeAdapter(IndexConfigurationBean.class, new IndexDefinitionDeserializer())
-            .create();
+    private static final Gson gson = new Gson();
 	/** The logger. */
 	private static final Log logger = LogFactory.getLog(AnalyticsResource.class);
     private static final String STR_JSON_ARRAY_OPEN_SQUARE_BRACKET = "[";
@@ -131,7 +116,7 @@ public class AnalyticsResource extends AbstractResource {
 			logger.debug("Invoking createTable tableName : " +
 			             tableBean.getTableName());
 		}
-		SecureAnalyticsDataService analyticsDataService = getSecureAnalyticsDataService();
+		SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
         String username = authenticate(authHeader);
         if (tableBean != null) {
             if (analyticsDataService.tableExists(username, tableBean.getTableName())) {
@@ -160,7 +145,7 @@ public class AnalyticsResource extends AbstractResource {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking listTables");
 		}
-		SecureAnalyticsDataService analyticsDataService = getSecureAnalyticsDataService();
+		SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
         String username = authenticate(authHeader);
         boolean tableExists = analyticsDataService.tableExists(username, tableName);
         if (logger.isDebugEnabled()) {
@@ -187,7 +172,7 @@ public class AnalyticsResource extends AbstractResource {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking listTables");
 		}
-		SecureAnalyticsDataService analyticsDataService = getSecureAnalyticsDataService();
+		SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
         String username = authenticate(authHeader);
         List<String> tables = analyticsDataService.listTables(username);
         if (logger.isDebugEnabled()) {
@@ -212,7 +197,7 @@ public class AnalyticsResource extends AbstractResource {
 			logger.debug("Invoking deleteTable for tableName : " +
 			             tableBean.getTableName());
 		}
-		SecureAnalyticsDataService analyticsDataService = getSecureAnalyticsDataService();
+		SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
         String username = authenticate(authHeader);
         if (tableBean != null) {
             if (analyticsDataService.tableExists(username, tableBean.getTableName())) {
@@ -229,7 +214,7 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Inserts or update a list of records to a table. updating happens only if there are matching record ids
-	 * @param inputStream The input stream representing the request body.
+	 * @param recordBeans the list of the record beans
 	 * @return the response
 	 * @throws AnalyticsException
 	 */
@@ -237,29 +222,23 @@ public class AnalyticsResource extends AbstractResource {
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}")
-	public StreamingOutput insertRecordsToTable(@PathParam("tableName")String tableName, InputStream inputStream,
+	public StreamingOutput insertRecordsToTable(@PathParam("tableName")String tableName, List<RecordBean> recordBeans,
                                                 @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                                                           throws AnalyticsException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Invoking insertRecordsToTable");
-        }
-        SecureAnalyticsDataService analyticsDataService = getSecureAnalyticsDataService();
+		if (logger.isDebugEnabled()) {
+			logger.debug("Invoking insertRecordsToTable");
+		}
+		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
         String username = authenticate(authHeader);
-        if (inputStream == null) {
-            throw new AnalyticsException("Records are empty");
-        }
-        Reader jsonReader = new BufferedReader(new InputStreamReader(inputStream));
-        Type listType = new TypeToken<List<RecordBean>>() {}.getType();
-        List<RecordBean> recordBeans = gson.fromJson(jsonReader, listType);
         if (recordBeans != null) {
             if (logger.isDebugEnabled()) {
                 for (RecordBean recordBean : recordBeans) {
                     logger.debug(" inserting -- Record Id: " + recordBean.getId() + " values :" +
-                                 recordBean.toString());
+                                 recordBean.toString() + " to table :" + tableName);
                 }
             }
             List<Record> records = Utils.getRecordsForTable(username, tableName, recordBeans);
-            analyticsDataService.put(username, records);
+            analyticsDataService.put(records);
             final Iterator<Record> recordIterator = records.iterator();
             return new StreamingOutput() {
                 @Override
@@ -268,7 +247,7 @@ public class AnalyticsResource extends AbstractResource {
                     Writer recordWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
                     recordWriter.write(STR_JSON_ARRAY_OPEN_SQUARE_BRACKET);
                     while (recordIterator.hasNext()) {
-                        recordWriter.write(gson.toJson(recordIterator.next().getId()));
+                        recordWriter.write(recordIterator.next().getId());
                         if (recordIterator.hasNext()) {
                             recordWriter.write(STR_JSON_COMMA);
                         }
@@ -278,7 +257,7 @@ public class AnalyticsResource extends AbstractResource {
                 }
             };
         } else {
-            throw new AnalyticsException("Records are empty");
+            throw new AnalyticsException("List of records is empty");
         }
     }
 
@@ -302,7 +281,7 @@ public class AnalyticsResource extends AbstractResource {
 			logger.debug("Invoking deleteRecords for tableName : " +
 			             tableName);
 		}
-		SecureAnalyticsDataService analyticsDataService = getSecureAnalyticsDataService();
+		SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
         String username = authenticate(authHeader);
         if (logger.isDebugEnabled()) {
             logger.debug("deleting the records from " + timeFrom + " to " + timeTo);
@@ -330,7 +309,7 @@ public class AnalyticsResource extends AbstractResource {
 			logger.debug("Invoking deleteRecords for tableName : " +
 			             tableName);
 		}
-        SecureAnalyticsDataService analyticsDataService = getSecureAnalyticsDataService();
+        SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
         String username = authenticate(authHeader);
         if (ids != null) {
             if (logger.isDebugEnabled()) {
@@ -359,7 +338,7 @@ public class AnalyticsResource extends AbstractResource {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking getRecordCount for tableName: " + tableName);
         }
-        SecureAnalyticsDataService analyticsDataService = getSecureAnalyticsDataService();
+        SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
         String username = authenticate(authHeader);
         long recordCount = analyticsDataService.getRecordCount(username, tableName,
                                                                Long.MIN_VALUE, Long.MAX_VALUE);
@@ -390,7 +369,7 @@ public class AnalyticsResource extends AbstractResource {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking getRecordGroups for tableName: " + tableName);
 		}
-		SecureAnalyticsDataService analyticsDataService = getSecureAnalyticsDataService();
+		SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
         String username = authenticate(authHeader);
         final RecordGroup[] recordGroups;
         recordGroups = analyticsDataService.get(username, tableName, 1, null, timeFrom, timeTo, recordsFrom, count);
@@ -495,8 +474,7 @@ public class AnalyticsResource extends AbstractResource {
 
 	/**
 	 * Inserts or update a list of records. Update only happens if there are matching record ids
-	 * @param inputStream the list of the record beans
-     * @param authHeader  authorization header encoded with base64(username: password)
+	 * @param recordBeans the list of the record beans
 	 * @return the response
 	 * @throws AnalyticsException
 	 */
@@ -504,17 +482,14 @@ public class AnalyticsResource extends AbstractResource {
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path(Constants.ResourcePath.RECORDS)
-	public StreamingOutput insertRecords(InputStream inputStream,
+	public StreamingOutput insertRecords(List<RecordBean> recordBeans,
                                          @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                                                           throws AnalyticsException {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking insertRecords");
         }
-        SecureAnalyticsDataService analyticsDataService = getSecureAnalyticsDataService();
+        SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
         String username = authenticate(authHeader);
-        Reader jsonReader = new BufferedReader(new InputStreamReader(inputStream));
-        Type listType = new TypeToken<List<RecordBean>>() {}.getType();
-        List<RecordBean> recordBeans = gson.fromJson(jsonReader, listType);
         if (recordBeans != null) {
             if (logger.isDebugEnabled()) {
                 for (RecordBean recordBean : recordBeans) {
@@ -532,7 +507,7 @@ public class AnalyticsResource extends AbstractResource {
                     Writer recordWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
                     recordWriter.write(STR_JSON_ARRAY_OPEN_SQUARE_BRACKET);
                     while (recordIterator.hasNext()) {
-                        recordWriter.write(gson.toJson(recordIterator.next().getId()));
+                        recordWriter.write(recordIterator.next().getId());
                         if (recordIterator.hasNext()) {
                             recordWriter.write(STR_JSON_COMMA);
                         }
@@ -542,7 +517,7 @@ public class AnalyticsResource extends AbstractResource {
                 }
             };
         } else {
-            throw new AnalyticsException("records are empty");
+            throw new AnalyticsException("List of records are empty");
         }
     }
 
@@ -558,8 +533,8 @@ public class AnalyticsResource extends AbstractResource {
     @Path("facets")
     public Response insertFacetRecords(List<RecordBean> recordBeans)
             throws AnalyticsException {
-        AnalyticsDataService ads = getAnalyticsDataService();
-        List<Record> l = new ArrayList<>();
+        AnalyticsDataService ads = Utils.getAnalyticsDataService();
+        List<Record> l = new ArrayList<Record>();
 
         String[] str = new String[]{"2015", "Jan", "24"};
         AnalyticsCategoryPath acp = new AnalyticsCategoryPath(str);
@@ -613,7 +588,7 @@ public class AnalyticsResource extends AbstractResource {
     @Path("drill/{categories}/{records}")
     public Response drilldown(@PathParam("categories")int categories, @PathParam("records")int records, List<RecordBean> recordBeans)
             throws AnalyticsException {
-        AnalyticsDataService ads = getAnalyticsDataService();
+        AnalyticsDataService ads = Utils.getAnalyticsDataService();
         AnalyticsCategoryPath path = new AnalyticsCategoryPath(new String[]{"2015", "Feb"});
         AnalyticsDrillDownRequest anss = new AnalyticsDrillDownRequest();
         anss.addCategoryPath("testField", path);
@@ -637,10 +612,44 @@ public class AnalyticsResource extends AbstractResource {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON})
     @Produces({ MediaType.APPLICATION_JSON })
-    @Path("drillrange")
+    @Path("drillresult")
     public Response drilldownRange(List<RecordBean> recordBeans)
             throws AnalyticsException {
-        AnalyticsDataService ads = getAnalyticsDataService();
+        AnalyticsDataService ads = Utils.getAnalyticsDataService();
+        AnalyticsDrillDownRequest anss = new AnalyticsDrillDownRequest();
+        anss.addRangeFacet("number", new AnalyticsDrillDownRange("-1 --- 1.5", -1, 1.5));
+        anss.addRangeFacet("number", new AnalyticsDrillDownRange("1.5 --- 3.1", 1.5, 3.1));
+        anss.addRangeFacet("number1", new AnalyticsDrillDownRange("3 --- 6", 3, 6));
+        AnalyticsCategoryPath path = new AnalyticsCategoryPath(new String[]{"2015"});
+        anss.addCategoryPath("testField", path);
+        anss.setLanguageQuery(null);
+        anss.setLanguage("lucene");
+        anss.setTableName("test");
+        anss.setCategoryCount(1);
+        anss.setRecordCount(1);
+        anss.setWithIds(true);
+        Map<String, DrillDownPerFieldResultBean> ws = new HashMap<>();
+        DrillDownPerFieldResultBean rr = new DrillDownPerFieldResultBean();
+        Map<String, DrillDownResultEntryBean> rt = new HashMap<>(0);
+        DrillDownResultEntryBean o =new DrillDownResultEntryBean();
+        o.setRecordIds(Arrays.asList(new String[]{"56","56","89"}));
+        o.setRecordCount(45);
+        rt.put("category",o);
+        rr.setPath(Arrays.asList(new String[]{"5454","767676"}));
+        rr.setPerCategoryResults(rt);
+        ws.put("key",rr);
+        DrillDownResultBean dd = new DrillDownResultBean();
+        dd.setPerFieldResults(ws);
+        return Response.ok(dd).build();
+    }
+
+    @POST
+    @Consumes({ MediaType.APPLICATION_JSON})
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path("drillreq")
+    public Response dri()
+            throws AnalyticsException {
+        AnalyticsDataService ads = Utils.getAnalyticsDataService();
         AnalyticsDrillDownRequest anss = new AnalyticsDrillDownRequest();
         anss.addRangeFacet("number", new AnalyticsDrillDownRange("-1 --- 1.5", -1, 1.5));
         anss.addRangeFacet("number", new AnalyticsDrillDownRange("1.5 --- 3.1", 1.5, 3.1));
@@ -654,29 +663,40 @@ public class AnalyticsResource extends AbstractResource {
         anss.setRecordCount(1);
         anss.setWithIds(true);
 
-        DrillDownResultBean dd = new DrillDownResultBean();
-        PerCategoryDrillDownResultBean cc1 = new PerCategoryDrillDownResultBean();
-        cc1.setCategory("fdfdf");
-        cc1.setRecordIds(new String[]{"gf", "fdf"});
-        cc1.setRecordCount(2);
-        cc1.setCategoryPath(new String[]{"gf", "fdf"});
-        PerCategoryDrillDownResultBean cc2 = new PerCategoryDrillDownResultBean();
-        cc2.setCategory("fdfdf");
-        cc2.setRecordIds(new String[]{"gf", "fdf"});
-        cc2.setRecordCount(2);
-        cc2.setCategoryPath(new String[]{"gf", "fdf"});
 
-        PerFieldDrillDownResultBean pp = new PerFieldDrillDownResultBean();
-        pp.setFieldName("testffff");
-        pp.setCategories(new PerCategoryDrillDownResultBean[]{cc1, cc2});
-        dd.setPerFieldEntries(new PerFieldDrillDownResultBean[]{pp});
-        return Response.ok(dd).build();
+        DrillDownRequestBean dd = new DrillDownRequestBean();
+        dd.setTableName("test");
+        dd.setCategoryCount(1);
+        dd.setCategoryStart(0);
+        dd.setLanguage("lucene");
+        dd.setQuery("field1:record1");
+        dd.setIncludeIds(true);
+        dd.setRecordCount(1);
+        dd.setRecordStart(0);
+        dd.setScoreFunction("1");
+
+        List<DrillDownPathBean> p = new ArrayList<>();
+        DrillDownPathBean d = new DrillDownPathBean("field3", new String[]{"A", "B"});
+        p.add(d);
+        /**
+        Map<String, List<DrillDownRangeBean>> tt = new LinkedHashMap<>();
+        List<DrillDownRangeBean> b = new ArrayList<>();
+        DrillDownRangeBean ff = new DrillDownRangeBean("label",12334,679898);
+        b.add(ff);
+        tt.put("fieldname", b);
+         dd.setRanges(tt);*/
+
+        dd.setCategories(p);
+        AnalyticsDrillDownRequest tg = Utils.createDrilldownRequest(dd, true);
+        AnalyticsDataService e = Utils.getAnalyticsDataService();
+        Map<String, List<DrillDownResultEntry>> h = e.drillDown(-1234, tg);
+        return null;
     }
 
     /**
 	 * Sets the indices.
 	 * @param tableName the table name
-	 * @param inputStream inputStream representing the request body
+	 * @param indexInfo the columns bean containing all the indices
 	 * @return the response
 	 * @throws AnalyticsException
 	 */
@@ -685,24 +705,21 @@ public class AnalyticsResource extends AbstractResource {
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}/indices")
 	public Response setIndices(@PathParam("tableName") String tableName,
-	                           InputStream inputStream,
+	                           IndexConfigurationBean indexInfo,
                                @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
             throws AnalyticsException {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking setIndices for tableName : " +
                          tableName);
         }
-        SecureAnalyticsDataService analyticsDataService = getSecureAnalyticsDataService();
+        SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
         String username = authenticate(authHeader);
-        Reader jsonReader = new BufferedReader(new InputStreamReader(inputStream));
-        IndexConfigurationBean indexInfo = gson.fromJson(jsonReader,IndexConfigurationBean.class);
         if (indexInfo != null) {
             Map<String, IndexType> columns = Utils.createIndexTypeMap(indexInfo.getIndices());
-            List<String> scoreParams = Arrays.asList(indexInfo.getScoreParams());
             if (logger.isDebugEnabled()) {
                 logger.debug("Setting indices : " + columns.keySet());
             }
-            analyticsDataService.setIndices(username, tableName, columns, scoreParams);
+            analyticsDataService.setIndices(username, tableName, columns,indexInfo.getScoreParams());
             return handleResponse(ResponseStatus.CREATED, "Successfully set indices in table: " +
                                                           tableName);
         } else {
@@ -726,17 +743,17 @@ public class AnalyticsResource extends AbstractResource {
             logger.debug("Invoking getIndices for tableName : " +
                          tableName);
         }
-        SecureAnalyticsDataService analyticsDataService = getSecureAnalyticsDataService();
+        SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
         String username = authenticate(authHeader);
         Map<String, IndexType> columns = analyticsDataService.getIndices(username, tableName);
         List<String> scoreParams = analyticsDataService.getScoreParams(username, tableName);
         IndexConfigurationBean indexConfigurationBean = new IndexConfigurationBean();
         indexConfigurationBean.setIndices(Utils.createIndexTypeBeanMap(columns));
-        indexConfigurationBean.setScoreParams(scoreParams.toArray(new String[scoreParams.size()]));
+        indexConfigurationBean.setScoreParams(scoreParams);
         if (logger.isDebugEnabled()) {
-            logger.debug("Getting indices : " + Arrays.toString(indexConfigurationBean.getIndices()));
+            logger.debug("Getting indices : " + indexConfigurationBean.getIndices().keySet());
         }
-        return Response.ok(gson.toJson(indexConfigurationBean)).build();
+        return Response.ok(indexConfigurationBean).build();
 	}
 
 	/**
@@ -755,7 +772,7 @@ public class AnalyticsResource extends AbstractResource {
             logger.debug("Invoking clearIndices for tableName : " +
                          tableName);
         }
-        SecureAnalyticsDataService analyticsDataService = getSecureAnalyticsDataService();
+        SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
         String username = authenticate(authHeader);
         analyticsDataService.clearIndices(username, tableName);
         return handleResponse(ResponseStatus.SUCCESS, "Successfully cleared indices in table: " +
@@ -772,12 +789,12 @@ public class AnalyticsResource extends AbstractResource {
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path(Constants.ResourcePath.SEARCH)
-	public StreamingOutput search(QueryBean queryBean, @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
+	public Response search(QueryBean queryBean, @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
             throws AnalyticsException {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking search for tableName : " + queryBean.getTableName());
         }
-        SecureAnalyticsDataService analyticsDataService = getSecureAnalyticsDataService();
+        SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
         String username = authenticate(authHeader);
         if (queryBean != null) {
             List<SearchResultEntry> searchResults = analyticsDataService.search(username,
@@ -786,30 +803,15 @@ public class AnalyticsResource extends AbstractResource {
             List<String> ids = Utils.getRecordIds(searchResults);
             RecordGroup[] recordGroups = analyticsDataService.get(username,
                                                                   queryBean.getTableName(), 1, null, ids);
-            final List<Iterator<Record>> iterators = Utils.getRecordIterators(recordGroups, analyticsDataService);
-            return new StreamingOutput() {
-                @Override
-                public void write(OutputStream outputStream)
-                        throws IOException, WebApplicationException {
-                    Writer recordWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
-                    recordWriter.write(STR_JSON_ARRAY_OPEN_SQUARE_BRACKET);
-                    for (Iterator<Record> iterator : iterators) {
-                        while (iterator.hasNext()) {
-                            RecordBean recordBean = Utils.createRecordBean(iterator.next());
-                            recordWriter.write(gson.toJson(recordBean));
-                            if (iterator.hasNext()) {
-                                recordWriter.write(STR_JSON_COMMA);
-                            }
-                            if (logger.isDebugEnabled()) {
-                                logger.debug("Retrieved -- Record Id: " + recordBean.getId() + " values :" +
-                                             recordBean.toString());
-                            }
-                        }
-                    }
-                    recordWriter.write(STR_JSON_ARRAY_CLOSING_SQUARE_BRACKET);
-                    recordWriter.flush();
+            List<RecordBean> recordBeans = Utils.createRecordBeans(GenericUtils.listRecords(analyticsDataService,
+                                                                                            recordGroups));
+            if (logger.isDebugEnabled()) {
+                for (RecordBean recordBean : recordBeans) {
+                    logger.debug("Search Result -- Record Id: " + recordBean.getId() + " values :" +
+                                 recordBean.toString());
                 }
-            };
+            }
+            return Response.ok(recordBeans).build();
         } else {
             throw new AnalyticsException("Search parameters not provided");
         }
@@ -832,7 +834,7 @@ public class AnalyticsResource extends AbstractResource {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking drilldown for tableName : " + requestBean.getTableName());
         }
-        SecureAnalyticsDataService analyticsDataService = getSecureAnalyticsDataService();
+        SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
         String username = authenticate(authHeader);
         if (requestBean != null) {
             AnalyticsDrillDownRequest request = Utils.createDrilldownRequest(requestBean, true);
@@ -861,7 +863,7 @@ public class AnalyticsResource extends AbstractResource {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking drilldownCount for tableName : " + requestBean.getTableName());
         }
-        SecureAnalyticsDataService analyticsDataService = getSecureAnalyticsDataService();
+        SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
         String username = authenticate(authHeader);
         if (requestBean != null) {
             AnalyticsDrillDownRequest request = Utils.createDrilldownRequest(requestBean, false);
@@ -889,7 +891,7 @@ public class AnalyticsResource extends AbstractResource {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking search count for tableName : " + queryBean.getTableName());
 		}
-		SecureAnalyticsDataService analyticsDataService = getSecureAnalyticsDataService();
+		SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
         String username = authenticate(authHeader);
         if (queryBean != null) {
             int result = analyticsDataService.searchCount(username, queryBean.getTableName(),
@@ -919,7 +921,7 @@ public class AnalyticsResource extends AbstractResource {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking waiting for indexing - timeout : " + seconds + " seconds");
         }
-        SecureAnalyticsDataService analyticsDataService = getSecureAnalyticsDataService();
+        SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
         analyticsDataService.waitForIndexing(seconds * Constants.MILLISECONDSPERSECOND);
         return handleResponse(ResponseStatus.SUCCESS, "Indexing Completed successfully");
 	}
@@ -942,7 +944,7 @@ public class AnalyticsResource extends AbstractResource {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking setTableSchema for tableName : " + tableName);
         }
-        SecureAnalyticsDataService analyticsDataService = getSecureAnalyticsDataService();
+        SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
         String username = authenticate(authHeader);
         if (analyticsSchemaBean != null) {
             AnalyticsSchema analyticsSchema = Utils.createAnalyticsSchema(analyticsSchemaBean);
@@ -969,7 +971,7 @@ public class AnalyticsResource extends AbstractResource {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking getTableSchema for table : " + tableName);
         }
-        SecureAnalyticsDataService analyticsDataService = getSecureAnalyticsDataService();
+        SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
         String username = authenticate(authHeader);
         AnalyticsSchema analyticsSchema = analyticsDataService.getTableSchema(username, tableName);
         AnalyticsSchemaBean analyticsSchemaBean = Utils.createTableSchemaBean(analyticsSchema);
@@ -1021,37 +1023,5 @@ public class AnalyticsResource extends AbstractResource {
             throw new UnauthenticatedUserException("Invalid authentication header");
         }
         return username;
-    }
-
-    /**
-     * Gets the analytics data service.
-     * @return the analytics data service
-     * @throws org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
-     */
-    private static AnalyticsDataService getAnalyticsDataService() throws AnalyticsException {
-        AnalyticsDataService analyticsDataService;
-        analyticsDataService = (AnalyticsDataService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                .getOSGiService(AnalyticsDataService.class,
-                                null);
-        if(analyticsDataService == null) {
-            throw new AnalyticsException("AnalyticsDataService is not available.");
-        }
-        return analyticsDataService;
-    }
-
-    /**
-     * Gets the analytics data service.
-     * @return the analytics data service
-     * @throws org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
-     */
-    private static SecureAnalyticsDataService getSecureAnalyticsDataService() throws AnalyticsException {
-        SecureAnalyticsDataService analyticsDataService;
-        analyticsDataService = (SecureAnalyticsDataService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                .getOSGiService(SecureAnalyticsDataService.class,
-                                null);
-        if(analyticsDataService == null) {
-            throw new AnalyticsException("AnalyticsDataService is not available.");
-        }
-        return analyticsDataService;
     }
 }

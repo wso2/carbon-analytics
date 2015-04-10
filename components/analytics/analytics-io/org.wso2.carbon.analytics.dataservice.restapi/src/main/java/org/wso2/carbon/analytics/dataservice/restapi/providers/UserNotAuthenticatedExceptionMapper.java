@@ -19,8 +19,8 @@ package org.wso2.carbon.analytics.dataservice.restapi.providers;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.restapi.Constants;
-import org.wso2.carbon.analytics.dataservice.io.commons.beans.ResponseBean;
 import org.wso2.carbon.analytics.dataservice.restapi.UnauthenticatedUserException;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.ResponseBean;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
