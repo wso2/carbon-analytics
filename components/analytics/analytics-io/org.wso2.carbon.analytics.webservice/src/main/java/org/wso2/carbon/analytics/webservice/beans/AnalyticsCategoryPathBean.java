@@ -14,29 +14,28 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.analytics.dataservice.io.commons.beans;
+package org.wso2.carbon.analytics.webservice.beans;
 
 /**
- * This class represents a single value entry in a record
+ * This class represents a  facet value object in a row. use this object to insert facet values in a record
  */
-public class RecordValueEntryBean {
+public class AnalyticsCategoryPathBean {
+    private float weight;
+    private String[] path;
 
-    private String fieldName;
-    private Object value;
-
-    public String getFieldName() {
-        return fieldName;
+    public float getWeight() {
+        return weight;
     }
 
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
+    public void setWeight(float weight) {
+        this.weight = weight;
     }
 
-    public Object getValue() {
-        return value;
+    public String[] getPath() {
+        return path;
     }
 
-    public void setValue(Object value) {
-        this.value = value;
+    public void setPath(String[] path) {
+        this.path = path;
     }
 }

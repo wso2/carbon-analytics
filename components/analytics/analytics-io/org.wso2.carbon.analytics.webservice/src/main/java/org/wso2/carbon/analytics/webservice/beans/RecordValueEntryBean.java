@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.analytics.dataservice.io.commons.beans;
+package org.wso2.carbon.analytics.webservice.beans;
 
 /**
  * This class represents a single value entry in a record
@@ -22,7 +22,8 @@ package org.wso2.carbon.analytics.dataservice.io.commons.beans;
 public class RecordValueEntryBean {
 
     private String fieldName;
-    private Object value;
+    private String value;
+    private String type;
 
     public String getFieldName() {
         return fieldName;
@@ -32,11 +33,19 @@ public class RecordValueEntryBean {
         this.fieldName = fieldName;
     }
 
-    public Object getValue() {
+    public String getValue() {
         return value;
     }
 
-    public void setValue(Object value) {
+    public void setValue(String value) {
         this.value = value;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

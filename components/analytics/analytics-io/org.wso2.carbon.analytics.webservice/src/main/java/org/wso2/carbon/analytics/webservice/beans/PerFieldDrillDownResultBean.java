@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.analytics.dataservice.io.commons.beans;
+package org.wso2.carbon.analytics.webservice.beans;
 
 /**
- * This class represents a single value entry in a record
+ * This class represents a single entry/a single field in a drilldownresult,
  */
-public class RecordValueEntryBean {
+public class PerFieldDrillDownResultBean {
 
     private String fieldName;
-    private Object value;
+    private PerCategoryDrillDownResultBean[] categories;
 
     public String getFieldName() {
         return fieldName;
@@ -32,11 +32,11 @@ public class RecordValueEntryBean {
         this.fieldName = fieldName;
     }
 
-    public Object getValue() {
-        return value;
+    public PerCategoryDrillDownResultBean[] getCategories() {
+        return categories;
     }
 
-    public void setValue(Object value) {
-        this.value = value;
+    public void setCategories(PerCategoryDrillDownResultBean[] categories) {
+        this.categories = categories;
     }
 }
