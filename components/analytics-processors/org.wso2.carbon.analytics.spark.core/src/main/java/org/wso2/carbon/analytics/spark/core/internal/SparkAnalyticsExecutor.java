@@ -27,7 +27,6 @@ import org.apache.spark.deploy.worker.Worker;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
-import org.apache.spark.sql.types.StructField;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterException;
@@ -478,6 +477,12 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         this.sparkConf = new SparkConf();
         int masterPort = BASE_MASTER_PORT + this.portOffset;
         int webuiPort = BASE_WEBUI_PORT + this.portOffset;
+        if (javaSparkCtx != null){
+            javaSparkCtx.close();
+        }
+        if (sqlCtx != null){
+            sqlCtx.sparkContext().stop();
+        }
         this.startMaster(this.myHost, masterPort, webuiPort);
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         acm.setProperty(CLUSTER_GROUP_NAME, MASTER_HOST_GROUP_PROP, this.myHost);
