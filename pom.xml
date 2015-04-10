@@ -33,13 +33,13 @@
 
     <modules>
         <module>service-stubs</module>
-        <module>components/analytics-dashboard</module>
+        <!-- <module>components/analytics-dashboard</module> -->
         <module>components/data-bridge</module>
         <module>components/event-stream</module>
         <module>components/application-deployer</module>
         <module>features/event-stream</module>
         <module>features/data-bridge</module>
-        <module>features/analytics-dashboard</module>
+        <!-- <module>features/analytics-dashboard</module> -->
         <module>features/application-deployer</module>
     </modules>
 

@@ -35,8 +35,8 @@
 
     <modules>
         <module>org.wso2.carbon.event.stream.stub</module>
-        <module>org.wso2.carbon.analytics.dashboard.stub</module>
-        <module>org.wso2.carbon.analytics.dashboard.batch.stub</module>
+        <!-- <module>org.wso2.carbon.analytics.dashboard.stub</module> -->
+        <!-- <module>org.wso2.carbon.analytics.dashboard.batch.stub</module> -->
     </modules>
 
 </project>
