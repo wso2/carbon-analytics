@@ -180,8 +180,6 @@ public class Utils {
 				return BeanIndexType.STRING;
             case FACET:
                 return BeanIndexType.FACET;
-            case SCOREPARAM:
-                return BeanIndexType.SCOREPARAM;
 			default:
 				return BeanIndexType.STRING;
 		}
@@ -210,8 +208,6 @@ public class Utils {
 				return IndexType.STRING;
             case BeanIndexType.FACET:
                 return IndexType.FACET;
-            case BeanIndexType.SCOREPARAM:
-                return IndexType.SCOREPARAM;
 			default:
 				return IndexType.STRING;
 		}

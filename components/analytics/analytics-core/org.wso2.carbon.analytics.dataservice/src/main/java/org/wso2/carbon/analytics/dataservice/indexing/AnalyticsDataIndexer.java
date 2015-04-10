@@ -692,7 +692,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         FacetsCollector fc = new FacetsCollector();
         Query indexQuery = new MatchAllDocsQuery();
         Map<String, IndexType> indices = this.lookupIndices(tenantId, tableName);
-        Map<String, List<AnalyticsDrillDownRange>> ranges = drillDownRequest.getRangeFacets();
         try {
             if (drillDownRequest.getLanguageQuery() != null) {
                 indexQuery = new AnalyticsQueryParser(this.luceneAnalyzer,
@@ -711,6 +710,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             if (indexReader != null) {
                 try {
                     indexReader.close();
+
                 } catch (IOException e) {
                     throw new AnalyticsIndexException("Error in closing the index reader",
                                                       e.getCause());
@@ -749,6 +749,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         drillDownQuery.add(field,
                            NumericRangeQuery.newDoubleRange(field,
                                                             range.getFrom(), range.getTo(), true, false));
+        drillDownResultEntry.setTo(range.getTo());
+        drillDownResultEntry.setFrom(range.getFrom());
         TopDocs topDocs = FacetsCollector.search(searcher, drillDownQuery, drillDownRequest.getRecordCount(), fc);
         if(drillDownRequest.isWithIds()) {
             int start = 0;

@@ -30,6 +30,9 @@ public class DrillDownResultEntry {
     private String[] categoryPath;
     private List<String> recordIds;
     private Double recordCount;
+    //variables to, from, hierarchicalFacets will only be used if the drilldown is numeric range based.
+    private double to;
+    private double from;
     private Map<String, List<DrillDownResultEntry>> hierarchicalFacets;
 
     public DrillDownResultEntry() {
@@ -115,5 +118,21 @@ public class DrillDownResultEntry {
 
     public void incrementRecordCount(Double recordCount) {
         this.recordCount += recordCount;
+    }
+
+    public double getTo() {
+        return to;
+    }
+
+    public void setTo(double to) {
+        this.to = to;
+    }
+
+    public double getFrom() {
+        return from;
+    }
+
+    public void setFrom(double from) {
+        this.from = from;
     }
 }

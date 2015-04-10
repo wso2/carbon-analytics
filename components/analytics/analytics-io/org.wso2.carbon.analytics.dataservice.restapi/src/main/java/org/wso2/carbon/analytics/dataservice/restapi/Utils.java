@@ -26,14 +26,17 @@ import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.AnalyticsSchemaBean;
-import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownPathBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.ColumnTypeBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownPathBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownPerFieldResultBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownRangeBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownResultBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownResultEntryBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.IndexTypeBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.PerFieldRangeDrillDownResultBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.PerRangeDrillDownResultBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.RangeDrillDownResultBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordBean;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
@@ -368,6 +371,11 @@ public class Utils {
         return new AnalyticsSchemaBean(columnTypeBeanTypes,primaryKeys);
     }
 
+    /**
+     * Create a a bean class for the drilldown result input which is a result of non-ranged based drilldown
+     * @param result The results from calling the drilldown method of the analyticsDataservice.
+     * @return a DrilldownResultBean class containing the drilldown information
+     */
     public static DrillDownResultBean createDrillDownResultBean(Map<String, List<DrillDownResultEntry>> result) {
         DrillDownResultBean resultBean = new DrillDownResultBean();
         resultBean.setPerFieldResults(createPerFieldDrillDownResultBean(result));
@@ -394,6 +402,38 @@ public class Utils {
             bean.setRecordCount(entry.getRecordCount());
             bean.setRecordIds(entry.getRecordIds());
             beans.put(entry.getCategory(), bean);
+        }
+        return beans;
+    }
+
+    /**
+     * Creates a bean class for results of a numeric range based drilldown search.
+     * @param result The result of the method "drilldown" of AnalyticsDataService
+     * @return A bean class representing the range based drilldown results
+     */
+    public static RangeDrillDownResultBean createRangeDrillDownResultBean(
+            Map<String, List<DrillDownResultEntry>> result) {
+        RangeDrillDownResultBean rangeDrillDownResultBean = new RangeDrillDownResultBean();
+        for (Map.Entry<String, List<DrillDownResultEntry>> entry : result.entrySet()) {
+            PerFieldRangeDrillDownResultBean bean = new PerFieldRangeDrillDownResultBean();
+            bean.setFieldName(entry.getKey());
+            bean.setPerRangeResult(createPerRangeDrillDownResultBeans(entry.getValue()));
+            rangeDrillDownResultBean.setPerFieldResults(bean);
+        }
+        return rangeDrillDownResultBean;
+    }
+
+    private static List<PerRangeDrillDownResultBean> createPerRangeDrillDownResultBeans(
+            List<DrillDownResultEntry> value) {
+        List<PerRangeDrillDownResultBean> beans = new ArrayList<>(0);
+        for (DrillDownResultEntry entry : value) {
+            PerRangeDrillDownResultBean bean = new PerRangeDrillDownResultBean();
+            bean.setLabel(entry.getCategory());
+            bean.setTo(entry.getTo());
+            bean.setFrom(entry.getFrom());
+            bean.setRecordCount(entry.getRecordCount());
+            bean.setRecordIds(entry.getRecordIds());
+            beans.add(bean);
         }
         return beans;
     }

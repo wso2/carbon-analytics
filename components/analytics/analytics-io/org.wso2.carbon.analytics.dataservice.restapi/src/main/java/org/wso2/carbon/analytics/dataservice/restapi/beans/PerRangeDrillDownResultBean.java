@@ -13,35 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wso2.carbon.analytics.dataservice.restapi.beans;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.List;
 
 /**
- * This class represents a bean class for a range for numbers, includes details about the bounds of the range.
- * To cover all cases, double values are used
+ * This class represents a single drilled down range in a field
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class DrillDownRangeBean {
+public class PerRangeDrillDownResultBean {
     @XmlElement(name = "label")
     private String label;
-    @XmlElement(name = "from")
-    private double from;
     @XmlElement(name = "to")
     private double to;
+    @XmlElement(name = "from")
+    private double from;
+    @XmlElement(name = "recordCount")
+    private double recordCount;
+    @XmlElement(name = "recordIds")
+    private List<String> recordIds;
 
-    /**
-     * This constructor is for jax rs serialization/deserialization
-     */
-    public DrillDownRangeBean() {
-
+    public String getLabel() {
+        return label;
     }
 
-    public DrillDownRangeBean(String label, double from, double to) {
+    public void setLabel(String label) {
         this.label = label;
-        this.from = from;
+    }
+
+    public double getTo() {
+        return to;
+    }
+
+    public void setTo(double to) {
         this.to = to;
     }
 
@@ -53,19 +61,19 @@ public class DrillDownRangeBean {
         this.from = from;
     }
 
-    public double getTo() {
-        return to;
+    public double getRecordCount() {
+        return recordCount;
     }
 
-    public void setTo(double to) {
-        this.to = to;
+    public void setRecordCount(double recordCount) {
+        this.recordCount = recordCount;
     }
 
-    public String getLabel() {
-        return label;
+    public List<String> getRecordIds() {
+        return recordIds;
     }
 
-    public void setLabel(String label) {
-        this.label = label;
+    public void setRecordIds(List<String> recordIds) {
+        this.recordIds = recordIds;
     }
 }

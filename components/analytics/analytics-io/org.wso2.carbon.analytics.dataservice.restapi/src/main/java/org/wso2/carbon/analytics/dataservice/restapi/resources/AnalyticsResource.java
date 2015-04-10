@@ -32,12 +32,11 @@ import org.wso2.carbon.analytics.dataservice.restapi.UnauthenticatedUserExceptio
 import org.wso2.carbon.analytics.dataservice.restapi.Utils;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownPathBean;
-import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownPerFieldResultBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownResultBean;
-import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownResultEntryBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.IndexConfigurationBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.QueryBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.RangeDrillDownResultBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.RecordBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.TableBean;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
@@ -74,7 +73,6 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -628,19 +626,8 @@ public class AnalyticsResource extends AbstractResource {
         anss.setCategoryCount(1);
         anss.setRecordCount(1);
         anss.setWithIds(true);
-        Map<String, DrillDownPerFieldResultBean> ws = new HashMap<>();
-        DrillDownPerFieldResultBean rr = new DrillDownPerFieldResultBean();
-        Map<String, DrillDownResultEntryBean> rt = new HashMap<>(0);
-        DrillDownResultEntryBean o =new DrillDownResultEntryBean();
-        o.setRecordIds(Arrays.asList(new String[]{"56","56","89"}));
-        o.setRecordCount(45);
-        rt.put("category",o);
-        rr.setPath(Arrays.asList(new String[]{"5454","767676"}));
-        rr.setPerCategoryResults(rt);
-        ws.put("key",rr);
-        DrillDownResultBean dd = new DrillDownResultBean();
-        dd.setPerFieldResults(ws);
-        return Response.ok(dd).build();
+        Map<String, List<DrillDownResultEntry>>g = ads.drillDown(-1234, anss);
+        return Response.ok(Utils.createRangeDrillDownResultBean(g)).build();
     }
 
     @POST
@@ -839,8 +826,13 @@ public class AnalyticsResource extends AbstractResource {
         if (requestBean != null) {
             AnalyticsDrillDownRequest request = Utils.createDrilldownRequest(requestBean, true);
             Map<String, List<DrillDownResultEntry>> result = analyticsDataService.drillDown(username, request);
-            DrillDownResultBean resultBean = Utils.createDrillDownResultBean(result);
-            return Response.ok(resultBean).build();
+            if (requestBean.getRanges() == null || requestBean.getRanges().isEmpty()) {
+                DrillDownResultBean resultBean = Utils.createDrillDownResultBean(result);
+                return Response.ok(resultBean).build();
+            } else {
+                RangeDrillDownResultBean resultBean = Utils.createRangeDrillDownResultBean(result);
+                return Response.ok(resultBean).build();
+            }
         } else {
             throw new AnalyticsException("Drilldown parameters not provided");
         }
