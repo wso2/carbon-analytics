@@ -700,7 +700,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             }
             indexReader = this.getCombinedIndexReader(tenantId, tableName);
             IndexSearcher searcher = new IndexSearcher(indexReader);
-            return this.getRangeFacets(drillDownRequest, searcher, indexQuery, ranges, fc);
+            return this.getRangeFacets(drillDownRequest, searcher, indexQuery, fc);
 
         } catch (IOException e) {
             throw new AnalyticsIndexException("Error in opening Index for range searches",
@@ -720,9 +720,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     }
 
     private Map<String, List<DrillDownResultEntry>> getRangeFacets(AnalyticsDrillDownRequest drillDownRequest,
-            IndexSearcher searcher, Query indexQuery, Map<String, List<AnalyticsDrillDownRange>> ranges,
-            FacetsCollector fc) throws IOException {
-
+            IndexSearcher searcher, Query indexQuery, FacetsCollector fc) throws IOException {
+        Map<String, List<AnalyticsDrillDownRange>> ranges = drillDownRequest.getRangeFacets();
         Map<String, List<DrillDownResultEntry>> result = new LinkedHashMap<>();
         for (Map.Entry<String, List<AnalyticsDrillDownRange>> entry : ranges.entrySet()) {
             for (AnalyticsDrillDownRange analyticsDrillDownRange : entry.getValue()) {
@@ -1228,20 +1227,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             break;
         case BOOLEAN:
             doc.add(new StringField(name, obj.toString(), Store.NO));
-            break;
-        case SCOREPARAM:
-            if (obj instanceof Float) {
-                doc.add(new DoubleDocValuesField(name,((Float) obj).doubleValue()));
-            } else if (obj instanceof Integer) {
-                doc.add(new DoubleDocValuesField(name,((Integer) obj).doubleValue()));
-            } else if (obj instanceof Long) {
-                doc.add(new DoubleDocValuesField(name,((Long) obj).doubleValue()));
-            } else if (obj instanceof Double) {
-                doc.add(new DoubleDocValuesField(name,((Double) obj).doubleValue()));
-            } else {
-                throw new AnalyticsIndexException(name + ": " + obj.toString() +
-                                                  " is not a SCOREPARAM");
-            }
             break;
         default:
             break;

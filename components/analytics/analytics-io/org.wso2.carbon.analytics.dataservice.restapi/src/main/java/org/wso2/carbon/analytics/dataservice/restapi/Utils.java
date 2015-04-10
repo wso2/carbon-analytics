@@ -100,21 +100,18 @@ public class Utils {
 	 * @return the records from record beans
 	 * @throws AnalyticsException if the tableName is not specified
 	 */
-	public static List<Record> getRecords(String username, List<RecordBean> recordBeans) throws AnalyticsException {
-		List<Record> records = new ArrayList<Record>();
-		try{
-			for (RecordBean recordBean : recordBeans) {
-				if(recordBean.getTableName().isEmpty()){
-					throw new AnalyticsException("TableName cannot be empty!");
-				}
-			records.add(new Record(recordBean.getId(), getTenantId(username), recordBean.getTableName(),
-		                           validateAndReturn(recordBean.getValues())));
-			}
-		}catch(NullPointerException e){
-			throw new AnalyticsException("TableName cannot be null");
-		}
-		return records;
-	}
+    public static List<Record> getRecords(String username, List<RecordBean> recordBeans)
+            throws AnalyticsException {
+        List<Record> records = new ArrayList<>();
+        int tenantId = getTenantId(username);
+        for (RecordBean recordBean : recordBeans) {
+            if (recordBean.getTableName() == null || recordBean.getTableName().isEmpty()) {
+                throw new AnalyticsException("TableName cannot be empty!");
+            }
+            records.add(new Record(recordBean.getId(), tenantId, recordBean.getTableName(), validateAndReturn(recordBean.getValues())));
+        }
+        return records;
+    }
 
     @SuppressWarnings("unchecked")
     private static Map<String, Object> validateAndReturn(Map<String, Object> values)
@@ -222,8 +219,6 @@ public class Utils {
 				return IndexTypeBean.STRING;
             case FACET:
                 return IndexTypeBean.FACET;
-            case SCOREPARAM:
-                return IndexTypeBean.SCOREPARAM;
 			default:
 				return IndexTypeBean.STRING;
 		}
@@ -251,8 +246,6 @@ public class Utils {
 				return IndexType.STRING;
             case FACET:
                 return IndexType.FACET;
-            case SCOREPARAM:
-                return IndexType.SCOREPARAM;
 			default:
 				return IndexType.STRING;
 		}
@@ -429,8 +422,7 @@ public class Utils {
 
     private static Map<String, List<AnalyticsDrillDownRange>> createDrillDownRanges(
             Map<String, List<DrillDownRangeBean>> ranges) {
-        Map<String, List<AnalyticsDrillDownRange>> result = new LinkedHashMap<String,
-                List<AnalyticsDrillDownRange>>(0);
+        Map<String, List<AnalyticsDrillDownRange>> result = new LinkedHashMap<>(0);
         if (ranges != null) {
             for (Map.Entry<String, List<DrillDownRangeBean>> entry : ranges.entrySet()) {
                 result.put(entry.getKey(), createDrillDownRanges(entry.getValue()));
