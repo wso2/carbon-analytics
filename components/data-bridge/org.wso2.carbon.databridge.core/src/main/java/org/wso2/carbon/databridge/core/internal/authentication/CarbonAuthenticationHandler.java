@@ -42,6 +42,7 @@ public class CarbonAuthenticationHandler implements AuthenticationHandler {
     }
 
     public boolean authenticate(String userName, String password) {
+        PrivilegedCarbonContext.destroyCurrentContext();
         PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         if (privilegedCarbonContext.getTenantDomain() == null) {
             privilegedCarbonContext.setTenantDomain(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
@@ -82,10 +83,14 @@ public class CarbonAuthenticationHandler implements AuthenticationHandler {
     @Override
     public void initContext(AgentSession agentSession) {
         int tenantId = agentSession.getCredentials().getTenantId();
-        PrivilegedCarbonContext.startTenantFlow();
-        PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-        privilegedCarbonContext.setTenantId(tenantId);
-        privilegedCarbonContext.setTenantDomain(agentSession.getDomainName());
+        PrivilegedCarbonContext currentContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+        if (currentContext.getTenantId(true) != tenantId) {
+            PrivilegedCarbonContext.destroyCurrentContext();
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+            privilegedCarbonContext.setTenantId(tenantId);
+            privilegedCarbonContext.setTenantDomain(agentSession.getDomainName());
+        }
     }
 
     @Override
