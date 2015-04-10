@@ -83,10 +83,6 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
         this.rdbmsQueryConfigurationEntry = null;
     }
     
-    public RDBMSAnalyticsFileSystem(RDBMSQueryConfigurationEntry rDBMSQueryConfigurationEntry) throws IOException {
-        this.rdbmsQueryConfigurationEntry = rDBMSQueryConfigurationEntry;
-    }
-    
     private void checkAndCreateSystemTables() throws AnalyticsException {
         Connection conn = null;
         try {

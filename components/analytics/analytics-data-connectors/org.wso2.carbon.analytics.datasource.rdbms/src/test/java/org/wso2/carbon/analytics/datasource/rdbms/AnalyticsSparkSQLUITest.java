@@ -29,10 +29,7 @@ import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerI
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
-import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
-import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
-import org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsFileSystemTest;
-import org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsRecordStoreTest;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.spark.admin.dto.AnalyticsQueryResultDto;
 import org.wso2.carbon.analytics.spark.admin.dto.AnalyticsRowResultDto;
 import org.wso2.carbon.analytics.spark.admin.internal.AnalyticsResultConverter;
@@ -55,22 +52,16 @@ import java.util.List;
 public class AnalyticsSparkSQLUITest {
 
     private AnalyticsDataService service;
-
-    private H2FileDBAnalyticsRecordStoreTest h2arstest;
-
-    private H2FileDBAnalyticsFileSystemTest h2afstest;
+    
+    public AnalyticsSparkSQLUITest() {
+        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf");
+    }
 
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException, IOException {
-        this.h2arstest = new H2FileDBAnalyticsRecordStoreTest();
-        this.h2afstest = new H2FileDBAnalyticsFileSystemTest();
-        this.h2arstest.setup();
-        this.h2afstest.setup();
-        AnalyticsRecordStore ars = this.h2arstest.getARS();
-        AnalyticsFileSystem afs = this.h2afstest.getAFS();
         AnalyticsServiceHolder.setHazelcastInstance(null);
         AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
-        this.service = new AnalyticsDataServiceImpl(ars, afs, 6);
+        this.service = new AnalyticsDataServiceImpl();
         ServiceHolder.setAnalyticsDataService(this.service);
         ServiceHolder.setAnalyticskExecutor(new SparkAnalyticsExecutor("localhost", 0));
     }

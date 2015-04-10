@@ -53,6 +53,10 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
     protected AnalyticsDataService service;
     
     private boolean becameLeader, leaderUpdated;
+    
+    public AnalyticsDataServiceTest() {
+        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf");
+    }
                
     public void init(AnalyticsDataService service) {
         this.service = service;

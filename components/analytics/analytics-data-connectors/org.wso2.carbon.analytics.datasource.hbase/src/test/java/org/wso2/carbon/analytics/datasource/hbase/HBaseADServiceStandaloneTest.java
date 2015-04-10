@@ -23,8 +23,6 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceImpl;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerImpl;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
-import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.rdbms.AnalyticsDataServiceTest;
 
 import javax.naming.NamingException;
@@ -32,28 +30,16 @@ import java.io.IOException;
 
 public class HBaseADServiceStandaloneTest extends AnalyticsDataServiceTest {
 
-    private HBaseAnalyticsRecordStoreTest hbasearstest;
-
-    private HDFSAnalyticsFileSystemTest hdfsafstest;
-
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException, IOException {
-        this.hbasearstest = new HBaseAnalyticsRecordStoreTest();
-        this.hdfsafstest = new HDFSAnalyticsFileSystemTest();
-        this.hbasearstest.setup();
-        this.hdfsafstest.setup();
-        AnalyticsRecordStore ars = this.hbasearstest.getStore();
-        AnalyticsFileSystem afs = this.hdfsafstest.getAFS();
         AnalyticsServiceHolder.setHazelcastInstance(null);
         AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
-        this.init(new AnalyticsDataServiceImpl(ars, afs, 6));
+        this.init(new AnalyticsDataServiceImpl());
     }
 
     @AfterClass
     public void done() throws NamingException, AnalyticsException, IOException {
         this.service.destroy();
-        this.hbasearstest.destroy();
-        this.hdfsafstest.destroy();
     }
 
 }

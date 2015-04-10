@@ -38,6 +38,7 @@ import org.wso2.carbon.ndatasource.core.DataSourceService;
 import org.wso2.carbon.ndatasource.core.DataSourceStatus;
 import org.wso2.carbon.ndatasource.core.SystemDataSourcesConfiguration;
 import org.wso2.carbon.ndatasource.core.utils.DataSourceUtils;
+import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.io.*;
@@ -90,7 +91,7 @@ public class GenericUtils {
 
     private static final String DEFAULT_CHARSET = "UTF8";
     
-    public static final String WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP = "wso2-analytics-conf-dir";
+    public static final String WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP = "wso2_custom_conf_dir";
     
     private static DataSourceRepository globalCustomRepo;
 
@@ -466,8 +467,29 @@ public class GenericUtils {
         }
     }
     
+    public static String getAnalyticsConfDirectory() {
+        File confDir = null;
+        try {
+            confDir = new File(CarbonUtils.getCarbonConfigDirPath());
+        } catch (Throwable ignore) {
+            /* some kind of an exception can be thrown if we are in a non-Carbon env */
+        }
+        if (confDir == null || !confDir.exists()) {
+            confDir = new File(getCustomAnalyticsConfDirectory());
+            if (!confDir.exists()) {
+                throw new IllegalStateException("The Java system property '" + WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP + 
+                        "' must be set to initialize non-Carbon env analytics");
+            }
+        }
+        return confDir.getAbsolutePath();
+    }
+    
+    private static String getCustomAnalyticsConfDirectory() {
+        return System.getProperty(WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP);
+    }
+    
     private static DataSourceRepository createGlobalCustomDataSourceRepo() throws DataSourceException {
-        String confDir = System.getProperty(WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP);
+        String confDir = getCustomAnalyticsConfDirectory();
         if (confDir == null || confDir.isEmpty()) {
             throw new IllegalStateException("The Java system property '" + WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP + 
                     "' must be set to initialize non-Carbon env analytics");

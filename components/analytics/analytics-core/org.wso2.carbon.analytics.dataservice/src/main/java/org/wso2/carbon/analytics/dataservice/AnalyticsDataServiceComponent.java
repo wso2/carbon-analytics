@@ -29,18 +29,8 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerImpl;
-import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfiguration;
-import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceService;
 import org.wso2.carbon.user.core.service.RealmService;
-import org.wso2.carbon.utils.CarbonUtils;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
-import java.io.File;
 
 /**
  * This class represents the analytics data service declarative services component.
@@ -56,21 +46,17 @@ public class AnalyticsDataServiceComponent {
 
     private static final Log log = LogFactory.getLog(AnalyticsDataServiceComponent.class);
 
-    private static final String ANALYTICS_DS_CONFIG_FILE = "analytics-dataservice-config.xml";
-
     protected void activate(ComponentContext ctx) {
         if (log.isDebugEnabled()) {
             log.debug("Starting AnalyticsDataServiceComponent#activate");
         }
         BundleContext bundleContext = ctx.getBundleContext();
         try {
-            AnalyticsDataServiceConfiguration config = this.loadAnalyticsDataServiceConfig();
             this.loadHazelcast();
             AnalyticsClusterManager clusterManager = new AnalyticsClusterManagerImpl();
             bundleContext.registerService(AnalyticsClusterManager.class, clusterManager, null);
             AnalyticsServiceHolder.setAnalyticsClusterManager(clusterManager);
-            AnalyticsDataService analyticsDataService = new AnalyticsDataServiceImpl(config);
-            AnalyticsServiceHolder.setAnalyticsDataService(analyticsDataService);
+            AnalyticsDataService analyticsDataService = new AnalyticsDataServiceImpl();
             SecureAnalyticsDataServiceImpl secureAnalyticsDataService = new SecureAnalyticsDataServiceImpl(analyticsDataService);
             bundleContext.registerService(AnalyticsDataService.class, analyticsDataService, null);
             bundleContext.registerService(SecureAnalyticsDataService.class, secureAnalyticsDataService, null);
@@ -99,25 +85,6 @@ public class AnalyticsDataServiceComponent {
         ServiceReference ref = ctx.getServiceReference(HazelcastInstance.class);
         if (ref != null) {
             AnalyticsServiceHolder.setHazelcastInstance((HazelcastInstance) ctx.getService(ref));
-        }
-    }
-
-    private AnalyticsDataServiceConfiguration loadAnalyticsDataServiceConfig() throws AnalyticsException {
-        try {
-            File confFile = new File(CarbonUtils.getCarbonConfigDirPath() +
-                    File.separator + AnalyticsDataSourceConstants.ANALYTICS_CONF_DIR +
-                    File.separator + ANALYTICS_DS_CONFIG_FILE);
-            if (!confFile.exists()) {
-                throw new AnalyticsException("Cannot initalize analytics data service, " +
-                        "the analytics data service configuration file cannot be found at: " +
-                        confFile.getPath());
-            }
-            JAXBContext ctx = JAXBContext.newInstance(AnalyticsDataServiceConfiguration.class);
-            Unmarshaller unmarshaller = ctx.createUnmarshaller();
-            return (AnalyticsDataServiceConfiguration) unmarshaller.unmarshal(confFile);
-        } catch (JAXBException e) {
-            throw new AnalyticsException(
-                    "Error in processing analytics data service configuration: " + e.getMessage(), e);
         }
     }
 

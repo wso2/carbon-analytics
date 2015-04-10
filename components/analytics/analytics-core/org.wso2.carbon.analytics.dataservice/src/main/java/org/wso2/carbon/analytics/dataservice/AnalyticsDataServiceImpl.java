@@ -34,10 +34,12 @@ import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
 import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -50,12 +52,18 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+
 /**
  * The implementation of {@link AnalyticsDataService}.
  */
 public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     private static final String ANALYTICS_DATASERVICE_GROUP = "__ANALYTICS_DATASERVICE_GROUP__";
+    
+    private static final String ANALYTICS_DS_CONFIG_FILE = "analytics-dataservice-config.xml";
     
     private AnalyticsRecordStore analyticsRecordStore;
     
@@ -65,11 +73,23 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     
     private Map<String, AnalyticsSchema> schemaMap = new HashMap<String, AnalyticsSchema>();
     
-    public AnalyticsDataServiceImpl(AnalyticsRecordStore analyticsRecordStore,
-            AnalyticsFileSystem analyticsFileSystem, int shardCount) throws AnalyticsException {
-        this.analyticsRecordStore = analyticsRecordStore;
-        this.analyticsFileSystem = analyticsFileSystem;
-        this.indexer = new AnalyticsDataIndexer(this.analyticsRecordStore, this.analyticsFileSystem, shardCount);
+    public AnalyticsDataServiceImpl() throws AnalyticsException {
+        AnalyticsDataServiceConfiguration config = this.loadAnalyticsDataServiceConfig();
+        Analyzer luceneAnalyzer;
+        try {
+            String arsClass = config.getAnalyticsRecordStoreConfiguration().getImplementation();
+            String afsClass = config.getAnalyticsFileSystemConfiguration().getImplementation();
+            String analyzerClass = config.getLuceneAnalyzerConfiguration().getImplementation();
+            this.analyticsRecordStore = (AnalyticsRecordStore) Class.forName(arsClass).newInstance();
+            this.analyticsFileSystem = (AnalyticsFileSystem) Class.forName(afsClass).newInstance();
+            this.analyticsRecordStore.init(this.convertToMap(config.getAnalyticsRecordStoreConfiguration().getProperties()));
+            this.analyticsFileSystem.init(this.convertToMap(config.getAnalyticsFileSystemConfiguration().getProperties()));
+            luceneAnalyzer = (Analyzer) Class.forName(analyzerClass).newInstance();
+        } catch (Exception e) {
+            throw new AnalyticsException("Error in creating analytics data service from configuration: " + 
+                    e.getMessage(), e);
+        }
+        this.indexer = new AnalyticsDataIndexer(this.analyticsRecordStore, this.analyticsFileSystem, config.getShardCount(), luceneAnalyzer);
         AnalyticsServiceHolder.setAnalyticsDataService(this);
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         if (acm.isClusteringEnabled()) {
@@ -78,27 +98,23 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         this.indexer.init();
     }
     
-    public AnalyticsDataServiceImpl(AnalyticsDataServiceConfiguration config) throws AnalyticsException {
-        AnalyticsRecordStore ars;
-        AnalyticsFileSystem afs;
-        Analyzer luceneAnalyzer;
+    private AnalyticsDataServiceConfiguration loadAnalyticsDataServiceConfig() throws AnalyticsException {
         try {
-            String arsClass = config.getAnalyticsRecordStoreConfiguration().getImplementation();
-            String afsClass = config.getAnalyticsFileSystemConfiguration().getImplementation();
-            String analyzerClass = config.getLuceneAnalyzerConfiguration().getImplementation();
-            ars = (AnalyticsRecordStore) Class.forName(arsClass).newInstance();
-            afs = (AnalyticsFileSystem) Class.forName(afsClass).newInstance();
-            ars.init(this.convertToMap(config.getAnalyticsRecordStoreConfiguration().getProperties()));
-            afs.init(this.convertToMap(config.getAnalyticsFileSystemConfiguration().getProperties()));
-            luceneAnalyzer = (Analyzer) Class.forName(analyzerClass).newInstance();
-        } catch (Exception e) {
-            throw new AnalyticsException("Error in creating analytics data service from configuration: " + 
-                    e.getMessage(), e);
+            File confFile = new File(GenericUtils.getAnalyticsConfDirectory() +
+                    File.separator + AnalyticsDataSourceConstants.ANALYTICS_CONF_DIR +
+                    File.separator + ANALYTICS_DS_CONFIG_FILE);
+            if (!confFile.exists()) {
+                throw new AnalyticsException("Cannot initalize analytics data service, " +
+                        "the analytics data service configuration file cannot be found at: " +
+                        confFile.getPath());
+            }
+            JAXBContext ctx = JAXBContext.newInstance(AnalyticsDataServiceConfiguration.class);
+            Unmarshaller unmarshaller = ctx.createUnmarshaller();
+            return (AnalyticsDataServiceConfiguration) unmarshaller.unmarshal(confFile);
+        } catch (JAXBException e) {
+            throw new AnalyticsException(
+                    "Error in processing analytics data service configuration: " + e.getMessage(), e);
         }
-        this.analyticsRecordStore = ars;
-        this.indexer = new AnalyticsDataIndexer(ars, afs, config.getShardCount(), luceneAnalyzer);
-        AnalyticsServiceHolder.setAnalyticsDataService(this);
-        this.indexer.init();
     }
     
     private Map<String, String> convertToMap(AnalyticsDataServiceConfigProperty[] props) {

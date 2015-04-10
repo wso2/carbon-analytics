@@ -35,7 +35,7 @@ import javax.xml.bind.Unmarshaller;
 
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
-import org.wso2.carbon.utils.CarbonUtils;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 /**
  * Utility methods for RDBMS based operations for analytics data source.
@@ -72,7 +72,7 @@ public class RDBMSUtils {
     
     public static RDBMSQueryConfiguration loadQueryConfiguration() throws AnalyticsException {
         try {
-            File confFile = new File(CarbonUtils.getCarbonConfigDirPath() + 
+            File confFile = new File(GenericUtils.getAnalyticsConfDirectory() + 
                     File.separator + AnalyticsDataSourceConstants.ANALYTICS_CONF_DIR + File.separator + RDBMS_QUERY_CONFIG_FILE);
             if (!confFile.exists()) {
                 throw new AnalyticsException("Cannot initalize RDBMS analytics data source, "

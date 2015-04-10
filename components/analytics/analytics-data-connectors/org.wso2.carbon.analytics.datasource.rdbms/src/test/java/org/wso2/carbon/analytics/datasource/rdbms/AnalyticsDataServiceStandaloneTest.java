@@ -28,31 +28,17 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceImpl;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerImpl;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
-import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
-import org.wso2.carbon.analytics.datasource.rdbms.h2.H2MemDBAnalyticsFileSystemTest;
-import org.wso2.carbon.analytics.datasource.rdbms.h2.H2MemDBAnalyticsRecordStoreTest;
 
 /**
  * Standalone test implementation of {@link AnalyticsDataServiceTest}.
  */
 public class AnalyticsDataServiceStandaloneTest extends AnalyticsDataServiceTest {
-
-    private H2MemDBAnalyticsRecordStoreTest h2arstest;
-    
-    private H2MemDBAnalyticsFileSystemTest h2afstest;
     
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException, IOException {
-        this.h2arstest = new H2MemDBAnalyticsRecordStoreTest();
-        this.h2afstest = new H2MemDBAnalyticsFileSystemTest();
-        this.h2arstest.setup();
-        this.h2afstest.setup();
-        AnalyticsRecordStore ars = this.h2arstest.getARS();
-        AnalyticsFileSystem afs = this.h2afstest.getAFS();
         AnalyticsServiceHolder.setHazelcastInstance(null);
         AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
-        this.init(new AnalyticsDataServiceImpl(ars, afs, 6));
+        this.init(new AnalyticsDataServiceImpl());
     }
     
     @AfterClass
