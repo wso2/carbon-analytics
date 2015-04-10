@@ -752,6 +752,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         drillDownResultEntry.setTo(range.getTo());
         drillDownResultEntry.setFrom(range.getFrom());
         TopDocs topDocs = FacetsCollector.search(searcher, drillDownQuery, drillDownRequest.getRecordCount(), fc);
+        drillDownResultEntry.setRecordCount(new Double(topDocs.totalHits).doubleValue());
         if(drillDownRequest.isWithIds()) {
             int start = 0;
             int count = drillDownRequest.getRecordCount();

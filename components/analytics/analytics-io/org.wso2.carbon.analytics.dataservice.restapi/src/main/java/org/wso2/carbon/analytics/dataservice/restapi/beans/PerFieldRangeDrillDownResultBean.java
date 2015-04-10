@@ -18,6 +18,7 @@ package org.wso2.carbon.analytics.dataservice.restapi.beans;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import java.util.List;
 
 /**
@@ -26,7 +27,9 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PerFieldRangeDrillDownResultBean {
 
+    @XmlElement(name = "fieldName")
     private String fieldName;
+    @XmlElement(name = "ranges")
     private List<PerRangeDrillDownResultBean> perRangeResult;
 
     public String getFieldName() {

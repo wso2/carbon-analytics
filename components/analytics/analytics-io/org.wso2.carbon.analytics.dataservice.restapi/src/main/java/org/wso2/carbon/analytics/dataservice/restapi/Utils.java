@@ -441,12 +441,11 @@ public class Utils {
     /**
      * Creates the AnalyticsDrilldownRequest object given a drilldownrequestBean class
      * @param bean bean class which represents the drilldown request.
-     * @param withIds whether to include the matching ids or not. this will be false if the user only needs the counts
      * @return Equivalent AnalyticsDrilldownRequest object.
      */
-    public static AnalyticsDrillDownRequest createDrilldownRequest(DrillDownRequestBean bean, boolean withIds) {
+    public static AnalyticsDrillDownRequest createDrilldownRequest(DrillDownRequestBean bean) {
         AnalyticsDrillDownRequest drillDownRequest = new AnalyticsDrillDownRequest();
-        drillDownRequest.setWithIds(withIds);
+        drillDownRequest.setWithIds(bean.isIncludeIds());
         drillDownRequest.setTableName(bean.getTableName());
         drillDownRequest.setCategoryCount(bean.getCategoryCount());
         drillDownRequest.setRecordCount(bean.getRecordCount());

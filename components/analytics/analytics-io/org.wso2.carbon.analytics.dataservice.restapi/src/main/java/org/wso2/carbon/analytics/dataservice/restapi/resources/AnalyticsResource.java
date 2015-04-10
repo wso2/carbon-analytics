@@ -32,6 +32,7 @@ import org.wso2.carbon.analytics.dataservice.restapi.UnauthenticatedUserExceptio
 import org.wso2.carbon.analytics.dataservice.restapi.Utils;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownPathBean;
+import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownRangeBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.DrillDownResultBean;
 import org.wso2.carbon.analytics.dataservice.restapi.beans.IndexConfigurationBean;
@@ -75,6 +76,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -665,19 +667,19 @@ public class AnalyticsResource extends AbstractResource {
         List<DrillDownPathBean> p = new ArrayList<>();
         DrillDownPathBean d = new DrillDownPathBean("field3", new String[]{"A", "B"});
         p.add(d);
-        /**
+
         Map<String, List<DrillDownRangeBean>> tt = new LinkedHashMap<>();
         List<DrillDownRangeBean> b = new ArrayList<>();
         DrillDownRangeBean ff = new DrillDownRangeBean("label",12334,679898);
         b.add(ff);
         tt.put("fieldname", b);
-         dd.setRanges(tt);*/
+         dd.setRanges(tt);
 
         dd.setCategories(p);
-        AnalyticsDrillDownRequest tg = Utils.createDrilldownRequest(dd, true);
+        AnalyticsDrillDownRequest tg = Utils.createDrilldownRequest(dd);
         AnalyticsDataService e = Utils.getAnalyticsDataService();
         Map<String, List<DrillDownResultEntry>> h = e.drillDown(-1234, tg);
-        return null;
+        return Response.ok(dd).build();
     }
 
     /**
@@ -824,7 +826,7 @@ public class AnalyticsResource extends AbstractResource {
         SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
         String username = authenticate(authHeader);
         if (requestBean != null) {
-            AnalyticsDrillDownRequest request = Utils.createDrilldownRequest(requestBean, true);
+            AnalyticsDrillDownRequest request = Utils.createDrilldownRequest(requestBean);
             Map<String, List<DrillDownResultEntry>> result = analyticsDataService.drillDown(username, request);
             if (requestBean.getRanges() == null || requestBean.getRanges().isEmpty()) {
                 DrillDownResultBean resultBean = Utils.createDrillDownResultBean(result);
@@ -858,7 +860,7 @@ public class AnalyticsResource extends AbstractResource {
         SecureAnalyticsDataService analyticsDataService = Utils.getSecureAnalyticsDataService();
         String username = authenticate(authHeader);
         if (requestBean != null) {
-            AnalyticsDrillDownRequest request = Utils.createDrilldownRequest(requestBean, false);
+            AnalyticsDrillDownRequest request = Utils.createDrilldownRequest(requestBean);
             Map<String, List<DrillDownResultEntry>> result = analyticsDataService.drillDown(username, request);
             DrillDownResultBean resultBean = Utils.createDrillDownResultBean(result);
             return Response.ok(resultBean).build();
