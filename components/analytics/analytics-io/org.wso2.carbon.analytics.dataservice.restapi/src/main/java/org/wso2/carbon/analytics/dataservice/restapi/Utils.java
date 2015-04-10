@@ -65,44 +65,47 @@ public class Utils {
     public static final float DEFAUL_CATEGORYPATH_WEIGHT = 1.0f;
 
     /**
-	 * Gets the analytics data service.
-	 * @return the analytics data service
-	 * @throws AnalyticsException
-	 */
-	public static AnalyticsDataService getAnalyticsDataService() throws AnalyticsException {
-		AnalyticsDataService analyticsDataService;
-		analyticsDataService = (AnalyticsDataService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
-		                                                     .getOSGiService(AnalyticsDataService.class,
-		                                                                     null);
-		if(analyticsDataService == null) {
-			throw new AnalyticsException("AnalyticsDataService is not available.");
-		}
-		return analyticsDataService;
-	}
+     * Gets the analytics data service.
+     *
+     * @return the analytics data service
+     * @throws AnalyticsException
+     */
+    public static AnalyticsDataService getAnalyticsDataService() throws AnalyticsException {
+        AnalyticsDataService analyticsDataService;
+        analyticsDataService = (AnalyticsDataService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                .getOSGiService(AnalyticsDataService.class,
+                                null);
+        if (analyticsDataService == null) {
+            throw new AnalyticsException("AnalyticsDataService is not available.");
+        }
+        return analyticsDataService;
+    }
 
     /**
-	 * Gets the analytics data service.
-	 * @return the analytics data service
-	 * @throws AnalyticsException
-	 */
-	public static SecureAnalyticsDataService getSecureAnalyticsDataService() throws AnalyticsException {
-		SecureAnalyticsDataService analyticsDataService;
-		analyticsDataService = (SecureAnalyticsDataService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
-		                                                     .getOSGiService(SecureAnalyticsDataService.class,
-		                                                                     null);
-		if(analyticsDataService == null) {
-			throw new AnalyticsException("AnalyticsDataService is not available.");
-		}
-		return analyticsDataService;
-	}
+     * Gets the analytics data service.
+     *
+     * @return the analytics data service
+     * @throws AnalyticsException
+     */
+    public static SecureAnalyticsDataService getSecureAnalyticsDataService()
+            throws AnalyticsException {
+        SecureAnalyticsDataService analyticsDataService;
+        analyticsDataService = (SecureAnalyticsDataService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                .getOSGiService(SecureAnalyticsDataService.class,
+                                null);
+        if (analyticsDataService == null) {
+            throw new AnalyticsException("AnalyticsDataService is not available.");
+        }
+        return analyticsDataService;
+    }
 
-	/**
-	 * Gets the records from record beans.
-	 * @param recordBeans
-	 *            the record beans
-	 * @return the records from record beans
-	 * @throws AnalyticsException if the tableName is not specified
-	 */
+    /**
+     * Gets the records from record beans.
+     *
+     * @param recordBeans the record beans
+     * @return the records from record beans
+     * @throws AnalyticsException if the tableName is not specified
+     */
     public static List<Record> getRecords(String username, List<RecordBean> recordBeans)
             throws AnalyticsException {
         List<Record> records = new ArrayList<>();
@@ -120,7 +123,7 @@ public class Utils {
     private static Map<String, Object> validateAndReturn(Map<String, Object> values)
             throws AnalyticsIndexException {
         Map<String, Object> valueMap = new LinkedHashMap<String, Object>(0);
-        for (Map.Entry<String, Object> recordEntry : values.entrySet()){
+        for (Map.Entry<String, Object> recordEntry : values.entrySet()) {
             //TODO : AnalyticsCategoryPath is mapped to a linkedList by jackson json.
             // Currently checking the type and convert it manually to categoryPath type.
             if (recordEntry.getValue() instanceof LinkedHashMap) {
@@ -134,8 +137,7 @@ public class Utils {
                     weight = (Double) weightObj;
                 } else if (weightObj == null) {
                     weight = DEFAUL_CATEGORYPATH_WEIGHT;
-                }
-                else {
+                } else {
                     throw new AnalyticsIndexException("Category Weight should be a float/integer value");
                 }
                 if (pathList != null && pathList.size() > 0) {
@@ -150,44 +152,47 @@ public class Utils {
                     throw new AnalyticsIndexException("Category path cannot be empty");
                 }
             } else {
-                valueMap.put(recordEntry.getKey(),recordEntry.getValue());
+                valueMap.put(recordEntry.getKey(), recordEntry.getValue());
             }
         }
         return valueMap;
     }
 
     /**
-	 * Gets the records from record beans belongs to a specific table.
-	 * @param recordBeans
-	 *            the record beans
-	 * @return the records from record beans
-	 */
-	public static List<Record> getRecordsForTable(String username,String tableName, List<RecordBean> recordBeans)
+     * Gets the records from record beans belongs to a specific table.
+     *
+     * @param recordBeans the record beans
+     * @return the records from record beans
+     */
+    public static List<Record> getRecordsForTable(String username, String tableName,
+                                                  List<RecordBean> recordBeans)
             throws AnalyticsException {
-		List<Record> records = new ArrayList<>();
-		for (RecordBean recordBean : recordBeans) {
-			records.add(new Record(recordBean.getId(), getTenantId(username), tableName,
-		                           validateAndReturn(recordBean.getValues())));
-		}
-		return records;
-	}
+        List<Record> records = new ArrayList<>();
+        for (RecordBean recordBean : recordBeans) {
+            records.add(new Record(recordBean.getId(), getTenantId(username), tableName,
+                                   validateAndReturn(recordBean.getValues())));
+        }
+        return records;
+    }
 
-	/**
-	 * Creates the record beans from records.
-	 * @param records the records
-	 * @return the list of recordBeans
-	 */
-	public static List<RecordBean> createRecordBeans(List<Record> records) {
-		List<RecordBean> recordBeans = new ArrayList<RecordBean>();
-		for(Record record : records) {
-			RecordBean recordBean = createRecordBean(record);
-			recordBeans.add(recordBean);
-		}
-		return recordBeans;
-	}
+    /**
+     * Creates the record beans from records.
+     *
+     * @param records the records
+     * @return the list of recordBeans
+     */
+    public static List<RecordBean> createRecordBeans(List<Record> records) {
+        List<RecordBean> recordBeans = new ArrayList<RecordBean>();
+        for (Record record : records) {
+            RecordBean recordBean = createRecordBean(record);
+            recordBeans.add(recordBean);
+        }
+        return recordBeans;
+    }
 
     /**
      * Create a RecordBean object out of a Record object
+     *
      * @param record the record object
      * @return RecordBean object
      */
@@ -200,134 +205,137 @@ public class Utils {
         return recordBean;
     }
 
-	/**
-	 * Creates the index type bean from index type.
-	 * @param indexType
-	 *            the index type
-	 * @return the index type bean
-	 */
-	public static IndexTypeBean createIndexTypeBean(IndexType indexType) {
-		switch (indexType) {
-			case BOOLEAN:
-				return IndexTypeBean.BOOLEAN;
-			case FLOAT:
-				return IndexTypeBean.FLOAT;
-			case DOUBLE:
-				return IndexTypeBean.DOUBLE;
-			case INTEGER:
-				return IndexTypeBean.INTEGER;
-			case LONG:
-				return IndexTypeBean.LONG;
-			case STRING:
-				return IndexTypeBean.STRING;
+    /**
+     * Creates the index type bean from index type.
+     *
+     * @param indexType the index type
+     * @return the index type bean
+     */
+    public static IndexTypeBean createIndexTypeBean(IndexType indexType) {
+        switch (indexType) {
+            case BOOLEAN:
+                return IndexTypeBean.BOOLEAN;
+            case FLOAT:
+                return IndexTypeBean.FLOAT;
+            case DOUBLE:
+                return IndexTypeBean.DOUBLE;
+            case INTEGER:
+                return IndexTypeBean.INTEGER;
+            case LONG:
+                return IndexTypeBean.LONG;
+            case STRING:
+                return IndexTypeBean.STRING;
             case FACET:
                 return IndexTypeBean.FACET;
-			default:
-				return IndexTypeBean.STRING;
-		}
-	}
+            default:
+                return IndexTypeBean.STRING;
+        }
+    }
 
-	/**
-	 * Creates the index type from index type bean.
-	 * @param indexTypeBean
-	 *            the index type bean
-	 * @return the index type
-	 */
-	public static IndexType createIndexType(IndexTypeBean indexTypeBean) {
-		switch (indexTypeBean) {
-			case BOOLEAN:
-				return IndexType.BOOLEAN;
-			case FLOAT:
-				return IndexType.FLOAT;
-			case DOUBLE:
-				return IndexType.DOUBLE;
-			case INTEGER:
-				return IndexType.INTEGER;
-			case LONG:
-				return IndexType.LONG;
-			case STRING:
-				return IndexType.STRING;
+    /**
+     * Creates the index type from index type bean.
+     *
+     * @param indexTypeBean the index type bean
+     * @return the index type
+     */
+    public static IndexType createIndexType(IndexTypeBean indexTypeBean) {
+        switch (indexTypeBean) {
+            case BOOLEAN:
+                return IndexType.BOOLEAN;
+            case FLOAT:
+                return IndexType.FLOAT;
+            case DOUBLE:
+                return IndexType.DOUBLE;
+            case INTEGER:
+                return IndexType.INTEGER;
+            case LONG:
+                return IndexType.LONG;
+            case STRING:
+                return IndexType.STRING;
             case FACET:
                 return IndexType.FACET;
-			default:
-				return IndexType.STRING;
-		}
-	}
+            default:
+                return IndexType.STRING;
+        }
+    }
 
-	/**
-	 * Creates the index type bean map fron index type map.
-	 * @param indexTypeMap
-	 *            the index type map
-	 * @return the map
-	 */
-	public static Map<String, IndexTypeBean> createIndexTypeBeanMap(Map<String, IndexType> indexTypeMap) {
-		Map<String, IndexTypeBean> indexTypeBeanMap = new HashMap<String, IndexTypeBean>();
-		Set<String> columns = indexTypeMap.keySet();
-		for (String column : columns) {
-			indexTypeBeanMap.put(column, createIndexTypeBean(indexTypeMap.get(column)));
-		}
-		return indexTypeBeanMap;
-	}
+    /**
+     * Creates the index type bean map fron index type map.
+     *
+     * @param indexTypeMap the index type map
+     * @return the map
+     */
+    public static Map<String, IndexTypeBean> createIndexTypeBeanMap(
+            Map<String, IndexType> indexTypeMap) {
+        Map<String, IndexTypeBean> indexTypeBeanMap = new HashMap<String, IndexTypeBean>();
+        Set<String> columns = indexTypeMap.keySet();
+        for (String column : columns) {
+            indexTypeBeanMap.put(column, createIndexTypeBean(indexTypeMap.get(column)));
+        }
+        return indexTypeBeanMap;
+    }
 
-	/**
-	 * Creates the index type map from index type bean map.
-	 * @param indexTypeBeanMap
-	 *            the index type bean map
-	 * @return the map
-	 */
-	public static Map<String, IndexType> createIndexTypeMap(Map<String, IndexTypeBean> indexTypeBeanMap) {
-		Map<String, IndexType> indexTypeMap = new HashMap<String, IndexType>();
-		Set<String> columns = indexTypeBeanMap.keySet();
-		for (String column : columns) {
-			indexTypeMap.put(column, createIndexType(indexTypeBeanMap.get(column)));
-		}
-		return indexTypeMap;
-	}
+    /**
+     * Creates the index type map from index type bean map.
+     *
+     * @param indexTypeBeanMap the index type bean map
+     * @return the map
+     */
+    public static Map<String, IndexType> createIndexTypeMap(
+            Map<String, IndexTypeBean> indexTypeBeanMap) {
+        Map<String, IndexType> indexTypeMap = new HashMap<String, IndexType>();
+        Set<String> columns = indexTypeBeanMap.keySet();
+        for (String column : columns) {
+            indexTypeMap.put(column, createIndexType(indexTypeBeanMap.get(column)));
+        }
+        return indexTypeMap;
+    }
 
-	/**
-	 * Gets the record ids from search results.
-	 * @param searchResults the search results
-	 * @return the record ids from search results
-	 */
-	public static List<String> getRecordIds(List<SearchResultEntry> searchResults) {
-		List<String> ids = new ArrayList<String>();
-		for(SearchResultEntry searchResult : searchResults) {
-			ids.add(searchResult.getId());
-		}
-		return ids;
-	}
+    /**
+     * Gets the record ids from search results.
+     *
+     * @param searchResults the search results
+     * @return the record ids from search results
+     */
+    public static List<String> getRecordIds(List<SearchResultEntry> searchResults) {
+        List<String> ids = new ArrayList<String>();
+        for (SearchResultEntry searchResult : searchResults) {
+            ids.add(searchResult.getId());
+        }
+        return ids;
+    }
 
-	/**
-	 * Gets the complete error message.
-	 * @param msg
-	 *            the Message
-	 * @param e
-	 *            the exception
-	 * @return the complete error message
-	 */
-	public static String getCompleteErrorMessage(String msg, Exception e) {
-		StringBuilder message = new StringBuilder(msg);
-		if (e.getCause() != null) {
-			message.append(". (");
+    /**
+     * Gets the complete error message.
+     *
+     * @param msg the Message
+     * @param e   the exception
+     * @return the complete error message
+     */
+    public static String getCompleteErrorMessage(String msg, Exception e) {
+        StringBuilder message = new StringBuilder(msg);
+        if (e.getCause() != null) {
+            message.append(". (");
             message.append(e.getCause().getMessage());
             message.append(")");
-		} else if (e.getMessage() != null) {
-			message.append(". (");
+        } else if (e.getMessage() != null) {
+            message.append(". (");
             message.append(e.getMessage());
             message.append(")");
-		}
-		return message.toString();
-	}
+        }
+        return message.toString();
+    }
 
     /**
      * Returns the list of iterators given RecordGroups as a parameter
-     * @param recordGroups the recordGroup array of which the iterators to be returned
+     *
+     * @param recordGroups         the recordGroup array of which the iterators to be returned
      * @param analyticsDataService the AnalyticsDataService instance
      * @return list of Iterators of Records
      * @throws AnalyticsException
      */
     public static List<Iterator<Record>> getRecordIterators(RecordGroup[] recordGroups,
-                                                      SecureAnalyticsDataService analyticsDataService)
+                                                            SecureAnalyticsDataService analyticsDataService)
             throws AnalyticsException {
 
         List<Iterator<Record>> iterators = new ArrayList<Iterator<Record>>();
@@ -340,6 +348,7 @@ public class Utils {
 
     /**
      * Create a Analytics schema from a bean class
+     *
      * @param analyticsSchemaBean bean table schema to be converted to Analytics Schema.
      * @return Analytics schema
      */
@@ -353,6 +362,7 @@ public class Utils {
 
     /**
      * Create table schema bean from a analytics schema
+     *
      * @param analyticsSchema Analytics schema to be converted to table schema bean
      * @return Table schema bean
      */
@@ -368,22 +378,25 @@ public class Utils {
         if (analyticsSchema.getPrimaryKeys() != null) {
             primaryKeys = analyticsSchema.getPrimaryKeys();
         }
-        return new AnalyticsSchemaBean(columnTypeBeanTypes,primaryKeys);
+        return new AnalyticsSchemaBean(columnTypeBeanTypes, primaryKeys);
     }
 
     /**
      * Create a a bean class for the drilldown result input which is a result of non-ranged based drilldown
+     *
      * @param result The results from calling the drilldown method of the analyticsDataservice.
      * @return a DrilldownResultBean class containing the drilldown information
      */
-    public static DrillDownResultBean createDrillDownResultBean(Map<String, List<DrillDownResultEntry>> result) {
+    public static DrillDownResultBean createDrillDownResultBean(
+            Map<String, List<DrillDownResultEntry>> result) {
         DrillDownResultBean resultBean = new DrillDownResultBean();
         resultBean.setPerFieldResults(createPerFieldDrillDownResultBean(result));
-        return  resultBean;
+        return resultBean;
     }
 
-    private static Map<String, DrillDownPerFieldResultBean> createPerFieldDrillDownResultBean(Map<String
-            , List<DrillDownResultEntry>> result) {
+    private static Map<String, DrillDownPerFieldResultBean> createPerFieldDrillDownResultBean(
+            Map<String
+                    , List<DrillDownResultEntry>> result) {
         Map<String, DrillDownPerFieldResultBean> perFieldResults = new LinkedHashMap<>();
         for (Map.Entry<String, List<DrillDownResultEntry>> entry : result.entrySet()) {
             DrillDownPerFieldResultBean bean = new DrillDownPerFieldResultBean();
@@ -408,6 +421,7 @@ public class Utils {
 
     /**
      * Creates a bean class for results of a numeric range based drilldown search.
+     *
      * @param result The result of the method "drilldown" of AnalyticsDataService
      * @return A bean class representing the range based drilldown results
      */
@@ -440,6 +454,7 @@ public class Utils {
 
     /**
      * Creates the AnalyticsDrilldownRequest object given a drilldownrequestBean class
+     *
      * @param bean bean class which represents the drilldown request.
      * @return Equivalent AnalyticsDrilldownRequest object.
      */
@@ -467,21 +482,23 @@ public class Utils {
                 result.put(entry.getKey(), createDrillDownRanges(entry.getValue()));
             }
         }
-        return  result;
+        return result;
     }
 
-    private static List<AnalyticsDrillDownRange> createDrillDownRanges(List<DrillDownRangeBean> ranges) {
+    private static List<AnalyticsDrillDownRange> createDrillDownRanges(
+            List<DrillDownRangeBean> ranges) {
         List<AnalyticsDrillDownRange> result = new ArrayList<AnalyticsDrillDownRange>(0);
         for (DrillDownRangeBean rangeBean : ranges) {
             AnalyticsDrillDownRange range = new AnalyticsDrillDownRange(rangeBean.getLabel(),
-                                             rangeBean.getFrom(), rangeBean.getTo());
+                                                                        rangeBean.getFrom(), rangeBean.getTo());
             result.add(range);
         }
         return result;
     }
 
 
-    private static Map<String , AnalyticsCategoryPath> createCategoryPaths(List<DrillDownPathBean> bean) {
+    private static Map<String, AnalyticsCategoryPath> createCategoryPaths(
+            List<DrillDownPathBean> bean) {
         Map<String, AnalyticsCategoryPath> categoryPaths = new LinkedHashMap<String, AnalyticsCategoryPath>(0);
         for (DrillDownPathBean drillDownPathBean : bean) {
             categoryPaths.put(drillDownPathBean.getFieldName(),
@@ -492,6 +509,7 @@ public class Utils {
 
     /**
      * convert a column type bean to ColumnType
+     *
      * @param columnTypeBean ColumnType Bean to be converted to ColumnType
      * @return ColumnType instance
      */
@@ -518,6 +536,7 @@ public class Utils {
 
     /**
      * convert a column type to bean type
+     *
      * @param columnType the ColumnType to be converted to bean type
      * @return ColumnTypeBean instance
      */

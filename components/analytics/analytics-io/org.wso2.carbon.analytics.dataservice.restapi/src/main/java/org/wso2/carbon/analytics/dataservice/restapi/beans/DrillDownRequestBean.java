@@ -35,21 +35,21 @@ public class DrillDownRequestBean {
     private String tableName;
     @XmlElement(name = "categories")
     private List<DrillDownPathBean> categories;
-    @XmlElement(name = "language")
+    @XmlElement(name = "language", required = false, defaultValue = "lucene")
     private String language;
     @XmlElement(name = "query")
     private String query;
     @XmlElement(name = "scoreFunction", required = false)
     private String scoreFunction;
-    @XmlElement(name = "recordCount")
+    @XmlElement(name = "recordCount", required = false, defaultValue = "10")
     private int recordCount;
-    @XmlElement(name = "categoryCount")
+    @XmlElement(name = "categoryCount", required = false, defaultValue = "10")
     private int categoryCount;
-    @XmlElement(name = "recordStart")
+    @XmlElement(name = "recordStart", required = false, defaultValue = "0")
     private  int recordStart;
-    @XmlElement(name = "categoryStart")
+    @XmlElement(name = "categoryStart", required = false, defaultValue = "0")
     private  int categoryStart;
-    @XmlElement(name = "includeIds")
+    @XmlElement(name = "includeIds", required = false, defaultValue = "false")
     private boolean includeIds;
     @XmlElement(name = "ranges", required = false)
     private Map<String, List<DrillDownRangeBean>> ranges;
