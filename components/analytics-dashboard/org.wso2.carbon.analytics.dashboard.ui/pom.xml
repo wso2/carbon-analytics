@@ -50,7 +50,7 @@
             <artifactId>org.wso2.carbon.event.stream.stub</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.event-processing</groupId>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.event.publisher.stub</artifactId>
         </dependency>
         <dependency>

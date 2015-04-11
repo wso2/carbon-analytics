@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2005 - 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  ~ use this file except in compliance with the License. You may obtain a copy
+  ~ of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software distributed
+  ~ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+  ~ CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations under the License.
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <groupId>org.wso2.carbon.analytics-common</groupId>
+        <artifactId>event-publisher-feature</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>org.wso2.carbon.event.output.adapter.feature</artifactId>
+    <packaging>pom</packaging>
+    <name>WSO2 Carbon - Event Publisher Output Adapter Feature</name>
+    <url>http://wso2.org</url>
+    <version>1.0.0-SNAPSHOT</version>
+    <description>
+        This feature bundles all the output adapters.
+    </description>
+
+
+
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.event.output.adapter.server.feature</artifactId>
+            <type>zip</type>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.event.output.adapter.email.server.feature</artifactId>
+            <type>zip</type>
+            <version>${carbon.analytics.common.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.event.output.adapter.http.server.feature</artifactId>
+            <type>zip</type>
+            <version>${carbon.analytics.common.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.event.output.adapter.jms.server.feature</artifactId>
+            <type>zip</type>
+            <version>${carbon.analytics.common.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.event.output.adapter.kafka.server.feature</artifactId>
+            <type>zip</type>
+            <version>${carbon.analytics.common.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.event.output.adapter.logger.server.feature</artifactId>
+            <type>zip</type>
+            <version>${carbon.analytics.common.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.event.output.adapter.rdbms.server.feature</artifactId>
+            <type>zip</type>
+            <version>${carbon.analytics.common.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.event.output.adapter.soap.server.feature</artifactId>
+            <type>zip</type>
+            <version>${carbon.analytics.common.version}</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.event.output.adapter.websocket.server.feature</artifactId>
+            <type>zip</type>
+            <version>${carbon.analytics.common.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.event.output.adapter.websocket.local.server.feature</artifactId>
+            <type>zip</type>
+            <version>${carbon.analytics.common.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.event.output.adapter.ui.server.feature</artifactId>
+            <type>zip</type>
+            <version>${carbon.analytics.common.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.event.output.adapter.wso2event.server.feature</artifactId>
+            <type>zip</type>
+            <version>${carbon.analytics.common.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.event.output.adapter.mqtt.server.feature</artifactId>
+            <type>zip</type>
+            <version>${carbon.analytics.common.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.event.output.adapter.sms.server.feature</artifactId>
+            <type>zip</type>
+            <version>${carbon.analytics.common.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.event.output.adapter.cassandra.server.feature</artifactId>
+            <type>zip</type>
+            <version>${carbon.analytics.common.version}</version>
+        </dependency>
+
+    </dependencies>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.wso2.maven</groupId>
+                <artifactId>carbon-p2-plugin</artifactId>
+                <version>${carbon.p2.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>4-p2-feature-generation</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>p2-feature-gen</goal>
+                        </goals>
+                        <configuration>
+                            <id>org.wso2.carbon.event.output.adapter</id>
+                            <propertiesFile>../../etc/feature.properties</propertiesFile>
+
+                            <includedFeatures>
+                                <includedFeatureDef>
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.output.adapter.server.feature:${carbon.analytics.common.version}
+                                </includedFeatureDef>
+
+
+                                <includedFeatureDef>
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.output.adapter.email.server.feature:${carbon.analytics.common.version}
+                                </includedFeatureDef>
+                                <includedFeatureDef>
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.output.adapter.http.server.feature:${carbon.analytics.common.version}
+                                </includedFeatureDef>
+                                <includedFeatureDef>
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.output.adapter.jms.server.feature:${carbon.analytics.common.version}
+                                </includedFeatureDef>
+                                <includedFeatureDef>
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.output.adapter.kafka.server.feature:${carbon.analytics.common.version}
+                                </includedFeatureDef>
+                                <includedFeatureDef>
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.output.adapter.logger.server.feature:${carbon.analytics.common.version}
+                                </includedFeatureDef>
+                                <includedFeatureDef>
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.output.adapter.rdbms.server.feature:${carbon.analytics.common.version}
+                                </includedFeatureDef>
+                                <includedFeatureDef>
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.output.adapter.soap.server.feature:${carbon.analytics.common.version}
+                                </includedFeatureDef>
+                                <includedFeatureDef>
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.output.adapter.websocket.server.feature:${carbon.analytics.common.version}
+                                </includedFeatureDef>
+                                <includedFeatureDef>
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.output.adapter.websocket.local.server.feature:${carbon.analytics.common.version}
+                                </includedFeatureDef>
+                                <includedFeatureDef>
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.output.adapter.ui.server.feature:${carbon.analytics.common.version}
+                                </includedFeatureDef>
+                                <includedFeatureDef>
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.output.adapter.wso2event.server.feature:${carbon.analytics.common.version}
+                                </includedFeatureDef>
+                                <includedFeatureDef>
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.output.adapter.mqtt.server.feature:${carbon.analytics.common.version}
+                                </includedFeatureDef>
+                                <includedFeatureDef>
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.output.adapter.sms.server.feature:${carbon.analytics.common.version}
+                                </includedFeatureDef>
+                                <includedFeatureDef>
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.output.adapter.cassandra.server.feature:${carbon.analytics.common.version}
+                                </includedFeatureDef>
+                            </includedFeatures>
+
+
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

@@ -1,0 +1,1037 @@
+
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://admin.receiver.event.carbon.wso2.org" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ax2104="http://admin.receiver.event.carbon.wso2.org/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://admin.receiver.event.carbon.wso2.org">
+    <wsdl:documentation>EventReceiverAdminService</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema xmlns:ax2105="http://admin.receiver.event.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://admin.receiver.event.carbon.wso2.org">
+            <xs:import namespace="http://admin.receiver.event.carbon.wso2.org/xsd"></xs:import>
+            <xs:element name="undeployInactiveEventReceiverConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="undeployActiveEventReceiverConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventReceiverName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setTracingEnabled">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventReceiverName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="flag" type="xs:boolean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setStatisticsEnabled">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventReceiverName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="flag" type="xs:boolean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getInputAdapterConfigurationSchema">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="adopterType" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getInputAdapterConfigurationSchemaResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2105:InputAdapterConfigurationDto"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getInactiveEventReceiverConfigurationContent">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getInactiveEventReceiverConfigurationContentResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllStreamSpecificActiveEventReceiverConfigurations">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="streamId" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllStreamSpecificActiveEventReceiverConfigurationsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2105:EventReceiverConfigurationInfoDto"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllInputAdapterTypes">
+                <xs:complexType>
+                    <xs:sequence></xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllInputAdapterTypesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllInactiveEventReceiverConfigurations">
+                <xs:complexType>
+                    <xs:sequence></xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllInactiveEventReceiverConfigurationsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2105:EventReceiverConfigurationFileDto"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllActiveEventReceiverConfigurations">
+                <xs:complexType>
+                    <xs:sequence></xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllActiveEventReceiverConfigurationsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2105:EventReceiverConfigurationInfoDto"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getActiveEventReceiverConfigurationContent">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventReceiverName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getActiveEventReceiverConfigurationContentResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getActiveEventReceiverConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventReceiverName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getActiveEventReceiverConfigurationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2105:EventReceiverConfigurationDto"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="editInactiveEventReceiverConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventReceiverConfiguration" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="editActiveEventReceiverConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventReceiverConfiguration" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="eventReceiverName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployXmlEventReceiverConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventReceiverName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="parentXpath" nillable="true" type="xs:string"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="namespaces" nillable="true" type="ax2105:EventMappingPropertyDto"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="inputMappings" nillable="true" type="ax2105:EventMappingPropertyDto"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="inputPropertyConfiguration" nillable="true" type="ax2105:BasicInputAdapterPropertyDto"></xs:element>
+                        <xs:element minOccurs="0" name="mappingEnabled" type="xs:boolean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployWso2EventReceiverConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventReceiverName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="metaData" nillable="true" type="ax2105:EventMappingPropertyDto"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="correlationData" nillable="true" type="ax2105:EventMappingPropertyDto"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="payloadData" nillable="true" type="ax2105:EventMappingPropertyDto"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="inputPropertyConfiguration" nillable="true" type="ax2105:BasicInputAdapterPropertyDto"></xs:element>
+                        <xs:element minOccurs="0" name="mappingEnabled" type="xs:boolean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployTextEventReceiverConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventReceiverName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="inputMappings" nillable="true" type="ax2105:EventMappingPropertyDto"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="inputPropertyConfiguration" nillable="true" type="ax2105:BasicInputAdapterPropertyDto"></xs:element>
+                        <xs:element minOccurs="0" name="mappingEnabled" type="xs:boolean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployMapEventReceiverConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventReceiverName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="inputMappings" nillable="true" type="ax2105:EventMappingPropertyDto"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="inputPropertyConfiguration" nillable="true" type="ax2105:BasicInputAdapterPropertyDto"></xs:element>
+                        <xs:element minOccurs="0" name="mappingEnabled" type="xs:boolean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployJsonEventReceiverConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventReceiverName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="inputMappings" nillable="true" type="ax2105:EventMappingPropertyDto"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="inputPropertyConfiguration" nillable="true" type="ax2105:BasicInputAdapterPropertyDto"></xs:element>
+                        <xs:element minOccurs="0" name="mappingEnabled" type="xs:boolean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployEventReceiverConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventReceiverConfigXml" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://admin.receiver.event.carbon.wso2.org/xsd">
+            <xs:complexType name="InputAdapterConfigurationDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="inputEventAdapterProperties" nillable="true" type="ax2104:DetailInputAdapterPropertyDto"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="supportedMessageFormats" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="DetailInputAdapterPropertyDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="defaultValue" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="displayName" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="hint" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="key" nillable="true" type="xs:string"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="options" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="required" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="secured" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="value" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="EventReceiverConfigurationInfoDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="editable" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="enableStats" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="enableTracing" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="eventReceiverName" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="inputAdapterType" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="inputStreamId" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="messageFormat" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="EventReceiverConfigurationFileDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="deploymentStatusMsg" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="eventReceiverName" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="EventReceiverConfigurationDto">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="correlationMappingPropertyDtos" nillable="true" type="ax2104:EventMappingPropertyDto"></xs:element>
+                    <xs:element minOccurs="0" name="customMappingEnabled" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="eventReceiverName" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="fromAdapterConfigurationDto" nillable="true" type="ax2104:InputAdapterConfigurationDto"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="mappingPropertyDtos" nillable="true" type="ax2104:EventMappingPropertyDto"></xs:element>
+                    <xs:element minOccurs="0" name="messageFormat" nillable="true" type="xs:string"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="metaMappingPropertyDtos" nillable="true" type="ax2104:EventMappingPropertyDto"></xs:element>
+                    <xs:element minOccurs="0" name="parentSelectorXpath" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="toStreamNameWithVersion" nillable="true" type="xs:string"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="xpathDefinitionMappingPropertyDtos" nillable="true" type="ax2104:EventMappingPropertyDto"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="EventMappingPropertyDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="defaultValue" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="valueOf" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="BasicInputAdapterPropertyDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="key" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="value" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="editInactiveEventReceiverConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:editInactiveEventReceiverConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="editInactiveEventReceiverConfigurationResponse"></wsdl:message>
+    <wsdl:message name="deployTextEventReceiverConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:deployTextEventReceiverConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deployTextEventReceiverConfigurationResponse"></wsdl:message>
+    <wsdl:message name="getAllInactiveEventReceiverConfigurationsRequest">
+        <wsdl:part name="parameters" element="ns:getAllInactiveEventReceiverConfigurations"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllInactiveEventReceiverConfigurationsResponse">
+        <wsdl:part name="parameters" element="ns:getAllInactiveEventReceiverConfigurationsResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getInactiveEventReceiverConfigurationContentRequest">
+        <wsdl:part name="parameters" element="ns:getInactiveEventReceiverConfigurationContent"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getInactiveEventReceiverConfigurationContentResponse">
+        <wsdl:part name="parameters" element="ns:getInactiveEventReceiverConfigurationContentResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="undeployActiveEventReceiverConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:undeployActiveEventReceiverConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="undeployActiveEventReceiverConfigurationResponse"></wsdl:message>
+    <wsdl:message name="getActiveEventReceiverConfigurationContentRequest">
+        <wsdl:part name="parameters" element="ns:getActiveEventReceiverConfigurationContent"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getActiveEventReceiverConfigurationContentResponse">
+        <wsdl:part name="parameters" element="ns:getActiveEventReceiverConfigurationContentResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllInputAdapterTypesRequest">
+        <wsdl:part name="parameters" element="ns:getAllInputAdapterTypes"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllInputAdapterTypesResponse">
+        <wsdl:part name="parameters" element="ns:getAllInputAdapterTypesResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getInputAdapterConfigurationSchemaRequest">
+        <wsdl:part name="parameters" element="ns:getInputAdapterConfigurationSchema"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getInputAdapterConfigurationSchemaResponse">
+        <wsdl:part name="parameters" element="ns:getInputAdapterConfigurationSchemaResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getActiveEventReceiverConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:getActiveEventReceiverConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getActiveEventReceiverConfigurationResponse">
+        <wsdl:part name="parameters" element="ns:getActiveEventReceiverConfigurationResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deployJsonEventReceiverConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:deployJsonEventReceiverConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deployJsonEventReceiverConfigurationResponse"></wsdl:message>
+    <wsdl:message name="getAllStreamSpecificActiveEventReceiverConfigurationsRequest">
+        <wsdl:part name="parameters" element="ns:getAllStreamSpecificActiveEventReceiverConfigurations"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllStreamSpecificActiveEventReceiverConfigurationsResponse">
+        <wsdl:part name="parameters" element="ns:getAllStreamSpecificActiveEventReceiverConfigurationsResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="setStatisticsEnabledRequest">
+        <wsdl:part name="parameters" element="ns:setStatisticsEnabled"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="setStatisticsEnabledResponse"></wsdl:message>
+    <wsdl:message name="editActiveEventReceiverConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:editActiveEventReceiverConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="editActiveEventReceiverConfigurationResponse"></wsdl:message>
+    <wsdl:message name="deployEventReceiverConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:deployEventReceiverConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deployEventReceiverConfigurationResponse"></wsdl:message>
+    <wsdl:message name="deployMapEventReceiverConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:deployMapEventReceiverConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deployMapEventReceiverConfigurationResponse"></wsdl:message>
+    <wsdl:message name="getAllActiveEventReceiverConfigurationsRequest">
+        <wsdl:part name="parameters" element="ns:getAllActiveEventReceiverConfigurations"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllActiveEventReceiverConfigurationsResponse">
+        <wsdl:part name="parameters" element="ns:getAllActiveEventReceiverConfigurationsResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deployWso2EventReceiverConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:deployWso2EventReceiverConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deployWso2EventReceiverConfigurationResponse"></wsdl:message>
+    <wsdl:message name="setTracingEnabledRequest">
+        <wsdl:part name="parameters" element="ns:setTracingEnabled"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="setTracingEnabledResponse"></wsdl:message>
+    <wsdl:message name="deployXmlEventReceiverConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:deployXmlEventReceiverConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deployXmlEventReceiverConfigurationResponse"></wsdl:message>
+    <wsdl:message name="undeployInactiveEventReceiverConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:undeployInactiveEventReceiverConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="undeployInactiveEventReceiverConfigurationResponse"></wsdl:message>
+    <wsdl:portType name="EventReceiverAdminServicePortType">
+        <wsdl:operation name="editInactiveEventReceiverConfiguration">
+            <wsdl:input message="ns:editInactiveEventReceiverConfigurationRequest" wsaw:Action="urn:editInactiveEventReceiverConfiguration"></wsdl:input>
+            <wsdl:output message="ns:editInactiveEventReceiverConfigurationResponse" wsaw:Action="urn:editInactiveEventReceiverConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployTextEventReceiverConfiguration">
+            <wsdl:input message="ns:deployTextEventReceiverConfigurationRequest" wsaw:Action="urn:deployTextEventReceiverConfiguration"></wsdl:input>
+            <wsdl:output message="ns:deployTextEventReceiverConfigurationResponse" wsaw:Action="urn:deployTextEventReceiverConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllInactiveEventReceiverConfigurations">
+            <wsdl:input message="ns:getAllInactiveEventReceiverConfigurationsRequest" wsaw:Action="urn:getAllInactiveEventReceiverConfigurations"></wsdl:input>
+            <wsdl:output message="ns:getAllInactiveEventReceiverConfigurationsResponse" wsaw:Action="urn:getAllInactiveEventReceiverConfigurationsResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getInactiveEventReceiverConfigurationContent">
+            <wsdl:input message="ns:getInactiveEventReceiverConfigurationContentRequest" wsaw:Action="urn:getInactiveEventReceiverConfigurationContent"></wsdl:input>
+            <wsdl:output message="ns:getInactiveEventReceiverConfigurationContentResponse" wsaw:Action="urn:getInactiveEventReceiverConfigurationContentResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployActiveEventReceiverConfiguration">
+            <wsdl:input message="ns:undeployActiveEventReceiverConfigurationRequest" wsaw:Action="urn:undeployActiveEventReceiverConfiguration"></wsdl:input>
+            <wsdl:output message="ns:undeployActiveEventReceiverConfigurationResponse" wsaw:Action="urn:undeployActiveEventReceiverConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveEventReceiverConfigurationContent">
+            <wsdl:input message="ns:getActiveEventReceiverConfigurationContentRequest" wsaw:Action="urn:getActiveEventReceiverConfigurationContent"></wsdl:input>
+            <wsdl:output message="ns:getActiveEventReceiverConfigurationContentResponse" wsaw:Action="urn:getActiveEventReceiverConfigurationContentResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllInputAdapterTypes">
+            <wsdl:input message="ns:getAllInputAdapterTypesRequest" wsaw:Action="urn:getAllInputAdapterTypes"></wsdl:input>
+            <wsdl:output message="ns:getAllInputAdapterTypesResponse" wsaw:Action="urn:getAllInputAdapterTypesResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getInputAdapterConfigurationSchema">
+            <wsdl:input message="ns:getInputAdapterConfigurationSchemaRequest" wsaw:Action="urn:getInputAdapterConfigurationSchema"></wsdl:input>
+            <wsdl:output message="ns:getInputAdapterConfigurationSchemaResponse" wsaw:Action="urn:getInputAdapterConfigurationSchemaResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveEventReceiverConfiguration">
+            <wsdl:input message="ns:getActiveEventReceiverConfigurationRequest" wsaw:Action="urn:getActiveEventReceiverConfiguration"></wsdl:input>
+            <wsdl:output message="ns:getActiveEventReceiverConfigurationResponse" wsaw:Action="urn:getActiveEventReceiverConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployJsonEventReceiverConfiguration">
+            <wsdl:input message="ns:deployJsonEventReceiverConfigurationRequest" wsaw:Action="urn:deployJsonEventReceiverConfiguration"></wsdl:input>
+            <wsdl:output message="ns:deployJsonEventReceiverConfigurationResponse" wsaw:Action="urn:deployJsonEventReceiverConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllStreamSpecificActiveEventReceiverConfigurations">
+            <wsdl:input message="ns:getAllStreamSpecificActiveEventReceiverConfigurationsRequest" wsaw:Action="urn:getAllStreamSpecificActiveEventReceiverConfigurations"></wsdl:input>
+            <wsdl:output message="ns:getAllStreamSpecificActiveEventReceiverConfigurationsResponse" wsaw:Action="urn:getAllStreamSpecificActiveEventReceiverConfigurationsResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setStatisticsEnabled">
+            <wsdl:input message="ns:setStatisticsEnabledRequest" wsaw:Action="urn:setStatisticsEnabled"></wsdl:input>
+            <wsdl:output message="ns:setStatisticsEnabledResponse" wsaw:Action="urn:setStatisticsEnabledResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editActiveEventReceiverConfiguration">
+            <wsdl:input message="ns:editActiveEventReceiverConfigurationRequest" wsaw:Action="urn:editActiveEventReceiverConfiguration"></wsdl:input>
+            <wsdl:output message="ns:editActiveEventReceiverConfigurationResponse" wsaw:Action="urn:editActiveEventReceiverConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployEventReceiverConfiguration">
+            <wsdl:input message="ns:deployEventReceiverConfigurationRequest" wsaw:Action="urn:deployEventReceiverConfiguration"></wsdl:input>
+            <wsdl:output message="ns:deployEventReceiverConfigurationResponse" wsaw:Action="urn:deployEventReceiverConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployMapEventReceiverConfiguration">
+            <wsdl:input message="ns:deployMapEventReceiverConfigurationRequest" wsaw:Action="urn:deployMapEventReceiverConfiguration"></wsdl:input>
+            <wsdl:output message="ns:deployMapEventReceiverConfigurationResponse" wsaw:Action="urn:deployMapEventReceiverConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllActiveEventReceiverConfigurations">
+            <wsdl:input message="ns:getAllActiveEventReceiverConfigurationsRequest" wsaw:Action="urn:getAllActiveEventReceiverConfigurations"></wsdl:input>
+            <wsdl:output message="ns:getAllActiveEventReceiverConfigurationsResponse" wsaw:Action="urn:getAllActiveEventReceiverConfigurationsResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployWso2EventReceiverConfiguration">
+            <wsdl:input message="ns:deployWso2EventReceiverConfigurationRequest" wsaw:Action="urn:deployWso2EventReceiverConfiguration"></wsdl:input>
+            <wsdl:output message="ns:deployWso2EventReceiverConfigurationResponse" wsaw:Action="urn:deployWso2EventReceiverConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setTracingEnabled">
+            <wsdl:input message="ns:setTracingEnabledRequest" wsaw:Action="urn:setTracingEnabled"></wsdl:input>
+            <wsdl:output message="ns:setTracingEnabledResponse" wsaw:Action="urn:setTracingEnabledResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployXmlEventReceiverConfiguration">
+            <wsdl:input message="ns:deployXmlEventReceiverConfigurationRequest" wsaw:Action="urn:deployXmlEventReceiverConfiguration"></wsdl:input>
+            <wsdl:output message="ns:deployXmlEventReceiverConfigurationResponse" wsaw:Action="urn:deployXmlEventReceiverConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployInactiveEventReceiverConfiguration">
+            <wsdl:input message="ns:undeployInactiveEventReceiverConfigurationRequest" wsaw:Action="urn:undeployInactiveEventReceiverConfiguration"></wsdl:input>
+            <wsdl:output message="ns:undeployInactiveEventReceiverConfigurationResponse" wsaw:Action="urn:undeployInactiveEventReceiverConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="EventReceiverAdminServiceSoap11Binding" type="ns:EventReceiverAdminServicePortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"></soap:binding>
+        <wsdl:operation name="editInactiveEventReceiverConfiguration">
+            <soap:operation soapAction="urn:editInactiveEventReceiverConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployTextEventReceiverConfiguration">
+            <soap:operation soapAction="urn:deployTextEventReceiverConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllInactiveEventReceiverConfigurations">
+            <soap:operation soapAction="urn:getAllInactiveEventReceiverConfigurations" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getInactiveEventReceiverConfigurationContent">
+            <soap:operation soapAction="urn:getInactiveEventReceiverConfigurationContent" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployActiveEventReceiverConfiguration">
+            <soap:operation soapAction="urn:undeployActiveEventReceiverConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveEventReceiverConfigurationContent">
+            <soap:operation soapAction="urn:getActiveEventReceiverConfigurationContent" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllInputAdapterTypes">
+            <soap:operation soapAction="urn:getAllInputAdapterTypes" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getInputAdapterConfigurationSchema">
+            <soap:operation soapAction="urn:getInputAdapterConfigurationSchema" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveEventReceiverConfiguration">
+            <soap:operation soapAction="urn:getActiveEventReceiverConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setStatisticsEnabled">
+            <soap:operation soapAction="urn:setStatisticsEnabled" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editActiveEventReceiverConfiguration">
+            <soap:operation soapAction="urn:editActiveEventReceiverConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployJsonEventReceiverConfiguration">
+            <soap:operation soapAction="urn:deployJsonEventReceiverConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllStreamSpecificActiveEventReceiverConfigurations">
+            <soap:operation soapAction="urn:getAllStreamSpecificActiveEventReceiverConfigurations" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployEventReceiverConfiguration">
+            <soap:operation soapAction="urn:deployEventReceiverConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployMapEventReceiverConfiguration">
+            <soap:operation soapAction="urn:deployMapEventReceiverConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployWso2EventReceiverConfiguration">
+            <soap:operation soapAction="urn:deployWso2EventReceiverConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllActiveEventReceiverConfigurations">
+            <soap:operation soapAction="urn:getAllActiveEventReceiverConfigurations" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setTracingEnabled">
+            <soap:operation soapAction="urn:setTracingEnabled" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployInactiveEventReceiverConfiguration">
+            <soap:operation soapAction="urn:undeployInactiveEventReceiverConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployXmlEventReceiverConfiguration">
+            <soap:operation soapAction="urn:deployXmlEventReceiverConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="EventReceiverAdminServiceSoap12Binding" type="ns:EventReceiverAdminServicePortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"></soap12:binding>
+        <wsdl:operation name="editInactiveEventReceiverConfiguration">
+            <soap12:operation soapAction="urn:editInactiveEventReceiverConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployTextEventReceiverConfiguration">
+            <soap12:operation soapAction="urn:deployTextEventReceiverConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllInactiveEventReceiverConfigurations">
+            <soap12:operation soapAction="urn:getAllInactiveEventReceiverConfigurations" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getInactiveEventReceiverConfigurationContent">
+            <soap12:operation soapAction="urn:getInactiveEventReceiverConfigurationContent" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployActiveEventReceiverConfiguration">
+            <soap12:operation soapAction="urn:undeployActiveEventReceiverConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveEventReceiverConfigurationContent">
+            <soap12:operation soapAction="urn:getActiveEventReceiverConfigurationContent" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllInputAdapterTypes">
+            <soap12:operation soapAction="urn:getAllInputAdapterTypes" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getInputAdapterConfigurationSchema">
+            <soap12:operation soapAction="urn:getInputAdapterConfigurationSchema" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveEventReceiverConfiguration">
+            <soap12:operation soapAction="urn:getActiveEventReceiverConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setStatisticsEnabled">
+            <soap12:operation soapAction="urn:setStatisticsEnabled" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editActiveEventReceiverConfiguration">
+            <soap12:operation soapAction="urn:editActiveEventReceiverConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployJsonEventReceiverConfiguration">
+            <soap12:operation soapAction="urn:deployJsonEventReceiverConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllStreamSpecificActiveEventReceiverConfigurations">
+            <soap12:operation soapAction="urn:getAllStreamSpecificActiveEventReceiverConfigurations" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployEventReceiverConfiguration">
+            <soap12:operation soapAction="urn:deployEventReceiverConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployMapEventReceiverConfiguration">
+            <soap12:operation soapAction="urn:deployMapEventReceiverConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployWso2EventReceiverConfiguration">
+            <soap12:operation soapAction="urn:deployWso2EventReceiverConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllActiveEventReceiverConfigurations">
+            <soap12:operation soapAction="urn:getAllActiveEventReceiverConfigurations" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setTracingEnabled">
+            <soap12:operation soapAction="urn:setTracingEnabled" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployInactiveEventReceiverConfiguration">
+            <soap12:operation soapAction="urn:undeployInactiveEventReceiverConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployXmlEventReceiverConfiguration">
+            <soap12:operation soapAction="urn:deployXmlEventReceiverConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="EventReceiverAdminServiceHttpBinding" type="ns:EventReceiverAdminServicePortType">
+        <http:binding verb="POST"></http:binding>
+        <wsdl:operation name="editInactiveEventReceiverConfiguration">
+            <http:operation location="editInactiveEventReceiverConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployTextEventReceiverConfiguration">
+            <http:operation location="deployTextEventReceiverConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllInactiveEventReceiverConfigurations">
+            <http:operation location="getAllInactiveEventReceiverConfigurations"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getInactiveEventReceiverConfigurationContent">
+            <http:operation location="getInactiveEventReceiverConfigurationContent"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployActiveEventReceiverConfiguration">
+            <http:operation location="undeployActiveEventReceiverConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveEventReceiverConfigurationContent">
+            <http:operation location="getActiveEventReceiverConfigurationContent"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllInputAdapterTypes">
+            <http:operation location="getAllInputAdapterTypes"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getInputAdapterConfigurationSchema">
+            <http:operation location="getInputAdapterConfigurationSchema"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveEventReceiverConfiguration">
+            <http:operation location="getActiveEventReceiverConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setStatisticsEnabled">
+            <http:operation location="setStatisticsEnabled"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editActiveEventReceiverConfiguration">
+            <http:operation location="editActiveEventReceiverConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployJsonEventReceiverConfiguration">
+            <http:operation location="deployJsonEventReceiverConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllStreamSpecificActiveEventReceiverConfigurations">
+            <http:operation location="getAllStreamSpecificActiveEventReceiverConfigurations"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployEventReceiverConfiguration">
+            <http:operation location="deployEventReceiverConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployMapEventReceiverConfiguration">
+            <http:operation location="deployMapEventReceiverConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployWso2EventReceiverConfiguration">
+            <http:operation location="deployWso2EventReceiverConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllActiveEventReceiverConfigurations">
+            <http:operation location="getAllActiveEventReceiverConfigurations"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setTracingEnabled">
+            <http:operation location="setTracingEnabled"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployInactiveEventReceiverConfiguration">
+            <http:operation location="undeployInactiveEventReceiverConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployXmlEventReceiverConfiguration">
+            <http:operation location="deployXmlEventReceiverConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="EventReceiverAdminService">
+        <wsdl:port name="EventReceiverAdminServiceHttpsSoap11Endpoint" binding="ns:EventReceiverAdminServiceSoap11Binding">
+            <soap:address location="https://192.168.1.6:9443/services/EventReceiverAdminService.EventReceiverAdminServiceHttpsSoap11Endpoint/"></soap:address>
+        </wsdl:port>
+        <wsdl:port name="EventReceiverAdminServiceHttpsSoap12Endpoint" binding="ns:EventReceiverAdminServiceSoap12Binding">
+            <soap12:address location="https://192.168.1.6:9443/services/EventReceiverAdminService.EventReceiverAdminServiceHttpsSoap12Endpoint/"></soap12:address>
+        </wsdl:port>
+        <wsdl:port name="EventReceiverAdminServiceHttpsEndpoint" binding="ns:EventReceiverAdminServiceHttpBinding">
+            <http:address location="https://192.168.1.6:9443/services/EventReceiverAdminService.EventReceiverAdminServiceHttpsEndpoint/"></http:address>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

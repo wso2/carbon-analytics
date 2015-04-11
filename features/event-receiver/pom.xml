@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~
+  ~ WSO2 Inc. licenses this file to you under the Apache License,
+  ~ Version 2.0 (the "License"); you may not use this file except
+  ~ in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <parent>
+        <artifactId>carbon-analytics-common</artifactId>
+        <groupId>org.wso2.carbon.analytics-common</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>event-receiver-feature</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>WSO2 Carbon - Event Receiver Aggregate Feature</name>
+    <url>http://maven.apache.org</url>
+
+
+    <modules>
+        <module>org.wso2.carbon.event.receiver.feature</module>
+        <module>org.wso2.carbon.event.receiver.ui.feature</module>
+        <module>org.wso2.carbon.event.receiver.server.feature</module>
+        <module>org.wso2.carbon.event.input.adapter.server.feature</module>
+        <module>org.wso2.carbon.event.input.adapter.http.server.feature</module>
+        <module>org.wso2.carbon.event.input.adapter.soap.server.feature</module>
+        <module>org.wso2.carbon.event.input.adapter.websocket.server.feature</module>
+        <module>org.wso2.carbon.event.input.adapter.websocket.local.server.feature</module>
+        <module>org.wso2.carbon.event.input.adapter.file.server.feature</module>
+        <module>org.wso2.carbon.event.input.adapter.email.server.feature</module>
+        <module>org.wso2.carbon.event.input.adapter.jms.server.feature</module>
+        <module>org.wso2.carbon.event.input.adapter.kafka.server.feature</module>
+        <module>org.wso2.carbon.event.input.adapter.mqtt.server.feature</module>
+        <module>org.wso2.carbon.event.input.adapter.wso2event.server.feature</module>
+        <module>org.wso2.carbon.event.input.adapter.feature</module>
+
+    </modules>
+
+
+</project>
