@@ -43,21 +43,21 @@ public class SMSEventAdapterFactory extends OutputEventAdapterFactory {
 
     @Override
     public List<Property> getStaticPropertyList() {
-        List<Property> staticPropertyList = new ArrayList<Property>();
+        return null;
+    }
+
+    @Override
+    public List<Property> getDynamicPropertyList() {
+        List<Property> dynamicPropertyList = new ArrayList<Property>();
 
         Property phoneNo = new Property(SMSEventAdapterConstants.ADAPTER_MESSAGE_SMS_NO);
         phoneNo.setDisplayName(
                 resourceBundle.getString(SMSEventAdapterConstants.ADAPTER_MESSAGE_SMS_NO));
         phoneNo.setHint(resourceBundle.getString(SMSEventAdapterConstants.ADAPTER_CONF_SMS_HINT_NO));
         phoneNo.setRequired(true);
-        staticPropertyList.add(phoneNo);
+        dynamicPropertyList.add(phoneNo);
 
-        return staticPropertyList;
-    }
-
-    @Override
-    public List<Property> getDynamicPropertyList() {
-        return null;
+        return dynamicPropertyList;
     }
 
     @Override

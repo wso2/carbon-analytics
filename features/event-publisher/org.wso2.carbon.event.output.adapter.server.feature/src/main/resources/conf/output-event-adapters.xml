@@ -15,9 +15,34 @@
 
 <outputEventAdaptersConfig>
 
-    <!--<adapterConfig type="adapterType">-->
-        <!--<property key="globalProprtyName1">value1</property>-->
-        <!--<property key="globalProprtyName2">value2</property>-->
-    <!--</adapterConfig>-->
+    <adapterConfig type="rdbms">
+        <property key="string">VARCHAR(255)</property>
+        <property key="double">DOUBLE</property>
+        <property key="integer">INT</property>
+        <property key="long">BIGINT</property>
+        <property key="float">FLOAT</property>
+        <property key="boolean">BOOL</property>
+        <property key="createTable">CREATE TABLE $TABLE_NAME ($COLUMN_TYPES)</property>
+        <property key="insertDataToTable">INSERT INTO $TABLE_NAME ($COLUMNS) VALUES ($VALUES)</property>
+        <property key="isTableExist">SELECT * FROM $TABLE_NAME limit 1</property>
+        <property key="updateTableRow">UPDATE $TABLE_NAME SET $COLUMN_VALUES WHERE $CONDITION</property>
+        <property key="comma">,</property>
+        <property key="questionMark">?</property>
+        <property key="equal">=</property>
+        <property key="and">AND</property>
+        <property key="selectAllColumnsDataTypeInTable">SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '$TABLE_NAME'</property>
+        <property key="selectFromTable">SELECT $COLUMNS FROM $TABLE_NAME</property>
+        <property key="oracle.string">varchar2(255)</property>
+        <property key="oracle.long">CLOB</property>
+        <property key="oracle.double">BINARY_DOUBLE</property>
+        <property key="oracle.isTableExist">SELECT * FROM $TABLE_NAME WHERE ROWNUM = 1</property>
+        <property key="oracle.selectAllColumnsDataTypeInTable">SELECT COLUMN_NAME, DATA_TYPE FROM USER_TAB_COLS WHERE TABLE_NAME = '$TABLE_NAME'</property>
+        <property key="mssql.string">varchar2(255)</property>
+        <property key="mssql.isTableExist">SELECT TOP 1 * FROM $TABLE_NAME</property>
+        <property key="mssql.selectAllColumnsDataTypeInTable">SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '$TABLE_NAME'</property>
+        <property key="h2.integer">varchar2(255)</property>
+        <property key="h2.long">REAL</property>
+        <property key="h2.selectAllColumnsDataTypeInTable">SHOW COLUMNS FROM $TABLE_NAME</property>
+    </adapterConfig>
 
 </outputEventAdaptersConfig>

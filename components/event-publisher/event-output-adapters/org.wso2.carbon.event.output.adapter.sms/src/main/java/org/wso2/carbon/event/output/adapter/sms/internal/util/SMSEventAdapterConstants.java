@@ -26,4 +26,11 @@ public final class SMSEventAdapterConstants {
 
     public static final String ADAPTER_MESSAGE_SMS_NO = "sms.no";
     public static final String ADAPTER_CONF_SMS_HINT_NO = "sms.no.default.hint";
+    public static final String MIN_THREAD_NAME = "minThread";
+    public static final String MAX_THREAD_NAME = "maxThread";
+    public static final String DEFAULT_KEEP_ALIVE_TIME_NAME = "defaultKeepAliveTime";
+    public static final int MIN_THREAD = 8;
+    public static final int MAX_THREAD = 100;
+    public static final long DEFAULT_KEEP_ALIVE_TIME = 20;
+    public static final String SMS_SEPARATOR =  ",";
 }
