@@ -37,23 +37,15 @@ import java.util.Map;
  */
 public class MySQLInnoDBAnalyticsFileSystemTest extends AnalyticsFileSystemTest {
 
-    private AnalyticsFileSystem afs;
-    
-    public MySQLInnoDBAnalyticsFileSystemTest() {
-        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf");
-    }
-
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException, IOException {
-        this.afs = new RDBMSAnalyticsFileSystem();
+        GenericUtils.clearGlobalCustomDataSourceRepo();
+        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf3");
+        AnalyticsFileSystem afs = new RDBMSAnalyticsFileSystem();
         Map<String, String> props = new HashMap<String, String>();
         props.put("datasource", "WSO2_ANALYTICS_FS_DB");
-        this.afs.init(props);
-        this.init("MySQLDBAnalyticsDataSource", this.afs);
-    }
-    
-    public AnalyticsFileSystem getAFS() {
-        return this.afs;
+        afs.init(props);
+        this.init("MySQLDBAnalyticsDataSource", afs);
     }
     
     @AfterClass

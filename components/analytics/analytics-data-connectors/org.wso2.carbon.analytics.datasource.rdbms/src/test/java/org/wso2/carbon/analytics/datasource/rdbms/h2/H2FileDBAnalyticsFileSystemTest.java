@@ -36,22 +36,16 @@ import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsFileSystem;
  * H2 implementation of analytics file system tests.
  */
 public class H2FileDBAnalyticsFileSystemTest extends AnalyticsFileSystemTest {
-        
-    private AnalyticsFileSystem afs;
-    
+            
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException, IOException {
         GenericUtils.clearGlobalCustomDataSourceRepo();
         System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");        
-        this.afs = new RDBMSAnalyticsFileSystem();
+        AnalyticsFileSystem afs = new RDBMSAnalyticsFileSystem();
         Map<String, String> props = new HashMap<String, String>();
         props.put("datasource", "WSO2_ANALYTICS_FS_DB");
-        this.afs.init(props);
-        this.init("H2FileDBAnalyticsDataSource", this.afs);
-    }
-    
-    public AnalyticsFileSystem getAFS() {
-        return this.afs;
+        afs.init(props);
+        this.init("H2FileDBAnalyticsDataSource", afs);
     }
     
     @AfterClass

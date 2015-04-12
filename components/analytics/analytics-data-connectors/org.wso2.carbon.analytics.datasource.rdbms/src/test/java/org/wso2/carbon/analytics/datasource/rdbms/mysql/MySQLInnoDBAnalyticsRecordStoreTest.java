@@ -35,24 +35,16 @@ import java.util.Map;
  * MySQL implementation of analytics record store tests.
  */
 public class MySQLInnoDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
-
-    private AnalyticsRecordStore ars;
-    
-    public MySQLInnoDBAnalyticsRecordStoreTest() {
-        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf");
-    }
         
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException {
-        this.ars = new RDBMSAnalyticsRecordStore();
+        GenericUtils.clearGlobalCustomDataSourceRepo();
+        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf3");
+        AnalyticsRecordStore ars = new RDBMSAnalyticsRecordStore();
         Map<String, String> props = new HashMap<String, String>();
         props.put("datasource", "WSO2_ANALYTICS_RS_DB");
-        this.ars.init(props);
+        ars.init(props);
         this.init("MySQLDBAnalyticsDataSource", ars);
-    }
-    
-    public AnalyticsRecordStore getARS() {
-        return this.ars;
     }
     
     @AfterClass

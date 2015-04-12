@@ -35,22 +35,16 @@ import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore;
  * H2 implementation of analytics record store tests.
  */
 public class H2FileDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
-        
-    private AnalyticsRecordStore ars;
-        
+                
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException {
         GenericUtils.clearGlobalCustomDataSourceRepo();
         System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");
-        this.ars = new RDBMSAnalyticsRecordStore();
+        AnalyticsRecordStore ars = new RDBMSAnalyticsRecordStore();
         Map<String, String> props = new HashMap<String, String>();
         props.put("datasource", "WSO2_ANALYTICS_RS_DB");
-        this.ars.init(props);
-        this.init("H2FileDBAnalyticsDataSource", this.ars);
-    }
-    
-    public AnalyticsRecordStore getARS() {
-        return this.ars;
+        ars.init(props);
+        this.init("H2FileDBAnalyticsDataSource", ars);
     }
     
     @AfterClass
