@@ -73,10 +73,6 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         this.rdbmsQueryConfigurationEntry = null;
     }
     
-    public RDBMSAnalyticsRecordStore(RDBMSQueryConfigurationEntry rdbmsQueryConfigurationEntry) {
-        this.rdbmsQueryConfigurationEntry = rdbmsQueryConfigurationEntry;
-    }
-    
     @Override
     public void init(Map<String, String> properties)
             throws AnalyticsException {

@@ -28,6 +28,7 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceImpl;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerImpl;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 /**
  * Standalone test implementation of {@link AnalyticsDataServiceTest}.
@@ -36,6 +37,8 @@ public class AnalyticsDataServiceStandaloneTest extends AnalyticsDataServiceTest
     
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException, IOException {
+        GenericUtils.clearGlobalCustomDataSourceRepo();
+        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");
         AnalyticsServiceHolder.setHazelcastInstance(null);
         AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
         this.init(new AnalyticsDataServiceImpl());

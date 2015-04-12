@@ -5,32 +5,13 @@
     </providers>
 
     <datasources>
-     
+        
         <datasource>
-            <name>WSO2_ANALYTICS_FS_DB</name>
+            <name>WSO2_ANALYTICS_FS_DB_MEM</name>
             <description>The datasource used for analytics file system</description>
             <definition type="RDBMS">
                 <configuration>
-                    <url>jdbc:h2:./target/ANALYTICS_FS_DB;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000</url>
-                    <username>wso2carbon</username>
-                    <password>wso2carbon</password>
-                    <driverClassName>org.h2.Driver</driverClassName>
-                    <maxActive>50</maxActive>
-                    <maxWait>60000</maxWait>
-                    <testOnBorrow>true</testOnBorrow>
-                    <validationQuery>SELECT 1</validationQuery>
-                    <validationInterval>30000</validationInterval>
-                    <defaultAutoCommit>false</defaultAutoCommit>
-                </configuration>
-            </definition>
-        </datasource>
-
-        <datasource>
-            <name>WSO2_ANALYTICS_RS_DB</name>
-            <description>The datasource used for analytics record store</description>
-            <definition type="RDBMS">
-                <configuration>
-                    <url>jdbc:h2:./target/ANALYTICS_RS_DB;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000</url>
+                    <url>jdbc:h2:mem:bam_test_afs_db</url>
                     <username>wso2carbon</username>
                     <password>wso2carbon</password>
                     <driverClassName>org.h2.Driver</driverClassName>
@@ -44,6 +25,25 @@
             </definition>
         </datasource>
         
+        <datasource>
+            <name>WSO2_ANALYTICS_RS_DB_MEM</name>
+            <description>The datasource used for analytics record store</description>
+            <definition type="RDBMS">
+                <configuration>
+                    <url>jdbc:h2:mem:bam_test_ars_db</url>
+                    <username>wso2carbon</username>
+                    <password>wso2carbon</password>
+                    <driverClassName>org.h2.Driver</driverClassName>
+                    <maxActive>50</maxActive>
+                    <maxWait>60000</maxWait>
+                    <testOnBorrow>true</testOnBorrow>
+                    <validationQuery>SELECT 1</validationQuery>
+                    <validationInterval>30000</validationInterval>
+                    <defaultAutoCommit>false</defaultAutoCommit>
+                </configuration>
+            </definition>
+        </datasource>
+
     </datasources>
 
 </datasources-configuration>

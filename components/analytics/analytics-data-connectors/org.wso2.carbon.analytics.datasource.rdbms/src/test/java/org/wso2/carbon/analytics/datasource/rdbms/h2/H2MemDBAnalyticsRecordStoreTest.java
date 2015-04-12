@@ -30,7 +30,6 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore;
-import org.wso2.carbon.analytics.datasource.rdbms.RDBMSQueryConfigurationEntry;
 
 /**
  * H2 implementation of analytics data source tests.
@@ -39,18 +38,15 @@ public class H2MemDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
     
     private AnalyticsRecordStore ars;
     
-    public H2MemDBAnalyticsRecordStoreTest() {
-        GenericUtils.clearGlobalCustomDataSourceRepo();
-        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");
-    }
-    
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException {
-        this.ars = new RDBMSAnalyticsRecordStore(this.generateQueryConfiguration());
+        GenericUtils.clearGlobalCustomDataSourceRepo();
+        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf2");        
+        this.ars = new RDBMSAnalyticsRecordStore();
         Map<String, String> props = new HashMap<String, String>();
         props.put("datasource", "WSO2_ANALYTICS_RS_DB_MEM");
         this.ars.init(props);
-        this.init("H2InMemoryDBAnalyticsDataSource", ars);
+        this.init("H2InMemoryDBAnalyticsDataSource", this.ars);
     }
     
     public AnalyticsRecordStore getARS() {
@@ -60,37 +56,6 @@ public class H2MemDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
     @AfterClass
     public void destroy() throws AnalyticsException {
         this.cleanup();
-    }
-
-    private RDBMSQueryConfigurationEntry generateQueryConfiguration() {
-        RDBMSQueryConfigurationEntry conf = new RDBMSQueryConfigurationEntry();
-        String[] recordMetaTableInitQueries = new String[1];
-        recordMetaTableInitQueries[0] = "CREATE TABLE AN_TABLE_META (tenantId INTEGER, tableName VARCHAR(256), tableSchema BINARY, PRIMARY KEY(tenantId, tableName))";
-        conf.setRecordMetaTableInitQueries(recordMetaTableInitQueries);
-        conf.setRecordMetaTableSelectQuery("SELECT tableSchema FROM AN_TABLE_META WHERE tenantId = ? AND tableName = ?");
-        conf.setRecordMetaTablesSelectByTenantQuery("SELECT tableName FROM AN_TABLE_META WHERE tenantId = ?");
-        conf.setRecordMetaTableInsertQuery("INSERT INTO AN_TABLE_META (tenantId, tableName) VALUES (?, ?)");
-        conf.setRecordMetaTableUpdateQuery("UPDATE AN_TABLE_META SET tableSchema = ? WHERE tenantId = ? AND tableName = ?");
-        conf.setRecordMetaTableDeleteQuery("DELETE AN_TABLE_META WHERE tenantId = ? AND tableName = ?");
-        conf.setRecordMetaTableCheckQuery("SELECT * FROM AN_TABLE_META WHERE tenantId = -1 AND tableName = '_X_'");
-        String[] recordTableInitQueries = new String[2];
-        recordTableInitQueries[0] = "CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data BLOB, PRIMARY KEY(record_id))";
-        recordTableInitQueries[1] = "CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)";
-        String[] recordTableDeleteQueries = new String[2];
-        recordTableDeleteQueries[0] = "DROP TABLE IF EXISTS {{TABLE_NAME}}";
-        recordTableDeleteQueries[1] = "DROP INDEX IF EXISTS {{TABLE_NAME}}_TIMESTAMP";        
-        conf.setRecordTableInitQueries(recordTableInitQueries);
-        conf.setRecordTableDeleteQueries(recordTableDeleteQueries);
-        conf.setRecordMergeQuery("MERGE INTO {{TABLE_NAME}} (timestamp, data, record_id) KEY (record_id) VALUES (?, ?, ?)");
-        conf.setRecordRetrievalQuery("SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE timestamp >= ? AND timestamp < ? LIMIT ?,?");
-        conf.setRecordRetrievalWithIdsQuery("SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})");
-        conf.setRecordDeletionWithIdsQuery("DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})");
-        conf.setRecordDeletionQuery("DELETE FROM {{TABLE_NAME}} WHERE timestamp >= ? AND timestamp < ?");
-        conf.setRecordCountQuery("SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp >= ? AND timestamp < ?");
-        conf.setPaginationFirstZeroIndexed(true);
-        conf.setPaginationFirstInclusive(true);
-        conf.setPaginationSecondLength(true);
-        return conf;
     }
     
 }

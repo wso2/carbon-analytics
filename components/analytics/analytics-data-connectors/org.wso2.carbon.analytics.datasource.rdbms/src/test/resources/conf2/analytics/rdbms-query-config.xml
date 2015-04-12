@@ -9,7 +9,8 @@
         <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
         <recordDeletionQuery>DELETE FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordDeletionQuery>
         <recordDeletionWithIdsQuery>DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordDeletionWithIdsQuery>
-        <recordMergeQuery>MERGE INTO {{TABLE_NAME}} (timestamp, data, record_id) KEY (record_id) VALUES (?, ?, ?)</recordMergeQuery>
+        <recordInsertQuery>INSERT INTO {{TABLE_NAME}} (timestamp, data, record_id) VALUES (?, ?, ?)</recordInsertQuery>
+        <recordUpdateQuery>UPDATE {{TABLE_NAME}} SET timestamp = ?, data = ? WHERE record_id = ?</recordUpdateQuery>
         <recordRetrievalQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ? LIMIT ?,?</recordRetrievalQuery>
         <recordRetrievalWithIdsQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordRetrievalWithIdsQuery>
         <recordTableDeleteQueries>

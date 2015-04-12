@@ -39,13 +39,10 @@ public class H2FileDBAnalyticsFileSystemTest extends AnalyticsFileSystemTest {
         
     private AnalyticsFileSystem afs;
     
-    public H2FileDBAnalyticsFileSystemTest() {
-        GenericUtils.clearGlobalCustomDataSourceRepo();
-        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");
-    }
-
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException, IOException {
+        GenericUtils.clearGlobalCustomDataSourceRepo();
+        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");        
         this.afs = new RDBMSAnalyticsFileSystem();
         Map<String, String> props = new HashMap<String, String>();
         props.put("datasource", "WSO2_ANALYTICS_FS_DB");

@@ -38,17 +38,14 @@ import org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsFileSystem;
 public class H2MemDBAnalyticsFileSystemTest extends AnalyticsFileSystemTest {
     
     private AnalyticsFileSystem afs;
-
-    public H2MemDBAnalyticsFileSystemTest() {
-        GenericUtils.clearGlobalCustomDataSourceRepo();
-        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");
-    }
     
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException, IOException {
+        GenericUtils.clearGlobalCustomDataSourceRepo();
+        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf2");        
         this.afs = new RDBMSAnalyticsFileSystem();
         Map<String, String> props = new HashMap<String, String>();
-        props.put("datasource", "WSO2_ANALYTICS_FS_DB");
+        props.put("datasource", "WSO2_ANALYTICS_FS_DB_MEM");
         this.afs.init(props);
         this.init("H2InMemoryDBAnalyticsDataSource", this.afs);
     }

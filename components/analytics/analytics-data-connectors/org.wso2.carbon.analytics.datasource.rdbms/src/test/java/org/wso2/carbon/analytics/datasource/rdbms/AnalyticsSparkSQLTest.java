@@ -46,13 +46,10 @@ public class AnalyticsSparkSQLTest {
 
     private AnalyticsDataService service;
     
-    public AnalyticsSparkSQLTest() {
-        GenericUtils.clearGlobalCustomDataSourceRepo();
-        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");
-    }
-    
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException, IOException {
+        GenericUtils.clearGlobalCustomDataSourceRepo();
+        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");
         AnalyticsServiceHolder.setHazelcastInstance(null);
         AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
         this.service = new AnalyticsDataServiceImpl();
