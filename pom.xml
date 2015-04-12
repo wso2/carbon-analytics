@@ -37,10 +37,16 @@
         <module>components/data-bridge</module>
         <module>components/event-stream</module>
         <module>components/application-deployer</module>
+        <module>components/event-monitor</module>
+        <module>components/event-receiver</module>
+        <module>components/event-publisher</module>
         <module>features/event-stream</module>
         <module>features/data-bridge</module>
         <!-- <module>features/analytics-dashboard</module> -->
         <module>features/application-deployer</module>
+        <module>features/event-monitor</module>
+        <module>features/event-receiver</module>
+        <module>features/event-publisher</module>
     </modules>
 
     <dependencyManagement>
@@ -86,6 +92,26 @@
                 <artifactId>disruptor</artifactId>
                 <version>${disruptor.orbit.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.hectorclient.wso2</groupId>
+                <artifactId>hector-core</artifactId>
+                <version>${hector.wso2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.rampart.wso2</groupId>
+                <artifactId>rampart-core</artifactId>
+                <version>${rampart.wso2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.rampart.wso2</groupId>
+                <artifactId>rampart-policy</artifactId>
+                <version>${rampart.wso2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.tyrus.bundles.wso2</groupId>
+                <artifactId>tyrus-standalone-client</artifactId>
+                <version>${org.glassfish.tyrus.wso2.version}</version>
+            </dependency>
             <!--orbit dependencies end-->
 
             <!--carbon-kernel dependencies start-->
@@ -129,6 +155,11 @@
                 <artifactId>org.wso2.carbon.user.core</artifactId>
                 <version>${carbon.kernel.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.ndatasource.core</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
             <!--carbon-kernel dependencies stop-->
 
             <!--carbon-commons dependencies start-->
@@ -151,6 +182,24 @@
                 <version>${siddhi.version}</version>
             </dependency>
             <!--siddhi dependencies stop-->
+
+            <!--axis2.transport dependencies start-->
+            <dependency>
+                <groupId>org.apache.axis2.transport</groupId>
+                <artifactId>axis2-transport-jms</artifactId>
+                <version>${axis2-transports.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2.transport</groupId>
+                <artifactId>axis2-transport-mail</artifactId>
+                <version>${axis2-transports.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2.transport</groupId>
+                <artifactId>axis2-transport-sms</artifactId>
+                <version>${axis2-transports.version}</version>
+            </dependency>
+            <!--axis2.transport dependencies end-->
 
             <!--third party dependencies start-->
             <dependency>
@@ -218,6 +267,63 @@
                 <groupId>com.googlecode.disruptor.wso2</groupId>
                 <artifactId>disruptor</artifactId>
                 <version>${orbit.version.distruptor}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-jms_1.1_spec</artifactId>
+                <version>${geronimo-jms.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka_2.10</artifactId>
+                <version>${kafka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.paho</groupId>
+                <artifactId>mqtt-client</artifactId>
+                <version>${org.eclipse.paho.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code</groupId>
+                <artifactId>jsmpp</artifactId>
+                <version>${google.jsmpp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.websocket</groupId>
+                <artifactId>javax.websocket-api</artifactId>
+                <version>${javax.websocket.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat</groupId>
+                <artifactId>tomcat-websocket-api</artifactId>
+                <version>${tomcat.websocket.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>${apache.httpcore.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>javax.ws.rs</groupId>
+                <artifactId>javax.ws.rs-api</artifactId>
+                <version>${javax.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+                <version>${cxf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.servicemix.bundles</groupId>
+                <artifactId>org.apache.servicemix.bundles.jaxb-api-2.0</artifactId>
+                <version>${apache.servicemix.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jayway.jsonpath</groupId>
+                <artifactId>json-path</artifactId>
+                <version>${jsonpath.version}</version>
             </dependency>
             <!--third party dependencies stop-->
 
@@ -318,9 +424,9 @@
             <!--<version>${carbon.analytics.common.version}</version>-->
             <!--</dependency>-->
             <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon.event-processing</groupId>-->
+            <!--<groupId>org.wso2.carbon.analytics-common</groupId>-->
             <!--<artifactId>org.wso2.carbon.event.publisher.stub</artifactId>-->
-            <!--<version>${carbon.event.processing.version}</version>-->
+            <!--<version>${carbon.analytics.common.version}</version>-->
             <!--</dependency>-->
 
             <dependency>
@@ -333,7 +439,99 @@
                 <artifactId>org.wso2.carbon.event.application.deployer</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
-
+            <dependency>
+                <artifactId>org.wso2.carbon.event.output.adapter.websocket.local</artifactId>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <version>${carbon.analytics.common.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <artifactId>org.wso2.carbon.event.output.adapter.ui</artifactId>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <version>${carbon.analytics.common.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <artifactId>org.wso2.carbon.event.input.adapter.websocket.local</artifactId>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <version>${carbon.analytics.common.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.input.adapter.core</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.output.adapter.core</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.statistics.stub</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.statistics.ui</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.statistics</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.tracer.stub</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.tracer.ui</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.publisher.core</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.receiver.admin</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.receiver.core</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.receiver.ui</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.receiver.stub</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.publisher.ui</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.publisher.stub</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.publisher.admin</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
             <!--carbon analytics common dependencies stop-->
 
             <!--features start-->
@@ -409,8 +607,83 @@
                 <version>${carbon.analytics.common.version}</version>
                 <type>zip</type>
             </dependency>
-
-
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.statistics.server.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.statistics.ui.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.tracer.server.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.tracer.ui.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.tracer</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.input.adapter.server.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.receiver.server.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.receiver.ui.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.databridge.datareceiver.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.databridge.datapublisher.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.publisher.server.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.publisher.ui.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.output.adapter.server.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
+            </dependency>
             <!--<dependency>-->
             <!--<groupId>org.wso2.carbon.analytics-common</groupId>-->
             <!--<artifactId>org.wso2.carbon.analytics.dashboard.ui.feature</artifactId>-->
@@ -676,6 +949,10 @@
         <httpcore.httpcomponents.wso2.version>4.3.3.wso2v1</httpcore.httpcomponents.wso2.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.scm.id>my-scm-server</project.scm.id>
+        <apache.httpcore.version>4.2.4</apache.httpcore.version>
+        <javax.version>2.0</javax.version>
+        <cxf.version>2.6.1</cxf.version>
+
     </properties>
 
 </project>
