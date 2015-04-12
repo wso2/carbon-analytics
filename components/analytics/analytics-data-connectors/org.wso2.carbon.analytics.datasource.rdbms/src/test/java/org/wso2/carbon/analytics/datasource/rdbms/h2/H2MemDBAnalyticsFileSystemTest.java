@@ -40,7 +40,8 @@ public class H2MemDBAnalyticsFileSystemTest extends AnalyticsFileSystemTest {
     private AnalyticsFileSystem afs;
 
     public H2MemDBAnalyticsFileSystemTest() {
-        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf");
+        GenericUtils.clearGlobalCustomDataSourceRepo();
+        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");
     }
     
     @BeforeClass

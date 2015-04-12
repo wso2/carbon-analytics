@@ -547,4 +547,8 @@ public class GenericUtils {
         }
     }
     
+    public static void clearGlobalCustomDataSourceRepo() {
+        globalCustomRepo = null;
+    }
+    
 }

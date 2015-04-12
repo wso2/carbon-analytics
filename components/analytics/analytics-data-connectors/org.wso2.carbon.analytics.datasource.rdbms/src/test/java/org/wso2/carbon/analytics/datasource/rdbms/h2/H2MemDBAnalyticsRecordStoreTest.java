@@ -40,7 +40,8 @@ public class H2MemDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
     private AnalyticsRecordStore ars;
     
     public H2MemDBAnalyticsRecordStoreTest() {
-        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf");
+        GenericUtils.clearGlobalCustomDataSourceRepo();
+        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");
     }
     
     @BeforeClass

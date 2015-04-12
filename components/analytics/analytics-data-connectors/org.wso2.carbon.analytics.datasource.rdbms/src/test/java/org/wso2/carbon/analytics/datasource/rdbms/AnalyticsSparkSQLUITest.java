@@ -54,7 +54,8 @@ public class AnalyticsSparkSQLUITest {
     private AnalyticsDataService service;
     
     public AnalyticsSparkSQLUITest() {
-        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf");
+        GenericUtils.clearGlobalCustomDataSourceRepo();
+        System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");
     }
 
     @BeforeClass
