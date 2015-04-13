@@ -16,12 +16,14 @@
 package org.wso2.carbon.analytics.webservice.beans;
 
 import javax.xml.bind.annotation.XmlElement;
+import java.io.Serializable;
 
 /**
  * The Class RecordGroupBean.
  */
-public class RecordGroupBean {
+public class RecordGroupBean implements Serializable {
 
+	private static final long serialVersionUID = 1017238844696994297L;
 	/** The locations. */
 	private String[] locations;
 

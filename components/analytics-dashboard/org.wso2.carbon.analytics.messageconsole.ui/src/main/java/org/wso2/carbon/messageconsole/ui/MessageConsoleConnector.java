@@ -28,14 +28,13 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.messageconsole.stub.MessageConsoleStub;
-import org.wso2.carbon.analytics.messageconsole.stub.beans.ColumnBean;
-import org.wso2.carbon.analytics.messageconsole.stub.beans.EntityBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.PermissionBean;
-import org.wso2.carbon.analytics.messageconsole.stub.beans.RecordBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.ScheduleTaskInfo;
-import org.wso2.carbon.analytics.messageconsole.stub.beans.TableBean;
+import org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceAnalyticsWebServiceExceptionException;
 import org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceStub;
 import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsSchemaBean;
+import org.wso2.carbon.analytics.webservice.stub.beans.IndexConfigurationBean;
+import org.wso2.carbon.analytics.webservice.stub.beans.IndexEntryBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.RecordValueEntryBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.SchemaColumnBean;
 import org.wso2.carbon.messageconsole.ui.beans.Column;
@@ -60,7 +59,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class will expose all the MessageConsoleService stub operations.
@@ -177,7 +178,6 @@ public class MessageConsoleConnector {
         }
         ResponseResult responseResult = new ResponseResult();
         try {
-
             org.wso2.carbon.analytics.webservice.stub.beans.RecordBean[] resultRecordBeans;
             if (searchQuery != null && !searchQuery.isEmpty()) {
                 resultRecordBeans = analyticsWebServiceStub.search(tableName, LUCENE, searchQuery, startIndex, pageSize);
@@ -192,11 +192,10 @@ public class MessageConsoleConnector {
                     log.debug("Result size: " + resultRecordBeans.length);
                 }
                 for (org.wso2.carbon.analytics.webservice.stub.beans.RecordBean recordBean : resultRecordBeans) {
-                    Record record = getRecord(recordBean);
+                    Record record = getRecord(recordBean, true);
                     records.add(record);
                 }
                 responseResult.setRecords(records);
-
             }
             responseResult.setResult(OK);
         } catch (Exception e) {
@@ -208,15 +207,18 @@ public class MessageConsoleConnector {
         return RESPONSE_RESULT_BUILDER.serializeNulls().create().toJson(responseResult);
     }
 
-    private Record getRecord(org.wso2.carbon.analytics.webservice.stub.beans.RecordBean recordBean) {
+    private Record getRecord(org.wso2.carbon.analytics.webservice.stub.beans.RecordBean recordBean, boolean
+            withDefaultColumn) {
         Record record = new Record();
         if (recordBean != null) {
             List<Column> columns = new ArrayList<>();
-            columns.add(new Column(RECORD_ID, recordBean.getId()));
-            columns.add(new Column(TIMESTAMP, DATE_FORMAT.format(new Date(recordBean.getTimestamp()))));
+            if (withDefaultColumn) {
+                columns.add(new Column(RECORD_ID, recordBean.getId()));
+                columns.add(new Column(TIMESTAMP, DATE_FORMAT.format(new Date(recordBean.getTimestamp()))));
+            }
             if (recordBean.getValues() != null) {
                 for (RecordValueEntryBean entityBean : recordBean.getValues()) {
-                    columns.add(new Column(entityBean.getFieldName(), String.valueOf(entityBean.getValue())));
+                    columns.add(getColumn(entityBean));
                 }
             }
             record.setColumns(columns);
@@ -224,11 +226,44 @@ public class MessageConsoleConnector {
         return record;
     }
 
+    private Column getColumn(RecordValueEntryBean entityBean) {
+        Column column;
+        String value = null;
+        switch (entityBean.getType()) {
+            case "STRING": {
+                value = entityBean.getStringValue();
+                break;
+            }
+            case "INTEGER": {
+                value = String.valueOf(entityBean.getIntValue());
+                break;
+            }
+            case "LONG": {
+                value = String.valueOf(entityBean.getLongValue());
+                break;
+            }
+            case "FLOAT": {
+                value = String.valueOf(entityBean.getFloatValue());
+                break;
+            }
+            case "DOUBLE": {
+                value = String.valueOf(entityBean.getDoubleValue());
+                break;
+            }
+            case "BOOLEAN": {
+                value = String.valueOf(entityBean.getBooleanValue());
+                break;
+            }
+        }
+        column = new Column(entityBean.getFieldName(), value, entityBean.getType());
+        return column;
+    }
+
     public String getTableInfo(String tableName) {
         ResponseTable table = new ResponseTable();
+        table.setName(tableName);
         try {
             AnalyticsSchemaBean tableSchema = analyticsWebServiceStub.getTableSchema(tableName);
-            table.setName(tableName);
             List<ResponseTable.Column> columns = new ArrayList<>();
             if (tableSchema.getColumns() != null) {
                 List<String> primaryKeys = null;
@@ -239,9 +274,9 @@ public class MessageConsoleConnector {
                     ResponseTable.Column column = new ResponseTable().new Column();
                     column.setName(resultColumn.getColumnName());
                     column.setType(resultColumn.getColumnType());
-                    column.setDisplay(Boolean.TRUE);
+                    column.setDisplay(true);
                     if (primaryKeys != null && primaryKeys.contains(resultColumn.getColumnName())) {
-                        column.setPrimary(Boolean.TRUE);
+                        column.setPrimary(true);
                     }
                     columns.add(column);
                 }
@@ -290,12 +325,11 @@ public class MessageConsoleConnector {
                       "} going to add to" + table);
         }
         ResponseRecord responseRecord = new ResponseRecord();
-        Gson gson = RESPONSE_RECORD_BUILDER.serializeNulls().create();
-        responseRecord.setResult(OK);
         try {
-//            org.wso2.carbon.analytics.webservice.stub.beans.RecordBean
-            RecordBean recordBean = messageConsoleStub.addRecord(table, columns, values);
-//            responseRecord.setRecord(getRecord(recordBean));
+            org.wso2.carbon.analytics.webservice.stub.beans.RecordBean[] recordBeans = putRecord(table, columns,
+                                                                                                 values, null);
+            responseRecord.setRecord(getRecord(recordBeans[0], true));
+            responseRecord.setResult(OK);
         } catch (Exception e) {
             String errorMsg = "Unable to add record {column: " + Arrays.toString(columns) + ", values: " + Arrays
                     .toString(values) + " } to table :" + table;
@@ -303,20 +337,92 @@ public class MessageConsoleConnector {
             responseRecord.setResult(ERROR);
             responseRecord.setMessage(errorMsg);
         }
-        return gson.toJson(responseRecord);
+        return RESPONSE_RECORD_BUILDER.serializeNulls().create().toJson(responseRecord);
     }
 
+    private RecordValueEntryBean[] getRecordValueEntryBeans(String[] columns, String[] values,
+                                                            AnalyticsSchemaBean tableSchema) {
+        int position = 0;
+        RecordValueEntryBean[] recordValueEntryBeans = new RecordValueEntryBean[columns.length];
+        List<SchemaColumnBean> schemaColumnBeans = Arrays.asList(tableSchema.getColumns());
+        for (int i = 0; i < columns.length; i++) {
+            String columnName = columns[i];
+            RecordValueEntryBean recordValueEntryBean = new RecordValueEntryBean();
+            recordValueEntryBean.setFieldName(columnName);
+            for (SchemaColumnBean schemaColumnBean : schemaColumnBeans) {
+                if (columnName.equals(schemaColumnBean.getColumnName())) {
+                    setRecordValueEntryBeanType(values[i], recordValueEntryBean, schemaColumnBean.getColumnType());
+                    break;
+                }
+            }
+            recordValueEntryBeans[position++] = recordValueEntryBean;
+        }
+        return recordValueEntryBeans;
+    }
+
+    private void setRecordValueEntryBeanType(String value, RecordValueEntryBean recordValueEntryBean, String type) {
+        switch (type) {
+            case "STRING": {
+                recordValueEntryBean.setStringValue(value);
+                recordValueEntryBean.setType("STRING");
+                break;
+            }
+            case "INTEGER": {
+                if (value == null || value.isEmpty()) {
+                    value = "0";
+                }
+                recordValueEntryBean.setIntValue(Integer.valueOf(value));
+                recordValueEntryBean.setType("INTEGER");
+                break;
+            }
+            case "LONG": {
+                if (value == null || value.isEmpty()) {
+                    value = "0";
+                }
+                recordValueEntryBean.setLongValue(Long.valueOf(value));
+                recordValueEntryBean.setType("LONG");
+                break;
+            }
+            case "BOOLEAN": {
+                if (value == null || value.isEmpty()) {
+                    value = "false";
+                }
+                recordValueEntryBean.setBooleanValue(Boolean.valueOf(value));
+                recordValueEntryBean.setType("BOOLEAN");
+                break;
+            }
+            case "FLOAT": {
+                if (value == null || value.isEmpty()) {
+                    value = "0";
+                }
+                recordValueEntryBean.setFloatValue(Float.valueOf(value));
+                recordValueEntryBean.setType("FLOAT");
+                break;
+            }
+            case "DOUBLE": {
+                if (value == null || value.isEmpty()) {
+                    value = "0";
+                }
+                recordValueEntryBean.setDoubleValue(Double.valueOf(value));
+                recordValueEntryBean.setType("DOUBLE");
+                break;
+            }
+            default: {
+                recordValueEntryBean.setStringValue(value);
+            }
+        }
+    }
 
     public String updateRecord(String table, String[] columns, String[] values, String recordId) {
         if (log.isDebugEnabled()) {
             log.debug("Record {id: " + recordId + ", column: " + Arrays.toString(columns) + ", values: " + Arrays.toString(values) + "} going to update to" + table);
         }
         ResponseRecord responseRecord = new ResponseRecord();
-        Gson gson = RESPONSE_RECORD_BUILDER.serializeNulls().create();
         responseRecord.setResult(OK);
         try {
-            RecordBean recordBean = messageConsoleStub.updateRecord(table, recordId, columns, values);
-//            responseRecord.setRecord(getRecord(recordBean));
+            org.wso2.carbon.analytics.webservice.stub.beans.RecordBean[] recordBeans = putRecord(table, columns, values, recordId);
+            responseRecord.setRecord(getRecord(recordBeans[0], true));
+            responseRecord.setResult(OK);
         } catch (Exception e) {
             String errorMsg = "Unable to update record {id: " + recordId + ", column: " + Arrays.toString(columns) + ", " +
                               "values: " + Arrays.toString(values) + " } to table :" + table;
@@ -324,7 +430,45 @@ public class MessageConsoleConnector {
             responseRecord.setResult(ERROR);
             responseRecord.setMessage(errorMsg);
         }
-        return gson.toJson(responseRecord);
+        return RESPONSE_RECORD_BUILDER.serializeNulls().create().toJson(responseRecord);
+    }
+
+    private org.wso2.carbon.analytics.webservice.stub.beans.RecordBean[] putRecord(String table, String[] columns,
+                                                                                   String[] values, String recordId)
+            throws RemoteException,
+                   org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceAnalyticsWebServiceExceptionException {
+        AnalyticsSchemaBean tableSchema = analyticsWebServiceStub.getTableSchema(table);
+        org.wso2.carbon.analytics.webservice.stub.beans.RecordBean recordBean = new org.wso2.carbon.analytics.webservice.stub.beans.RecordBean();
+        recordBean.setId(recordId);
+        recordBean.setTableName(table);
+        recordBean.setTimestamp(System.currentTimeMillis());
+        if (columns != null && tableSchema != null && tableSchema.getColumns() != null) {
+            RecordValueEntryBean[] recordValueEntryBeans = getRecordValueEntryBeans(columns, values, tableSchema);
+            recordBean.setValues(recordValueEntryBeans);
+        }
+        org.wso2.carbon.analytics.webservice.stub.beans.RecordBean[] recordBeans = new org.wso2.carbon.analytics.webservice.stub.beans.RecordBean[]{recordBean};
+        analyticsWebServiceStub.put(recordBeans);
+        return recordBeans;
+    }
+
+    private Record getRecord(String table, String recordId, boolean withDefaultColumns)
+            throws RemoteException, AnalyticsWebServiceAnalyticsWebServiceExceptionException {
+        String[] ids = new String[]{recordId};
+        org.wso2.carbon.analytics.webservice.stub.beans.RecordBean[] recordBeans = analyticsWebServiceStub.getById(table, 1, null, ids);
+        if (recordBeans != null && recordBeans.length > 0) {
+            return getRecord(recordBeans[0], withDefaultColumns);
+        }
+        return null;
+    }
+
+    private org.wso2.carbon.analytics.webservice.stub.beans.RecordBean getRecordBean(String table, String recordId)
+            throws RemoteException, AnalyticsWebServiceAnalyticsWebServiceExceptionException {
+        String[] ids = new String[]{recordId};
+        org.wso2.carbon.analytics.webservice.stub.beans.RecordBean[] recordBeans = analyticsWebServiceStub.getById(table, 1, null, ids);
+        if (recordBeans != null && recordBeans.length > 0) {
+            return recordBeans[0];
+        }
+        return null;
     }
 
     public String getArbitraryFields(String table, String recordId) {
@@ -332,15 +476,40 @@ public class MessageConsoleConnector {
             log.debug("Get arbitrary field values for recordId [" + recordId + "] in table[" + table + "]");
         }
         ResponseArbitraryField responseArbitraryField = new ResponseArbitraryField();
-        Gson gson = RESPONSE_ARBITRARY_FIELD_BUILDER.serializeNulls().create();
         responseArbitraryField.setResult(OK);
+        List<Column> resultColumns = new ArrayList<>();
         try {
-            List<Column> resultColumns = new ArrayList<>();
-            EntityBean[] entityBeans = messageConsoleStub.getArbitraryList(table, recordId);
-            if (entityBeans != null) {
-                for (EntityBean entityBean : entityBeans) {
-                    Column column = new Column(entityBean.getColumnName(), entityBean.getValue(), entityBean.getType());
-                    resultColumns.add(column);
+            Record originalRecord = getRecord(table, recordId, false);
+            AnalyticsSchemaBean schema = analyticsWebServiceStub.getTableSchema(table);
+            if (originalRecord != null) {
+                List<Column> columns = originalRecord.getColumns();
+                if (schema != null) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Table schema[" + table + "] is not null");
+                    }
+                    SchemaColumnBean[] schemaColumns = schema.getColumns();
+                    if (schemaColumns != null && schemaColumns.length > 0) {
+                        for (Column column : columns) {
+                            boolean arbitraryField = true;
+                            for (SchemaColumnBean schemaColumnBean : schemaColumns) {
+                                if (column.getKey().equals(schemaColumnBean.getColumnName())) {
+                                    arbitraryField = false;
+                                    break;
+                                }
+                            }
+                            if (arbitraryField) {
+                                resultColumns.add(column);
+                            }
+                        }
+                    } else {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Either table schema[" + table + "] null or empty. Adding all records to " +
+                                      "arbitrary list");
+                        }
+                        for (Column column : columns) {
+                            resultColumns.add(column);
+                        }
+                    }
                 }
             }
             responseArbitraryField.setColumns(resultColumns);
@@ -350,7 +519,7 @@ public class MessageConsoleConnector {
             responseArbitraryField.setResult(ERROR);
             responseArbitraryField.setMessage(errorMsg);
         }
-        return gson.toJson(responseArbitraryField);
+        return RESPONSE_ARBITRARY_FIELD_BUILDER.serializeNulls().create().toJson(responseArbitraryField);
     }
 
     public String deleteArbitraryField(String table, String recordId, String fieldName) {
@@ -358,17 +527,29 @@ public class MessageConsoleConnector {
             log.debug("Deleting arbitrary field[" + fieldName + "] in record[" + recordId + "] in table[" + table + "]");
         }
         ResponseArbitraryField responseArbitraryField = new ResponseArbitraryField();
-        Gson gson = RESPONSE_ARBITRARY_FIELD_BUILDER.serializeNulls().create();
         responseArbitraryField.setResult(OK);
         try {
-            messageConsoleStub.deleteArbitraryField(table, recordId, fieldName);
+            org.wso2.carbon.analytics.webservice.stub.beans.RecordBean originalRecord = getRecordBean(table, recordId);
+            if (originalRecord != null) {
+                RecordValueEntryBean[] columns = originalRecord.getValues();
+                RecordValueEntryBean[] newColumnsList = new RecordValueEntryBean[columns.length - 1];
+                int i = 0;
+                for (RecordValueEntryBean column : columns) {
+                    if (!fieldName.equalsIgnoreCase(column.getFieldName())) {
+                        newColumnsList[i++] = column;
+                    }
+                }
+                originalRecord.setValues(newColumnsList);
+                originalRecord.setTimestamp(System.currentTimeMillis());
+                analyticsWebServiceStub.put(new org.wso2.carbon.analytics.webservice.stub.beans.RecordBean[]{originalRecord});
+            }
         } catch (Exception e) {
             String errorMsg = "Unable to delete arbitrary field with record[" + recordId + "] in table[" + table + "]";
             log.error(errorMsg, e);
             responseArbitraryField.setResult(ERROR);
             responseArbitraryField.setMessage(errorMsg);
         }
-        return gson.toJson(responseArbitraryField);
+        return RESPONSE_ARBITRARY_FIELD_BUILDER.serializeNulls().create().toJson(responseArbitraryField);
     }
 
     public String putArbitraryField(String table, String recordId, String fieldName, String value, String type) {
@@ -377,11 +558,26 @@ public class MessageConsoleConnector {
                       "] in record[" + recordId + "] in  table[" + table + "]");
         }
         ResponseArbitraryFieldColumn responseArbitraryFieldColumn = new ResponseArbitraryFieldColumn();
-        Gson gson = RESPONSE_ARBITRARY_FIELD_COLUMN_BUILDER.serializeNulls().create();
-        responseArbitraryFieldColumn.setResult(OK);
         try {
-            messageConsoleStub.putArbitraryField(table, recordId, fieldName, value, type);
-            responseArbitraryFieldColumn.setColumn(new Column(fieldName, value, type));
+            org.wso2.carbon.analytics.webservice.stub.beans.RecordBean originalRecord = getRecordBean(table, recordId);
+            if (originalRecord != null) {
+                RecordValueEntryBean[] columns = originalRecord.getValues();
+                RecordValueEntryBean[] newColumnsList = new RecordValueEntryBean[columns.length + 1];
+                int i = 0;
+                for (RecordValueEntryBean column : columns) {
+                    newColumnsList[i++] = column;
+                }
+                RecordValueEntryBean newArbitraryField = new RecordValueEntryBean();
+                newArbitraryField.setFieldName(fieldName);
+                newArbitraryField.setFieldName(fieldName);
+                setRecordValueEntryBeanType(value, newArbitraryField, type);
+                newColumnsList[i] = newArbitraryField;
+                originalRecord.setValues(newColumnsList);
+                originalRecord.setTimestamp(System.currentTimeMillis());
+                analyticsWebServiceStub.put(new org.wso2.carbon.analytics.webservice.stub.beans.RecordBean[]{originalRecord});
+                responseArbitraryFieldColumn.setColumn(new Column(fieldName, value, type));
+                responseArbitraryFieldColumn.setResult(OK);
+            }
         } catch (Exception e) {
             String errorMsg = "Unable to save arbitrary field[" + fieldName + "] with record[" + recordId + "] in " +
                               "table[" + table + "]";
@@ -389,7 +585,7 @@ public class MessageConsoleConnector {
             responseArbitraryFieldColumn.setResult(ERROR);
             responseArbitraryFieldColumn.setMessage(errorMsg);
         }
-        return gson.toJson(responseArbitraryFieldColumn);
+        return RESPONSE_ARBITRARY_FIELD_COLUMN_BUILDER.serializeNulls().create().toJson(responseArbitraryFieldColumn);
     }
 
     public String createTable(String table, String detailsJsonString) {
@@ -397,26 +593,43 @@ public class MessageConsoleConnector {
             log.debug("Creating table[" + table + "] with values [" + detailsJsonString + "]");
         }
         String msg;
-        TableBean tableBean = new TableBean();
-        tableBean.setName(table);
-        Gson gson = new Gson();
-        List<TableSchemaColumn> columnList = gson.fromJson(detailsJsonString, TABLE_SCHEMA_TYPE);
-        ColumnBean[] columns = new ColumnBean[columnList.size()];
-        int i = 0;
+        List<TableSchemaColumn> columnList = new Gson().fromJson(detailsJsonString, TABLE_SCHEMA_TYPE);
+        List<String> primaryKeys = new ArrayList<>();
+        List<SchemaColumnBean> schemaColumnBeans = new ArrayList<>();
+        List<IndexEntryBean> entryBeans = new ArrayList<>();
         for (TableSchemaColumn schemaColumn : columnList) {
             if (schemaColumn.getColumn() != null && !schemaColumn.getColumn().isEmpty()) {
-                ColumnBean columnBean = new ColumnBean();
-                columnBean.setName(schemaColumn.getColumn());
-                columnBean.setType(schemaColumn.getType());
-                columnBean.setPrimary(schemaColumn.isPrimary());
-                columnBean.setIndex(schemaColumn.isIndex());
-                columns[i++] = columnBean;
+                if (schemaColumn.isPrimary()) {
+                    primaryKeys.add(schemaColumn.getColumn());
+                }
+                SchemaColumnBean schemaColumnBean = new SchemaColumnBean();
+                schemaColumnBean.setColumnName(schemaColumn.getColumn());
+                schemaColumnBean.setColumnType(schemaColumn.getType());
+                schemaColumnBeans.add(schemaColumnBean);
+                if (schemaColumn.isIndex()) {
+                    IndexEntryBean indexEntryBean = new IndexEntryBean();
+                    indexEntryBean.setFieldName(schemaColumn.getColumn());
+                    indexEntryBean.setIndexType(schemaColumn.getType());
+                    entryBeans.add(indexEntryBean);
+                }
             }
         }
-        tableBean.setColumns(columns);
-        msg = "Successfully saved table information";
         try {
-            messageConsoleStub.createTable(tableBean);
+            analyticsWebServiceStub.createTable(table);
+            AnalyticsSchemaBean analyticsSchemaBean = new AnalyticsSchemaBean();
+            SchemaColumnBean[] columnBeans = new SchemaColumnBean[schemaColumnBeans.size()];
+            analyticsSchemaBean.setColumns(schemaColumnBeans.toArray(columnBeans));
+            String[] primaryKeyArray = new String[primaryKeys.size()];
+            analyticsSchemaBean.setPrimaryKeys(primaryKeys.toArray(primaryKeyArray));
+            analyticsWebServiceStub.setTableSchema(table, analyticsSchemaBean);
+            PermissionBean permissionBean = messageConsoleStub.getAvailablePermissions();
+            if (permissionBean.getSetIndex()) {
+                IndexConfigurationBean configurationBean = new IndexConfigurationBean();
+                IndexEntryBean[] indexEntryBeans = new IndexEntryBean[entryBeans.size()];
+                configurationBean.setIndices(entryBeans.toArray(indexEntryBeans));
+                analyticsWebServiceStub.setIndices(table, configurationBean);
+            }
+            msg = "Successfully saved table information";
         } catch (Exception e) {
             log.error("Unable to save table information: " + e.getMessage(), e);
             msg = "Unable to save table information: " + e.getMessage();
@@ -429,26 +642,45 @@ public class MessageConsoleConnector {
             log.debug("Editing table[" + table + "] with values [" + detailsJsonString + "]");
         }
         String msg;
-        TableBean tableBean = new TableBean();
-        tableBean.setName(table);
-        Gson gson = new Gson();
-        List<TableSchemaColumn> columnList = gson.fromJson(detailsJsonString, TABLE_SCHEMA_TYPE);
-        ColumnBean[] columns = new ColumnBean[columnList.size()];
-        int i = 0;
+        List<TableSchemaColumn> columnList = new Gson().fromJson(detailsJsonString, TABLE_SCHEMA_TYPE);
+        List<String> primaryKeys = new ArrayList<>();
+        List<SchemaColumnBean> schemaColumnBeans = new ArrayList<>();
+        List<IndexEntryBean> entryBeans = new ArrayList<>();
         for (TableSchemaColumn schemaColumn : columnList) {
             if (schemaColumn.getColumn() != null && !schemaColumn.getColumn().isEmpty()) {
-                ColumnBean columnBean = new ColumnBean();
-                columnBean.setName(schemaColumn.getColumn());
-                columnBean.setType(schemaColumn.getType());
-                columnBean.setPrimary(schemaColumn.isPrimary());
-                columnBean.setIndex(schemaColumn.isIndex());
-                columns[i++] = columnBean;
+                if (schemaColumn.isPrimary()) {
+                    primaryKeys.add(schemaColumn.getColumn());
+                }
+                SchemaColumnBean schemaColumnBean = new SchemaColumnBean();
+                schemaColumnBean.setColumnName(schemaColumn.getColumn());
+                schemaColumnBean.setColumnType(schemaColumn.getType());
+                schemaColumnBeans.add(schemaColumnBean);
+                if (schemaColumn.isIndex()) {
+                    IndexEntryBean indexEntryBean = new IndexEntryBean();
+                    indexEntryBean.setFieldName(schemaColumn.getColumn());
+                    indexEntryBean.setIndexType(schemaColumn.getType());
+                    entryBeans.add(indexEntryBean);
+                }
             }
         }
-        tableBean.setColumns(columns);
-        msg = "Successfully saved table information";
         try {
-            messageConsoleStub.editTable(tableBean);
+            AnalyticsSchemaBean analyticsSchemaBean = new AnalyticsSchemaBean();
+            SchemaColumnBean[] columnBeans = new SchemaColumnBean[schemaColumnBeans.size()];
+            analyticsSchemaBean.setColumns(schemaColumnBeans.toArray(columnBeans));
+            String[] primaryKeyArray = new String[primaryKeys.size()];
+            analyticsSchemaBean.setPrimaryKeys(primaryKeys.toArray(primaryKeyArray));
+            analyticsWebServiceStub.setTableSchema(table, analyticsSchemaBean);
+            PermissionBean permissionBean = messageConsoleStub.getAvailablePermissions();
+            if (permissionBean.getDeleteIndex()) {
+                analyticsWebServiceStub.clearIndices(table);
+            }
+            if (permissionBean.getSetIndex()) {
+                IndexConfigurationBean configurationBean = new IndexConfigurationBean();
+                IndexEntryBean[] indexEntryBeans = new IndexEntryBean[entryBeans.size()];
+                configurationBean.setIndices(entryBeans.toArray(indexEntryBeans));
+                analyticsWebServiceStub.setIndices(table, configurationBean);
+            }
+            msg = "Successfully saved table information";
         } catch (Exception e) {
             log.error("Unable to save table information: " + e.getMessage(), e);
             msg = "Unable to save table information: " + e.getMessage();
@@ -472,24 +704,43 @@ public class MessageConsoleConnector {
     }
 
     public String getTableInfoWithIndexInfo(String table) {
-        List<TableSchemaColumn> tableSchemaColumns = new ArrayList<>();
-        Gson gson = new GsonBuilder().serializeNulls().create();
+        Map<String, TableSchemaColumn> schemaColumnMap = new HashMap<>();
         try {
-            TableBean tableInfo = messageConsoleStub.getTableInfoWithIndicesInfo(table);
-            if (tableInfo != null && tableInfo.getColumns() != null) {
-                for (ColumnBean column : tableInfo.getColumns()) {
+            AnalyticsSchemaBean tableSchema = analyticsWebServiceStub.getTableSchema(table);
+            if (tableSchema.getColumns() != null) {
+                List<String> primaryKeys = null;
+                if (tableSchema.getPrimaryKeys() != null) {
+                    primaryKeys = Arrays.asList(tableSchema.getPrimaryKeys());
+                }
+                for (SchemaColumnBean resultColumn : tableSchema.getColumns()) {
                     TableSchemaColumn schemaColumn = new TableSchemaColumn();
-                    schemaColumn.setColumn(column.getName());
-                    schemaColumn.setType(column.getType());
-                    schemaColumn.setIndex(column.getIndex());
-                    schemaColumn.setPrimary(column.getPrimary());
-                    tableSchemaColumns.add(schemaColumn);
+                    schemaColumn.setColumn(resultColumn.getColumnName());
+                    schemaColumn.setType(resultColumn.getColumnType());
+                    if (primaryKeys != null && primaryKeys.contains(resultColumn.getColumnName())) {
+                        schemaColumn.setPrimary(true);
+                    }
+                    schemaColumnMap.put(resultColumn.getColumnName(), schemaColumn);
+                }
+            }
+            IndexConfigurationBean indexConfigurationBean = analyticsWebServiceStub.getIndices(table);
+            if (indexConfigurationBean != null && indexConfigurationBean.getIndices() != null) {
+                for (IndexEntryBean indexEntryBean : indexConfigurationBean.getIndices()) {
+                    if (schemaColumnMap.containsKey(indexEntryBean.getFieldName())) {
+                        schemaColumnMap.get(indexEntryBean.getFieldName()).setIndex(true);
+                    } else {
+                        TableSchemaColumn schemaColumn = new TableSchemaColumn();
+                        schemaColumn.setColumn(indexEntryBean.getFieldName());
+                        schemaColumn.setType(indexEntryBean.getIndexType());
+                        schemaColumn.setPrimary(false);
+                        schemaColumn.setIndex(true);
+                        schemaColumnMap.put(indexEntryBean.getFieldName(), schemaColumn);
+                    }
                 }
             }
         } catch (Exception e) {
             log.error("Unable to get table information for table:" + table, e);
         }
-        return gson.toJson(tableSchemaColumns);
+        return new GsonBuilder().serializeNulls().create().toJson(new ArrayList<>(schemaColumnMap.values()));
     }
 
 

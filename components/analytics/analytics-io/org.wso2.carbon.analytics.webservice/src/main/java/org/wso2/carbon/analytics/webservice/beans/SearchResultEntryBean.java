@@ -20,6 +20,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.io.Serializable;
 
 /**
  * The Class SearchResultEntryBean.
@@ -31,8 +32,9 @@ import javax.xml.bind.annotation.XmlType;
 })
 
 @XmlRootElement( name = "SearchResultEntry")
-public class SearchResultEntryBean {
-	
+public class SearchResultEntryBean implements Serializable {
+
+	private static final long serialVersionUID = -1168090243724348417L;
 	/** The id. */
 	@XmlElement(required = true)
 	private String id;

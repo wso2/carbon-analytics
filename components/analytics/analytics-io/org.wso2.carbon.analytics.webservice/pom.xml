@@ -54,7 +54,9 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Private-Package>org.wso2.carbon.analytics.webservice.internal.*</Private-Package>
-                        <Export-Package>org.wso2.carbon.analytics.webservice.*</Export-Package>
+                        <Export-Package>
+                            org.wso2.carbon.analytics.webservice.*;version="${carbon.analytics.version}"
+                        </Export-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>

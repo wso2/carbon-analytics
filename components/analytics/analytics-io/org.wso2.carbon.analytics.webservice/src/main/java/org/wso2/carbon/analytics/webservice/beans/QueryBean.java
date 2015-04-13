@@ -15,11 +15,14 @@
  */
 package org.wso2.carbon.analytics.webservice.beans;
 
+import java.io.Serializable;
+
 /**
  * The Class QueryBean.
  */
-public class QueryBean {
-	
+public class QueryBean implements Serializable {
+
+	private static final long serialVersionUID = -3940101281983944720L;
 	/** The tenant id. */
 	private int tenantId;
 	

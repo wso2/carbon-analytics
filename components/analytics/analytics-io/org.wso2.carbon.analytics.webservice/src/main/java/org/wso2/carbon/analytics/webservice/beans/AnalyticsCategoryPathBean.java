@@ -16,10 +16,13 @@
 
 package org.wso2.carbon.analytics.webservice.beans;
 
+import java.io.Serializable;
+
 /**
  * This class represents a  facet value object in a row. use this object to insert facet values in a record
  */
-public class AnalyticsCategoryPathBean {
+public class AnalyticsCategoryPathBean implements Serializable {
+    private static final long serialVersionUID = -7272867456721628819L;
     private float weight;
     private String[] path;
 

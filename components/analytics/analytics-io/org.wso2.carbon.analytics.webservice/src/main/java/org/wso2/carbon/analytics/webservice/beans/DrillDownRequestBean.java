@@ -16,12 +16,15 @@
 
 package org.wso2.carbon.analytics.webservice.beans;
 
+import java.io.Serializable;
+
 /**
  * This bean class represents the drill down information to perform drilldown operations
  * (search and count)
  */
-public class DrillDownRequestBean {
+public class DrillDownRequestBean implements Serializable {
 
+    private static final long serialVersionUID = 491563554715534955L;
     private String tableName;
     private DrillDownPathBean[] categories;
     private String language;

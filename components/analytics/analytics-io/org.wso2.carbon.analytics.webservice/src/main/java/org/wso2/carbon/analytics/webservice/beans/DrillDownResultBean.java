@@ -20,13 +20,15 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 
 /**
  * This class represents the bean class for results of a drilldown request.
  */
 @XmlRootElement(name = "drilldownInfo")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class DrillDownResultBean {
+public class DrillDownResultBean implements Serializable {
+    private static final long serialVersionUID = 2609089740777067593L;
     @XmlElement(name = "categories", required = true)
     private PerFieldDrillDownResultBean[] perFieldEntries;
     @XmlElement(name = "ranges", required = false)

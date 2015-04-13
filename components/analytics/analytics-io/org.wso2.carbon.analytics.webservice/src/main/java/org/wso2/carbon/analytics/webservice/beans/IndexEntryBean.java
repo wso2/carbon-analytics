@@ -16,10 +16,13 @@
 
 package org.wso2.carbon.analytics.webservice.beans;
 
+import java.io.Serializable;
+
 /**
  * This class represents the bean for a single index entry definition
  */
-public class IndexEntryBean {
+public class IndexEntryBean implements Serializable {
+    private static final long serialVersionUID = -2971456381394072843L;
     private String fieldName;
     private String indexType;
 

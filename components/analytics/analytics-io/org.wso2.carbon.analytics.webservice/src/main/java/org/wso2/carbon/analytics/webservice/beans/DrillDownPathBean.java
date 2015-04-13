@@ -20,6 +20,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 
 /**
  * This class represents a facet object bean. facet object defines the hierarchical categoryName,
@@ -38,8 +39,9 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "categoryPath")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class DrillDownPathBean {
+public class DrillDownPathBean implements Serializable {
 
+    private static final long serialVersionUID = 7420162894825001765L;
     @XmlElement(name = "path")
     private String[] path;
     @XmlElement(name = "categoryName", required = false, defaultValue = "1.0")

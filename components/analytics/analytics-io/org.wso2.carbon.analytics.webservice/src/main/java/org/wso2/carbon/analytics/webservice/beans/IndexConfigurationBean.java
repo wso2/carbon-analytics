@@ -16,14 +16,16 @@
 
 package org.wso2.carbon.analytics.webservice.beans;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * This class represents the index configuration bean which contains the index column definition and
  * scoring parameters for scoring function.
  */
-public class IndexConfigurationBean {
+public class IndexConfigurationBean implements Serializable {
 
+    private static final long serialVersionUID = 3453813080253710437L;
     private IndexEntryBean[] indices;
     private String[] scoreParams;
 

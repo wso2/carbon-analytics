@@ -19,14 +19,16 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 
 /**
  * The Class TableBean.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement( name = "table")
-public class TableBean {
-	
+public class TableBean implements Serializable {
+
+	private static final long serialVersionUID = -4604642066136125250L;
 	@XmlElement(name = "tableName", required = true)
 	private String tableName;
 

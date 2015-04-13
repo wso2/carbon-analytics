@@ -18,20 +18,21 @@
             </xs:complexType>
             <xs:complexType name="RecordValueEntryBean">
                 <xs:sequence>
+                    <xs:element minOccurs="0" name="analyticsCategoryPathBeanValue" nillable="true" type="ax223:AnalyticsCategoryPathBean"></xs:element>
+                    <xs:element minOccurs="0" name="booleanValue" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="doubleValue" type="xs:double"></xs:element>
                     <xs:element minOccurs="0" name="fieldName" nillable="true" type="xs:string"></xs:element>
-                    <xs:element minOccurs="0" name="value" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="floatValue" type="xs:float"></xs:element>
+                    <xs:element minOccurs="0" name="intValue" type="xs:int"></xs:element>
+                    <xs:element minOccurs="0" name="longValue" type="xs:long"></xs:element>
+                    <xs:element minOccurs="0" name="stringValue" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"></xs:element>
                 </xs:sequence>
             </xs:complexType>
-            <xs:complexType name="IndexConfigurationBean">
+            <xs:complexType name="AnalyticsCategoryPathBean">
                 <xs:sequence>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="indices" nillable="true" type="ax223:IndexEntryBean"></xs:element>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="scoreParams" nillable="true" type="xs:string"></xs:element>
-                </xs:sequence>
-            </xs:complexType>
-            <xs:complexType name="IndexEntryBean">
-                <xs:sequence>
-                    <xs:element minOccurs="0" name="fieldName" nillable="true" type="xs:string"></xs:element>
-                    <xs:element minOccurs="0" name="indexType" nillable="true" type="xs:string"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="path" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="weight" type="xs:float"></xs:element>
                 </xs:sequence>
             </xs:complexType>
             <xs:complexType name="AnalyticsSchemaBean">
@@ -46,6 +47,18 @@
                     <xs:element minOccurs="0" name="columnType" nillable="true" type="xs:string"></xs:element>
                 </xs:sequence>
             </xs:complexType>
+            <xs:complexType name="IndexConfigurationBean">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="indices" nillable="true" type="ax223:IndexEntryBean"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="scoreParams" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="IndexEntryBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="fieldName" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="indexType" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
         </xs:schema>
         <xs:schema xmlns:ax222="http://exception.webservice.analytics.carbon.wso2.org/xsd" xmlns:ax224="http://beans.webservice.analytics.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://webservice.analytics.carbon.wso2.org">
             <xs:import namespace="http://exception.webservice.analytics.carbon.wso2.org/xsd"></xs:import>
@@ -54,15 +67,6 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="AnalyticsWebServiceException" nillable="true" type="ax221:AnalyticsWebServiceException"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deleteByRange">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
-                        <xs:element minOccurs="0" name="timeFrom" type="xs:long"></xs:element>
-                        <xs:element minOccurs="0" name="timeTo" type="xs:long"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -103,11 +107,49 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="deleteByRange">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="timeFrom" type="xs:long"></xs:element>
+                        <xs:element minOccurs="0" name="timeTo" type="xs:long"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="deleteByIds">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="ids" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="createTable">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setTableSchema">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="schema" nillable="true" type="ax223:AnalyticsSchemaBean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTableSchema">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTableSchemaResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax223:AnalyticsSchemaBean"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -212,39 +254,10 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="setTableSchema">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
-                        <xs:element minOccurs="0" name="schema" nillable="true" type="ax223:AnalyticsSchemaBean"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getTableSchema">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getTableSchemaResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax223:AnalyticsSchemaBean"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="createTable">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
             <xs:element name="put">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="records" nillable="true" type="ax223:RecordBean"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="recordBeans" nillable="true" type="ax223:RecordBean"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -304,14 +317,14 @@
     <wsdl:message name="getTableSchemaResponse">
         <wsdl:part name="parameters" element="ns:getTableSchemaResponse"></wsdl:part>
     </wsdl:message>
-    <wsdl:message name="setTableSchemaRequest">
-        <wsdl:part name="parameters" element="ns:setTableSchema"></wsdl:part>
-    </wsdl:message>
     <wsdl:message name="getRecordCountRequest">
         <wsdl:part name="parameters" element="ns:getRecordCount"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getRecordCountResponse">
         <wsdl:part name="parameters" element="ns:getRecordCountResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="setTableSchemaRequest">
+        <wsdl:part name="parameters" element="ns:setTableSchema"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getByIdRequest">
         <wsdl:part name="parameters" element="ns:getById"></wsdl:part>
@@ -385,14 +398,14 @@
             <wsdl:output message="ns:getTableSchemaResponse" wsaw:Action="urn:getTableSchemaResponse"></wsdl:output>
             <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getTableSchemaAnalyticsWebServiceAnalyticsWebServiceException"></wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="setTableSchema">
-            <wsdl:input message="ns:setTableSchemaRequest" wsaw:Action="urn:setTableSchema"></wsdl:input>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:setTableSchemaAnalyticsWebServiceAnalyticsWebServiceException"></wsdl:fault>
-        </wsdl:operation>
         <wsdl:operation name="getRecordCount">
             <wsdl:input message="ns:getRecordCountRequest" wsaw:Action="urn:getRecordCount"></wsdl:input>
             <wsdl:output message="ns:getRecordCountResponse" wsaw:Action="urn:getRecordCountResponse"></wsdl:output>
             <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getRecordCountAnalyticsWebServiceAnalyticsWebServiceException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="setTableSchema">
+            <wsdl:input message="ns:setTableSchemaRequest" wsaw:Action="urn:setTableSchema"></wsdl:input>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:setTableSchemaAnalyticsWebServiceAnalyticsWebServiceException"></wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="getById">
             <wsdl:input message="ns:getByIdRequest" wsaw:Action="urn:getById"></wsdl:input>
@@ -512,6 +525,15 @@
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap:fault>
             </wsdl:fault>
         </wsdl:operation>
+        <wsdl:operation name="setTableSchema">
+            <soap:operation soapAction="urn:setTableSchema" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
         <wsdl:operation name="getRecordCount">
             <soap:operation soapAction="urn:getRecordCount" style="document"></soap:operation>
             <wsdl:input>
@@ -520,15 +542,6 @@
             <wsdl:output>
                 <soap:body use="literal"></soap:body>
             </wsdl:output>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap:fault>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="setTableSchema">
-            <soap:operation soapAction="urn:setTableSchema" style="document"></soap:operation>
-            <wsdl:input>
-                <soap:body use="literal"></soap:body>
-            </wsdl:input>
             <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap:fault>
             </wsdl:fault>
@@ -704,6 +717,15 @@
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap12:fault>
             </wsdl:fault>
         </wsdl:operation>
+        <wsdl:operation name="setTableSchema">
+            <soap12:operation soapAction="urn:setTableSchema" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
         <wsdl:operation name="getRecordCount">
             <soap12:operation soapAction="urn:getRecordCount" style="document"></soap12:operation>
             <wsdl:input>
@@ -712,15 +734,6 @@
             <wsdl:output>
                 <soap12:body use="literal"></soap12:body>
             </wsdl:output>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap12:fault>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="setTableSchema">
-            <soap12:operation soapAction="urn:setTableSchema" style="document"></soap12:operation>
-            <wsdl:input>
-                <soap12:body use="literal"></soap12:body>
-            </wsdl:input>
             <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap12:fault>
             </wsdl:fault>
@@ -875,6 +888,12 @@
                 <mime:content type="text/xml" part="parameters"></mime:content>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="setTableSchema">
+            <http:operation location="setTableSchema"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+        </wsdl:operation>
         <wsdl:operation name="getRecordCount">
             <http:operation location="getRecordCount"></http:operation>
             <wsdl:input>
@@ -883,12 +902,6 @@
             <wsdl:output>
                 <mime:content type="text/xml" part="parameters"></mime:content>
             </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="setTableSchema">
-            <http:operation location="setTableSchema"></http:operation>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"></mime:content>
-            </wsdl:input>
         </wsdl:operation>
         <wsdl:operation name="getById">
             <http:operation location="getById"></http:operation>

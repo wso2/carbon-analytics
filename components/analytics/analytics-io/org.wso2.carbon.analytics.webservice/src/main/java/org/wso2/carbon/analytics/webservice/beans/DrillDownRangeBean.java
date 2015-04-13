@@ -16,13 +16,16 @@
 
 package org.wso2.carbon.analytics.webservice.beans;
 
+import java.io.Serializable;
+
 /**
  * This class represents a bean class for a range for numbers, includes details about the bounds of the range.
  * To cover all cases, double values are used
  */
 
-public class DrillDownRangeBean {
+public class DrillDownRangeBean implements Serializable {
 
+    private static final long serialVersionUID = -3716289676026929336L;
     private String label;
     private double from;
     private double to;

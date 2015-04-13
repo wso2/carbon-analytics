@@ -20,6 +20,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.io.Serializable;
 
 /**
  * The Class ResponseBean.
@@ -27,8 +28,9 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = { "status", "message" })
 @XmlRootElement(name = "response")
-public class ResponseBean {
+public class ResponseBean implements Serializable {
 
+	private static final long serialVersionUID = 3774118455947900553L;
 	/** The status. */
 	@XmlElement(required = true)
 	private String status;

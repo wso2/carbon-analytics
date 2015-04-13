@@ -26,6 +26,7 @@ import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema.ColumnType;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -86,9 +87,9 @@ public class Utils {
     @SuppressWarnings("unchecked")
     private static Map<String, Object> validateAndReturn(RecordValueEntryBean[] values)
             throws AnalyticsIndexException {
-        Map<String, Object> valueMap = new LinkedHashMap<>(0);
+        Map<String, Object> valueMap = new LinkedHashMap<>();
         for (RecordValueEntryBean recordEntry : values){
-                valueMap.put(recordEntry.getFieldName(),recordEntry.getValue());
+            valueMap.put(recordEntry.getFieldName(), getValue(recordEntry));
         }
         return valueMap;
     }
@@ -138,21 +139,20 @@ public class Utils {
     }
 
     private static RecordValueEntryBean[] createRecordEntryBeans(Map<String, Object> values) {
-        List<RecordValueEntryBean> beans = new ArrayList<>(0);
+        List<RecordValueEntryBean> beans = new ArrayList<>(values.size());
         for (Map.Entry<String, Object> entry : values.entrySet()) {
             RecordValueEntryBean bean = new RecordValueEntryBean();
             if (entry.getValue() instanceof AnalyticsCategoryPath) {
-                AnalyticsCategoryPath analyticsCategoryPath = (AnalyticsCategoryPath)entry.getValue();
+                AnalyticsCategoryPath analyticsCategoryPath = (AnalyticsCategoryPath) entry.getValue();
                 AnalyticsCategoryPathBean categoryPathBean = new AnalyticsCategoryPathBean();
                 categoryPathBean.setWeight(analyticsCategoryPath.getWeight());
                 categoryPathBean.setPath(analyticsCategoryPath.getPath());
                 bean.setFieldName(entry.getKey());
-                bean.setValue(String.valueOf(categoryPathBean));
+                bean.setAnalyticsCategoryPathBeanValue(categoryPathBean);
+                bean.setType(RecordValueEntryBean.FACET);
                 beans.add(bean);
             } else {
-                bean.setFieldName(entry.getKey());
-                bean.setValue(String.valueOf(entry.getValue()));
-                beans.add(bean);
+                beans.add(getRecordValueEntryBean(entry.getKey(), entry.getValue()));
             }
         }
         return beans.toArray(new RecordValueEntryBean[beans.size()]);
@@ -220,7 +220,7 @@ public class Utils {
 	 * @return the map
 	 */
 	public static IndexEntryBean[] createIndexTypeBeanMap(Map<String, IndexType> indexTypeMap) {
-		List<IndexEntryBean> indexTypeBeans = new ArrayList<>(0);
+		List<IndexEntryBean> indexTypeBeans = new ArrayList<>();
 		Set<String> columns = indexTypeMap.keySet();
 		for (String column : columns) {
             IndexEntryBean bean = new IndexEntryBean();
@@ -238,7 +238,7 @@ public class Utils {
 	 * @return the map
 	 */
 	public static Map<String, IndexType> createIndexTypeMap(IndexEntryBean[] indexTypeBeans) {
-		Map<String, IndexType> indexTypeMap = new HashMap<>(0);
+		Map<String, IndexType> indexTypeMap = new HashMap<>();
 		for (IndexEntryBean entryBean : indexTypeBeans) {
 			indexTypeMap.put(entryBean.getFieldName(), createIndexType(entryBean.getIndexType()));
 		}
@@ -303,11 +303,21 @@ public class Utils {
      * @return Analytics schema
      */
     public static AnalyticsSchema createAnalyticsSchema(AnalyticsSchemaBean analyticsSchemaBean) {
-        Map<String, AnalyticsSchema.ColumnType> columnTypes = new HashMap<>();
-        for (SchemaColumnBean columnBean : analyticsSchemaBean.getColumns()) {
-            columnTypes.put(columnBean.getColumnName(), getColumnType(columnBean.getColumnType()));
+        Map<String, ColumnType> columnTypes = null;
+        if (analyticsSchemaBean == null) {
+            return null;
         }
-        return new AnalyticsSchema(columnTypes, Arrays.asList(analyticsSchemaBean.getPrimaryKeys()));
+        if (analyticsSchemaBean.getColumns() != null) {
+            columnTypes = new HashMap<>();
+            for (SchemaColumnBean columnBean : analyticsSchemaBean.getColumns()) {
+                columnTypes.put(columnBean.getColumnName(), getColumnType(columnBean.getColumnType()));
+            }
+        }
+        List<String> primaryKeys = null;
+        if (analyticsSchemaBean.getPrimaryKeys() != null) {
+            primaryKeys = Arrays.asList(analyticsSchemaBean.getPrimaryKeys());
+        }
+        return new AnalyticsSchema(columnTypes, primaryKeys);
     }
 
     /**
@@ -316,21 +326,23 @@ public class Utils {
      * @return Table schema bean
      */
     public static AnalyticsSchemaBean createTableSchemaBean(AnalyticsSchema analyticsSchema) {
-        List<SchemaColumnBean> columnBeans = new ArrayList<>(0);
-        List<String> primaryKeys = new ArrayList<>(0);
-        if (analyticsSchema != null) {
-            if (analyticsSchema.getColumns() != null) {
-                for (Map.Entry<String, AnalyticsSchema.ColumnType> columnTypeEntry :
-                        analyticsSchema.getColumns().entrySet()) {
-                    SchemaColumnBean bean = new SchemaColumnBean();
-                    bean.setColumnName(columnTypeEntry.getKey());
-                    bean.setColumnType(getColumnTypeBean(columnTypeEntry.getValue()));
-                    columnBeans.add(bean);
-                }
+
+        if (analyticsSchema == null) {
+            return null;
+        }
+        List<SchemaColumnBean> columnBeans = new ArrayList<>();
+        List<String> primaryKeys = new ArrayList<>();
+        if (analyticsSchema.getColumns() != null) {
+            for (Map.Entry<String, ColumnType> columnTypeEntry :
+                    analyticsSchema.getColumns().entrySet()) {
+                SchemaColumnBean bean = new SchemaColumnBean();
+                bean.setColumnName(columnTypeEntry.getKey());
+                bean.setColumnType(getColumnTypeBean(columnTypeEntry.getValue()));
+                columnBeans.add(bean);
             }
-            if (analyticsSchema.getPrimaryKeys() != null) {
-                primaryKeys = analyticsSchema.getPrimaryKeys();
-            }
+        }
+        if (analyticsSchema.getPrimaryKeys() != null) {
+            primaryKeys = analyticsSchema.getPrimaryKeys();
         }
         return new AnalyticsSchemaBean(columnBeans.toArray(new SchemaColumnBean[columnBeans.size()]),
                                        primaryKeys.toArray(new String[primaryKeys.size()]));
@@ -344,7 +356,7 @@ public class Utils {
 
     private static PerFieldDrillDownResultBean[] createPerFieldDrillDownResultBean(Map<String
             , List<DrillDownResultEntry>> result) {
-        List<PerFieldDrillDownResultBean> resultBeans = new ArrayList<>(0);
+        List<PerFieldDrillDownResultBean> resultBeans = new ArrayList<>();
         for (Map.Entry<String, List<DrillDownResultEntry>> entry : result.entrySet()) {
             PerFieldDrillDownResultBean entryBean = new PerFieldDrillDownResultBean();
             entryBean.setFieldName(entry.getKey());
@@ -356,7 +368,7 @@ public class Utils {
 
     private static PerCategoryDrillDownResultBean[] createPerCategoryDrillDownResultBean
             (List<DrillDownResultEntry> result) {
-        List<PerCategoryDrillDownResultBean> beans = new ArrayList<>(0);
+        List<PerCategoryDrillDownResultBean> beans = new ArrayList<>();
         for (DrillDownResultEntry entry : result) {
             PerCategoryDrillDownResultBean bean = new PerCategoryDrillDownResultBean();
             bean.setCategory(entry.getCategory());
@@ -392,7 +404,7 @@ public class Utils {
 
     private static Map<String, List<AnalyticsDrillDownRange>> createDrillDownRanges(
             DrillDownFieldRangeBean[] ranges) {
-        Map<String, List<AnalyticsDrillDownRange>> result = new LinkedHashMap<>(0);
+        Map<String, List<AnalyticsDrillDownRange>> result = new LinkedHashMap<>();
         for (DrillDownFieldRangeBean entry : ranges) {
             result.put(entry.getFieldName(), createDrillDownRanges(entry.getRanges()));
         }
@@ -400,7 +412,7 @@ public class Utils {
     }
 
     private static List<AnalyticsDrillDownRange> createDrillDownRanges(DrillDownRangeBean[] ranges) {
-        List<AnalyticsDrillDownRange> result = new ArrayList<>(0);
+        List<AnalyticsDrillDownRange> result = new ArrayList<>();
         for (DrillDownRangeBean rangeBean : ranges) {
             AnalyticsDrillDownRange range = new AnalyticsDrillDownRange(rangeBean.getLabel(),
                                              rangeBean.getFrom(), rangeBean.getTo());
@@ -411,7 +423,7 @@ public class Utils {
 
 
     private static Map<String , AnalyticsCategoryPath> createCategoryPaths(DrillDownPathBean[] bean) {
-        Map<String, AnalyticsCategoryPath> categoryPaths = new LinkedHashMap<>(0);
+        Map<String, AnalyticsCategoryPath> categoryPaths = new LinkedHashMap<>();
         for (DrillDownPathBean drillDownPathBean : bean) {
             categoryPaths.put(drillDownPathBean.getCategoryName(),
                               new AnalyticsCategoryPath(drillDownPathBean.getPath()));
@@ -424,24 +436,24 @@ public class Utils {
      * @param type ColumnType Bean to be converted to ColumnType
      * @return ColumnType instance
      */
-    private static AnalyticsSchema.ColumnType getColumnType(String type) {
+    private static ColumnType getColumnType(String type) {
         switch (type) {
-            case BeanColumnType.STRING:
-                return AnalyticsSchema.ColumnType.STRING;
-            case BeanColumnType.INTEGER:
-                return AnalyticsSchema.ColumnType.INTEGER;
-            case BeanColumnType.LONG:
-                return AnalyticsSchema.ColumnType.LONG;
-            case BeanColumnType.FLOAT:
-                return AnalyticsSchema.ColumnType.FLOAT;
-            case BeanColumnType.DOUBLE:
-                return AnalyticsSchema.ColumnType.DOUBLE;
-            case BeanColumnType.BOOLEAN:
-                return AnalyticsSchema.ColumnType.BOOLEAN;
-            case BeanColumnType.BINARY:
-                return AnalyticsSchema.ColumnType.BINARY;
+            case RecordValueEntryBean.STRING:
+                return ColumnType.STRING;
+            case RecordValueEntryBean.INTEGER:
+                return ColumnType.INTEGER;
+            case RecordValueEntryBean.LONG:
+                return ColumnType.LONG;
+            case RecordValueEntryBean.FLOAT:
+                return ColumnType.FLOAT;
+            case RecordValueEntryBean.DOUBLE:
+                return ColumnType.DOUBLE;
+            case RecordValueEntryBean.BOOLEAN:
+                return ColumnType.BOOLEAN;
+            case RecordValueEntryBean.BINARY:
+                return ColumnType.BINARY;
             default:
-                return AnalyticsSchema.ColumnType.STRING;
+                return ColumnType.STRING;
         }
     }
 
@@ -450,24 +462,24 @@ public class Utils {
      * @param columnType the ColumnType to be converted to bean type
      * @return ColumnTypeBean instance
      */
-    private static String getColumnTypeBean(AnalyticsSchema.ColumnType columnType) {
+    private static String getColumnTypeBean(ColumnType columnType) {
         switch (columnType) {
             case STRING:
-                return BeanColumnType.STRING;
+                return RecordValueEntryBean.STRING;
             case INTEGER:
-                return BeanColumnType.INTEGER;
+                return RecordValueEntryBean.INTEGER;
             case LONG:
-                return BeanColumnType.LONG;
+                return RecordValueEntryBean.LONG;
             case FLOAT:
-                return BeanColumnType.FLOAT;
+                return RecordValueEntryBean.FLOAT;
             case DOUBLE:
-                return BeanColumnType.DOUBLE;
+                return RecordValueEntryBean.DOUBLE;
             case BOOLEAN:
-                return BeanColumnType.BOOLEAN;
+                return RecordValueEntryBean.BOOLEAN;
             case BINARY:
-                return BeanColumnType.BINARY;
+                return RecordValueEntryBean.BINARY;
             default:
-                return BeanColumnType.STRING;
+                return RecordValueEntryBean.STRING;
         }
     }
 
@@ -491,18 +503,6 @@ public class Utils {
         public static final String INTEGER = "INTEGER";
         public static final String FACET = "FACET";
         public static final String SCOREPARAM = "SCOREPARAM";
-    }
-
-    private class  BeanColumnType {
-
-        public static final String STRING = "STRING";
-        public static final String LONG = "LONG";
-        public static final String FLOAT = "FLOAT";
-        public static final String DOUBLE = "DOUBLE";
-        public static final String BOOLEAN = "BOOLEAN";
-        public static final String BINARY = "BINARY";
-        public static final String INTEGER = "INTEGER";
-
     }
 
     public static IndexConfigurationBean getIndexConfiguration(Map<String, IndexType> indices, List<String>
@@ -543,49 +543,85 @@ public class Utils {
         return scoreParams;
     }
 
-    private Object getObject(String value, String type) {
-        Object convertedValue;
-        switch (type) {
-            case BeanColumnType.STRING: {
-                convertedValue = String.valueOf(value);
+    private static Object getValue(RecordValueEntryBean recordValueEntryBean) {
+        Object resultObj;
+        switch (recordValueEntryBean.getType()) {
+            case RecordValueEntryBean.STRING: {
+                resultObj = recordValueEntryBean.getStringValue();
                 break;
             }
-            case BeanColumnType.INTEGER: {
-                if (value == null || value.isEmpty()) {
-                    value = "0";
-                }
-                convertedValue = Integer.valueOf(value);
+            case RecordValueEntryBean.INTEGER: {
+                resultObj = recordValueEntryBean.getIntValue();
                 break;
             }
-            case BeanColumnType.LONG: {
-                if (value == null || value.isEmpty()) {
-                    value = "0";
-                }
-                convertedValue = Integer.valueOf(value);
+            case RecordValueEntryBean.LONG: {
+                resultObj = recordValueEntryBean.getLongValue();
                 break;
             }
-            case BeanColumnType.BOOLEAN: {
-                convertedValue = Boolean.valueOf(value);
+            case RecordValueEntryBean.BOOLEAN: {
+                resultObj = recordValueEntryBean.getBooleanValue();
                 break;
             }
-            case BeanColumnType.FLOAT: {
-                if (value == null || value.isEmpty()) {
-                    value = "0.0";
-                }
-                convertedValue = Float.valueOf(value);
+            case RecordValueEntryBean.FLOAT: {
+                resultObj = recordValueEntryBean.getFloatValue();
                 break;
             }
-            case BeanColumnType.DOUBLE: {
-                if (value == null || value.isEmpty()) {
-                    value = "0.0";
-                }
-                convertedValue = Double.valueOf(value);
+            case RecordValueEntryBean.DOUBLE: {
+                resultObj = recordValueEntryBean.getDoubleValue();
+                break;
+            }
+            case RecordValueEntryBean.FACET: {
+                resultObj = recordValueEntryBean.getAnalyticsCategoryPathBeanValue();
                 break;
             }
             default: {
-                convertedValue = value;
+                resultObj = recordValueEntryBean.getStringValue();
             }
         }
-        return convertedValue;
+        return resultObj;
+    }
+
+    private static RecordValueEntryBean getRecordValueEntryBean(String fieldName, Object value) {
+        RecordValueEntryBean recordValueEntryBean = new RecordValueEntryBean();
+        recordValueEntryBean.setFieldName(fieldName);
+        if (value != null) {
+            switch (value.getClass().toString().toUpperCase()) {
+                case RecordValueEntryBean.STRING: {
+                    recordValueEntryBean.setStringValue(String.valueOf(value));
+                    recordValueEntryBean.setType(RecordValueEntryBean.STRING);
+                    break;
+                }
+                case RecordValueEntryBean.INTEGER: {
+                    recordValueEntryBean.setIntValue(Integer.valueOf(String.valueOf(value)));
+                    recordValueEntryBean.setType(RecordValueEntryBean.INTEGER);
+                    break;
+                }
+                case RecordValueEntryBean.LONG: {
+                    recordValueEntryBean.setLongValue(Long.valueOf(String.valueOf(value)));
+                    recordValueEntryBean.setType(RecordValueEntryBean.LONG);
+                    break;
+                }
+                case RecordValueEntryBean.BOOLEAN: {
+                    recordValueEntryBean.setBooleanValue(Boolean.valueOf(String.valueOf(value)));
+                    recordValueEntryBean.setType(RecordValueEntryBean.BOOLEAN);
+                    break;
+                }
+                case RecordValueEntryBean.FLOAT: {
+                    recordValueEntryBean.setFloatValue(Float.valueOf(String.valueOf(value)));
+                    recordValueEntryBean.setType(RecordValueEntryBean.FLOAT);
+                    break;
+                }
+                case RecordValueEntryBean.DOUBLE: {
+                    recordValueEntryBean.setDoubleValue(Double.valueOf(String.valueOf(value)));
+                    recordValueEntryBean.setType(RecordValueEntryBean.DOUBLE);
+                    break;
+                }
+                default: {
+                    recordValueEntryBean.setStringValue(String.valueOf(value));
+                    recordValueEntryBean.setType(RecordValueEntryBean.STRING);
+                }
+            }
+        }
+        return recordValueEntryBean;
     }
 }

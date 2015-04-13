@@ -20,6 +20,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 
 
 /**
@@ -27,8 +28,9 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "credential")
-public class CredentialBean {
+public class CredentialBean implements Serializable {
 
+    private static final long serialVersionUID = -6048430066805201829L;
     @XmlElement(name = "username", required = true)
     private String username;
 

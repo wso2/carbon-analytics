@@ -15,12 +15,15 @@
  */
 package org.wso2.carbon.analytics.webservice.beans;
 
+import java.io.Serializable;
+
 /**
  * The Class RecordBean.
  */
-public class RecordBean {
+public class RecordBean implements Serializable {
 
-    /** The id. */
+	private static final long serialVersionUID = -1592541010962618508L;
+	/** The id. */
     private String id;
 
 	/** The table name. */

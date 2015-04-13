@@ -16,10 +16,13 @@
 
 package org.wso2.carbon.analytics.webservice.beans;
 
+import java.io.Serializable;
+
 /**
  * This class represents columns in SchemaBean
  */
-public class SchemaColumnBean {
+public class SchemaColumnBean implements Serializable {
+    private static final long serialVersionUID = -4156435823075540631L;
     private String columnName;
     private String columnType;
 

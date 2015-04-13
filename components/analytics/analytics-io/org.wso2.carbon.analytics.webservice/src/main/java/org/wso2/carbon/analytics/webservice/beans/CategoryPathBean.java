@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 
 /**
  * This class represents a facet object bean. facet object defines the hierarchical category,
@@ -40,8 +41,9 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "categoryPath")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class CategoryPathBean {
+public class CategoryPathBean implements Serializable {
 
+    private static final long serialVersionUID = 5377662210798281041L;
     @XmlElement(name = "path")
     private String[] path;
     @XmlElement(name = "weight")

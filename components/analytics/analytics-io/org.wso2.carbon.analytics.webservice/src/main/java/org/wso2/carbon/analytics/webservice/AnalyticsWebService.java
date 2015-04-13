@@ -71,6 +71,7 @@ public class AnalyticsWebService extends AbstractAdmin {
         try {
             analyticsDataAPI.createTable(getUsername(), tableName);
         } catch (Exception e) {
+            logger.error("Unable to create table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to create table due to " + e.getMessage(), e);
         }
     }
@@ -87,6 +88,7 @@ public class AnalyticsWebService extends AbstractAdmin {
         try {
             analyticsDataAPI.setTableSchema(getUsername(), tableName, Utils.createAnalyticsSchema(schema));
         } catch (AnalyticsException e) {
+            logger.error("Unable to set table schema[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to set table schema due to " + e.getMessage(), e);
         }
     }
@@ -103,6 +105,7 @@ public class AnalyticsWebService extends AbstractAdmin {
         try {
             return Utils.createTableSchemaBean(analyticsDataAPI.getTableSchema(getUsername(), tableName));
         } catch (AnalyticsException e) {
+            logger.error("Unable to get table schema[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to get table schema for table[" + tableName + "] due to " + e
                     .getMessage(), e);
         }
@@ -119,6 +122,7 @@ public class AnalyticsWebService extends AbstractAdmin {
         try {
             return analyticsDataAPI.tableExists(getUsername(), tableName);
         } catch (AnalyticsException e) {
+            logger.error("Unable to check table[" + tableName + "] exist due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to check status of the table[" + tableName + "] due to " + e
                     .getMessage(), e);
         }
@@ -135,6 +139,7 @@ public class AnalyticsWebService extends AbstractAdmin {
         try {
             analyticsDataAPI.deleteTable(getUsername(), tableName);
         } catch (AnalyticsException e) {
+            logger.error("Unable to delete table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to delete table[" + tableName + "] due to " + e.getMessage(), e);
         }
     }
@@ -155,6 +160,7 @@ public class AnalyticsWebService extends AbstractAdmin {
                 return new String[0];
             }
         } catch (AnalyticsException e) {
+            logger.error("Unable to get table name list due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to list tables due to " + e.getMessage(), e);
         }
     }
@@ -175,6 +181,7 @@ public class AnalyticsWebService extends AbstractAdmin {
         try {
             return analyticsDataAPI.getRecordCount(getUsername(), tableName, timeFrom, timeTo);
         } catch (AnalyticsException e) {
+            logger.error("Unable to get record count for table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to get record count for table[" + tableName + "] due to " + e
                     .getMessage(), e);
         }
@@ -189,15 +196,17 @@ public class AnalyticsWebService extends AbstractAdmin {
      * this will be a full replace of the record, where the older record is effectively deleted and the new one is
      * added, there will not be a merge of older record's field's with the new one.
      *
-     * @param records Arrays of RecordBean to be inserted
+     * @param recordBeans Arrays of RecordBean to be inserted
      * @throws AnalyticsWebServiceException
      */
-    public void put(RecordBean[] records) throws AnalyticsWebServiceException {
+    public void put(RecordBean[] recordBeans) throws AnalyticsWebServiceException {
         try {
-            List<RecordBean> recordBeans = Arrays.asList(records);
+            List<RecordBean> recordBeanList = Arrays.asList(recordBeans);
             String username = getUsername();
-            analyticsDataAPI.put(username, Utils.getRecords(username, recordBeans));
+            List<Record> records = Utils.getRecords(username, recordBeanList);
+            analyticsDataAPI.put(username, records);
         } catch (AnalyticsException e) {
+            logger.error("Unable to put records  due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to add record due to " + e.getMessage(), e);
         }
     }
@@ -232,6 +241,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
             return recordBeans.toArray(resultRecordBeans);
         } catch (AnalyticsException e) {
+            logger.error("Unable to get records from table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to get record from table[" + tableName + "] due to " + e
                     .getMessage(), e);
         }
@@ -265,6 +275,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
             return recordBeans.toArray(resultRecordBeans);
         } catch (AnalyticsException e) {
+            logger.error("Unable to get records from table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to get record from table[" + tableName + "] due to " + e
                     .getMessage(), e);
         }
@@ -282,6 +293,7 @@ public class AnalyticsWebService extends AbstractAdmin {
         try {
             analyticsDataAPI.delete(getUsername(), tableName, timeFrom, timeTo);
         } catch (AnalyticsException e) {
+            logger.error("Unable to delete records from table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to delete record from table[" + tableName + "] due to " + e
                     .getMessage(), e);
         }
@@ -298,6 +310,7 @@ public class AnalyticsWebService extends AbstractAdmin {
         try {
             analyticsDataAPI.delete(getUsername(), tableName, Arrays.asList(ids));
         } catch (AnalyticsException e) {
+            logger.error("Unable to delete records from table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to delete record from table[" + tableName + "] due to " + e
                     .getMessage(), e);
         }
@@ -318,6 +331,7 @@ public class AnalyticsWebService extends AbstractAdmin {
         try {
             analyticsDataAPI.setIndices(getUsername(), tableName, Utils.getIndices(indexConfigurationBean), Utils.getScoreParam(indexConfigurationBean));
         } catch (AnalyticsIndexException e) {
+            logger.error("Unable to set indices for table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to set indices from table[" + tableName + "] due to " + e
                     .getMessage(), e);
         }
@@ -336,6 +350,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             return Utils.getIndexConfiguration(analyticsDataAPI.getIndices(getUsername(), tableName),
                                                analyticsDataAPI.getScoreParams(getUsername(), tableName));
         } catch (AnalyticsException e) {
+            logger.error("Unable to get indices from table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to get indices from table[" + tableName + "] due to " + e
                     .getMessage(), e);
         }
@@ -351,6 +366,7 @@ public class AnalyticsWebService extends AbstractAdmin {
         try {
             analyticsDataAPI.clearIndices(getUsername(), tableName);
         } catch (AnalyticsException e) {
+            logger.error("Unable to clear indices from table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to clear indices from table[" + tableName + "] due to " + e
                     .getMessage(), e);
         }
@@ -378,6 +394,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
             return recordBeans.toArray(resultRecordBeans);
         } catch (AnalyticsException e) {
+            logger.error("Unable to get search result for table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to get search result from table[" + tableName + "] due to " + e
                     .getMessage(), e);
         }
@@ -396,6 +413,7 @@ public class AnalyticsWebService extends AbstractAdmin {
         try {
             return analyticsDataAPI.searchCount(getUsername(), tableName, language, query);
         } catch (AnalyticsIndexException e) {
+            logger.error("Unable to get search count for table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to get search count from table[" + tableName + "] due to "
                                                    + e.getMessage(), e);
         }
@@ -411,6 +429,7 @@ public class AnalyticsWebService extends AbstractAdmin {
         try {
             analyticsDataAPI.waitForIndexing(maxWait);
         } catch (AnalyticsException e) {
+            logger.error("An exception occurred: " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("An exception occurred: " + e.getMessage(), e);
         }
     }
@@ -425,6 +444,7 @@ public class AnalyticsWebService extends AbstractAdmin {
         try {
             analyticsDataAPI.destroy();
         } catch (AnalyticsException e) {
+            logger.error("An exception occurred: " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("An exception occurred: " + e.getMessage(), e);
         }
     }

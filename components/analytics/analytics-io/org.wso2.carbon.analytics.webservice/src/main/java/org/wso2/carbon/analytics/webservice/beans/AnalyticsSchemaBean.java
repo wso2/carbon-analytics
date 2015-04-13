@@ -16,11 +16,14 @@
 
 package org.wso2.carbon.analytics.webservice.beans;
 
+import java.io.Serializable;
+
 /**
  * Bean class for representing the table schema
  */
-public class AnalyticsSchemaBean {
+public class AnalyticsSchemaBean implements Serializable {
 
+    private static final long serialVersionUID = -3948980132143204970L;
     private  SchemaColumnBean[] columns;
     private String[] primaryKeys;
 

@@ -16,11 +16,14 @@
 
 package org.wso2.carbon.analytics.webservice.beans;
 
+import java.io.Serializable;
+
 /**
  * This class represents a single entry/a single field in a drilldownresult,
  */
-public class PerFieldDrillDownResultBean {
+public class PerFieldDrillDownResultBean implements Serializable {
 
+    private static final long serialVersionUID = 2327136897054222997L;
     private String fieldName;
     private PerCategoryDrillDownResultBean[] categories;
 

@@ -16,10 +16,13 @@
 
 package org.wso2.carbon.analytics.webservice.beans;
 
+import java.io.Serializable;
+
 /**
  * Bean class to represent drilldown results per category under each field.
  */
-public class PerCategoryDrillDownResultBean {
+public class PerCategoryDrillDownResultBean implements Serializable {
+    private static final long serialVersionUID = -7306371614799719557L;
     private String category;
     private String[] categoryPath;
     private String[] recordIds;

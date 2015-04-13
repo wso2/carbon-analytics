@@ -16,11 +16,14 @@
 
 package org.wso2.carbon.analytics.webservice.beans;
 
+import java.io.Serializable;
+
 /**
  * This class represents the bean class for containing the drilldown ranges per a field.
  */
-public class DrillDownFieldRangeBean {
+public class DrillDownFieldRangeBean implements Serializable {
 
+    private static final long serialVersionUID = -1094086094853006437L;
     private String fieldName;
     private DrillDownRangeBean[] ranges;
 
