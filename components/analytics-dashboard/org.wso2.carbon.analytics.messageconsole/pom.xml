@@ -49,7 +49,7 @@
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Private-Package>org.org.wso2.carbon.analytics.messageconsole.internal</Private-Package>
                         <Export-Package>
-                            org.wso2.carbon.analytics.messageconsole.*
+                            org.wso2.carbon.analytics.messageconsole.*;version="${carbon.analytics.version}"
                         </Export-Package>
                         <Import-Package>
                             org.apache.commons.logging.*,

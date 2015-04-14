@@ -746,7 +746,7 @@ public class MessageConsoleConnector {
 
     public boolean isPaginationSupported() {
         try {
-            return messageConsoleStub.isPaginationSupported();
+            return analyticsWebServiceStub.isPaginationSupported();
         } catch (RemoteException e) {
             log.error("Unable to check whether pagination support available or not.");
         }

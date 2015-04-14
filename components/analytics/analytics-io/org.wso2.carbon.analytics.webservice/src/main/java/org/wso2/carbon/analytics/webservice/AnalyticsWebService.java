@@ -448,4 +448,13 @@ public class AnalyticsWebService extends AbstractAdmin {
             throw new AnalyticsWebServiceException("An exception occurred: " + e.getMessage(), e);
         }
     }
+
+    /**
+     * Check whether under laying data layer implementation support for pagination or not.
+     *
+     * @return boolean true or false based on under laying data layer implementation
+     */
+    public boolean isPaginationSupported() {
+        return analyticsDataAPI.isPaginationSupported();
+    }
 }
