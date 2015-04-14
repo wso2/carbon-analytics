@@ -34,9 +34,7 @@ import org.wso2.carbon.databridge.commons.AttributeType;
 
 import com.google.gson.Gson;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class EventStreamAdminService extends AbstractAdmin {
 
@@ -229,6 +227,13 @@ public class EventStreamAdminService extends AbstractAdmin {
                     eventStreamInfoDtos[index].setEditable(eventStreamConfiguration.isEditable());
                     index++;
                 }
+                Arrays.sort(eventStreamInfoDtos, new Comparator() {
+
+                    @Override
+                    public int compare(Object o1, Object o2) {
+                        return ((EventStreamInfoDto) o1).getStreamName().compareTo(((EventStreamInfoDto) o2).getStreamName());
+                    }
+                });
                 return eventStreamInfoDtos;
             } else {
                 return new EventStreamInfoDto[0];
