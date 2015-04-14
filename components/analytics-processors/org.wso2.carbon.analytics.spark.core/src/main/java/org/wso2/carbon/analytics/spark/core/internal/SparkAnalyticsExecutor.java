@@ -104,6 +104,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private int workerCount = 1;
     
     private Object workerActorSystem;
+    private Object masterActorSystem;
 
     public SparkAnalyticsExecutor(String myHost, int portOffset) throws AnalyticsClusterException {
         this.myHost = myHost;
@@ -127,7 +128,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
 
     private void startMaster(String host, int port, int webUIport) {
-        Master.startSystemAndActor(host, port, webUIport, this.sparkConf);
+        this.masterActorSystem = Master.startSystemAndActor(host, port, webUIport, this.sparkConf)._1();
     }
 
     private void startWorker(String workerHost, String masterHost, int masterPort, int p1, int p2) {
@@ -138,7 +139,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
         this.workerActorSystem = Worker.startSystemAndActor(workerHost, p1, p2, 2, 1000000, new String[]{"spark://" + masterHost + ":" + masterPort},
                                                             null, (Option) None$.MODULE$, sparkConf)._1();
-    }
+          }
 
     private void initSparkDataListener() {
         this.validateSparkScriptPathPermission();
@@ -182,6 +183,19 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             method.invoke(this.workerActorSystem);
         } catch (Exception e) {
             throw new RuntimeException("Error in shutting down worker: " + e.getMessage(), e);
+        }
+    }
+
+    private void shutdownMaster(){
+        if (this.masterActorSystem == null) {
+            return;
+        }
+        try {
+            Method method = this.masterActorSystem.getClass().getMethod("shutdown");
+            method.invoke(this.masterActorSystem);
+            this.masterActorSystem = null;
+        } catch (Exception e) {
+            throw new RuntimeException("Error in shutting down master: " + e.getMessage(), e);
         }
     }
 
@@ -477,12 +491,10 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         this.sparkConf = new SparkConf();
         int masterPort = BASE_MASTER_PORT + this.portOffset;
         int webuiPort = BASE_WEBUI_PORT + this.portOffset;
-        if (javaSparkCtx != null){
-            javaSparkCtx.close();
-        }
-        if (sqlCtx != null){
-            sqlCtx.sparkContext().stop();
-        }
+        this.stop();
+
+        this.shutdownMaster();
+        this.shutdownWorker();
         this.startMaster(this.myHost, masterPort, webuiPort);
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         acm.setProperty(CLUSTER_GROUP_NAME, MASTER_HOST_GROUP_PROP, this.myHost);
