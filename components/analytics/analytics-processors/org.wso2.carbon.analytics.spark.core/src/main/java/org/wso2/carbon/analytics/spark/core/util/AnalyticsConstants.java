@@ -61,4 +61,5 @@ public class AnalyticsConstants {
     public static final String OBJECT = "OBJECT";
 
     public static final String DEFAULT_CHARSET = "UTF8";
+    public static final String SCRIPT_DEPLOYMENT_DIR = "sparkscripts";
 }

@@ -17,6 +17,14 @@
 -->
 
 <component xmlns="http://products.wso2.org/carbon">
+    <deployers>
+        <deployer>
+            <directory>analytics-indices</directory>
+            <extension>xml</extension>
+            <class>org.wso2.carbon.analytics.dataservice.AnalyticsIndexDeployer</class>
+        </deployer>
+    </deployers>
+
     <ManagementPermissions>
         <ManagementPermission>
             <DisplayName>Analytics Data</DisplayName>

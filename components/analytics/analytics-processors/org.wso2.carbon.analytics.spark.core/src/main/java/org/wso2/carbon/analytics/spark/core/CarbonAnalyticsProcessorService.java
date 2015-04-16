@@ -86,7 +86,7 @@ public class CarbonAnalyticsProcessorService implements AnalyticsProcessorServic
     public void updateScript(int tenantId, String scriptName, String scriptContent, String cronExpression)
             throws AnalyticsPersistenceException {
         try {
-            AnalyticsPersistenceManager.getInstance().updateScript(tenantId, scriptName, scriptContent, cronExpression);
+            AnalyticsPersistenceManager.getInstance().putScript(tenantId, scriptName, scriptContent, cronExpression);
         } catch (AnalyticsPersistenceException e) {
             log.error("Error while updating the script : " + scriptName, e);
             throw e;

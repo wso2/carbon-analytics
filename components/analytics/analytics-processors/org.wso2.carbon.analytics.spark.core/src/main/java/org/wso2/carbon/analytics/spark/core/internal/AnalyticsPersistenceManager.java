@@ -239,7 +239,7 @@ public class AnalyticsPersistenceManager {
      * @param cron          New cron expression of the script.
      * @throws AnalyticsPersistenceException
      */
-    public void updateScript(int tenantId, String scriptName, String scriptContent, String cron)
+    public void putScript(int tenantId, String scriptName, String scriptContent, String cron)
             throws AnalyticsPersistenceException {
         try {
             UserRegistry userRegistry = ServiceHolder.getTenantConfigRegistry(tenantId);
@@ -253,8 +253,7 @@ public class AnalyticsPersistenceManager {
                 userRegistry.put(scriptLocation, resource);
                 scheduleTask(tenantId, script);
             } else {
-                throw new AnalyticsPersistenceException("Already a script exists with same name : " + scriptName
-                        + " for tenantId :" + tenantId);
+                this.saveScript(tenantId, scriptName, scriptContent, cron);
             }
         } catch (RegistryException e) {
             throw new AnalyticsPersistenceException("Error while loading the registry for tenant :" + tenantId, e);

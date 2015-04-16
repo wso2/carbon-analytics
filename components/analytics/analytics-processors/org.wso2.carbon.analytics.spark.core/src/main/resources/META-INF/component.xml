@@ -18,9 +18,9 @@
 <component xmlns="http://products.wso2.org/carbon">
     <deployers>
         <deployer>
-            <directory>analytics</directory>
+            <directory>spark-scripts</directory>
             <extension>ql</extension>
-            <class>org.wso2.carbon.analytics.spark.core.AnalyticsDeployer</class>
+            <class>org.wso2.carbon.analytics.spark.core.SparkScriptDeployer</class>
         </deployer>
     </deployers>
 
