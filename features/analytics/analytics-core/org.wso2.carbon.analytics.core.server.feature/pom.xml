@@ -58,6 +58,10 @@
             <artifactId>asm4-all</artifactId>
             <version>${asm4.orbit.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.esotericsoftware.kryo</groupId>
+            <artifactId>kryo</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -89,6 +93,7 @@
                             <bundles>
                                 <bundleDef>org.wso2.orbit.org.apache.lucene:lucene</bundleDef>
                                 <bundleDef>org.wso2.orbit.asm4:asm4-all</bundleDef>
+                                <bundleDef>com.esotericsoftware.kryo:kryo</bundleDef>
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasource.core</bundleDef>
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.dataservice</bundleDef>
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.dataservice.commons</bundleDef>

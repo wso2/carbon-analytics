@@ -19,7 +19,9 @@ package org.wso2.carbon.analytics.spark.core.exception;
 
 import org.apache.axis2.deployment.DeploymentException;
 
-public class AnalyticsScriptDeploymentException extends DeploymentException{
+public class AnalyticsScriptDeploymentException extends DeploymentException {
+
+    private static final long serialVersionUID = -4479055838304546891L;
 
     public AnalyticsScriptDeploymentException(String message, Throwable cause) {
         super(message, cause);

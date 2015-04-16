@@ -43,7 +43,6 @@
                             ${project.artifactId}
                         </Bundle-SymbolicName>
                         <Export-Package>
-                            org.wso2.carbon.analytics.datasource.commons,
                             org.wso2.carbon.analytics.datasource.commons.*
                         </Export-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>

@@ -26,7 +26,6 @@ import org.wso2.carbon.analytics.spark.core.exception.AnalyticsPersistenceExcept
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsScriptDeploymentException;
 import org.wso2.carbon.analytics.spark.core.internal.AnalyticsPersistenceManager;
 import org.wso2.carbon.analytics.spark.core.internal.AnalyticsServerStartupObserver;
-import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsScript;
 import org.wso2.carbon.context.PrivilegedCarbonContext;

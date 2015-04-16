@@ -22,7 +22,6 @@ import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.deployment.repository.util.DeploymentFileData;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.CarbonException;
 import org.wso2.carbon.analytics.spark.core.SparkScriptDeployer;
 import org.wso2.carbon.core.ServerStartupObserver;
 import org.wso2.carbon.utils.CarbonUtils;

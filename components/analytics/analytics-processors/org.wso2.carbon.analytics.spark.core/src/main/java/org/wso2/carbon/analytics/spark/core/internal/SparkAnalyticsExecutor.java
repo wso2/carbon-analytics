@@ -48,12 +48,8 @@ import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsRelation;
 import org.wso2.carbon.utils.CarbonUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
@@ -385,50 +381,11 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
     
     private static byte[] tableKeysToBinary(String[] keys) throws AnalyticsException {
-        ByteArrayOutputStream byteOut = null;
-        ObjectOutputStream objOut = null;
-        try {
-            byteOut = new ByteArrayOutputStream();
-            objOut = new ObjectOutputStream(byteOut);
-            objOut.writeObject(keys);
-            return byteOut.toByteArray();
-        } catch (IOException e) {
-            throw new AnalyticsException("Error in converting table keys to binary: " + e.getMessage(), e);
-        } finally {
-            try {
-                objOut.close();
-            } catch (IOException e) {
-                log.error(e);
-            }
-            try {
-                byteOut.close();
-            } catch (IOException e) {
-                log.error(e);
-            }
-        }
+        return GenericUtils.serializeObject(keys);
     }
     
     private static String[] binaryToTableKeys(byte[] data) throws AnalyticsException {
-        ByteArrayInputStream byteIn = null;
-        ObjectInputStream objIn = null;
-        try {
-            byteIn = new ByteArrayInputStream(data);
-            objIn = new ObjectInputStream(byteIn);
-            return (String[]) objIn.readObject();
-        } catch (ClassNotFoundException | IOException e) {
-            throw new AnalyticsException("Error in converting binary data to table info: " + e.getMessage(), e);
-        } finally {
-            try {
-                objIn.close();
-            } catch (IOException e) {
-                log.error(e);
-            }
-            try {
-                byteIn.close();
-            } catch (IOException e) {
-                log.error(e);
-            }
-        }
+        return (String[]) GenericUtils.deserializeObject(data);
     }
     
     private static String[] loadTableKeys(int tenantId, String tableName) throws AnalyticsException {

@@ -390,7 +390,23 @@ public class GenericUtils {
     }
 
     public static Object deserializeObject(byte[] source) {
+        if (source == null) {
+            return null;
+        }
         Input input = new Input(source);
+        try {
+            Kryo kryo = kryoTL.get();
+            return kryo.readClassAndObject(input);
+        } finally {
+            input.close();
+        }
+    }
+    
+    public static Object deserializeObject(InputStream in) {
+        if (in == null) {
+            return null;
+        }
+        Input input = new Input(in);
         try {
             Kryo kryo = kryoTL.get();
             return kryo.readClassAndObject(input);

@@ -35,8 +35,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -383,37 +381,15 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     }
     
     private InputStream schemaToStream(AnalyticsSchema schema) throws AnalyticsException {
-        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-        try {
-            ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
-            objOut.writeObject(schema);
-            objOut.close();
-            byteOut.close();
-            return new ByteArrayInputStream(byteOut.toByteArray());
-        } catch (IOException e) {
-            throw new AnalyticsException("Error in schema -> stream: " + e.getMessage(), e);
-        }
+        return new ByteArrayInputStream(GenericUtils.serializeObject(schema));
     }
     
     private AnalyticsSchema streamToSchema(InputStream in) throws AnalyticsException {
-        ObjectInputStream objIn = null;
-        try {
-            if (in == null || in.available() == 0) {
-                return new AnalyticsSchema(null, null);
-            }
-            objIn = new ObjectInputStream(in);
-            return (AnalyticsSchema) objIn.readObject();
-        } catch (ClassNotFoundException | IOException e) {
-            throw new AnalyticsException("Error in stream -> schema: " + e.getMessage(), e);
-        } finally {
-            try {
-                if (objIn != null) {
-                    objIn.close();
-                }
-            } catch (IOException ignore) {
-                /* ignore */
-            }
+        AnalyticsSchema schema = (AnalyticsSchema) GenericUtils.deserializeObject(in);
+        if (schema == null) {
+            schema = new AnalyticsSchema();
         }
+        return schema;
     }
     
     @Override
