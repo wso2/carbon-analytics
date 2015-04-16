@@ -30,7 +30,7 @@ public class AnalyticsIndexConfiguration {
     private List<AnalyticsIndexColumn> indexColumns;
     private List<String> scoreParams;
 
-    @XmlElement(name = "IndexColumns")
+    @XmlElement(name = "IndexColumn")
     public List<AnalyticsIndexColumn> getIndexColumns() {
         return indexColumns;
     }
@@ -58,7 +58,6 @@ public class AnalyticsIndexConfiguration {
         return indexColMap;
     }
 
-    @XmlRootElement(name = "IndexColumn")
     public static class AnalyticsIndexColumn {
         private String columnName;
         private IndexType indexType;

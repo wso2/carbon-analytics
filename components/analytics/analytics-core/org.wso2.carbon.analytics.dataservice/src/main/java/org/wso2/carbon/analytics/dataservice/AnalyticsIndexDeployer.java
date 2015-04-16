@@ -76,28 +76,34 @@ public class AnalyticsIndexDeployer extends AbstractDeployer {
      * @throws AnalyticsIndexDeploymentException
      */
     public void deploy(DeploymentFileData deploymentFileData) throws AnalyticsIndexDeploymentException {
-        try {
-            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-            JAXBContext context = JAXBContext.newInstance(AnalyticsIndexConfiguration.class);
-            Unmarshaller un = context.createUnmarshaller();
-            AnalyticsIndexConfiguration configuration =
-                    (AnalyticsIndexConfiguration) un.unmarshal(deploymentFileData.getFile());
-            AnalyticsServiceHolder.getAnalyticsDataService().setIndices(tenantId,
-                    getTableNameFromAnalyticsIndexFileName(deploymentFileData.getName()),
-                    configuration.getIndexColumnsMap(), configuration.getScoreParams());
-        } catch (JAXBException e) {
-            String errorMsg = "Error while reading from the file : " + deploymentFileData.getAbsolutePath();
-            log.error(errorMsg, e);
-            throw new AnalyticsIndexDeploymentException(errorMsg, e);
-        } catch (AnalyticsIndexException e) {
-            String errorMsg = "Error setting the indices from file : " + deploymentFileData.getAbsolutePath();
-            log.error(errorMsg, e);
-            throw new AnalyticsIndexDeploymentException(errorMsg, e);
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        if (AnalyticsDataServiceServerStartupObserver.getInstance().getInitialized()) {
+            try {
+                log.info("Deploying analytics indices from file : " + deploymentFileData.getName() + " for tenant id :" + tenantId);
+                JAXBContext context = JAXBContext.newInstance(AnalyticsIndexConfiguration.class);
+                Unmarshaller un = context.createUnmarshaller();
+                AnalyticsIndexConfiguration configuration =
+                        (AnalyticsIndexConfiguration) un.unmarshal(deploymentFileData.getFile());
+                AnalyticsServiceHolder.getAnalyticsDataService().setIndices(tenantId,
+                        getTableNameFromAnalyticsIndexFileName(deploymentFileData.getName()),
+                        configuration.getIndexColumnsMap(), configuration.getScoreParams());
+            } catch (JAXBException e) {
+                String errorMsg = "Error while reading from the file : " + deploymentFileData.getAbsolutePath();
+                log.error(errorMsg, e);
+                throw new AnalyticsIndexDeploymentException(errorMsg, e);
+            } catch (AnalyticsIndexException e) {
+                String errorMsg = "Error setting the indices from file : " + deploymentFileData.getAbsolutePath();
+                log.error(errorMsg, e);
+                throw new AnalyticsIndexDeploymentException(errorMsg, e);
+            }
+        }else {
+            AnalyticsDataServiceServerStartupObserver.getInstance().addPausedDeployment(deploymentFileData);
         }
     }
 
     public void undeploy(String fileName) throws AnalyticsIndexDeploymentException {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        log.info("Undeploying the analytics indices from file : "+ fileName +" for tenant id :" + tenantId);
         String tableName = getTableNameFromAnalyticsIndexFileName(fileName);
         try {
             AnalyticsServiceHolder.getAnalyticsDataService().setIndices(tenantId,
@@ -110,7 +116,8 @@ public class AnalyticsIndexDeployer extends AbstractDeployer {
         }
     }
 
-    private String getTableNameFromAnalyticsIndexFileName(String fileName) {
+    private String getTableNameFromAnalyticsIndexFileName(String filePath) {
+        String fileName = new File(filePath).getName();
         return fileName.substring(0, fileName.length() - EXTENSION.length() - 1);
     }
 

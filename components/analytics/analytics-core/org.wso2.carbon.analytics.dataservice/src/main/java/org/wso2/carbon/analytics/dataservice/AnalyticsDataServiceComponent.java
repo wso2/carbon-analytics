@@ -30,10 +30,12 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerImpl;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceService;
+import org.wso2.carbon.core.ServerStartupObserver;
 import org.wso2.carbon.user.core.service.RealmService;
 
 /**
  * This class represents the analytics data service declarative services component.
+ *
  * @scr.component name="analytics.component" immediate="true"
  * @scr.reference name="listener.manager.service" interface="org.apache.axis2.engine.ListenerManager"
  * cardinality="1..1" policy="dynamic"  bind="setListenerManager" unbind="unsetListenerManager"
@@ -60,10 +62,12 @@ public class AnalyticsDataServiceComponent {
             SecureAnalyticsDataServiceImpl secureAnalyticsDataService = new SecureAnalyticsDataServiceImpl(analyticsDataService);
             bundleContext.registerService(AnalyticsDataService.class, analyticsDataService, null);
             bundleContext.registerService(SecureAnalyticsDataService.class, secureAnalyticsDataService, null);
+            bundleContext.registerService(ServerStartupObserver.class, AnalyticsDataServiceServerStartupObserver
+                    .getInstance(), null);
             if (log.isDebugEnabled()) {
                 log.debug("Finished AnalyticsDataServiceComponent#activate");
             }
-        } catch(Throwable e) {
+        } catch (Throwable e) {
             log.error("Error in activating analytics data service: " + e.getMessage(), e);
         }
     }
@@ -73,13 +77,13 @@ public class AnalyticsDataServiceComponent {
             AnalyticsDataService service = AnalyticsServiceHolder.getAnalyticsDataService();
             if (service != null) {
                 service.destroy();
-            }            
+            }
         } catch (Throwable e) {
             log.error("Error in deactivating analytics data service: " + e.getMessage(), e);
         }
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({"rawtypes", "unchecked"})
     private void loadHazelcast() {
         BundleContext ctx = FrameworkUtil.getBundle(AnalyticsServiceHolder.class).getBundleContext();
         ServiceReference ref = ctx.getServiceReference(HazelcastInstance.class);
@@ -97,11 +101,11 @@ public class AnalyticsDataServiceComponent {
     protected void unsetListenerManager(ListenerManager lm) {
         /* empty */
     }
-    
+
     protected void setAnalyticsDataSourceService(AnalyticsDataSourceService service) {
         /* just to make sure analytics data source component is initialized first */
     }
-    
+
     protected void unsetAnalyticsDataSourceService(AnalyticsDataSourceService service) {
         /* empty */
     }

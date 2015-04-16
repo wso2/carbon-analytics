@@ -15,7 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.analytics.spark.core.internal;
+package org.wso2.carbon.analytics.dataservice;
 
 import org.apache.axis2.deployment.Deployer;
 import org.apache.axis2.deployment.DeploymentException;
@@ -23,7 +23,6 @@ import org.apache.axis2.deployment.repository.util.DeploymentFileData;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.CarbonException;
-import org.wso2.carbon.analytics.spark.core.SparkScriptDeployer;
 import org.wso2.carbon.core.ServerStartupObserver;
 import org.wso2.carbon.utils.CarbonUtils;
 
@@ -31,18 +30,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class AnalyticsServerStartupObserver implements ServerStartupObserver {
-    private static final Log log = LogFactory.getLog(AnalyticsServerStartupObserver.class);
-    private static AnalyticsServerStartupObserver instance = new AnalyticsServerStartupObserver();
+public class AnalyticsDataServiceServerStartupObserver implements ServerStartupObserver {
+    private static final Log log = LogFactory.getLog(AnalyticsDataServiceServerStartupObserver.class);
+    private static AnalyticsDataServiceServerStartupObserver instance = new AnalyticsDataServiceServerStartupObserver();
     private AtomicBoolean initialized;
     private List<DeploymentFileData> pausedDeployments;
 
-    private AnalyticsServerStartupObserver() {
+    private AnalyticsDataServiceServerStartupObserver() {
         this.initialized = new AtomicBoolean();
         this.pausedDeployments = new ArrayList<>();
     }
 
-    public static AnalyticsServerStartupObserver getInstance() {
+    public static AnalyticsDataServiceServerStartupObserver getInstance() {
         return instance;
     }
 
@@ -60,7 +59,7 @@ public class AnalyticsServerStartupObserver implements ServerStartupObserver {
 
     private void deployPausedDeployments() {
         try {
-            Deployer deployer = CarbonUtils.getDeployer(SparkScriptDeployer.class.getName());
+            Deployer deployer = CarbonUtils.getDeployer(AnalyticsIndexDeployer.class.getName());
             for (DeploymentFileData deploymentFileData : this.pausedDeployments) {
                 try {
                     deployer.deploy(deploymentFileData);
