@@ -26,10 +26,13 @@ import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsIndexConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.utils.CarbonUtils;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -38,10 +41,26 @@ public class AnalyticsIndexDeployer extends AbstractDeployer {
     private static final Log log = LogFactory.getLog(AnalyticsIndexDeployer.class);
 
     private static final String EXTENSION = "xml";
+    private static final String DIR_NAME = "analytics-indices";
 
     @Override
     public void init(ConfigurationContext configurationContext) {
-
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        String repository;
+        if (tenantId == MultitenantConstants.SUPER_TENANT_ID) {
+            repository = CarbonUtils.getCarbonRepository();
+        } else {
+            repository = CarbonUtils.getCarbonTenantsDirPath() + File.separator + tenantId;
+        }
+        repository += File.separator + DIR_NAME;
+        File file = new File(repository);
+        if (!file.exists()) {
+            boolean dirCreated = file.mkdirs();
+            if (!dirCreated) {
+                log.warn("Cannot successfully create the deployment dir for analytics indices in path: "
+                        + file.getAbsolutePath());
+            }
+        }
     }
 
     @Override

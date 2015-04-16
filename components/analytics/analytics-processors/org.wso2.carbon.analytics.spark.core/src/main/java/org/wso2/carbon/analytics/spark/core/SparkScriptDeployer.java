@@ -25,47 +25,75 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsPersistenceException;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsScriptDeploymentException;
 import org.wso2.carbon.analytics.spark.core.internal.AnalyticsPersistenceManager;
+import org.wso2.carbon.analytics.spark.core.internal.AnalyticsServerStartupObserver;
+import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsScript;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.utils.CarbonUtils;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import java.io.File;
 
 public class SparkScriptDeployer extends AbstractDeployer {
 
     private static final Log log = LogFactory.getLog(SparkScriptDeployer.class);
+    private static final String DIR_NAME = "spark-scripts";
 
     @Override
     public void init(ConfigurationContext configurationContext) {
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        String repository;
+        if (tenantId == MultitenantConstants.SUPER_TENANT_ID) {
+            repository = CarbonUtils.getCarbonRepository();
+        } else {
+            repository = CarbonUtils.getCarbonTenantsDirPath() + File.separator + tenantId;
+        }
+        repository += File.separator + DIR_NAME;
+        File file = new File(repository);
+        if (!file.exists()) {
+            boolean dirCreated = file.mkdirs();
+            if (!dirCreated) {
+                log.warn("Cannot successfully create the deployment dir for analytics indices in path: "
+                        + file.getAbsolutePath());
+            }
+        }
     }
 
     public void deploy(DeploymentFileData deploymentFileData) throws AnalyticsScriptDeploymentException {
-        try {
-            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-            JAXBContext context = JAXBContext.newInstance(AnalyticsScript.class);
-            Unmarshaller un = context.createUnmarshaller();
-            AnalyticsScript script = (AnalyticsScript) un.unmarshal(deploymentFileData.getFile());
-            script.setName(getScriptName(deploymentFileData.getName()));
-            AnalyticsPersistenceManager.getInstance().putScript(tenantId, script.getName(), script.getScriptContent(),
-                    script.getCronExpression());
-        } catch (JAXBException e) {
-            String errorMsg = "Error while reading the analytics script : "
-                    + deploymentFileData.getAbsolutePath();
-            log.error(errorMsg, e);
-            throw new AnalyticsScriptDeploymentException(errorMsg, e);
-        } catch (AnalyticsPersistenceException e) {
-            String errorMsg = "Error while storing the script : "
-                    + deploymentFileData.getAbsolutePath();
-            log.error(errorMsg);
-            throw new AnalyticsScriptDeploymentException(errorMsg, e);
+        if (AnalyticsServerStartupObserver.getInstance().getInitialized()) {
+            try {
+                int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+                log.info("Deploying spark script: " + deploymentFileData.getName() + " for tenant : " + tenantId);
+                JAXBContext context = JAXBContext.newInstance(AnalyticsScript.class);
+                Unmarshaller un = context.createUnmarshaller();
+                AnalyticsScript script = (AnalyticsScript) un.unmarshal(deploymentFileData.getFile());
+                script.setName(getScriptName(deploymentFileData.getName()));
+                AnalyticsPersistenceManager.getInstance().putScript(tenantId, script.getName(), script.getScriptContent(),
+                        script.getCronExpression());
+            } catch (JAXBException e) {
+                String errorMsg = "Error while reading the analytics script : "
+                        + deploymentFileData.getAbsolutePath();
+                log.error(errorMsg, e);
+                throw new AnalyticsScriptDeploymentException(errorMsg, e);
+            } catch (AnalyticsPersistenceException e) {
+                String errorMsg = "Error while storing the script : "
+                        + deploymentFileData.getAbsolutePath();
+                log.error(errorMsg);
+                throw new AnalyticsScriptDeploymentException(errorMsg, e);
+            }
+        }else {
+            AnalyticsServerStartupObserver.getInstance().addPausedDeployment(deploymentFileData);
         }
     }
 
     public void undeploy(String fileName) throws AnalyticsScriptDeploymentException {
         try {
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            log.info("Undeploying spark script : "+ fileName + " for tenant id : "+ tenantId);
             AnalyticsPersistenceManager.getInstance().deleteScript(tenantId, getScriptName(fileName));
         } catch (AnalyticsPersistenceException e) {
             String errorMsg = "Error while deleting the script : " + fileName;
@@ -84,7 +112,8 @@ public class SparkScriptDeployer extends AbstractDeployer {
 
     }
 
-    private String getScriptName(String fileName) throws AnalyticsPersistenceException {
+    private String getScriptName(String filePath) throws AnalyticsPersistenceException {
+        String fileName = new File(filePath).getName();
         if (fileName.endsWith(AnalyticsConstants.SCRIPT_EXTENSION)) {
             return fileName.substring(0, fileName.length() - AnalyticsConstants.SCRIPT_EXTENSION.length());
         }

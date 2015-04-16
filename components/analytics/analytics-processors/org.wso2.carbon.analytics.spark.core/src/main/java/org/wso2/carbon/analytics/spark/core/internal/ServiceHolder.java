@@ -105,5 +105,5 @@ public class ServiceHolder {
     public static void setAnalyticskExecutor(SparkAnalyticsExecutor analyticskExecutor) {
         ServiceHolder.analyticskExecutor = analyticskExecutor;
     }
-    
+
 }

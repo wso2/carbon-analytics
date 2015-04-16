@@ -17,17 +17,15 @@
 */
 package org.wso2.carbon.analytics.spark.core.internal;
 
-import java.net.SocketException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
-import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterException;
 import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.CarbonAnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.base.ServerConfiguration;
+import org.wso2.carbon.core.ServerStartupObserver;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.registry.core.service.RegistryService;
@@ -63,11 +61,13 @@ public class AnalyticsComponent {
             } catch (Throwable e) {
                 String msg = "Error initializing analytics executor: " + e.getMessage();
                 log.error(msg, e);
-//            throw new RuntimeException(msg, e);
+            //throw new RuntimeException(msg, e);
             }
             AnalyticsProcessorService analyticsProcessorService = new CarbonAnalyticsProcessorService();
             ctx.getBundleContext().registerService(AnalyticsProcessorService.class, analyticsProcessorService, null);
             ServiceHolder.setAnalyticsProcessorService(analyticsProcessorService);
+            // Registering server startup observer
+            ctx.getBundleContext().registerService(ServerStartupObserver.class, AnalyticsServerStartupObserver.getInstance(), null);
             if (log.isDebugEnabled()) {
                 log.debug("Finished activating Analytics Spark Core");
             }

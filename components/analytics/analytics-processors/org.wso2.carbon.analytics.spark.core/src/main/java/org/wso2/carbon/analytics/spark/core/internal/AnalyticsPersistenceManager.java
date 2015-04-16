@@ -209,8 +209,8 @@ public class AnalyticsPersistenceManager {
                 userRegistry.delete(scriptLocation);
                 scheduleTask(tenantId, new AnalyticsScript(scriptName));
             } else {
-                throw new AnalyticsPersistenceException("Cannot delete non existing script : "
-                        + scriptName + " for tenantId : " + tenantId);
+                throw new AnalyticsPersistenceException("Script wasn't existing in :" + scriptLocation +
+                        ". Cannot delete non existing script : " + scriptName + " for tenantId : " + tenantId + ". ");
             }
         } catch (RegistryException e) {
             throw new AnalyticsPersistenceException("Error while loading the registry for tenant : " + tenantId, e);
