@@ -265,12 +265,6 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         int tenantId = 0;
         String tableName = null;
         Table table, indexTable;
-        Put put;
-        String recordId;
-        long timestamp;
-        byte[] data;
-        Map<String, Object> columns;
-        List<Put> puts, indexPuts;
         if (records.isEmpty()) {
             return;
         }
@@ -284,32 +278,12 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
                         HBaseAnalyticsDSConstants.TableType.DATA)));
                 indexTable = this.conn.getTable(TableName.valueOf(HBaseUtils.generateTableName(tenantId, tableName,
                         HBaseAnalyticsDSConstants.TableType.INDEX)));
-                List<Record> recordList = recordBatches.get(genericTableName);
-                puts = new ArrayList<>();
-                indexPuts = new ArrayList<>();
-                    /* iterating over single records in a batch */
-                for (Record record : recordList) {
-                    recordId = record.getId();
-                    timestamp = record.getTimestamp();
-                    columns = record.getValues();
-                    if ((columns == null) || columns.isEmpty()) {
-                        data = new byte[]{0};
-                    } else {
-                        data = GenericUtils.encodeRecordValues(columns);
-
-                    }
-                    put = new Put(recordId.getBytes(StandardCharsets.UTF_8));
-                    put.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                            HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME, timestamp, data);
-                    put.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                            HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME, timestamp, HBaseUtils.encodeLong(timestamp));
-                    indexPuts.add(this.putIndexData(record));
-                    puts.add(put);
-                }
+                /* Populating batched Put instances from records in a single batch */
+                List<List<Put>> allPuts = this.populatePuts(recordBatches.get(genericTableName));
                 /* Using Table.put(List<Put>) method to minimise network calls per table */
                 try {
-                    indexTable.put(indexPuts);
-                    table.put(puts);
+                    indexTable.put(allPuts.get(0));
+                    table.put(allPuts.get(1));
                 } finally {
                     table.close();
                     indexTable.close();
@@ -321,6 +295,34 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
             }
             throw new AnalyticsException("Error adding new records: " + e.getMessage(), e);
         }
+    }
+
+    private List<List<Put>> populatePuts(List<Record> records) throws AnalyticsException{
+        byte[] data;
+        List<Put> puts = new ArrayList<>();
+        List<Put> indexPuts = new ArrayList<>();
+        for (Record record : records) {
+            String recordId = record.getId();
+            long timestamp = record.getTimestamp();
+            Map<String, Object> columns = record.getValues();
+            if ((columns == null) || columns.isEmpty()) {
+                data = new byte[]{0};
+            } else {
+                data = GenericUtils.encodeRecordValues(columns);
+
+            }
+            Put put = new Put(recordId.getBytes(StandardCharsets.UTF_8));
+            put.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                    HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME, timestamp, data);
+            put.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                    HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME, timestamp, HBaseUtils.encodeLong(timestamp));
+            indexPuts.add(this.putIndexData(record));
+            puts.add(put);
+        }
+        List<List<Put>> output = new ArrayList<>();
+        output.add(indexPuts);
+        output.add(puts);
+        return output;
     }
 
     private Put putIndexData(Record record) {
