@@ -33,7 +33,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -111,18 +110,7 @@ public class HBaseUtils {
                     (HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
                             HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME);
             values = GenericUtils.decodeRecordValues(CellUtil.cloneValue(dataCell), colSet);
-            Cell timeCell = currentResult.getColumnLatestCell
-                    (HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                            HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
-            timestamp = HBaseUtils.decodeLong(CellUtil.cloneValue(timeCell));
-            return new Record(new String(rowId), tenantId, tableName, values, timestamp);
-        } else if (currentResult.containsColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME)) {
-            Cell timeCell = currentResult.getColumnLatestCell
-                    (HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                            HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME);
-            values = new HashMap<>();
-            timestamp = HBaseUtils.decodeLong(CellUtil.cloneValue(timeCell));
+            timestamp = dataCell.getTimestamp();
             return new Record(new String(rowId), tenantId, tableName, values, timestamp);
         }
         return null;
