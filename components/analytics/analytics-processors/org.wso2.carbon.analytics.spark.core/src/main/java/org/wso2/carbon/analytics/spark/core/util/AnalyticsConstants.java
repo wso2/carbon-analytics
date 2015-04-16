@@ -30,7 +30,7 @@ public class AnalyticsConstants {
          */
     }
 
-    public static final String SCRIPT_EXTENSION = ".ql";
+    public static final String SCRIPT_EXTENSION = ".xml";
     public static final String DEFAULT_CRON = "DEFAULT";
     public static final String SCRIPT_TASK_TYPE = "ANALYTICS_SPARK";
     public static final String TASK_TENANT_ID_PROPERTY = "TENANT_ID";

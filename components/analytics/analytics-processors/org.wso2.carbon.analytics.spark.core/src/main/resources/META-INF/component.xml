@@ -19,7 +19,7 @@
     <deployers>
         <deployer>
             <directory>spark-scripts</directory>
-            <extension>ql</extension>
+            <extension>xml</extension>
             <class>org.wso2.carbon.analytics.spark.core.SparkScriptDeployer</class>
         </deployer>
     </deployers>
