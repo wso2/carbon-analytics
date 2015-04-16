@@ -18,6 +18,9 @@
  */
 package org.wso2.carbon.analytics.datasource.core.util;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 import org.apache.commons.collections.IteratorUtils;
 import org.w3c.dom.Document;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
@@ -28,37 +31,20 @@ import org.wso2.carbon.analytics.datasource.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordReader;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.ndatasource.common.DataSourceConstants;
-import org.wso2.carbon.ndatasource.common.DataSourceException;
 import org.wso2.carbon.ndatasource.common.DataSourceConstants.DataSourceStatusModes;
-import org.wso2.carbon.ndatasource.core.CarbonDataSource;
-import org.wso2.carbon.ndatasource.core.DataSourceManager;
-import org.wso2.carbon.ndatasource.core.DataSourceMetaInfo;
-import org.wso2.carbon.ndatasource.core.DataSourceRepository;
-import org.wso2.carbon.ndatasource.core.DataSourceService;
-import org.wso2.carbon.ndatasource.core.DataSourceStatus;
-import org.wso2.carbon.ndatasource.core.SystemDataSourcesConfiguration;
+import org.wso2.carbon.ndatasource.common.DataSourceException;
+import org.wso2.carbon.ndatasource.core.*;
 import org.wso2.carbon.ndatasource.core.utils.DataSourceUtils;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
-
+import javax.xml.bind.JAXBContext;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.xml.bind.JAXBContext;
+import java.util.*;
 
 /**
  * Generic utility methods for analytics data source implementations.
@@ -267,6 +253,9 @@ public class GenericUtils {
             ByteBuffer buffer = ByteBuffer.wrap(data);
             while (buffer.remaining() > 0) {
                 size = buffer.getInt();
+                if (size == 0) {
+                    break;
+                }
                 buff = new byte[size];
                 buffer.get(buff, 0, size);
                 colName = new String(buff, DEFAULT_CHARSET);
