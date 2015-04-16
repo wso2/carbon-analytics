@@ -144,8 +144,8 @@ public class EmailEventAdapter implements OutputEventAdapter {
                     BaseConstants.DEFAULT_TEXT_WRAPPER, null);
             payload.setText(body);
 
+            ServiceClient serviceClient = null;
             try {
-                ServiceClient serviceClient;
                 ConfigurationContext configContext = EmailEventAdapterServiceValueHolder
                         .getConfigurationContextService().getClientConfigContext();
 
@@ -174,6 +174,14 @@ public class EmailEventAdapter implements OutputEventAdapter {
                         "subject: " + subject + ", to: " + to + ".";
                 log.error(msg);
                 log.error(t);
+            } finally {
+                if (serviceClient != null) {
+                    try {
+                        serviceClient.cleanup();
+                    } catch (AxisFault axisFault) {
+                        log.error("Error while cleaning-up service client resources ", axisFault);
+                    }
+                }
             }
         }
     }

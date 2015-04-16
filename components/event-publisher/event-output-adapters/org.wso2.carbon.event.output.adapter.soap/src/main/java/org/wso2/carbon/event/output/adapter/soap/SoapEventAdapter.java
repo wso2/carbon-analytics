@@ -53,6 +53,7 @@ public class SoapEventAdapter implements OutputEventAdapter {
     private OutputEventAdapterConfiguration eventAdapterConfiguration;
     private Map<String, String> globalProperties;
     ExecutorService executorService;
+    private ConfigurationContext configContext;
 
     public SoapEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
                             Map<String, String> globalProperties) {
@@ -124,6 +125,18 @@ public class SoapEventAdapter implements OutputEventAdapter {
         Map<String, String> headers = this.extractHeaders(dynamicProperties.get(
                 SoapEventAdapterConstants.ADAPTER_CONF_SOAP_HEADERS));
 
+        if (configContext == null) {
+            try {
+                configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(
+                        System.getProperty(ServerConstants.CARBON_HOME)
+                                + SoapEventAdapterConstants.SERVER_CLIENT_DEPLOYMENT_DIR,
+                        System.getProperty(ServerConstants.CARBON_CONFIG_DIR_PATH)
+                                + SoapEventAdapterConstants.AXIS2_CLIENT_CONF_FILE);
+            } catch (AxisFault axisFault) {
+                throw new OutputEventAdapterRuntimeException("Error while creating configuration context from filesystem ", axisFault);
+            }
+        }
+
         this.executorService.submit(new SoapSender(url, message, userName, password, headers));
     }
 
@@ -175,54 +188,51 @@ public class SoapEventAdapter implements OutputEventAdapter {
 
         @Override
         public void run() {
-            ConfigurationContext configContext;
+
+            ServiceClient serviceClient = null;
             try {
-                configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(
-                        System.getProperty(ServerConstants.CARBON_HOME)
-                                + SoapEventAdapterConstants.SERVER_CLIENT_DEPLOYMENT_DIR,
-                        System.getProperty(ServerConstants.CARBON_CONFIG_DIR_PATH)
-                                + SoapEventAdapterConstants.AXIS2_CLIENT_CONF_FILE);
-
-                ServiceClient serviceClient;
+                serviceClient = new ServiceClient(configContext, null);
+                Options options = new Options();
+                options.setTo(new EndpointReference(url));
                 try {
-                    serviceClient = new ServiceClient(configContext, null);
-                    Options options = new Options();
-                    options.setTo(new EndpointReference(url));
-                    try {
-                        if (headers != null) {
-                            for (Map.Entry<String, String> headerValue : headers.entrySet()) {
-                                options.setProperty(headerValue.getKey(), headerValue.getValue());
-                            }
+                    if (headers != null) {
+                        for (Map.Entry<String, String> headerValue : headers.entrySet()) {
+                            options.setProperty(headerValue.getKey(), headerValue.getValue());
                         }
-                    } catch (Exception e) {
-                        log.error("Invalid headers : \"" + headers + "\", ignoring headers...");
                     }
-
-                    if (username != null || password != null) {
-                        options.setUserName(username);
-                        options.setPassword(password);
-                        serviceClient.engageModule("rampart");
-                        options.setProperty(RampartMessageData.KEY_RAMPART_POLICY, loadPolicy());
-                    }
-
-                    serviceClient.setOptions(options);
-                    serviceClient.fireAndForget(AXIOMUtil.stringToOM(payload.toString()));
-
-                } catch (AxisFault e) {
-                    throw new ConnectionUnavailableException("Exception in adapter "
-                            + eventAdapterConfiguration.getName() + " while sending events to soap endpoint "
-                            + this.url, e);
-                } catch (XMLStreamException e) {
-                    throw new OutputEventAdapterRuntimeException(
-                            "Exception occurred in adapter " + eventAdapterConfiguration.getName()
-                                    + " while converting the event to xml object ", e);
                 } catch (Exception e) {
-                    throw new OutputEventAdapterRuntimeException("Exception occurred in adapter "
-                            + eventAdapterConfiguration.getName(), e);
+                    log.error("Invalid headers : \"" + headers + "\", ignoring headers...");
                 }
-            } catch (AxisFault axisFault) {
+
+                if (username != null || password != null) {
+                    options.setUserName(username);
+                    options.setPassword(password);
+                    serviceClient.engageModule("rampart");
+                    options.setProperty(RampartMessageData.KEY_RAMPART_POLICY, loadPolicy());
+                }
+
+                serviceClient.setOptions(options);
+                serviceClient.fireAndForget(AXIOMUtil.stringToOM(payload.toString()));
+
+            } catch (AxisFault e) {
+                throw new ConnectionUnavailableException("Exception in adapter "
+                        + eventAdapterConfiguration.getName() + " while sending events to soap endpoint "
+                        + this.url, e);
+            } catch (XMLStreamException e) {
+                throw new OutputEventAdapterRuntimeException(
+                        "Exception occurred in adapter " + eventAdapterConfiguration.getName()
+                                + " while converting the event to xml object ", e);
+            } catch (Exception e) {
                 throw new OutputEventAdapterRuntimeException("Exception occurred in adapter "
-                        + eventAdapterConfiguration.getName(), axisFault);
+                        + eventAdapterConfiguration.getName(), e);
+            } finally {
+                if (serviceClient != null) {
+                    try {
+                        serviceClient.cleanup();
+                    } catch (AxisFault axisFault) {
+                        log.error("Error while cleaning-up service client resources ", axisFault);
+                    }
+                }
             }
 
         }

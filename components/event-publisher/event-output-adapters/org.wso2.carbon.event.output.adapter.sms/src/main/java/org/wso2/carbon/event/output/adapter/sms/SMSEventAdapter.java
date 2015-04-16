@@ -134,9 +134,8 @@ public final class SMSEventAdapter implements OutputEventAdapter {
             OMElement payload = OMAbstractFactory.getOMFactory().createOMElement(
                     BaseConstants.DEFAULT_TEXT_WRAPPER, null);
             payload.setText(message);
-
+            ServiceClient serviceClient = null;
             try {
-                ServiceClient serviceClient;
                 ConfigurationContext configContext = SMSEventAdapterServiceValueHolder.getConfigurationContextService().getClientConfigContext();
                 if (configContext != null) {
                     serviceClient = new ServiceClient(configContext, null);
@@ -158,6 +157,14 @@ public final class SMSEventAdapter implements OutputEventAdapter {
                 String msg = "Error in delivering the message, " +
                         "message: " + message + ", to: " + smsNo + ".";
                 log.error(msg, ex);
+            } finally {
+                if (serviceClient != null) {
+                    try {
+                        serviceClient.cleanup();
+                    } catch (AxisFault axisFault) {
+                        log.error("Error while cleaning-up service client resources ", axisFault);
+                    }
+                }
             }
         }
     }
