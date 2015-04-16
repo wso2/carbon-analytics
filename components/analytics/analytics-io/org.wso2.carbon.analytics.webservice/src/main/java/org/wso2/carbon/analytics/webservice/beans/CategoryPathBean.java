@@ -49,6 +49,8 @@ public class CategoryPathBean implements Serializable {
     @XmlElement(name = "weight")
     private  float weight;
 
+    public CategoryPathBean() { }
+    
     /**
      * Create a hierarchical category with a given path and weight with 1.0.
      * Use this constructor when the categoryPaths need to be given for drill down search

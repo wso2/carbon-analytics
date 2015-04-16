@@ -44,6 +44,8 @@ public class RecordValueEntryBean implements Serializable {
     public static final String INTEGER = "INTEGER";
     public static final String FACET = "FACET";
 
+    public RecordValueEntryBean() { }
+    
     public String getFieldName() {
         return fieldName;
     }

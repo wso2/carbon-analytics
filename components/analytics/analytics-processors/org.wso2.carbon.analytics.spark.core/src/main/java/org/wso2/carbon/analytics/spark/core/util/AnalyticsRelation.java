@@ -46,6 +46,8 @@ public class AnalyticsRelation extends TableScan implements Serializable {
     
     private String tableName;
     
+    public AnalyticsRelation() { }
+    
     public AnalyticsRelation(int tenantId, String tableName, 
             JavaSQLContext sqlContext, String schemaString) {
         this.tenantId = tenantId;

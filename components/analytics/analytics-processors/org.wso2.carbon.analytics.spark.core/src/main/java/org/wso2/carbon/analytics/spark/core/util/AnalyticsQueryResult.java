@@ -32,6 +32,8 @@ public class AnalyticsQueryResult implements Serializable {
     
     private List<List<Object>> rows;
     
+    public AnalyticsQueryResult() { }
+    
     public AnalyticsQueryResult(String[] columns, List<List<Object>> rows) {
         this.columns = columns;
         this.rows = rows;

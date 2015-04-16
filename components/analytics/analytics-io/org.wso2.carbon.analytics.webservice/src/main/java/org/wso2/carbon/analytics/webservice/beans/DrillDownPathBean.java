@@ -47,6 +47,8 @@ public class DrillDownPathBean implements Serializable {
     @XmlElement(name = "categoryName", required = false, defaultValue = "1.0")
     private  String categoryName;
 
+    public DrillDownPathBean() { }
+    
     /**
      * Create a hierarchical categoryName with a given path and categoryName with 1.0.
      * Use this constructor when the categoryPaths need to be given for drill down search

@@ -42,8 +42,7 @@ public class ResponseBean implements Serializable {
 	/**
 	 * Instantiates a new response bean.
 	 */
-	public ResponseBean() {
-	}
+	public ResponseBean() { }
 
 	/**
 	 * Instantiates a new response bean.

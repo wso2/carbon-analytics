@@ -28,8 +28,9 @@ import java.util.Map;
  * This class contains the details about Drill down search. Use this class when you need to query
  * faceted/categorized information
  */
-public class AnalyticsDrillDownRequest implements Serializable{
+public class AnalyticsDrillDownRequest implements Serializable {
 
+    private static final long serialVersionUID = 5472794378224537697L;
     //table name on which the drill down is performed
     private String tableName;
     //List of facets / List of category path to drill down
@@ -53,7 +54,7 @@ public class AnalyticsDrillDownRequest implements Serializable{
     //make this true if the ids of the records are needed
     private boolean withIds;
 
-    public  AnalyticsDrillDownRequest() {
+    public AnalyticsDrillDownRequest() {
         this(false);
     }
 

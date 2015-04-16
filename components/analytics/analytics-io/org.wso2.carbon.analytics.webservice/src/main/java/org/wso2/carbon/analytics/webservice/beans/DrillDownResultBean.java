@@ -43,6 +43,8 @@ public class DrillDownResultBean implements Serializable {
     private int recordCount;
     private  int recordStart;
     private boolean withIds;
+    
+    public DrillDownResultBean() { }
 
     public PerFieldDrillDownResultBean[] getPerFieldEntries() {
         return perFieldEntries;

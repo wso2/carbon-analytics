@@ -27,9 +27,7 @@ public class AnalyticsSchemaBean implements Serializable {
     private  SchemaColumnBean[] columns;
     private String[] primaryKeys;
 
-    public AnalyticsSchemaBean(){
-
-    }
+    public AnalyticsSchemaBean() { }
 
     public AnalyticsSchemaBean(
             SchemaColumnBean[] columns,String[] primaryKeys) {

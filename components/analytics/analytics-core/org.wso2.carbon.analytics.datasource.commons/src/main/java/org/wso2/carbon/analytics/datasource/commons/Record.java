@@ -43,6 +43,8 @@ public class Record implements Serializable {
     
     private int hashCode = -1;
     
+    public Record() { }
+    
     public Record(int tenantId, String tableName, Map<String, Object> values) {
         this(null, tenantId, tableName, values, System.currentTimeMillis());
     }

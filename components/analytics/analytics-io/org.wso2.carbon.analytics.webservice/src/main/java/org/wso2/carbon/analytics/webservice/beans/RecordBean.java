@@ -35,6 +35,8 @@ public class RecordBean implements Serializable {
 	/** The values. */
 	private RecordValueEntryBean[] values;
 
+	public RecordBean() { }
+	
 	/**
 	 * Sets the table name.
 	 * @param tableName the new table name

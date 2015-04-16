@@ -37,6 +37,8 @@ public class DrillDownRequestBean implements Serializable {
     private boolean includeIds;
     private DrillDownFieldRangeBean[] ranges;
 
+    public DrillDownRequestBean() { }
+    
     public String getTableName() {
         return tableName;
     }

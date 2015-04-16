@@ -26,6 +26,8 @@ public class SchemaColumnBean implements Serializable {
     private String columnName;
     private String columnType;
 
+    public SchemaColumnBean() { }
+    
     public String getColumnName() {
         return columnName;
     }

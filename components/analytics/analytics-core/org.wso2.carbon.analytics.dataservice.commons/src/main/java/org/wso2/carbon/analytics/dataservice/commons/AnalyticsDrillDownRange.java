@@ -24,10 +24,14 @@ import java.io.Serializable;
  */
 public class AnalyticsDrillDownRange implements Serializable{
 
+    private static final long serialVersionUID = 2158861592169651853L;
+    
     private String label;
     private double from;
     private double to;
 
+    public AnalyticsDrillDownRange() { }
+    
     public AnalyticsDrillDownRange(String label, double from, double to) {
         this.label = label;
         this.from = from;

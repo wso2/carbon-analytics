@@ -26,6 +26,8 @@ public class IndexEntryBean implements Serializable {
     private String fieldName;
     private String indexType;
 
+    public IndexEntryBean() { }
+    
     public String getFieldName() {
         return fieldName;
     }

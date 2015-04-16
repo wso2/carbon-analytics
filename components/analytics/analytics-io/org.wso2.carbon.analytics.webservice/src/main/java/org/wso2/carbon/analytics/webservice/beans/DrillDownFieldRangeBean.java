@@ -27,6 +27,8 @@ public class DrillDownFieldRangeBean implements Serializable {
     private String fieldName;
     private DrillDownRangeBean[] ranges;
 
+    public DrillDownFieldRangeBean() { }
+    
     public String getFieldName() {
         return fieldName;
     }

@@ -33,6 +33,8 @@ public class AnalyticsSchema implements Serializable {
     
     private List<String> primaryKeys;
     
+    public AnalyticsSchema() { }
+    
     public AnalyticsSchema(Map<String, ColumnType> columns, List<String> primaryKeys) {
         this.columns = columns;
         this.primaryKeys = primaryKeys;

@@ -59,6 +59,10 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
     
     private String tableName;
     
+    public AnalyticsRDD() { 
+        super(null, null, null);
+    }
+    
     public AnalyticsRDD(int tenantId, String tableName, List<String> columns, 
             SparkContext sc, Seq<Dependency<?>> deps, ClassTag<Row> evidence) {
         super(sc, deps, evidence);

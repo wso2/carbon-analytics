@@ -37,10 +37,13 @@ import java.io.Serializable;
  */
 public class AnalyticsCategoryPath implements Serializable{
 
+    private static final long serialVersionUID = -6817819400713291618L;
     private String[] path;
-    private  float weight;
+    private float weight;
     private static final String SEPARATOR = "/";
 
+    public AnalyticsCategoryPath() { }
+    
     /**
      * Create a hierarchical category with a given path and weight with 1.0.
      * Use this constructor when the categoryPaths need to be given for drill down search

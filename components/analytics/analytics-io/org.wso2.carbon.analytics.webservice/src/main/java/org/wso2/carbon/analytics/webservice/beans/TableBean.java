@@ -32,6 +32,8 @@ public class TableBean implements Serializable {
 	@XmlElement(name = "tableName", required = true)
 	private String tableName;
 
+	public TableBean() { }
+	
 	/**
 	 * @return the tableName
 	 */

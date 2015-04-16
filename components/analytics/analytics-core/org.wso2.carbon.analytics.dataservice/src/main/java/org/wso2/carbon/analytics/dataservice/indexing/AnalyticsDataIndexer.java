@@ -90,11 +90,7 @@ import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -286,67 +282,10 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         this.insertIndexOperationRecords(indexOpRecords);
     }
     
-    private byte[] indexOpsToBinary(List<IndexOperation> indexOps) throws AnalyticsException {
-        ByteArrayOutputStream byteOut = null;
-        ObjectOutputStream objOut = null;
-        try {
-            byteOut = new ByteArrayOutputStream();
-            objOut = new ObjectOutputStream(byteOut);
-            objOut.writeObject(indexOps);
-            return byteOut.toByteArray();
-        } catch (IOException e) {
-            throw new AnalyticsException("Error in converting index ops to binary: " + e.getMessage(), e);
-        } finally {
-            try {
-                if (objOut != null) {
-                    objOut.close();
-                }
-            } catch (IOException e) {
-                log.error(e);
-            }
-            try {
-                if (byteOut != null) {
-                    byteOut.close();
-                }
-            } catch (IOException e) {
-                log.error(e);
-            }
-        }
-    }
-    
-    @SuppressWarnings("unchecked")
-    private List<IndexOperation> binaryToIndexOps(byte[] data) throws AnalyticsDataCorruptionException {
-        ByteArrayInputStream byteIn = null;
-        ObjectInputStream objIn = null;
-        try {
-            byteIn = new ByteArrayInputStream(data);
-            objIn = new ObjectInputStream(byteIn);
-            return (List<IndexOperation>) objIn.readObject();
-        } catch (ClassNotFoundException | IOException e) {
-            throw new AnalyticsDataCorruptionException("Error in converting binary data to index ops: " + 
-                    e.getMessage(), e);
-        } finally {
-            try {
-                if (objIn != null) {
-                    objIn.close();
-                }
-            } catch (IOException e) {
-                log.error(e);
-            }
-            try {
-                if (byteIn != null) {
-                    byteIn.close();
-                }
-            } catch (IOException e) {
-                log.error(e);
-            }
-        }
-    }
-    
     private Record generateIndexOperationRecord(int tenantId, String tableNamePrefix, int shardIndex, 
             List<IndexOperation> indexOps) throws AnalyticsException {
         Map<String, Object> values = new HashMap<String, Object>(1);
-        values.put(INDEX_OP_DATA_ATTRIBUTE, this.indexOpsToBinary(indexOps));
+        values.put(INDEX_OP_DATA_ATTRIBUTE, GenericUtils.serializeObject(indexOps));
         return new Record(GenericUtils.generateRecordID(), tenantId, 
                 this.generateShardedIndexDataTableName(tableNamePrefix, shardIndex), values);
     }
@@ -360,9 +299,10 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return result;
     }
     
+    @SuppressWarnings("unchecked")
     private List<IndexOperation> extractIndexOperations(Record indexOpRecord) throws AnalyticsDataCorruptionException {
         byte[] data = (byte[]) indexOpRecord.getValue(INDEX_OP_DATA_ATTRIBUTE);
-        return this.binaryToIndexOps(data);
+        return (List<IndexOperation>) GenericUtils.deserializeObject(data);
     }
     
     private List<IndexOperation> checkAndExtractIndexOperations(List<Record> indexOpRecords) throws AnalyticsException {
@@ -1788,6 +1728,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         private String tableName;
         
         private String id;
+        
+        public IndexOperation() { }
         
         public IndexOperation(int tenantId, String tableName, String id) {
             this.tenantId = tenantId;

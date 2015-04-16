@@ -34,6 +34,10 @@ public class AnalyticsSchema extends StructType implements Serializable {
 
     private static final long serialVersionUID = 4405181965742932573L;
 
+    public AnalyticsSchema() {
+        super(null);
+    }
+    
     public AnalyticsSchema(Seq<StructField> fields) {
         super(fields);
     }

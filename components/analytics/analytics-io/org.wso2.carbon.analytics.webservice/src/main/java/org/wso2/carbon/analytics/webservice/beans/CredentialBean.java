@@ -29,13 +29,15 @@ import java.io.Serializable;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "credential")
 public class CredentialBean implements Serializable {
-
+    
     private static final long serialVersionUID = -6048430066805201829L;
     @XmlElement(name = "username", required = true)
     private String username;
 
     @XmlElement(name = "password", required = true)
     private String password;
+    
+    public CredentialBean() { }
 
     public String getUsername() {
         return username;

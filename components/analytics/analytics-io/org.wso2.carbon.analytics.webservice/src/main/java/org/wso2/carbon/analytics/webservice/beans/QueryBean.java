@@ -44,6 +44,8 @@ public class QueryBean implements Serializable {
 	/** The count. */
 	private int count;
 
+	public QueryBean() { }
+	
 	/**
 	 * Gets the tenant id.
 	 * @return the tenant id

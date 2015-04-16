@@ -31,6 +31,8 @@ public class RecordGroupBean implements Serializable {
 	@XmlElement(required = true)
 	private RecordBean[] records;
 
+	public RecordGroupBean() { }
+	
 	/**
 	 * Gets the locations.
 	 * @return the locations

@@ -41,6 +41,10 @@ import org.wso2.carbon.ndatasource.core.utils.DataSourceUtils;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -94,6 +98,12 @@ public class GenericUtils {
     public static final String WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP = "wso2_custom_conf_dir";
     
     private static DataSourceRepository globalCustomRepo;
+    
+    private static ThreadLocal<Kryo> kryoTL = new ThreadLocal<Kryo>() {
+        protected Kryo initialValue() {
+            return new Kryo();
+        };
+    };
 
     public static String getParentPath(String path) {
         if (path.equals("/")) {
@@ -377,37 +387,27 @@ public class GenericUtils {
         return builder.toString();
     }
 
-    public static byte[] serializeObject(Object obj) throws AnalyticsException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = null;
-        byte[] result;
+    public static byte[] serializeObject(Object obj) {
+        Kryo kryo = kryoTL.get();
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        Output out = new Output(byteOut);
         try {
-            oos = new ObjectOutputStream(baos);
-            oos.writeObject(obj);
-            result = baos.toByteArray();
-        } catch (IOException e) {
-            throw new AnalyticsException("Error serializing object: " + e.getMessage(), e);
+            kryo.writeClassAndObject(out, obj);
+            out.flush();
+            return byteOut.toByteArray();
         } finally {
-            GenericUtils.closeQuietly(oos);
-            GenericUtils.closeQuietly(baos);
+            out.close();
         }
-        return result;
     }
 
-    public static Object deserializeObject(byte[] source) throws AnalyticsException {
-        ByteArrayInputStream bais = new ByteArrayInputStream(source);
-        ObjectInputStream ois = null;
-        Object result;
+    public static Object deserializeObject(byte[] source) {
+        Input input = new Input(source);
         try {
-            ois = new ObjectInputStream(bais);
-            result = ois.readObject();
-        } catch (ClassNotFoundException | IOException e) {
-            throw new AnalyticsException("Error de-serializing object: " + e.getMessage(), e);
+            Kryo kryo = kryoTL.get();
+            return kryo.readClassAndObject(input);
         } finally {
-            GenericUtils.closeQuietly(ois);
-            GenericUtils.closeQuietly(bais);
+            input.close();
         }
-        return result;
     }
     
     private static void addDataSourceProviders(List<String> providers) throws DataSourceException {

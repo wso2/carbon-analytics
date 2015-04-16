@@ -43,6 +43,8 @@ public class SearchResultEntryBean implements Serializable {
 	@XmlElement(required = true)
 	private float score;
 
+	public SearchResultEntryBean() { }
+	
 	/**
 	 * Sets the id.
 	 * @param id the new id
