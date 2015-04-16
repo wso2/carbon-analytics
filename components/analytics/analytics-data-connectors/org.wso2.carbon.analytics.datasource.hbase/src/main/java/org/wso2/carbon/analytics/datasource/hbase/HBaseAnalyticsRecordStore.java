@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.Pair;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -51,9 +52,10 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
 
     private static final Log log = LogFactory.getLog(HBaseAnalyticsRecordStore.class);
 
-    public HBaseAnalyticsRecordStore(Connection conn, HBaseAnalyticsConfigurationEntry entry) throws IOException {
+    public HBaseAnalyticsRecordStore(Connection conn, HBaseAnalyticsConfigurationEntry entry) throws IOException, AnalyticsException {
         this.conn = conn;
         this.queryConfig = entry;
+        this.createMetaTable();
     }
 
     public HBaseAnalyticsRecordStore() {
@@ -195,14 +197,22 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
 
     private void deleteMetaTableEntry(int tenantId, String tableName) throws AnalyticsException {
         Table metaTable = null;
+        Admin admin = null;
+        TableName metaTablename = TableName.valueOf(HBaseAnalyticsDSConstants.ANALYTICS_META_TABLE_NAME);
         try {
-            metaTable = this.conn.getTable(TableName.valueOf(HBaseAnalyticsDSConstants.ANALYTICS_META_TABLE_NAME));
+            admin = this.conn.getAdmin();
+            if (!(admin.tableExists(metaTablename))) {
+                log.warn("Analytics Meta Table does not exist in the HBase deployment!");
+                return;
+            }
+            metaTable = this.conn.getTable(metaTablename);
             byte[] row = HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.DATA).
                     getBytes(StandardCharsets.UTF_8);
             metaTable.delete(new Delete(row));
         } catch (IOException e) {
             throw new AnalyticsException("Error deleting meta entry for table " + tableName + " for tenant " + tenantId, e);
         } finally {
+            GenericUtils.closeQuietly(admin);
             GenericUtils.closeQuietly(metaTable);
         }
     }
@@ -279,24 +289,22 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
                 indexPuts = new ArrayList<>();
                     /* iterating over single records in a batch */
                 for (Record record : recordList) {
-                    if (record != null) {
-                        recordId = record.getId();
-                        timestamp = record.getTimestamp();
-                        columns = record.getValues();
-                        if ((columns == null) || columns.isEmpty()) {
-                            data = new byte[]{};
-                        } else {
-                            data = GenericUtils.encodeRecordValues(columns);
+                    recordId = record.getId();
+                    timestamp = record.getTimestamp();
+                    columns = record.getValues();
+                    if ((columns == null) || columns.isEmpty()) {
+                        data = new byte[]{0};
+                    } else {
+                        data = GenericUtils.encodeRecordValues(columns);
 
-                        }
-                        put = new Put(recordId.getBytes(StandardCharsets.UTF_8));
-                        put.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                                HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME, timestamp, data);
-                        put.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
-                                HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME, timestamp, HBaseUtils.encodeLong(timestamp));
-                        indexPuts.add(this.putIndexData(record));
-                        puts.add(put);
                     }
+                    put = new Put(recordId.getBytes(StandardCharsets.UTF_8));
+                    put.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                            HBaseAnalyticsDSConstants.ANALYTICS_ROWDATA_QUALIFIER_NAME, timestamp, data);
+                    put.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_DATA_COLUMN_FAMILY_NAME,
+                            HBaseAnalyticsDSConstants.ANALYTICS_TS_QUALIFIER_NAME, timestamp, HBaseUtils.encodeLong(timestamp));
+                    indexPuts.add(this.putIndexData(record));
+                    puts.add(put);
                 }
                 /* Using Table.put(List<Put>) method to minimise network calls per table */
                 try {
@@ -345,19 +353,19 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
     @Override
     public void setTableSchema(int tenantId, String tableName, AnalyticsSchema schema) throws AnalyticsException {
         byte[] encodedSchema = this.serializeSchema(schema);
-        Table metaTable;
-        try {
-            metaTable = this.conn.getTable(TableName.valueOf(HBaseAnalyticsDSConstants.ANALYTICS_META_TABLE_NAME));
-        } catch (IOException e) {
+        if (!this.tableExists(tenantId, tableName)) {
             throw new AnalyticsTableNotAvailableException(tenantId, tableName);
         }
+        Table metaTable = null;
          /* Using the table name itself as the row key, since it will be helpful in direct retrieval (well known key),
-            * and there will only ever be a single row for the schema information which we will directly retrieve,
-            * eliminating any future issue when other rows get added (if required) to the meta table.  */
-        Put put = new Put(HBaseAnalyticsDSConstants.ANALYTICS_META_TABLE_NAME.getBytes(StandardCharsets.UTF_8));
+            * and there will only ever be a single row for the schema information for this table which we will
+            * directly retrieve.  */
+        String rowKey = HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.DATA);
+        Put put = new Put(Bytes.toBytes(rowKey));
         put.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_META_COLUMN_FAMILY_NAME,
                 HBaseAnalyticsDSConstants.ANALYTICS_SCHEMA_QUALIFIER_NAME, encodedSchema);
         try {
+            metaTable = this.conn.getTable(TableName.valueOf(HBaseAnalyticsDSConstants.ANALYTICS_META_TABLE_NAME));
             metaTable.put(put);
         } catch (IOException e) {
             throw new AnalyticsException("Error setting schema to table " + tableName + " for tenant " + tenantId +
@@ -369,25 +377,17 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
 
     @Override
     public AnalyticsSchema getTableSchema(int tenantId, String tableName) throws AnalyticsException {
-        Admin admin = null;
-        Table metaTable;
+        Table metaTable = null;
         byte[] resultSchema;
-        try {
-            admin = this.conn.getAdmin();
-            if (!admin.tableExists(TableName.valueOf(HBaseAnalyticsDSConstants.ANALYTICS_META_TABLE_NAME))) {
-                throw new AnalyticsTableNotAvailableException(tenantId, tableName);
-            }
-            metaTable = this.conn.getTable(TableName.valueOf(HBaseAnalyticsDSConstants.ANALYTICS_META_TABLE_NAME));
-        } catch (IOException e) {
-            throw new AnalyticsException("Error setting schema to table " + tableName + " for tenant " + tenantId +
-                    " : " + e.getMessage(), e);
-        } finally {
-            GenericUtils.closeQuietly(admin);
+        if (!(this.tableExists(tenantId, tableName))) {
+            throw new AnalyticsTableNotAvailableException(tenantId, tableName);
         }
-        Get get = new Get(HBaseAnalyticsDSConstants.ANALYTICS_META_TABLE_NAME.getBytes(StandardCharsets.UTF_8));
+        String rowKey = HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.DATA);
+        Get get = new Get(Bytes.toBytes(rowKey));
         get.addColumn(HBaseAnalyticsDSConstants.ANALYTICS_META_COLUMN_FAMILY_NAME,
                 HBaseAnalyticsDSConstants.ANALYTICS_SCHEMA_QUALIFIER_NAME);
         try {
+            metaTable = this.conn.getTable(TableName.valueOf(HBaseAnalyticsDSConstants.ANALYTICS_META_TABLE_NAME));
             resultSchema = metaTable.get(get).value();
         } catch (IOException e) {
             throw new AnalyticsException("Error setting schema to table " + tableName + " for tenant " + tenantId +
@@ -403,6 +403,9 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
     }
 
     private AnalyticsSchema deserializeSchema(byte[] source) throws AnalyticsException {
+        if (source == null) {
+            return new AnalyticsSchema(null, null);
+        }
         return (AnalyticsSchema) GenericUtils.deserializeObject(source);
     }
 
