@@ -30,6 +30,7 @@ import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 import javax.naming.Context;
+
 import java.util.*;
 
 /**
@@ -72,6 +73,11 @@ public class AnalyticsRecordStoreTest {
     }
 
     public static List<Record> generateRecords(int tenantId, String tableName, int i, int c, long time, int timeOffset) {
+        return generateRecords(tenantId, tableName, i, c, time, timeOffset, true);
+    }
+    
+    public static List<Record> generateRecords(int tenantId, String tableName, int i, int c, long time, int timeOffset,
+            boolean generateRecordIds) {
         List<Record> result = new ArrayList<Record>();
         Map<String, Object> values;
         long timeTmp;
@@ -91,11 +97,11 @@ public class AnalyticsRecordStoreTest {
             } else {
                 timeTmp = System.currentTimeMillis();
             }
-            result.add(new Record(GenericUtils.generateRecordID(), tenantId, tableName, values, timeTmp));
+            result.add(new Record(generateRecordIds ? GenericUtils.generateRecordID() : null, tenantId, tableName, values, timeTmp));
         }
         return result;
     }
-
+    
     private List<Record> generateRecordsForUpdate(List<Record> recordsIn) {
         List<Record> result = new ArrayList<Record>();
         Map<String, Object> values;
@@ -279,7 +285,7 @@ public class AnalyticsRecordStoreTest {
     }
 
     @Test
-    public void testMultipleDataRecordAddRetieveUpdate() throws AnalyticsException {
+    public void testMultipleDataRecordAddRetrieveUpdate() throws AnalyticsException {
         this.cleanupT1();
         this.analyticsRS.createTable(15, "T1");
         List<Record> records = generateRecords(15, "T1", 1, 50, -1, -1);

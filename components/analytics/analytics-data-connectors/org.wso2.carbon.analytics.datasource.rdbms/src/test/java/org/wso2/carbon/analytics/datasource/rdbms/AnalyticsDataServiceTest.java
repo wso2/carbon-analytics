@@ -21,6 +21,7 @@ package org.wso2.carbon.analytics.datasource.rdbms;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -37,7 +38,9 @@ import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema.ColumnType;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
@@ -349,6 +352,54 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
             records = AnalyticsRecordStoreTest.generateRecords(tenantId, tableName, i, batch, -1, -1);
             this.service.put(records);
         }
+    }
+
+    @Test
+    public void testMultipleDataRecordAddRetrieveWithKeys() throws AnalyticsException {
+        int tenantId = 1;
+        String tableName = "MyT1";
+        this.cleanupTable(tenantId, tableName);
+        this.service.createTable(tenantId, tableName);
+        Map<String, ColumnType> columns = new HashMap<String, AnalyticsSchema.ColumnType>();
+        columns.put("tenant", ColumnType.INTEGER);
+        columns.put("log", ColumnType.STRING);
+        List<String> primaryKeys = new ArrayList<String>();
+        primaryKeys.add("tenant");
+        primaryKeys.add("log");
+        AnalyticsSchema schema = new AnalyticsSchema(columns, primaryKeys);
+        this.service.setTableSchema(tenantId, tableName, schema);
+        List<Record> records = AnalyticsRecordStoreTest.generateRecords(tenantId, tableName, 1, 75, -1, -1, false);
+        this.service.put(records);
+        List<Record> recordsIn = GenericUtils.listRecords(this.service,
+                this.service.get(tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+        Assert.assertEquals(new HashSet<Record>(recordsIn), new HashSet<Record>(records));
+        records = AnalyticsRecordStoreTest.generateRecords(tenantId, tableName, 1, 74, -1, -1, false);
+        this.service.put(records);
+        recordsIn = GenericUtils.listRecords(this.service,
+                this.service.get(tenantId, tableName, 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+        Assert.assertEquals(recordsIn.size(), 75);
+        records = AnalyticsRecordStoreTest.generateRecords(tenantId, tableName, 1, 77, -1, -1, false);
+        this.service.put(records);
+        recordsIn = GenericUtils.listRecords(this.service,
+                this.service.get(tenantId, tableName, 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+        Assert.assertEquals(recordsIn.size(), 77);
+        Assert.assertEquals(new HashSet<Record>(recordsIn), new HashSet<Record>(records));
+        primaryKeys.clear();
+        schema = new AnalyticsSchema(columns, primaryKeys);
+        this.service.setTableSchema(tenantId, tableName, schema);
+        records = AnalyticsRecordStoreTest.generateRecords(tenantId, tableName, 1, 10, -1, -1, false);
+        this.service.put(records);
+        recordsIn = GenericUtils.listRecords(this.service,
+                this.service.get(tenantId, tableName, 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+        Assert.assertEquals(recordsIn.size(), 87);
+        schema = new AnalyticsSchema(null, null);
+        this.service.setTableSchema(tenantId, tableName, schema);
+        records = AnalyticsRecordStoreTest.generateRecords(tenantId, tableName, 1, 10, -1, -1, false);
+        this.service.put(records);
+        recordsIn = GenericUtils.listRecords(this.service,
+                this.service.get(tenantId, tableName, 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+        Assert.assertEquals(recordsIn.size(), 97);
+        this.cleanupTable(tenantId, tableName);
     }
     
     @Test

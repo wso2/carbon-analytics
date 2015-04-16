@@ -76,9 +76,7 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
             throw new AnalyticsClusterException("This node has already joined the group: " + groupId);
         }
         this.checkAndCleanupGroups(groupId);
-        if (groupEventListener != null) {   
-            this.groups.put(groupId, groupEventListener);
-        }
+        this.groups.put(groupId, groupEventListener);
         List<Member> groupMembers = this.getGroupMembers(groupId);
         Member myself = this.hz.getCluster().getLocalMember();
         groupMembers.add(myself);
