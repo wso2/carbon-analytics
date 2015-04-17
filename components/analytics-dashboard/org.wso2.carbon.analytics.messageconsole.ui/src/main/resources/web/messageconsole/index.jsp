@@ -91,6 +91,7 @@
         }
 
         $(document).ready(function () {
+            $.ajaxSetup({cache: false});
             loadTableSelect();
             $("#DeleteAllButton").hide();
             jQuery('#timeFrom').datetimepicker({
@@ -126,6 +127,8 @@
 
             $("#addNewTable").on("click", function () {
                 $("#column-details").find('tr').slice(1, document.getElementById('column-details').rows.length - 1).remove();
+                $("#column-details").find("input[type=text]").val("");
+                $('#tableForm')[0].reset();
                 $('#createTableDialog').dialog({
                     title: 'Create a new table...',
                     height: 300,
@@ -149,7 +152,7 @@
                 $(this).val('Delete');
                 $(this).attr('class', 'del');
                 var appendTxt =
-                        "<tr><td><input type='text' name='column'/></td><td><select><option value='STRING'>STRING</option><option value='INTEGER'>INTEGER</option><option value='LONG'>LONG</option><option value='BOOLEAN'>BOOLEAN</option><option value='FLOAT'>FLOAT</option><option value='DOUBLE'>DOUBLE</option></select></td><td><input type='checkbox' name='primary'/></td><c:if test="${permissions != null && permissions.isSetIndex()}"><td><input type='checkbox' name='index'/></td></c:if><td><input class='add' type='button' value='Add More'/></td></tr>";
+                        "<tr><td><input type='text' name='column'/></td><td><select><option value='STRING'>STRING</option><option value='INTEGER'>INTEGER</option><option value='LONG'>LONG</option><option value='BOOLEAN'>BOOLEAN</option><option value='FLOAT'>FLOAT</option><option value='DOUBLE'>DOUBLE</option><c:if test="${permissions != null && permissions.isSetIndex()}"><option value='FACET'>FACET</option></c:if></select></td><td><input type='checkbox' name='primary'/></td><c:if test="${permissions != null && permissions.isSetIndex()}"><td><input type='checkbox' name='index'/></td><td><input type='checkbox' name='scoreParam'/></td></c:if><td><input class='add' type='button' value='Add More'/></td></tr>";
                 $("#column-details tbody tr:last").after(appendTxt);
             });
 
@@ -213,6 +216,7 @@
                            var resultArray = jQuery.parseJSON(result);
                            var arrayLength = resultArray.length;
                            $("#column-details").find('tr').slice(1, document.getElementById('column-details').rows.length - 1).remove();
+                           $('#tableForm')[0].reset();
                            var table = document.getElementById('column-details');
                            $('#createTableDialog').dialog({
                                  title: 'Edit table',
@@ -249,6 +253,9 @@
                                selectElement.options[3] = new Option('BOOLEAN', 'BOOLEAN');
                                selectElement.options[4] = new Option('FLOAT', 'FLOAT');
                                selectElement.options[5] = new Option('DOUBLE', 'DOUBLE');
+                               <c:if test="${permissions != null && permissions.isSetIndex()}">
+                               selectElement.options[5] = new Option('FACET', 'FACET');
+                               </c:if>
                                selectElement.value = resultArray[i].type;
                                typeCell.appendChild(selectElement);
 
@@ -264,6 +271,12 @@
                                indexCheckElement.type = "checkbox";
                                indexCheckElement.checked = resultArray[i].index;
                                indexCell.appendChild(indexCheckElement);
+
+                               var scoreParamCell = row.insertCell(cellNo++);
+                               var scoreParamCheckElement = document.createElement('input');
+                               scoreParamCheckElement.type = "checkbox";
+                               scoreParamCheckElement.checked = resultArray[i].scoreParam;
+                               scoreParamCell.appendChild(scoreParamCheckElement);
                                </c:if>
 
                                var buttonCell = row.insertCell(cellNo++);
@@ -310,6 +323,8 @@
                             item ["primary"] = table.rows[r].cells[c].childNodes[0].checked;
                         } else if (c == 3) {
                             item ["index"] = table.rows[r].cells[c].childNodes[0].checked;
+                        } else if (c == 4) {
+                            item ["scoreParam"] = table.rows[r].cells[c].childNodes[0].checked;
                         }
                     }
                 }
@@ -476,7 +491,7 @@
                                 },
                                 Type: {
                                     title: 'Type',
-                                    options: ["STRING", "INTEGER", "LONG", "BOOLEAN", "FLOAT", "DOUBLE"],
+                                    options: ["STRING", "INTEGER", "LONG", "BOOLEAN", "FLOAT", "DOUBLE", "FACET"],
                                     list: false
                                 }
                             }
@@ -699,6 +714,7 @@
                         <th>Primary key</th>
                         <c:if test="${permissions != null && permissions.isSetIndex()}">
                             <th>Index</th>
+                            <th>Score Param</th>
                         </c:if>
                         <th>&nbsp;</th>
                     </tr>
@@ -713,10 +729,14 @@
                             <option value="BOOLEAN">BOOLEAN</option>
                             <option value="FLOAT">FLOAT</option>
                             <option value="DOUBLE">DOUBLE</option>
+                            <c:if test="${permissions != null && permissions.isSetIndex()}">
+                                <option value="FACET">FACET</option>
+                            </c:if>
                         </select></td>
                         <td><input type="checkbox" name="primary"/></td>
                         <c:if test="${permissions != null && permissions.isSetIndex()}">
                             <td><input type="checkbox" name="index"/></td>
+                            <td><input type="checkbox" name="scoreParam"/></td>
                         </c:if>
                         <td><input class="add" type="button" value="Add More"/></td>
                     </tr>

@@ -113,9 +113,9 @@
             String tableInfo = request.getParameter("tableInfo");
             String action = request.getParameter("action");
             if ("add".equals(action)) {
-                out.print(connector.createTable(tableName, tableInfo));
+                out.print(connector.putTable(tableName, tableInfo, true));
             } else if ("edit".equals(action)) {
-                out.print(connector.editTable(tableName, tableInfo));
+                out.print(connector.putTable(tableName, tableInfo, false));
             }
             break;
         }

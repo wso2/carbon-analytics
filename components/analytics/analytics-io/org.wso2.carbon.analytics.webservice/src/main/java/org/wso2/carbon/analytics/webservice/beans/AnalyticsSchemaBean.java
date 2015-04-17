@@ -24,13 +24,14 @@ import java.io.Serializable;
 public class AnalyticsSchemaBean implements Serializable {
 
     private static final long serialVersionUID = -3948980132143204970L;
-    private  SchemaColumnBean[] columns;
+    private SchemaColumnBean[] columns;
     private String[] primaryKeys;
 
-    public AnalyticsSchemaBean() { }
+    public AnalyticsSchemaBean() {
+    }
 
     public AnalyticsSchemaBean(
-            SchemaColumnBean[] columns,String[] primaryKeys) {
+            SchemaColumnBean[] columns, String[] primaryKeys) {
         this.columns = columns;
         this.primaryKeys = primaryKeys;
     }

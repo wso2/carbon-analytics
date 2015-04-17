@@ -26,16 +26,15 @@ import java.io.Serializable;
  * This class represents a facet object bean. facet object defines the hierarchical categoryName,
  * which can be drilled down. This can be used as a value in a record.
  * Example :
- *   Assume a record represents a book.
- *      Then the record field : value pairs will be, e.g.
- *          Price : $50.00
- *          Author : firstName LastName
- *          ISBN : 234325435445435436
- *          Published Date : "1987" , "March", "21"
- *
+ * Assume a record represents a book.
+ * Then the record field : value pairs will be, e.g.
+ * Price : $50.00
+ * Author : firstName LastName
+ * ISBN : 234325435445435436
+ * Published Date : "1987" , "March", "21"
+ * <p/>
  * Here Publish Date will be a facet/categoryPath, since it can be drilled down to Year, then month and date
  * and categorizes by each level.
- *
  */
 @XmlRootElement(name = "categoryPath")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -45,24 +44,28 @@ public class DrillDownPathBean implements Serializable {
     @XmlElement(name = "path")
     private String[] path;
     @XmlElement(name = "categoryName", required = false, defaultValue = "1.0")
-    private  String categoryName;
+    private String categoryName;
 
-    public DrillDownPathBean() { }
-    
+    public DrillDownPathBean() {
+    }
+
     /**
      * Create a hierarchical categoryName with a given path and categoryName with 1.0.
      * Use this constructor when the categoryPaths need to be given for drill down search
      * in DrillDownRequest objects
+     *
      * @param path array of strings representing the categoryName path.
      */
     public DrillDownPathBean(String[] path) {
         this.path = path;
     }
+
     /**
      * Creates a hierarchical Category with the given categoryName and the array of Strings representing
      * the hierarchical categoryName
+     *
      * @param categoryName Weight of the categoryName, set it to 1.0 if weights are not necessary
-     * @param path String array which represent the categoryName path.
+     * @param path         String array which represent the categoryName path.
      */
     public DrillDownPathBean(String categoryName, String[] path) {
         this.categoryName = categoryName;
@@ -83,6 +86,7 @@ public class DrillDownPathBean implements Serializable {
 
     /**
      * Set a categoryName for the facet categoryName
+     *
      * @param categoryName categoryName in float ( set is as 1.0 if weights are not needed)
      */
     public void setCategoryName(String categoryName) {

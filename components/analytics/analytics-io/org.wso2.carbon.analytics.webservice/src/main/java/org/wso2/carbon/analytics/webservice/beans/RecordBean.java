@@ -22,82 +22,100 @@ import java.io.Serializable;
  */
 public class RecordBean implements Serializable {
 
-	private static final long serialVersionUID = -1592541010962618508L;
-	/** The id. */
+    private static final long serialVersionUID = -1592541010962618508L;
+    /**
+     * The id.
+     */
     private String id;
 
-	/** The table name. */
-	private String tableName;
+    /**
+     * The table name.
+     */
+    private String tableName;
 
-    /** The timestamp. */
+    /**
+     * The timestamp.
+     */
     private Long timestamp;
 
-	/** The values. */
-	private RecordValueEntryBean[] values;
+    /**
+     * The values.
+     */
+    private RecordValueEntryBean[] values;
 
-	public RecordBean() { }
-	
-	/**
-	 * Sets the table name.
-	 * @param tableName the new table name
-	 */
-	public void setTableName(String tableName) {
-		this.tableName = tableName;
-	}
+    public RecordBean() {
+    }
 
-	/**
-	 * Sets the values.
-	 * @param values the values
-	 */
-	public void setValues(RecordValueEntryBean[] values) {
-		this.values = values;
-	}
+    /**
+     * Sets the table name.
+     *
+     * @param tableName the new table name
+     */
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
 
-	/**
-	 * Sets the timestamp.
-	 * @param timestamp the new timestamp
-	 */
-	public void setTimestamp(long timestamp) {
-		this.timestamp = timestamp;
-	}
+    /**
+     * Sets the values.
+     *
+     * @param values the values
+     */
+    public void setValues(RecordValueEntryBean[] values) {
+        this.values = values;
+    }
 
-	/**
-	 * Sets the id.
-	 * @param id the new id
-	 */
-	public void setId(String id) {
-		this.id = id;
-	}
+    /**
+     * Sets the timestamp.
+     *
+     * @param timestamp the new timestamp
+     */
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
 
-	/**
-	 * Gets the id.
-	 * @return the id
-	 */
-	public String getId() {
-		return id;
-	}
-	/**
-	 * Gets the table name.
-	 * @return the table name
-	 */
-	public String getTableName() {
-		return tableName;
-	}
+    /**
+     * Sets the id.
+     *
+     * @param id the new id
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	/**
-	 * Gets the values.
-	 * @return the values
-	 */
-	public RecordValueEntryBean[] getValues() {
-		return values;
-	}
+    /**
+     * Gets the id.
+     *
+     * @return the id
+     */
+    public String getId() {
+        return id;
+    }
 
-	/**
-	 * Gets the timestamp.
-	 * @return the timestamp
-	 */
-	public long getTimestamp() {
-		return timestamp;
-	}
+    /**
+     * Gets the table name.
+     *
+     * @return the table name
+     */
+    public String getTableName() {
+        return tableName;
+    }
+
+    /**
+     * Gets the values.
+     *
+     * @return the values
+     */
+    public RecordValueEntryBean[] getValues() {
+        return values;
+    }
+
+    /**
+     * Gets the timestamp.
+     *
+     * @return the timestamp
+     */
+    public long getTimestamp() {
+        return timestamp;
+    }
 
 }

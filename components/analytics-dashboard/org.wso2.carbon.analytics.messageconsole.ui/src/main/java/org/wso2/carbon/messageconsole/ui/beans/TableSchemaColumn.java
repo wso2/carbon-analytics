@@ -26,6 +26,7 @@ public class TableSchemaColumn {
     String type;
     boolean primary;
     boolean index;
+    boolean scoreParam;
 
     public TableSchemaColumn() {
     }
@@ -60,5 +61,13 @@ public class TableSchemaColumn {
 
     public void setIndex(boolean index) {
         this.index = index;
+    }
+
+    public boolean isScoreParam() {
+        return scoreParam;
+    }
+
+    public void setScoreParam(boolean scoreParam) {
+        this.scoreParam = scoreParam;
     }
 }

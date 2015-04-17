@@ -47,22 +47,22 @@ import java.util.Map;
  */
 public class Utils {
 
-	/**
-	 * Gets the records from record beans.
-	 * @param recordBeans
-	 *            the record beans
-	 * @return the records from record beans
-	 * @throws AnalyticsException if the tableName is not specified
-	 */
+    /**
+     * Gets the records from record beans.
+     *
+     * @param recordBeans the record beans
+     * @return the records from record beans
+     * @throws AnalyticsException if the tableName is not specified
+     */
     public static List<Record> getRecords(String username, List<RecordBean> recordBeans) throws AnalyticsException {
         List<Record> records = new ArrayList<>();
-            int tenantId = getTenantId(username);
-            for (RecordBean recordBean : recordBeans) {
-                if (recordBean.getTableName().isEmpty()) {
-                    throw new AnalyticsException("TableName cannot be empty!");
-                }
-                records.add(new Record(recordBean.getId(), tenantId, recordBean.getTableName(), validateAndReturn(recordBean.getValues())));
+        int tenantId = getTenantId(username);
+        for (RecordBean recordBean : recordBeans) {
+            if (recordBean.getTableName().isEmpty()) {
+                throw new AnalyticsException("TableName cannot be empty!");
             }
+            records.add(new Record(recordBean.getId(), tenantId, recordBean.getTableName(), validateAndReturn(recordBean.getValues())));
+        }
         return records;
     }
 
@@ -70,44 +70,46 @@ public class Utils {
     private static Map<String, Object> validateAndReturn(RecordValueEntryBean[] values)
             throws AnalyticsIndexException {
         Map<String, Object> valueMap = new LinkedHashMap<>();
-        for (RecordValueEntryBean recordEntry : values){
+        for (RecordValueEntryBean recordEntry : values) {
             valueMap.put(recordEntry.getFieldName(), getValue(recordEntry));
         }
         return valueMap;
     }
 
     /**
-	 * Gets the records from record beans belongs to a specific table.
-	 * @param recordBeans
-	 *            the record beans
-	 * @return the records from record beans
-	 */
-	public static List<Record> getRecordsForTable(String username,String tableName, List<RecordBean> recordBeans)
+     * Gets the records from record beans belongs to a specific table.
+     *
+     * @param recordBeans the record beans
+     * @return the records from record beans
+     */
+    public static List<Record> getRecordsForTable(String username, String tableName, List<RecordBean> recordBeans)
             throws AnalyticsException {
-		List<Record> records = new ArrayList<>();
-		for (RecordBean recordBean : recordBeans) {
-			records.add(new Record(recordBean.getId(), getTenantId(username), tableName,
-		                           validateAndReturn(recordBean.getValues())));
-		}
-		return records;
-	}
+        List<Record> records = new ArrayList<>();
+        for (RecordBean recordBean : recordBeans) {
+            records.add(new Record(recordBean.getId(), getTenantId(username), tableName,
+                                   validateAndReturn(recordBean.getValues())));
+        }
+        return records;
+    }
 
-	/**
-	 * Creates the record beans from records.
-	 * @param records the records
-	 * @return the list of recordBeans
-	 */
-	public static List<RecordBean> createRecordBeans(List<Record> records) {
-		List<RecordBean> recordBeans = new ArrayList<>();
-		for(Record record : records) {
-			RecordBean recordBean = createRecordBean(record);
-			recordBeans.add(recordBean);
-		}
-		return recordBeans;
-	}
+    /**
+     * Creates the record beans from records.
+     *
+     * @param records the records
+     * @return the list of recordBeans
+     */
+    public static List<RecordBean> createRecordBeans(List<Record> records) {
+        List<RecordBean> recordBeans = new ArrayList<>();
+        for (Record record : records) {
+            RecordBean recordBean = createRecordBean(record);
+            recordBeans.add(recordBean);
+        }
+        return recordBeans;
+    }
 
     /**
      * Create a RecordBean object out of a Record object
+     *
      * @param record the record object
      * @return RecordBean object
      */
@@ -141,75 +143,77 @@ public class Utils {
     }
 
     /**
-	 * Creates the index type bean from index type.
-	 * @param indexType
-	 *            the index type
-	 * @return the index type bean
-	 */
-	public static String createIndexTypeBean(IndexType indexType) {
-		switch (indexType) {
-			case BOOLEAN:
-				return BeanIndexType.BOOLEAN;
-			case FLOAT:
-				return BeanIndexType.FLOAT;
-			case DOUBLE:
-				return BeanIndexType.DOUBLE;
-			case INTEGER:
-				return BeanIndexType.INTEGER;
-			case LONG:
-				return BeanIndexType.LONG;
-			case STRING:
-				return BeanIndexType.STRING;
+     * Creates the index type bean from index type.
+     *
+     * @param indexType the index type
+     * @return the index type bean
+     */
+    public static String createIndexTypeBean(IndexType indexType) {
+        switch (indexType) {
+            case BOOLEAN:
+                return BeanIndexType.BOOLEAN;
+            case FLOAT:
+                return BeanIndexType.FLOAT;
+            case DOUBLE:
+                return BeanIndexType.DOUBLE;
+            case INTEGER:
+                return BeanIndexType.INTEGER;
+            case LONG:
+                return BeanIndexType.LONG;
+            case STRING:
+                return BeanIndexType.STRING;
             case FACET:
                 return BeanIndexType.FACET;
-			default:
-				return BeanIndexType.STRING;
-		}
-	}
+            default:
+                return BeanIndexType.STRING;
+        }
+    }
 
-	/**
-	 * Creates the index type from index type bean.
-	 * @param type
-	 *            the index type bean
-	 * @return the index type
-	 */
+    /**
+     * Creates the index type from index type bean.
+     *
+     * @param type the index type bean
+     * @return the index type
+     */
 
-	public static IndexType createIndexType(String type) {
-		switch (type) {
-			case BeanIndexType.BOOLEAN:
-				return IndexType.BOOLEAN;
-			case BeanIndexType.FLOAT:
-				return IndexType.FLOAT;
-			case BeanIndexType.DOUBLE:
-				return IndexType.DOUBLE;
-			case BeanIndexType.INTEGER:
-				return IndexType.INTEGER;
-			case BeanIndexType.LONG:
-				return IndexType.LONG;
-			case BeanIndexType.STRING:
-				return IndexType.STRING;
+    public static IndexType createIndexType(String type) {
+        switch (type) {
+            case BeanIndexType.BOOLEAN:
+                return IndexType.BOOLEAN;
+            case BeanIndexType.FLOAT:
+                return IndexType.FLOAT;
+            case BeanIndexType.DOUBLE:
+                return IndexType.DOUBLE;
+            case BeanIndexType.INTEGER:
+                return IndexType.INTEGER;
+            case BeanIndexType.LONG:
+                return IndexType.LONG;
+            case BeanIndexType.STRING:
+                return IndexType.STRING;
             case BeanIndexType.FACET:
                 return IndexType.FACET;
-			default:
-				return IndexType.STRING;
-		}
-	}
+            default:
+                return IndexType.STRING;
+        }
+    }
 
-	/**
-	 * Gets the record ids from search results.
-	 * @param searchResults the search results
-	 * @return the record ids from search results
-	 */
-	public static List<String> getRecordIds(List<SearchResultEntry> searchResults) {
-		List<String> ids = new ArrayList<>();
-		for(SearchResultEntry searchResult : searchResults) {
-			ids.add(searchResult.getId());
-		}
-		return ids;
-	}
+    /**
+     * Gets the record ids from search results.
+     *
+     * @param searchResults the search results
+     * @return the record ids from search results
+     */
+    public static List<String> getRecordIds(List<SearchResultEntry> searchResults) {
+        List<String> ids = new ArrayList<>();
+        for (SearchResultEntry searchResult : searchResults) {
+            ids.add(searchResult.getId());
+        }
+        return ids;
+    }
 
     /**
      * Create a Analytics schema from a bean class
+     *
      * @param analyticsSchemaBean bean table schema to be converted to Analytics Schema.
      * @return Analytics schema
      */
@@ -233,6 +237,7 @@ public class Utils {
 
     /**
      * Create table schema bean from a analytics schema
+     *
      * @param analyticsSchema Analytics schema to be converted to table schema bean
      * @return Table schema bean
      */
@@ -261,6 +266,7 @@ public class Utils {
 
     /**
      * convert a column type bean to ColumnType
+     *
      * @param type ColumnType Bean to be converted to ColumnType
      * @return ColumnType instance
      */
@@ -287,6 +293,7 @@ public class Utils {
 
     /**
      * convert a column type to bean type
+     *
      * @param columnType the ColumnType to be converted to bean type
      * @return ColumnTypeBean instance
      */
@@ -355,7 +362,7 @@ public class Utils {
 
     public static Map<String, IndexType> getIndices(IndexConfigurationBean indexConfigurationBean) {
         Map<String, IndexType> indexTypeMap = new HashMap<>();
-        if (indexConfigurationBean.getIndices() != null) {
+        if (indexConfigurationBean != null && indexConfigurationBean.getIndices() != null) {
             for (IndexEntryBean indexEntryBean : indexConfigurationBean.getIndices()) {
                 indexTypeMap.put(indexEntryBean.getFieldName(), createIndexType(indexEntryBean.getIndexType()));
             }
@@ -365,7 +372,7 @@ public class Utils {
 
     public static List<String> getScoreParam(IndexConfigurationBean indexConfigurationBean) {
         List<String> scoreParams = null;
-        if (indexConfigurationBean.getScoreParams() != null) {
+        if (indexConfigurationBean != null && indexConfigurationBean.getScoreParams() != null) {
             scoreParams = Arrays.asList(indexConfigurationBean.getScoreParams());
         }
         return scoreParams;

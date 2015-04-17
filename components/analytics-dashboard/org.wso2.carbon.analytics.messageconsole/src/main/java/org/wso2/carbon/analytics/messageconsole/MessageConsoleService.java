@@ -89,6 +89,7 @@ public class MessageConsoleService extends AbstractAdmin {
         }
         return permission;
     }
+
     /**
      * This method is use to get logged in username with tenant domain
      *
@@ -126,6 +127,7 @@ public class MessageConsoleService extends AbstractAdmin {
 
     /**
      * Get already schedule information for given table
+     *
      * @param table Table name that need to get task information
      * @return ScheduleTaskInfo instance
      * @throws MessageConsoleException

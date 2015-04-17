@@ -19,7 +19,7 @@
 package org.wso2.carbon.analytics.messageconsole.exception;
 
 /**
- *  This exception class represent message console related general exceptions.
+ * This exception class represent message console related general exceptions.
  */
 public class MessageConsoleException extends Exception {
 
