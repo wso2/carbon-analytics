@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.analytics.dataservice.restapi;
 
+import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
@@ -87,7 +88,25 @@ public class Utils {
      * @return the analytics data service
      * @throws AnalyticsException
      */
-    public static SecureAnalyticsDataService getSecureAnalyticsDataService()
+    public static AnalyticsDataAPI getAnalyticsDataAPIs()
+            throws AnalyticsException {
+        AnalyticsDataAPI analyticsDataAPI;
+        analyticsDataAPI = (AnalyticsDataAPI) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                .getOSGiService(AnalyticsDataAPI.class,
+                                null);
+        if (analyticsDataAPI == null) {
+            throw new AnalyticsException("Analytics Data API is not available.");
+        }
+        return analyticsDataAPI;
+    }
+
+    /**
+     * Gets the analytics data service.
+     *
+     * @return the analytics data service
+     * @throws AnalyticsException
+     */
+    public static SecureAnalyticsDataService getCarbonAnalyticsAPI()
             throws AnalyticsException {
         SecureAnalyticsDataService analyticsDataService;
         analyticsDataService = (SecureAnalyticsDataService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
