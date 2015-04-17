@@ -28,8 +28,9 @@ public class PerCategoryDrillDownResultBean implements Serializable {
     private String[] recordIds;
     private double recordCount;
 
-    public PerCategoryDrillDownResultBean() { }
-    
+    public PerCategoryDrillDownResultBean() {
+    }
+
     public String getCategory() {
         return category;
     }

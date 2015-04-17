@@ -23,14 +23,13 @@ import org.wso2.carbon.registry.core.RegistryConstants;
  * Holds the constants associated with analytics scripts processing, and execution.
  */
 public class AnalyticsConstants {
-
     private AnalyticsConstants(){
         /**
          * Avoid instantiation
          */
     }
-
-    public static final String SCRIPT_EXTENSION = ".xml";
+    public static final String SCRIPT_EXTENSION = "xml";
+    public static final String SCRIPT_EXTENSION_SEPARATOR = ".";
     public static final String DEFAULT_CRON = "DEFAULT";
     public static final String SCRIPT_TASK_TYPE = "ANALYTICS_SPARK";
     public static final String TASK_TENANT_ID_PROPERTY = "TENANT_ID";
@@ -40,7 +39,6 @@ public class AnalyticsConstants {
             +"org.wso2.carbon.analytics.spark";
     public static final String ANALYTICS_MEDIA_TYPE = "application/xml";
     public static final String SPARK_COMPUTE_CLASSPATH_SCRIPT_PATH = "bin/compute-classpath.sh";
-
     public static final String STRING_TYPE = "string";
     public static final String INT_TYPE = "int";
     public static final String INTEGER_TYPE = "integer";
@@ -55,11 +53,9 @@ public class AnalyticsConstants {
     public static final String TERM_PRIMARY = "primary";
     public static final String TERM_KEY = "key";
     public static final String TERM_AS = "as";
-
     public static final String TABLE_INFO_TABLE_NAME = "__TABLE_INFO__";
     public static final int TABLE_INFO_TENANT_ID = -1000;
     public static final String OBJECT = "OBJECT";
-
     public static final String DEFAULT_CHARSET = "UTF8";
-    public static final String SCRIPT_DEPLOYMENT_DIR = "sparkscripts";
+    public static final String SCRIPT_DEPLOYMENT_DIR = "spark-scripts";
 }

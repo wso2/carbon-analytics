@@ -35,6 +35,7 @@ import org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceStub;
 import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.IndexConfigurationBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.IndexEntryBean;
+import org.wso2.carbon.analytics.webservice.stub.beans.RecordBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.RecordValueEntryBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.SchemaColumnBean;
 import org.wso2.carbon.messageconsole.ui.beans.Column;
@@ -178,7 +179,7 @@ public class MessageConsoleConnector {
         }
         ResponseResult responseResult = new ResponseResult();
         try {
-            org.wso2.carbon.analytics.webservice.stub.beans.RecordBean[] resultRecordBeans;
+            RecordBean[] resultRecordBeans;
             if (searchQuery != null && !searchQuery.isEmpty()) {
                 resultRecordBeans = analyticsWebServiceStub.search(tableName, LUCENE, searchQuery, startIndex, pageSize);
                 responseResult.setTotalRecordCount(analyticsWebServiceStub.searchCount(tableName, LUCENE, searchQuery));
@@ -191,7 +192,7 @@ public class MessageConsoleConnector {
                 if (log.isDebugEnabled()) {
                     log.debug("Result size: " + resultRecordBeans.length);
                 }
-                for (org.wso2.carbon.analytics.webservice.stub.beans.RecordBean recordBean : resultRecordBeans) {
+                for (RecordBean recordBean : resultRecordBeans) {
                     Record record = getRecord(recordBean, true);
                     records.add(record);
                 }
@@ -207,7 +208,7 @@ public class MessageConsoleConnector {
         return RESPONSE_RESULT_BUILDER.serializeNulls().create().toJson(responseResult);
     }
 
-    private Record getRecord(org.wso2.carbon.analytics.webservice.stub.beans.RecordBean recordBean, boolean
+    private Record getRecord(RecordBean recordBean, boolean
             withDefaultColumn) {
         Record record = new Record();
         if (recordBean != null) {
@@ -326,8 +327,8 @@ public class MessageConsoleConnector {
         }
         ResponseRecord responseRecord = new ResponseRecord();
         try {
-            org.wso2.carbon.analytics.webservice.stub.beans.RecordBean[] recordBeans = putRecord(table, columns,
-                                                                                                 values, null);
+            RecordBean[] recordBeans = putRecord(table, columns,
+                                                 values, null);
             responseRecord.setRecord(getRecord(recordBeans[0], true));
             responseRecord.setResult(OK);
         } catch (Exception e) {
@@ -420,7 +421,7 @@ public class MessageConsoleConnector {
         ResponseRecord responseRecord = new ResponseRecord();
         responseRecord.setResult(OK);
         try {
-            org.wso2.carbon.analytics.webservice.stub.beans.RecordBean[] recordBeans = putRecord(table, columns, values, recordId);
+            RecordBean[] recordBeans = putRecord(table, columns, values, recordId);
             responseRecord.setRecord(getRecord(recordBeans[0], true));
             responseRecord.setResult(OK);
         } catch (Exception e) {
@@ -433,12 +434,12 @@ public class MessageConsoleConnector {
         return RESPONSE_RECORD_BUILDER.serializeNulls().create().toJson(responseRecord);
     }
 
-    private org.wso2.carbon.analytics.webservice.stub.beans.RecordBean[] putRecord(String table, String[] columns,
-                                                                                   String[] values, String recordId)
+    private RecordBean[] putRecord(String table, String[] columns,
+                                   String[] values, String recordId)
             throws RemoteException,
                    org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceAnalyticsWebServiceExceptionException {
         AnalyticsSchemaBean tableSchema = analyticsWebServiceStub.getTableSchema(table);
-        org.wso2.carbon.analytics.webservice.stub.beans.RecordBean recordBean = new org.wso2.carbon.analytics.webservice.stub.beans.RecordBean();
+        RecordBean recordBean = new RecordBean();
         recordBean.setId(recordId);
         recordBean.setTableName(table);
         recordBean.setTimestamp(System.currentTimeMillis());
@@ -446,7 +447,7 @@ public class MessageConsoleConnector {
             RecordValueEntryBean[] recordValueEntryBeans = getRecordValueEntryBeans(columns, values, tableSchema);
             recordBean.setValues(recordValueEntryBeans);
         }
-        org.wso2.carbon.analytics.webservice.stub.beans.RecordBean[] recordBeans = new org.wso2.carbon.analytics.webservice.stub.beans.RecordBean[]{recordBean};
+        RecordBean[] recordBeans = new RecordBean[]{recordBean};
         analyticsWebServiceStub.put(recordBeans);
         return recordBeans;
     }
@@ -454,17 +455,17 @@ public class MessageConsoleConnector {
     private Record getRecord(String table, String recordId, boolean withDefaultColumns)
             throws RemoteException, AnalyticsWebServiceAnalyticsWebServiceExceptionException {
         String[] ids = new String[]{recordId};
-        org.wso2.carbon.analytics.webservice.stub.beans.RecordBean[] recordBeans = analyticsWebServiceStub.getById(table, 1, null, ids);
+        RecordBean[] recordBeans = analyticsWebServiceStub.getById(table, 1, null, ids);
         if (recordBeans != null && recordBeans.length > 0) {
             return getRecord(recordBeans[0], withDefaultColumns);
         }
         return null;
     }
 
-    private org.wso2.carbon.analytics.webservice.stub.beans.RecordBean getRecordBean(String table, String recordId)
+    private RecordBean getRecordBean(String table, String recordId)
             throws RemoteException, AnalyticsWebServiceAnalyticsWebServiceExceptionException {
         String[] ids = new String[]{recordId};
-        org.wso2.carbon.analytics.webservice.stub.beans.RecordBean[] recordBeans = analyticsWebServiceStub.getById(table, 1, null, ids);
+        RecordBean[] recordBeans = analyticsWebServiceStub.getById(table, 1, null, ids);
         if (recordBeans != null && recordBeans.length > 0) {
             return recordBeans[0];
         }
@@ -529,7 +530,7 @@ public class MessageConsoleConnector {
         ResponseArbitraryField responseArbitraryField = new ResponseArbitraryField();
         responseArbitraryField.setResult(OK);
         try {
-            org.wso2.carbon.analytics.webservice.stub.beans.RecordBean originalRecord = getRecordBean(table, recordId);
+            RecordBean originalRecord = getRecordBean(table, recordId);
             if (originalRecord != null) {
                 RecordValueEntryBean[] columns = originalRecord.getValues();
                 RecordValueEntryBean[] newColumnsList = new RecordValueEntryBean[columns.length - 1];
@@ -541,7 +542,7 @@ public class MessageConsoleConnector {
                 }
                 originalRecord.setValues(newColumnsList);
                 originalRecord.setTimestamp(System.currentTimeMillis());
-                analyticsWebServiceStub.put(new org.wso2.carbon.analytics.webservice.stub.beans.RecordBean[]{originalRecord});
+                analyticsWebServiceStub.put(new RecordBean[]{originalRecord});
             }
         } catch (Exception e) {
             String errorMsg = "Unable to delete arbitrary field with record[" + recordId + "] in table[" + table + "]";
@@ -559,7 +560,7 @@ public class MessageConsoleConnector {
         }
         ResponseArbitraryFieldColumn responseArbitraryFieldColumn = new ResponseArbitraryFieldColumn();
         try {
-            org.wso2.carbon.analytics.webservice.stub.beans.RecordBean originalRecord = getRecordBean(table, recordId);
+            RecordBean originalRecord = getRecordBean(table, recordId);
             if (originalRecord != null) {
                 RecordValueEntryBean[] columns = originalRecord.getValues();
                 RecordValueEntryBean[] newColumnsList = new RecordValueEntryBean[columns.length + 1];
@@ -574,7 +575,7 @@ public class MessageConsoleConnector {
                 newColumnsList[i] = newArbitraryField;
                 originalRecord.setValues(newColumnsList);
                 originalRecord.setTimestamp(System.currentTimeMillis());
-                analyticsWebServiceStub.put(new org.wso2.carbon.analytics.webservice.stub.beans.RecordBean[]{originalRecord});
+                analyticsWebServiceStub.put(new RecordBean[]{originalRecord});
                 responseArbitraryFieldColumn.setColumn(new Column(fieldName, value, type));
                 responseArbitraryFieldColumn.setResult(OK);
             }
@@ -588,13 +589,14 @@ public class MessageConsoleConnector {
         return RESPONSE_ARBITRARY_FIELD_COLUMN_BUILDER.serializeNulls().create().toJson(responseArbitraryFieldColumn);
     }
 
-    public String createTable(String table, String detailsJsonString) {
+    public String putTable(String table, String detailsJsonString, boolean isCreating) {
         if (log.isDebugEnabled()) {
-            log.debug("Creating table[" + table + "] with values [" + detailsJsonString + "]");
+            log.debug("Put table[" + table + "] with values [" + detailsJsonString + "]");
         }
         String msg;
         List<TableSchemaColumn> columnList = new Gson().fromJson(detailsJsonString, TABLE_SCHEMA_TYPE);
         List<String> primaryKeys = new ArrayList<>();
+        List<String> scoreParams = new ArrayList<>();
         List<SchemaColumnBean> schemaColumnBeans = new ArrayList<>();
         List<IndexEntryBean> entryBeans = new ArrayList<>();
         for (TableSchemaColumn schemaColumn : columnList) {
@@ -606,16 +608,21 @@ public class MessageConsoleConnector {
                 schemaColumnBean.setColumnName(schemaColumn.getColumn());
                 schemaColumnBean.setColumnType(schemaColumn.getType());
                 schemaColumnBeans.add(schemaColumnBean);
-                if (schemaColumn.isIndex()) {
+                if (schemaColumn.isIndex() || "FACET".equals(schemaColumn.getType())) {
                     IndexEntryBean indexEntryBean = new IndexEntryBean();
                     indexEntryBean.setFieldName(schemaColumn.getColumn());
                     indexEntryBean.setIndexType(schemaColumn.getType());
                     entryBeans.add(indexEntryBean);
                 }
+                if (schemaColumn.isScoreParam()) {
+                    scoreParams.add(schemaColumn.getColumn());
+                }
             }
         }
         try {
-            analyticsWebServiceStub.createTable(table);
+            if (isCreating) {
+                analyticsWebServiceStub.createTable(table);
+            }
             AnalyticsSchemaBean analyticsSchemaBean = new AnalyticsSchemaBean();
             SchemaColumnBean[] columnBeans = new SchemaColumnBean[schemaColumnBeans.size()];
             analyticsSchemaBean.setColumns(schemaColumnBeans.toArray(columnBeans));
@@ -623,61 +630,15 @@ public class MessageConsoleConnector {
             analyticsSchemaBean.setPrimaryKeys(primaryKeys.toArray(primaryKeyArray));
             analyticsWebServiceStub.setTableSchema(table, analyticsSchemaBean);
             PermissionBean permissionBean = messageConsoleStub.getAvailablePermissions();
-            if (permissionBean.getSetIndex()) {
-                IndexConfigurationBean configurationBean = new IndexConfigurationBean();
-                IndexEntryBean[] indexEntryBeans = new IndexEntryBean[entryBeans.size()];
-                configurationBean.setIndices(entryBeans.toArray(indexEntryBeans));
-                analyticsWebServiceStub.setIndices(table, configurationBean);
-            }
-            msg = "Successfully saved table information";
-        } catch (Exception e) {
-            log.error("Unable to save table information: " + e.getMessage(), e);
-            msg = "Unable to save table information: " + e.getMessage();
-        }
-        return msg;
-    }
-
-    public String editTable(String table, String detailsJsonString) {
-        if (log.isDebugEnabled()) {
-            log.debug("Editing table[" + table + "] with values [" + detailsJsonString + "]");
-        }
-        String msg;
-        List<TableSchemaColumn> columnList = new Gson().fromJson(detailsJsonString, TABLE_SCHEMA_TYPE);
-        List<String> primaryKeys = new ArrayList<>();
-        List<SchemaColumnBean> schemaColumnBeans = new ArrayList<>();
-        List<IndexEntryBean> entryBeans = new ArrayList<>();
-        for (TableSchemaColumn schemaColumn : columnList) {
-            if (schemaColumn.getColumn() != null && !schemaColumn.getColumn().isEmpty()) {
-                if (schemaColumn.isPrimary()) {
-                    primaryKeys.add(schemaColumn.getColumn());
-                }
-                SchemaColumnBean schemaColumnBean = new SchemaColumnBean();
-                schemaColumnBean.setColumnName(schemaColumn.getColumn());
-                schemaColumnBean.setColumnType(schemaColumn.getType());
-                schemaColumnBeans.add(schemaColumnBean);
-                if (schemaColumn.isIndex()) {
-                    IndexEntryBean indexEntryBean = new IndexEntryBean();
-                    indexEntryBean.setFieldName(schemaColumn.getColumn());
-                    indexEntryBean.setIndexType(schemaColumn.getType());
-                    entryBeans.add(indexEntryBean);
-                }
-            }
-        }
-        try {
-            AnalyticsSchemaBean analyticsSchemaBean = new AnalyticsSchemaBean();
-            SchemaColumnBean[] columnBeans = new SchemaColumnBean[schemaColumnBeans.size()];
-            analyticsSchemaBean.setColumns(schemaColumnBeans.toArray(columnBeans));
-            String[] primaryKeyArray = new String[primaryKeys.size()];
-            analyticsSchemaBean.setPrimaryKeys(primaryKeys.toArray(primaryKeyArray));
-            analyticsWebServiceStub.setTableSchema(table, analyticsSchemaBean);
-            PermissionBean permissionBean = messageConsoleStub.getAvailablePermissions();
-            if (permissionBean.getDeleteIndex()) {
+            if (!isCreating && permissionBean.getDeleteIndex()) {
                 analyticsWebServiceStub.clearIndices(table);
             }
             if (permissionBean.getSetIndex()) {
                 IndexConfigurationBean configurationBean = new IndexConfigurationBean();
                 IndexEntryBean[] indexEntryBeans = new IndexEntryBean[entryBeans.size()];
                 configurationBean.setIndices(entryBeans.toArray(indexEntryBeans));
+                String[] scoreParamArray = new String[scoreParams.size()];
+                configurationBean.setScoreParams(scoreParams.toArray(scoreParamArray));
                 analyticsWebServiceStub.setIndices(table, configurationBean);
             }
             msg = "Successfully saved table information";
@@ -727,6 +688,7 @@ public class MessageConsoleConnector {
                 for (IndexEntryBean indexEntryBean : indexConfigurationBean.getIndices()) {
                     if (schemaColumnMap.containsKey(indexEntryBean.getFieldName())) {
                         schemaColumnMap.get(indexEntryBean.getFieldName()).setIndex(true);
+                        schemaColumnMap.get(indexEntryBean.getFieldName()).setType(indexEntryBean.getIndexType());
                     } else {
                         TableSchemaColumn schemaColumn = new TableSchemaColumn();
                         schemaColumn.setColumn(indexEntryBean.getFieldName());
@@ -737,6 +699,14 @@ public class MessageConsoleConnector {
                     }
                 }
             }
+            if (indexConfigurationBean != null && indexConfigurationBean.getScoreParams() != null) {
+                for (String scoreParam : indexConfigurationBean.getScoreParams()) {
+                    if (schemaColumnMap.containsKey(scoreParam)) {
+                        schemaColumnMap.get(scoreParam).setScoreParam(true);
+                    }
+                }
+            }
+
         } catch (Exception e) {
             log.error("Unable to get table information for table:" + table, e);
         }

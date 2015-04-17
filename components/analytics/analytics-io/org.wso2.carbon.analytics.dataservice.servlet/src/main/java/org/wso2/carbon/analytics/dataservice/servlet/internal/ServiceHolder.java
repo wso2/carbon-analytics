@@ -24,6 +24,10 @@ import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 import org.wso2.carbon.identity.authentication.AuthenticationService;
 import org.wso2.carbon.user.core.service.RealmService;
 
+/**
+ * Class holder to register the osgi services registered within the component.
+ *
+ */
 public class ServiceHolder {
     private static AuthenticationService authenticationService;
     private static AnalyticsDataService analyticsDataService;

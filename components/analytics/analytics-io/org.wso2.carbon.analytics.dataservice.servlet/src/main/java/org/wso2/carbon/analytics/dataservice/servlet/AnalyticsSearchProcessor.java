@@ -40,13 +40,16 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Servlet to process the analytics search requests and returns the results.
+ */
 public class AnalyticsSearchProcessor extends HttpServlet {
 
     /**
      * Search the table
      *
-     * @param req
-     * @param resp
+     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param resp HttpResponse which returns the result of the intended operation.
      * @throws ServletException
      * @throws IOException
      */
@@ -108,8 +111,8 @@ public class AnalyticsSearchProcessor extends HttpServlet {
     /**
      * Send a drill down request and get the results.
      *
-     * @param req
-     * @param resp
+     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param resp HttpResponse which returns the result of the intended operation.
      * @throws ServletException
      * @throws IOException
      */

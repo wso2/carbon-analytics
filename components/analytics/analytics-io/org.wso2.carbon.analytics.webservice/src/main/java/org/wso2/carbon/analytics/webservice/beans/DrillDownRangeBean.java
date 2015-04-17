@@ -29,8 +29,9 @@ public class DrillDownRangeBean implements Serializable {
     private String label;
     private double from;
     private double to;
-    
-    public DrillDownRangeBean() { }
+
+    public DrillDownRangeBean() {
+    }
 
     public DrillDownRangeBean(String label, double from, double to) {
         this.label = label;

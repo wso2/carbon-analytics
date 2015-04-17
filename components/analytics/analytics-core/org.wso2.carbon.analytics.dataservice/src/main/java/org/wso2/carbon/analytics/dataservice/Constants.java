@@ -33,7 +33,7 @@ public class Constants {
     public static final String PERMISSION_SET_INDEXING = "/permission/admin/manage/analytics/indexing/set";
     public static final String PERMISSION_GET_INDEXING = "/permission/admin/manage/analytics/indexing/get";
     public static final String PERMISSION_DELETE_INDEXING = "/permission/admin/manage/analytics/indexing/delete";
-    
     public static final String DEFAULT_CHARSET = "UTF8";
-    
+    public static final String ANALYTICS_INDICES_FILE_EXTENSION = "xml";
+    public static final String ANALYTICS_INDICES_DEPLOYMENT_DIR_NAME = "analytics-indices";
 }

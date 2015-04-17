@@ -17,13 +17,19 @@
 */
 package org.wso2.carbon.analytics.spark.core.internal;
 
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.CarbonAnalyticsProcessorService;
+import org.wso2.carbon.analytics.spark.core.deployment.SparkScriptCAppDeployer;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
+import org.wso2.carbon.application.deployer.AppDeployerConstants;
+import org.wso2.carbon.application.deployer.AppDeployerUtils;
+import org.wso2.carbon.application.deployer.handler.AppDeploymentHandler;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.core.ServerStartupObserver;
 import org.wso2.carbon.ntask.common.TaskException;
@@ -32,7 +38,12 @@ import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
 import org.wso2.carbon.utils.NetworkUtils;
 
+import java.io.InputStream;
+import java.net.URL;
+
 /**
+ * Declarative service component for spark analytics.
+ *
  * @scr.component name="analytics.core" immediate="true"
  * @scr.reference name="ntask.component" interface="org.wso2.carbon.ntask.core.service.TaskService"
  * cardinality="1..1" policy="dynamic" bind="setTaskService" unbind="unsetTaskService"
@@ -63,11 +74,23 @@ public class AnalyticsComponent {
                 log.error(msg, e);
             //throw new RuntimeException(msg, e);
             }
+            BundleContext bundleContext = ctx.getBundleContext();
             AnalyticsProcessorService analyticsProcessorService = new CarbonAnalyticsProcessorService();
-            ctx.getBundleContext().registerService(AnalyticsProcessorService.class, analyticsProcessorService, null);
+            bundleContext.registerService(AnalyticsProcessorService.class, analyticsProcessorService, null);
             ServiceHolder.setAnalyticsProcessorService(analyticsProcessorService);
             // Registering server startup observer
-            ctx.getBundleContext().registerService(ServerStartupObserver.class, AnalyticsServerStartupObserver.getInstance(), null);
+            bundleContext.registerService(ServerStartupObserver.class, AnalyticsServerStartupObserver.getInstance(), null);
+            SparkScriptCAppDeployer sparkScriptCAppDeployer = new SparkScriptCAppDeployer();
+            bundleContext.registerService(
+                    AppDeploymentHandler.class.getName(), sparkScriptCAppDeployer, null);
+            // read required-features.xml
+            URL reqFeaturesResource = bundleContext.getBundle()
+                    .getResource(AppDeployerConstants.REQ_FEATURES_XML);
+            if (reqFeaturesResource != null) {
+                InputStream xmlStream = reqFeaturesResource.openStream();
+                ServiceHolder.setRequiredFeatures(AppDeployerUtils
+                        .readRequiredFeaturs(new StAXOMBuilder(xmlStream).getDocumentElement()));
+            }
             if (log.isDebugEnabled()) {
                 log.debug("Finished activating Analytics Spark Core");
             }

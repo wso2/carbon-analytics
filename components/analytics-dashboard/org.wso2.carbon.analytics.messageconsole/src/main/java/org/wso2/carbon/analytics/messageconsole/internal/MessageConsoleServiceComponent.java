@@ -28,6 +28,7 @@ import org.wso2.carbon.ntask.core.service.TaskService;
 
 /**
  * This class represents the analytics message console service declarative services component.
+ *
  * @scr.component name="messageconsole.component" immediate="true"
  * @scr.reference name="analytics.component" interface="org.wso2.carbon.analytics.dataservice.AnalyticsDataService"
  * cardinality="1..1" policy="dynamic" bind="setAnalyticsDataService" unbind="unsetAnalyticsDataService"
@@ -47,6 +48,7 @@ public class MessageConsoleServiceComponent {
             logger.error("Unable to register analytics data purging task type", e);
         }
     }
+
     protected void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {
         if (logger.isDebugEnabled()) {
             logger.info("Setting the Analytics Data Service");

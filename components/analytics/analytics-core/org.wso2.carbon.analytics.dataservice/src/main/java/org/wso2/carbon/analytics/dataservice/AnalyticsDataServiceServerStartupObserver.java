@@ -22,7 +22,7 @@ import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.deployment.repository.util.DeploymentFileData;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.CarbonException;
+import org.wso2.carbon.analytics.dataservice.deployment.AnalyticsIndexDeployer;
 import org.wso2.carbon.core.ServerStartupObserver;
 import org.wso2.carbon.utils.CarbonUtils;
 
@@ -30,6 +30,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * This class is a observer which is registered for get triggered when the server has been completed starting up,
+ * and then after the server completed starting up it will actually do the registered paused deployments
+ * to avoid the missing osgi services.
+ */
 public class AnalyticsDataServiceServerStartupObserver implements ServerStartupObserver {
     private static final Log log = LogFactory.getLog(AnalyticsDataServiceServerStartupObserver.class);
     private static AnalyticsDataServiceServerStartupObserver instance = new AnalyticsDataServiceServerStartupObserver();

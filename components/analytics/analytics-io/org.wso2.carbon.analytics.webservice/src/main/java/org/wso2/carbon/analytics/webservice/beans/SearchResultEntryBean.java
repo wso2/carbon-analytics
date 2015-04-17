@@ -27,53 +27,62 @@ import java.io.Serializable;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = {
-                      "id",
-                      "score"
+        "id",
+        "score"
 })
 
-@XmlRootElement( name = "SearchResultEntry")
+@XmlRootElement(name = "SearchResultEntry")
 public class SearchResultEntryBean implements Serializable {
 
-	private static final long serialVersionUID = -1168090243724348417L;
-	/** The id. */
-	@XmlElement(required = true)
-	private String id;
-	
-	/** The score. */
-	@XmlElement(required = true)
-	private float score;
+    private static final long serialVersionUID = -1168090243724348417L;
+    /**
+     * The id.
+     */
+    @XmlElement(required = true)
+    private String id;
 
-	public SearchResultEntryBean() { }
-	
-	/**
-	 * Sets the id.
-	 * @param id the new id
-	 */
-	public void setId(String id) {
-		this.id = id;
-	}
+    /**
+     * The score.
+     */
+    @XmlElement(required = true)
+    private float score;
 
-	/**
-	 * Sets the score.
-	 * @param score the new score
-	 */
-	public void setScore(float score) {
-		this.score = score;
-	}
-	
-	/**
-	 * Gets the id.
-	 * @return the id
-	 */
-	public String getId() {
-		return id;
-	}
+    public SearchResultEntryBean() {
+    }
 
-	/**
-	 * Gets the score.
-	 * @return the score
-	 */
-	public float getScore() {
-		return score;
-	}
+    /**
+     * Sets the id.
+     *
+     * @param id the new id
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    /**
+     * Sets the score.
+     *
+     * @param score the new score
+     */
+    public void setScore(float score) {
+        this.score = score;
+    }
+
+    /**
+     * Gets the id.
+     *
+     * @return the id
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * Gets the score.
+     *
+     * @return the score
+     */
+    public float getScore() {
+        return score;
+    }
 }

@@ -35,16 +35,17 @@ public class DrillDownResultBean implements Serializable {
     private DrillDownFieldRangeBean[] perFieldRanges;
     @XmlElement(name = "ll")
     private String language;
-    private  String languageQuery;
+    private String languageQuery;
     private String scoreFunction;
     private int categoryCount;
 
     private int categoryStart;
     private int recordCount;
-    private  int recordStart;
+    private int recordStart;
     private boolean withIds;
-    
-    public DrillDownResultBean() { }
+
+    public DrillDownResultBean() {
+    }
 
     public PerFieldDrillDownResultBean[] getPerFieldEntries() {
         return perFieldEntries;

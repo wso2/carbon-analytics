@@ -17,6 +17,10 @@
 */
 package org.wso2.carbon.analytics.dataservice.servlet.exception;
 
+/**
+ * Exception to indicate the authentication failure of the analytics api remote service.
+ *
+ */
 public class AnalyticsAPIAuthenticationException extends Exception {
 
     public AnalyticsAPIAuthenticationException(String message){

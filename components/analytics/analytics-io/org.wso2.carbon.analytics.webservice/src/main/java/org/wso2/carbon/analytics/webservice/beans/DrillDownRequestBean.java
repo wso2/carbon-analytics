@@ -32,13 +32,14 @@ public class DrillDownRequestBean implements Serializable {
     private String scoreFunction;
     private int recordCount;
     private int categoryCount;
-    private  int recordStart;
-    private  int categoryStart;
+    private int recordStart;
+    private int categoryStart;
     private boolean includeIds;
     private DrillDownFieldRangeBean[] ranges;
 
-    public DrillDownRequestBean() { }
-    
+    public DrillDownRequestBean() {
+    }
+
     public String getTableName() {
         return tableName;
     }

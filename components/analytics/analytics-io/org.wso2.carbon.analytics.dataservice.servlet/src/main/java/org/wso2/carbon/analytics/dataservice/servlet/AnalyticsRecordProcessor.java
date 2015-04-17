@@ -35,13 +35,16 @@ import java.io.PrintWriter;
 import java.lang.reflect.Type;
 import java.util.List;
 
+/**
+ * Servlet to process records related operations such as add/delete/update the records.
+ */
 public class AnalyticsRecordProcessor extends HttpServlet {
 
     /**
      * Get record count
      *
-     * @param req
-     * @param resp
+     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param resp HttpResponse which returns the result of the intended operation.
      * @throws ServletException
      * @throws IOException
      */
@@ -91,8 +94,8 @@ public class AnalyticsRecordProcessor extends HttpServlet {
     /**
      * Put records
      *
-     * @param req
-     * @param resp
+     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param resp HttpResponse which returns the result of the intended operation.
      * @throws ServletException
      * @throws IOException
      */
@@ -131,8 +134,8 @@ public class AnalyticsRecordProcessor extends HttpServlet {
     /**
      * delete records for range and given ids..
      *
-     * @param req
-     * @param resp
+     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param resp HttpResponse which returns the result of the intended operation.
      * @throws ServletException
      * @throws IOException
      */

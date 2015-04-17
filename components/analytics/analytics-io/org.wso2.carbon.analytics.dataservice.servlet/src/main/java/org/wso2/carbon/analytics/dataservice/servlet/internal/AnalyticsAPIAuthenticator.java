@@ -28,6 +28,11 @@ import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.util.*;
 
+/**
+ * Authenticator class which is used for authenticating analytics API and generates
+ * relevant session Id for the request which is stored in a distributed hazlecast map.
+ */
+
 public class AnalyticsAPIAuthenticator {
     private static Log log = LogFactory.getLog(AnalyticsAPIAuthenticator.class);
     private static final String SESSION_CACHE_NAME = "ANALYTICS_API_SERVICE_SESSION_CACHE";
@@ -53,7 +58,8 @@ public class AnalyticsAPIAuthenticator {
             boolean authenticated = ServiceHolder.getAuthenticationService().authenticate(userName, password);
             if (authenticated) {
                 try {
-                    boolean authorized = ServiceHolder.getRealmService().getTenantUserRealm(MultitenantConstants.SUPER_TENANT_ID).
+                    boolean authorized = ServiceHolder.getRealmService().
+                            getTenantUserRealm(MultitenantConstants.SUPER_TENANT_ID).
                             getAuthorizationManager().isUserAuthorized(username,
                             AnalyticsAPIConstants.ANALYTICS_REMOTE_API_INVOCATION_PERMISSION,
                             CarbonConstants.UI_PERMISSION_ACTION);
@@ -61,11 +67,13 @@ public class AnalyticsAPIAuthenticator {
                         String sessionId = UUID.randomUUID().toString();
                         sessionIds.put(sessionId, Boolean.TRUE);
                         return sessionId;
-                    }else {
-                        logAndThrowAuthException("User :" + userName + " don't have necessary permissions to connect to remote analytics API.");
+                    } else {
+                        logAndThrowAuthException("User :" + userName + " don't have necessary permissions " +
+                                "to connect to remote analytics API.");
                     }
                 } catch (UserStoreException e) {
-                    logAndThrowAuthException("User :" + userName + " don't have necessary permissions to connect to remote analytics API.");
+                    logAndThrowAuthException("User :" + userName + " don't have necessary permissions " +
+                            "to connect to remote analytics API.");
                 }
             } else {
                 logAndThrowAuthException("Login failed for user :" + userName);

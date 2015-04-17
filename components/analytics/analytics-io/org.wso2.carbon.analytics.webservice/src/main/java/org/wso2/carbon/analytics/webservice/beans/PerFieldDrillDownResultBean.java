@@ -27,8 +27,9 @@ public class PerFieldDrillDownResultBean implements Serializable {
     private String fieldName;
     private PerCategoryDrillDownResultBean[] categories;
 
-    public PerFieldDrillDownResultBean() { }
-    
+    public PerFieldDrillDownResultBean() {
+    }
+
     public String getFieldName() {
         return fieldName;
     }

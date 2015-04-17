@@ -25,27 +25,28 @@ import java.io.Serializable;
  * The Class TableBean.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement( name = "table")
+@XmlRootElement(name = "table")
 public class TableBean implements Serializable {
 
-	private static final long serialVersionUID = -4604642066136125250L;
-	@XmlElement(name = "tableName", required = true)
-	private String tableName;
+    private static final long serialVersionUID = -4604642066136125250L;
+    @XmlElement(name = "tableName", required = true)
+    private String tableName;
 
-	public TableBean() { }
-	
-	/**
-	 * @return the tableName
-	 */
-	public String getTableName() {
-		return tableName;
-	}
+    public TableBean() {
+    }
 
-	/**
-	 * @param tableName the tableName to set
-	 */
-	public void setTableName(String tableName) {
-		this.tableName = tableName;
-	}
-	
+    /**
+     * @return the tableName
+     */
+    public String getTableName() {
+        return tableName;
+    }
+
+    /**
+     * @param tableName the tableName to set
+     */
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+
 }

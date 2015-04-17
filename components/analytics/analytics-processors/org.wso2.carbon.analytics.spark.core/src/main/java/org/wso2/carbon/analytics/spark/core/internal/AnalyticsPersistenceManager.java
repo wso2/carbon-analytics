@@ -191,7 +191,7 @@ public class AnalyticsPersistenceManager {
      */
     private String getScriptLocation(String scriptName) throws AnalyticsPersistenceException {
         return AnalyticsConstants.ANALYTICS_SCRIPTS_LOCATION + RegistryConstants.PATH_SEPARATOR + scriptName +
-                AnalyticsConstants.SCRIPT_EXTENSION;
+                AnalyticsConstants.SCRIPT_EXTENSION_SEPARATOR + AnalyticsConstants.SCRIPT_EXTENSION;
     }
 
     /**

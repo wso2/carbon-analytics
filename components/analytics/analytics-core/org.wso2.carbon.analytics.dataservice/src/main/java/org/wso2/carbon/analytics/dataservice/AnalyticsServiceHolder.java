@@ -21,7 +21,11 @@ package org.wso2.carbon.analytics.dataservice;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 
 import com.hazelcast.core.HazelcastInstance;
+import org.wso2.carbon.application.deployer.Feature;
 import org.wso2.carbon.user.core.service.RealmService;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * This represents a service holder class for analytics data service.
@@ -35,6 +39,8 @@ public class AnalyticsServiceHolder {
     private static AnalyticsDataService analyticsDataService;
 
     private static RealmService realmService;
+
+    private static Map<String, List<Feature>> requiredFeatures;
 
     public static void setHazelcastInstance(HazelcastInstance hazelcastInstance) {
         AnalyticsServiceHolder.hazelcastInstance = hazelcastInstance;
@@ -66,5 +72,13 @@ public class AnalyticsServiceHolder {
 
     public static RealmService getRealmService() {
         return AnalyticsServiceHolder.realmService;
+    }
+
+    public static Map<String, List<Feature>> getRequiredFeatures() {
+        return requiredFeatures;
+    }
+
+    public static void setRequiredFeatures(Map<String, List<Feature>> requiredFeatures) {
+        AnalyticsServiceHolder.requiredFeatures = requiredFeatures;
     }
 }

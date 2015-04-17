@@ -15,7 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.analytics.spark.core;
+package org.wso2.carbon.analytics.spark.core.deployment;
 
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.deployment.AbstractDeployer;
@@ -23,7 +23,7 @@ import org.apache.axis2.deployment.repository.util.DeploymentFileData;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsPersistenceException;
-import org.wso2.carbon.analytics.spark.core.exception.AnalyticsScriptDeploymentException;
+import org.wso2.carbon.analytics.spark.core.exception.SparkScriptDeploymentException;
 import org.wso2.carbon.analytics.spark.core.internal.AnalyticsPersistenceManager;
 import org.wso2.carbon.analytics.spark.core.internal.AnalyticsServerStartupObserver;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
@@ -37,10 +37,13 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 
+/**
+ * Deployer implementation to deploy the spark scripts artifacts.
+ */
 public class SparkScriptDeployer extends AbstractDeployer {
 
     private static final Log log = LogFactory.getLog(SparkScriptDeployer.class);
-    private static final String DIR_NAME = "spark-scripts";
+
 
     @Override
     public void init(ConfigurationContext configurationContext) {
@@ -51,7 +54,7 @@ public class SparkScriptDeployer extends AbstractDeployer {
         } else {
             repository = CarbonUtils.getCarbonTenantsDirPath() + File.separator + tenantId;
         }
-        repository += File.separator + DIR_NAME;
+        repository += File.separator + AnalyticsConstants.SCRIPT_DEPLOYMENT_DIR;
         File file = new File(repository);
         if (!file.exists()) {
             boolean dirCreated = file.mkdirs();
@@ -62,7 +65,7 @@ public class SparkScriptDeployer extends AbstractDeployer {
         }
     }
 
-    public void deploy(DeploymentFileData deploymentFileData) throws AnalyticsScriptDeploymentException {
+    public void deploy(DeploymentFileData deploymentFileData) throws SparkScriptDeploymentException {
         if (AnalyticsServerStartupObserver.getInstance().getInitialized()) {
             try {
                 int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
@@ -77,27 +80,27 @@ public class SparkScriptDeployer extends AbstractDeployer {
                 String errorMsg = "Error while reading the analytics script : "
                         + deploymentFileData.getAbsolutePath();
                 log.error(errorMsg, e);
-                throw new AnalyticsScriptDeploymentException(errorMsg, e);
+                throw new SparkScriptDeploymentException(errorMsg, e);
             } catch (AnalyticsPersistenceException e) {
                 String errorMsg = "Error while storing the script : "
                         + deploymentFileData.getAbsolutePath();
                 log.error(errorMsg);
-                throw new AnalyticsScriptDeploymentException(errorMsg, e);
+                throw new SparkScriptDeploymentException(errorMsg, e);
             }
-        }else {
+        } else {
             AnalyticsServerStartupObserver.getInstance().addPausedDeployment(deploymentFileData);
         }
     }
 
-    public void undeploy(String fileName) throws AnalyticsScriptDeploymentException {
+    public void undeploy(String fileName) throws SparkScriptDeploymentException {
         try {
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-            log.info("Undeploying spark script : "+ fileName + " for tenant id : "+ tenantId);
+            log.info("Undeploying spark script : " + fileName + " for tenant id : " + tenantId);
             AnalyticsPersistenceManager.getInstance().deleteScript(tenantId, getScriptName(fileName));
         } catch (AnalyticsPersistenceException e) {
             String errorMsg = "Error while deleting the script : " + fileName;
             log.error(errorMsg, e);
-            throw new AnalyticsScriptDeploymentException(errorMsg, e);
+            throw new SparkScriptDeploymentException(errorMsg, e);
         }
     }
 
@@ -114,7 +117,8 @@ public class SparkScriptDeployer extends AbstractDeployer {
     private String getScriptName(String filePath) throws AnalyticsPersistenceException {
         String fileName = new File(filePath).getName();
         if (fileName.endsWith(AnalyticsConstants.SCRIPT_EXTENSION)) {
-            return fileName.substring(0, fileName.length() - AnalyticsConstants.SCRIPT_EXTENSION.length());
+            return fileName.substring(0, fileName.length() - (AnalyticsConstants.SCRIPT_EXTENSION.length() +
+                    AnalyticsConstants.SCRIPT_EXTENSION_SEPARATOR.length()));
         }
         return fileName;
     }

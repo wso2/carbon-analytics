@@ -23,46 +23,55 @@ import java.io.Serializable;
  */
 public class RecordGroupBean implements Serializable {
 
-	private static final long serialVersionUID = 1017238844696994297L;
-	/** The locations. */
-	private String[] locations;
+    private static final long serialVersionUID = 1017238844696994297L;
+    /**
+     * The locations.
+     */
+    private String[] locations;
 
-	/** The records. */
-	@XmlElement(required = true)
-	private RecordBean[] records;
+    /**
+     * The records.
+     */
+    @XmlElement(required = true)
+    private RecordBean[] records;
 
-	public RecordGroupBean() { }
-	
-	/**
-	 * Gets the locations.
-	 * @return the locations
-	 */
-	public String[] getLocations() {
-		return locations;
-	}
+    public RecordGroupBean() {
+    }
 
-	/**
-	 * Sets the locations.
-	 * @param locations the new locations
-	 */
-	public void setLocations(String[] locations) {
-		this.locations = locations;
-	}
+    /**
+     * Gets the locations.
+     *
+     * @return the locations
+     */
+    public String[] getLocations() {
+        return locations;
+    }
 
-	/**
-	 * Gets the records.
-	 * @return the records
-	 */
-	public RecordBean[] getRecords() {
-		return records;
-	}
+    /**
+     * Sets the locations.
+     *
+     * @param locations the new locations
+     */
+    public void setLocations(String[] locations) {
+        this.locations = locations;
+    }
 
-	/**
-	 * Sets the records.
-	 * @param records the new records
-	 */
-	public void setRecords(RecordBean[] records) {
-		this.records = records;
-	}
+    /**
+     * Gets the records.
+     *
+     * @return the records
+     */
+    public RecordBean[] getRecords() {
+        return records;
+    }
+
+    /**
+     * Sets the records.
+     *
+     * @param records the new records
+     */
+    public void setRecords(RecordBean[] records) {
+        this.records = records;
+    }
 
 }

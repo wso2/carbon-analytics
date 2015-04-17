@@ -22,139 +22,168 @@ import java.io.Serializable;
  */
 public class QueryBean implements Serializable {
 
-	private static final long serialVersionUID = -3940101281983944720L;
-	/** The tenant id. */
-	private int tenantId;
-	
-	/** The table name. */
-	private String tableName;
-	
-	/** The columns. */
-	private IndexEntryBean[] columns;
+    private static final long serialVersionUID = -3940101281983944720L;
+    /**
+     * The tenant id.
+     */
+    private int tenantId;
 
-	/** The language. */
-	private String language;
+    /**
+     * The table name.
+     */
+    private String tableName;
 
-	/** The query. */
-	private String query;
+    /**
+     * The columns.
+     */
+    private IndexEntryBean[] columns;
 
-	/** The start. */
-	private int start;
+    /**
+     * The language.
+     */
+    private String language;
 
-	/** The count. */
-	private int count;
+    /**
+     * The query.
+     */
+    private String query;
 
-	public QueryBean() { }
-	
-	/**
-	 * Gets the tenant id.
-	 * @return the tenant id
-	 */
-	public int getTenantId() {
-		return tenantId;
-	}
+    /**
+     * The start.
+     */
+    private int start;
 
-	/**
-	 * Sets the tenant id.
-	 * @param tenantId the new tenant id
-	 */
-	public void setTenantId(int tenantId) {
-		this.tenantId = tenantId;
-	}
+    /**
+     * The count.
+     */
+    private int count;
 
-	/**
-	 * Gets the table name.
-	 * @return the table name
-	 */
-	public String getTableName() {
-		return tableName;
-	}
+    public QueryBean() {
+    }
 
-	/**
-	 * Sets the table name.
-	 * @param tableName the new table name
-	 */
-	public void setTableName(String tableName) {
-		this.tableName = tableName;
-	}
+    /**
+     * Gets the tenant id.
+     *
+     * @return the tenant id
+     */
+    public int getTenantId() {
+        return tenantId;
+    }
 
-	/**
-	 * Gets the columns.
-	 * @return the columns
-	 */
-	public IndexEntryBean[] getColumns() {
-		return columns;
-	}
+    /**
+     * Sets the tenant id.
+     *
+     * @param tenantId the new tenant id
+     */
+    public void setTenantId(int tenantId) {
+        this.tenantId = tenantId;
+    }
 
-	/**
-	 * Sets the columns.
-	 * @param columns the columns
-	 */
-	public void setColumns(IndexEntryBean[] columns) {
-		this.columns = columns;
-	}
+    /**
+     * Gets the table name.
+     *
+     * @return the table name
+     */
+    public String getTableName() {
+        return tableName;
+    }
 
-	/**
-	 * Gets the language.
-	 * @return the language
-	 */
-	public String getLanguage() {
-		return language;
-	}
+    /**
+     * Sets the table name.
+     *
+     * @param tableName the new table name
+     */
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
 
-	/**
-	 * Sets the language.
-	 * @param language the new language
-	 */
-	public void setLanguage(String language) {
-		this.language = language;
-	}
+    /**
+     * Gets the columns.
+     *
+     * @return the columns
+     */
+    public IndexEntryBean[] getColumns() {
+        return columns;
+    }
 
-	/**
-	 * Gets the query.
-	 * @return the query
-	 */
-	public String getQuery() {
-		return query;
-	}
+    /**
+     * Sets the columns.
+     *
+     * @param columns the columns
+     */
+    public void setColumns(IndexEntryBean[] columns) {
+        this.columns = columns;
+    }
 
-	/**
-	 * Sets the query.
-	 * @param query the new query
-	 */
-	public void setQuery(String query) {
-		this.query = query;
-	}
+    /**
+     * Gets the language.
+     *
+     * @return the language
+     */
+    public String getLanguage() {
+        return language;
+    }
 
-	/**
-	 * Gets the start.
-	 * @return the start
-	 */
-	public int getStart() {
-		return start;
-	}
+    /**
+     * Sets the language.
+     *
+     * @param language the new language
+     */
+    public void setLanguage(String language) {
+        this.language = language;
+    }
 
-	/**
-	 * Sets the start.
-	 * @param start the new start
-	 */
-	public void setStart(int start) {
-		this.start = start;
-	}
+    /**
+     * Gets the query.
+     *
+     * @return the query
+     */
+    public String getQuery() {
+        return query;
+    }
 
-	/**
-	 * Gets the count.
-	 * @return the count
-	 */
-	public int getCount() {
-		return count;
-	}
+    /**
+     * Sets the query.
+     *
+     * @param query the new query
+     */
+    public void setQuery(String query) {
+        this.query = query;
+    }
 
-	/**
-	 * Sets the count.
-	 * @param count the new count
-	 */
-	public void setCount(int count) {
-		this.count = count;
-	}
+    /**
+     * Gets the start.
+     *
+     * @return the start
+     */
+    public int getStart() {
+        return start;
+    }
+
+    /**
+     * Sets the start.
+     *
+     * @param start the new start
+     */
+    public void setStart(int start) {
+        this.start = start;
+    }
+
+    /**
+     * Gets the count.
+     *
+     * @return the count
+     */
+    public int getCount() {
+        return count;
+    }
+
+    /**
+     * Sets the count.
+     *
+     * @param count the new count
+     */
+    public void setCount(int count) {
+        this.count = count;
+    }
 }

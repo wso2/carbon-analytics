@@ -227,7 +227,7 @@ public class AnalyticsWebService extends AbstractAdmin {
      * @throws AnalyticsWebServiceException
      */
     public RecordBean[] getByRange(String tableName, int numPartitionsHint, String[] columns, long timeFrom,
-                                 long timeTo, int recordsFrom, int recordsCount) throws AnalyticsWebServiceException {
+                                   long timeTo, int recordsFrom, int recordsCount) throws AnalyticsWebServiceException {
 
         try {
             List<String> columnList = null;
@@ -321,9 +321,9 @@ public class AnalyticsWebService extends AbstractAdmin {
      * saved in a persistent storage under analytics data service, to be able to lookup the
      * indices later, i.e. these indices should be in-effect after a server restart.
      *
-     * @param tableName The table name
-     * @param indexConfigurationBean   A IndexConfigurationBean that contains a set of columns to create indices for,
-     *                                 and their data types
+     * @param tableName              The table name
+     * @param indexConfigurationBean A IndexConfigurationBean that contains a set of columns to create indices for,
+     *                               and their data types
      * @throws AnalyticsWebServiceException
      */
     public void setIndices(String tableName, IndexConfigurationBean indexConfigurationBean)

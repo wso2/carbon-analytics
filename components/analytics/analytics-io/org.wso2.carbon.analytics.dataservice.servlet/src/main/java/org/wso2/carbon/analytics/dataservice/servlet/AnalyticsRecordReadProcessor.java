@@ -38,13 +38,17 @@ import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * This servlet processes the RecordGroup and streams the records into the wire.
+ *
+ */
 public class AnalyticsRecordReadProcessor extends HttpServlet {
 
     /**
      * Read the record record count
      *
-     * @param req
-     * @param resp
+     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param resp HttpResponse which returns the result of the intended operation.
      * @throws javax.servlet.ServletException
      * @throws java.io.IOException
      */
@@ -61,7 +65,6 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
             }
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
             boolean securityEnabled = Boolean.parseBoolean(req.getParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM));
-
             Gson gson = new Gson();
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.GET_RANGE_RECORD_GROUP_OPERATION)) {
                 int tenantId = MultitenantConstants.INVALID_TENANT_ID;
@@ -97,7 +100,6 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
                 }
-
             } else if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.GET_IDS_RECORD_GROUP_OPERATION)) {
                 int tenantId = MultitenantConstants.INVALID_TENANT_ID;
                 if (!securityEnabled)
@@ -133,7 +135,6 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
                         objectOutputStream.close();
                     }
                 }
-
             } else if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.READ_RECORD_OPERATION)) {
                 ServletInputStream servletInputStream = req.getInputStream();
                 ObjectInputStream inputStream = null;
@@ -172,6 +173,13 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
         }
     }
 
+    /**
+     * Stream the records in a given record group.
+     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param resp HttpResponse which returns the result of the intended operation.
+     * @throws ServletException
+     * @throws IOException
+     */
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String sessionId = req.getHeader(AnalyticsAPIConstants.SESSION_ID);
         if (sessionId == null || sessionId.trim().isEmpty()) {
@@ -208,7 +216,6 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
             }
         }
     }
-
 
     private byte[] getBinaryRecordGroup(RecordGroup recordGroup) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();

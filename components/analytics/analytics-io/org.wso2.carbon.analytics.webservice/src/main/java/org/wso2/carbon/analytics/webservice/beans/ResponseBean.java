@@ -26,71 +26,82 @@ import java.io.Serializable;
  * The Class ResponseBean.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(propOrder = { "status", "message" })
+@XmlType(propOrder = {"status", "message"})
 @XmlRootElement(name = "response")
 public class ResponseBean implements Serializable {
 
-	private static final long serialVersionUID = 3774118455947900553L;
-	/** The status. */
-	@XmlElement(required = true)
-	private String status;
+    private static final long serialVersionUID = 3774118455947900553L;
+    /**
+     * The status.
+     */
+    @XmlElement(required = true)
+    private String status;
 
-	/** The message. */
-	@XmlElement(required = false)
-	private String message;
+    /**
+     * The message.
+     */
+    @XmlElement(required = false)
+    private String message;
 
-	/**
-	 * Instantiates a new response bean.
-	 */
-	public ResponseBean() { }
+    /**
+     * Instantiates a new response bean.
+     */
+    public ResponseBean() {
+    }
 
-	/**
-	 * Instantiates a new response bean.
-	 * @param status the status
-	 * @param message the message
-	 */
-	public ResponseBean(String status, String message) {
-		this.status = status;
-		this.message = message;
-	}
+    /**
+     * Instantiates a new response bean.
+     *
+     * @param status  the status
+     * @param message the message
+     */
+    public ResponseBean(String status, String message) {
+        this.status = status;
+        this.message = message;
+    }
 
-	/**
-	 * Instantiates a new response bean.
-	 * @param status the status
-	 */
-	public ResponseBean(String status) {
-		this.status = status;
-	}
+    /**
+     * Instantiates a new response bean.
+     *
+     * @param status the status
+     */
+    public ResponseBean(String status) {
+        this.status = status;
+    }
 
-	/**
-	 * Gets the status.
-	 * @return the status
-	 */
-	public String getStatus() {
-		return status;
-	}
+    /**
+     * Gets the status.
+     *
+     * @return the status
+     */
+    public String getStatus() {
+        return status;
+    }
 
-	/**
-	 * Sets the status.
-	 * @param status the new status
-	 */
-	public void setStatus(String status) {
-		this.status = status;
-	}
+    /**
+     * Sets the status.
+     *
+     * @param status the new status
+     */
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
-	/**
-	 * Gets the message.
-	 * @return the message
-	 */
-	public String getMessage() {
-		return message;
-	}
+    /**
+     * Gets the message.
+     *
+     * @return the message
+     */
+    public String getMessage() {
+        return message;
+    }
 
-	/**
-	 * Sets the message.
-	 * @param message the new message
-	 */
-	public void setMessage(String message) {
-		this.message = message;
-	}
+    /**
+     * Sets the message.
+     *
+     * @param message the new message
+     */
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }

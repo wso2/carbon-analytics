@@ -37,12 +37,17 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Process the index related operations for the remote API, and the remote http clients can use servlet
+ * to do index operations by being in a separate node.
+ */
+
 public class AnalyticsIndexProcessor extends HttpServlet {
     /**
      * set indices
      *
-     * @param req
-     * @param resp
+     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param resp HttpResponse which returns the result of the intended operation.
      * @throws javax.servlet.ServletException
      * @throws java.io.IOException
      */
@@ -112,8 +117,8 @@ public class AnalyticsIndexProcessor extends HttpServlet {
     /**
      * Get the indices
      *
-     * @param req
-     * @param resp
+     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param resp HttpResponse which returns the result of the intended operation.
      * @throws ServletException
      * @throws IOException
      */
@@ -169,8 +174,8 @@ public class AnalyticsIndexProcessor extends HttpServlet {
     /**
      * delete the index
      *
-     * @param req
-     * @param resp
+     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param resp HttpResponse which returns the result of the intended operation.
      * @throws ServletException
      * @throws IOException
      */

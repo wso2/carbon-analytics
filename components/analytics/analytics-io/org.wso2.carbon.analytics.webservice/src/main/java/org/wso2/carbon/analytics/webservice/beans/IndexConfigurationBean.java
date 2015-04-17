@@ -29,8 +29,9 @@ public class IndexConfigurationBean implements Serializable {
     private IndexEntryBean[] indices;
     private String[] scoreParams;
 
-    public IndexConfigurationBean() { }
-    
+    public IndexConfigurationBean() {
+    }
+
     public IndexEntryBean[] getIndices() {
         if (indices == null) {
             return new ArrayList<IndexEntryBean>(0).toArray(new IndexEntryBean[0]);

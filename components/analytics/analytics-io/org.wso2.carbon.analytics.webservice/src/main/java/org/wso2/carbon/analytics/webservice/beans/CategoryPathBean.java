@@ -28,16 +28,15 @@ import java.io.Serializable;
  * This class represents a facet object bean. facet object defines the hierarchical category,
  * which can be drilled down. This can be used as a value in a record.
  * Example :
- *   Assume a record represents a book.
- *      Then the record field : value pairs will be, e.g.
- *          Price : $50.00
- *          Author : firstName LastName
- *          ISBN : 234325435445435436
- *          Published Date : "1987" , "March", "21"
- *
+ * Assume a record represents a book.
+ * Then the record field : value pairs will be, e.g.
+ * Price : $50.00
+ * Author : firstName LastName
+ * ISBN : 234325435445435436
+ * Published Date : "1987" , "March", "21"
+ * <p/>
  * Here Publish Date will be a facet/categoryPath, since it can be drilled down to Year, then month and date
  * and categorizes by each level.
- *
  */
 @XmlRootElement(name = "categoryPath")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -47,24 +46,28 @@ public class CategoryPathBean implements Serializable {
     @XmlElement(name = "path")
     private String[] path;
     @XmlElement(name = "weight")
-    private  float weight;
+    private float weight;
 
-    public CategoryPathBean() { }
-    
+    public CategoryPathBean() {
+    }
+
     /**
      * Create a hierarchical category with a given path and weight with 1.0.
      * Use this constructor when the categoryPaths need to be given for drill down search
      * in DrillDownRequest objects
+     *
      * @param path array of strings representing the category path.
      */
     public CategoryPathBean(String[] path) {
         this.path = path;
     }
+
     /**
      * Creates a hierarchical Category with the given weight and the array of Strings representing
      * the hierarchical category
+     *
      * @param weight Weight of the category, set it to 1.0 if weights are not necessary
-     * @param path String array which represent the category path.
+     * @param path   String array which represent the category path.
      */
     public CategoryPathBean(float weight, String[] path) {
         this.weight = weight;
@@ -85,6 +88,7 @@ public class CategoryPathBean implements Serializable {
 
     /**
      * Set a weight for the facet category
+     *
      * @param weight weight in float ( set is as 1.0 if weights are not needed)
      */
     public void setWeight(float weight) {
