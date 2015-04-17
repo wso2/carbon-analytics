@@ -15,10 +15,14 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.analytics.dataservice;
+package org.wso2.carbon.analytics.dataservice.deployment;
 
 import org.apache.axis2.deployment.DeploymentException;
 
+/**
+ * This class represents the exception to be thrown when there are some problems encountered
+ * when deploying the analytics index artifact.
+ */
 public class AnalyticsIndexDeploymentException extends DeploymentException {
 
     public AnalyticsIndexDeploymentException(String message, Throwable cause) {

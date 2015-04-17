@@ -32,13 +32,16 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+/**
+ * This servlet processes the request to operate the analytics table schema.
+ */
 public class AnalyticsTableSchemaProcessor extends HttpServlet {
 
     /**
      * set schema
      *
-     * @param req
-     * @param resp
+     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param resp HttpResponse which returns the result of the intended operation.
      * @throws ServletException
      * @throws IOException
      */
@@ -78,6 +81,14 @@ public class AnalyticsTableSchemaProcessor extends HttpServlet {
         }
     }
 
+    /**
+     * Get table schema.
+     *
+     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param resp HttpResponse which returns the result of the intended operation.
+     * @throws ServletException
+     * @throws IOException
+     */
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String sessionId = req.getHeader(AnalyticsAPIConstants.SESSION_ID);
         if (sessionId == null || sessionId.trim().isEmpty()) {

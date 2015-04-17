@@ -19,11 +19,14 @@ package org.wso2.carbon.analytics.spark.core.exception;
 
 import org.apache.axis2.deployment.DeploymentException;
 
-public class AnalyticsScriptDeploymentException extends DeploymentException {
+/**
+ * This exception is thrown when there are any problems encountered when deploying the spark scripts.
+ */
+public class SparkScriptDeploymentException extends DeploymentException{
 
     private static final long serialVersionUID = -4479055838304546891L;
 
-    public AnalyticsScriptDeploymentException(String message, Throwable cause) {
+    public SparkScriptDeploymentException(String message, Throwable cause) {
         super(message, cause);
     }
 }

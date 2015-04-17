@@ -28,7 +28,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * This servlet is processes the requests which is intended to control the analytics data service in the remote node.
+ */
 public class AnalyticsServiceProcessor extends HttpServlet{
+
+    /**
+     * Destroy the analytics service.
+     *
+     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param resp HttpResponse which returns the result of the intended operation.
+     * @throws ServletException
+     * @throws IOException
+     */
 
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String sessionId = req.getHeader(AnalyticsAPIConstants.SESSION_ID);

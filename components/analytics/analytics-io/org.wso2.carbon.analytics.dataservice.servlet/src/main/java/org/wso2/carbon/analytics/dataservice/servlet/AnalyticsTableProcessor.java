@@ -33,15 +33,15 @@ import java.io.PrintWriter;
 import java.util.List;
 
 /**
- * The servlet does the table related operations for the analytics service.
+ * The servlet does the analytics table related operations for the analytics service.
  */
 public class AnalyticsTableProcessor extends HttpServlet {
 
     /**
      * Get the all tables for tenant or check table exists
      *
-     * @param req
-     * @param resp
+     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param resp HttpResponse which returns the result of the intended operation.
      * @throws ServletException
      * @throws IOException
      */
@@ -98,8 +98,8 @@ public class AnalyticsTableProcessor extends HttpServlet {
     /**
      * create table
      *
-     * @param req
-     * @param resp
+     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param resp HttpResponse which returns the result of the intended operation.
      * @throws ServletException
      * @throws IOException
      */
@@ -138,8 +138,8 @@ public class AnalyticsTableProcessor extends HttpServlet {
     /**
      * delete the table
      *
-     * @param req
-     * @param resp
+     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param resp HttpResponse which returns the result of the intended operation.
      * @throws ServletException
      * @throws IOException
      */
@@ -174,5 +174,4 @@ public class AnalyticsTableProcessor extends HttpServlet {
             }
         }
     }
-
 }

@@ -20,6 +20,7 @@ package org.wso2.carbon.analytics.spark.core.internal;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
+import org.wso2.carbon.application.deployer.Feature;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.TaskManager;
 import org.wso2.carbon.ntask.core.service.TaskService;
@@ -28,6 +29,9 @@ import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class holds the OSGI services registered with Declarative service component.
@@ -51,6 +55,8 @@ public class ServiceHolder {
     private static TenantRegistryLoader tenantRegistryLoader;
     
     private static SparkAnalyticsExecutor analyticskExecutor;
+
+    private static Map<String, List<Feature>> requiredFeatures;
 
     public static void setTaskService(TaskService taskService) {
         ServiceHolder.taskService = taskService;
@@ -106,4 +112,11 @@ public class ServiceHolder {
         ServiceHolder.analyticskExecutor = analyticskExecutor;
     }
 
+    public static Map<String, List<Feature>> getRequiredFeatures() {
+        return requiredFeatures;
+    }
+
+    public static void setRequiredFeatures(Map<String, List<Feature>> requiredFeatures) {
+        ServiceHolder.requiredFeatures = requiredFeatures;
+    }
 }

@@ -34,6 +34,9 @@ import javax.servlet.ServletException;
 import java.util.Hashtable;
 
 /**
+ * Declarative service component for the analytics data service servlet.
+ */
+/**
  * @scr.component name="analytics.thrift.component" immediate="true"
  * @scr.reference name="org.wso2.carbon.identity.authentication.internal.AuthenticationServiceComponent"
  * interface="org.wso2.carbon.identity.authentication.AuthenticationService"

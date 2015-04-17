@@ -15,13 +15,16 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.analytics.dataservice;
+package org.wso2.carbon.analytics.dataservice.deployment;
 
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.deployment.AbstractDeployer;
 import org.apache.axis2.deployment.repository.util.DeploymentFileData;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceServerStartupObserver;
+import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.dataservice.Constants;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsIndexConfiguration;
@@ -36,13 +39,18 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * This class represents the deployer implementation for the analytics index artifacts.
+ */
 public class AnalyticsIndexDeployer extends AbstractDeployer {
 
     private static final Log log = LogFactory.getLog(AnalyticsIndexDeployer.class);
 
-    private static final String EXTENSION = "xml";
-    private static final String DIR_NAME = "analytics-indices";
-
+    /**
+     * Initialize the hotdeployment directory if the directory is missing.
+     *
+     * @param configurationContext Configuration context for the tenant which needs to be initialized.
+     */
     @Override
     public void init(ConfigurationContext configurationContext) {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
@@ -52,7 +60,7 @@ public class AnalyticsIndexDeployer extends AbstractDeployer {
         } else {
             repository = CarbonUtils.getCarbonTenantsDirPath() + File.separator + tenantId;
         }
-        repository += File.separator + DIR_NAME;
+        repository += File.separator + Constants.ANALYTICS_INDICES_DEPLOYMENT_DIR_NAME;
         File file = new File(repository);
         if (!file.exists()) {
             boolean dirCreated = file.mkdirs();
@@ -118,7 +126,7 @@ public class AnalyticsIndexDeployer extends AbstractDeployer {
 
     private String getTableNameFromAnalyticsIndexFileName(String filePath) {
         String fileName = new File(filePath).getName();
-        return fileName.substring(0, fileName.length() - EXTENSION.length() - 1);
+        return fileName.substring(0, fileName.length() - Constants.ANALYTICS_INDICES_FILE_EXTENSION.length() - 1);
     }
 
     @Override

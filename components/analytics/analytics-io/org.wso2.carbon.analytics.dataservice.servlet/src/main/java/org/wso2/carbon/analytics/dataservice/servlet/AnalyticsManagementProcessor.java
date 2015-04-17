@@ -29,13 +29,17 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+/**
+ * This servlet intend to process the request which controls overall analytics data api operations.
+ *
+ */
 public class AnalyticsManagementProcessor extends HttpServlet {
 
     /**
-     * Login operation.
+     * Login operation for remote analytics api servlet.
      *
-     * @param req
-     * @param resp
+     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param resp HttpResponse which returns the result of the intended operation.
      * @throws ServletException
      * @throws IOException
      */
