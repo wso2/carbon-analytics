@@ -559,7 +559,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         IndexReader reader = null;
         try {
             reader = this.getCombinedIndexReader(tenantId, tableName);
-            IndexSearcher searcher = new IndexSearcher(reader);
+            IndexSearcher searcher = new IndexSearcher(reader, Executors.newCachedThreadPool());
             Map<String, IndexType> indices = this.lookupIndices(tenantId, tableName);
             Query indexQuery = new AnalyticsQueryParser(this.luceneAnalyzer, indices).parse(query);
             TopScoreDocCollector collector = TopScoreDocCollector.create(count, true);

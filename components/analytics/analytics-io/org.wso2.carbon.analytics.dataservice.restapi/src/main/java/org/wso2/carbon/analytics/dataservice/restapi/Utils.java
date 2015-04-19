@@ -133,7 +133,7 @@ public class Utils {
             if (recordBean.getTableName() == null || recordBean.getTableName().isEmpty()) {
                 throw new AnalyticsException("TableName cannot be empty!");
             }
-            records.add(new Record(recordBean.getId(), tenantId, recordBean.getTableName(), validateAndReturn(recordBean.getValues())));
+            records.add(new Record(tenantId, recordBean.getTableName(), validateAndReturn(recordBean.getValues())));
         }
         return records;
     }
@@ -188,7 +188,7 @@ public class Utils {
             throws AnalyticsException {
         List<Record> records = new ArrayList<>();
         for (RecordBean recordBean : recordBeans) {
-            records.add(new Record(recordBean.getId(), getTenantId(username), tableName,
+            records.add(new Record(getTenantId(username), tableName,
                                    validateAndReturn(recordBean.getValues())));
         }
         return records;

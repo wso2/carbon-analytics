@@ -284,6 +284,7 @@ public interface AnalyticsDataService extends AnalyticsRecordReader {
      * @return the results containing field names and respective facets
      * @throws AnalyticsIndexException
      */
+    //TODO: rename
     Map<String, List<DrillDownResultEntry>> drillDown(int tenantId, AnalyticsDrillDownRequest drillDownRequest) throws AnalyticsIndexException;
 
     /**
