@@ -19,21 +19,21 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-        <groupId>org.wso2.bam</groupId>
-        <artifactId>wso2bam-multitenancy-features</artifactId>
+        <groupId>org.wso2.das</groupId>
+        <artifactId>wso2das-features</artifactId>
         <version>3.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>org.wso2.bam.multitenancy.style.feature</artifactId>
+    <artifactId>org.wso2.das.styles.feature</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Business Activity Monitor - Multi-tenant Style Feature</name>
+    <name>WSO2 Data Analytics Server - Product Style Feature</name>
 
     <dependencies>
         <dependency>
-            <groupId>org.wso2.bam</groupId>
-            <artifactId>org.wso2.bam.multitenancy.styles</artifactId>
+            <groupId>org.wso2.das</groupId>
+            <artifactId>org.wso2.das.styles</artifactId>
         </dependency>
     </dependencies>
 
@@ -42,6 +42,7 @@
             <plugin>
                 <groupId>org.wso2.maven</groupId>
                 <artifactId>carbon-p2-plugin</artifactId>
+                <version>1.5</version>
                 <executions>
                     <execution>
                         <id>p2-feature-generation</id>
@@ -50,10 +51,10 @@
                             <goal>p2-feature-gen</goal>
                         </goals>
                         <configuration>
-                            <id>org.wso2.bam.multitenancy.style</id>
+                            <id>org.wso2.das.styles</id>
                             <propertiesFile>../etc/feature.properties</propertiesFile>
                             <bundles>
-                                <bundleDef>org.wso2.bam:org.wso2.bam.multitenancy.styles</bundleDef>
+                                <bundleDef>org.wso2.das:org.wso2.das.styles</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.ui:${carbon.kernel.version}</importFeatureDef>
