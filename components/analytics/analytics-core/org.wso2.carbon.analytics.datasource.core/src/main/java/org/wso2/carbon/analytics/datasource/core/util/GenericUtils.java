@@ -18,10 +18,6 @@
  */
 package org.wso2.carbon.analytics.datasource.core.util;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
-
 import org.apache.commons.collections.IteratorUtils;
 import org.w3c.dom.Document;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
@@ -87,11 +83,11 @@ public class GenericUtils {
     
     private static DataSourceRepository globalCustomRepo;
     
-    private static ThreadLocal<Kryo> kryoTL = new ThreadLocal<Kryo>() {
-        protected Kryo initialValue() {
-            return new Kryo();
-        };
-    };
+//    private static ThreadLocal<Kryo> kryoTL = new ThreadLocal<Kryo>() {
+//        protected Kryo initialValue() {
+//            return new Kryo();
+//        };
+//    };
 
     public static String getParentPath(String path) {
         if (path.equals("/")) {

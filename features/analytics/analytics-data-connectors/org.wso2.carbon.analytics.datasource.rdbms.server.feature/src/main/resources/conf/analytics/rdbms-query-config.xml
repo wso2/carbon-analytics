@@ -45,8 +45,7 @@
             <query>CREATE INDEX index_parent_id ON AN_FS_PATH(parent_path)</query>
         </fsTableInitQueries>
         <fsTablesCheckQuery>SELECT path FROM AN_FS_PATH WHERE path = '/'</fsTablesCheckQuery>
-        <fsUpdateDataChunkQuery>UPDATE AN_FS_DATA SET data = ? WHERE path = ? AND sequence = ?</fsUpdateDataChunkQuery>
-        <fsWriteDataChunkQuery>INSERT INTO AN_FS_DATA (path,sequence,data) VALUES (?,?,?)</fsWriteDataChunkQuery>
+        <fsMergeDataChunkQuery>MERGE INTO AN_FS_DATA (path,sequence,data) KEY (path,sequence) VALUES (?,?,?)</fsMergeDataChunkQuery>
     </database>
     <database name = "mysql">
         <paginationFirstInclusive>true</paginationFirstInclusive>
@@ -93,8 +92,7 @@
             <query>CREATE INDEX index_parent_id ON AN_FS_PATH(parent_path)</query>
         </fsTableInitQueries>
         <fsTablesCheckQuery>SELECT path FROM AN_FS_PATH WHERE path = '/'</fsTablesCheckQuery>
-        <fsUpdateDataChunkQuery>UPDATE AN_FS_DATA SET data = ? WHERE path = ? AND sequence = ?</fsUpdateDataChunkQuery>
-        <fsWriteDataChunkQuery>INSERT INTO AN_FS_DATA (path,sequence,data) VALUES (?,?,?)</fsWriteDataChunkQuery>
+        <fsMergeDataChunkQuery>INSERT INTO AN_FS_DATA (path,sequence,data) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE data=VALUES(data)</fsMergeDataChunkQuery>        
     </database>
 </query-configuration>
 
