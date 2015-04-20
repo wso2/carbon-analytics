@@ -96,12 +96,14 @@ public class EventPublisherConfigurationBuilder {
             properties.putAll(eventPublisherConfiguration.getToAdapterDynamicProperties());
         }
         for (Map.Entry<String, String> propertyEntry : properties.entrySet()) {
-            OMElement propertyElement = factory.createOMElement(new QName(
-                    EventPublisherConstants.EF_ELE_PROPERTY));
-            propertyElement.declareDefaultNamespace(EventPublisherConstants.EF_CONF_NS);
-            propertyElement.addAttribute(EventPublisherConstants.EF_ATTR_NAME, propertyEntry.getKey(), null);
-            propertyElement.setText(propertyEntry.getValue());
-            toOMElement.addChild(propertyElement);
+            if(propertyEntry.getValue() != null){
+                OMElement propertyElement = factory.createOMElement(new QName(
+                        EventPublisherConstants.EF_ELE_PROPERTY));
+                propertyElement.declareDefaultNamespace(EventPublisherConstants.EF_CONF_NS);
+                propertyElement.addAttribute(EventPublisherConstants.EF_ATTR_NAME, propertyEntry.getKey(), null);
+                propertyElement.setText(propertyEntry.getValue());
+                toOMElement.addChild(propertyElement);
+            }
         }
         eventPublisherConfigElement.addChild(toOMElement);
         try {
