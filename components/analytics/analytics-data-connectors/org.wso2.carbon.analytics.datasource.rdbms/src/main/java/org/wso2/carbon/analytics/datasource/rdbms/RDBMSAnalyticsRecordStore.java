@@ -188,8 +188,9 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         Record firstRecord = records.get(0);
         int tenantId = firstRecord.getTenantId();
         String tableName = firstRecord.getTableName();
-        if (this.getRecordMergeSQL(tenantId, tableName) != null) {
-            this.mergeRecordsSimilar(conn, records, tenantId, tableName);
+        String mergeSQL = this.getRecordMergeSQL(tenantId, tableName);
+        if (mergeSQL != null) {
+            this.mergeRecordsSimilar(conn, records, tenantId, tableName, mergeSQL);
         } else {
             this.insertAndUpdateRecordsSimilar(conn, records, tenantId, tableName);
         }
@@ -203,9 +204,8 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     }
     
     private void mergeRecordsSimilar(Connection conn, 
-            List<Record> records, int tenantId, String tableName) throws SQLException, 
-            AnalyticsException, AnalyticsTableNotAvailableException {
-        String query = this.getRecordMergeSQL(tenantId, tableName);
+            List<Record> records, int tenantId, String tableName, String query) 
+            throws SQLException, AnalyticsException, AnalyticsTableNotAvailableException {
         PreparedStatement stmt = null;
         try {
             stmt = conn.prepareStatement(query);
@@ -868,6 +868,9 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
                 } else {
                     /* end of the result set, time to clean up.. */
                     RDBMSUtils.cleanupConnection(this.rs, this.stmt, this.conn);
+                    this.rs = null;
+                    this.stmt = null;
+                    this.conn = null;
                     return null;
                 }
             } catch (Exception e) {
@@ -879,6 +882,13 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         @Override
         public void remove() {
             /* this is a read-only iterator, nothing will be removed */
+        }
+        
+        @Override
+        public void finalize() {
+            /* in the unlikely case, this iterator does not go to the end,
+             * we have to make sure the connection is cleaned up */
+            RDBMSUtils.cleanupConnection(this.rs, this.stmt, this.conn);
         }
         
     }

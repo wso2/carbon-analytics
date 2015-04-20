@@ -387,6 +387,35 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
     }
     
     private void writeChunks(String path, List<DataChunk> chunks) throws IOException {
+        String mergeQuery = this.getMergeDataChunkQuery();
+        if (mergeQuery != null) {
+            this.writeChunksMerge(path, chunks, mergeQuery);
+        } else {
+            this.writeChunksInsertOrUpdate(path, chunks);
+        }
+    }
+    
+    private void writeChunksMerge(String path, List<DataChunk> chunks, String query) throws IOException {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        try {
+            conn = this.getConnection(false);
+            stmt = conn.prepareStatement(query);
+            for (DataChunk chunk : chunks) {
+                this.populateStatementWithDataChunk(stmt, path, chunk);
+                stmt.addBatch();
+            }
+            stmt.executeBatch();
+            conn.commit();
+        } catch (SQLException e) {
+            RDBMSUtils.rollbackConnection(conn);
+            throw new IOException("Error in fs write chunk merge: " + e.getMessage(), e);
+        } finally {
+            RDBMSUtils.cleanupConnection(null, stmt, conn);
+        }
+    }
+    
+    private void writeChunksInsertOrUpdate(String path, List<DataChunk> chunks) throws IOException {
         Connection conn = null;
         PreparedStatement stmt = null;
         try {
@@ -468,6 +497,10 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
 
     private String getWriteDataChunkQuery() {
         return this.getQueryConfiguration().getFsWriteDataChunkQuery();
+    }
+    
+    private String getMergeDataChunkQuery() {
+        return this.getQueryConfiguration().getFsMergeDataChunkQuery();
     }
     
     /**

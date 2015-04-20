@@ -95,6 +95,8 @@ public class RDBMSQueryConfigurationEntry {
     
     private String fsUpdateDataChunkQuery;
     
+    private String fsMergeDataChunkQuery;
+    
     private String fsDeletePathQuery;
     
     private int fsDataChunkSize;
@@ -376,6 +378,14 @@ public class RDBMSQueryConfigurationEntry {
         return fsUpdateDataChunkQuery;
     }
     
+    public String getFsMergeDataChunkQuery() {
+        return fsMergeDataChunkQuery;
+    }
+    
+    public void setFsMergeDataChunkQuery(String fsMergeDataChunkQuery) {
+        this.fsMergeDataChunkQuery = fsMergeDataChunkQuery;
+    }
+
     public void setFsUpdateDataChunkQuery(String fsUpdateDataChunkQuery) {
         this.fsUpdateDataChunkQuery = fsUpdateDataChunkQuery;
     }
