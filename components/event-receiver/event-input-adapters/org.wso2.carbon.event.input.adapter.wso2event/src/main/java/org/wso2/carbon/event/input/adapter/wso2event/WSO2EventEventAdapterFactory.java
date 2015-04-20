@@ -40,23 +40,6 @@ public class WSO2EventEventAdapterFactory extends InputEventAdapterFactory {
     @Override
     public List<Property> getPropertyList() {
         List<Property> propertyList = new ArrayList<Property>();
-
-        // set stream definition
-        Property streamDefinitionProperty = new Property(WSO2EventAdapterConstants.ADAPTER_STREAM_NAME);
-        streamDefinitionProperty.setDisplayName(
-                resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_STREAM_NAME));
-        streamDefinitionProperty.setRequired(true);
-
-
-        // set stream version
-        Property streamVersionProperty = new Property(WSO2EventAdapterConstants.ADAPTER_STREAM_VERSION);
-        streamVersionProperty.setDisplayName(
-                resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_STREAM_VERSION));
-        streamVersionProperty.setRequired(true);
-
-        propertyList.add(streamDefinitionProperty);
-        propertyList.add(streamVersionProperty);
-
         return propertyList;
     }
 

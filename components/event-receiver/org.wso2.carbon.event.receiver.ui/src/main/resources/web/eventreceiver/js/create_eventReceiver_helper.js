@@ -42,7 +42,7 @@ function loadEventAdapterProperty(inputAdapterProperty, eventReceiverInputTable,
     textLabel.innerHTML = displayName;
     var requiredElementId = "property_";
     var textPasswordType = "text";
-    var hint = ""
+    var hint = "";
     var defaultValue = "";
 
     if (inputAdapterProperty.localRequired) {
@@ -117,15 +117,21 @@ function loadEventAdapterProperties(adapterSchema, propertiesHeading) {
     for (i = eventReceiverInputTable.rows.length - 7; i > 2; i--) {
         eventReceiverInputTable.deleteRow(i);
     }
-    if(adapterSchema.localInputEventAdapterProperties.length > 0){
-        var tableRow = eventReceiverInputTable.insertRow(3);
-        var inputField = tableRow.insertCell(0);
-        inputField.innerHTML = '<b><i><span style="color: #666666; ">'+propertiesHeading+'</span></i></b>';
+
+    if(adapterSchema.localInputEventAdapterProperties != null){
+        if(aadapterSchema.localInputEventAdapterProperties.length > 0){
+            var tableRow = eventReceiverInputTable.insertRow(3);
+            var inputField = tableRow.insertCell(0);
+            inputField.innerHTML = '<b><i><span style="color: #666666; ">'+propertiesHeading+'</span></i></b>';
+
+        }
+        for (var i = 0; i < adapterSchema.localInputEventAdapterProperties.length; i++) {
+            // for each property, add a text and input field in a row
+            loadEventAdapterProperty(adapterSchema.localInputEventAdapterProperties[i], eventReceiverInputTable, i);
+        }
     }
-    for (var i = 0; i < adapterSchema.localInputEventAdapterProperties.length; i++) {
-        // for each property, add a text and input field in a row
-        loadEventAdapterProperty(adapterSchema.localInputEventAdapterProperties[i], eventReceiverInputTable, i);
-    }
+
+
 
 }
 function loadEventAdapterRelatedProperties(toPropertyHeader, propertiesHeading) {
@@ -502,9 +508,7 @@ function addEventReceiverViaPopup(form, toStreamId, redirectPage) {
         CARBON.showErrorDialog("Empty inputs fields are not allowed.");
         return;
     }
-    if (toStreamName != "" && toStreamVersion == "") {
-        toStreamVersion = "1.0.0";
-    }
+
 
     var propertyCount = 0;
     var propertyString = "";
@@ -553,11 +557,18 @@ function addEventReceiverViaPopup(form, toStreamId, redirectPage) {
         var metaData = "";
         var correlationData = "";
         var payloadData = "";
+        var fromStreamName = "";
+        var fromStreamVersion = "";
 
         if (customMappingValue == "enable") {
+            fromStreamName = document.getElementById("property_Required_stream_name").value;
+            fromStreamVersion = document.getElementById("property_Required_stream_version").value;
             metaData = getWso2EventDataValues("addMetaEventDataTable", 'meta');
             correlationData = getWso2EventDataValues("addCorrelationEventDataTable", 'correlation');
             payloadData = getWso2EventDataValues("addPayloadEventDataTable", 'payload');
+        }
+        if (toStreamName != "" && toStreamVersion == "") {
+            toStreamVersion = "1.0.0";
         }
 
         if ((metaData == "" && correlationData == "" && payloadData == "" && customMappingValue == "enable") || correlationData == "invalid" || payloadData == "invalid" || metaData == "invalid") {
@@ -571,7 +582,8 @@ function addEventReceiverViaPopup(form, toStreamId, redirectPage) {
                     eventReceiverName: eventReceiverName, toStreamName: toStreamName,
                     toStreamVersion: toStreamVersion, eventAdapterInfo: eventAdapterInfo, mappingType: mappingType,
                     propertySet: propertyString, customMappingValue: customMappingValue,
-                    metaData: metaData, correlationData: correlationData, payloadData: payloadData
+                    metaData: metaData, correlationData: correlationData, payloadData: payloadData,
+                    fromStreamName: fromStreamName, fromStreamVersion: fromStreamVersion
                 },
                 onSuccess: function (event) {
                     if ("true" == event.responseText.trim()) {

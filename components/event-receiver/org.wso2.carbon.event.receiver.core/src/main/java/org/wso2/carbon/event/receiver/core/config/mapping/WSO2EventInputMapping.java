@@ -20,9 +20,26 @@ import org.wso2.carbon.event.receiver.core.config.EventReceiverConstants;
 
 public class WSO2EventInputMapping extends InputMapping {
 
+    private String fromEventName;
+    private String fromEventVersion;
+
     @Override
     public String getMappingType() {
         return EventReceiverConstants.ER_WSO2EVENT_MAPPING_TYPE;
     }
+
+    public void setFromEventName(String fromEventName){
+        this.fromEventName = fromEventName;
+    }
+    public String getFromEventName(){
+        return fromEventName;
+    }
+    public void setFromEventVersion(String fromEventVersion){
+        this.fromEventVersion = fromEventVersion;
+    }
+    public String getFromEventVersion(){
+        return fromEventVersion;
+    }
+
 
 }

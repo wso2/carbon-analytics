@@ -44,29 +44,30 @@ public class WSO2EventInputMapper implements InputMapper {
     public WSO2EventInputMapper(EventReceiverConfiguration eventReceiverConfiguration,
                                 StreamDefinition exportedStreamDefinition)
             throws EventReceiverConfigurationException {
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-
-        this.eventReceiverConfiguration = eventReceiverConfiguration;
-        Map<String, String> inputProperties = eventReceiverConfiguration.getFromAdapterConfiguration().getProperties();
-        String fromStreamName = inputProperties.get(EventReceiverConstants.ADAPTER_MESSAGE_STREAM_NAME);
-        String fromStreamVersion = inputProperties.get(EventReceiverConstants.ADAPTER_MESSAGE_STREAM_VERSION);
-        if (fromStreamName == null || fromStreamVersion == null || (fromStreamName.isEmpty()) || (fromStreamVersion.isEmpty())) {
-            throw new EventReceiverConfigurationException("Required message properties stream name and stream version not found");
-        }
-
         //TODO It is better if logic to check from stream definition store can be moved outside of input mapper.
         EventStreamService eventStreamService = EventReceiverServiceValueHolder.getEventStreamService();
 
-        try {
-            this.importedStreamDefinition = eventStreamService.getStreamDefinition(fromStreamName, fromStreamVersion);
-        } catch (EventStreamConfigurationException e) {
-            throw new EventReceiverStreamValidationException("Error while retrieving stream definition : " + e.getMessage(), fromStreamName + ":" + fromStreamVersion);
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+
+        this.eventReceiverConfiguration = eventReceiverConfiguration;
+        WSO2EventInputMapping wso2EventInputMapping = (WSO2EventInputMapping) this.eventReceiverConfiguration.getInputMapping();
+
+        String fromStreamName = wso2EventInputMapping.getFromEventName();
+        String fromStreamVersion = wso2EventInputMapping.getFromEventVersion();
+
+        if (fromStreamName == null || fromStreamVersion == null || (fromStreamName.isEmpty()) || (fromStreamVersion.isEmpty())) {
+            importedStreamDefinition = exportedStreamDefinition;
+        }else{
+            try {
+                this.importedStreamDefinition = eventStreamService.getStreamDefinition(fromStreamName, fromStreamVersion);
+            } catch (EventStreamConfigurationException e) {
+                throw new EventReceiverStreamValidationException("Error while retrieving stream definition : " + e.getMessage(), fromStreamName + ":" + fromStreamVersion);
+            }
         }
 
         validateInputStreamAttributes();
 
         if (importedStreamDefinition != null && eventReceiverConfiguration.getInputMapping().isCustomMappingEnabled()) {
-            WSO2EventInputMapping wso2EventInputMapping = (WSO2EventInputMapping) this.eventReceiverConfiguration.getInputMapping();
             this.exportedStreamDefinition = exportedStreamDefinition;
 
             this.inputDataTypeSpecificPositionMap = new HashMap<InputDataType, int[]>();
@@ -193,35 +194,40 @@ public class WSO2EventInputMapper implements InputMapper {
         Object[] outObjArray = null;
         if (obj instanceof Event) {
             Event event = (Event) obj;
-            Map<String, String> arbitraryMap = event.getArbitraryDataMap();
-            if (arbitraryMap != null && !arbitraryMap.isEmpty()) {
-                outObjArray = processArbitraryMap(event);
-            } else if (inputDataTypeSpecificPositionMap != null) {
-                List<Object> outObjList = new ArrayList<Object>();
-                Object[] inEventArray = new Object[0];
-                if (event.getMetaData() != null) {
-                    inEventArray = ObjectArrays.concat(inEventArray, event.getMetaData(), Object.class);
+            if(event.getStreamId().equalsIgnoreCase(importedStreamDefinition.getStreamId())){
+                Map<String, String> arbitraryMap = event.getArbitraryDataMap();
+                if (arbitraryMap != null && !arbitraryMap.isEmpty()) {
+                    outObjArray = processArbitraryMap(event);
+                } else if (inputDataTypeSpecificPositionMap != null) {
+                    List<Object> outObjList = new ArrayList<Object>();
+                    Object[] inEventArray = new Object[0];
+                    if (event.getMetaData() != null) {
+                        inEventArray = ObjectArrays.concat(inEventArray, event.getMetaData(), Object.class);
+                    }
+                    if (event.getCorrelationData() != null) {
+                        inEventArray = ObjectArrays.concat(inEventArray, event.getCorrelationData(), Object.class);
+                    }
+                    if (event.getPayloadData() != null) {
+                        inEventArray = ObjectArrays.concat(inEventArray, event.getPayloadData(), Object.class);
+                    }
+                    int[] metaPositions = inputDataTypeSpecificPositionMap.get(InputDataType.META_DATA);
+                    for (int metaPosition : metaPositions) {
+                        outObjList.add(inEventArray[metaPosition]);
+                    }
+                    int[] correlationPositions = inputDataTypeSpecificPositionMap.get(InputDataType.CORRELATION_DATA);
+                    for (int correlationPosition : correlationPositions) {
+                        outObjList.add(inEventArray[correlationPosition]);
+                    }
+                    int[] payloadPositions = inputDataTypeSpecificPositionMap.get(InputDataType.PAYLOAD_DATA);
+                    for (int payloadPosition : payloadPositions) {
+                        outObjList.add(inEventArray[payloadPosition]);
+                    }
+                    outObjArray = outObjList.toArray();
                 }
-                if (event.getCorrelationData() != null) {
-                    inEventArray = ObjectArrays.concat(inEventArray, event.getCorrelationData(), Object.class);
-                }
-                if (event.getPayloadData() != null) {
-                    inEventArray = ObjectArrays.concat(inEventArray, event.getPayloadData(), Object.class);
-                }
-                int[] metaPositions = inputDataTypeSpecificPositionMap.get(InputDataType.META_DATA);
-                for (int metaPosition : metaPositions) {
-                    outObjList.add(inEventArray[metaPosition]);
-                }
-                int[] correlationPositions = inputDataTypeSpecificPositionMap.get(InputDataType.CORRELATION_DATA);
-                for (int correlationPosition : correlationPositions) {
-                    outObjList.add(inEventArray[correlationPosition]);
-                }
-                int[] payloadPositions = inputDataTypeSpecificPositionMap.get(InputDataType.PAYLOAD_DATA);
-                for (int payloadPosition : payloadPositions) {
-                    outObjList.add(inEventArray[payloadPosition]);
-                }
-                outObjArray = outObjList.toArray();
+            }else{
+                return null;
             }
+
         }
         return outObjArray;
     }
@@ -231,10 +237,14 @@ public class WSO2EventInputMapper implements InputMapper {
         Object[] outObjArray = null;
         if (obj instanceof Event) {
             Event inputEvent = (Event) obj;
-            Object[] metaCorrArray = ObjectArrays.concat(inputEvent.getMetaData() != null ? inputEvent.getMetaData() : new Object[0]
-                    , inputEvent.getCorrelationData() != null ? inputEvent.getCorrelationData() : new Object[0], Object.class);
-            outObjArray = ObjectArrays.concat
-                    (metaCorrArray, inputEvent.getPayloadData() != null ? inputEvent.getPayloadData() : new Object[0], Object.class);
+            if(inputEvent.getStreamId().equalsIgnoreCase(importedStreamDefinition.getStreamId())){
+                Object[] metaCorrArray = ObjectArrays.concat(inputEvent.getMetaData() != null ? inputEvent.getMetaData() : new Object[0]
+                        , inputEvent.getCorrelationData() != null ? inputEvent.getCorrelationData() : new Object[0], Object.class);
+                outObjArray = ObjectArrays.concat
+                        (metaCorrArray, inputEvent.getPayloadData() != null ? inputEvent.getPayloadData() : new Object[0], Object.class);
+            }else{
+                return null;
+            }
         }
         return outObjArray;
     }
