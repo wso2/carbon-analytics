@@ -29,7 +29,7 @@ public class DrillDownResultEntry {
     private String category;
     private String[] categoryPath;
     private List<String> recordIds;
-    private Double recordCount;
+    private Double recordCount; //TODO : score
     //variables to, from, hierarchicalFacets will only be used if the drilldown is numeric range based.
     private double to;
     private double from;

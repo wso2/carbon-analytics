@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.analytics.dataservice.restapi;
 
+import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
@@ -87,7 +88,25 @@ public class Utils {
      * @return the analytics data service
      * @throws AnalyticsException
      */
-    public static SecureAnalyticsDataService getSecureAnalyticsDataService()
+    public static AnalyticsDataAPI getAnalyticsDataAPIs()
+            throws AnalyticsException {
+        AnalyticsDataAPI analyticsDataAPI;
+        analyticsDataAPI = (AnalyticsDataAPI) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                .getOSGiService(AnalyticsDataAPI.class,
+                                null);
+        if (analyticsDataAPI == null) {
+            throw new AnalyticsException("Analytics Data API is not available.");
+        }
+        return analyticsDataAPI;
+    }
+
+    /**
+     * Gets the analytics data service.
+     *
+     * @return the analytics data service
+     * @throws AnalyticsException
+     */
+    public static SecureAnalyticsDataService getCarbonAnalyticsAPI()
             throws AnalyticsException {
         SecureAnalyticsDataService analyticsDataService;
         analyticsDataService = (SecureAnalyticsDataService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
@@ -114,7 +133,7 @@ public class Utils {
             if (recordBean.getTableName() == null || recordBean.getTableName().isEmpty()) {
                 throw new AnalyticsException("TableName cannot be empty!");
             }
-            records.add(new Record(recordBean.getId(), tenantId, recordBean.getTableName(), validateAndReturn(recordBean.getValues())));
+            records.add(new Record(tenantId, recordBean.getTableName(), validateAndReturn(recordBean.getValues())));
         }
         return records;
     }
@@ -169,7 +188,7 @@ public class Utils {
             throws AnalyticsException {
         List<Record> records = new ArrayList<>();
         for (RecordBean recordBean : recordBeans) {
-            records.add(new Record(recordBean.getId(), getTenantId(username), tableName,
+            records.add(new Record(getTenantId(username), tableName,
                                    validateAndReturn(recordBean.getValues())));
         }
         return records;
@@ -460,7 +479,6 @@ public class Utils {
      */
     public static AnalyticsDrillDownRequest createDrilldownRequest(DrillDownRequestBean bean) {
         AnalyticsDrillDownRequest drillDownRequest = new AnalyticsDrillDownRequest();
-        drillDownRequest.setWithIds(bean.isIncludeIds());
         drillDownRequest.setTableName(bean.getTableName());
         drillDownRequest.setCategoryCount(bean.getCategoryCount());
         drillDownRequest.setRecordCount(bean.getRecordCount());

@@ -376,7 +376,6 @@ public class Utils {
      */
     public static AnalyticsDrillDownRequest createDrilldownRequest(DrillDownRequestBean bean, boolean withIds) {
         AnalyticsDrillDownRequest drillDownRequest = new AnalyticsDrillDownRequest();
-        drillDownRequest.setWithIds(withIds);
         drillDownRequest.setTableName(bean.getTableName());
         drillDownRequest.setCategoryCount(bean.getCategoryCount());
         drillDownRequest.setRecordCount(bean.getRecordCount());
