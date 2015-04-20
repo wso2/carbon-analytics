@@ -15,7 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.databridge.agent.test.binary;
+package org.wso2.carbon.databridge.agent.test.thrift;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -33,10 +33,9 @@ import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 
-import java.io.IOException;
 import java.net.SocketException;
 
-public class ServerOfflineTest extends TestCase {
+public class ServerOfflineThriftTest extends TestCase{
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
 
@@ -58,27 +57,27 @@ public class ServerOfflineTest extends TestCase {
             "  ]" +
             "}";
 
-    private BinaryTestServer binaryTestServer;
+    private ThriftTestServer thriftTestServer;
 
-    private synchronized void startServer(int port, int securePort) throws DataBridgeException,
-            StreamDefinitionStoreException, MalformedStreamDefinitionException, IOException {
+    private synchronized void startServer(int port) throws DataBridgeException,
+            StreamDefinitionStoreException, MalformedStreamDefinitionException {
+        thriftTestServer = new ThriftTestServer();
+        thriftTestServer.start(port);
+        thriftTestServer.addStreamDefinition(STREAM_DEFN, -1234);
+
         DataPublisherTestUtil.setKeyStoreParams();
         DataPublisherTestUtil.setTrustStoreParams();
-        binaryTestServer = new BinaryTestServer();
-        binaryTestServer.start(port, securePort);
-        binaryTestServer.addStreamDefinition(STREAM_DEFN, -1234);
+
+
     }
 
     public void testSendingEventsWhileServerOffline()
             throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException,
             DataEndpointException, DataEndpointConfigurationException, SocketException {
-        DataPublisherTestUtil.setKeyStoreParams();
-        DataPublisherTestUtil.setTrustStoreParams();
-
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
-        DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName + ": 9611",
-                "ssl://" + hostName + ":9711", "admin", "admin");
+        DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":7611",
+                "admin", "admin");
         Event event = new Event();
         event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
         event.setMetaData(new Object[]{"127.0.0.1"});
@@ -96,75 +95,111 @@ public class ServerOfflineTest extends TestCase {
     }
 
     public void testBlockingEventSendingAndServerStartup()
-            throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, IOException {
-        DataPublisherTestUtil.setKeyStoreParams();
-        DataPublisherTestUtil.setTrustStoreParams();
+            throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, SocketException {
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
-        DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName + ":9611",
-                "ssl://" + hostName + ":9711", "admin", "admin");
+        DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":7631",
+                "admin", "admin");
         Event event = new Event();
         event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
         event.setMetaData(new Object[]{"127.0.0.1"});
         event.setCorrelationData(null);
         event.setPayloadData(new Object[]{"WSO2", 123.4, 2, 12.4, 1.3});
 
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-        }
+        thriftTestServer = new ThriftTestServer();
+        thriftTestServer.addStreamDefinition(STREAM_DEFN, -1234);
+        thriftTestServer.stopAndStartDuration(7631, 10000, 1000);
 
-        startServer(9611, 9711);
+        DataPublisherTestUtil.setKeyStoreParams();
+        DataPublisherTestUtil.setTrustStoreParams();
 
-        int queueSize = AgentHolder.getInstance().getDataEndpointAgent("Binary").
+        int queueSize = AgentHolder.getInstance().getDataEndpointAgent("Thrift").
                 getAgentConfiguration().getQueueSize();
         int numberOfEventsSent = queueSize + 1000;
         for (int i = 0; i < numberOfEventsSent; i++) {
             dataPublisher.publish(event);
         }
         try {
-            Thread.sleep(60000);
+            Thread.sleep(10000);
         } catch (InterruptedException e) {
         }
 
-        Assert.assertEquals(numberOfEventsSent, binaryTestServer.getNumberOfEventsReceived());
-        binaryTestServer.stop();
+        Assert.assertEquals(numberOfEventsSent, thriftTestServer.getNumberOfEventsReceived());
+        thriftTestServer.stop();
     }
 
-
     public void testNonBlockingEventSendingAndServerStartup()
-            throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException,
-            TransportException, DataEndpointException, DataEndpointConfigurationException,
-            MalformedStreamDefinitionException, DataBridgeException,
-            StreamDefinitionStoreException, IOException {
-        DataPublisherTestUtil.setKeyStoreParams();
-        DataPublisherTestUtil.setTrustStoreParams();
+            throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, SocketException {
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
-        DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName + ":9651",
-                "ssl://" + hostName + ":9751", "admin", "admin");
+        DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":7651",
+                "admin", "admin");
         Event event = new Event();
         event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
         event.setMetaData(new Object[]{"127.0.0.1"});
         event.setCorrelationData(null);
         event.setPayloadData(new Object[]{"WSO2", 123.4, 2, 12.4, 1.3});
 
-        binaryTestServer = new BinaryTestServer();
-        binaryTestServer.addStreamDefinition(STREAM_DEFN, -1234);
-        binaryTestServer.stopAndStartDuration(9651, 9751, 10000, 1000);
+        thriftTestServer = new ThriftTestServer();
+        thriftTestServer.addStreamDefinition(STREAM_DEFN, -1234);
+        thriftTestServer.stopAndStartDuration(7651, 10000, 1000);
 
-        int queueSize = AgentHolder.getInstance().getDataEndpointAgent("Binary").
+        DataPublisherTestUtil.setKeyStoreParams();
+        DataPublisherTestUtil.setTrustStoreParams();
+
+        int queueSize = AgentHolder.getInstance().getDataEndpointAgent("Thrift").
                 getAgentConfiguration().getQueueSize();
         int numberOfEventsSent = queueSize + 1000;
         for (int i = 0; i < numberOfEventsSent; i++) {
             dataPublisher.tryPublish(event);
         }
         try {
-            Thread.sleep(60000);
+            Thread.sleep(35000);
         } catch (InterruptedException e) {
         }
 
-        Assert.assertEquals(queueSize, binaryTestServer.getNumberOfEventsReceived());
-        binaryTestServer.stop();
+        Assert.assertEquals(queueSize, thriftTestServer.getNumberOfEventsReceived());
+        thriftTestServer.stop();
     }
+
+//    public void testServerShutDownWhileBlockingPublishing() throws SocketException,
+//            DataEndpointAuthenticationException, DataEndpointAgentConfigurationException,
+//            TransportException, DataEndpointException, DataEndpointConfigurationException,
+//            MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException {
+//        AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath());
+//        String hostName = DataPublisherTestUtil.LOCAL_HOST;
+//
+//        startServer(7641);
+//
+//        DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":7641",
+//                "ssl://" + hostName + ":7741", "admin", "admin");
+//        Event event = new Event();
+//        event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
+//        event.setMetaData(new Object[]{"127.0.0.1"});
+//        event.setCorrelationData(null);
+//        event.setPayloadData(new Object[]{"WSO2", 123.4, 2, 12.4, 1.3});
+//
+//        int publishTime = 20000;
+//
+//        thriftTestServer.stopAndStartDuration(7641, 5000, 60000);
+//        long startTime = System.currentTimeMillis();
+//
+//        int eventsPublished = 0;
+//        while (true) {
+//            eventsPublished++;
+//            dataPublisher.publish(event);
+//            if (System.currentTimeMillis() >= startTime + publishTime) {
+//                break;
+//            }
+//        }
+//
+//        try {
+//            Thread.sleep(2000);
+//        } catch (InterruptedException e) {
+//        }
+//        Assert.assertEquals(thriftTestServer.getNumberOfEventsReceived(), eventsPublished);
+//        thriftTestServer.stop();
+//    }
+
+
 }

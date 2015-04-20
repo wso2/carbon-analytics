@@ -734,8 +734,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <encoding>UTF-8</encoding>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
         </plugins>
@@ -894,20 +894,19 @@
 
     <properties>
         <carbon.analytics.common.version>1.0.0-SNAPSHOT</carbon.analytics.common.version>
-        <carbon.event.processing.version>2.0.4-SNAPSHOT</carbon.event.processing.version>
+        <!--<carbon.event.processing.version>2.0.4-SNAPSHOT</carbon.event.processing.version>-->
 
         <!-- Carbon kernel version -->
-        <carbon.kernel.version>4.3.0</carbon.kernel.version>
+        <carbon.kernel.version>4.4.0</carbon.kernel.version>
         <!--<carbon.kernel.imp.pkg.version>[4.3.0, 4.4.0)</carbon.kernel.imp.pkg.version>-->
 
-        <orbit.version.json>2.0.0.wso2v1</orbit.version.json>
-
-        <carbon.commons.version>4.3.4</carbon.commons.version>
+        <carbon.commons.version>4.4.0</carbon.commons.version>
         <!--<carbon.commons.imp.pkg.version>[4.3.0, 4.4.0)</carbon.commons.imp.pkg.version>-->
 
         <!--CEP versions-->
         <siddhi.version>3.0.0-SNAPSHOT</siddhi.version>
 
+        <orbit.version.json>2.0.0.wso2v1</orbit.version.json>
         <carbon.p2.plugin.version>1.5.3</carbon.p2.plugin.version>
         <tomcat.websocket.version>7.0.54</tomcat.websocket.version>
         <orbit.version.axiom>1.2.11.wso2v5</orbit.version.axiom>

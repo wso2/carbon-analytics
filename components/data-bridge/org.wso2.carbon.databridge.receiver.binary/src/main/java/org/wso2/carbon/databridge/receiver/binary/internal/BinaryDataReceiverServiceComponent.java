@@ -22,7 +22,6 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
-import org.wso2.carbon.databridge.receiver.binary.BinaryDataReceiver;
 import org.wso2.carbon.databridge.receiver.binary.conf.BinaryDataReceiverConfiguration;
 
 import java.io.IOException;
