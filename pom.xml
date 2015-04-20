@@ -17,12 +17,19 @@
 
     <modules>
         <module>service-stubs</module>
-        <module>components/analytics</module>
+        <module>components/analytics-core</module>
+        <module>components/analytics-data-connectors</module>
+        <module>components/analytics-io</module>
+        <module>components/analytics-processors</module>
         <module>components/analytics-data-agents</module>
-        <module>components/analytics-dashboard</module>
+        <module>components/analytics-views</module>
         <module>features/analytics-data-agents</module>
-        <module>features/analytics</module>
-        <module>features/dashboards/analytics-dashboards</module>
+        <module>features/analytics-core</module>
+        <module>features/analytics-data-connectors</module>
+        <module>features/analytics-io</module>
+        <module>features/analytics-lite</module>
+        <module>features/analytics-processors</module>
+        <module>features/analytics-views</module>
     </modules>
 
     <dependencyManagement>
@@ -282,11 +289,6 @@
                 <artifactId>org.wso2.carbon.identity.authentication</artifactId>
                 <version>${carbon.commons.version}</version>
             </dependency>
-            <!--<dependency>-->
-                <!--<groupId>org.wso2.carbon.analytics</groupId>-->
-                <!--<artifactId>org.wso2.carbon.analytics.dataservice.thrift.commons</artifactId>-->
-                <!--<version>${carbon.analytics.version}</version>-->
-            <!--</dependency>-->
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.databridge.core</artifactId>
@@ -296,11 +298,6 @@
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.databridge.commons</artifactId>
                 <version>${carbon.analytics.common.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.databridge.streamdefn.registry</artifactId>
-                <version>$carbon.analytics.common.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
@@ -347,7 +344,7 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.analytics.dataservice.io.commons</artifactId>
+                <artifactId>org.wso2.carbon.analytics.io.commons</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
@@ -391,7 +388,7 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.analytics.dataservice.servlet</artifactId>
+                <artifactId>org.wso2.carbon.analytics.servlet</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
@@ -428,27 +425,15 @@
                 <type>zip</type>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.analytics.dashboard.ui</artifactId>
-                <version>${carbon.analytics.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.lmax.wso2</groupId>
                 <artifactId>disruptor</artifactId>
                 <version>${orbit.version.disruptor}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.analytics.dataservice.restapi</artifactId>
+                <artifactId>org.wso2.carbon.analytics.restapi</artifactId>
                 <version>${carbon.analytics.version}</version>
                 <type>war</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.analytics.dataservice.restapi.server.feature
-                </artifactId>
-                <version>${carbon.analytics.version}</version>
-                <type>zip</type>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
@@ -972,12 +957,19 @@
             </activation>
             <modules>
                 <module>service-stubs</module>
-                <module>components/analytics</module>
+                <module>components/analytics-core</module>
+                <module>components/analytics-data-connectors</module>
+                <module>components/analytics-io</module>
+                <module>components/analytics-processors</module>
                 <module>components/analytics-data-agents</module>
-                <module>components/analytics-dashboard</module>
+                <module>components/analytics-views</module>
                 <module>features/analytics-data-agents</module>
-                <module>features/analytics</module>
-                <module>features/dashboards/analytics-dashboards</module>
+                <module>features/analytics-core</module>
+                <module>features/analytics-data-connectors</module>
+                <module>features/analytics-io</module>
+                <module>features/analytics-lite</module>
+                <module>features/analytics-processors</module>
+                <module>features/analytics-views</module>
             </modules>
         </profile>
         <profile>
@@ -990,12 +982,19 @@
             </activation>
             <modules>
                 <module>service-stubs</module>
-                <module>components/analytics</module>
+                <module>components/analytics-core</module>
+                <module>components/analytics-data-connectors</module>
+                <module>components/analytics-io</module>
+                <module>components/analytics-processors</module>
                 <module>components/analytics-data-agents</module>
-                <module>components/analytics-dashboard</module>
+                <module>components/analytics-views</module>
                 <module>features/analytics-data-agents</module>
-                <module>features/analytics</module>
-                <module>features/dashboards/analytics-dashboards</module>
+                <module>features/analytics-core</module>
+                <module>features/analytics-data-connectors</module>
+                <module>features/analytics-io</module>
+                <module>features/analytics-lite</module>
+                <module>features/analytics-processors</module>
+                <module>features/analytics-views</module>
             </modules>
         </profile>
         <profile>
@@ -1007,9 +1006,12 @@
                 </property>
             </activation>
             <modules>
+                <module>components/analytics-core</module>
+                <module>components/analytics-data-connectors</module>
+                <module>components/analytics-io</module>
+                <module>components/analytics-processors</module>
                 <module>components/analytics-data-agents</module>
-                <module>components/analytics</module>
-                <module>components/analytics-dashboard</module>
+                <module>components/analytics-views</module>
             </modules>
         </profile>
     </profiles>

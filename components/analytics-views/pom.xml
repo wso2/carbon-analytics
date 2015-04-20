@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
- ~ Copyright (c) 2009-2011, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~ Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  ~
  ~ Licensed under the Apache License, Version 2.0 (the "License");
  ~ you may not use this file except in compliance with the License.
@@ -25,13 +25,14 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>analytics-data-agents-features</artifactId>
+    <artifactId>analytics-views</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon - Analytics Data Agents Aggregator Module</name>
+    <name>WSO2 Carbon - Analytics Views Components Aggregator Module</name>
+    <url>http://wso2.org</url>
 
     <modules>
-        <module>message-tracer-handler</module>
-        <!--<module>jmx</module>-->
+        <module>org.wso2.carbon.analytics.messageconsole</module>
+        <module>org.wso2.carbon.analytics.messageconsole.ui</module>
     </modules>
-</project>
 
+</project>
