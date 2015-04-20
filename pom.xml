@@ -804,6 +804,11 @@
                 <version>${commons.codec.orbit.version}</version>
             </dependency>
             <dependency>
+                <groupId>commons-configuration.wso2</groupId>
+                <artifactId>commons-configuration</artifactId>
+                <version>${commons.configuration.orbit.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.orbit.org.apache.htrace</groupId>
                 <artifactId>htrace-core-apache</artifactId>
                 <version>${apache.htrace.version}</version>
@@ -1059,6 +1064,7 @@
         <orbit.version.disruptor>3.2.1.wso2v1</orbit.version.disruptor>
         <asm.orbit.version>3.1.wso2v1</asm.orbit.version>
         <commons.codec.orbit.version>1.4.0.wso2v1</commons.codec.orbit.version>
+        <commons.configuration.orbit.version>1.6.0.wso2v1</commons.configuration.orbit.version>
         <commons.collections.orbit.version>3.2.0.wso2v1</commons.collections.orbit.version>
 
         <!-- Orbits for HBase client -->

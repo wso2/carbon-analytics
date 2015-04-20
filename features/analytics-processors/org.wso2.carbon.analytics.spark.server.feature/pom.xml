@@ -225,6 +225,11 @@
             <artifactId>javax.servlet.jsp-api</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>commons-configuration.wso2</groupId>
+            <artifactId>commons-configuration</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -305,6 +310,7 @@
                                 <bundleDef>org.wso2.orbit.org.apache.mesos:mesos</bundleDef>
                                 <bundleDef>com.google.protobuf:protobuf-java</bundleDef>
                                 <bundleDef>org.spark-project.protobuf:protobuf-java</bundleDef>
+                                <bundleDef>commons-configuration.wso2:commons-configuration</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}
