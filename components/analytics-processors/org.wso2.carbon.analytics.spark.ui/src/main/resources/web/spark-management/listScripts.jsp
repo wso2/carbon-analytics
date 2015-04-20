@@ -77,32 +77,32 @@
                     %>
                     <tr>
                         <td><label>
-                            <%=aScript%>
+                            <%=aScript.getName()%>
                         </label>
                         </td>
                         <td>
                             <% if (aScript.getEditable()) {%>
                             <a class="icon-link"
                                style="background: url('../spark-management/images/edit.gif') no-repeat;"
-                               href="addOrEditScript.jsp?scriptName=<%=aScript%>&editable=true">Edit</a>
+                               href="addOrEditScript.jsp?scriptName=<%=aScript.getName()%>">Edit</a>
                             <a class="icon-link"
-                               href="executeScript.jsp?scriptName=<%=aScript%>"
+                               href="executeScript.jsp?scriptName=<%=aScript.getName()%>"
                                style="background: url('../spark-management/images/execute.gif') no-repeat;">
                                 Execute</a>
                                 <%--<a class="icon-link" style="background: url('images/tasks-icon.gif') no-repeat;"--%>
                                 <%--href="">Schedule--%>
                                 <%--Script--%>
                                 <%--</a>--%>
-                            <a onclick="deleteRow('<%=aScript%>','Do you want to delete')"
+                            <a onclick="deleteRow('<%=aScript.getName()%>','Do you want to delete')"
                                class="delete-icon-link" href="#">Delete</a>
                             <%
                                 }else {
                             %>
                             <a class="icon-link"
                                style="background: url('../spark-management/images/edit.gif') no-repeat;"
-                               href="addOrEditScript.jsp?scriptName=<%=aScript%>">View</a>
+                               href="addOrEditScript.jsp?scriptName=<%=aScript.getName()%>&editable=false">View</a>
                             <a class="icon-link"
-                               href="executeScript.jsp?scriptName=<%=aScript%>"
+                               href="executeScript.jsp?scriptName=<%=aScript.getName()%>"
                                style="background: url('../spark-management/images/execute.gif') no-repeat;">
                                 Execute</a>
                             <%
@@ -132,7 +132,7 @@
                 </tr>
                 <tr>
                     <td><a class="icon-link" style="background-image:url(images/add.gif);"
-                           href="addOrEditScript.jsp?editable=true"><fmt:message
+                           href="addOrEditScript.jsp"><fmt:message
                             key="spark.script.add"/></a></td>
                 </tr>
                 </tbody>

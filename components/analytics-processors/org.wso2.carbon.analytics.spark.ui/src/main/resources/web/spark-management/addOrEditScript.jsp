@@ -31,15 +31,6 @@
     <script src="../editarea/edit_area_full.js" type="text/javascript"></script>
     <script type="text/javascript" src="../ajax/js/prototype.js"></script>
     <link rel="stylesheet" type="text/css" href="css/spark-explorer-styles.css">
-    <script type="text/javascript">
-        YAHOO.util.Event.onDOMReady(function () {
-            editAreaLoader.init({
-                id: "allcommands"
-                , syntax: "sql"
-                , start_highlight: true
-            });
-        });
-    </script>
 
     <%
         String serverURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);
@@ -49,7 +40,7 @@
 
         String scriptName = request.getParameter("scriptName");
         String editableParam = request.getParameter("editable");
-        boolean editable = false;
+        boolean editable = true;
         if (editableParam != null) {
             editable = Boolean.parseBoolean(editableParam);
         }
@@ -74,6 +65,17 @@
     %>
 
     <script type="text/javascript">
+        var editable = <%=editable%>;
+        YAHOO.util.Event.onDOMReady(function () {
+            editAreaLoader.init({
+                id: "allcommands"
+                , syntax: "sql"
+                , start_highlight: true,
+                is_editable : editable
+            });
+        });
+//        editAreaLoader.set_editable(false);
+//        alert("edi")
 
         function executeQuery() {
             var scriptContent = editAreaLoader.getValue("allcommands");
@@ -215,7 +217,7 @@
                                    class="required" autofocus/>
 
                             <div class="sectionHelp">
-                                Enter the name of the actual analytics script.
+                                The name of the actual analytics script.
                             </div>
 
                         </td>
@@ -229,8 +231,17 @@
                                 class="required">*</span>
                         </td>
                         <td>
+                                <%--<%--%>
+                                <%--if (!editable) {--%>
+                                <%--%>--%>
+                                <%--<script type="application/javascript">--%>
+                                <%--editAreaLoader._setDisabled()--%>
+                                <%--</script>--%>
+                                <%--<%--%>
+                                <%--}--%>
+                                <%--%>--%>
                             <textarea id="allcommands" name="allcommands" rows="20"
-                                      style="width:99%" class="required" disabled="<%=!editable%>" contenteditable="false"><%=scriptContent%>
+                                      style="width:99%" class="required"><%=scriptContent%>
                             </textarea>
                         </td>
                     </tr>
@@ -247,11 +258,12 @@
                     <tr>
                         <td class="leftCol-med labelField">Cron Expression</td>
                         <td>
+
                             <input name="cronExpr" type="text" id="cronExpr" placeholder="0 0/5 * * * ?"
-                                   value="<%=cronExp.trim()%>" disabled="<%=!editable%>"/>
+                                   value="<%=cronExp.trim()%>" <% if (!editable) {%> disabled <% }%>/>
 
                             <div class="sectionHelp">
-                                Enter the cron expression for the rate of analytics script to be executed
+                                The cron expression for the rate of analytics script to be executed
                             </div>
                         </td>
                     </tr>
