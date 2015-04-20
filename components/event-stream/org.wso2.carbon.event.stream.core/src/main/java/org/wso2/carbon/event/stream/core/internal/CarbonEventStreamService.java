@@ -38,7 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CarbonEventStreamService implements EventStreamService {
 
     private static final Log log = LogFactory.getLog(CarbonEventStreamService.class);
-    private Map<Integer, TreeMap<String, EventStreamConfiguration>> tenantSpecificEventStreamConfigs = new ConcurrentHashMap<Integer, TreeMap<String, EventStreamConfiguration>>();
+    private Map<Integer, ConcurrentHashMap<String, EventStreamConfiguration>> tenantSpecificEventStreamConfigs = new ConcurrentHashMap<Integer, ConcurrentHashMap<String, EventStreamConfiguration>>();
     private List<StreamDefinition> pendingStreams = new ArrayList<StreamDefinition>();
 
     public void removeEventStreamConfigurationFromMap(String fileName) {
@@ -141,9 +141,9 @@ public class CarbonEventStreamService implements EventStreamService {
     public void addEventStreamConfig(EventStreamConfiguration eventStreamConfiguration)
             throws EventStreamConfigurationException {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        TreeMap<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
+        ConcurrentHashMap<String, EventStreamConfiguration> eventStreamConfigs = tenantSpecificEventStreamConfigs.get(tenantId);
         if (eventStreamConfigs == null) {
-            eventStreamConfigs = new TreeMap<String, EventStreamConfiguration>();
+            eventStreamConfigs = new ConcurrentHashMap<String, EventStreamConfiguration>();
             tenantSpecificEventStreamConfigs.put(tenantId, eventStreamConfigs);
         }
         eventStreamConfigs.put(eventStreamConfiguration.getStreamDefinition().getStreamId(), eventStreamConfiguration);
