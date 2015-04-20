@@ -28,21 +28,6 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.wso2.carbon.event-processing</groupId>
-                <artifactId>org.wso2.carbon.event.stream.manager.core</artifactId>
-                <version>${carbon.event-processing.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.wso2.siddhi</groupId>
-                        <artifactId>siddhi-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.wso2.carbon</groupId>
-                        <artifactId>org.wso2.carbon.stratos.common</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.spark.core</artifactId>
                 <version>${carbon.analytics.version}</version>
@@ -303,24 +288,24 @@
                 <!--<version>${carbon.analytics.version}</version>-->
             <!--</dependency>-->
             <dependency>
-                <groupId>org.wso2.carbon.commons</groupId>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.databridge.core</artifactId>
-                <version>${carbon.commons.version}</version>
+                <version>${carbon.analytics.common.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.commons</groupId>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.databridge.commons</artifactId>
-                <version>${carbon.commons.version}</version>
+                <version>${carbon.analytics.common.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.commons</groupId>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.databridge.streamdefn.registry</artifactId>
-                <version>${carbon.commons.version}</version>
+                <version>$carbon.analytics.common.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.commons</groupId>
-                <artifactId>org.wso2.carbon.databridge.agent.thrift</artifactId>
-                <version>${carbon.commons.version}</version>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.stream.core</artifactId>
+                <version>${carbon.analytics.common.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.github.stephenc</groupId>
@@ -1101,7 +1086,8 @@
         <asm4.orbit.version>4.0.0.wso2v1</asm4.orbit.version>
         <carbon.commons.version>4.3.6</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.3.6, 4.4.0)</carbon.commons.imp.pkg.version>
-        <carbon.event-processing.version>2.0.2</carbon.event-processing.version>
+        <carbon.event-processing.version>2.0.4-SNAPSHOT</carbon.event-processing.version>
+        <carbon.analytics.common.version>1.0.0-SNAPSHOT</carbon.analytics.common.version>
 
         <carbon.analytics.version>1.0.3-SNAPSHOT</carbon.analytics.version>
         <carbon.analytics.imp.pkg.version>[1.0.3-SNAPSHOT, 1.1.0)</carbon.analytics.imp.pkg.version>

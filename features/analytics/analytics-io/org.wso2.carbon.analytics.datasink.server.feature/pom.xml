@@ -58,7 +58,7 @@
                                     org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasink:${carbon.analytics.version}
                                 </bundleDef>
                                 <bundleDef>
-                                    org.wso2.carbon.event-processing:org.wso2.carbon.event.stream.manager.core:${carbon.event-processing.version}
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.stream.core:${carbon.analytics.common.version}
                                 </bundleDef>
                                 <bundleDef>
                                     com.lmax.wso2:disruptor:${orbit.version.disruptor}
