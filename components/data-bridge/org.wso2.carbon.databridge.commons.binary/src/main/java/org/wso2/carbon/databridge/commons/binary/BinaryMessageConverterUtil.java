@@ -17,38 +17,71 @@
 */
 package org.wso2.carbon.databridge.commons.binary;
 
-import org.wso2.carbon.databridge.commons.Event;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 
 public class BinaryMessageConverterUtil {
 
-    public static String getCompleteError(String message, Exception ex) {
-        StringBuilder error = new StringBuilder();
-        error.append(BinaryMessageConstants.ERROR_RESPONSE).append("\n");
-        error.append(BinaryMessageConstants.ERROR_EXCEPTION_CLASS).append(ex.getClass().getCanonicalName()).append("\n");
-        error.append(BinaryMessageConstants.ERROR_MESSAGE).append(message).append("\n");
-        error.append(BinaryMessageConstants.ERROR_EXCEPTION_TRACE).append(ex.getStackTrace().toString()).append("\n");
-        return error.toString();
+    public static byte[] loadData(InputStream in, byte[] dataArray) throws IOException {
+
+        int start = 0;
+        while (true) {
+            int readCount = in.read(dataArray, start, dataArray.length - start);
+            if (readCount != -1) {
+                start += readCount;
+                if (start == dataArray.length) {
+                    return dataArray;
+                }
+            } else {
+                throw new EOFException("Connection closed from remote end.");
+            }
+        }
     }
 
-    public static String getLoginSuccessResponse(String sessionId) {
-        StringBuilder response = new StringBuilder();
-        response.append(BinaryMessageConstants.OK_RESPONSE).append("\n");
-        response.append(BinaryMessageConstants.SESSION_ID_PREFIX).append(sessionId).append("\n");
-        response.append(BinaryMessageConstants.END_MESSAGE).append("\n");
-        return response.toString();
+    public static String getString(ByteBuffer byteBuffer, int size) {
+
+        byte[] bytes = new byte[size];
+        byteBuffer.get(bytes);
+        return new String(bytes);
     }
 
-    public static String getLogoutSuccessResponse() {
-        StringBuilder response = new StringBuilder();
-        response.append(BinaryMessageConstants.OK_RESPONSE).append("\n");
-        response.append(BinaryMessageConstants.END_MESSAGE).append("\n");
-        return response.toString();
+    public static int getSize(Object data) {
+        if (data instanceof String) {
+            return 4 + ((String) data).length();
+        } else if (data instanceof Integer) {
+            return 4;
+        } else if (data instanceof Long) {
+            return 8;
+        } else if (data instanceof Float) {
+            return 4;
+        } else if (data instanceof Double) {
+            return 8;
+        } else if (data instanceof Boolean) {
+            return 1;
+        } else {
+            return 4;
+        }
     }
 
-    public static String getPublishSuccessResponse() {
-        StringBuilder response = new StringBuilder();
-        response.append(BinaryMessageConstants.OK_RESPONSE).append("\n");
-        response.append(BinaryMessageConstants.END_MESSAGE).append("\n");
-        return response.toString();
+    public static void assignData(Object data, ByteBuffer eventDataBuffer) throws IOException {
+        if (data instanceof String) {
+            eventDataBuffer.putInt(((String) data).length());
+            eventDataBuffer.put((((String) data).getBytes(BinaryMessageConstants.DEFAULT_CHARSET)));
+        } else if (data instanceof Integer) {
+            eventDataBuffer.putInt((Integer) data);
+        } else if (data instanceof Long) {
+            eventDataBuffer.putLong((Long) data);
+        } else if (data instanceof Float) {
+            eventDataBuffer.putFloat((Float) data);
+        } else if (data instanceof Double) {
+            eventDataBuffer.putDouble((Double) data);
+        } else if (data instanceof Boolean) {
+            eventDataBuffer.put((byte) (((Boolean) data) ? 1 : 0));
+        } else {
+            eventDataBuffer.putInt(0);
+        }
+
     }
 }

@@ -16,16 +16,16 @@
 * under the License.
 */
 
-package org.wso2.carbon.databridge.receiver.binary;
+package org.wso2.carbon.databridge.receiver.binary.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.ServerConfiguration;
-import org.wso2.carbon.databridge.commons.binary.BinaryMessageConverterUtil;
+import org.wso2.carbon.databridge.commons.binary.BinaryMessageConstants;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
+import org.wso2.carbon.databridge.receiver.binary.BinaryEventConverter;
 import org.wso2.carbon.databridge.receiver.binary.conf.BinaryDataReceiverConfiguration;
-import org.wso2.carbon.databridge.receiver.binary.internal.RequestProcessor;
 
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.SSLServerSocket;
@@ -33,8 +33,11 @@ import javax.net.ssl.SSLServerSocketFactory;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static org.wso2.carbon.databridge.commons.binary.BinaryMessageConverterUtil.loadData;
 
 /**
  * Binary Transport Receiver implementation.
@@ -61,7 +64,7 @@ public class BinaryDataReceiver {
         startEventTransmission();
     }
 
-    public void stop(){
+    public void stop() {
         sslReceiverExecutorService.shutdownNow();
         tcpReceiverExecutorService.shutdownNow();
     }
@@ -111,6 +114,7 @@ public class BinaryDataReceiver {
             this.serverSocket = serverSocket;
         }
 
+
         @Override
         public void run() {
             Socket socket;
@@ -120,34 +124,108 @@ public class BinaryDataReceiver {
                  */
                 while (true) {
                     socket = this.serverSocket.accept();
-                    InputStream inputstream = socket.getInputStream();
-                    InputStreamReader inputstreamreader = new InputStreamReader(inputstream);
-                    BufferedReader bufferedreader = new BufferedReader(inputstreamreader);
-                    BufferedWriter outputStream = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-                    String messageLine;
-                    RequestProcessor requestProcessor = new RequestProcessor(dataBridgeReceiverService);
-                    while ((messageLine = bufferedreader.readLine()) != null) {
-                        if (requestProcessor.isMessageEnded()) {
-                            requestProcessor = new RequestProcessor(dataBridgeReceiverService);
-                        }
-                        try {
-                            String response = requestProcessor.consume(messageLine);
-                            if (response != null) {
-                                outputStream.write(response);
-                                outputStream.flush();
-                            }
-                        } catch (Exception e) {
-                            String errorMsg = "Error occurred while reading the message. " + e.getMessage();
-                            log.error(errorMsg, e);
-                            outputStream.write(BinaryMessageConverterUtil.getCompleteError(errorMsg, e));
-                            outputStream.flush();
-                            break;
-                        }
+                    InputStream inputstream = new BufferedInputStream(socket.getInputStream());
+                    OutputStream outputStream = new BufferedOutputStream((socket.getOutputStream()));
+
+                    int messageType = inputstream.read();
+                    while (messageType!=-1) {
+                        int messageSize = ByteBuffer.wrap(loadData(inputstream, new byte[4])).getInt();
+                        byte[] message = loadData(inputstream, new byte[messageSize]);
+                        processMessage(messageType, message, outputStream);
+                        messageType = inputstream.read();
                     }
                 }
             } catch (IOException ex) {
                 log.error("Error while creating SSL socket on port : " + binaryDataReceiverConfiguration.getSizeOfTCPThreadPool(), ex);
+            } catch (Throwable t) {
+                log.error("Error while receiving messages " + t.getMessage(), t);
             }
         }
+
+    }
+
+    private String processMessage(int messageType, byte[] message, OutputStream outputStream) {
+        ByteBuffer byteBuffer = ByteBuffer.wrap(message);
+        int sessionIdLength;
+        String sessionId;
+
+        switch (messageType) {
+            case 0: //Login
+                int userNameLength = byteBuffer.getInt();
+                int passwordLength = byteBuffer.getInt();
+
+                String userName = new String(message, 8, userNameLength);
+                String password = new String(message, 8 + userNameLength, passwordLength);
+
+                try {
+                    sessionId = dataBridgeReceiverService.login(userName, password);
+
+                    ByteBuffer buffer = ByteBuffer.allocate(5 + sessionId.length());
+                    buffer.put((byte) 2);
+                    buffer.putInt(sessionId.length());
+                    buffer.put(sessionId.getBytes(BinaryMessageConstants.DEFAULT_CHARSET));
+
+                    outputStream.write(buffer.array());
+                    outputStream.flush();
+                } catch (Exception e) {
+                    try {
+                        sendError(e, outputStream);
+                    } catch (IOException e1) {
+                        log.error("Error while sending response for login message: " + e1.getMessage(), e1);
+                    }
+                }
+                break;
+            case 1://Logout
+                sessionIdLength = byteBuffer.getInt();
+                sessionId = new String(message, 4, sessionIdLength);
+                try {
+                    dataBridgeReceiverService.logout(sessionId);
+
+                    outputStream.write((byte) 0);
+                    outputStream.flush();
+                } catch (Exception e) {
+                    try {
+                        sendError(e, outputStream);
+                    } catch (IOException e1) {
+                        log.error("Error while sending response for login message: " + e1.getMessage(), e1);
+                    }
+                }
+                break;
+            case 2: //Publish
+                sessionIdLength = byteBuffer.getInt();
+                sessionId = new String(message, 4, sessionIdLength);
+                try {
+                    dataBridgeReceiverService.publish(message, sessionId, BinaryEventConverter.getConverter());
+
+                    outputStream.write((byte) 0);
+                    outputStream.flush();
+                } catch (Exception e) {
+                    try {
+                        sendError(e, outputStream);
+                    } catch (IOException e1) {
+                        log.error("Error while sending response for login message: " + e1.getMessage(), e1);
+                    }
+                }
+                break;
+            default:
+                log.error("Message Type " + messageType + " is not supported!");
+        }
+        return null;
+    }
+
+    private void sendError(Exception e, OutputStream outputStream) throws IOException {
+
+        int errorClassNameLength = e.getClass().getCanonicalName().length();
+        int errorMsgLength = e.getMessage().length();
+
+        ByteBuffer bbuf = ByteBuffer.wrap(new byte[8]);
+        bbuf.putInt(errorClassNameLength);
+        bbuf.putInt(errorMsgLength);
+
+        outputStream.write((byte) 1);//Error
+        outputStream.write(bbuf.array());
+        outputStream.write(e.getClass().getCanonicalName().getBytes(BinaryMessageConstants.DEFAULT_CHARSET));
+        outputStream.write(e.getMessage().getBytes(BinaryMessageConstants.DEFAULT_CHARSET));
+        outputStream.flush();
     }
 }

@@ -34,7 +34,6 @@
         <module>org.wso2.carbon.databridge.commons</module>
         <module>org.wso2.carbon.databridge.commons.thrift</module>
         <module>org.wso2.carbon.databridge.commons.binary</module>
-        <module>org.wso2.carbon.databridge.agent.thrift</module>
         <module>org.wso2.carbon.databridge.core</module>
         <module>org.wso2.carbon.databridge.streamdefn.registry</module>
         <module>org.wso2.carbon.databridge.receiver.thrift</module>

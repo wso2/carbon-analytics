@@ -37,8 +37,8 @@ import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 import java.net.SocketException;
 
 
-public class OneEndPointDPTest extends TestCase {
-    Logger log = Logger.getLogger(OneEndPointDPTest.class);
+public class OneEndPointDPThriftTest extends TestCase {
+    Logger log = Logger.getLogger(OneEndPointDPThriftTest.class);
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
     private ThriftTestServer thriftTestServer;
