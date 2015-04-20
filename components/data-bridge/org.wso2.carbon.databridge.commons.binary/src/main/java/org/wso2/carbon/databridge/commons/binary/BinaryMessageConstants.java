@@ -18,34 +18,6 @@
 package org.wso2.carbon.databridge.commons.binary;
 
 public class BinaryMessageConstants {
-    public static final String START_MESSAGE = "START";
-    public static final String END_MESSAGE = "END";
-    public static final String START_EVENT = "START_EVENT";
-    public static final String END_EVENT = "END_EVENT";
-    public static final String PARAMS_SEPARATOR = "#::#";
-
-    public static final String PUBLISH_OPERATION = "publish";
-    public static final String LOGIN_OPERATION = "login";
-    public static final String LOGOUT_OPERATION = "logout";
-
-    public static final String STREAM_ID_PREFIX = "STREAM_ID__";
-    public static final String TIME_STAMP_PREFIX = "TIME_STAMP__";
-    public static final String START_META_DATA = "START_META_DATA";
-    public static final String START_CORRELATION_DATA = "START_CORRELATION_DATA";
-    public static final String START_PAYLOAD_DATA = "START_PAYLOAD";
-    public static final String START_ARBITRARY_DATA = "START_ARBITRARY";
-    public static final String END_ARBITRARY_DATA = "END_ARBITRARY";
-    public static final String END_META_DATA = "END_META_DATA";
-    public static final String END_CORRELATION_DATA = "END_CORRELATION_DATA";
-    public static final String END_PAYLOAD_DATA = "END_PAYLOAD";
-
-    public static final String SESSION_ID_PREFIX = "SESSION_ID__";
-
-    public static final String OK_RESPONSE = "OK";
-    public static final String ERROR_RESPONSE = "ERROR";
-
-    public static final String ERROR_MESSAGE = "ERROR_MSG__";
-    public static final String ERROR_EXCEPTION_CLASS = "ERROR_EXCEPTION_CLASS__";
-    public static final String ERROR_EXCEPTION_TRACE = "ERROR_EXCEPTION_TRACE__";
+    public static final String DEFAULT_CHARSET = "UTF-8";
 
 }

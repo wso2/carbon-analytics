@@ -40,8 +40,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class OneEndPointDPTest extends TestCase {
-    Logger log = Logger.getLogger(OneEndPointDPTest.class);
+public class OneEndPointDPBinaryTest extends TestCase {
+    Logger log = Logger.getLogger(OneEndPointDPBinaryTest.class);
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
     private BinaryTestServer testServer;
