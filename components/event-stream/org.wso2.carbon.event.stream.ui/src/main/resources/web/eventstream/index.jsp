@@ -110,15 +110,6 @@
                     <td><%= eventStreamInfoDto.getStreamDescription() != null ? eventStreamInfoDto.getStreamDescription() : "" %>
                     </td>
                     <td>
-                        <a style="background-image: url(../eventstream/images/inflow.png);"
-                           class="icon-link"
-                           href="stream_in_flows.jsp?ordinal=1&eventStreamWithVersion=<%=eventStreamWithVersion%>"><font
-                                color="#4682b4">In-Flows</font></a>
-
-                        <a style="background-image: url(../eventstream/images/outflow.png);"
-                           class="icon-link"
-                           href="stream_out_flows.jsp?ordinal=1&eventStreamWithVersion=<%=eventStreamWithVersion%>"><font
-                                color="#4682b4">Out-Flows</font></a>
                         <%
                         if(eventStreamInfoDto.getEditable()) {
                         %>
