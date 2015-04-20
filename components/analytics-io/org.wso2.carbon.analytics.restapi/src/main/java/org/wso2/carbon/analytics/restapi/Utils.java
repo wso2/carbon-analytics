@@ -188,7 +188,7 @@ public class Utils {
             throws AnalyticsException {
         List<Record> records = new ArrayList<>();
         for (RecordBean recordBean : recordBeans) {
-            records.add(new Record(getTenantId(username), tableName,
+            records.add(new Record(recordBean.getId(), getTenantId(username), tableName,
                                    validateAndReturn(recordBean.getValues())));
         }
         return records;
