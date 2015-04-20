@@ -27,14 +27,41 @@
         String streamId = request.getParameter("streamNameWithVersion");
         EventStreamAdminServiceStub eventStreamAdminServiceStub = EventReceiverUIUtils.getEventStreamAdminService(config, session, request);
         EventStreamDefinitionDto streamDefinitionDto = eventStreamAdminServiceStub.getStreamDefinitionDto(streamId);
+        String[] toStreamNameAndVersion = streamId.split(":");
+        String streamName = toStreamNameAndVersion[0];
+        String streamVersion = toStreamNameAndVersion[1];
     %>
 
     <table class="styledLeft noBorders spacer-bot"
            style="width:100%">
         <tbody>
+
         <tr fromElementKey="inputWso2EventMapping">
             <td colspan="2" class="middle-header">
                 <fmt:message key="event.receiver.mapping.wso2event"/>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="leftCol-med">
+                <fmt:message key="from.event.stream"/>
+                <span class="required">*</span>
+            </td>
+            <td>
+                <div class="outputFields">
+                    <input id="property_Required_stream_name" class="initE" type="text" value="<%=streamName%>" name="stream" style="width:75%">
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="leftCol-med">
+                <fmt:message key="from.event.version"/>
+                <span class="required">*</span>
+            </td>
+            <td>
+                <div class="outputFields">
+                    <input id="property_Required_stream_version" class="initE" type="text" value="<%=streamVersion%>" name="version" style="width:75%">
+                </div>
             </td>
         </tr>
 

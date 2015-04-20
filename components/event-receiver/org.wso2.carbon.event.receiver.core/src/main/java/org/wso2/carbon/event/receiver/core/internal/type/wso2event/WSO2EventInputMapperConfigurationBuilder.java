@@ -62,6 +62,10 @@ public class WSO2EventInputMapperConfigurationBuilder {
                 InputMappingAttribute inputMappingAttribute = getInputMappingAttributeFromOM(propertyOMElement);
                 wso2EventInputMapping.addInputMappingAttribute(inputMappingAttribute);
             }
+            OMElement fromOMElement = mappingElement.getFirstChildWithName(new QName(EventReceiverConstants.ER_CONF_NS, EventReceiverConstants.ER_ELEMENT_FROM));
+            wso2EventInputMapping.setFromEventName(fromOMElement.getAttributeValue(new QName(EventReceiverConstants.ER_ATTR_STREAM_NAME)));
+            wso2EventInputMapping.setFromEventVersion(fromOMElement.getAttributeValue(new QName(EventReceiverConstants.ER_ATTR_VERSION)));
+
             List<InputMappingAttribute> sortedInputMappingAttributes = EventReceiverUtil.sortInputMappingAttributes(wso2EventInputMapping.getInputMappingAttributes());
             int streamPosition = 0;
             for (InputMappingAttribute inputMappingAttribute : sortedInputMappingAttributes) {
@@ -98,6 +102,7 @@ public class WSO2EventInputMapperConfigurationBuilder {
             throws EventReceiverConfigurationException {
         List<String> supportedChildTags = new ArrayList<String>();
         supportedChildTags.add(EventReceiverConstants.ER_ELEMENT_PROPERTY);
+        supportedChildTags.add(EventReceiverConstants.ER_ELEMENT_FROM);
 
         String customMappingEnabledAttribute = omElement.getAttributeValue(new QName(EventReceiverConstants.ER_ATTR_CUSTOM_MAPPING_ENABLED));
         if (customMappingEnabledAttribute == null || customMappingEnabledAttribute.equalsIgnoreCase(EventReceiverConstants.ENABLE_CONST)) {
@@ -150,6 +155,12 @@ public class WSO2EventInputMapperConfigurationBuilder {
             mappingOMElement.addAttribute(EventReceiverConstants.ER_ATTR_CUSTOM_MAPPING_ENABLED, EventReceiverConstants.DISABLE_CONST, null);
         }
         if (inputMappingAttributes.size() > 0) {
+            OMElement fromOMElement = factory.createOMElement(new QName(EventReceiverConstants.ER_ELEMENT_FROM));
+            fromOMElement.setNamespace(mappingOMElement.getDefaultNamespace());
+            fromOMElement.addAttribute(EventReceiverConstants.ER_ATTR_STREAM_NAME, wso2EventInputMapping.getFromEventName(), null);
+            fromOMElement.addAttribute(EventReceiverConstants.ER_ATTR_VERSION, wso2EventInputMapping.getFromEventVersion(), null);
+            mappingOMElement.addChild(fromOMElement);
+
             for (InputMappingAttribute inputMappingAttribute : inputMappingAttributes) {
                 OMElement propertyOMElement = getPropertyOmElement(factory, inputMappingAttribute);
                 propertyOMElement.setNamespace(mappingOMElement.getDefaultNamespace());

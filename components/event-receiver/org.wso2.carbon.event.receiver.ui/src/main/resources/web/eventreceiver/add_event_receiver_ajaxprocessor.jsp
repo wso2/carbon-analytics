@@ -59,6 +59,8 @@
             String eventAdapterInfo = request.getParameter("eventAdapterInfo");
             // property set contains a set of properties, eg; userName$myName|url$http://wso2.org|
             String propertySet = request.getParameter("propertySet");
+
+            String fromStreamNameWithVersion = "";
             BasicInputAdapterPropertyDto[] basicInputAdapterPropertyDtos = null;
 
             if (propertySet != null) {
@@ -89,6 +91,9 @@
                 String customMapping = request.getParameter("customMappingValue");
 
                 if (customMapping.equalsIgnoreCase(EventReceiverUIConstants.STRING_LITERAL_ENABLE)) {
+
+                    fromStreamNameWithVersion = request.getParameter("fromStreamName") + EventReceiverUIConstants.STREAM_VERSION_DELIMITER + request.getParameter("fromStreamVersion");
+
                     String metaPropertySet = request.getParameter("metaData");
 
                     if (metaPropertySet != null && !metaPropertySet.isEmpty()) {
@@ -154,7 +159,7 @@
                     }
                 }
                 stub.deployWso2EventReceiverConfiguration(eventReceiverName, streamNameWithVersion, eventAdapterInfo, metaEbProperties, correlationEbProperties, payloadEbProperties,
-                        basicInputAdapterPropertyDtos, EventReceiverUIConstants.STRING_LITERAL_ENABLE.equalsIgnoreCase(customMapping));
+                        basicInputAdapterPropertyDtos, EventReceiverUIConstants.STRING_LITERAL_ENABLE.equalsIgnoreCase(customMapping), fromStreamNameWithVersion);
             } else if (inputMappingType.equals("xml")) {
 
                 String prefixPropertySet = request.getParameter("prefixData");

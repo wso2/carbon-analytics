@@ -358,7 +358,8 @@ public class EventReceiverAdminService extends AbstractAdmin {
                                                      EventMappingPropertyDto[] correlationData,
                                                      EventMappingPropertyDto[] payloadData,
                                                      BasicInputAdapterPropertyDto[] inputPropertyConfiguration,
-                                                     boolean mappingEnabled)
+                                                     boolean mappingEnabled,
+                                                     String fromStreamNameWithVersion)
             throws AxisFault {
 
         if (checkEventReceiverValidity(eventReceiverName)) {
@@ -400,6 +401,10 @@ public class EventReceiverAdminService extends AbstractAdmin {
                             wso2EventInputMapping.addInputMappingAttribute(inputProperty);
                         }
                     }
+                    String[] fromStreamProperties = fromStreamNameWithVersion.split(":");
+                    wso2EventInputMapping.setFromEventName(fromStreamProperties[0]);
+                    wso2EventInputMapping.setFromEventVersion(fromStreamProperties[1]);
+
                 }
                 eventReceiverConfiguration.setInputMapping(wso2EventInputMapping);
                 eventReceiverService.deployEventReceiverConfiguration(eventReceiverConfiguration);

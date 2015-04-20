@@ -87,7 +87,7 @@ public class WSO2EventAdapterServiceDS {
                         PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(credentials.getDomainName());
 
                         for (Event event : events) {
-                            ConcurrentHashMap<String, WSO2EventAdapter> adapters = WSO2EventAdapterServiceValueHolder.getAdapterService(credentials.getDomainName(), event.getStreamId());
+                            ConcurrentHashMap<String, WSO2EventAdapter> adapters = WSO2EventAdapterServiceValueHolder.getAdapterService(credentials.getDomainName());
                             if (adapters != null) {
                                 for (WSO2EventAdapter adapter : adapters.values()) {
                                     adapter.getEventAdaptorListener().onEvent(event);
