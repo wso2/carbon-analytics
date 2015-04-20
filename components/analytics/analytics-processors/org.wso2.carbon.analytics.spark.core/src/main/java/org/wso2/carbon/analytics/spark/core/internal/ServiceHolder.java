@@ -56,8 +56,6 @@ public class ServiceHolder {
     
     private static SparkAnalyticsExecutor analyticskExecutor;
 
-    private static Map<String, List<Feature>> requiredFeatures;
-
     public static void setTaskService(TaskService taskService) {
         ServiceHolder.taskService = taskService;
     }
@@ -107,16 +105,7 @@ public class ServiceHolder {
         return analyticskExecutor;
     }
 
-    
     public static void setAnalyticskExecutor(SparkAnalyticsExecutor analyticskExecutor) {
         ServiceHolder.analyticskExecutor = analyticskExecutor;
-    }
-
-    public static Map<String, List<Feature>> getRequiredFeatures() {
-        return requiredFeatures;
-    }
-
-    public static void setRequiredFeatures(Map<String, List<Feature>> requiredFeatures) {
-        ServiceHolder.requiredFeatures = requiredFeatures;
     }
 }

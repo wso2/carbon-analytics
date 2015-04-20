@@ -67,7 +67,7 @@
                         <Private-Package>
                             org.wso2.carbon.analytics.spark.core.internal.*,
                         </Private-Package>
-                        <Axis2Deployer>SparkScriptDeployer</Axis2Deployer>
+                        <WSO2-Application-Deployer>Spark Script CApp Deployer</WSO2-Application-Deployer>
                     </instructions>
                 </configuration>
             </plugin>

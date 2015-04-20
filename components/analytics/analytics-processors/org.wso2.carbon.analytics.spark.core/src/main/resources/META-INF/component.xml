@@ -16,14 +16,6 @@
  ~ under the License.
 -->
 <component xmlns="http://products.wso2.org/carbon">
-    <deployers>
-        <deployer>
-            <directory>spark-scripts</directory>
-            <extension>xml</extension>
-            <class>org.wso2.carbon.analytics.spark.core.deployment.SparkScriptDeployer</class>
-        </deployer>
-    </deployers>
-
     <ManagementPermissions>
         <ManagementPermission>
             <DisplayName>Event Adaptors</DisplayName>
