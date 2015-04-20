@@ -26,7 +26,7 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
-import org.wso2.carbon.event.stream.manager.core.WSO2EventListConsumer;
+import org.wso2.carbon.event.stream.core.WSO2EventListConsumer;
 
 import java.util.List;
 
