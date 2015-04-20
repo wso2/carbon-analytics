@@ -55,7 +55,8 @@ public class AnalyticsSchema implements Serializable {
         FLOAT,
         DOUBLE,
         BOOLEAN,
-        BINARY
+        BINARY,
+        FACET
     }
     
     @Override

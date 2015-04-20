@@ -22,7 +22,7 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.datasink.AnalyticsDSConnector;
 import org.wso2.carbon.analytics.datasink.subscriber.AnalyticsEventStreamListener;
 import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
-import org.wso2.carbon.event.stream.manager.core.EventStreamService;
+import org.wso2.carbon.event.stream.core.EventStreamService;
 
 public class ServiceHolder {
     private static EventStreamService eventStreamService;

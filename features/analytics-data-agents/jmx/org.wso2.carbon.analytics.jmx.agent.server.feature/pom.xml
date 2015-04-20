@@ -45,7 +45,7 @@
             <artifactId>org.wso2.carbon.utils</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.commons</groupId>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.databridge.agent.thrift</artifactId>
         </dependency>
     </dependencies>
@@ -76,7 +76,7 @@
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>
-                                    org.wso2.carbon.databridge.agent.thrift.server:${carbon.commons.version}
+                                    org.wso2.carbon.databridge.agent.thrift.server:${carbon.analytics.common.version}
                                 </importFeatureDef>
                                 <importFeatureDef>
                                     org.wso2.carbon.ntask.core:${carbon.commons.version}

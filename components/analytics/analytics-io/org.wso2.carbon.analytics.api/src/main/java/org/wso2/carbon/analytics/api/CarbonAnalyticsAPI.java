@@ -53,7 +53,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             this.analyticsDataConfiguration = (AnalyticsDataConfiguration) un.unmarshal(new File(configFilePath));
             AnalyticsAPIHttpClient.init(analyticsDataConfiguration);
         } catch (JAXBException ex) {
-            throw new AnalyticsServiceException("Error while loading the configuration : " + configFilePath);
+            throw new AnalyticsServiceException("Error while loading the configuration : " + configFilePath, ex);
         }
     }
 

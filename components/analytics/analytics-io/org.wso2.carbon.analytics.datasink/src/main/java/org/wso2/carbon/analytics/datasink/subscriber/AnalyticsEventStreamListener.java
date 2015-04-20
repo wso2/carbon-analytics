@@ -24,8 +24,7 @@ import org.wso2.carbon.analytics.datasink.internal.util.ServiceHolder;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
-import org.wso2.carbon.event.stream.manager.core.EventStreamListener;
-import org.wso2.carbon.event.stream.manager.core.exception.EventStreamConfigurationException;
+import org.wso2.carbon.event.stream.core.EventStreamListener;
 
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,7 +40,7 @@ public class AnalyticsEventStreamListener implements EventStreamListener {
     public void removedEventStream(int tenantId, String streamName, String version) {
         String cacheKey = generateConsumerCacheKey(streamName, version, tenantId);
         if (consumerCache.get(cacheKey) != null) {
-            ServiceHolder.getEventStreamService().unsubscribe(consumerCache.get(cacheKey), tenantId);
+//            ServiceHolder.getEventStreamService().unsubscribe(consumerCache.get(cacheKey), tenantId);
         }
     }
 
@@ -51,12 +50,12 @@ public class AnalyticsEventStreamListener implements EventStreamListener {
                 new AnalyticsWSO2EventConsumer(DataBridgeCommonsUtils.generateStreamId(streamName, version),
                         tenantId);
         consumerCache.put(generateConsumerCacheKey(streamName, version, tenantId), analyticsWSO2EventConsumer);
-        try {
-            ServiceHolder.getEventStreamService().subscribe(analyticsWSO2EventConsumer, tenantId);
-        } catch (EventStreamConfigurationException e) {
-            log.error("Error while registering subscriber for stream name :" + streamName +
-                    " , version :" + version + " for tenant id " + tenantId + ". " + e.getMessage(), e);
-        }
+//        try {
+////            ServiceHolder.getEventStreamService().subscribe(analyticsWSO2EventConsumer, tenantId);
+//        } catch (EventStreamConfigurationException e) {
+//            log.error("Error while registering subscriber for stream name :" + streamName +
+//                    " , version :" + version + " for tenant id " + tenantId + ". " + e.getMessage(), e);
+//        }
     }
 
     private String generateConsumerCacheKey(String streamName, String version, int tenantId) {

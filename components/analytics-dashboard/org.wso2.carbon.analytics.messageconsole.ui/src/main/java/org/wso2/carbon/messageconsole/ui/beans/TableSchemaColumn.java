@@ -22,11 +22,11 @@ package org.wso2.carbon.messageconsole.ui.beans;
  */
 public class TableSchemaColumn {
 
-    String column;
-    String type;
-    boolean primary;
-    boolean index;
-    boolean scoreParam;
+    private String column;
+    private String type;
+    private boolean primary;
+    private boolean index;
+    private boolean scoreParam;
 
     public TableSchemaColumn() {
     }

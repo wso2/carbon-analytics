@@ -26,9 +26,9 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
 
     <link href="js/jquery-ui.min.css" rel="stylesheet" type="text/css"/>
     <link href="../dialog/css/jqueryui/jqueryui-themeroller.css" rel="stylesheet" type="text/css"/>
@@ -127,7 +127,9 @@
 
             $("#addNewTable").on("click", function () {
                 $("#column-details").find('tr').slice(1, document.getElementById('column-details').rows.length - 1).remove();
-                $("#column-details").find("input[type=text]").val("");
+                $('#column-details tr').each(function () {
+                    $(this).find('select.select').prop("disabled", false)
+                });
                 $('#tableForm')[0].reset();
                 $('#createTableDialog').dialog({
                     title: 'Create a new table...',
@@ -152,42 +154,42 @@
                 $(this).val('Delete');
                 $(this).attr('class', 'del');
                 var appendTxt =
-                        "<tr><td><input type='text' name='column'/></td><td><select><option value='STRING'>STRING</option><option value='INTEGER'>INTEGER</option><option value='LONG'>LONG</option><option value='BOOLEAN'>BOOLEAN</option><option value='FLOAT'>FLOAT</option><option value='DOUBLE'>DOUBLE</option><c:if test="${permissions != null && permissions.isSetIndex()}"><option value='FACET'>FACET</option></c:if></select></td><td><input type='checkbox' name='primary'/></td><c:if test="${permissions != null && permissions.isSetIndex()}"><td><input type='checkbox' name='index'/></td><td><input type='checkbox' name='scoreParam'/></td></c:if><td><input class='add' type='button' value='Add More'/></td></tr>";
+                        "<tr><td><input type='text' name='column'/></td><td><select class='select'><option value='STRING'>STRING</option><option value='INTEGER'>INTEGER</option><option value='LONG'>LONG</option><option value='BOOLEAN'>BOOLEAN</option><option value='FLOAT'>FLOAT</option><option value='DOUBLE'>DOUBLE</option><c:if test="${permissions != null && permissions.isSetIndex()}"><option value='FACET'>FACET</option></c:if></select></td><td><input type='checkbox' name='primary'/></td><c:if test="${permissions != null && permissions.isSetIndex()}"><td><input type='checkbox' name='index'/></td><td><input type='checkbox' name='scoreParam' class='score-param-class'/></td></c:if><td><input class='add' type='button' value='Add More'/></td></tr>";
                 $("#column-details tbody tr:last").after(appendTxt);
             });
 
             $("#deleteTableButton").on("click", function () {
                 $("#table-delete-confirm").dialog({
-                                                      height: 300,
-                                                      width: 500,
-                                                      modal: true,
-                                                      resizable: true,
-                                                      buttons: {
-                                                          "Delete Table": function () {
-                                                              $.post('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeDeleteTable, {tableName: $("#tableSelect").val()},
-                                                                     function (result) {
-                                                                         var label = document.getElementById('deleteTableMsgLabel');
-                                                                         label.style.display = 'block';
-                                                                         label.innerHTML = result;
-                                                                         loadTableSelect();
-                                                                         $('#deleteTableMsg').fadeOut(10000);
-                                                                         $('#DeleteAllButton').hide();
-                                                                         try {
-                                                                             if (tableLoaded == true) {
-                                                                                 $('#AnalyticsTableContainer').jtable('destroy');
-                                                                                 tableLoaded = false;
-                                                                             }
-                                                                         } catch (err) {
-                                                                         }
+                    height: 300,
+                    width: 500,
+                    modal: true,
+                    resizable: true,
+                    buttons: {
+                        "Delete Table": function () {
+                            $.post('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeDeleteTable, {tableName: $("#tableSelect").val()},
+                                   function (result) {
+                                       var label = document.getElementById('deleteTableMsgLabel');
+                                       label.style.display = 'block';
+                                       label.innerHTML = result;
+                                       loadTableSelect();
+                                       $('#deleteTableMsg').fadeOut(10000);
+                                       $('#DeleteAllButton').hide();
+                                       try {
+                                           if (tableLoaded == true) {
+                                               $('#AnalyticsTableContainer').jtable('destroy');
+                                               tableLoaded = false;
+                                           }
+                                       } catch (err) {
+                                       }
 
-                                                                     });
-                                                              $(this).dialog("close");
-                                                          },
-                                                          Cancel: function () {
-                                                              $(this).dialog("close");
-                                                          }
-                                                      }
-                                                  });
+                                   });
+                            $(this).dialog("close");
+                        },
+                        Cancel: function () {
+                            $(this).dialog("close");
+                        }
+                    }
+                });
                 $("#table-delete-confirm").dialog("open");
                 return true;
             });
@@ -217,14 +219,17 @@
                            var arrayLength = resultArray.length;
                            $("#column-details").find('tr').slice(1, document.getElementById('column-details').rows.length - 1).remove();
                            $('#tableForm')[0].reset();
+                           $('#column-details tr').each(function () {
+                               $(this).find('select.select').prop("disabled", false)
+                           });
                            var table = document.getElementById('column-details');
                            $('#createTableDialog').dialog({
-                                 title: 'Edit table',
-                                 height: 300,
-                                 width: 500,
-                                 modal: true,
-                                 resizable: true
-                             });
+                               title: 'Edit table',
+                               height: 300,
+                               width: 500,
+                               modal: true,
+                               resizable: true
+                           });
                            document.getElementById('createTablePopup').style.display = 'block';
                            document.getElementById('msgLabel').style.display = 'none';
 
@@ -257,26 +262,31 @@
                                selectElement.options[5] = new Option('FACET', 'FACET');
                                </c:if>
                                selectElement.value = resultArray[i].type;
+                               selectElement.className = "select";
                                typeCell.appendChild(selectElement);
 
                                var primaryCell = row.insertCell(cellNo++);
                                var primaryCheckElement = document.createElement('input');
                                primaryCheckElement.type = "checkbox";
                                primaryCheckElement.checked = resultArray[i].primary;
-                               primaryCell.appendChild(primaryCheckElement);
 
+                               primaryCell.appendChild(primaryCheckElement);
                                <c:if test="${permissions != null && permissions.isSetIndex()}">
                                var indexCell = row.insertCell(cellNo++);
                                var indexCheckElement = document.createElement('input');
                                indexCheckElement.type = "checkbox";
                                indexCheckElement.checked = resultArray[i].index;
-                               indexCell.appendChild(indexCheckElement);
 
+                               indexCell.appendChild(indexCheckElement);
                                var scoreParamCell = row.insertCell(cellNo++);
                                var scoreParamCheckElement = document.createElement('input');
                                scoreParamCheckElement.type = "checkbox";
+                               scoreParamCheckElement.className = "score-param-class";
                                scoreParamCheckElement.checked = resultArray[i].scoreParam;
                                scoreParamCell.appendChild(scoreParamCheckElement);
+                               if (resultArray[i].scoreParam) {
+                                   selectElement.disabled = true;
+                               }
                                </c:if>
 
                                var buttonCell = row.insertCell(cellNo++);
@@ -300,6 +310,10 @@
                     $("#dataPurgingScheudleTime").prop('disabled', true);
                     $("#dataPurgingDay").prop('disabled', true);
                 }
+            });
+
+            $("#column-details tbody").on("change", ".score-param-class", function () {
+                $(this).parents("tr:eq(0)").find(".select").prop("disabled", this.checked);
             });
         });
 
@@ -416,7 +430,7 @@
                 $('#AnalyticsTableContainer').jtable('reload');
             });
             tableLoaded = true;
-             $("#resultsTable").show();
+            $("#resultsTable").show();
         }
 
         function getArbitraryFields(rowData) {
@@ -491,7 +505,7 @@
                                 },
                                 Type: {
                                     title: 'Type',
-                                    options: ["STRING", "INTEGER", "LONG", "BOOLEAN", "FLOAT", "DOUBLE", "FACET"],
+                                    options: ["STRING", "INTEGER", "LONG", "BOOLEAN", "FLOAT", "DOUBLE"],
                                     list: false
                                 }
                             }
@@ -537,7 +551,7 @@
                                           list: val.display,
                                           key: val.key
                                       };
-                                      if (val.type == 'STRING') {
+                                      if (val.type == 'STRING' || val.type == 'FACET') {
                                           fields[val.name].type = 'textarea';
                                       } else if (val.type == 'INTEGER' || val.type == 'LONG') {
                                           fields[val.name].inputClass = 'validate[custom[integer]]';
@@ -722,7 +736,7 @@
                     <tbody>
                     <tr>
                         <td><input type="text" name="column"/></td>
-                        <td><select>
+                        <td><select class="select">
                             <option value="STRING">STRING</option>
                             <option value="INTEGER">INTEGER</option>
                             <option value="LONG">LONG</option>
@@ -736,7 +750,7 @@
                         <td><input type="checkbox" name="primary"/></td>
                         <c:if test="${permissions != null && permissions.isSetIndex()}">
                             <td><input type="checkbox" name="index"/></td>
-                            <td><input type="checkbox" name="scoreParam"/></td>
+                            <td><input type="checkbox" name="scoreParam" class="score-param-class"/></td>
                         </c:if>
                         <td><input class="add" type="button" value="Add More"/></td>
                     </tr>

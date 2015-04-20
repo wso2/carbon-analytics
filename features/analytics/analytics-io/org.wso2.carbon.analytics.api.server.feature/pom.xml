@@ -10,7 +10,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.analytics.api.server.feature</artifactId>
-    <name>WSO2 Carbon - Analytics API Client Feature</name>
+    <name>WSO2 Carbon - Analytics API Server Feature</name>
     <description>This feature contains the aggregate core bundles required for analytics api client functionality</description>
 
     <dependencies>

@@ -32,6 +32,7 @@ import org.wso2.carbon.analytics.messageconsole.stub.beans.PermissionBean;
 import org.wso2.carbon.analytics.messageconsole.stub.beans.ScheduleTaskInfo;
 import org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceAnalyticsWebServiceExceptionException;
 import org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceStub;
+import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsCategoryPathBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.IndexConfigurationBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.IndexEntryBean;
@@ -39,6 +40,7 @@ import org.wso2.carbon.analytics.webservice.stub.beans.RecordBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.RecordValueEntryBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.SchemaColumnBean;
 import org.wso2.carbon.messageconsole.ui.beans.Column;
+import org.wso2.carbon.messageconsole.ui.beans.FacetBean;
 import org.wso2.carbon.messageconsole.ui.beans.Permissions;
 import org.wso2.carbon.messageconsole.ui.beans.Record;
 import org.wso2.carbon.messageconsole.ui.beans.ResponseArbitraryField;
@@ -103,6 +105,8 @@ public class MessageConsoleConnector {
     private static final GsonBuilder RESPONSE_ARBITRARY_FIELD_COLUMN_BUILDER = new GsonBuilder().
             registerTypeAdapter(ResponseArbitraryFieldColumn.class, new ResponseArbitraryFieldSerializer());
     private static final Type TABLE_SCHEMA_TYPE = new TypeToken<List<TableSchemaColumn>>() {
+    }.getType();
+    private static final Type FACET_BEAN_TYPE = new TypeToken<FacetBean>() {
     }.getType();
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 
@@ -255,6 +259,16 @@ public class MessageConsoleConnector {
                 value = String.valueOf(entityBean.getBooleanValue());
                 break;
             }
+            case "FACET": {
+                AnalyticsCategoryPathBean analyticsCategoryPathBeanValue = entityBean.getAnalyticsCategoryPathBeanValue();
+                FacetBean facetBean = new FacetBean();
+                if (analyticsCategoryPathBeanValue != null) {
+                    facetBean.setWeight(analyticsCategoryPathBeanValue.getWeight());
+                    facetBean.setPath(Arrays.asList(analyticsCategoryPathBeanValue.getPath()));
+                }
+                value = String.valueOf(new Gson().toJson(facetBean));
+                break;
+            }
         }
         column = new Column(entityBean.getFieldName(), value, entityBean.getType());
         return column;
@@ -327,8 +341,7 @@ public class MessageConsoleConnector {
         }
         ResponseRecord responseRecord = new ResponseRecord();
         try {
-            RecordBean[] recordBeans = putRecord(table, columns,
-                                                 values, null);
+            RecordBean[] recordBeans = putRecord(table, columns, values, null);
             responseRecord.setRecord(getRecord(recordBeans[0], true));
             responseRecord.setResult(OK);
         } catch (Exception e) {
@@ -408,6 +421,20 @@ public class MessageConsoleConnector {
                 recordValueEntryBean.setType("DOUBLE");
                 break;
             }
+            case "FACET": {
+                FacetBean facetBean = new Gson().fromJson(value, FACET_BEAN_TYPE);
+                if (facetBean != null) {
+                    AnalyticsCategoryPathBean categoryPathBean = new AnalyticsCategoryPathBean();
+                    categoryPathBean.setWeight(facetBean.getWeight());
+                    if (facetBean.getPath() != null) {
+                        String[] paths = new String[facetBean.getPath().size()];
+                        categoryPathBean.setPath(facetBean.getPath().toArray(paths));
+                    }
+                    recordValueEntryBean.setAnalyticsCategoryPathBeanValue(categoryPathBean);
+                    recordValueEntryBean.setType("FACET");
+                }
+                break;
+            }
             default: {
                 recordValueEntryBean.setStringValue(value);
             }
@@ -434,10 +461,8 @@ public class MessageConsoleConnector {
         return RESPONSE_RECORD_BUILDER.serializeNulls().create().toJson(responseRecord);
     }
 
-    private RecordBean[] putRecord(String table, String[] columns,
-                                   String[] values, String recordId)
-            throws RemoteException,
-                   org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceAnalyticsWebServiceExceptionException {
+    private RecordBean[] putRecord(String table, String[] columns, String[] values, String recordId)
+            throws RemoteException, AnalyticsWebServiceAnalyticsWebServiceExceptionException {
         AnalyticsSchemaBean tableSchema = analyticsWebServiceStub.getTableSchema(table);
         RecordBean recordBean = new RecordBean();
         recordBean.setId(recordId);
@@ -601,6 +626,10 @@ public class MessageConsoleConnector {
         List<IndexEntryBean> entryBeans = new ArrayList<>();
         for (TableSchemaColumn schemaColumn : columnList) {
             if (schemaColumn.getColumn() != null && !schemaColumn.getColumn().isEmpty()) {
+                if (schemaColumn.isScoreParam()) {
+                    scoreParams.add(schemaColumn.getColumn());
+                    schemaColumn.setType("INTEGER");
+                }
                 if (schemaColumn.isPrimary()) {
                     primaryKeys.add(schemaColumn.getColumn());
                 }
@@ -608,14 +637,11 @@ public class MessageConsoleConnector {
                 schemaColumnBean.setColumnName(schemaColumn.getColumn());
                 schemaColumnBean.setColumnType(schemaColumn.getType());
                 schemaColumnBeans.add(schemaColumnBean);
-                if (schemaColumn.isIndex() || "FACET".equals(schemaColumn.getType())) {
+                if (schemaColumn.isIndex() || "FACET".equals(schemaColumn.getType()) || schemaColumn.isScoreParam()) {
                     IndexEntryBean indexEntryBean = new IndexEntryBean();
                     indexEntryBean.setFieldName(schemaColumn.getColumn());
                     indexEntryBean.setIndexType(schemaColumn.getType());
                     entryBeans.add(indexEntryBean);
-                }
-                if (schemaColumn.isScoreParam()) {
-                    scoreParams.add(schemaColumn.getColumn());
                 }
             }
         }
@@ -630,9 +656,6 @@ public class MessageConsoleConnector {
             analyticsSchemaBean.setPrimaryKeys(primaryKeys.toArray(primaryKeyArray));
             analyticsWebServiceStub.setTableSchema(table, analyticsSchemaBean);
             PermissionBean permissionBean = messageConsoleStub.getAvailablePermissions();
-            if (!isCreating && permissionBean.getDeleteIndex()) {
-                analyticsWebServiceStub.clearIndices(table);
-            }
             if (permissionBean.getSetIndex()) {
                 IndexConfigurationBean configurationBean = new IndexConfigurationBean();
                 IndexEntryBean[] indexEntryBeans = new IndexEntryBean[entryBeans.size()];
@@ -706,7 +729,6 @@ public class MessageConsoleConnector {
                     }
                 }
             }
-
         } catch (Exception e) {
             log.error("Unable to get table information for table:" + table, e);
         }

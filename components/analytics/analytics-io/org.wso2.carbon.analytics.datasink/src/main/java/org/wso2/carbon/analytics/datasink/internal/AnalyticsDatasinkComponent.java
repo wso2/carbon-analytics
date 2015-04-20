@@ -25,7 +25,8 @@ import org.wso2.carbon.analytics.datasink.AnalyticsDSConnector;
 import org.wso2.carbon.analytics.datasink.internal.util.ServiceHolder;
 import org.wso2.carbon.analytics.datasink.subscriber.AnalyticsEventStreamListener;
 import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
-import org.wso2.carbon.event.stream.manager.core.EventStreamService;
+import org.wso2.carbon.event.stream.core.EventStreamListener;
+import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
@@ -34,7 +35,7 @@ import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
  * @scr.reference name="registry.streamdefn.comp"
  * interface="org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore"
  * cardinality="1..1" policy="dynamic" bind="setStreamDefinitionStoreService" unbind="unsetStreamDefinitionStoreService"
- * @scr.reference name="event.stream.service" interface="org.wso2.carbon.event.stream.manager.core.EventStreamService"
+ * @scr.reference name="event.stream.service" interface="org.wso2.carbon.event.stream.core.EventStreamService"
  * cardinality="1..1" policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
  * @scr.reference name="analytics.component" interface="org.wso2.carbon.analytics.dataservice.AnalyticsDataService"
  * cardinality="1..1" policy="dynamic" bind="setAnalyticsDataservice" unbind="unsetAnalyticsDataservice"
@@ -50,7 +51,8 @@ public class AnalyticsDatasinkComponent {
             }
             componentContext.getBundleContext().registerService(Axis2ConfigurationContextObserver.class.getName(),
                     new AnalyticsDatasinkConfigurationContextObserver(), null);
-
+            componentContext.getBundleContext().registerService(EventStreamListener.class.getName(),
+                    ServiceHolder.getAnalyticsEventStreamListener(), null);
             ServiceHolder.setAnalyticsDSConnector(new AnalyticsDSConnector());
             ServiceHolder.getAnalyticsEventStreamListener().loadEventStreams(MultitenantConstants.SUPER_TENANT_ID);
         }catch (Throwable e){
@@ -74,7 +76,7 @@ public class AnalyticsDatasinkComponent {
 
     protected void setEventStreamService(EventStreamService eventStreamService) {
         ServiceHolder.setAnalyticsEventStreamListener(new AnalyticsEventStreamListener());
-        eventStreamService.registerEventStreamListener(ServiceHolder.getAnalyticsEventStreamListener());
+//        eventStreamService.registerEventStreamListener();
         ServiceHolder.setEventStreamService(eventStreamService);
     }
 
