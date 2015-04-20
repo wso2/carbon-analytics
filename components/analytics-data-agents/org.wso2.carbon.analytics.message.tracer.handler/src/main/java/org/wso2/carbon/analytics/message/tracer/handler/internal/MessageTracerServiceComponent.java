@@ -27,6 +27,7 @@ import org.wso2.carbon.analytics.message.tracer.handler.conf.RegistryPersistence
 import org.wso2.carbon.analytics.message.tracer.handler.util.MessageTracerConstants;
 import org.wso2.carbon.analytics.message.tracer.handler.util.ServiceHolder;
 import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
 import org.wso2.carbon.utils.ConfigurationContextService;
@@ -41,6 +42,10 @@ import org.wso2.carbon.utils.ConfigurationContextService;
  * interface="org.wso2.carbon.registry.core.service.RegistryService"
  * cardinality="1..1" policy="dynamic" bind="setRegistryService"
  * unbind="unsetRegistryService"
+ * @scr.reference name="org.wso2.carbon.event.stream.core.EventStreamService"
+ * interface="org.wso2.carbon.event.stream.core.EventStreamService"
+ * cardinality="1..1" policy="dynamic" bind="setEventStreamService"
+ * unbind="unsetEventStreamService"
  */
 
 public class MessageTracerServiceComponent {
@@ -64,7 +69,7 @@ public class MessageTracerServiceComponent {
                     MessageTracerConstants.ANALYTICS_SERVICE_MESSAGE_TRACER_MODULE_NAME);
             BundleContext bundleContext = context.getBundleContext();
             bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(),
-                                          new MessageTracerAxis2ConfigurationContextObserver(), null);
+                    new MessageTracerAxis2ConfigurationContextObserver(), null);
 
             new RegistryPersistenceManager().load(CarbonContext.getThreadLocalCarbonContext().getTenantId());
 
@@ -83,15 +88,13 @@ public class MessageTracerServiceComponent {
         }
     }
 
-    protected void setConfigurationContextService(
-            ConfigurationContextService configurationContextService) {
+    protected void setConfigurationContextService(ConfigurationContextService configurationContextService) {
         configurationContext = configurationContextService.getServerConfigContext();
         ServiceHolder.setConfigurationContextService(configurationContextService);
 
     }
 
-    protected void unsetConfigurationContextService(
-            ConfigurationContextService configurationContextService) {
+    protected void unsetConfigurationContextService(ConfigurationContextService configurationContextService) {
         configurationContext = null;
         ServiceHolder.setConfigurationContextService(null);
     }
@@ -102,6 +105,14 @@ public class MessageTracerServiceComponent {
 
     protected void unsetRegistryService(RegistryService registryService) {
         ServiceHolder.setRegistryService(null);
+    }
+
+    protected void setEventStreamService(EventStreamService eventStreamService) {
+        ServiceHolder.setEventStreamService(eventStreamService);
+    }
+
+    protected void unsetEventStreamService(EventStreamService eventStreamService) {
+        ServiceHolder.setEventStreamService(null);
     }
 
     public static MessageTracerConfiguration getMessageTracerConfiguration() {

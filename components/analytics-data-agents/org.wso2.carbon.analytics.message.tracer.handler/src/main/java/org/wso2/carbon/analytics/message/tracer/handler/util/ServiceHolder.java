@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.analytics.message.tracer.handler.util;
 
+import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
@@ -26,12 +27,17 @@ public class ServiceHolder {
 
     private static RegistryService registryService;
 
+    private static EventStreamService eventStreamService;
+
+    private ServiceHolder() {
+        /* preventing initialization */
+    }
+
     public static ConfigurationContextService getConfigurationContextService() {
         return configurationContextService;
     }
 
-    public static void setConfigurationContextService(
-            ConfigurationContextService configurationContextService) {
+    public static void setConfigurationContextService(ConfigurationContextService configurationContextService) {
         ServiceHolder.configurationContextService = configurationContextService;
     }
 
@@ -41,5 +47,13 @@ public class ServiceHolder {
 
     public static void setRegistryService(RegistryService registryService) {
         ServiceHolder.registryService = registryService;
+    }
+
+    public static EventStreamService getEventStreamService() {
+        return eventStreamService;
+    }
+
+    public static void setEventStreamService(EventStreamService eventStreamService) {
+        ServiceHolder.eventStreamService = eventStreamService;
     }
 }

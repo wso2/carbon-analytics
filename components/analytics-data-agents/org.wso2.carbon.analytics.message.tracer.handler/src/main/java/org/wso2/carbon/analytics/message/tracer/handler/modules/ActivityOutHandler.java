@@ -206,7 +206,7 @@ public class ActivityOutHandler extends AbstractHandler {
                     }
 
                     if (eventingConfigData.isPublishToBAMEnable()) {
-                        publisher.publish(tenantID, tracingInfo);
+                        publisher.publish(tracingInfo);
                     }
 
                     if (eventingConfigData.isLoggingEnable()) {
