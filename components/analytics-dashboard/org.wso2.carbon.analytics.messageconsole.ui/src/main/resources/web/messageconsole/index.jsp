@@ -197,6 +197,7 @@
             $("#purgeRecordButton").on("click", function () {
                 var label = document.getElementById('dataPurgingMsgLabel');
                 label.style.display = 'none';
+                $("#dataPurgingScheudleTime").datepicker("destroy");
                 $.post('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeGetPurgingTask,
                         {tableName: $("#tableSelect").val()},
                        function (result) {
@@ -207,7 +208,6 @@
                            $('#dataPurgingDay').val(resultObj.retentionPeriod);
                            $('#dataPurgingDay').prop('disabled', false);
                            $('#dataPurgingCheckBox').prop("checked", true);
-                           $('#dataPurgingScheudleTime').datepicker("destroy");
                        });
                 return true;
             });

@@ -706,26 +706,29 @@ public class MessageConsoleConnector {
                     schemaColumnMap.put(resultColumn.getColumnName(), schemaColumn);
                 }
             }
-            IndexConfigurationBean indexConfigurationBean = analyticsWebServiceStub.getIndices(table);
-            if (indexConfigurationBean != null && indexConfigurationBean.getIndices() != null) {
-                for (IndexEntryBean indexEntryBean : indexConfigurationBean.getIndices()) {
-                    if (schemaColumnMap.containsKey(indexEntryBean.getFieldName())) {
-                        schemaColumnMap.get(indexEntryBean.getFieldName()).setIndex(true);
-                        schemaColumnMap.get(indexEntryBean.getFieldName()).setType(indexEntryBean.getIndexType());
-                    } else {
-                        TableSchemaColumn schemaColumn = new TableSchemaColumn();
-                        schemaColumn.setColumn(indexEntryBean.getFieldName());
-                        schemaColumn.setType(indexEntryBean.getIndexType());
-                        schemaColumn.setPrimary(false);
-                        schemaColumn.setIndex(true);
-                        schemaColumnMap.put(indexEntryBean.getFieldName(), schemaColumn);
+            PermissionBean permissionBean = messageConsoleStub.getAvailablePermissions();
+            if (permissionBean.getGetIndex()) {
+                IndexConfigurationBean indexConfigurationBean = analyticsWebServiceStub.getIndices(table);
+                if (indexConfigurationBean != null && indexConfigurationBean.getIndices() != null) {
+                    for (IndexEntryBean indexEntryBean : indexConfigurationBean.getIndices()) {
+                        if (schemaColumnMap.containsKey(indexEntryBean.getFieldName())) {
+                            schemaColumnMap.get(indexEntryBean.getFieldName()).setIndex(true);
+                            schemaColumnMap.get(indexEntryBean.getFieldName()).setType(indexEntryBean.getIndexType());
+                        } else {
+                            TableSchemaColumn schemaColumn = new TableSchemaColumn();
+                            schemaColumn.setColumn(indexEntryBean.getFieldName());
+                            schemaColumn.setType(indexEntryBean.getIndexType());
+                            schemaColumn.setPrimary(false);
+                            schemaColumn.setIndex(true);
+                            schemaColumnMap.put(indexEntryBean.getFieldName(), schemaColumn);
+                        }
                     }
                 }
-            }
-            if (indexConfigurationBean != null && indexConfigurationBean.getScoreParams() != null) {
-                for (String scoreParam : indexConfigurationBean.getScoreParams()) {
-                    if (schemaColumnMap.containsKey(scoreParam)) {
-                        schemaColumnMap.get(scoreParam).setScoreParam(true);
+                if (indexConfigurationBean != null && indexConfigurationBean.getScoreParams() != null) {
+                    for (String scoreParam : indexConfigurationBean.getScoreParams()) {
+                        if (schemaColumnMap.containsKey(scoreParam)) {
+                            schemaColumnMap.get(scoreParam).setScoreParam(true);
+                        }
                     }
                 }
             }
