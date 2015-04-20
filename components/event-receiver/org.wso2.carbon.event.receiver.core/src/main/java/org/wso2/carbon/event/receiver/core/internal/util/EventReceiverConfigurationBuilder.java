@@ -76,11 +76,13 @@ public class EventReceiverConfigurationBuilder {
         Map<String, String> inputPropertyMap = inputEventAdapterConfiguration.getProperties();
         if (inputPropertyMap != null) {
             for (Map.Entry<String, String> propertyEntry : inputPropertyMap.entrySet()) {
-                OMElement propertyElement = factory.createOMElement(new QName(EventReceiverConstants.ER_ELEMENT_PROPERTY));
-                propertyElement.declareDefaultNamespace(EventReceiverConstants.ER_CONF_NS);
-                propertyElement.addAttribute(EventReceiverConstants.ER_ATTR_NAME, propertyEntry.getKey(), null);
-                propertyElement.setText(propertyEntry.getValue());
-                fromOMElement.addChild(propertyElement);
+                if(propertyEntry.getValue() != null){
+                    OMElement propertyElement = factory.createOMElement(new QName(EventReceiverConstants.ER_ELEMENT_PROPERTY));
+                    propertyElement.declareDefaultNamespace(EventReceiverConstants.ER_CONF_NS);
+                    propertyElement.addAttribute(EventReceiverConstants.ER_ATTR_NAME, propertyEntry.getKey(), null);
+                    propertyElement.setText(propertyEntry.getValue());
+                    fromOMElement.addChild(propertyElement);
+                }
             }
         }
         eventReceiverConfigElement.addChild(fromOMElement);
