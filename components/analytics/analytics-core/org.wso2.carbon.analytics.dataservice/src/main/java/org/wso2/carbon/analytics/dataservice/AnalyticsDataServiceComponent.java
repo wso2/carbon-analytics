@@ -73,19 +73,9 @@ public class AnalyticsDataServiceComponent {
             SecureAnalyticsDataServiceImpl secureAnalyticsDataService = new SecureAnalyticsDataServiceImpl(analyticsDataService);
             bundleContext.registerService(AnalyticsDataService.class, analyticsDataService, null);
             bundleContext.registerService(SecureAnalyticsDataService.class, secureAnalyticsDataService, null);
-            bundleContext.registerService(ServerStartupObserver.class, AnalyticsDataServiceServerStartupObserver
-                    .getInstance(), null);
             AnalyticsIndexCAppDeployer indexCAppDeployer = new AnalyticsIndexCAppDeployer();
             bundleContext.registerService(
                     AppDeploymentHandler.class.getName(), indexCAppDeployer, null);
-            // read required-features.xml
-            URL reqFeaturesResource = bundleContext.getBundle()
-                    .getResource(AppDeployerConstants.REQ_FEATURES_XML);
-            if (reqFeaturesResource != null) {
-                InputStream xmlStream = reqFeaturesResource.openStream();
-                AnalyticsServiceHolder.setRequiredFeatures(AppDeployerUtils
-                        .readRequiredFeaturs(new StAXOMBuilder(xmlStream).getDocumentElement()));
-            }
             if (log.isDebugEnabled()) {
                 log.debug("Finished AnalyticsDataServiceComponent#activate");
             }

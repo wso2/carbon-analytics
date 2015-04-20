@@ -40,8 +40,6 @@ public class AnalyticsServiceHolder {
 
     private static RealmService realmService;
 
-    private static Map<String, List<Feature>> requiredFeatures;
-
     public static void setHazelcastInstance(HazelcastInstance hazelcastInstance) {
         AnalyticsServiceHolder.hazelcastInstance = hazelcastInstance;
     }
@@ -72,13 +70,5 @@ public class AnalyticsServiceHolder {
 
     public static RealmService getRealmService() {
         return AnalyticsServiceHolder.realmService;
-    }
-
-    public static Map<String, List<Feature>> getRequiredFeatures() {
-        return requiredFeatures;
-    }
-
-    public static void setRequiredFeatures(Map<String, List<Feature>> requiredFeatures) {
-        AnalyticsServiceHolder.requiredFeatures = requiredFeatures;
     }
 }

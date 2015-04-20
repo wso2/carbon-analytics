@@ -15,17 +15,17 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.analytics.dataservice.deployment;
+package org.wso2.carbon.analytics.spark.core;
 
 import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
-import org.wso2.carbon.analytics.dataservice.Constants;
-import org.wso2.carbon.analytics.dataservice.commons.IndexType;
-import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
-import org.wso2.carbon.analytics.dataservice.config.AnalyticsIndexConfiguration;
+import org.wso2.carbon.analytics.spark.core.exception.AnalyticsPersistenceException;
+import org.wso2.carbon.analytics.spark.core.exception.SparkScriptDeploymentException;
+import org.wso2.carbon.analytics.spark.core.internal.AnalyticsPersistenceManager;
+import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
+import org.wso2.carbon.analytics.spark.core.util.AnalyticsScript;
 import org.wso2.carbon.application.deployer.AppDeployerConstants;
 import org.wso2.carbon.application.deployer.CarbonApplication;
 import org.wso2.carbon.application.deployer.config.Artifact;
@@ -37,22 +37,21 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
- * This class represents the implementation of Carbon application deployer for analytics index.
+ * This class represents the implementation of Carbon application deployer for spark script.
  */
-public class AnalyticsIndexCAppDeployer implements AppDeploymentHandler {
-    private static final Log log = LogFactory.getLog(AnalyticsIndexCAppDeployer.class);
-    private static final String TYPE = "analytics/index";
+public class SparkScriptCAppDeployer implements AppDeploymentHandler {
+    private static final Log log = LogFactory.getLog(SparkScriptCAppDeployer.class);
+    private static final String TYPE = "analytics/spark";
 
     @Override
     public void deployArtifacts(CarbonApplication carbonApplication, AxisConfiguration axisConfiguration)
             throws DeploymentException {
         List<Artifact.Dependency> artifacts = carbonApplication.getAppConfig().getApplicationArtifact()
                 .getDependencies();
+        // loop through all artifacts
         for (Artifact.Dependency dep : artifacts) {
             Artifact artifact = dep.getArtifact();
             if (artifact == null) {
@@ -71,39 +70,44 @@ public class AnalyticsIndexCAppDeployer implements AppDeploymentHandler {
                         throw e;
                     }
                 } else if (files.size() != 0) {
-                    log.error("Analytics Indices must have a single XML file to " +
-                            "be deployed. But " + files.size() + " files found.");
+                    log.warn("Spark script must have a single XML file to be deployed. But "
+                            + files.size() + " files found");
                 }
             }
         }
     }
 
-    private void deploy(String deploymentFilePath) throws AnalyticsIndexDeploymentException {
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        File deploymentFile  = new File(deploymentFilePath);
+    private void deploy(String scriptFilePath) throws SparkScriptDeploymentException {
+        File deploymentFileData = new File(scriptFilePath);
         try {
-            log.info("Deploying analytics indices from file : " + deploymentFile.getName() + " for tenant id :" + tenantId);
-            JAXBContext context = JAXBContext.newInstance(AnalyticsIndexConfiguration.class);
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            log.info("Deploying spark script: " + deploymentFileData.getName() + " for tenant : " + tenantId);
+            JAXBContext context = JAXBContext.newInstance(AnalyticsScript.class);
             Unmarshaller un = context.createUnmarshaller();
-            AnalyticsIndexConfiguration configuration =
-                    (AnalyticsIndexConfiguration) un.unmarshal(deploymentFile);
-            AnalyticsServiceHolder.getAnalyticsDataService().setIndices(tenantId,
-                    getTableNameFromAnalyticsIndexFileName(deploymentFile.getName()),
-                    configuration.getIndexColumnsMap(), configuration.getScoreParams());
+            AnalyticsScript script = (AnalyticsScript) un.unmarshal(deploymentFileData);
+            script.setName(getScriptName(deploymentFileData.getName()));
+            AnalyticsPersistenceManager.getInstance().putScript(tenantId, script.getName(), script.getScriptContent(),
+                    script.getCronExpression());
         } catch (JAXBException e) {
-            String errorMsg = "Error while reading from the file : " + deploymentFile.getAbsolutePath();
+            String errorMsg = "Error while reading the analytics script : "
+                    + deploymentFileData.getAbsolutePath();
             log.error(errorMsg, e);
-            throw new AnalyticsIndexDeploymentException(errorMsg, e);
-        } catch (AnalyticsIndexException e) {
-            String errorMsg = "Error setting the indices from file : " + deploymentFile.getAbsolutePath();
-            log.error(errorMsg, e);
-            throw new AnalyticsIndexDeploymentException(errorMsg, e);
+            throw new SparkScriptDeploymentException(errorMsg, e);
+        } catch (AnalyticsPersistenceException e) {
+            String errorMsg = "Error while storing the script : "
+                    + deploymentFileData.getAbsolutePath();
+            log.error(errorMsg);
+            throw new SparkScriptDeploymentException(errorMsg, e);
         }
     }
 
-    private String getTableNameFromAnalyticsIndexFileName(String filePath) {
+    private String getScriptName(String filePath) throws AnalyticsPersistenceException {
         String fileName = new File(filePath).getName();
-        return fileName.substring(0, fileName.length() - Constants.ANALYTICS_INDICES_FILE_EXTENSION.length() - 1);
+        if (fileName.endsWith(AnalyticsConstants.SCRIPT_EXTENSION)) {
+            return fileName.substring(0, fileName.length() - (AnalyticsConstants.SCRIPT_EXTENSION.length() +
+                    AnalyticsConstants.SCRIPT_EXTENSION_SEPARATOR.length()));
+        }
+        return fileName;
     }
 
     @Override
@@ -111,6 +115,7 @@ public class AnalyticsIndexCAppDeployer implements AppDeploymentHandler {
             throws DeploymentException {
         List<Artifact.Dependency> artifacts = carbonApplication.getAppConfig().getApplicationArtifact()
                 .getDependencies();
+        // loop through all artifacts
         for (Artifact.Dependency dep : artifacts) {
             Artifact artifact = dep.getArtifact();
             if (artifact == null) {
@@ -139,18 +144,15 @@ public class AnalyticsIndexCAppDeployer implements AppDeploymentHandler {
         }
     }
 
-    private void undeploy(String fileName) throws AnalyticsIndexDeploymentException {
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        log.info("Undeploying the analytics indices from file : "+ fileName +" for tenant id :" + tenantId);
-        String tableName = getTableNameFromAnalyticsIndexFileName(fileName);
+    private void undeploy(String scriptFileName) throws SparkScriptDeploymentException {
         try {
-            AnalyticsServiceHolder.getAnalyticsDataService().setIndices(tenantId,
-                    tableName, new HashMap<String, IndexType>(), new ArrayList<String>());
-        } catch (AnalyticsIndexException e) {
-            String errorMsg = "Error undeploying the analytics index file : " + fileName
-                    + " for tenant id : " + tenantId;
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            log.info("Undeploying spark script : " + scriptFileName + " for tenant id : " + tenantId);
+            AnalyticsPersistenceManager.getInstance().deleteScript(tenantId, getScriptName(scriptFileName));
+        } catch (AnalyticsPersistenceException e) {
+            String errorMsg = "Error while deleting the script : " + scriptFileName;
             log.error(errorMsg, e);
-            throw new AnalyticsIndexDeploymentException(errorMsg, e);
+            throw new SparkScriptDeploymentException(errorMsg, e);
         }
     }
 }
