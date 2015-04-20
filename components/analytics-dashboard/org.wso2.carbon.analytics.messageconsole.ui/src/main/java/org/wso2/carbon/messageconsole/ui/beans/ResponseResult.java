@@ -26,11 +26,8 @@ import java.util.List;
 public class ResponseResult {
 
     private String result;
-
     private String message;
-
     private long totalRecordCount;
-
     private List<Record> records = new ArrayList<>();
 
     public ResponseResult() {

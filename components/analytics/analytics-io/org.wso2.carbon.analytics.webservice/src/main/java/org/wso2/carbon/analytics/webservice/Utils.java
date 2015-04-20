@@ -286,6 +286,8 @@ public class Utils {
                 return ColumnType.BOOLEAN;
             case RecordValueEntryBean.BINARY:
                 return ColumnType.BINARY;
+            case RecordValueEntryBean.FACET:
+                return ColumnType.FACET;
             default:
                 return ColumnType.STRING;
         }
@@ -313,6 +315,8 @@ public class Utils {
                 return RecordValueEntryBean.BOOLEAN;
             case BINARY:
                 return RecordValueEntryBean.BINARY;
+            case FACET:
+                return RecordValueEntryBean.FACET;
             default:
                 return RecordValueEntryBean.STRING;
         }
@@ -406,7 +410,12 @@ public class Utils {
                 break;
             }
             case RecordValueEntryBean.FACET: {
-                resultObj = recordValueEntryBean.getAnalyticsCategoryPathBeanValue();
+                AnalyticsCategoryPath analyticsCategoryPath = new AnalyticsCategoryPath();
+                if (recordValueEntryBean.getAnalyticsCategoryPathBeanValue() != null) {
+                    analyticsCategoryPath.setWeight(recordValueEntryBean.getAnalyticsCategoryPathBeanValue().getWeight());
+                    analyticsCategoryPath.setPath(recordValueEntryBean.getAnalyticsCategoryPathBeanValue().getPath());
+                }
+                resultObj = analyticsCategoryPath;
                 break;
             }
             default: {
