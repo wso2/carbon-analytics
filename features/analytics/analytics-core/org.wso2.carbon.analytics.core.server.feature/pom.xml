@@ -17,7 +17,8 @@
 ~ under the License.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
@@ -63,8 +64,8 @@
             <artifactId>kryo</artifactId>
         </dependency>
         <dependency>
-            <groupId>antlr.wso2</groupId>
-            <artifactId>antlr</artifactId>
+            <groupId>org.antlr.wso2</groupId>
+            <artifactId>antlr-runtime</artifactId>
         </dependency>
     </dependencies>
 
@@ -98,11 +99,14 @@
                                 <bundleDef>org.wso2.orbit.org.apache.lucene:lucene</bundleDef>
                                 <bundleDef>org.wso2.orbit.asm4:asm4-all</bundleDef>
                                 <bundleDef>com.esotericsoftware.kryo:kryo</bundleDef>
-                                <bundleDef>antlr.wso2:antlr</bundleDef>
-                                <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasource.core</bundleDef>
+                                <bundleDef>org.antlr.wso2:antlr-runtime</bundleDef>
+                                <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasource.core
+                                </bundleDef>
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.dataservice</bundleDef>
-                                <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.dataservice.commons</bundleDef>
-                                <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasource.commons</bundleDef>
+                                <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.dataservice.commons
+                                </bundleDef>
+                                <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasource.commons
+                                </bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}</importFeatureDef>

@@ -584,8 +584,8 @@
             </dependency>
 
             <dependency>
-                <groupId>antlr.wso2</groupId>
-                <artifactId>antlr</artifactId>
+                <groupId>org.antlr.wso2</groupId>
+                <artifactId>antlr-runtime</artifactId>
                 <version>${antlr.version}</version>
             </dependency>
 
