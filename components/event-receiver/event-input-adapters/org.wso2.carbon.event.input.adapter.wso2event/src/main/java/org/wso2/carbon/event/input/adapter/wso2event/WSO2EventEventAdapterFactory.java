@@ -54,8 +54,8 @@ public class WSO2EventEventAdapterFactory extends InputEventAdapterFactory {
                 resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_STREAM_VERSION));
         streamVersionProperty.setRequired(true);
 
-        propertyList.add(streamDefinitionProperty);
         propertyList.add(streamVersionProperty);
+        propertyList.add(streamDefinitionProperty);
 
         return propertyList;
     }
