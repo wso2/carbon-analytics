@@ -51,15 +51,8 @@ public class AnalyticsDrillDownRequest implements Serializable {
     private int recordCount;
     //Records start index
     private  int recordStart;
-    //make this true if the ids of the records are needed
-    private boolean withIds;
 
     public AnalyticsDrillDownRequest() {
-        this(false);
-    }
-
-    public  AnalyticsDrillDownRequest(boolean withIds) {
-        this.withIds = withIds;
     }
 
     public AnalyticsDrillDownRequest(String tableName,
@@ -67,7 +60,7 @@ public class AnalyticsDrillDownRequest implements Serializable {
                                      Map<String, List<AnalyticsDrillDownRange>> ranges,
                                      String language, String languageQuery,
                                      String scoreFunction, int categoryCount, int recordCount,
-                                     int recordStart, boolean withIds) {
+                                     int recordStart) {
         this.tableName = tableName;
         this.categoryPaths = categoryPaths;
         this.ranges = ranges;
@@ -77,7 +70,6 @@ public class AnalyticsDrillDownRequest implements Serializable {
         this.categoryCount = categoryCount;
         this.recordCount = recordCount;
         this.recordStart = recordStart;
-        this.withIds = withIds;
     }
 
     /**
@@ -243,23 +235,6 @@ public class AnalyticsDrillDownRequest implements Serializable {
      */
     public void setRecordCount(int recordCount) {
         this.recordCount = recordCount;
-    }
-
-    /**
-     * Check if the drill down request to include the resulting IDs. Otherwise the result will not have
-     * Record IDS and will have only the facet details.
-     * @return Boolean if
-     */
-    public boolean isWithIds() {
-        return withIds;
-    }
-
-    /**
-     * Make sure result will contain the record ids of the matching records.
-     * @param withIds this should be true if the user wants the record ids in the resulting drilldown object.
-     */
-    public void setWithIds(boolean withIds) {
-        this.withIds = withIds;
     }
 
     public int getRecordStartIndex() {

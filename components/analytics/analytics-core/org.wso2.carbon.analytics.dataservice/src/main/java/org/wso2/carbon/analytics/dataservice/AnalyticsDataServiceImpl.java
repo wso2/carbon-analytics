@@ -39,6 +39,9 @@ import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -51,10 +54,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 
 /**
  * The implementation of {@link AnalyticsDataService}.
@@ -338,7 +337,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public Map<String, List<DrillDownResultEntry>> drillDown(int tenantId, AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
-        return this.getIndexer().drillDown(tenantId, drillDownRequest);
+    //    return this.getIndexer().drillDown(tenantId, drillDownRequest);
+        return null;
     }
 
     @Override

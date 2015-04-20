@@ -58,7 +58,6 @@
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Carbon-Component>UIBundle</Carbon-Component>
                         <Import-Package>
-                            org.wso2.carbon.authenticator.stub.*;version="${carbon.kernel.version}",
                             org.wso2.carbon.analytics.webservice.stub.*;version="${carbon.analytics.imp.pkg.version}"
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>

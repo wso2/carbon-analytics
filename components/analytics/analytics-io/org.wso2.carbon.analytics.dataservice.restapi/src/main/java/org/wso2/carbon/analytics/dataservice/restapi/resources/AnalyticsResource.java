@@ -598,7 +598,6 @@ public class AnalyticsResource extends AbstractResource {
         anss.setTableName("test");
         anss.setCategoryCount(categories);
         anss.setRecordCount(records);
-        anss.setWithIds(true);
 
         return Response.ok(ads.drillDown(-1234,anss)).build();
     }
@@ -627,7 +626,6 @@ public class AnalyticsResource extends AbstractResource {
         anss.setTableName("test");
         anss.setCategoryCount(1);
         anss.setRecordCount(1);
-        anss.setWithIds(true);
         Map<String, List<DrillDownResultEntry>>g = ads.drillDown(-1234, anss);
         return Response.ok(Utils.createRangeDrillDownResultBean(g)).build();
     }
@@ -650,7 +648,6 @@ public class AnalyticsResource extends AbstractResource {
         anss.setTableName("test");
         anss.setCategoryCount(1);
         anss.setRecordCount(1);
-        anss.setWithIds(true);
 
 
         DrillDownRequestBean dd = new DrillDownRequestBean();

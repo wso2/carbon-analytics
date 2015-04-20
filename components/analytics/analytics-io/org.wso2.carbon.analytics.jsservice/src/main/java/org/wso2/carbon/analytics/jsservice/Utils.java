@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.analytics.jsservice;
 
+import org.apache.axiom.om.util.Base64;
 import org.wso2.carbon.analytics.jsservice.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.jsservice.beans.ColumnTypeBean;
 import org.wso2.carbon.analytics.jsservice.beans.IndexConfigurationBean;
@@ -26,7 +27,14 @@ import org.wso2.carbon.analytics.webservice.stub.beans.IndexEntryBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.RecordBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.RecordValueEntryBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.SchemaColumnBean;
+import org.wso2.carbon.base.MultitenantConstants;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.user.api.UserRealm;
+import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.user.core.service.RealmService;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,6 +47,7 @@ import java.util.Map;
  */
 public class Utils {
 
+    private static final String DEFAUL_CHARSETT = "UTF-8";
     public static final int CATEGORYPATH_FIELD_COUNT = 2;
     public static final float DEFAUL_CATEGORYPATH_WEIGHT = 1.0f;
 
@@ -305,5 +314,52 @@ public class Utils {
             default:
                 return ColumnTypeBean.STRING;
         }
+    }
+
+    public static String[] authenticate(String authHeader) throws UnauthenticatedUserException{
+
+        String credentials[];
+        if (authHeader != null && authHeader.startsWith(Constants.BASIC_AUTH_HEADER)) {
+            // Authorization: Basic base64credentials
+            String base64Credentials = authHeader.substring(Constants.BASIC_AUTH_HEADER.length()).trim();
+            String tempCredentials = new String(Base64.decode(base64Credentials),
+                                                Charset.forName(DEFAUL_CHARSETT));
+            // credentials = username:password
+            final String[] values = tempCredentials.split(":", 2);
+            String username = values[0];
+            String password = values[1];
+            credentials = values;
+            if ("".equals(username) || username == null || "".equals(password) || password == null) {
+                throw new UnauthenticatedUserException("Username and password cannot be empty");
+            }
+            String tenantDomain = MultitenantUtils.getTenantDomain(username);
+            String tenantLessUserName = MultitenantUtils.getTenantAwareUsername(username);
+            try {
+                // get super tenant context and get realm service which is an osgi service
+                RealmService realmService = (RealmService) PrivilegedCarbonContext
+                        .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+                if (realmService != null) {
+                    int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+                    if (tenantId == MultitenantConstants.INVALID_TENANT_ID) {
+                        throw new UnauthenticatedUserException("Authentication failed - Invalid domain");
+                    }
+                    // get tenant's user realm
+                    UserRealm userRealm = realmService.getTenantUserRealm(tenantId);
+                    boolean isAuthenticated = userRealm.getUserStoreManager()
+                            .authenticate(tenantLessUserName, password);
+                    if (!isAuthenticated) {
+                        throw  new UnauthenticatedUserException("User is not authenticated!");
+                    } else {
+                        return credentials;
+                    }
+                }
+            } catch (UserStoreException e) {
+                throw new UnauthenticatedUserException("Error while accessing the user realm of user :"
+                                             + username, e);
+            }
+        } else {
+            throw new UnauthenticatedUserException("Invalid authentication header");
+        }
+        return credentials;
     }
 }

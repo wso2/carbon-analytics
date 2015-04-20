@@ -48,6 +48,25 @@ public class AnalyticsWebServiceConnector {
     private AnalyticsWebServiceStub analyticsWebServiceStub;
     private Gson gson;
 
+    public static final String TYPE_CLEAR_INDICES = "clearIndices";
+    public static final String TYPE_CREATE_TABLE = "createTable";
+    public static final String TYPE_DELETE_BY_ID = "deleteByIds";
+    public static final String TYPE_DELETE_BY_RANGE = "deleteByRange";
+    public static final String TYPE_DELETE_TABLE = "deleteTable";
+    public static final String TYPE_GET_INDICES = "getIndices";
+    public static final String TYPE_GET_RECORD_COUNT = "getCount";
+    public static final String TYPE_GET_BY_ID = "getByIds";
+    public static final String TYPE_GET_BY_RANGE = "getByRange";
+    public static final String TYPE_LIST_TABLES = "listTables";
+    public static final String TYPE_GET_SCHEMA = "getSchema";
+    public static final String TYPE_PUT_RECORDS = "putRecords";
+    public static final String TYPE_SEARCH = "search";
+    public static final String TYPE_SEARCH_COUNT = "searchCount";
+    public static final String TYPE_SET_INDICES = "setIndices";
+    public static final String TYPE_SET_SCHEMA = "setSchema";
+    public static final String TYPE_TABLE_EXISTS = "tableExists";
+    public static final String TYPE_WAIT_FOR_INDEXING = "waitForIndexing";
+
     public AnalyticsWebServiceConnector(ConfigurationContext configCtx, String backendServerURL, String cookie) {
         try {
             String analyticsWebServiceUrl = backendServerURL + ANALYTICS_WEB_SERVICE;
