@@ -41,18 +41,18 @@ public class OutputAdapterRuntime {
         this.name = name;
         synchronized (this) {
             outputEventAdapter.init();
-            try {
-                outputEventAdapter.connect();
-                connected = true;
-            } catch (ConnectionUnavailableException e) {
-                connected = false;
-                outputEventAdapter.disconnect();
-                log.error("Error initializing connecting on " + this.name + ", reconnection will be tried on next event arrival.", e);
-            } catch (OutputEventAdapterRuntimeException e) {
-                connected = false;
-                outputEventAdapter.disconnect();
-                log.error("Error initializing connecting on " + this.name + ", reconnection will be tried on next event arrival.", e);
-            }
+//            try {
+//                outputEventAdapter.connect();
+//                connected = true;
+//            } catch (ConnectionUnavailableException e) {
+//                connected = false;
+//                outputEventAdapter.disconnect();
+//                log.error("Error initializing connecting on " + this.name + ", reconnection will be tried on next event arrival.", e);
+//            } catch (OutputEventAdapterRuntimeException e) {
+//                connected = false;
+//                outputEventAdapter.disconnect();
+//                log.error("Error initializing connecting on " + this.name + ", reconnection will be tried on next event arrival.", e);
+//            }
         }
     }
 
