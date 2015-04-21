@@ -434,9 +434,16 @@ public class AnalyticsAPIHttpClient {
             postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             postMethod.setEntity(new ByteArrayEntity(GenericUtils.serializeObject(records)));
             HttpResponse httpResponse = httpClient.execute(postMethod);
-            String response = getResponse(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                String response = getResponse(httpResponse);
                 throw new AnalyticsServiceException("Unable to put the records. " + response);
+            }else {
+                List<String> recordIds = (List < String >)GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                int index = 0;
+                for (Record record: records){
+                    record.setId(recordIds.get(index));
+                    index++;
+                }
             }
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceAuthenticationException("Malformed URL provided. " + e.getMessage(), e);
@@ -640,7 +647,7 @@ public class AnalyticsAPIHttpClient {
     public List<SearchResultEntry> search(int tenantId, String username, String tableName, String language, String query,
                                           int start, int count, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
-        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI)
+        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.SEARCH_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.SEARCH_OPERATION)
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
                 .addParameter(AnalyticsAPIConstants.LANGUAGE_PARAM, language)

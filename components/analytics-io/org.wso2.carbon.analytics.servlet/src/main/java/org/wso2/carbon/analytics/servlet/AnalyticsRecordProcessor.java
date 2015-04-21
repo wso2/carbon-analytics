@@ -38,6 +38,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -122,6 +123,11 @@ public class AnalyticsRecordProcessor extends HttpServlet {
                     List<Record> records = (List <Record>) GenericUtils.deserializeObject(req.getInputStream());
                     if (!securityEnabled) ServiceHolder.getAnalyticsDataService().put(records);
                     else ServiceHolder.getSecureAnalyticsDataService().put(username, records);
+                    List<String> recordIds = new ArrayList<>();
+                    for (Record record: records){
+                        recordIds.add(record.getId());
+                    }
+                    resp.getOutputStream().write(GenericUtils.serializeObject(recordIds));
                     resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
