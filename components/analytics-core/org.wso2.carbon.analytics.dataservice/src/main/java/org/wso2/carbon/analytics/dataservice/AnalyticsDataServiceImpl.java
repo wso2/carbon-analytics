@@ -20,10 +20,12 @@ package org.wso2.carbon.analytics.dataservice;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
-import org.wso2.carbon.analytics.dataservice.commons.DrillDownResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfigProperty;
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfiguration;
@@ -335,10 +337,29 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     @Override
-    public Map<String, List<DrillDownResultEntry>> drillDown(int tenantId, AnalyticsDrillDownRequest drillDownRequest)
+    public List<SearchResultEntry> drillDownSearch(int tenantId, AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
-    //    return this.getIndexer().drillDown(tenantId, drillDownRequest);
-        return null;
+        return this.getIndexer().getDrillDownRecords(tenantId, drillDownRequest, null, null);
+    }
+
+    @Override
+    public int drillDownSearchCount(int tenantId, AnalyticsDrillDownRequest drillDownRequest)
+            throws AnalyticsIndexException {
+        return this.getIndexer().getDrillDownRecordCount(tenantId, drillDownRequest, null, null);
+    }
+
+    @Override
+    public SubCategories drillDownCategories(int tenantId,
+                                             CategoryDrillDownRequest drillDownRequest)
+            throws AnalyticsIndexException {
+        return this.getIndexer().drilldownCategories(tenantId, drillDownRequest);
+    }
+
+    @Override
+    public List<AnalyticsDrillDownRange> drillDownRangeCount(int tenantId,
+                                                             AnalyticsDrillDownRequest drillDownRequest)
+            throws AnalyticsIndexException {
+        return this.getIndexer().drillDownRangeCount(tenantId, drillDownRequest);
     }
 
     @Override

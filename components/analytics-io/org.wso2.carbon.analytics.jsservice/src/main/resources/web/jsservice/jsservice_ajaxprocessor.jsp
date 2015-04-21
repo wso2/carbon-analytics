@@ -14,161 +14,185 @@
   ~ limitations under the License.
   --%>
 
-<%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.apache.axis2.context.ConfigurationContext" %>
 <%@ page import="org.wso2.carbon.CarbonConstants" %>
-<%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ page import="org.wso2.carbon.analytics.jsservice.AnalyticsWebServiceConnector" %>
-<%@ page import="org.wso2.carbon.analytics.jsservice.Utils" %>
 <%@ page import="org.wso2.carbon.analytics.jsservice.UnauthenticatedUserException" %>
+<%@ page import="org.wso2.carbon.analytics.jsservice.Utils" %>
+<%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
+<%@ page import="org.wso2.carbon.utils.ServerConstants" %>
+<%@ page import="java.io.BufferedReader" %>
 
 <%
     String serverURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);
     ConfigurationContext configContext = (ConfigurationContext) config.getServletContext().
             getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
     String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
-    AnalyticsWebServiceConnector connector;
+    AnalyticsWebServiceConnector connector = null;
     String authParam = request.getHeader("Authorization");
-
     if (authParam != null) {
         try {
             String[] credentials = Utils.authenticate(authParam);
             connector = new AnalyticsWebServiceConnector(configContext, serverURL, credentials[0], credentials[1]);
         } catch (UnauthenticatedUserException e) {
-            out.print("{ \"Result\": \"ERROR\", \"Message\": \"" + e.getMessage() + "\" }");
+            out.print("{ \"status\": \"Unauthenticated\", \"message\": \"Error while authenticating: " +
+                      e.getMessage() + "\" }");
         }
     } else {
         connector = new AnalyticsWebServiceConnector(configContext, serverURL, cookie);
     }
-
+    int type = 0;
     String typeParam = request.getParameter("type");
-    String type = "";
     if (typeParam != null && !typeParam.isEmpty()) {
-        type = typeParam;
+        type = Integer.parseInt(typeParam);
     }
 
     String tableName = request.getParameter("tableName");
-    if (!type.equals(AnalyticsWebServiceConnector.TYPE_LIST_TABLES)) {
+    if (type != AnalyticsWebServiceConnector.TYPE_LIST_TABLES &&
+        type != AnalyticsWebServiceConnector.TYPE_PUT_RECORDS) {
         if (tableName == null || tableName.isEmpty()) {
-            out.print("{ \"Result\": \"ERROR\", \"Message\": \"Table name param is empty\" }");
+            out.print("{ \"status\": \"Failed\", \"message\": \"Table name param is empty\" }");
         }
     }
 
-    switch (type) {
-        case AnalyticsWebServiceConnector.TYPE_LIST_TABLES: {
-            String jtStartIndex = request.getParameter("jtStartIndex");
-            if (jtStartIndex == null || jtStartIndex.isEmpty()) {
-                jtStartIndex = "0";
+    if (connector != null) {
+        switch (type) {
+            case AnalyticsWebServiceConnector.TYPE_LIST_TABLES: {
+                out.print(connector.getTableList());
+                break;
             }
-            int startIndex = Integer.parseInt(jtStartIndex);
-            String jtPageSize = request.getParameter("jtPageSize");
-            if (jtPageSize == null || jtPageSize.isEmpty()) {
-                jtPageSize = "500";
+            case AnalyticsWebServiceConnector.TYPE_CREATE_TABLE: {
+                out.print(connector.createTable(tableName));
+                break;
             }
-            int pageSize = Integer.parseInt(jtPageSize);
-            String query = request.getParameter("query");
-            long from = 0;
-            String timeFrom = request.getParameter("timeFrom");
-            if (timeFrom != null && !timeFrom.isEmpty()) {
-                timeFrom = timeFrom.concat("000");
-                from = Long.parseLong(timeFrom);
+            case AnalyticsWebServiceConnector.TYPE_DELETE_TABLE: {
+                out.print(connector.deleteTable(tableName));
+                break;
             }
-            long to = Long.MAX_VALUE;
-            String timeTo = request.getParameter("timeTo");
-            if (timeTo != null && !timeTo.isEmpty()) {
-                timeTo = timeTo.concat("000");
-                to = Long.parseLong(timeTo);
+            case AnalyticsWebServiceConnector.TYPE_TABLE_EXISTS: {
+                out.print(connector.tableExists(tableName));
+                break;
             }
-            out.print(connector.getRecords(tableName, from, to, startIndex, pageSize, query));
-            break;
-        }
-        case MessageConsoleConnector.TYPE_UPDATE_RECORD: {
-            Map<String, String[]> parameters = request.getParameterMap();
-            Properties properties = new Properties(parameters).invoke(UPDATE_RECORD_ACTION);
-            String[] columns = properties.getColumns();
-            String[] values = properties.getValues();
-
-            String recordID = request.getParameter(MessageConsoleConnector.RECORD_ID);
-            out.print(connector.updateRecord(tableName, columns, values, recordID));
-            break;
-        }
-        case MessageConsoleConnector.TYPE_CREATE_RECORD: {
-            Map<String, String[]> parameters = request.getParameterMap();
-            Properties properties = new Properties(parameters).invoke(CREATE_RECORD_ACTION);
-            String[] columns = properties.getColumns();
-            String[] values = properties.getValues();
-
-            out.print(connector.addRecord(tableName, columns, values));
-            break;
-        }
-        case MessageConsoleConnector.TYPE_DELETE_RECORD: {
-            String recordsIdString = request.getParameter(MessageConsoleConnector.RECORD_ID);
-            String[] recordsIds = new String[]{recordsIdString};
-            out.print(connector.deleteRecords(tableName, recordsIds));
-            break;
-        }
-        case MessageConsoleConnector.TYPE_TABLE_INFO: {
-            out.print(connector.getTableInfo(tableName));
-            break;
-        }
-        case MessageConsoleConnector.TYPE_LIST_ARBITRARY_RECORD: {
-            String recordId = request.getParameter("bam_unique_rec_id");
-            out.print(connector.getArbitraryFields(tableName, recordId));
-            break;
-        }
-        case MessageConsoleConnector.TYPE_CRATE_ARBITRARY_RECORD: {
-            String recordId = request.getParameter("bam_unique_rec_id");
-            String fieldName = request.getParameter("Name");
-            String fieldValue = request.getParameter("Value");
-            String fieldType = request.getParameter("Type");
-            out.print(connector.putArbitraryField(tableName, recordId, fieldName, fieldValue, fieldType));
-            break;
-        }
-        case MessageConsoleConnector.TYPE_UPDATE_ARBITRARY_RECORD: {
-            String recordId = request.getParameter("bam_unique_rec_id");
-            String fieldName = request.getParameter("Name");
-            String fieldValue = request.getParameter("Value");
-            String fieldType = request.getParameter("Type");
-            out.print(connector.putArbitraryField(tableName, recordId, fieldName, fieldValue, fieldType));
-            break;
-        }
-        case MessageConsoleConnector.TYPE_DELETE_ARBITRARY_RECORD: {
-            String recordId = request.getParameter("bam_unique_rec_id");
-            String fieldName = request.getParameter("Name");
-            out.print(connector.deleteArbitraryField(tableName, recordId, fieldName));
-            break;
-        }
-        case MessageConsoleConnector.TYPE_CREATE_TABLE: {
-            String tableInfo = request.getParameter("tableInfo");
-            String action = request.getParameter("action");
-            if ("add".equals(action)) {
-                out.print(connector.putTable(tableName, tableInfo, true));
-            } else if ("edit".equals(action)) {
-                out.print(connector.putTable(tableName, tableInfo, false));
+            case AnalyticsWebServiceConnector.TYPE_GET_BY_RANGE: {
+                long timeFrom = Long.parseLong(request.getParameter("timeFrom"));
+                long timeTo = Long.parseLong(request.getParameter("timeTo"));
+                int start = Integer.parseInt(request.getParameter("start"));
+                int count = Integer.parseInt(request.getParameter("count"));
+                out.print(connector.getRecordsByRange(tableName, timeFrom, timeTo, start, count));
+                break;
             }
-            break;
+            case AnalyticsWebServiceConnector.TYPE_GET_BY_ID: {
+                StringBuilder buffer = new StringBuilder();
+                BufferedReader reader = request.getReader();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                String recordIdsAsString = buffer.toString();
+                out.print(connector.getRecordsByIds(tableName, recordIdsAsString));
+                break;
+            }
+            case AnalyticsWebServiceConnector.TYPE_GET_RECORD_COUNT: {
+                out.print(connector.getRecordCount(tableName));
+                break;
+            }
+            case AnalyticsWebServiceConnector.TYPE_DELETE_BY_RANGE: {
+                long timeFrom = Long.parseLong(request.getParameter("timeFrom"));
+                long timeTo = Long.parseLong(request.getParameter("timeTo"));
+                out.print(connector.deleteRecordsByRange(tableName, timeFrom, timeTo));
+                break;
+            }
+            case AnalyticsWebServiceConnector.TYPE_DELETE_BY_ID: {
+                StringBuilder buffer = new StringBuilder();
+                BufferedReader reader = request.getReader();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                String recordIdsAsString = buffer.toString();
+                out.print(connector.deleteRecordsByIds(tableName, recordIdsAsString));
+                break;
+            }
+            case AnalyticsWebServiceConnector.TYPE_SET_INDICES: {
+                StringBuilder buffer = new StringBuilder();
+                BufferedReader reader = request.getReader();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                String indicesAsString = buffer.toString();
+                out.print(connector.setIndices(tableName, indicesAsString));
+                break;
+            }
+            case AnalyticsWebServiceConnector.TYPE_GET_INDICES: {
+                out.print(connector.getIndices(tableName));
+                break;
+            }
+            case AnalyticsWebServiceConnector.TYPE_CLEAR_INDICES: {
+                out.print(connector.clearIndices(tableName));
+                break;
+            }
+            case AnalyticsWebServiceConnector.TYPE_PUT_RECORDS: {
+                StringBuilder buffer = new StringBuilder();
+                BufferedReader reader = request.getReader();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                String recordsAsString = buffer.toString();
+                out.print(connector.insertRecords(recordsAsString));
+                break;
+            }
+            case AnalyticsWebServiceConnector.TYPE_SEARCH_COUNT: {
+                StringBuilder buffer = new StringBuilder();
+                BufferedReader reader = request.getReader();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                String queryAsString = buffer.toString();
+                out.print(connector.searchCount(tableName, queryAsString));
+                break;
+            }
+            case AnalyticsWebServiceConnector.TYPE_SEARCH: {
+                StringBuilder buffer = new StringBuilder();
+                BufferedReader reader = request.getReader();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                String queryAsString = buffer.toString();
+                out.print(connector.search(tableName, queryAsString));
+                break;
+            }
+            case AnalyticsWebServiceConnector.TYPE_SET_SCHEMA: {
+                StringBuilder buffer = new StringBuilder();
+                BufferedReader reader = request.getReader();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                String schemaAsString = buffer.toString();
+                out.print(connector.setTableSchema(tableName, schemaAsString));
+                break;
+            }
+            case AnalyticsWebServiceConnector.TYPE_GET_SCHEMA: {
+                out.print(connector.getTableSchema(tableName));
+                break;
+            }
+            case AnalyticsWebServiceConnector.TYPE_PAGINATION_SUPPORTED: {
+                out.print(connector.isPaginationSupported());
+                break;
+            }
+            case AnalyticsWebServiceConnector.TYPE_WAIT_FOR_INDEXING: {
+                long waitTime = Long.parseLong(request.getParameter("waitTime"));
+                out.print(connector.waitForIndexing(waitTime));
+                break;
+            }
+            default:
+                out.print("{ \"status\": \"Failed\", \"message\": \"Unidentified operation\" }");
         }
-        case MessageConsoleConnector.TYPE_DELETE_TABLE: {
-            out.print(connector.deleteTable(tableName));
-            break;
-        }
-        case MessageConsoleConnector.TYPE_GET_TABLE_INFO: {
-            out.print(connector.getTableInfoWithIndexInfo(tableName));
-            break;
-        }
-        case MessageConsoleConnector.TYPE_GET_PURGING_TASK_INFO: {
-            out.print(connector.getDataPurgingDetails(tableName));
-            break;
-        }
-        case MessageConsoleConnector.TYPE_SAVE_PURGING_TASK_INFO: {
-            out.print(connector.scheduleDataPurging(tableName, request.getParameter("cron"),
-                                                    request.getParameter("retention"),
-                                                    Boolean.parseBoolean(request.getParameter("enable"))));
-            break;
-        }
-        case MessageConsoleConnector.TYPE_LIST_TABLE: {
-            out.print(connector.getTableList());
-            break;
-        }
+    } else {
+        out.print("{ \"status\": \"Failed\", \"message\": \"AnalyticsWebServiceConnector is unavailable\" }");
     }
 %>

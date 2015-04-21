@@ -29,6 +29,7 @@ public class AnalyticsDrillDownRange implements Serializable{
     private String label;
     private double from;
     private double to;
+    private double score;
 
     public AnalyticsDrillDownRange() { }
     
@@ -36,6 +37,13 @@ public class AnalyticsDrillDownRange implements Serializable{
         this.label = label;
         this.from = from;
         this.to = to;
+    }
+
+    public AnalyticsDrillDownRange(String label, double from, double to, double score) {
+        this.label = label;
+        this.from = from;
+        this.to = to;
+        this.score = score;
     }
 
     public double getFrom() {
@@ -60,5 +68,13 @@ public class AnalyticsDrillDownRange implements Serializable{
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    public double getScore() {
+        return score;
+    }
+
+    public void setScore(double score) {
+        this.score = score;
     }
 }

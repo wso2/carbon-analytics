@@ -40,6 +40,7 @@
         <module>org.wso2.carbon.analytics.api.feature</module>
         <module>org.wso2.carbon.analytics.webservice.server.feature</module>
         <module>org.wso2.carbon.analytics.webservice.feature</module>
+        <module>org.wso2.carbon.analytics.jsservice.feature</module>
     </modules>
 
 </project>

@@ -21,7 +21,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This bean class represents the drill down information to perform drilldown operations
@@ -52,7 +51,9 @@ public class DrillDownRequestBean {
     @XmlElement(name = "includeIds", required = false, defaultValue = "false")
     private boolean includeIds;
     @XmlElement(name = "ranges", required = false)
-    private Map<String, List<DrillDownRangeBean>> ranges;
+    private List<DrillDownRangeBean> ranges;
+    @XmlElement(name = "rangeField", required = false)
+    private String rangeField;
 
     public String getTableName() {
         return tableName;
@@ -126,19 +127,27 @@ public class DrillDownRequestBean {
         this.includeIds = includeIds;
     }
 
-    public Map<String, List<DrillDownRangeBean>> getRanges() {
-        return ranges;
-    }
-
-    public void setRanges(Map<String, List<DrillDownRangeBean>> ranges) {
-        this.ranges = ranges;
-    }
-
     public int getCategoryStart() {
         return categoryStart;
     }
 
     public void setCategoryStart(int categoryStart) {
         this.categoryStart = categoryStart;
+    }
+
+    public List<DrillDownRangeBean> getRanges() {
+        return ranges;
+    }
+
+    public void setRanges(List<DrillDownRangeBean> ranges) {
+        this.ranges = ranges;
+    }
+
+    public String getRangeField() {
+        return rangeField;
+    }
+
+    public void setRangeField(String rangeField) {
+        this.rangeField = rangeField;
     }
 }

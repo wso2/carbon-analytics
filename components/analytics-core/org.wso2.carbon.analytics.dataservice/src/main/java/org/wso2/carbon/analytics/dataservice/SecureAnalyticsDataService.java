@@ -17,10 +17,12 @@
 */
 package org.wso2.carbon.analytics.dataservice;
 
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
-import org.wso2.carbon.analytics.dataservice.commons.DrillDownResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -297,15 +299,48 @@ public interface SecureAnalyticsDataService extends AnalyticsRecordReader {
     public void waitForIndexing(long maxWait) throws AnalyticsTimeoutException, AnalyticsException;
 
     /**
-     * Returns the drill down results of a search query, given {@link org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest}
+     * Returns the drill down results of a search query, given
+     * {@link org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest}
+     * @param username The username
      * @param drillDownRequest The drilldown object which contains the drilldown information
-     * @param facetCount nunber of maximum facets per each field
-     * @param recordCount number of each records in each facet
-     * @return the results containing field names and respective facets
+     * @return the results containing the ids which match the drilldown query.
      * @throws AnalyticsIndexException
      */
-    Map<String, List<DrillDownResultEntry>> drillDown(String username, AnalyticsDrillDownRequest drillDownRequest) throws AnalyticsIndexException;
+    public List<SearchResultEntry> drillDownSearch(String username, AnalyticsDrillDownRequest drillDownRequest)
+            throws AnalyticsIndexException;
 
+    /**
+     * Returns the count of results of a search query, given
+     * {@link org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest}
+     * @param username The username
+     * @param drillDownRequest The drilldown object which contains the drilldown information
+     * @return the count of the records which match the drilldown query
+     * @throws AnalyticsIndexException
+     */
+    public int drillDownSearchCount(String username, AnalyticsDrillDownRequest drillDownRequest)
+            throws AnalyticsIndexException;
+
+    /**
+     * Returns the subcategories of a facet field, given
+     * {@link org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest}
+     * @param username The username
+     * @param drillDownRequest The category drilldown object which contains the category drilldown information
+     * @return
+     * @throws AnalyticsIndexException
+     */
+    public SubCategories drillDownCategories(String username, CategoryDrillDownRequest drillDownRequest)
+            throws AnalyticsIndexException;
+
+    /**
+     * Returns a list of range buckets of a specific field with the total score for each bucket.
+     * @param username The username
+     * @param drillDownRequest The drilldown request which contains all query information
+     * @return A list of {@link org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange}
+     * with score property not-null
+     * @throws AnalyticsIndexException
+     */
+    public List<AnalyticsDrillDownRange> drillDownRangeCount(String username, AnalyticsDrillDownRequest drillDownRequest)
+            throws AnalyticsIndexException;
     /**
      * Destroys and frees any resources taken up by the analytics data service implementation.
      */

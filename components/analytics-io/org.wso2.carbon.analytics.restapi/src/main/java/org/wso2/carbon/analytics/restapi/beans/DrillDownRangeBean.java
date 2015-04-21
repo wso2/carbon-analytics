@@ -31,7 +31,8 @@ public class DrillDownRangeBean {
     private double from;
     @XmlElement(name = "to")
     private double to;
-
+    @XmlElement(name = "score")
+    private double score;
     /**
      * This constructor is for jax rs serialization/deserialization
      */
@@ -43,6 +44,13 @@ public class DrillDownRangeBean {
         this.label = label;
         this.from = from;
         this.to = to;
+    }
+
+    public DrillDownRangeBean(String label, double from, double to, double score) {
+        this.label = label;
+        this.from = from;
+        this.to = to;
+        this.score = score;
     }
 
     public double getFrom() {
@@ -67,5 +75,13 @@ public class DrillDownRangeBean {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    public double getScore() {
+        return score;
+    }
+
+    public void setScore(double score) {
+        this.score = score;
     }
 }

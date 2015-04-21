@@ -14,42 +14,49 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.analytics.dataservice.commons;
+package org.wso2.carbon.analytics.restapi.beans;
 
-import java.io.Serializable;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
 /**
  * This class Contains Sub-categories of a given facet field/column. "path" represents the hierarchical
  * path to the categories and "categories" contains the list of categories with their scores.
  */
+@XmlRootElement(name = "subCategories")
+@XmlAccessorType(XmlAccessType.FIELD)
+public class SubCategoriesBean {
 
-public class SubCategories implements Serializable {
+    private String[] categoryPath;
+    private List<String> categories;
 
+    /**
+     * This constructor is used by JAX-RS
+     */
+    public SubCategoriesBean() {
 
-    private static final long serialVersionUID = -4760813079030890572L;
-    private String[] path;
-    private List<SearchResultEntry> categories;
-
-    public SubCategories(String[] path,
-                         List<SearchResultEntry> categories) {
-        this.path = path;
+    }
+    public SubCategoriesBean(String[] path,
+                             List<String> categories) {
+        this.categoryPath = path;
         this.categories = categories;
     }
 
-    public String[] getPath() {
-        return path;
-    }
-
-    public void setPath(String[] path) {
-        this.path = path;
-    }
-
-    public List<SearchResultEntry> getCategories() {
+    public List<String> getCategories() {
         return categories;
     }
 
-    public void setCategories(List<SearchResultEntry> categories) {
+    public void setCategories(List<String> categories) {
         this.categories = categories;
+    }
+
+    public String[] getCategoryPath() {
+        return categoryPath;
+    }
+
+    public void setCategoryPath(String[] categoryPath) {
+        this.categoryPath = categoryPath;
     }
 }

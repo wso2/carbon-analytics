@@ -18,13 +18,15 @@
 package org.wso2.carbon.analytics.servlet;
 
 import com.google.gson.GsonBuilder;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
-import org.wso2.carbon.analytics.dataservice.commons.DrillDownResultEntry;
-import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
+import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
 import org.wso2.carbon.analytics.servlet.exception.AnalyticsAPIAuthenticationException;
 import org.wso2.carbon.analytics.servlet.internal.ServiceHolder;
-import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.servlet.ServletException;
@@ -37,7 +39,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Servlet to process the analytics search requests and returns the results.
@@ -131,36 +132,144 @@ public class AnalyticsSearchProcessor extends HttpServlet {
             if (!securityEnabled)
                 tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
             String userName = req.getParameter(AnalyticsAPIConstants.USERNAME_PARAM);
-            if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.DRILL_DOWN_OPERATION)) {
-                ServletInputStream servletInputStream = req.getInputStream();
-                ObjectInputStream inputStream = new ObjectInputStream(servletInputStream);
-                ObjectOutputStream objectOutputStream = null;
-                try {
-                    AnalyticsDrillDownRequest drillDownRequest = (AnalyticsDrillDownRequest) inputStream.readObject();
-                    Map<String, List<DrillDownResultEntry>> drillDownResult;
-                    if (!securityEnabled) drillDownResult = ServiceHolder.getAnalyticsDataService().
-                            drillDown(tenantIdParam, drillDownRequest);
-                    else
-                        drillDownResult = ServiceHolder.getSecureAnalyticsDataService().drillDown(userName, drillDownRequest);
-                    objectOutputStream = new ObjectOutputStream(resp.getOutputStream());
-                    objectOutputStream.writeObject(drillDownResult);
-                    resp.setStatus(HttpServletResponse.SC_OK);
-                } catch (AnalyticsException | ClassNotFoundException e) {
-                    resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
-                } finally {
-                    if (servletInputStream != null) {
-                        servletInputStream.close();
-                    }
-                    if (inputStream != null) {
-                        inputStream.close();
-                    }
-                    if (objectOutputStream != null) {
-                        objectOutputStream.close();
-                    }
-                }
-            } else {
+            if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.DRILL_DOWN_SEARCH_OPERATION)) {
+                doDrillDownSearch(req, resp, securityEnabled, tenantIdParam, userName);
+            } else if (operation != null && operation.trim()
+                    .equalsIgnoreCase(AnalyticsAPIConstants.DRILL_DOWN_SEARCH_COUNT_OPERATION)) {
+                doDrillDownSearchCount(req, resp, securityEnabled, tenantIdParam, userName);
+            } else if (operation != null && operation.trim()
+                    .equalsIgnoreCase(AnalyticsAPIConstants.DRILL_DOWN_SEARCH_CATEGORY_OPERATION)) {
+                doDrillDownCategories(req, resp, securityEnabled, tenantIdParam, userName);
+            } else if (operation != null && operation.trim()
+                    .equalsIgnoreCase(AnalyticsAPIConstants.DRILL_DOWN_SEARCH_RANGE_COUNT_OPERATION)) {
+                doDrillDownRangeCount(req, resp, securityEnabled, tenantIdParam, userName);
+            }  else {
                 resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : " + operation
                         + " with get request!");
+            }
+        }
+    }
+
+    private void doDrillDownSearch(HttpServletRequest req, HttpServletResponse resp,
+                                   boolean securityEnabled, int tenantIdParam, String userName)
+            throws IOException {
+        ServletInputStream servletInputStream = req.getInputStream();
+        ObjectInputStream inputStream = new ObjectInputStream(servletInputStream);
+        ObjectOutputStream objectOutputStream = null;
+        try {
+            AnalyticsDrillDownRequest drillDownRequest = (AnalyticsDrillDownRequest) inputStream.readObject();
+            List<SearchResultEntry> drillDownResult;
+            if (!securityEnabled) drillDownResult = ServiceHolder.getAnalyticsDataService().
+                    drillDownSearch(tenantIdParam, drillDownRequest);
+            else
+                drillDownResult = ServiceHolder.getSecureAnalyticsDataService().drillDownSearch(userName, drillDownRequest);
+            objectOutputStream = new ObjectOutputStream(resp.getOutputStream());
+            objectOutputStream.writeObject(drillDownResult);
+            resp.setStatus(HttpServletResponse.SC_OK);
+        } catch (AnalyticsException | ClassNotFoundException e) {
+            resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
+        } finally {
+            if (servletInputStream != null) {
+                servletInputStream.close();
+            }
+            if (inputStream != null) {
+                inputStream.close();
+            }
+            if (objectOutputStream != null) {
+                objectOutputStream.close();
+            }
+        }
+    }
+
+    private void doDrillDownSearchCount(HttpServletRequest req, HttpServletResponse resp,
+                                   boolean securityEnabled, int tenantIdParam, String userName)
+            throws IOException {
+        ServletInputStream servletInputStream = req.getInputStream();
+        ObjectInputStream inputStream = new ObjectInputStream(servletInputStream);
+        ObjectOutputStream objectOutputStream = null;
+        try {
+            AnalyticsDrillDownRequest drillDownRequest = (AnalyticsDrillDownRequest) inputStream.readObject();
+            int resultCount;
+            if (!securityEnabled) resultCount = ServiceHolder.getAnalyticsDataService().
+                    drillDownSearchCount(tenantIdParam, drillDownRequest);
+            else
+                resultCount = ServiceHolder.getSecureAnalyticsDataService().drillDownSearchCount(userName, drillDownRequest);
+            objectOutputStream = new ObjectOutputStream(resp.getOutputStream());
+            objectOutputStream.writeObject(resultCount);
+            resp.setStatus(HttpServletResponse.SC_OK);
+        } catch (AnalyticsException | ClassNotFoundException e) {
+            resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
+        } finally {
+            if (servletInputStream != null) {
+                servletInputStream.close();
+            }
+            if (inputStream != null) {
+                inputStream.close();
+            }
+            if (objectOutputStream != null) {
+                objectOutputStream.close();
+            }
+        }
+    }
+
+    private void doDrillDownCategories(HttpServletRequest req, HttpServletResponse resp,
+                                   boolean securityEnabled, int tenantIdParam, String userName)
+            throws IOException {
+        ServletInputStream servletInputStream = req.getInputStream();
+        ObjectInputStream inputStream = new ObjectInputStream(servletInputStream);
+        ObjectOutputStream objectOutputStream = null;
+        try {
+            CategoryDrillDownRequest drillDownRequest = (CategoryDrillDownRequest) inputStream.readObject();
+            SubCategories subCategories;
+            if (!securityEnabled) subCategories = ServiceHolder.getAnalyticsDataService().
+                    drillDownCategories(tenantIdParam, drillDownRequest);
+            else
+                subCategories = ServiceHolder.getSecureAnalyticsDataService().drillDownCategories(userName, drillDownRequest);
+            objectOutputStream = new ObjectOutputStream(resp.getOutputStream());
+            objectOutputStream.writeObject(subCategories);
+            resp.setStatus(HttpServletResponse.SC_OK);
+        } catch (AnalyticsException | ClassNotFoundException e) {
+            resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
+        } finally {
+            if (servletInputStream != null) {
+                servletInputStream.close();
+            }
+            if (inputStream != null) {
+                inputStream.close();
+            }
+            if (objectOutputStream != null) {
+                objectOutputStream.close();
+            }
+        }
+    }
+
+    private void doDrillDownRangeCount(HttpServletRequest req, HttpServletResponse resp,
+                                       boolean securityEnabled, int tenantIdParam, String userName)
+            throws IOException {
+        ServletInputStream servletInputStream = req.getInputStream();
+        ObjectInputStream inputStream = new ObjectInputStream(servletInputStream);
+        ObjectOutputStream objectOutputStream = null;
+        try {
+            AnalyticsDrillDownRequest drillDownRequest = (AnalyticsDrillDownRequest) inputStream.readObject();
+            List<AnalyticsDrillDownRange> ranges;
+            if (!securityEnabled) ranges = ServiceHolder.getAnalyticsDataService().
+                    drillDownRangeCount(tenantIdParam, drillDownRequest);
+            else
+                ranges = ServiceHolder.getSecureAnalyticsDataService().drillDownRangeCount(userName, drillDownRequest);
+            objectOutputStream = new ObjectOutputStream(resp.getOutputStream());
+            objectOutputStream.writeObject(ranges);
+            resp.setStatus(HttpServletResponse.SC_OK);
+        } catch (AnalyticsException | ClassNotFoundException e) {
+            resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
+        } finally {
+            if (servletInputStream != null) {
+                servletInputStream.close();
+            }
+            if (inputStream != null) {
+                inputStream.close();
+            }
+            if (objectOutputStream != null) {
+                objectOutputStream.close();
             }
         }
     }

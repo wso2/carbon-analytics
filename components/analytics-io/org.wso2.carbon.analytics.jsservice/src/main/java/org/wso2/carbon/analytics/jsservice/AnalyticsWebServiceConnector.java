@@ -48,24 +48,25 @@ public class AnalyticsWebServiceConnector {
     private AnalyticsWebServiceStub analyticsWebServiceStub;
     private Gson gson;
 
-    public static final String TYPE_CLEAR_INDICES = "clearIndices";
-    public static final String TYPE_CREATE_TABLE = "createTable";
-    public static final String TYPE_DELETE_BY_ID = "deleteByIds";
-    public static final String TYPE_DELETE_BY_RANGE = "deleteByRange";
-    public static final String TYPE_DELETE_TABLE = "deleteTable";
-    public static final String TYPE_GET_INDICES = "getIndices";
-    public static final String TYPE_GET_RECORD_COUNT = "getCount";
-    public static final String TYPE_GET_BY_ID = "getByIds";
-    public static final String TYPE_GET_BY_RANGE = "getByRange";
-    public static final String TYPE_LIST_TABLES = "listTables";
-    public static final String TYPE_GET_SCHEMA = "getSchema";
-    public static final String TYPE_PUT_RECORDS = "putRecords";
-    public static final String TYPE_SEARCH = "search";
-    public static final String TYPE_SEARCH_COUNT = "searchCount";
-    public static final String TYPE_SET_INDICES = "setIndices";
-    public static final String TYPE_SET_SCHEMA = "setSchema";
-    public static final String TYPE_TABLE_EXISTS = "tableExists";
-    public static final String TYPE_WAIT_FOR_INDEXING = "waitForIndexing";
+    public static final int TYPE_CLEAR_INDICES = 1;
+    public static final int TYPE_CREATE_TABLE = 2;
+    public static final int TYPE_DELETE_BY_ID = 3;
+    public static final int TYPE_DELETE_BY_RANGE = 4;
+    public static final int TYPE_DELETE_TABLE = 5;
+    public static final int TYPE_GET_INDICES = 6;
+    public static final int TYPE_GET_RECORD_COUNT = 7;
+    public static final int TYPE_GET_BY_ID = 8;
+    public static final int TYPE_GET_BY_RANGE = 9;
+    public static final int TYPE_LIST_TABLES = 10;
+    public static final int TYPE_GET_SCHEMA = 11;
+    public static final int TYPE_PUT_RECORDS = 12;
+    public static final int TYPE_SEARCH = 13;
+    public static final int TYPE_SEARCH_COUNT = 14;
+    public static final int TYPE_SET_INDICES = 15;
+    public static final int TYPE_SET_SCHEMA = 16;
+    public static final int TYPE_TABLE_EXISTS = 17;
+    public static final int TYPE_WAIT_FOR_INDEXING = 18;
+    public static final int TYPE_PAGINATION_SUPPORTED = 19;
 
     public AnalyticsWebServiceConnector(ConfigurationContext configCtx, String backendServerURL, String cookie) {
         try {
@@ -77,7 +78,7 @@ public class AnalyticsWebServiceConnector {
             options.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING, cookie);
             gson = new Gson();
         } catch (AxisFault axisFault) {
-            logger.error("Unable to create MessageConsoleStub.", axisFault);
+            logger.error("Unable to create AnalyticsWebServiceStub.", axisFault);
         }
     }
 
@@ -93,7 +94,7 @@ public class AnalyticsWebServiceConnector {
             options.setPassword(password);
             gson = new Gson();
         } catch (AxisFault axisFault) {
-            logger.error("Unable to create MessageConsoleStub.", axisFault);
+            logger.error("Unable to create AnalyticsWebServiceStub.", axisFault);
         }
     }
 
@@ -137,7 +138,7 @@ public class AnalyticsWebServiceConnector {
         } catch (Exception e) {
             logger.error("Failed to check the existance of the table: " + e.getMessage(), e);
             gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to check the existance of table: " +
-                                                              tableName));
+                                                              tableName + ": " + e.getMessage()));
         }
         return gson.toJson(handleResponse(ResponseStatus.SUCCESS,
                               "Table : " + tableName + " exists."));
@@ -150,7 +151,7 @@ public class AnalyticsWebServiceConnector {
             tableList = analyticsWebServiceStub.listTables();
         } catch (Exception e) {
             logger.error("Unable to get table list:" + e.getMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Unable to get table list"));
+            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Unable to get table list: " + e.getMessage()));
         }
         if (tableList == null) {
             if (logger.isDebugEnabled()) {
@@ -178,7 +179,7 @@ public class AnalyticsWebServiceConnector {
             } catch (Exception e) {
                 logger.error("Unable to delete table: " + e.getMessage(), e);
                 return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to delete table: " +
-                                                                         tableName));
+                                                                         tableName + ": " + e.getMessage()));
             }
         } else {
             return gson.toJson(handleResponse(ResponseStatus.NON_EXISTENT, "Table: " + tableName +
@@ -200,8 +201,8 @@ public class AnalyticsWebServiceConnector {
                                                                       tableName));
         } catch (Exception e) {
             logger.error("Failed to delete records by range: " + e.getMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED,
-                                              "Failed to delete records by range for table: " + tableName));
+            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to delete records by range for table: " +
+                                                                     tableName + ": " + e.getMessage()));
         }
     }
 
@@ -222,8 +223,8 @@ public class AnalyticsWebServiceConnector {
                                                                           tableName));
             } catch (Exception e) {
                 logger.error("Failed to delete records by ids: " + e.getMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED,
-                                                  "Failed to delete records by IDs for table: " + tableName));
+                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to delete records by IDs for table: " +
+                                                                         tableName + ": " + e.getMessage()));
             }
         } else {
             return gson.toJson(handleResponse(ResponseStatus.FAILED, "Id list is empty"));
@@ -243,7 +244,7 @@ public class AnalyticsWebServiceConnector {
         } catch (Exception e) {
             logger.error("Failed to get record count for table: " + tableName);
             return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get record count for table: " +
-                                                                     tableName));
+                                                                     tableName + ": " + e.getMessage()));
         }
     }
 
@@ -258,7 +259,8 @@ public class AnalyticsWebServiceConnector {
             return gson.toJson(records);
         } catch (Exception e) {
             logger.error("failed to get records from table: " + tableName + " : " + e.getMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get records from table: " + tableName));
+            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get records from table: " +
+                                                                     tableName + ": " + e.getMessage()));
         }
     }
 
@@ -276,7 +278,7 @@ public class AnalyticsWebServiceConnector {
         } catch (Exception e) {
             logger.error("failed to get records from table: " + tableName + " : " + e.getMessage(), e);
             return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get records from table: " +
-                                                                     tableName));
+                                                                     tableName + ": " + e.getMessage()));
         }
     }
 
@@ -299,7 +301,7 @@ public class AnalyticsWebServiceConnector {
                 return gson.toJson(handleResponse(ResponseStatus.CREATED, "Successfully created records"));
             } catch (Exception e) {
                 logger.error("Failed to put records: " + e.getMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to put records"));
+                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to put records: " + e.getMessage()));
             }
         } else {
             return gson.toJson(handleResponse(ResponseStatus.FAILED, "Record list is empty"));
@@ -322,8 +324,8 @@ public class AnalyticsWebServiceConnector {
                                                               tableName));
             } catch (Exception e) {
                 logger.error("Failed to set indices for table: " + tableName + " : " + e.getMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED,
-                                                  "Failed to set indices for table: " + tableName));
+                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to set indices for table: " +
+                                                  tableName + ": " + e.getMessage()));
             }
         } else {
             return gson.toJson(handleResponse(ResponseStatus.FAILED, "Index information is not provided"));
@@ -349,7 +351,7 @@ public class AnalyticsWebServiceConnector {
         } catch (Exception e) {
             logger.error("Failed to get indices for table: " + tableName + " : " + e.getMessage(), e);
             return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get indices for table: " +
-                                                                     tableName));
+                                                                     tableName + ": " + e.getMessage()));
         }
     }
 
@@ -365,18 +367,18 @@ public class AnalyticsWebServiceConnector {
         } catch (Exception e) {
             logger.error("Failed to clear indices for table: " + tableName);
             return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to clear indices for table: " +
-                                                                     tableName));
+                                                                     tableName + ": " + e.getMessage()));
         }
     }
 
-    public String search(String queryAsString) {
+    public String search(String tableName, String queryAsString) {
         QueryBean queryBean = gson.fromJson(queryAsString, QueryBean.class);
         if (logger.isDebugEnabled()) {
-            logger.debug("Invoking search for tableName : " + queryBean.getTableName());
+            logger.debug("Invoking search for tableName : " + tableName);
         }
         if (queryBean != null) {
             try {
-                RecordBean[] searchResults = analyticsWebServiceStub.search(queryBean.getTableName(),
+                RecordBean[] searchResults = analyticsWebServiceStub.search(tableName,
                                                                             queryBean.getLanguage(), queryBean.getQuery(), queryBean.getStart(),
                                                                             queryBean.getCount());
                 List<Record> records = Utils.getRecordBeans(searchResults);
@@ -388,34 +390,34 @@ public class AnalyticsWebServiceConnector {
                 }
                 return gson.toJson(records);
             } catch (Exception e) {
-                logger.error("Failed to perform search on table: " + queryBean.getTableName() + " : " +
+                logger.error("Failed to perform search on table: " + tableName + " : " +
                              e.getMessage(), e);
                 return gson.toJson(handleResponse(ResponseStatus.FAILED,
-                          "Failed to perform search on table: " + queryBean.getTableName()));
+                          "Failed to perform search on table: " + tableName + ": " + e.getMessage()));
             }
         } else {
             return gson.toJson(handleResponse(ResponseStatus.FAILED, "Search parameters are not provided"));
         }
     }
 
-    public String searchCount(String queryAsString) {
+    public String searchCount(String tableName, String queryAsString) {
         QueryBean queryBean = gson.fromJson(queryAsString, QueryBean.class);
         if (logger.isDebugEnabled()) {
-            logger.debug("Invoking search count for tableName : " + queryBean.getTableName());
+            logger.debug("Invoking search count for tableName : " + tableName);
         }
         if (queryBean != null) {
             try {
-                int result = analyticsWebServiceStub.searchCount(queryBean.getTableName(),
+                int result = analyticsWebServiceStub.searchCount(tableName,
                                                                  queryBean.getLanguage(), queryBean.getQuery());
                 if (logger.isDebugEnabled()) {
                     logger.debug("Search count : " + result);
                 }
                 return gson.toJson(result);
             } catch (Exception e) {
-                logger.error("Failed to get the record count for table: " + queryBean.getTableName() +
+                logger.error("Failed to get the record count for table: " + tableName +
                              " : " + e.getMessage(), e);
                 return gson.toJson(handleResponse(ResponseStatus.FAILED,
-                            " Failed to get the record count for table: " + queryBean.getTableName()));
+                            " Failed to get the record count for table: " + tableName + ": " + e.getMessage()));
             }
         } else {
             return gson.toJson(handleResponse(ResponseStatus.FAILED, " Search parameters not provided"));
@@ -431,7 +433,8 @@ public class AnalyticsWebServiceConnector {
             return gson.toJson(handleResponse(ResponseStatus.SUCCESS, "Indexing Completed successfully"));
         } catch (Exception e) {
             logger.error("Failed to wait till indexing finishes: " + e.getMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to wait till indexing finishes"));
+            return gson.toJson(handleResponse(ResponseStatus.FAILED,
+                                              "Failed to wait till indexing finishes: " + e.getMessage()));
         }
     }
 
@@ -450,8 +453,8 @@ public class AnalyticsWebServiceConnector {
                                                                           + tableName));
             } catch (Exception e) {
                 logger.error("Failed to set the table schema for table: " + tableName + " : " + e.getMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED,
-                                                  " Failed to set table schema for table: " + tableName));
+                return gson.toJson(handleResponse(ResponseStatus.FAILED, " Failed to set table schema for table: " +
+                                                  tableName + ": " + e.getMessage()));
             }
         } else {
             return gson.toJson(handleResponse(ResponseStatus.FAILED,"Table schema is not provided"));
@@ -469,10 +472,24 @@ public class AnalyticsWebServiceConnector {
             return gson.toJson(analyticsSchemaBean);
         } catch (Exception e) {
             logger.error("Failed to get the table schema for table: " + tableName + " : " + e.getMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED,
-                                              "Failed to get the table schema for table: " + tableName));
+            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get the table schema for table: " +
+                                              tableName + ": " + e.getMessage()));
         }
     }
+
+    public String isPaginationSupported() {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Invoking isPaginationSupported");
+        }
+        try {
+            return gson.toJson(analyticsWebServiceStub.isPaginationSupported());
+        } catch (Exception e) {
+            logger.error("Failed to check pagination support" + e.getMessage(), e);
+            return gson.toJson(handleResponse(ResponseStatus.FAILED,
+                                              "Failed to check pagination support: " + e.getMessage()));
+        }
+    }
+
 
     public ResponseBean handleResponse(ResponseStatus responseStatus, String message) {
         ResponseBean response;

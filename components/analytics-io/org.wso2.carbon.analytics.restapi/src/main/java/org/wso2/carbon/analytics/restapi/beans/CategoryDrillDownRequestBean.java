@@ -14,21 +14,30 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.analytics.dataservice.commons;
+package org.wso2.carbon.analytics.restapi.beans;
 
-import java.io.Serializable;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class contains the details about category drilldown. This class is used  as an input to get
  * the subcategories of a facet field when using drillDownCategories API
  */
-public class CategoryDrillDownRequest implements Serializable{
+@XmlRootElement(name = "categoryDrillDownRequest")
+@XmlAccessorType(XmlAccessType.FIELD)
+public class CategoryDrillDownRequestBean {
 
-    private static final long serialVersionUID = 1303627415169817875L;
     private String tableName;
     private String fieldName;
-    private String[] path;
+    @XmlElement(name = "categoryPath", required = false)
+    private List<String> categoryPath;
+    @XmlElement(name = "query", required = false, defaultValue = "*:*")
     private String query;
+    @XmlElement(name = "scoreFunction", required = false, defaultValue = "_weight")
     private String scoreFunction;
 
     public String getTableName() {
@@ -47,14 +56,6 @@ public class CategoryDrillDownRequest implements Serializable{
         this.fieldName = fieldName;
     }
 
-    public String[] getPath() {
-        return path;
-    }
-
-    public void setPath(String[] path) {
-        this.path = path;
-    }
-
     public String getQuery() {
         return query;
     }
@@ -69,5 +70,16 @@ public class CategoryDrillDownRequest implements Serializable{
 
     public void setScoreFunction(String scoreFunction) {
         this.scoreFunction = scoreFunction;
+    }
+
+    public List<String> getCategoryPath() {
+        if (categoryPath == null) {
+            return new ArrayList<>(0);
+        }
+        return categoryPath;
+    }
+
+    public void setCategoryPath(List<String> categoryPath) {
+        this.categoryPath = categoryPath;
     }
 }

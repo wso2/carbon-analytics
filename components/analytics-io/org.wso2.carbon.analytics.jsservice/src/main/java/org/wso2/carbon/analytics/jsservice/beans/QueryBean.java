@@ -26,17 +26,13 @@ import java.util.Map;
  * The Class QueryBean.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(propOrder = { "tenantId", "tableName", "columns", "language", "query", "start", "count" })
+@XmlType(propOrder = { "tenantId", "columns", "language", "query", "start", "count" })
 @XmlRootElement(name = "query")
 public class QueryBean {
 	
 	/** The tenant id. */
 	@XmlElement(required = true)
 	private int tenantId;
-	
-	/** The table name. */
-	@XmlElement(required = true)
-	private String tableName;
 	
 	/** The columns. */
 	@XmlElement(required = false)
@@ -72,22 +68,6 @@ public class QueryBean {
 	 */
 	public void setTenantId(int tenantId) {
 		this.tenantId = tenantId;
-	}
-
-	/**
-	 * Gets the table name.
-	 * @return the table name
-	 */
-	public String getTableName() {
-		return tableName;
-	}
-
-	/**
-	 * Sets the table name.
-	 * @param tableName the new table name
-	 */
-	public void setTableName(String tableName) {
-		this.tableName = tableName;
 	}
 
 	/**

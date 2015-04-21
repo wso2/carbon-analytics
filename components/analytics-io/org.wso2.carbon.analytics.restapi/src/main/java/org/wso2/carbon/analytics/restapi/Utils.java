@@ -22,34 +22,30 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
-import org.wso2.carbon.analytics.dataservice.commons.DrillDownResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
-import org.wso2.carbon.analytics.restapi.beans.AnalyticsSchemaBean;
-import org.wso2.carbon.analytics.restapi.beans.ColumnTypeBean;
-import org.wso2.carbon.analytics.restapi.beans.DrillDownPathBean;
-import org.wso2.carbon.analytics.restapi.beans.DrillDownPerFieldResultBean;
-import org.wso2.carbon.analytics.restapi.beans.DrillDownRangeBean;
-import org.wso2.carbon.analytics.restapi.beans.DrillDownRequestBean;
-import org.wso2.carbon.analytics.restapi.beans.DrillDownResultBean;
-import org.wso2.carbon.analytics.restapi.beans.DrillDownResultEntryBean;
-import org.wso2.carbon.analytics.restapi.beans.IndexTypeBean;
-import org.wso2.carbon.analytics.restapi.beans.PerFieldRangeDrillDownResultBean;
-import org.wso2.carbon.analytics.restapi.beans.PerRangeDrillDownResultBean;
-import org.wso2.carbon.analytics.restapi.beans.RangeDrillDownResultBean;
-import org.wso2.carbon.analytics.restapi.beans.RecordBean;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.restapi.beans.AnalyticsSchemaBean;
+import org.wso2.carbon.analytics.restapi.beans.CategoryDrillDownRequestBean;
+import org.wso2.carbon.analytics.restapi.beans.ColumnTypeBean;
+import org.wso2.carbon.analytics.restapi.beans.DrillDownPathBean;
+import org.wso2.carbon.analytics.restapi.beans.DrillDownRangeBean;
+import org.wso2.carbon.analytics.restapi.beans.DrillDownRequestBean;
+import org.wso2.carbon.analytics.restapi.beans.IndexTypeBean;
+import org.wso2.carbon.analytics.restapi.beans.RecordBean;
+import org.wso2.carbon.analytics.restapi.beans.SubCategoriesBean;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -101,24 +97,6 @@ public class Utils {
     }
 
     /**
-     * Gets the analytics data service.
-     *
-     * @return the analytics data service
-     * @throws AnalyticsException
-     */
-    public static SecureAnalyticsDataService getCarbonAnalyticsAPI()
-            throws AnalyticsException {
-        SecureAnalyticsDataService analyticsDataService;
-        analyticsDataService = (SecureAnalyticsDataService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                .getOSGiService(SecureAnalyticsDataService.class,
-                                null);
-        if (analyticsDataService == null) {
-            throw new AnalyticsException("AnalyticsDataService is not available.");
-        }
-        return analyticsDataService;
-    }
-
-    /**
      * Gets the records from record beans.
      *
      * @param recordBeans the record beans
@@ -141,7 +119,7 @@ public class Utils {
     @SuppressWarnings("unchecked")
     private static Map<String, Object> validateAndReturn(Map<String, Object> values)
             throws AnalyticsIndexException {
-        Map<String, Object> valueMap = new LinkedHashMap<String, Object>(0);
+        Map<String, Object> valueMap = new LinkedHashMap<>(0);
         for (Map.Entry<String, Object> recordEntry : values.entrySet()) {
             //TODO : AnalyticsCategoryPath is mapped to a linkedList by jackson json.
             // Currently checking the type and convert it manually to categoryPath type.
@@ -201,7 +179,7 @@ public class Utils {
      * @return the list of recordBeans
      */
     public static List<RecordBean> createRecordBeans(List<Record> records) {
-        List<RecordBean> recordBeans = new ArrayList<RecordBean>();
+        List<RecordBean> recordBeans = new ArrayList<>();
         for (Record record : records) {
             RecordBean recordBean = createRecordBean(record);
             recordBeans.add(recordBean);
@@ -286,7 +264,7 @@ public class Utils {
      */
     public static Map<String, IndexTypeBean> createIndexTypeBeanMap(
             Map<String, IndexType> indexTypeMap) {
-        Map<String, IndexTypeBean> indexTypeBeanMap = new HashMap<String, IndexTypeBean>();
+        Map<String, IndexTypeBean> indexTypeBeanMap = new HashMap<>();
         Set<String> columns = indexTypeMap.keySet();
         for (String column : columns) {
             indexTypeBeanMap.put(column, createIndexTypeBean(indexTypeMap.get(column)));
@@ -302,7 +280,7 @@ public class Utils {
      */
     public static Map<String, IndexType> createIndexTypeMap(
             Map<String, IndexTypeBean> indexTypeBeanMap) {
-        Map<String, IndexType> indexTypeMap = new HashMap<String, IndexType>();
+        Map<String, IndexType> indexTypeMap = new HashMap<>();
         Set<String> columns = indexTypeBeanMap.keySet();
         for (String column : columns) {
             indexTypeMap.put(column, createIndexType(indexTypeBeanMap.get(column)));
@@ -317,7 +295,7 @@ public class Utils {
      * @return the record ids from search results
      */
     public static List<String> getRecordIds(List<SearchResultEntry> searchResults) {
-        List<String> ids = new ArrayList<String>();
+        List<String> ids = new ArrayList<>();
         for (SearchResultEntry searchResult : searchResults) {
             ids.add(searchResult.getId());
         }
@@ -357,7 +335,7 @@ public class Utils {
                                                             SecureAnalyticsDataService analyticsDataService)
             throws AnalyticsException {
 
-        List<Iterator<Record>> iterators = new ArrayList<Iterator<Record>>();
+        List<Iterator<Record>> iterators = new ArrayList<>();
         for (RecordGroup recordGroup : recordGroups) {
             iterators.add(analyticsDataService.readRecords(recordGroup));
         }
@@ -372,7 +350,7 @@ public class Utils {
      * @return Analytics schema
      */
     public static AnalyticsSchema createAnalyticsSchema(AnalyticsSchemaBean analyticsSchemaBean) {
-        Map<String, AnalyticsSchema.ColumnType> columnTypes = new HashMap<String, AnalyticsSchema.ColumnType>();
+        Map<String, AnalyticsSchema.ColumnType> columnTypes = new HashMap<>();
         for (Map.Entry<String, ColumnTypeBean> columnEntry : analyticsSchemaBean.getColumns().entrySet()) {
             columnTypes.put(columnEntry.getKey(), getColumnType(columnEntry.getValue()));
         }
@@ -386,8 +364,8 @@ public class Utils {
      * @return Table schema bean
      */
     public static AnalyticsSchemaBean createTableSchemaBean(AnalyticsSchema analyticsSchema) {
-        Map<String, ColumnTypeBean> columnTypeBeanTypes = new HashMap<String, ColumnTypeBean>();
-        List<String> primaryKeys = new ArrayList<String>();
+        Map<String, ColumnTypeBean> columnTypeBeanTypes = new HashMap<>();
+        List<String> primaryKeys = new ArrayList<>();
         if (analyticsSchema.getColumns() != null) {
             for (Map.Entry<String, AnalyticsSchema.ColumnType> columnTypeEntry :
                     analyticsSchema.getColumns().entrySet()) {
@@ -401,77 +379,6 @@ public class Utils {
     }
 
     /**
-     * Create a a bean class for the drilldown result input which is a result of non-ranged based drilldown
-     *
-     * @param result The results from calling the drilldown method of the analyticsDataservice.
-     * @return a DrilldownResultBean class containing the drilldown information
-     */
-    public static DrillDownResultBean createDrillDownResultBean(
-            Map<String, List<DrillDownResultEntry>> result) {
-        DrillDownResultBean resultBean = new DrillDownResultBean();
-        resultBean.setPerFieldResults(createPerFieldDrillDownResultBean(result));
-        return resultBean;
-    }
-
-    private static Map<String, DrillDownPerFieldResultBean> createPerFieldDrillDownResultBean(
-            Map<String
-                    , List<DrillDownResultEntry>> result) {
-        Map<String, DrillDownPerFieldResultBean> perFieldResults = new LinkedHashMap<>();
-        for (Map.Entry<String, List<DrillDownResultEntry>> entry : result.entrySet()) {
-            DrillDownPerFieldResultBean bean = new DrillDownPerFieldResultBean();
-            bean.setPath(Arrays.asList(entry.getValue().get(0).getCategoryPath()));
-            bean.setPerCategoryResults(createPerCategoryDrillDownResultBean(entry.getValue()));
-            perFieldResults.put(entry.getKey(), bean);
-        }
-        return perFieldResults;
-    }
-
-    private static Map<String, DrillDownResultEntryBean> createPerCategoryDrillDownResultBean
-            (List<DrillDownResultEntry> result) {
-        Map<String, DrillDownResultEntryBean> beans = new LinkedHashMap<>(0);
-        for (DrillDownResultEntry entry : result) {
-            DrillDownResultEntryBean bean = new DrillDownResultEntryBean();
-            bean.setRecordCount(entry.getRecordCount());
-            bean.setRecordIds(entry.getRecordIds());
-            beans.put(entry.getCategory(), bean);
-        }
-        return beans;
-    }
-
-    /**
-     * Creates a bean class for results of a numeric range based drilldown search.
-     *
-     * @param result The result of the method "drilldown" of AnalyticsDataService
-     * @return A bean class representing the range based drilldown results
-     */
-    public static RangeDrillDownResultBean createRangeDrillDownResultBean(
-            Map<String, List<DrillDownResultEntry>> result) {
-        RangeDrillDownResultBean rangeDrillDownResultBean = new RangeDrillDownResultBean();
-        for (Map.Entry<String, List<DrillDownResultEntry>> entry : result.entrySet()) {
-            PerFieldRangeDrillDownResultBean bean = new PerFieldRangeDrillDownResultBean();
-            bean.setFieldName(entry.getKey());
-            bean.setPerRangeResult(createPerRangeDrillDownResultBeans(entry.getValue()));
-            rangeDrillDownResultBean.setPerFieldResults(bean);
-        }
-        return rangeDrillDownResultBean;
-    }
-
-    private static List<PerRangeDrillDownResultBean> createPerRangeDrillDownResultBeans(
-            List<DrillDownResultEntry> value) {
-        List<PerRangeDrillDownResultBean> beans = new ArrayList<>(0);
-        for (DrillDownResultEntry entry : value) {
-            PerRangeDrillDownResultBean bean = new PerRangeDrillDownResultBean();
-            bean.setLabel(entry.getCategory());
-            bean.setTo(entry.getTo());
-            bean.setFrom(entry.getFrom());
-            bean.setRecordCount(entry.getRecordCount());
-            bean.setRecordIds(entry.getRecordIds());
-            beans.add(bean);
-        }
-        return beans;
-    }
-
-    /**
      * Creates the AnalyticsDrilldownRequest object given a drilldownrequestBean class
      *
      * @param bean bean class which represents the drilldown request.
@@ -480,36 +387,57 @@ public class Utils {
     public static AnalyticsDrillDownRequest createDrilldownRequest(DrillDownRequestBean bean) {
         AnalyticsDrillDownRequest drillDownRequest = new AnalyticsDrillDownRequest();
         drillDownRequest.setTableName(bean.getTableName());
-        drillDownRequest.setCategoryCount(bean.getCategoryCount());
         drillDownRequest.setRecordCount(bean.getRecordCount());
-        drillDownRequest.setCategoryStartIndex(bean.getCategoryStart());
         drillDownRequest.setRecordStartIndex(bean.getRecordStart());
         drillDownRequest.setLanguage(bean.getLanguage());
         drillDownRequest.setLanguageQuery(bean.getQuery());
         drillDownRequest.setScoreFunction(bean.getScoreFunction());
         drillDownRequest.setCategoryPaths(createCategoryPaths(bean.getCategories()));
-        drillDownRequest.setRangeFacets(createDrillDownRanges(bean.getRanges()));
+        drillDownRequest.setRanges(createDrillDownRanges(bean.getRanges()));
+        drillDownRequest.setRangeField(bean.getRangeField());
         return drillDownRequest;
     }
 
-    private static Map<String, List<AnalyticsDrillDownRange>> createDrillDownRanges(
-            Map<String, List<DrillDownRangeBean>> ranges) {
-        Map<String, List<AnalyticsDrillDownRange>> result = new LinkedHashMap<>(0);
-        if (ranges != null) {
-            for (Map.Entry<String, List<DrillDownRangeBean>> entry : ranges.entrySet()) {
-                result.put(entry.getKey(), createDrillDownRanges(entry.getValue()));
-            }
+    public static CategoryDrillDownRequest createDrilldownRequest(CategoryDrillDownRequestBean bean) {
+        CategoryDrillDownRequest drillDownRequest = new CategoryDrillDownRequest();
+        drillDownRequest.setTableName(bean.getTableName());
+        drillDownRequest.setFieldName(bean.getFieldName());
+        drillDownRequest.setQuery(bean.getQuery());
+        drillDownRequest.setScoreFunction(bean.getScoreFunction());
+        List<String> path = bean.getCategoryPath();
+        drillDownRequest.setPath(path.toArray(new String[path.size()]));
+        return drillDownRequest;
+    }
+
+    public static SubCategoriesBean createSubCategoriesBean(SubCategories categories) {
+        SubCategoriesBean bean = new SubCategoriesBean();
+        bean.setCategoryPath(categories.getPath());
+        List<String> subCategories = new ArrayList<>();
+        for (SearchResultEntry entry : categories.getCategories()) {
+            subCategories.add(entry.getId());
         }
-        return result;
+        bean.setCategories(subCategories);
+        return bean;
     }
 
     private static List<AnalyticsDrillDownRange> createDrillDownRanges(
             List<DrillDownRangeBean> ranges) {
-        List<AnalyticsDrillDownRange> result = new ArrayList<AnalyticsDrillDownRange>(0);
+        List<AnalyticsDrillDownRange> result = new ArrayList<>();
         for (DrillDownRangeBean rangeBean : ranges) {
             AnalyticsDrillDownRange range = new AnalyticsDrillDownRange(rangeBean.getLabel(),
-                                                                        rangeBean.getFrom(), rangeBean.getTo());
+                     rangeBean.getFrom(), rangeBean.getTo());
             result.add(range);
+        }
+        return result;
+    }
+
+    public static List<DrillDownRangeBean> createDrillDownRangeBeans(
+            List<AnalyticsDrillDownRange> ranges) {
+        List<DrillDownRangeBean> result = new ArrayList<>();
+        for (AnalyticsDrillDownRange range : ranges) {
+            DrillDownRangeBean bean = new DrillDownRangeBean(range.getLabel(),
+                      range.getFrom(), range.getTo(), range.getScore());
+            result.add(bean);
         }
         return result;
     }
@@ -517,7 +445,7 @@ public class Utils {
 
     private static Map<String, AnalyticsCategoryPath> createCategoryPaths(
             List<DrillDownPathBean> bean) {
-        Map<String, AnalyticsCategoryPath> categoryPaths = new LinkedHashMap<String, AnalyticsCategoryPath>(0);
+        Map<String, AnalyticsCategoryPath> categoryPaths = new LinkedHashMap<>();
         for (DrillDownPathBean drillDownPathBean : bean) {
             categoryPaths.put(drillDownPathBean.getFieldName(),
                               new AnalyticsCategoryPath(drillDownPathBean.getPath()));

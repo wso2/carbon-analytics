@@ -21,10 +21,12 @@ import org.wso2.carbon.analytics.api.exception.AnalyticsServiceException;
 import org.wso2.carbon.analytics.api.internal.AnalyticsDataConfiguration;
 import org.wso2.carbon.analytics.api.internal.ServiceHolder;
 import org.wso2.carbon.analytics.api.internal.client.AnalyticsAPIHttpClient;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
-import org.wso2.carbon.analytics.dataservice.commons.DrillDownResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -424,6 +426,59 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
+    public List<SearchResultEntry> drillDownSearch(String username, AnalyticsDrillDownRequest drillDownRequest)
+            throws AnalyticsIndexException {
+        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+            return ServiceHolder.getSecureAnalyticsDataService().drillDownSearch(username, drillDownRequest);
+        } else {
+            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
+                                                                         analyticsDataConfiguration.getPassword());
+            return AnalyticsAPIHttpClient.getInstance().drillDownSearch(MultitenantConstants.INVALID_TENANT_ID,
+                   username, drillDownRequest, true);
+        }
+    }
+    @Override
+    public int drillDownSearchCount(String username, AnalyticsDrillDownRequest drillDownRequest)
+            throws AnalyticsIndexException {
+        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+            return ServiceHolder.getSecureAnalyticsDataService().drillDownSearchCount(username, drillDownRequest);
+        } else {
+            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
+                                                                         analyticsDataConfiguration.getPassword());
+            return AnalyticsAPIHttpClient.getInstance().drillDownSearchCount(MultitenantConstants.INVALID_TENANT_ID,
+                                                                             username, drillDownRequest, true);
+        }
+    }
+
+    @Override
+    public SubCategories drillDownCategories(String username,
+                                             CategoryDrillDownRequest drillDownRequest)
+            throws AnalyticsIndexException {
+        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+            return ServiceHolder.getSecureAnalyticsDataService().drillDownCategories(username, drillDownRequest);
+        } else {
+            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
+                                                                         analyticsDataConfiguration.getPassword());
+            return AnalyticsAPIHttpClient.getInstance().drillDownCategories(MultitenantConstants.INVALID_TENANT_ID,
+                                                                            username, drillDownRequest, true);
+        }
+    }
+
+    @Override
+    public List<AnalyticsDrillDownRange> drillDownRangeCount(String username,
+                                                             AnalyticsDrillDownRequest drillDownRequest)
+            throws AnalyticsIndexException {
+        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+            return ServiceHolder.getSecureAnalyticsDataService().drillDownRangeCount(username, drillDownRequest);
+        } else {
+            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
+                                                                         analyticsDataConfiguration.getPassword());
+            return AnalyticsAPIHttpClient.getInstance().drillDownRangeCount(MultitenantConstants.INVALID_TENANT_ID,
+                                                                            username, drillDownRequest, true);
+        }
+    }
+
+    @Override
     public Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             return ServiceHolder.getAnalyticsDataService().readRecords(recordGroup);
@@ -537,14 +592,51 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public Map<String, List<DrillDownResultEntry>> drillDown(int tenantId, AnalyticsDrillDownRequest drillDownRequest)
+    public List<SearchResultEntry> drillDownSearch(int tenantId, AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
-            return ServiceHolder.getAnalyticsDataService().drillDown(tenantId, drillDownRequest);
+            return ServiceHolder.getAnalyticsDataService().drillDownSearch(tenantId, drillDownRequest);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
-            return AnalyticsAPIHttpClient.getInstance().drillDown(tenantId, null, drillDownRequest, false);
+            return AnalyticsAPIHttpClient.getInstance().drillDownSearch(tenantId, null, drillDownRequest, false);
+        }
+    }
+    @Override
+    public int drillDownSearchCount(int tenantId, AnalyticsDrillDownRequest drillDownRequest)
+            throws AnalyticsIndexException {
+        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+            return ServiceHolder.getAnalyticsDataService().drillDownSearchCount(tenantId, drillDownRequest);
+        } else {
+            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
+                                                                         analyticsDataConfiguration.getPassword());
+            return AnalyticsAPIHttpClient.getInstance().drillDownSearchCount(tenantId, null, drillDownRequest, false);
+        }
+    }
+
+    @Override
+    public SubCategories drillDownCategories(int tenantId,
+                                             CategoryDrillDownRequest drillDownRequest)
+            throws AnalyticsIndexException {
+        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+            return ServiceHolder.getAnalyticsDataService().drillDownCategories(tenantId, drillDownRequest);
+        } else {
+            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
+                                                                         analyticsDataConfiguration.getPassword());
+            return AnalyticsAPIHttpClient.getInstance().drillDownCategories(tenantId, null, drillDownRequest, false);
+        }
+    }
+
+    @Override
+    public List<AnalyticsDrillDownRange> drillDownRangeCount(int tenantId,
+                                                             AnalyticsDrillDownRequest drillDownRequest)
+            throws AnalyticsIndexException {
+        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+            return ServiceHolder.getAnalyticsDataService().drillDownRangeCount(tenantId, drillDownRequest);
+        } else {
+            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
+                                                                         analyticsDataConfiguration.getPassword());
+            return AnalyticsAPIHttpClient.getInstance().drillDownRangeCount(tenantId, null, drillDownRequest, false);
         }
     }
 
@@ -556,18 +648,6 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
             AnalyticsAPIHttpClient.getInstance().waitForIndexing(maxWait);
-        }
-    }
-
-    @Override
-    public Map<String, List<DrillDownResultEntry>> drillDown(String username, AnalyticsDrillDownRequest drillDownRequest) throws AnalyticsIndexException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
-            return ServiceHolder.getSecureAnalyticsDataService().drillDown(username, drillDownRequest);
-        } else {
-            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
-                    analyticsDataConfiguration.getPassword());
-            return AnalyticsAPIHttpClient.getInstance().drillDown(MultitenantConstants.INVALID_TENANT_ID, null,
-                    drillDownRequest, true);
         }
     }
 

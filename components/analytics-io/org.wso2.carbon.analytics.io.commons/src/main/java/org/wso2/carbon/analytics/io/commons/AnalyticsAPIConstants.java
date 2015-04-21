@@ -72,7 +72,10 @@ public class AnalyticsAPIConstants {
     public static final String GET_SCORE_PARAMS_OPERATION = "__get_score_params_opr";
     public static final String DELETE_INDICES_OPERATION = "__delete_indices_opr";
     public static final String SEARCH_OPERATION = "__search_opr";
-    public static final String DRILL_DOWN_OPERATION = "__drillDown_opr";
+    public static final String DRILL_DOWN_SEARCH_OPERATION = "__drillDownSearch_opr";
+    public static final String DRILL_DOWN_SEARCH_COUNT_OPERATION = "drillDownSearchCount_opr";
+    public static final String DRILL_DOWN_SEARCH_CATEGORY_OPERATION = "drillDownSearchCategory_opr";
+    public static final String DRILL_DOWN_SEARCH_RANGE_COUNT_OPERATION = "drillDownRangeCount_opr";
     public static final String SEARCH_COUNT_OPERATION = "__search_count_opr";
     public static final String WAIT_FOR_INDEXING_OPERATION = "__wait_for_index_opr";
     public static final String DESTROY_OPERATION = "__destroy_opr";

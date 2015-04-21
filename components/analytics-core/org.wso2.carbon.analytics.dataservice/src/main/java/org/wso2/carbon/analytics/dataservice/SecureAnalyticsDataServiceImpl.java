@@ -17,10 +17,12 @@
 */
 package org.wso2.carbon.analytics.dataservice;
 
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
-import org.wso2.carbon.analytics.dataservice.commons.DrillDownResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -281,16 +283,63 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     }
 
     @Override
-    public Map<String, List<DrillDownResultEntry>> drillDown(String username,
+    public List<SearchResultEntry> drillDownSearch(String username,
+                                                   AnalyticsDrillDownRequest drillDownRequest)
+            throws AnalyticsIndexException {
+        try {
+            int tenantId = getTenantId(username);
+            if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_SEARCH_RECORD)) {
+                throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                               "permission to perform drilldownSearch");
+            }
+            return analyticsDataService.drillDownSearch(tenantId, drillDownRequest);
+        } catch (AnalyticsException e) {
+            throw new AnalyticsIndexException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public int drillDownSearchCount(String username, AnalyticsDrillDownRequest drillDownRequest)
+            throws AnalyticsIndexException {
+        try {
+            int tenantId = getTenantId(username);
+            if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_SEARCH_RECORD)) {
+                throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                               "permission to perform drilldownSearchCount");
+            }
+            return analyticsDataService.drillDownSearchCount(tenantId, drillDownRequest);
+        } catch (AnalyticsException e) {
+            throw new AnalyticsIndexException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public SubCategories drillDownCategories(String username,
+                                             CategoryDrillDownRequest drillDownRequest)
+            throws AnalyticsIndexException {
+        try {
+            int tenantId = getTenantId(username);
+            if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_SEARCH_RECORD)) {
+                throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                               "permission to drilldown categories");
+            }
+            return analyticsDataService.drillDownCategories(tenantId, drillDownRequest);
+        } catch (AnalyticsException e) {
+            throw new AnalyticsIndexException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public List<AnalyticsDrillDownRange> drillDownRangeCount(String username,
                                                              AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
         try {
             int tenantId = getTenantId(username);
             if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_SEARCH_RECORD)) {
                 throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
-                                                               "permission to perform faceted drilldown");
+                                                               "permission to drilldown ranges");
             }
-            return analyticsDataService.drillDown(tenantId, drillDownRequest);
+            return analyticsDataService.drillDownRangeCount(tenantId, drillDownRequest);
         } catch (AnalyticsException e) {
             throw new AnalyticsIndexException(e.getMessage(), e);
         }

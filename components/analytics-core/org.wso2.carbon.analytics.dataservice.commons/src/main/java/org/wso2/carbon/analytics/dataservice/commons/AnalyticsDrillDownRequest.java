@@ -19,7 +19,6 @@ package org.wso2.carbon.analytics.dataservice.commons;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,39 +34,36 @@ public class AnalyticsDrillDownRequest implements Serializable {
     private String tableName;
     //List of facets / List of category path to drill down
     private Map<String, AnalyticsCategoryPath> categoryPaths;
-    //List of Range facets to drilldown
-    private Map<String, List<AnalyticsDrillDownRange>> ranges;
+    //List of Range facets/buckets to drilldown
+    private List<AnalyticsDrillDownRange> ranges;
+    //Field name which is bucketed.
+    private String rangeField;
     //query language - either lucene or regex
     private String language;
     // language query
     private  String languageQuery;
     // represents the score function and the values
     private String scoreFunction;
-    //maximun number of categories for each facet field
-    private int categoryCount;
-
-    private int categoryStart;
     // maximum records for each category in each facet
     private int recordCount;
     //Records start index
     private  int recordStart;
-
     public AnalyticsDrillDownRequest() {
     }
 
     public AnalyticsDrillDownRequest(String tableName,
-                                     Map<String, AnalyticsCategoryPath> categoryPaths,
-                                     Map<String, List<AnalyticsDrillDownRange>> ranges,
+                                     Map<String, AnalyticsCategoryPath> categoryPaths, String rangeField,
+                                     List<AnalyticsDrillDownRange> ranges,
                                      String language, String languageQuery,
-                                     String scoreFunction, int categoryCount, int recordCount,
+                                     String scoreFunction, int recordCount,
                                      int recordStart) {
         this.tableName = tableName;
         this.categoryPaths = categoryPaths;
+        this.rangeField = rangeField;
         this.ranges = ranges;
         this.language = language;
         this.languageQuery = languageQuery;
         this.scoreFunction = scoreFunction;
-        this.categoryCount = categoryCount;
         this.recordCount = recordCount;
         this.recordStart = recordStart;
     }
@@ -164,61 +160,6 @@ public class AnalyticsDrillDownRequest implements Serializable {
     }
 
     /**
-     * Get the List of Drill down ranges. This can be null if the
-     * drilldown mechanism is not ranged based.
-     * @return The map of ranges with the fields
-     */
-    public Map<String, List<AnalyticsDrillDownRange>> getRangeFacets() {
-        return ranges;
-    }
-
-    /**
-     * Sets the ranges for drilling down ranges.
-     * @param ranges The map of ranges, the key of the map represents the field bieng range-queried
-     *                and value represents a list which can have several ranges for one field.
-     */
-    public void setRangeFacets(Map<String, List<AnalyticsDrillDownRange>> ranges) {
-        this.ranges = ranges;
-    }
-
-    /**
-     * Inserts a single range to existing List of ranges.
-     * @param range A drill down range being inserted
-     */
-    public  void addRangeFacet(String field, AnalyticsDrillDownRange range) {
-        if (this.ranges == null) {
-            this.ranges = new LinkedHashMap<>();
-        }
-        List<AnalyticsDrillDownRange> ranges = this.getRangeFacets().get(field);
-
-        if (ranges == null) {
-            ranges = new ArrayList<>();
-            this.ranges.put(field, ranges);
-        }
-        ranges.add(range);
-    }
-
-    /**
-     * Get the maximum number of  child categories/facets for each field to be present
-     * in the drilldown result.
-     * @return The number of maximum child facets
-     */
-    public int getCategoryCount() {
-        if (categoryCount < 0) {
-            return 0;
-        }
-        return categoryCount;
-    }
-
-    /**
-     * Sets the maximum number of child facets to be returned from the drilldown.
-     * @param categoryCount the number of child facets in max.
-     */
-    public void setCategoryCount(int categoryCount) {
-        this.categoryCount = categoryCount;
-    }
-
-    /**
      * Returns the number of maximum records per a child facet in each facet field in drilldown result.
      * @return the number of records in a child facet in max.
      */
@@ -252,18 +193,19 @@ public class AnalyticsDrillDownRequest implements Serializable {
         this.recordStart = recordStart;
     }
 
-    public int getCategoryStartIndex() {
-        if (categoryStart < 0) {
-            return 0;
-        }
-        return categoryStart;
+    public List<AnalyticsDrillDownRange> getRanges() {
+        return ranges;
     }
 
-    /**
-     * set the starting index of the categories
-     * @param categoryStart 0 based index
-     */
-    public void setCategoryStartIndex(int categoryStart) {
-        this.categoryStart = categoryStart;
+    public void setRanges(List<AnalyticsDrillDownRange> ranges) {
+        this.ranges = ranges;
+    }
+
+    public String getRangeField() {
+        return rangeField;
+    }
+
+    public void setRangeField(String rangeField) {
+        this.rangeField = rangeField;
     }
 }

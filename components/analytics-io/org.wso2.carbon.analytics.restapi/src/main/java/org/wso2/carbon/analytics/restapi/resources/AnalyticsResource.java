@@ -24,28 +24,29 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
-import org.wso2.carbon.analytics.dataservice.commons.DrillDownResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
-import org.wso2.carbon.analytics.restapi.Constants;
-import org.wso2.carbon.analytics.restapi.UnauthenticatedUserException;
-import org.wso2.carbon.analytics.restapi.Utils;
-import org.wso2.carbon.analytics.restapi.beans.AnalyticsSchemaBean;
-import org.wso2.carbon.analytics.restapi.beans.DrillDownPathBean;
-import org.wso2.carbon.analytics.restapi.beans.DrillDownRangeBean;
-import org.wso2.carbon.analytics.restapi.beans.DrillDownRequestBean;
-import org.wso2.carbon.analytics.restapi.beans.DrillDownResultBean;
-import org.wso2.carbon.analytics.restapi.beans.IndexConfigurationBean;
-import org.wso2.carbon.analytics.restapi.beans.QueryBean;
-import org.wso2.carbon.analytics.restapi.beans.RangeDrillDownResultBean;
-import org.wso2.carbon.analytics.restapi.beans.RecordBean;
-import org.wso2.carbon.analytics.restapi.beans.TableBean;
+import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.analytics.restapi.Constants;
+import org.wso2.carbon.analytics.restapi.UnauthenticatedUserException;
+import org.wso2.carbon.analytics.restapi.Utils;
+import org.wso2.carbon.analytics.restapi.beans.AnalyticsSchemaBean;
+import org.wso2.carbon.analytics.restapi.beans.CategoryDrillDownRequestBean;
+import org.wso2.carbon.analytics.restapi.beans.DrillDownPathBean;
+import org.wso2.carbon.analytics.restapi.beans.DrillDownRangeBean;
+import org.wso2.carbon.analytics.restapi.beans.DrillDownRequestBean;
+import org.wso2.carbon.analytics.restapi.beans.IndexConfigurationBean;
+import org.wso2.carbon.analytics.restapi.beans.QueryBean;
+import org.wso2.carbon.analytics.restapi.beans.RecordBean;
+import org.wso2.carbon.analytics.restapi.beans.SubCategoriesBean;
+import org.wso2.carbon.analytics.restapi.beans.TableBean;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.user.api.UserRealm;
@@ -76,7 +77,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -228,7 +228,7 @@ public class AnalyticsResource extends AbstractResource {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking insertRecordsToTable");
 		}
-		AnalyticsDataService analyticsDataService = Utils.getAnalyticsDataService();
+		SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         if (recordBeans != null) {
             if (logger.isDebugEnabled()) {
@@ -238,7 +238,7 @@ public class AnalyticsResource extends AbstractResource {
                 }
             }
             List<Record> records = Utils.getRecordsForTable(username, tableName, recordBeans);
-            analyticsDataService.put(records);
+            analyticsDataService.put(username, records);
             final Iterator<Record> recordIterator = records.iterator();
             return new StreamingOutput() {
                 @Override
@@ -596,10 +596,9 @@ public class AnalyticsResource extends AbstractResource {
         anss.setLanguageQuery(null);
         anss.setLanguage("lucene");
         anss.setTableName("test");
-        anss.setCategoryCount(categories);
         anss.setRecordCount(records);
 
-        return Response.ok(ads.drillDown(-1234,anss)).build();
+        return Response.ok(ads.drillDownSearch(-1234, anss)).build();
     }
 
     /**
@@ -616,18 +615,19 @@ public class AnalyticsResource extends AbstractResource {
             throws AnalyticsException {
         AnalyticsDataService ads = Utils.getAnalyticsDataService();
         AnalyticsDrillDownRequest anss = new AnalyticsDrillDownRequest();
-        anss.addRangeFacet("number", new AnalyticsDrillDownRange("-1 --- 1.5", -1, 1.5));
-        anss.addRangeFacet("number", new AnalyticsDrillDownRange("1.5 --- 3.1", 1.5, 3.1));
-        anss.addRangeFacet("number1", new AnalyticsDrillDownRange("3 --- 6", 3, 6));
+        List<AnalyticsDrillDownRange> ranges = new ArrayList<>();
+        ranges.add(new AnalyticsDrillDownRange("-1 --- 1.5", -1, 1.5));
+        ranges.add(new AnalyticsDrillDownRange("1.5 --- 3.1", 1.5, 3.1));
+        ranges.add(new AnalyticsDrillDownRange("3 --- 6", 3, 6));
+        anss.setRanges(ranges);
         AnalyticsCategoryPath path = new AnalyticsCategoryPath(new String[]{"2015"});
         anss.addCategoryPath("testField", path);
         anss.setLanguageQuery(null);
         anss.setLanguage("lucene");
         anss.setTableName("test");
-        anss.setCategoryCount(1);
         anss.setRecordCount(1);
-        Map<String, List<DrillDownResultEntry>>g = ads.drillDown(-1234, anss);
-        return Response.ok(Utils.createRangeDrillDownResultBean(g)).build();
+        List<SearchResultEntry> g = ads.drillDownSearch(-1234, anss);
+        return Response.ok(g).build();
     }
 
     @POST
@@ -638,15 +638,16 @@ public class AnalyticsResource extends AbstractResource {
             throws AnalyticsException {
         AnalyticsDataService ads = Utils.getAnalyticsDataService();
         AnalyticsDrillDownRequest anss = new AnalyticsDrillDownRequest();
-        anss.addRangeFacet("number", new AnalyticsDrillDownRange("-1 --- 1.5", -1, 1.5));
-        anss.addRangeFacet("number", new AnalyticsDrillDownRange("1.5 --- 3.1", 1.5, 3.1));
-        anss.addRangeFacet("number1", new AnalyticsDrillDownRange("3 --- 6", 3, 6));
+        List<AnalyticsDrillDownRange> ranges = new ArrayList<>();
+        ranges.add(new AnalyticsDrillDownRange("-1 --- 1.5", -1, 1.5));
+        ranges.add(new AnalyticsDrillDownRange("1.5 --- 3.1", 1.5, 3.1));
+        ranges.add(new AnalyticsDrillDownRange("3 --- 6", 3, 6));
+        anss.setRanges(ranges);
         AnalyticsCategoryPath path = new AnalyticsCategoryPath(new String[]{"2015"});
         anss.addCategoryPath("testField", path);
         anss.setLanguageQuery(null);
         anss.setLanguage("lucene");
         anss.setTableName("test");
-        anss.setCategoryCount(1);
         anss.setRecordCount(1);
 
 
@@ -664,19 +665,16 @@ public class AnalyticsResource extends AbstractResource {
         List<DrillDownPathBean> p = new ArrayList<>();
         DrillDownPathBean d = new DrillDownPathBean("field3", new String[]{"A", "B"});
         p.add(d);
-
-        Map<String, List<DrillDownRangeBean>> tt = new LinkedHashMap<>();
         List<DrillDownRangeBean> b = new ArrayList<>();
         DrillDownRangeBean ff = new DrillDownRangeBean("label",12334,679898);
         b.add(ff);
-        tt.put("fieldname", b);
-         dd.setRanges(tt);
-
+         dd.setRanges(b);
+            dd.setRangeField("fieldName");
         dd.setCategories(p);
         AnalyticsDrillDownRequest tg = Utils.createDrilldownRequest(dd);
         AnalyticsDataService e = Utils.getAnalyticsDataService();
-        Map<String, List<DrillDownResultEntry>> h = e.drillDown(-1234, tg);
-        return Response.ok(dd).build();
+        List<SearchResultEntry> h = e.drillDownSearch(-1234, tg);
+        return Response.ok(h).build();
     }
 
     /**
@@ -824,14 +822,13 @@ public class AnalyticsResource extends AbstractResource {
         String username = authenticate(authHeader);
         if (requestBean != null) {
             AnalyticsDrillDownRequest request = Utils.createDrilldownRequest(requestBean);
-            Map<String, List<DrillDownResultEntry>> result = analyticsDataService.drillDown(username, request);
-            if (requestBean.getRanges() == null || requestBean.getRanges().isEmpty()) {
-                DrillDownResultBean resultBean = Utils.createDrillDownResultBean(result);
-                return Response.ok(resultBean).build();
-            } else {
-                RangeDrillDownResultBean resultBean = Utils.createRangeDrillDownResultBean(result);
-                return Response.ok(resultBean).build();
-            }
+            List<SearchResultEntry> result= analyticsDataService.drillDownSearch(username, request);
+            List<String> ids = Utils.getRecordIds(result);
+            RecordGroup[] recordGroups = analyticsDataService.get(username,
+                                                                  requestBean.getTableName(), 1, null, ids);
+            List<RecordBean> recordBeans = Utils.createRecordBeans(GenericUtils.listRecords(analyticsDataService,
+                                                                                            recordGroups));
+            return Response.ok(recordBeans).build();
         } else {
             throw new AnalyticsException("Drilldown parameters not provided");
         }
@@ -858,11 +855,68 @@ public class AnalyticsResource extends AbstractResource {
         String username = authenticate(authHeader);
         if (requestBean != null) {
             AnalyticsDrillDownRequest request = Utils.createDrilldownRequest(requestBean);
-            Map<String, List<DrillDownResultEntry>> result = analyticsDataService.drillDown(username, request);
-            DrillDownResultBean resultBean = Utils.createDrillDownResultBean(result);
-            return Response.ok(resultBean).build();
+            int result = analyticsDataService.drillDownSearchCount(username, request);
+            return Response.ok(result).build();
         } else {
-            throw new AnalyticsException("Drilldown parameters not provided");
+            throw new AnalyticsException("DrilldownCount parameters not provided");
+        }
+    }
+
+    /**
+     * Performs the drilldown operation on a given set of range buckets of a field.
+     * @param requestBean request for drilldown which contains all the details to be drilled down
+     * @param authHeader basic authentication header base64 encoded
+     * @return List of analyticsDrilldownRange objects with scores not-null
+     * @throws AnalyticsException
+     */
+    @POST
+    @Consumes({ MediaType.APPLICATION_JSON})
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path(Constants.ResourcePath.DRILLDOWNCOUNT)
+    public Response drillDownRangeCount(DrillDownRequestBean requestBean,
+                                   @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
+            throws AnalyticsException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Invoking drilldownRangeCount for tableName : " + requestBean.getTableName());
+        }
+        SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+        String username = authenticate(authHeader);
+        if (requestBean != null) {
+            AnalyticsDrillDownRequest request = Utils.createDrilldownRequest(requestBean);
+            List<AnalyticsDrillDownRange> ranges = analyticsDataService.drillDownRangeCount(username, request);
+            List<DrillDownRangeBean> rangeBeans = Utils.createDrillDownRangeBeans(ranges);
+            return Response.ok(rangeBeans).build();
+        } else {
+            throw new AnalyticsException("DrilldownRangeCount parameters not provided");
+        }
+    }
+
+    /**
+     * Performs the drilldown operation on a given field to get the child categories
+     * @param requestBean request for drilldown which contains all the details of the category drilldown
+     * @param authHeader basic authentication header base64 encoded
+     * @return List of subcategories
+     * @throws AnalyticsException
+     */
+    @POST
+    @Consumes({ MediaType.APPLICATION_JSON})
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path(Constants.ResourcePath.DRILLDOWNCOUNT)
+    public Response drillDownCategories(CategoryDrillDownRequestBean requestBean,
+                                   @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
+            throws AnalyticsException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Invoking drilldownCategories for tableName : " + requestBean.getTableName());
+        }
+        SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+        String username = authenticate(authHeader);
+        if (requestBean != null) {
+            CategoryDrillDownRequest request = Utils.createDrilldownRequest(requestBean);
+            SubCategories categories = analyticsDataService.drillDownCategories(username, request);
+            SubCategoriesBean bean = Utils.createSubCategoriesBean(categories);
+            return Response.ok(bean).build();
+        } else {
+            throw new AnalyticsException("DrilldownCategory parameters not provided");
         }
     }
 
