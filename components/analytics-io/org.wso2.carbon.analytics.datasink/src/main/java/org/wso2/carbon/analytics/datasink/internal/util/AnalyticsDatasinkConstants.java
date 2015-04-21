@@ -22,5 +22,5 @@ public class AnalyticsDatasinkConstants {
     public static final int DEFAULT_BUNDLE_SIZE = 1024;
     public static final String EVENT_META_DATA_TYPE = "meta";
     public static final String EVENT_CORRELATION_DATA_TYPE = "correlation";
-    public static final String STREAM_VERSION_KEY = "Version";
+    public static final String STREAM_VERSION_KEY = "_version";
 }
