@@ -37,7 +37,6 @@ public class AnalyticsDataPurgingTask extends AbstractTask {
 
     @Override
     public void execute() {
-        System.out.println("CarbonContext.getThreadLocalCarbonContext().getTenantId() = " + CarbonContext.getThreadLocalCarbonContext().getTenantId());
         if (logger.isDebugEnabled()) {
             logger.debug("Staring execute analytics data puring task");
         }
