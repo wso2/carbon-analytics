@@ -110,12 +110,6 @@
                     })
                 }
             });
-            jQuery('#dataPurgingScheudleTime').datetimepicker({
-                datepicker: false,
-                format: 'H:i',
-                closeOnDateSelect: true
-            });
-
             $("#createTableDialog").dialog({
                 autoOpen: false
             });
@@ -202,13 +196,12 @@
                         {tableName: $("#tableSelect").val()},
                        function (result) {
                            var resultObj = jQuery.parseJSON(result);
-                           $("#purgeRecordDialog").dialog("open");
                            $('#dataPurgingScheudleTime').val(resultObj.cronString);
                            $('#dataPurgingScheudleTime').prop('disabled', false);
-                           $("#dataPurgingScheudleTime").datepicker('hide');
                            $('#dataPurgingDay').val(resultObj.retentionPeriod);
                            $('#dataPurgingDay').prop('disabled', false);
                            $('#dataPurgingCheckBox').prop("checked", true);
+                           $("#purgeRecordDialog").dialog("open");
                        });
                 return true;
             });
@@ -778,7 +771,7 @@
                     <input type="checkbox" id="dataPurgingCheckBox">
                 </label>
                 <br/>
-                <label> Schedule Time:
+                <label> Schedule Time (Either cron string or HH:MM):
                     <input type="text" id="dataPurgingScheudleTime" disabled="disabled" class="validate[required]">
                 </label>
                 <br/>
