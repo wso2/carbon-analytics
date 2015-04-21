@@ -169,9 +169,7 @@ function arbitraryFieldDeleteActionMethod(postData) {
 }
 
 function createJTable() {
-    $("#resultsTable").show();
-    var workAreaWidth = $("#workArea").width();
-    $("#AnalyticsTableContainer").width(workAreaWidth-20);
+
     var table = $("#tableSelect").val();
     if (table != '-1') {
         $.getJSON("/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=" + typeTableInfo + "&tableName=" + table,

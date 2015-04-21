@@ -2,8 +2,25 @@
  * Created by Halil İbrahim Kalkan
  * http://www.jtable.org
  */
+#AnalyticsTableContainer{
+    padding:6px 0px;
+}
+#query{
+    font-family: "Lucida Grande","Lucida Sans","Microsoft Sans Serif","Lucida Sans Unicode","Verdana","Sans-serif","trebuchet ms";
+    font-size: 12px;
+    font-weight: normal;
+    line-height: 1.25em;
+}
+form.jtable-dialog-form{
+    padding-bottom:50px!important;
+}
+.ui-dialog-buttonpane{
+    width:98%;
+}
+ .ui-dialog-titlebar-close{
+    background: url(../dialog/css/jqueryui/images/222222_11x11_icon_close.gif) 4px 4px no-repeat;
+ }
  .ui-widget-overlay {
-      background-image:url(../../../img/overlay.png);
       opacity: 0.1;
   }
   .ui-dialog-content table.styledLeft {
@@ -17,8 +34,11 @@
   .ui-dialog-content table.normal td{
         vertical-align:middle;
    }
+   .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button{
+        font-size:12px;
+   }
   .ui-dialog-content table.styledLeft thead th {
-      background-image:url(../../../images/table-header.gif);
+      background-image:url(../images/table-header.gif);
       background-position: left bottom;
       background-repeat:repeat-x;
       border:1px solid #cccccc;
@@ -28,9 +48,16 @@
       margin-bottom:5px;
       padding-left:8px;
   }
-
+  #resultsTable table.styledLeft tbody tr td{
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+  #resultsTable table.styledLeft tbody tr td{
+      padding-top: 8px;
+      padding-bottom: 8px;
+  }
   .ui-dialog-content table.styledLeft tbody tr td.middle-header {
-      background-image:url(../../../images/table-header.gif);
+      background-image:url(../images/table-header.gif);
       background-position: left bottom;
       background-repeat:repeat-x;
       border:1px solid #cccccc;
@@ -42,7 +69,7 @@
   }
 
   .ui-dialog-content table.styledLeft tbody tr td.sub-header {
-  	background-image:url(../../../images/table-header.gif);
+  	background-image:url(../images/table-header.gif);
       background-position: left bottom;
       background-repeat:repeat-x;
       border:1px solid #cccccc;
@@ -82,11 +109,16 @@
   .ui-dialog-content table.styledLeft tbody tr td.buttonRow {
       padding-top: 5px;
       padding-bottom: 5px;
-      background-image: url(../../../images/buttonRow-bg.gif);
+      background-image: url(../images/buttonRow-bg.gif);
       background-position: left top;
       background-repeat: repeat-x;
   }
-
+.searchQueryTxt{
+    padding: 20px 0px;
+    float: left;
+    padding-right: 6px;
+    display: inline-block;
+}
  #createTablePopup{
   padding-top:40px; 
  }
@@ -285,7 +317,7 @@ form.jtable-dialog-form div.jtable-input-field-container:last-child {
 }
 form.jtable-dialog-form div.jtable-input-label {
   padding: 2px 3px;
-  font-size: 1.1em;
+  font-size: 12px;
   color: #666;
 }
 form.jtable-dialog-form div.jtable-input {
