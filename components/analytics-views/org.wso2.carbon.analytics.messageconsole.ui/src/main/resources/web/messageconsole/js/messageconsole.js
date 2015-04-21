@@ -18,7 +18,7 @@ function getArbitraryFields(rowData) {
                                                      listAction: function (postData, jtParams) {
                                                          var postData = {};
                                                          postData['tableName'] = $("#tableSelect").val();
-                                                         postData['bam_unique_rec_id'] = rowData.record.bam_unique_rec_id;
+                                                         postData['_unique_rec_id'] = rowData.record._unique_rec_id;
                                                          return arbitraryFieldListActionMethod(postData, jtParams);
                                                      },
                                                      createAction: function (postData) {
@@ -29,7 +29,7 @@ function getArbitraryFields(rowData) {
                                                      },
                                                      deleteAction: function (postData) {
                                                          postData['tableName'] = $("#tableSelect").val();
-                                                         postData['bam_unique_rec_id'] = rowData.record.bam_unique_rec_id;
+                                                         postData['_unique_rec_id'] = rowData.record._unique_rec_id;
                                                          return arbitraryFieldDeleteActionMethod(postData);
                                                      }
                                                  },
@@ -52,11 +52,11 @@ function getArbitraryFields(rowData) {
                                                      data.form.validationEngine('detach');
                                                  },
                                                  fields: {
-                                                     bam_unique_rec_id: {
+                                                     _unique_rec_id: {
                                                          type: 'hidden',
                                                          key: true,
                                                          list: false,
-                                                         defaultValue: rowData.record.bam_unique_rec_id
+                                                         defaultValue: rowData.record._unique_rec_id
                                                      },
                                                      Name: {
                                                          title: 'Name',
@@ -103,12 +103,12 @@ function arbitraryFieldCreateActionMethod(postData) {
     if ($selectedRows.length > 0) {
         $selectedRows.each(function () {
             var record = $(this).data('record');
-            recordId = record.bam_unique_rec_id;
+            recordId = record._unique_rec_id;
         });
     }
     return $.Deferred(function ($dfd) {
         $.ajax({
-                   url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeCreateArbitraryRecord + "&tableName=" + $("#tableSelect").val() + "&bam_unique_rec_id=" + recordId,
+                   url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeCreateArbitraryRecord + "&tableName=" + $("#tableSelect").val() + "&_unique_rec_id=" + recordId,
                    type: 'POST',
                    dataType: 'json',
                    data: postData,
@@ -129,12 +129,12 @@ function arbitraryFieldUpdateActionMethod(postData) {
     if ($selectedRows.length > 0) {
         $selectedRows.each(function () {
             var record = $(this).data('record');
-            recordId = record.bam_unique_rec_id;
+            recordId = record._unique_rec_id;
         });
     }
     return $.Deferred(function ($dfd) {
         $.ajax({
-                   url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeUpdateArbitraryRecord + "&tableName=" + $("#tableSelect").val() + "&bam_unique_rec_id=" + recordId,
+                   url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeUpdateArbitraryRecord + "&tableName=" + $("#tableSelect").val() + "&_unique_rec_id=" + recordId,
                    type: 'POST',
                    dataType: 'json',
                    data: postData,
@@ -213,7 +213,7 @@ function createJTable() {
                               }
                           }
 
-                          if (val.name == 'bam_unique_rec_id' || val.name == 'bam_rec_timestamp') {
+                          if (val.name == '_unique_rec_id' || val.name == '_timestamp') {
                               fields[val.name].edit = false;
                               fields[val.name].create = false;
                           }
