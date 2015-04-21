@@ -44,6 +44,7 @@ import org.wso2.carbon.analytics.api.RemoteRecordIterator;
 import org.wso2.carbon.analytics.api.internal.AnalyticsDataConfiguration;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.DrillDownResultEntry;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.io.commons.RemoteRecordGroup;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceAuthenticationException;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceException;
@@ -422,18 +423,16 @@ public class AnalyticsAPIHttpClient {
 
     public void putRecords(String username, List<Record> records, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
-        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.RECORD_PROCESSOR_SERVICE_URI);
+        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.RECORD_PROCESSOR_SERVICE_URI)
+        .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.PUT_RECORD_OPERATION)
+        .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
+        if (securityEnabled) {
+            builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
+        }
         try {
             HttpPost postMethod = new HttpPost(builder.build().toString());
             postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
-            List<NameValuePair> params = new ArrayList<>();
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.PUT_RECORD_OPERATION));
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.RECORDS_PARAM, new Gson().toJson(records)));
-            if (securityEnabled) {
-                params.add(new BasicNameValuePair(AnalyticsAPIConstants.USERNAME_PARAM, username));
-            }
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled)));
-            postMethod.setEntity(new UrlEncodedFormEntity(params));
+            postMethod.setEntity(new ByteArrayEntity(GenericUtils.serializeObject(records)));
             HttpResponse httpResponse = httpClient.execute(postMethod);
             String response = getResponse(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
