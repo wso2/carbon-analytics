@@ -20,7 +20,6 @@ package org.wso2.carbon.analytics.dataservice;
 
 import com.hazelcast.core.HazelcastInstance;
 
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.engine.ListenerManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,17 +31,8 @@ import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerImpl;
 import org.wso2.carbon.analytics.dataservice.deployment.AnalyticsIndexCAppDeployer;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceService;
-import org.wso2.carbon.application.deployer.AppDeployerConstants;
-import org.wso2.carbon.application.deployer.AppDeployerUtils;
-import org.wso2.carbon.application.deployer.Feature;
 import org.wso2.carbon.application.deployer.handler.AppDeploymentHandler;
-import org.wso2.carbon.core.ServerStartupObserver;
 import org.wso2.carbon.user.core.service.RealmService;
-
-import java.io.InputStream;
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
 
 /**
  * This class represents the analytics data service declarative services component.

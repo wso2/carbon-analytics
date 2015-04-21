@@ -24,6 +24,7 @@ import java.util.List;
 
 public class HBaseTimestampRecordGroup implements RecordGroup {
 
+    private static final long serialVersionUID = -5892873497625619175L;
     private int tenantId;
     private String tableName;
     private List<String> columns;

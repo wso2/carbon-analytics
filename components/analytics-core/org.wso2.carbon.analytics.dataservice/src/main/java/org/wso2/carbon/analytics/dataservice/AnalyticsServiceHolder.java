@@ -21,11 +21,7 @@ package org.wso2.carbon.analytics.dataservice;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 
 import com.hazelcast.core.HazelcastInstance;
-import org.wso2.carbon.application.deployer.Feature;
 import org.wso2.carbon.user.core.service.RealmService;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * This represents a service holder class for analytics data service.

@@ -19,6 +19,8 @@ package org.wso2.carbon.analytics.api.exception;
 
 public class AnalyticsServiceException extends RuntimeException {
 
+    private static final long serialVersionUID = 5649198479245947311L;
+
     public AnalyticsServiceException(String msg) {
         super(msg);
     }

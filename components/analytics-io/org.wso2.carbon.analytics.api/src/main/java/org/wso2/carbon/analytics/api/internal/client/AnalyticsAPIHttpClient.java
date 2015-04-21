@@ -20,6 +20,7 @@ package org.wso2.carbon.analytics.api.internal.client;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+
 import org.apache.axiom.om.util.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -56,6 +57,7 @@ import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.*;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
@@ -421,6 +423,7 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void putRecords(String username, List<Record> records, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.RECORD_PROCESSOR_SERVICE_URI)
@@ -438,7 +441,7 @@ public class AnalyticsAPIHttpClient {
                 String response = getResponse(httpResponse);
                 throw new AnalyticsServiceException("Unable to put the records. " + response);
             }else {
-                List<String> recordIds = (List < String >)GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                List<String> recordIds = (List<String>) GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
                 int index = 0;
                 for (Record record: records){
                     record.setId(recordIds.get(index));
@@ -941,6 +944,7 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public Map<String, List<DrillDownResultEntry>> drillDown(int tenantId, String username,
                                                              AnalyticsDrillDownRequest drillDownRequest, boolean securityEnabled) {
         URIBuilder builder = new URIBuilder();

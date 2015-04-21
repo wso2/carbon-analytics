@@ -619,6 +619,9 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
     }
 
     public class HBaseUnsupportedOperationException extends AnalyticsException {
+
+        private static final long serialVersionUID = -380641886204128313L;
+
         public HBaseUnsupportedOperationException(String s) {
             super(s);
         }

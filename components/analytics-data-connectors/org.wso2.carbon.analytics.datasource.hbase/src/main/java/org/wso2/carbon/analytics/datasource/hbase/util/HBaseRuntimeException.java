@@ -21,6 +21,9 @@ package org.wso2.carbon.analytics.datasource.hbase.util;
  * Standard subclass of java.lang.RuntimeException for HBase Analytics Datasource
  */
 public class HBaseRuntimeException extends RuntimeException {
+
+    private static final long serialVersionUID = 6583309924856824092L;
+
     public HBaseRuntimeException(String s, Throwable t) {
         super(s, t);
     }

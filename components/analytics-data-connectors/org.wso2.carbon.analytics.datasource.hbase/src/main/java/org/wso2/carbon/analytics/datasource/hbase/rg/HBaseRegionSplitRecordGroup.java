@@ -24,6 +24,7 @@ import java.util.List;
 
 public class HBaseRegionSplitRecordGroup implements RecordGroup {
 
+    private static final long serialVersionUID = 2275709979928947981L;
     private int tenantId;
     private String tableName;
     private byte[] startRow;
