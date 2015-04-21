@@ -119,7 +119,7 @@ function loadEventAdapterProperties(adapterSchema, propertiesHeading) {
     }
 
     if(adapterSchema.localInputEventAdapterProperties != null){
-        if(aadapterSchema.localInputEventAdapterProperties.length > 0){
+        if(adapterSchema.localInputEventAdapterProperties.length > 0){
             var tableRow = eventReceiverInputTable.insertRow(3);
             var inputField = tableRow.insertCell(0);
             inputField.innerHTML = '<b><i><span style="color: #666666; ">'+propertiesHeading+'</span></i></b>';
