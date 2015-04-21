@@ -20,7 +20,6 @@ package org.wso2.carbon.analytics.api.internal.client;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-
 import org.apache.axiom.om.util.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,22 +41,29 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.util.EntityUtils;
 import org.wso2.carbon.analytics.api.RemoteRecordIterator;
-import org.wso2.carbon.analytics.api.internal.AnalyticsDataConfiguration;
-import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
-import org.wso2.carbon.analytics.dataservice.commons.DrillDownResultEntry;
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
-import org.wso2.carbon.analytics.io.commons.RemoteRecordGroup;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceAuthenticationException;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceException;
-import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
+import org.wso2.carbon.analytics.api.internal.AnalyticsDataConfiguration;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
+import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
+import org.wso2.carbon.analytics.io.commons.RemoteRecordGroup;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -946,9 +952,6 @@ public class AnalyticsAPIHttpClient {
     public List<SearchResultEntry> drillDownSearch(int tenantId, String username,
                                                                    AnalyticsDrillDownRequest drillDownRequest,
                                                                    boolean securityEnabled) {
-    @SuppressWarnings("unchecked")
-    public Map<String, List<DrillDownResultEntry>> drillDown(int tenantId, String username,
-                                                             AnalyticsDrillDownRequest drillDownRequest, boolean securityEnabled) {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.SEARCH_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.DRILL_DOWN_SEARCH_OPERATION)
@@ -958,62 +961,21 @@ public class AnalyticsAPIHttpClient {
         } else {
             builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
         }
-        ByteArrayOutputStream out = null;
-        ObjectOutputStream os = null;
-        InputStream is = null;
-        ObjectInputStream oi = null;
         try {
             HttpPost postMethod = new HttpPost(builder.build().toString());
             postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
-            out = new ByteArrayOutputStream();
-            os = new ObjectOutputStream(out);
-            os.writeObject(drillDownRequest);
-            postMethod.setEntity(new ByteArrayEntity(out.toByteArray()));
+            postMethod.setEntity(new ByteArrayEntity(GenericUtils.serializeObject(drillDownRequest)));
             HttpResponse httpResponse = httpClient.execute(postMethod);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponse(httpResponse);
                 throw new AnalyticsServiceException("Unable to read the DrillDown Request Object. "
                         + response);
             }
-            is = httpResponse.getEntity().getContent();
-            oi = new ObjectInputStream(is);
-            return (List<SearchResultEntry>) oi.readObject();
+            return (List<SearchResultEntry>) GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceException("Malformed URL provided. " + e.getMessage(), e);
         } catch (IOException e) {
             throw new AnalyticsServiceException("Error while connecting to the remote service. " + e.getMessage(), e);
-        } catch (ClassNotFoundException e) {
-            throw new AnalyticsServiceException("Unable to de serialize the object as the class is not found in " +
-                    "this instance. " + e.getMessage(), e);
-        } finally {
-            if (os != null) {
-                try {
-                    os.close();
-                } catch (IOException e) {
-                    log.warn("Error while closing object stream! " + e.getMessage());
-                }
-            }
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    log.warn("Error while closing output stream! " + e.getMessage());
-                }
-            }
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    log.warn("Error while closing input stream! " + e.getMessage());
-                }
-            }
-            if (oi != null) {
-                try {
-                    oi.close();
-                } catch (IOException e) {
-                    log.warn("Error while closing input stream! " + e.getMessage());
-                }
-            }
         }
     }
 
@@ -1029,62 +991,21 @@ public class AnalyticsAPIHttpClient {
         } else {
             builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
         }
-        ByteArrayOutputStream out = null;
-        ObjectOutputStream os = null;
-        InputStream is = null;
-        ObjectInputStream oi = null;
         try {
             HttpPost postMethod = new HttpPost(builder.build().toString());
             postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
-            out = new ByteArrayOutputStream();
-            os = new ObjectOutputStream(out);
-            os.writeObject(drillDownRequest);
-            postMethod.setEntity(new ByteArrayEntity(out.toByteArray()));
+            postMethod.setEntity(new ByteArrayEntity(GenericUtils.serializeObject(drillDownRequest)));
             HttpResponse httpResponse = httpClient.execute(postMethod);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponse(httpResponse);
                 throw new AnalyticsServiceException("Unable to read the DrillDown Request Object. "
                                                     + response);
             }
-            is = httpResponse.getEntity().getContent();
-            oi = new ObjectInputStream(is);
-            return ((Integer) oi.readObject()).intValue();
+            return ((Integer) GenericUtils.deserializeObject(httpResponse.getEntity().getContent()));
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceException("Malformed URL provided. " + e.getMessage(), e);
         } catch (IOException e) {
             throw new AnalyticsServiceException("Error while connecting to the remote service. " + e.getMessage(), e);
-        } catch (ClassNotFoundException e) {
-            throw new AnalyticsServiceException("Unable to de serialize the object as the class is not found in " +
-                                                "this instance. " + e.getMessage(), e);
-        } finally {
-            if (os != null) {
-                try {
-                    os.close();
-                } catch (IOException e) {
-                    log.warn("Error while closing object stream! " + e.getMessage());
-                }
-            }
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    log.warn("Error while closing output stream! " + e.getMessage());
-                }
-            }
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    log.warn("Error while closing input stream! " + e.getMessage());
-                }
-            }
-            if (oi != null) {
-                try {
-                    oi.close();
-                } catch (IOException e) {
-                    log.warn("Error while closing input stream! " + e.getMessage());
-                }
-            }
         }
     }
 
@@ -1100,62 +1021,21 @@ public class AnalyticsAPIHttpClient {
         } else {
             builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
         }
-        ByteArrayOutputStream out = null;
-        ObjectOutputStream os = null;
-        InputStream is = null;
-        ObjectInputStream oi = null;
         try {
             HttpPost postMethod = new HttpPost(builder.build().toString());
             postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
-            out = new ByteArrayOutputStream();
-            os = new ObjectOutputStream(out);
-            os.writeObject(drillDownRequest);
-            postMethod.setEntity(new ByteArrayEntity(out.toByteArray()));
+            postMethod.setEntity(new ByteArrayEntity(GenericUtils.serializeObject(drillDownRequest)));
             HttpResponse httpResponse = httpClient.execute(postMethod);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponse(httpResponse);
                 throw new AnalyticsServiceException("Unable to read the Category drilldown object. "
                                                     + response);
             }
-            is = httpResponse.getEntity().getContent();
-            oi = new ObjectInputStream(is);
-            return (SubCategories) oi.readObject();
+            return (SubCategories) GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceException("Malformed URL provided. " + e.getMessage(), e);
         } catch (IOException e) {
             throw new AnalyticsServiceException("Error while connecting to the remote service. " + e.getMessage(), e);
-        } catch (ClassNotFoundException e) {
-            throw new AnalyticsServiceException("Unable to de serialize the object as the class is not found in " +
-                                                "this instance. " + e.getMessage(), e);
-        } finally {
-            if (os != null) {
-                try {
-                    os.close();
-                } catch (IOException e) {
-                    log.warn("Error while closing object stream! " + e.getMessage());
-                }
-            }
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    log.warn("Error while closing output stream! " + e.getMessage());
-                }
-            }
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    log.warn("Error while closing input stream! " + e.getMessage());
-                }
-            }
-            if (oi != null) {
-                try {
-                    oi.close();
-                } catch (IOException e) {
-                    log.warn("Error while closing input stream! " + e.getMessage());
-                }
-            }
         }
     }
 
@@ -1171,62 +1051,21 @@ public class AnalyticsAPIHttpClient {
         } else {
             builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
         }
-        ByteArrayOutputStream out = null;
-        ObjectOutputStream os = null;
-        InputStream is = null;
-        ObjectInputStream oi = null;
         try {
             HttpPost postMethod = new HttpPost(builder.build().toString());
             postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
-            out = new ByteArrayOutputStream();
-            os = new ObjectOutputStream(out);
-            os.writeObject(drillDownRequest);
-            postMethod.setEntity(new ByteArrayEntity(out.toByteArray()));
+            postMethod.setEntity(new ByteArrayEntity(GenericUtils.serializeObject(drillDownRequest)));
             HttpResponse httpResponse = httpClient.execute(postMethod);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponse(httpResponse);
                 throw new AnalyticsServiceException("Unable to read the Analytics drilldown object. "
                                                     + response);
             }
-            is = httpResponse.getEntity().getContent();
-            oi = new ObjectInputStream(is);
-            return (List<AnalyticsDrillDownRange>) oi.readObject();
+            return (List<AnalyticsDrillDownRange>) GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceException("Malformed URL provided. " + e.getMessage(), e);
         } catch (IOException e) {
             throw new AnalyticsServiceException("Error while connecting to the remote service. " + e.getMessage(), e);
-        } catch (ClassNotFoundException e) {
-            throw new AnalyticsServiceException("Unable to de serialize the object as the class is not found in " +
-                                                "this instance. " + e.getMessage(), e);
-        } finally {
-            if (os != null) {
-                try {
-                    os.close();
-                } catch (IOException e) {
-                    log.warn("Error while closing object stream! " + e.getMessage());
-                }
-            }
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    log.warn("Error while closing output stream! " + e.getMessage());
-                }
-            }
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    log.warn("Error while closing input stream! " + e.getMessage());
-                }
-            }
-            if (oi != null) {
-                try {
-                    oi.close();
-                } catch (IOException e) {
-                    log.warn("Error while closing input stream! " + e.getMessage());
-                }
-            }
         }
     }
 }
