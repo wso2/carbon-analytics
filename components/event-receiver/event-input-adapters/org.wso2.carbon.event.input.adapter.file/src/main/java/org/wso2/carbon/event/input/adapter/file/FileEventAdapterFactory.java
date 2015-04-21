@@ -50,6 +50,23 @@ public class FileEventAdapterFactory extends InputEventAdapterFactory {
         filePath.setHint(resourceBundle.getString(FileEventAdapterConstants.EVENT_ADAPTER_CONF_FILEPATH_HINT));
         propertyList.add(filePath);
 
+
+        Property delayInMillis = new Property(FileEventAdapterConstants.EVENT_ADAPTER_DELAY_MILLIS);
+        delayInMillis.setDisplayName(
+                resourceBundle.getString(FileEventAdapterConstants.EVENT_ADAPTER_DELAY_MILLIS));
+        delayInMillis.setHint(resourceBundle.getString(FileEventAdapterConstants.EVENT_ADAPTER_DELAY_MILLIS_HINT));
+        propertyList.add(delayInMillis);
+
+        Property startFromEndProperty = new Property(FileEventAdapterConstants.EVENT_ADAPTER_START_FROM_END);
+        startFromEndProperty.setRequired(true);
+        startFromEndProperty.setDisplayName(
+                resourceBundle.getString(FileEventAdapterConstants.EVENT_ADAPTER_START_FROM_END));
+        startFromEndProperty.setOptions(new String[]{"true", "false"});
+        startFromEndProperty.setDefaultValue("false");
+        startFromEndProperty.setHint(resourceBundle.getString(
+                FileEventAdapterConstants.EVENT_ADAPTER_START_FROM_END_HINT));
+        propertyList.add(startFromEndProperty);
+
         return propertyList;
     }
 

@@ -125,7 +125,7 @@ function loadEventAdapterProperties(adapterSchema, propertiesHeading) {
             inputField.innerHTML = '<b><i><span style="color: #666666; ">'+propertiesHeading+'</span></i></b>';
 
         }
-        for (var i = 0; i < adapterSchema.localInputEventAdapterProperties.length; i++) {
+        for (var i = adapterSchema.localInputEventAdapterProperties.length - 1 ; i >= 0; i--) {
             // for each property, add a text and input field in a row
             loadEventAdapterProperty(adapterSchema.localInputEventAdapterProperties[i], eventReceiverInputTable, i);
         }
