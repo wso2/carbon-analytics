@@ -17,16 +17,13 @@
 */
 package org.wso2.carbon.analytics.api;
 
-
-import org.apache.commons.httpclient.HttpMethod;
-
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.Iterator;
 
-public class RemoteRecordIterator<T> implements Iterator {
+public class RemoteRecordIterator<T> implements Iterator<T> {
     private ObjectInputStream objectInputStream;
     private T nextObject;
     private boolean completed;
@@ -36,6 +33,7 @@ public class RemoteRecordIterator<T> implements Iterator {
         this.completed = false;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public synchronized boolean hasNext() {
         try {

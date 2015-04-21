@@ -19,7 +19,9 @@ package org.wso2.carbon.analytics.servlet;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
+import org.wso2.carbon.analytics.io.commons.RemoteRecordGroup;
 import org.wso2.carbon.analytics.servlet.exception.AnalyticsAPIAuthenticationException;
 import org.wso2.carbon.analytics.servlet.internal.ServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -27,12 +29,16 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,7 +49,7 @@ public class AnalyticsRecordProcessor extends HttpServlet {
     /**
      * Get record count
      *
-     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param req  HttpRequest which has the required parameters to do the operation.
      * @param resp HttpResponse which returns the result of the intended operation.
      * @throws ServletException
      * @throws IOException
@@ -94,7 +100,7 @@ public class AnalyticsRecordProcessor extends HttpServlet {
     /**
      * Put records
      *
-     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param req  HttpRequest which has the required parameters to do the operation.
      * @param resp HttpResponse which returns the result of the intended operation.
      * @throws ServletException
      * @throws IOException
@@ -112,14 +118,16 @@ public class AnalyticsRecordProcessor extends HttpServlet {
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
             boolean securityEnabled = Boolean.parseBoolean(req.getParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM));
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.PUT_RECORD_OPERATION)) {
-                String recordsJson = req.getParameter(AnalyticsAPIConstants.RECORDS_PARAM);
                 String username = req.getParameter(AnalyticsAPIConstants.USERNAME_PARAM);
-                Type recordListType = new TypeToken<List<Record>>() {
-                }.getType();
-                List<Record> records = new Gson().fromJson(recordsJson, recordListType);
                 try {
+                    List<Record> records = (List <Record>) GenericUtils.deserializeObject(req.getInputStream());
                     if (!securityEnabled) ServiceHolder.getAnalyticsDataService().put(records);
                     else ServiceHolder.getSecureAnalyticsDataService().put(username, records);
+                    List<String> recordIds = new ArrayList<>();
+                    for (Record record: records){
+                        recordIds.add(record.getId());
+                    }
+                    resp.getOutputStream().write(GenericUtils.serializeObject(recordIds));
                     resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
@@ -134,7 +142,7 @@ public class AnalyticsRecordProcessor extends HttpServlet {
     /**
      * delete records for range and given ids..
      *
-     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param req  HttpRequest which has the required parameters to do the operation.
      * @param resp HttpResponse which returns the result of the intended operation.
      * @throws ServletException
      * @throws IOException

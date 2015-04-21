@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.messageconsole.Constants;
 import org.wso2.carbon.analytics.messageconsole.internal.ServiceHolder;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.ntask.core.AbstractTask;
 
 import java.util.Calendar;
@@ -53,16 +53,12 @@ public class AnalyticsDataPurgingTask extends AbstractTask {
             calendar.set(Calendar.MILLISECOND, 999);
             calendar.add(Calendar.DATE, -retentionPeriod);
             try {
-                logger.info("Data going to purge from " + table + " within range " + Long.MIN_VALUE + ":" +
-                            calendar.getTime() + "[" + calendar.getTimeInMillis() + "]");
-                PrivilegedCarbonContext.startTenantFlow();
-                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(Integer.parseInt(tenantId), true);
+                logger.info("All the data records before " + calendar.getTime() + "[" + calendar.getTimeInMillis() +
+                            "] going to purge from " + table);
                 ServiceHolder.getAnalyticsDataService().delete(Integer.parseInt(tenantId), table, Long.MIN_VALUE,
                                                                calendar.getTimeInMillis());
             } catch (AnalyticsException e) {
                 logger.error("Unable to perform data purging task due to " + e.getMessage(), e);
-            } finally {
-                PrivilegedCarbonContext.endTenantFlow();
             }
         } else {
             logger.error("Retention period either empty or null.");

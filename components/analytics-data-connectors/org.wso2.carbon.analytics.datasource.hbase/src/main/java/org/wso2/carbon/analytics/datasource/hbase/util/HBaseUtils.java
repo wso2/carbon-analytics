@@ -32,6 +32,7 @@ import org.wso2.carbon.utils.CarbonUtils;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
 import java.io.File;
 import java.util.Map;
 import java.util.Set;
@@ -99,7 +100,7 @@ public class HBaseUtils {
         return Bytes.toLong(arr);
     }
 
-    public static Record constructRecord(Result currentResult, int tenantId, String tableName, Set colSet)
+    public static Record constructRecord(Result currentResult, int tenantId, String tableName, Set<String> colSet)
             throws AnalyticsException {
         byte[] rowId = currentResult.getRow();
         Map<String, Object> values;

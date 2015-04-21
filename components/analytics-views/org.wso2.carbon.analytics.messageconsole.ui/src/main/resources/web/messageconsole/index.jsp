@@ -26,9 +26,9 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-    <meta http-equiv="Pragma" content="no-cache"/>
-    <meta http-equiv="Expires" content="0"/>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
 
     <link href="js/jquery-ui.min.css" rel="stylesheet" type="text/css"/>
     <link href="../dialog/css/jqueryui/jqueryui-themeroller.css" rel="stylesheet" type="text/css"/>
@@ -110,11 +110,6 @@
                     })
                 }
             });
-            jQuery('#dataPurgingScheudleTime').datetimepicker({
-                datepicker: false,
-                format: 'H:i'
-            });
-
             $("#createTableDialog").dialog({
                 autoOpen: false
             });
@@ -197,17 +192,16 @@
             $("#purgeRecordButton").on("click", function () {
                 var label = document.getElementById('dataPurgingMsgLabel');
                 label.style.display = 'none';
-                $("#dataPurgingScheudleTime").datepicker("destroy");
                 $.post('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeGetPurgingTask,
                         {tableName: $("#tableSelect").val()},
                        function (result) {
                            var resultObj = jQuery.parseJSON(result);
-                           $("#purgeRecordDialog").dialog("open");
                            $('#dataPurgingScheudleTime').val(resultObj.cronString);
                            $('#dataPurgingScheudleTime').prop('disabled', false);
                            $('#dataPurgingDay').val(resultObj.retentionPeriod);
                            $('#dataPurgingDay').prop('disabled', false);
                            $('#dataPurgingCheckBox').prop("checked", true);
+                           $("#purgeRecordDialog").dialog("open");
                        });
                 return true;
             });
@@ -576,7 +570,6 @@
             }
         }
     </script>
-
 </head>
 <body>
 <fmt:bundle basename="org.wso2.carbon.analytics.messageconsole.ui.i18n.Resources">
@@ -778,7 +771,7 @@
                     <input type="checkbox" id="dataPurgingCheckBox">
                 </label>
                 <br/>
-                <label> Schedule Time:
+                <label> Schedule Time (Either cron string or HH:MM):
                     <input type="text" id="dataPurgingScheudleTime" disabled="disabled" class="validate[required]">
                 </label>
                 <br/>

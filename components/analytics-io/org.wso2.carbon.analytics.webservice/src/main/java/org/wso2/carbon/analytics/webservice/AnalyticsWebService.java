@@ -197,18 +197,21 @@ public class AnalyticsWebService extends AbstractAdmin {
      * added, there will not be a merge of older record's field's with the new one.
      *
      * @param recordBeans Arrays of RecordBean to be inserted
+     * @return Arrays of updated RecordBean with ids
      * @throws AnalyticsWebServiceException
      */
-    public void put(RecordBean[] recordBeans) throws AnalyticsWebServiceException {
+    public RecordBean[] put(RecordBean[] recordBeans) throws AnalyticsWebServiceException {
         try {
             List<RecordBean> recordBeanList = Arrays.asList(recordBeans);
             String username = getUsername();
             List<Record> records = Utils.getRecords(username, recordBeanList);
             analyticsDataAPI.put(username, records);
+            recordBeans = Utils.createRecordBeans(records).toArray(recordBeans);
         } catch (AnalyticsException e) {
             logger.error("Unable to put records  due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to add record due to " + e.getMessage(), e);
         }
+        return recordBeans;
     }
 
     /**

@@ -473,8 +473,7 @@ public class MessageConsoleConnector {
             recordBean.setValues(recordValueEntryBeans);
         }
         RecordBean[] recordBeans = new RecordBean[]{recordBean};
-        analyticsWebServiceStub.put(recordBeans);
-        return recordBeans;
+        return analyticsWebServiceStub.put(recordBeans);
     }
 
     private Record getRecord(String table, String recordId, boolean withDefaultColumns)

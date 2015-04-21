@@ -77,22 +77,6 @@ public class Utils {
     }
 
     /**
-     * Gets the records from record beans belongs to a specific table.
-     *
-     * @param recordBeans the record beans
-     * @return the records from record beans
-     */
-    public static List<Record> getRecordsForTable(String username, String tableName, List<RecordBean> recordBeans)
-            throws AnalyticsException {
-        List<Record> records = new ArrayList<>();
-        for (RecordBean recordBean : recordBeans) {
-            records.add(new Record(recordBean.getId(), getTenantId(username), tableName,
-                                   validateAndReturn(recordBean.getValues())));
-        }
-        return records;
-    }
-
-    /**
      * Creates the record beans from records.
      *
      * @param records the records
@@ -332,7 +316,6 @@ public class Utils {
     }
 
     private static class BeanIndexType {
-
         public static final String STRING = "STRING";
         public static final String LONG = "LONG";
         public static final String FLOAT = "FLOAT";

@@ -25,6 +25,7 @@ import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 import org.wso2.carbon.event.stream.core.EventStreamListener;
+import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,29 +34,29 @@ public class AnalyticsEventStreamListener implements EventStreamListener {
 
     private static final Log log = LogFactory.getLog(AnalyticsEventStreamListener.class);
 
-    private static final ConcurrentHashMap<String, AnalyticsWSO2EventConsumer> consumerCache
-            = new ConcurrentHashMap<String, AnalyticsWSO2EventConsumer>();
+    private static final ConcurrentHashMap<String, AnalyticsWSO2EventListConsumer> consumerCache
+            = new ConcurrentHashMap<>();
 
     @Override
     public void removedEventStream(int tenantId, String streamName, String version) {
         String cacheKey = generateConsumerCacheKey(streamName, version, tenantId);
         if (consumerCache.get(cacheKey) != null) {
-//            ServiceHolder.getEventStreamService().unsubscribe(consumerCache.get(cacheKey), tenantId);
+            ServiceHolder.getEventStreamService().unsubscribe(consumerCache.get(cacheKey));
         }
     }
 
     @Override
     public void addedEventStream(int tenantId, String streamName, String version) {
-        AnalyticsWSO2EventConsumer analyticsWSO2EventConsumer =
-                new AnalyticsWSO2EventConsumer(DataBridgeCommonsUtils.generateStreamId(streamName, version),
+        AnalyticsWSO2EventListConsumer analyticsWSO2EventListConsumer =
+                new AnalyticsWSO2EventListConsumer(DataBridgeCommonsUtils.generateStreamId(streamName, version),
                         tenantId);
-        consumerCache.put(generateConsumerCacheKey(streamName, version, tenantId), analyticsWSO2EventConsumer);
-//        try {
-////            ServiceHolder.getEventStreamService().subscribe(analyticsWSO2EventConsumer, tenantId);
-//        } catch (EventStreamConfigurationException e) {
-//            log.error("Error while registering subscriber for stream name :" + streamName +
-//                    " , version :" + version + " for tenant id " + tenantId + ". " + e.getMessage(), e);
-//        }
+        consumerCache.put(generateConsumerCacheKey(streamName, version, tenantId), analyticsWSO2EventListConsumer);
+        try {
+            ServiceHolder.getEventStreamService().subscribe(analyticsWSO2EventListConsumer);
+        } catch (EventStreamConfigurationException e) {
+            log.error("Error while registering subscriber for stream name :" + streamName +
+                    " , version :" + version + " for tenant id " + tenantId + ". " + e.getMessage(), e);
+        }
     }
 
     private String generateConsumerCacheKey(String streamName, String version, int tenantId) {

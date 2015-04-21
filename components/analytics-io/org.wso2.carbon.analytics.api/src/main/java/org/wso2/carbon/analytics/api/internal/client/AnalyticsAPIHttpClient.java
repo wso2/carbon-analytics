@@ -20,6 +20,7 @@ package org.wso2.carbon.analytics.api.internal.client;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+
 import org.apache.axiom.om.util.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,29 +42,22 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.util.EntityUtils;
 import org.wso2.carbon.analytics.api.RemoteRecordIterator;
+import org.wso2.carbon.analytics.api.internal.AnalyticsDataConfiguration;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
+import org.wso2.carbon.analytics.dataservice.commons.DrillDownResultEntry;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.analytics.io.commons.RemoteRecordGroup;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceAuthenticationException;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceException;
-import org.wso2.carbon.analytics.api.internal.AnalyticsDataConfiguration;
-import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
-import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
-import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
+import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
-import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
-import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
-import org.wso2.carbon.analytics.io.commons.RemoteRecordGroup;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -428,24 +422,30 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void putRecords(String username, List<Record> records, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
-        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.RECORD_PROCESSOR_SERVICE_URI);
+        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.RECORD_PROCESSOR_SERVICE_URI)
+        .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.PUT_RECORD_OPERATION)
+        .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
+        if (securityEnabled) {
+            builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
+        }
         try {
             HttpPost postMethod = new HttpPost(builder.build().toString());
             postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
-            List<NameValuePair> params = new ArrayList<>();
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.PUT_RECORD_OPERATION));
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.RECORDS_PARAM, new Gson().toJson(records)));
-            if (securityEnabled) {
-                params.add(new BasicNameValuePair(AnalyticsAPIConstants.USERNAME_PARAM, username));
-            }
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled)));
-            postMethod.setEntity(new UrlEncodedFormEntity(params));
+            postMethod.setEntity(new ByteArrayEntity(GenericUtils.serializeObject(records)));
             HttpResponse httpResponse = httpClient.execute(postMethod);
-            String response = getResponse(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                String response = getResponse(httpResponse);
                 throw new AnalyticsServiceException("Unable to put the records. " + response);
+            }else {
+                List<String> recordIds = (List<String>) GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                int index = 0;
+                for (Record record: records){
+                    record.setId(recordIds.get(index));
+                    index++;
+                }
             }
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceAuthenticationException("Malformed URL provided. " + e.getMessage(), e);
@@ -649,7 +649,7 @@ public class AnalyticsAPIHttpClient {
     public List<SearchResultEntry> search(int tenantId, String username, String tableName, String language, String query,
                                           int start, int count, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
-        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI)
+        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.SEARCH_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.SEARCH_OPERATION)
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
                 .addParameter(AnalyticsAPIConstants.LANGUAGE_PARAM, language)
@@ -946,6 +946,9 @@ public class AnalyticsAPIHttpClient {
     public List<SearchResultEntry> drillDownSearch(int tenantId, String username,
                                                                    AnalyticsDrillDownRequest drillDownRequest,
                                                                    boolean securityEnabled) {
+    @SuppressWarnings("unchecked")
+    public Map<String, List<DrillDownResultEntry>> drillDown(int tenantId, String username,
+                                                             AnalyticsDrillDownRequest drillDownRequest, boolean securityEnabled) {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.SEARCH_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.DRILL_DOWN_SEARCH_OPERATION)

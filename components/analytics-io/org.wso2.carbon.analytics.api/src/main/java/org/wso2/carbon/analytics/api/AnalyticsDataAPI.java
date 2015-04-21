@@ -29,5 +29,5 @@ import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 
 public interface AnalyticsDataAPI extends AnalyticsDataService, SecureAnalyticsDataService{
 
-   //TODO: methods related streams, etc.
+
 }

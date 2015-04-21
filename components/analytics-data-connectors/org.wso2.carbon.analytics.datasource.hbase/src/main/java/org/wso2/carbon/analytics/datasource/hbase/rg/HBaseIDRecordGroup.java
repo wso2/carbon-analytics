@@ -24,6 +24,7 @@ import java.util.List;
 
 public class HBaseIDRecordGroup implements RecordGroup {
 
+    private static final long serialVersionUID = -478424013928152032L;
     private int tenantId;
     private String tableName;
     private List<String> columns;

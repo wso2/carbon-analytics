@@ -225,6 +225,9 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
     }
 
     public class HDFSRuntimeException extends RuntimeException {
+
+        private static final long serialVersionUID = 9089866389463879488L;
+
         HDFSRuntimeException(String s, Throwable t) {
             super(s, t);
         }
