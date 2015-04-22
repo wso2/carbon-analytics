@@ -38,7 +38,6 @@
         <module>org.wso2.carbon.databridge.datapublisher.feature</module>
         <module>org.wso2.carbon.databridge.core.server.feature</module>
         <module>org.wso2.carbon.databridge.receiver.thrift.server.feature</module>
-        <module>org.wso2.carbon.databridge.streamdefn.registry.server.feature</module>
         <module>org.wso2.carbon.databridge.datareceiver.feature</module>
         <module>org.wso2.carbon.databridge.receiver.binary.server.feature</module>
         <module>org.wso2.carbon.databridge.streamdefn.filesystem.server.feature</module>
