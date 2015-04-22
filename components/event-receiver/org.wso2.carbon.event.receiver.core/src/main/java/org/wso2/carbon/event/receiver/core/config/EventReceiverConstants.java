@@ -126,9 +126,6 @@ public final class EventReceiverConstants {
     private EventReceiverConstants() {
 
     }
-//    public static final String CHARSET_UTF8 = "UTF-8";
-//    public static final String ITA_EMAIL = "email";
-//    public static final String REGEX_FOR_WORD_START = "\\b*";
-//    public static final String REGEX_FOR_WORD_END = "\\b*.*";
+
 
 }
