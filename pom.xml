@@ -27,7 +27,7 @@
     <groupId>org.wso2.carbon.analytics-common</groupId>
     <artifactId>carbon-analytics-common</artifactId>
     <packaging>pom</packaging>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>WSO2 Carbon - Carbon Analytics Common Aggregator Module</name>
     <url>http://wso2.org</url>
 
@@ -174,6 +174,14 @@
                 <version>${carbon.commons.version}</version>
             </dependency>
             <!--carbon-commons dependencies stop-->
+
+            <!--carbon-deployment dependencies start-->
+            <dependency>
+                <groupId>org.wso2.carbon.deployment</groupId>
+                <artifactId>org.wso2.carbon.as.runtimes.cxf.feature</artifactId>
+                <version>${carbon.deployment.version}</version>
+            </dependency>
+            <!--carbon-deployment dependencies stop-->
 
             <!--siddhi dependencies start-->
             <dependency>
@@ -324,6 +332,11 @@
                 <groupId>com.jayway.jsonpath</groupId>
                 <artifactId>json-path</artifactId>
                 <version>${jsonpath.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.minidev</groupId>
+                <artifactId>json-smart</artifactId>
+                <version>${jsonsmart.version}</version>
             </dependency>
             <!--third party dependencies stop-->
 
@@ -684,23 +697,16 @@
                 <version>${carbon.analytics.common.version}</version>
                 <type>zip</type>
             </dependency>
-            <dependency>
-                <groupId>com.jayway.jsonpath</groupId>
-                <artifactId>json-path</artifactId>
-                <version>${jsonpath.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.minidev</groupId>
-                <artifactId>json-smart</artifactId>
-                <version>${jsonsmart.version}</version>
-            </dependency>
 
-            <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon.analytics-common</groupId>-->
-            <!--<artifactId>org.wso2.carbon.analytics.dashboard.ui.feature</artifactId>-->
-            <!--<version>${carbon.analytics.common.version}</version>-->
-            <!--<type>zip</type>-->
-            <!--</dependency>-->
+            <!--carbon-deployment features start-->
+            <dependency>
+                <groupId>org.wso2.carbon.deployment</groupId>
+                <artifactId>org.wso2.carbon.as.runtimes.cxf.feature</artifactId>
+                <version>${carbon.deployment.version}</version>
+                <type>zip</type>
+            </dependency>
+            <!--carbon-deployment features stop-->
+
             <!--features end-->
         </dependencies>
     </dependencyManagement>
@@ -811,7 +817,7 @@
         <url>https://github.com/wso2/carbon-analytics-common.git</url>
         <developerConnection>scm:git:https://github.com/wso2/carbon-analytics-common.git</developerConnection>
         <connection>scm:git:https://github.com/wso2/carbon-analytics-common.git</connection>
-        <tag>HEAD</tag>
+        <tag>carbon-analytics-common-1.0.0</tag>
     </scm>
 
     <pluginRepositories>
@@ -895,13 +901,14 @@
     </repositories>
 
     <properties>
-        <carbon.analytics.common.version>1.1.0-SNAPSHOT</carbon.analytics.common.version>
+        <carbon.analytics.common.version>1.0.0</carbon.analytics.common.version>
 
         <!-- Carbon kernel version -->
         <carbon.kernel.version>4.4.0</carbon.kernel.version>
         <!--<carbon.kernel.imp.pkg.version>[4.3.0, 4.4.0)</carbon.kernel.imp.pkg.version>-->
 
         <carbon.commons.version>4.4.0</carbon.commons.version>
+        <carbon.deployment.version>4.4.0</carbon.deployment.version>
         <!--<carbon.commons.imp.pkg.version>[4.3.0, 4.4.0)</carbon.commons.imp.pkg.version>-->
 
         <!--CEP versions-->
@@ -949,7 +956,7 @@
         <httpcore.httpcomponents.wso2.version>4.3.3.wso2v1</httpcore.httpcomponents.wso2.version>
         <apache.httpcore.version>4.2.4</apache.httpcore.version>
         <javax.version>2.0</javax.version>
-        <cxf.version>2.6.1</cxf.version>
+        <cxf.version>2.6.2</cxf.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.scm.id>my-scm-server</project.scm.id>
