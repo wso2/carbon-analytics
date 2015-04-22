@@ -885,6 +885,7 @@ function addInputRegexDef() {
 function updateAttributeType() {
     var typeMap = JSON.parse( document.getElementById("streamMapping").getAttribute("mapping"));
     var selectedIndex = document.getElementById("inputPropertyName").selectedIndex;
+    alert(typeMap[selectedIndex]);
     document.getElementById("inputPropertyType").value = typeMap[selectedIndex];
 }
 

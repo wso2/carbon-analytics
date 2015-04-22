@@ -97,18 +97,18 @@ public class WSO2EventAdapterFactory extends OutputEventAdapterFactory {
         publishingModeProperty.setHint(resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_HINT_PUBLISH_TIMEOUT_MS));
 
         // set stream definition
-        Property streamDefinitionProperty = new Property(WSO2EventAdapterConstants.ADAPTER_STATIC_CONFIG_STREAM_NAME);
-        streamDefinitionProperty.setDisplayName(
-                resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_STATIC_CONFIG_STREAM_NAME));
-        streamDefinitionProperty.setRequired(true);
+//        Property streamDefinitionProperty = new Property(WSO2EventAdapterConstants.ADAPTER_STATIC_CONFIG_STREAM_NAME);
+//        streamDefinitionProperty.setDisplayName(
+//                resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_STATIC_CONFIG_STREAM_NAME));
+//        streamDefinitionProperty.setRequired(true);
 
 
         // set stream version
-        Property streamVersionProperty = new Property(WSO2EventAdapterConstants.ADAPTER_STATIC_CONFIG_STREAM_VERSION);
-        streamVersionProperty.setDisplayName(
-                resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_STATIC_CONFIG_STREAM_VERSION));
-        streamVersionProperty.setDefaultValue("1.0.0");
-        streamVersionProperty.setRequired(true);
+//        Property streamVersionProperty = new Property(WSO2EventAdapterConstants.ADAPTER_STATIC_CONFIG_STREAM_VERSION);
+//        streamVersionProperty.setDisplayName(
+//                resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_STATIC_CONFIG_STREAM_VERSION));
+//        streamVersionProperty.setDefaultValue("1.0.0");
+//        streamVersionProperty.setRequired(true);
 
         propertyList.add(ipProperty);
         propertyList.add(authenticatorIpProperty);
@@ -116,8 +116,8 @@ public class WSO2EventAdapterFactory extends OutputEventAdapterFactory {
         propertyList.add(passwordProperty);
         propertyList.add(protocolProperty);
         propertyList.add(publishingModeProperty);
-        propertyList.add(streamDefinitionProperty);
-        propertyList.add(streamVersionProperty);
+//        propertyList.add(streamDefinitionProperty);
+//        propertyList.add(streamVersionProperty);
 
         return propertyList;
     }
