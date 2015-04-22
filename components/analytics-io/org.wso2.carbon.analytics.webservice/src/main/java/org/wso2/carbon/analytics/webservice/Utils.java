@@ -66,7 +66,6 @@ public class Utils {
         return records;
     }
 
-    @SuppressWarnings("unchecked")
     private static Map<String, Object> validateAndReturn(RecordValueEntryBean[] values)
             throws AnalyticsIndexException {
         Map<String, Object> valueMap = new LinkedHashMap<>();

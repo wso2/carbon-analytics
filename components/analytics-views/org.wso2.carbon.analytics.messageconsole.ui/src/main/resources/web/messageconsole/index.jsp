@@ -659,6 +659,16 @@
                                         <textarea id="query" rows="4" cols="100" placeholder="Search Query"></textarea>
                                     </td>
                                 </tr>
+                                <tr>
+                                    <td>By Facet</td>
+                                    <td>
+                                        <select id="facetListSelect" onchange="alert('hi');">
+                                            <option value="-1">Select a Facet</option>
+                                        </select>
+                                        <input id="addFacet" type="button" value="Add" onclick="alert('test');"
+                                               class="button">
+                                    </td>
+                                </tr>
                             </c:if>
                             </tbody>
                         </table>

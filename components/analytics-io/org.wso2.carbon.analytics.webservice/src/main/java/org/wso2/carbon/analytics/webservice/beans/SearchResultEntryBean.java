@@ -15,36 +15,17 @@
  */
 package org.wso2.carbon.analytics.webservice.beans;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 
 /**
  * The Class SearchResultEntryBean.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(propOrder = {
-        "id",
-        "score"
-})
 
-@XmlRootElement(name = "SearchResultEntry")
 public class SearchResultEntryBean implements Serializable {
 
     private static final long serialVersionUID = -1168090243724348417L;
-    /**
-     * The id.
-     */
-    @XmlElement(required = true)
-    private String id;
 
-    /**
-     * The score.
-     */
-    @XmlElement(required = true)
+    private String id;
     private float score;
 
     public SearchResultEntryBean() {

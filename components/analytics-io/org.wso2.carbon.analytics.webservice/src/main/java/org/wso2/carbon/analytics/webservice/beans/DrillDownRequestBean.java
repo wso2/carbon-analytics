@@ -26,16 +26,11 @@ public class DrillDownRequestBean implements Serializable {
 
     private static final long serialVersionUID = 491563554715534955L;
     private String tableName;
-    private DrillDownPathBean[] categories;
-    private String language;
+    private String fieldName;
+    private String[] path;
     private String query;
     private String scoreFunction;
-    private int recordCount;
-    private int categoryCount;
-    private int recordStart;
-    private int categoryStart;
-    private boolean includeIds;
-    private DrillDownFieldRangeBean[] ranges;
+
 
     public DrillDownRequestBean() {
     }
@@ -48,20 +43,20 @@ public class DrillDownRequestBean implements Serializable {
         this.tableName = tableName;
     }
 
-    public DrillDownPathBean[] getCategories() {
-        return categories;
+    public String getFieldName() {
+        return fieldName;
     }
 
-    public void setCategories(DrillDownPathBean[] categories) {
-        this.categories = categories;
+    public void setFieldName(String fieldName) {
+        this.fieldName = fieldName;
     }
 
-    public String getLanguage() {
-        return language;
+    public String[] getPath() {
+        return path;
     }
 
-    public void setLanguage(String language) {
-        this.language = language;
+    public void setPath(String[] path) {
+        this.path = path;
     }
 
     public String getQuery() {
@@ -78,53 +73,5 @@ public class DrillDownRequestBean implements Serializable {
 
     public void setScoreFunction(String scoreFunction) {
         this.scoreFunction = scoreFunction;
-    }
-
-    public int getRecordCount() {
-        return recordCount;
-    }
-
-    public void setRecordCount(int recordCount) {
-        this.recordCount = recordCount;
-    }
-
-    public int getCategoryCount() {
-        return categoryCount;
-    }
-
-    public void setCategoryCount(int categoryCount) {
-        this.categoryCount = categoryCount;
-    }
-
-    public int getRecordStart() {
-        return recordStart;
-    }
-
-    public void setRecordStart(int recordStart) {
-        this.recordStart = recordStart;
-    }
-
-    public boolean isIncludeIds() {
-        return includeIds;
-    }
-
-    public void setIncludeIds(boolean includeIds) {
-        this.includeIds = includeIds;
-    }
-
-    public DrillDownFieldRangeBean[] getRanges() {
-        return ranges;
-    }
-
-    public void setRanges(DrillDownFieldRangeBean[] ranges) {
-        this.ranges = ranges;
-    }
-
-    public int getCategoryStart() {
-        return categoryStart;
-    }
-
-    public void setCategoryStart(int categoryStart) {
-        this.categoryStart = categoryStart;
     }
 }

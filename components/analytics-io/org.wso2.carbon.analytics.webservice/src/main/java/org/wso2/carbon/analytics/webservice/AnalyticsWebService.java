@@ -21,14 +21,18 @@ package org.wso2.carbon.analytics.webservice;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
+import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsSchemaBean;
+import org.wso2.carbon.analytics.webservice.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.webservice.beans.IndexConfigurationBean;
 import org.wso2.carbon.analytics.webservice.beans.RecordBean;
+import org.wso2.carbon.analytics.webservice.beans.SubCategoriesBean;
 import org.wso2.carbon.analytics.webservice.exception.AnalyticsWebServiceException;
 import org.wso2.carbon.analytics.webservice.internal.ServiceHolder;
 import org.wso2.carbon.core.AbstractAdmin;
@@ -457,5 +461,40 @@ public class AnalyticsWebService extends AbstractAdmin {
      */
     public boolean isPaginationSupported() {
         return analyticsDataAPI.isPaginationSupported();
+    }
+
+    /**
+     * Returns the subcategories of a facet field, given DrillDownRequestBean
+     *
+     * @param drillDownRequest The category drilldown object which contains the category drilldown information
+     * @return SubCategoriesBean instance that contains the immediate category information
+     * @throws AnalyticsWebServiceException
+     */
+    public SubCategoriesBean drillDownCategories(DrillDownRequestBean drillDownRequest)
+            throws AnalyticsWebServiceException {
+
+        CategoryDrillDownRequest categoryDrillDownRequest = new CategoryDrillDownRequest();
+        categoryDrillDownRequest.setTableName(drillDownRequest.getTableName());
+        categoryDrillDownRequest.setFieldName(drillDownRequest.getFieldName());
+        categoryDrillDownRequest.setPath(drillDownRequest.getPath());
+        categoryDrillDownRequest.setQuery(drillDownRequest.getQuery());
+        categoryDrillDownRequest.setScoreFunction(drillDownRequest.getScoreFunction());
+
+        SubCategoriesBean subCategoriesBean = new SubCategoriesBean();
+        try {
+            SubCategories subCategories = analyticsDataAPI.drillDownCategories(getUsername(), categoryDrillDownRequest);
+            subCategoriesBean.setPath(subCategories.getPath());
+
+
+            subCategoriesBean.setCategories();
+        } catch (AnalyticsIndexException e) {
+            logger.error("Unable to get drill down category information for table[" + drillDownRequest.getTableName() + "] and " +
+                         "field[" + drillDownRequest.getFieldName() + "] due to " + e.getMessage(), e);
+            throw new AnalyticsWebServiceException("Unable to get drill down category information for " +
+                                                   "table[" + drillDownRequest.getTableName() + "] and " +
+                                                   "field[" + drillDownRequest.getFieldName() + "] due to " + e
+                                                           .getMessage(), e);
+        }
+        return subCategoriesBean;
     }
 }
