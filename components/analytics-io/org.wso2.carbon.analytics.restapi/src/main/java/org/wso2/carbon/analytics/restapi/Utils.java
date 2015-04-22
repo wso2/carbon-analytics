@@ -389,7 +389,6 @@ public class Utils {
         drillDownRequest.setTableName(bean.getTableName());
         drillDownRequest.setRecordCount(bean.getRecordCount());
         drillDownRequest.setRecordStartIndex(bean.getRecordStart());
-        drillDownRequest.setLanguage(bean.getLanguage());
         drillDownRequest.setLanguageQuery(bean.getQuery());
         drillDownRequest.setScoreFunction(bean.getScoreFunction());
         drillDownRequest.setCategoryPaths(createCategoryPaths(bean.getCategories()));

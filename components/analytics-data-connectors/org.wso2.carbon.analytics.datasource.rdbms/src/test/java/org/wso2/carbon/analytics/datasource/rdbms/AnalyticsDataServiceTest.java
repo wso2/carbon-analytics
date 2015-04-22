@@ -18,17 +18,6 @@
  */
 package org.wso2.carbon.analytics.datasource.rdbms;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
@@ -39,12 +28,23 @@ import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
-import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema.ColumnType;
+import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.base.MultitenantConstants;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class represents the analytics data service tests.
@@ -126,36 +126,36 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         List<Record> records = this.generateIndexRecords(tenantId, tableName, n, 0);
         this.service.put(records);
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
-        List<SearchResultEntry> result = this.service.search(tenantId, tableName, "lucene", "STR1:STRING0", 0, 10);
+        List<SearchResultEntry> result = this.service.search(tenantId, tableName, "STR1:STRING0", 0, 10);
         Assert.assertEquals(result.size(), 1);
-        result = this.service.search(tenantId, tableName, "lucene", "str2:string0", 0, 10);
+        result = this.service.search(tenantId, tableName, "str2:string0", 0, 10);
         Assert.assertEquals(result.size(), 1);
-        result = this.service.search(tenantId, tableName, "lucene", "str2:String0", 0, 10);
+        result = this.service.search(tenantId, tableName, "str2:String0", 0, 10);
         Assert.assertEquals(result.size(), 1);
-        result = this.service.search(tenantId, tableName, "lucene", "TXT1:name", 0, n + 10);
+        result = this.service.search(tenantId, tableName, "TXT1:name", 0, n + 10);
         Assert.assertEquals(result.size(), n);
-        result = this.service.search(tenantId, tableName, "lucene", "INT1:" + (n - 1), 0, 10);
+        result = this.service.search(tenantId, tableName, "INT1:" + (n - 1), 0, 10);
         Assert.assertEquals(result.size(), 1);
-        result = this.service.search(tenantId, tableName, "lucene", "LN1:1435000", 0, 10);
+        result = this.service.search(tenantId, tableName, "LN1:1435000", 0, 10);
         Assert.assertEquals(result.size(), 1);
-        result = this.service.search(tenantId, tableName, "lucene", "DB1:54.535", 0, 10);
+        result = this.service.search(tenantId, tableName, "DB1:54.535", 0, 10);
         Assert.assertEquals(result.size(), 1);
-        result = this.service.search(tenantId, tableName, "lucene", "FL1:3.14", 0, 10);
+        result = this.service.search(tenantId, tableName, "FL1:3.14", 0, 10);
         Assert.assertEquals(result.size(), 1);
-        result = this.service.search(tenantId, tableName, "lucene", "BL1:true", 0, 10);
+        result = this.service.search(tenantId, tableName, "BL1:true", 0, 10);
         Assert.assertTrue(result.size() > 0);
         if (n > 4) {
-            result = this.service.search(tenantId, tableName, "lucene", "INT1:[1 TO 3]", 0, 10);
+            result = this.service.search(tenantId, tableName, "INT1:[1 TO 3]", 0, 10);
             Assert.assertEquals(result.size(), 3);
-            result = this.service.search(tenantId, tableName, "lucene", "LN1:[1435000 TO 1435001]", 0, 10);
+            result = this.service.search(tenantId, tableName, "LN1:[1435000 TO 1435001]", 0, 10);
             Assert.assertEquals(result.size(), 2);
-            result = this.service.search(tenantId, tableName, "lucene", "LN1:[1435000 TO 1435001}", 0, 10);
+            result = this.service.search(tenantId, tableName, "LN1:[1435000 TO 1435001}", 0, 10);
             Assert.assertEquals(result.size(), 1);
-            result = this.service.search(tenantId, tableName, "lucene", "DB1:[54.01 TO 55.86]", 0, 10);
+            result = this.service.search(tenantId, tableName, "DB1:[54.01 TO 55.86]", 0, 10);
             Assert.assertEquals(result.size(), 2);
-            result = this.service.search(tenantId, tableName, "lucene", "FL1:[3.01 TO 4.50]", 0, 10);
+            result = this.service.search(tenantId, tableName, "FL1:[3.01 TO 4.50]", 0, 10);
             Assert.assertEquals(result.size(), 2);
-            result = this.service.search(tenantId, tableName, "lucene", "BL1:[false TO true]", 0, 10);
+            result = this.service.search(tenantId, tableName, "BL1:[false TO true]", 0, 10);
             Assert.assertTrue(result.size() > 2);
         }
         this.cleanupTable(tenantId, tableName);
@@ -188,9 +188,9 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         List<Record> records = this.generateIndexRecords(tenantId, tableName, 100, 0);
         this.service.put(records);
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
-        int count = this.service.searchCount(tenantId, tableName, "lucene", "STR1:STRING55");
+        int count = this.service.searchCount(tenantId, tableName, "STR1:STRING55");
         Assert.assertEquals(count, 1);
-        count = this.service.searchCount(tenantId, tableName, "lucene", "TXT1:name");
+        count = this.service.searchCount(tenantId, tableName, "TXT1:name");
         Assert.assertEquals(count, 100);
         this.cleanupTable(tenantId, tableName);
     }
@@ -218,13 +218,13 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.setIndices(tenantId, tableName, columns);
         this.service.put(records);
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
-        List<SearchResultEntry> result = this.service.search(tenantId, tableName, "lucene", "STR1:tea", 0, 10);
+        List<SearchResultEntry> result = this.service.search(tenantId, tableName, "STR1:tea", 0, 10);
         Assert.assertEquals(result.size(), 1);
         String id = record.getId();
         Assert.assertEquals(result.get(0).getId(), id);
-        result = this.service.search(tenantId, tableName, "lucene", "STR1:diamonds", 0, 10);
+        result = this.service.search(tenantId, tableName, "STR1:diamonds", 0, 10);
         Assert.assertEquals(result.size(), 0);
-        result = this.service.search(tenantId, tableName, "lucene", "STR2:cricket", 0, 10);
+        result = this.service.search(tenantId, tableName, "STR2:cricket", 0, 10);
         Assert.assertEquals(result.size(), 1);
         Assert.assertEquals(result.get(0).getId(), id);
         values = new HashMap<String, Object>();
@@ -236,17 +236,17 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         /* update */
         this.service.put(records);
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
-        result = this.service.search(tenantId, tableName, "lucene", "STR1:tea", 0, 10);
+        result = this.service.search(tenantId, tableName, "STR1:tea", 0, 10);
         Assert.assertEquals(result.size(), 0);
-        result = this.service.search(tenantId, tableName, "lucene", "STR2:cricket", 0, 10);
+        result = this.service.search(tenantId, tableName, "STR2:cricket", 0, 10);
         Assert.assertEquals(result.size(), 0);
-        result = this.service.search(tenantId, tableName, "lucene", "STR1:diamonds", 0, 10);
+        result = this.service.search(tenantId, tableName, "STR1:diamonds", 0, 10);
         Assert.assertEquals(result.size(), 1);
         Assert.assertEquals(result.get(0).getId(), id);
-        result = this.service.search(tenantId, tableName, "lucene", "STR2:basketball", 0, 10);
+        result = this.service.search(tenantId, tableName, "STR2:basketball", 0, 10);
         Assert.assertEquals(result.size(), 1);
         Assert.assertEquals(result.get(0).getId(), id);
-        result = this.service.search(tenantId, tableName, "lucene", "STR1:hockey", 0, 10);
+        result = this.service.search(tenantId, tableName, "STR1:hockey", 0, 10);
         Assert.assertEquals(result.size(), 1);
         Assert.assertEquals(result.get(0).getId(), record2.getId());
         this.cleanupTable(tenantId, tableName);
@@ -271,11 +271,11 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         ids.add(records.get(97).getId());
         Assert.assertEquals(GenericUtils.listRecords(this.service, this.service.get(tenantId, tableName, 2, null, ids)).size(), 4);
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
-        List<SearchResultEntry> result = this.service.search(tenantId, tableName, "lucene", "STR1:S*", 0, 150);
+        List<SearchResultEntry> result = this.service.search(tenantId, tableName, "STR1:S*", 0, 150);
         Assert.assertEquals(result.size(), 98);
         this.service.delete(tenantId, tableName, ids);
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
-        result = this.service.search(tenantId, tableName, "lucene", "STR1:S*", 0, 150);
+        result = this.service.search(tenantId, tableName, "STR1:S*", 0, 150);
         Assert.assertEquals(result.size(), 94);
         Assert.assertEquals(GenericUtils.listRecords(this.service, this.service.get(tenantId, tableName, 3, null, ids)).size(), 0);
         this.cleanupTable(tenantId, tableName);
@@ -304,7 +304,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         /* lets test table name case-insensitiveness too */
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
         List<SearchResultEntry> results = this.service.search(tenantId, 
-                tableName.toUpperCase(), "lucene", "STR1:s*", 0, n);
+                tableName.toUpperCase(), "STR1:s*", 0, n);
         Assert.assertEquals(results.size(), n - 3);
         this.cleanupTable(tenantId, tableName);
     }
@@ -432,7 +432,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         System.out.println("* Read Time: " + (end - start) + " ms.");
         System.out.println("* Read Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);        
         start = System.currentTimeMillis();
-        List<SearchResultEntry> results = this.service.search(tenantId, tableName, "lucene", "log: exception", 0, 75);
+        List<SearchResultEntry> results = this.service.search(tenantId, tableName, "log: exception", 0, 75);
         end = System.currentTimeMillis();
         Assert.assertEquals(results.size(), 75);
         System.out.println("* Search Result Count: " + results.size() + " Time: " + (end - start) + " ms.");
@@ -494,7 +494,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         System.out.println("* Read Time: " + (end - start) + " ms.");
         System.out.println("* Read Throughput (TPS): " + (n * batch * nThreads) / (double) (end - start) * 1000.0);        
         start = System.currentTimeMillis();
-        List<SearchResultEntry> results = this.service.search(tenantId, tableName, "lucene", "log: exception", 0, 75);
+        List<SearchResultEntry> results = this.service.search(tenantId, tableName, "log: exception", 0, 75);
         end = System.currentTimeMillis();
         Assert.assertEquals(results.size(), 75);
         System.out.println("* Search Result Count: " + results.size() + " Time: " + (end - start) + " ms.");

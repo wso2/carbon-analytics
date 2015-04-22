@@ -253,7 +253,6 @@ public interface AnalyticsDataService extends AnalyticsRecordReader {
      * Searches the data with a given search query.
      * @param tenantId The tenant id
      * @param tableName The table name
-     * @param language The language used to give the search query
      * @param query The search query
      * @param start The start location of the result, 0 based
      * @param count The maximum number of result entries to be returned
@@ -261,20 +260,18 @@ public interface AnalyticsDataService extends AnalyticsRecordReader {
      * @throws AnalyticsIndexException
      * @throws AnalyticsException 
      */
-    List<SearchResultEntry> search(int tenantId, String tableName, String language,
+    List<SearchResultEntry> search(int tenantId, String tableName,
             String query, int start, int count) throws AnalyticsIndexException, AnalyticsException;
     
     /**
      * Returns the search count of results of a given search query.
      * @param tenantId The tenant id
      * @param tableName The table name
-     * @param language The language used to give the search query
      * @param query The search query
      * @return The count of results
      * @throws AnalyticsIndexException
      */
-    int searchCount(int tenantId, String tableName, String language, 
-            String query) throws AnalyticsIndexException;
+    int searchCount(int tenantId, String tableName, String query) throws AnalyticsIndexException;
 
     /**
      * Returns the drill down results of a search query, given

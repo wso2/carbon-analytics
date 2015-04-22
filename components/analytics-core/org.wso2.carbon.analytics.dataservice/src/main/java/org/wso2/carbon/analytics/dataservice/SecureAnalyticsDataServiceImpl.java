@@ -252,18 +252,18 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     }
 
     @Override
-    public List<SearchResultEntry> search(String username, String tableName, String language, String query, int start,
+    public List<SearchResultEntry> search(String username, String tableName, String query, int start,
                                           int count) throws AnalyticsIndexException, AnalyticsException {
         int tenantId = getTenantId(username);
         if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_SEARCH_RECORD)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
                                                            "permission to search indexed records");
         }
-        return analyticsDataService.search(tenantId, tableName, language, query, start, count);
+        return analyticsDataService.search(tenantId, tableName, query, start, count);
     }
 
     @Override
-    public int searchCount(String username, String tableName, String language, String query)
+    public int searchCount(String username, String tableName, String query)
             throws AnalyticsIndexException {
         try {
             int tenantId = getTenantId(username);
@@ -271,7 +271,7 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
                 throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
                                                                "permission to get search indexed record count");
             }
-            return analyticsDataService.searchCount(tenantId, tableName, language, query);
+            return analyticsDataService.searchCount(tenantId, tableName, query);
         } catch (AnalyticsException e) {
             throw new AnalyticsIndexException(e.getMessage(), e);
         }

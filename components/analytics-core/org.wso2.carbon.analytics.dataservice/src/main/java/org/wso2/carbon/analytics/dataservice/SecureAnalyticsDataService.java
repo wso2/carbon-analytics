@@ -263,7 +263,6 @@ public interface SecureAnalyticsDataService extends AnalyticsRecordReader {
      *
      * @param username  The username of the user that invoke this method
      * @param tableName The table name
-     * @param language  The language used to give the search query
      * @param query     The search query
      * @param start     The start location of the result, 0 based
      * @param count     The maximum number of result entries to be returned
@@ -271,8 +270,7 @@ public interface SecureAnalyticsDataService extends AnalyticsRecordReader {
      * @throws AnalyticsIndexException
      * @throws AnalyticsException
      */
-    List<SearchResultEntry> search(String username, String tableName, String language,
-                                   String query, int start, int count)
+    List<SearchResultEntry> search(String username, String tableName, String query, int start, int count)
             throws AnalyticsIndexException, AnalyticsException;
 
     /**
@@ -280,13 +278,11 @@ public interface SecureAnalyticsDataService extends AnalyticsRecordReader {
      *
      * @param username  The username of the user that invoke this method
      * @param tableName The table name
-     * @param language  The language used to give the search query
      * @param query     The search query
      * @return The count of results
      * @throws AnalyticsIndexException
      */
-    int searchCount(String username, String tableName, String language,
-                    String query) throws AnalyticsIndexException;
+    int searchCount(String username, String tableName, String query) throws AnalyticsIndexException;
 
     /**
      * This method waits until the current indexing operations for the system is done.

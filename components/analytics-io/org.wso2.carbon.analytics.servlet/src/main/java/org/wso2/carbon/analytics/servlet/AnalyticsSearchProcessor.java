@@ -70,7 +70,6 @@ public class AnalyticsSearchProcessor extends HttpServlet {
                 tenantIdParam = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
             String userName = req.getParameter(AnalyticsAPIConstants.USERNAME_PARAM);
             String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
-            String language = req.getParameter(AnalyticsAPIConstants.LANGUAGE_PARAM);
             String query = req.getParameter(AnalyticsAPIConstants.QUERY);
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.SEARCH_OPERATION)) {
                 int start = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.START_PARAM));
@@ -78,9 +77,9 @@ public class AnalyticsSearchProcessor extends HttpServlet {
                 try {
                     List<SearchResultEntry> searchResult;
                     if (!securityEnabled) searchResult = ServiceHolder.getAnalyticsDataService().search(tenantIdParam,
-                            tableName, language, query, start, count);
+                            tableName, query, start, count);
                     else searchResult = ServiceHolder.getSecureAnalyticsDataService().search(userName, tableName,
-                            language, query, start, count);
+                            query, start, count);
                     PrintWriter output = resp.getWriter();
                     output.append(new GsonBuilder().create().toJson(searchResult));
                     resp.setStatus(HttpServletResponse.SC_OK);
@@ -91,10 +90,9 @@ public class AnalyticsSearchProcessor extends HttpServlet {
                 try {
                     int count;
                     if (!securityEnabled) count = ServiceHolder.getAnalyticsDataService().searchCount(tenantIdParam,
-                            tableName, language, query);
+                            tableName, query);
                     else
-                        count = ServiceHolder.getSecureAnalyticsDataService().searchCount(userName, tableName, language,
-                                query);
+                        count = ServiceHolder.getSecureAnalyticsDataService().searchCount(userName, tableName, query);
                     PrintWriter output = resp.getWriter();
                     output.append(AnalyticsAPIConstants.SEARCH_COUNT).append(AnalyticsAPIConstants.SEPARATOR).append(String.valueOf(count));
                     resp.setStatus(HttpServletResponse.SC_OK);

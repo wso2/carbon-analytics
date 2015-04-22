@@ -531,7 +531,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
     
-    public List<SearchResultEntry> search(int tenantId, String tableName, String language, String query, 
+    public List<SearchResultEntry> search(int tenantId, String tableName, String query,
             int start, int count) throws AnalyticsIndexException {
 
         List<SearchResultEntry> result = new ArrayList<>();
@@ -581,8 +581,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
 
-    public int searchCount(int tenantId, String tableName, String language, 
-            String query) throws AnalyticsIndexException {
+    public int searchCount(int tenantId, String tableName, String query) throws AnalyticsIndexException {
         IndexReader reader = null;
         try {
             reader = this.getCombinedIndexReader(tenantId, tableName);

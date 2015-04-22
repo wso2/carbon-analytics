@@ -379,17 +379,16 @@ public class AnalyticsWebService extends AbstractAdmin {
      * Searches the data with a given search query.
      *
      * @param tableName The table name
-     * @param language  The language used to give the search query
      * @param query     The search query
      * @param start     The start location of the result, 0 based
      * @param count     The maximum number of result entries to be returned
      * @return An arrays of {@link RecordBean}s
      * @throws AnalyticsWebServiceException
      */
-    public RecordBean[] search(String tableName, String language, String query, int start, int count)
+    public RecordBean[] search(String tableName, String query, int start, int count)
             throws AnalyticsWebServiceException {
         try {
-            List<SearchResultEntry> searchResults = analyticsDataAPI.search(getUsername(), tableName, language, query,
+            List<SearchResultEntry> searchResults = analyticsDataAPI.search(getUsername(), tableName, query,
                                                                             start, count);
             List<String> recordIds = Utils.getRecordIds(searchResults);
             List<Record> records = GenericUtils.listRecords(analyticsDataAPI, analyticsDataAPI.get(getUsername(), tableName, DEFAULT_NUM_PARTITIONS_HINT, null, recordIds));
@@ -407,14 +406,13 @@ public class AnalyticsWebService extends AbstractAdmin {
      * Returns the search count of results of a given search query.
      *
      * @param tableName The table name
-     * @param language  The language used to give the search query
      * @param query     The search query
      * @return The count of results
      * @throws AnalyticsWebServiceException
      */
-    public int searchCount(String tableName, String language, String query) throws AnalyticsWebServiceException {
+    public int searchCount(String tableName, String query) throws AnalyticsWebServiceException {
         try {
-            return analyticsDataAPI.searchCount(getUsername(), tableName, language, query);
+            return analyticsDataAPI.searchCount(getUsername(), tableName, query);
         } catch (AnalyticsIndexException e) {
             logger.error("Unable to get search count for table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to get search count from table[" + tableName + "] due to "

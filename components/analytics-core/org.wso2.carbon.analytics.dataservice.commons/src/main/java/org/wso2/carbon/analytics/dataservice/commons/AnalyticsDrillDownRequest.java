@@ -38,8 +38,6 @@ public class AnalyticsDrillDownRequest implements Serializable {
     private List<AnalyticsDrillDownRange> ranges;
     //Field name which is bucketed.
     private String rangeField;
-    //query language - either lucene or regex
-    private String language;
     // language query
     private  String languageQuery;
     // represents the score function and the values
@@ -53,15 +51,13 @@ public class AnalyticsDrillDownRequest implements Serializable {
 
     public AnalyticsDrillDownRequest(String tableName,
                                      Map<String, AnalyticsCategoryPath> categoryPaths, String rangeField,
-                                     List<AnalyticsDrillDownRange> ranges,
-                                     String language, String languageQuery,
+                                     List<AnalyticsDrillDownRange> ranges, String languageQuery,
                                      String scoreFunction, int recordCount,
                                      int recordStart) {
         this.tableName = tableName;
         this.categoryPaths = categoryPaths;
         this.rangeField = rangeField;
         this.ranges = ranges;
-        this.language = language;
         this.languageQuery = languageQuery;
         this.scoreFunction = scoreFunction;
         this.recordCount = recordCount;
@@ -141,22 +137,6 @@ public class AnalyticsDrillDownRequest implements Serializable {
      */
     public void setLanguageQuery(String languageQuery) {
         this.languageQuery = languageQuery;
-    }
-
-    /**
-     * Returns the query language lucene or regex.
-     * @return the language
-     */
-    public String getLanguage() {
-        return language;
-    }
-
-    /**
-     * Sets the query language. It should be lucene or regex.
-     * @param language Th language type
-     */
-    public void setLanguage(String language) {
-        this.language = language;
     }
 
     /**

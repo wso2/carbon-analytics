@@ -652,13 +652,12 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public List<SearchResultEntry> search(int tenantId, String username, String tableName, String language, String query,
+    public List<SearchResultEntry> search(int tenantId, String username, String tableName, String query,
                                           int start, int count, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.SEARCH_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.SEARCH_OPERATION)
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
-                .addParameter(AnalyticsAPIConstants.LANGUAGE_PARAM, language)
                 .addParameter(AnalyticsAPIConstants.QUERY, query)
                 .addParameter(AnalyticsAPIConstants.START_PARAM, String.valueOf(start))
                 .addParameter(AnalyticsAPIConstants.COUNT_PARAM, String.valueOf(count))
@@ -675,7 +674,7 @@ public class AnalyticsAPIHttpClient {
             String response = getResponse(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to search the table - " + tableName
-                        + " for tenant id : " + tenantId + " with language : " + language + ", query : " + query + ". "
+                        + " for tenant id : " + tenantId + " with query : " + query + ". "
                         + response);
             } else {
                 Type searchResultType = new TypeToken<List<SearchResultEntry>>() {
@@ -689,13 +688,12 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public int searchCount(int tenantId, String username, String tableName, String language, String query,
+    public int searchCount(int tenantId, String username, String tableName, String query,
                            boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.SEARCH_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.SEARCH_COUNT_OPERATION)
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
-                .addParameter(AnalyticsAPIConstants.LANGUAGE_PARAM, language)
                 .addParameter(AnalyticsAPIConstants.QUERY, query)
                 .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
         if (!securityEnabled) {
@@ -710,7 +708,7 @@ public class AnalyticsAPIHttpClient {
             String response = getResponse(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to search the table - " + tableName
-                        + " for tenant id : " + tenantId + " with language : " + language + ", query : " + query + ". "
+                        + " for tenant id : " + tenantId + " with query : " + query + ". "
                         + response);
             } else {
                 if (response.startsWith(AnalyticsAPIConstants.SEARCH_COUNT)) {

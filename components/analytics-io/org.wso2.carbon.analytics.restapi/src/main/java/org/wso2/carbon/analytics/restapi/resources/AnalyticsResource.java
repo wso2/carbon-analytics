@@ -594,7 +594,6 @@ public class AnalyticsResource extends AbstractResource {
         anss.addCategoryPath("testField", path);
         anss.setScoreFunction("2*_weight");
         anss.setLanguageQuery(null);
-        anss.setLanguage("lucene");
         anss.setTableName("test");
         anss.setRecordCount(records);
 
@@ -623,7 +622,6 @@ public class AnalyticsResource extends AbstractResource {
         AnalyticsCategoryPath path = new AnalyticsCategoryPath(new String[]{"2015"});
         anss.addCategoryPath("testField", path);
         anss.setLanguageQuery(null);
-        anss.setLanguage("lucene");
         anss.setTableName("test");
         anss.setRecordCount(1);
         List<SearchResultEntry> g = ads.drillDownSearch(-1234, anss);
@@ -646,16 +644,12 @@ public class AnalyticsResource extends AbstractResource {
         AnalyticsCategoryPath path = new AnalyticsCategoryPath(new String[]{"2015"});
         anss.addCategoryPath("testField", path);
         anss.setLanguageQuery(null);
-        anss.setLanguage("lucene");
         anss.setTableName("test");
         anss.setRecordCount(1);
 
 
         DrillDownRequestBean dd = new DrillDownRequestBean();
         dd.setTableName("test");
-        dd.setCategoryCount(1);
-        dd.setCategoryStart(0);
-        dd.setLanguage("lucene");
         dd.setQuery("field1:record1");
         dd.setIncludeIds(true);
         dd.setRecordCount(1);
@@ -782,7 +776,7 @@ public class AnalyticsResource extends AbstractResource {
         String username = authenticate(authHeader);
         if (queryBean != null) {
             List<SearchResultEntry> searchResults = analyticsDataService.search(username,
-                     queryBean.getTableName(), queryBean.getLanguage(), queryBean.getQuery(),
+                     queryBean.getTableName(), queryBean.getQuery(),
                      queryBean.getStart(), queryBean.getCount());
             List<String> ids = Utils.getRecordIds(searchResults);
             RecordGroup[] recordGroups = analyticsDataService.get(username,
@@ -939,8 +933,7 @@ public class AnalyticsResource extends AbstractResource {
 		SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         if (queryBean != null) {
-            int result = analyticsDataService.searchCount(username, queryBean.getTableName(),
-                                                          queryBean.getLanguage(), queryBean.getQuery());
+            int result = analyticsDataService.searchCount(username, queryBean.getTableName(), queryBean.getQuery());
             if (logger.isDebugEnabled()) {
                 logger.debug("Search count : " + result);
             }

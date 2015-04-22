@@ -39,11 +39,6 @@ public class QueryBean implements Serializable {
     private IndexEntryBean[] columns;
 
     /**
-     * The language.
-     */
-    private String language;
-
-    /**
      * The query.
      */
     private String query;
@@ -113,24 +108,6 @@ public class QueryBean implements Serializable {
      */
     public void setColumns(IndexEntryBean[] columns) {
         this.columns = columns;
-    }
-
-    /**
-     * Gets the language.
-     *
-     * @return the language
-     */
-    public String getLanguage() {
-        return language;
-    }
-
-    /**
-     * Sets the language.
-     *
-     * @param language the new language
-     */
-    public void setLanguage(String language) {
-        this.language = language;
     }
 
     /**

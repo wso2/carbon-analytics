@@ -20,6 +20,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,20 +35,14 @@ public class DrillDownRequestBean {
     private String tableName;
     @XmlElement(name = "categories")
     private List<DrillDownPathBean> categories;
-    @XmlElement(name = "language", required = false, defaultValue = "lucene")
-    private String language;
     @XmlElement(name = "query")
     private String query;
     @XmlElement(name = "scoreFunction", required = false)
     private String scoreFunction;
     @XmlElement(name = "recordCount", required = false, defaultValue = "10")
     private int recordCount;
-    @XmlElement(name = "categoryCount", required = false, defaultValue = "10")
-    private int categoryCount;
     @XmlElement(name = "recordStart", required = false, defaultValue = "0")
     private  int recordStart;
-    @XmlElement(name = "categoryStart", required = false, defaultValue = "0")
-    private  int categoryStart;
     @XmlElement(name = "includeIds", required = false, defaultValue = "false")
     private boolean includeIds;
     @XmlElement(name = "ranges", required = false)
@@ -64,19 +59,14 @@ public class DrillDownRequestBean {
     }
 
     public List<DrillDownPathBean> getCategories() {
+        if (categories == null) {
+            return new ArrayList<>();
+        }
         return categories;
     }
 
     public void setCategories(List<DrillDownPathBean> categories) {
         this.categories = categories;
-    }
-
-    public String getLanguage() {
-        return language;
-    }
-
-    public void setLanguage(String language) {
-        this.language = language;
     }
 
     public String getQuery() {
@@ -103,14 +93,6 @@ public class DrillDownRequestBean {
         this.recordCount = recordCount;
     }
 
-    public int getCategoryCount() {
-        return categoryCount;
-    }
-
-    public void setCategoryCount(int categoryCount) {
-        this.categoryCount = categoryCount;
-    }
-
     public int getRecordStart() {
         return recordStart;
     }
@@ -127,15 +109,10 @@ public class DrillDownRequestBean {
         this.includeIds = includeIds;
     }
 
-    public int getCategoryStart() {
-        return categoryStart;
-    }
-
-    public void setCategoryStart(int categoryStart) {
-        this.categoryStart = categoryStart;
-    }
-
     public List<DrillDownRangeBean> getRanges() {
+        if (ranges == null) {
+            return new ArrayList<>();
+        }
         return ranges;
     }
 

@@ -39,7 +39,6 @@ public class AnalyticsAPIConstants {
     public static final String RECORD_IDS_PARAM = "recordIds";
     public static final String INDEX_PARAM = "index";
     public static final String SCORE_PARAM = "score";
-    public static final String LANGUAGE_PARAM = "language";
     public static final String QUERY = "query";
     public static final String START_PARAM = "start";
     public static final String COUNT_PARAM = "count";

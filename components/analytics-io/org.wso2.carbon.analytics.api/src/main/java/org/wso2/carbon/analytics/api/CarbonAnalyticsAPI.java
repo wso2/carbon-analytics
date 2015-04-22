@@ -402,26 +402,26 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public List<SearchResultEntry> search(String username, String tableName, String language, String query, int start, int count) throws AnalyticsIndexException, AnalyticsException {
+    public List<SearchResultEntry> search(String username, String tableName, String query, int start, int count) throws AnalyticsIndexException, AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
-            return ServiceHolder.getSecureAnalyticsDataService().search(username, tableName, language, query, start, count);
+            return ServiceHolder.getSecureAnalyticsDataService().search(username, tableName, query, start, count);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
             return AnalyticsAPIHttpClient.getInstance().search(MultitenantConstants.INVALID_TENANT_ID,
-                    username, tableName, language, query, start, count, true);
+                    username, tableName, query, start, count, true);
         }
     }
 
     @Override
-    public int searchCount(String username, String tableName, String language, String query) throws AnalyticsIndexException {
+    public int searchCount(String username, String tableName, String query) throws AnalyticsIndexException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
-            return ServiceHolder.getSecureAnalyticsDataService().searchCount(username, tableName, language, query);
+            return ServiceHolder.getSecureAnalyticsDataService().searchCount(username, tableName, query);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
             return AnalyticsAPIHttpClient.getInstance().searchCount(MultitenantConstants.INVALID_TENANT_ID,
-                    username, tableName, language, query, true);
+                    username, tableName, query, true);
         }
     }
 
@@ -569,25 +569,25 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public List<SearchResultEntry> search(int tenantId, String tableName, String language, String query, int start,
+    public List<SearchResultEntry> search(int tenantId, String tableName, String query, int start,
                                           int count) throws AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
-            return ServiceHolder.getAnalyticsDataService().search(tenantId, tableName, language, query, start, count);
+            return ServiceHolder.getAnalyticsDataService().search(tenantId, tableName, query, start, count);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
-            return AnalyticsAPIHttpClient.getInstance().search(tenantId, null, tableName, language, query, start, count, false);
+            return AnalyticsAPIHttpClient.getInstance().search(tenantId, null, tableName, query, start, count, false);
         }
     }
 
     @Override
-    public int searchCount(int tenantId, String tableName, String language, String query) throws AnalyticsIndexException {
+    public int searchCount(int tenantId, String tableName, String query) throws AnalyticsIndexException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
-            return ServiceHolder.getAnalyticsDataService().searchCount(tenantId, tableName, language, query);
+            return ServiceHolder.getAnalyticsDataService().searchCount(tenantId, tableName, query);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
-            return AnalyticsAPIHttpClient.getInstance().searchCount(tenantId, null, tableName, language, query, false);
+            return AnalyticsAPIHttpClient.getInstance().searchCount(tenantId, null, tableName, query, false);
         }
     }
 
