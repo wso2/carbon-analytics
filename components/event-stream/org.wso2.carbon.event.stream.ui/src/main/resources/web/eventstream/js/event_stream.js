@@ -523,8 +523,6 @@ function addEventStreamByString(form) {
             if (addStreamResposeJSON.success.localeCompare("fail") == 0) {
                 CARBON.showErrorDialog("Failed to add event stream, Exception: " + addStreamResposeJSON.message);
             } else {
-                var eventStreamDefinitionJSON = JSON.parse(eventStreamDefinitionString);
-                var newEventStreamId = eventStreamDefinitionJSON.name + ":" + eventStreamDefinitionJSON.version;
                 CARBON.showInfoDialog("Stream definition added successfully!!",function () {
                     form.submit();
                 });
