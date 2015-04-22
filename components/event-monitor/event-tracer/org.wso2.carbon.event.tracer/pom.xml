@@ -32,6 +32,17 @@
     <name>WSO2 Carbon - Event Tracer BE</name>
     <url>http://wso2.org</url>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang.wso2</groupId>
+            <artifactId>commons-lang</artifactId>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -45,27 +56,11 @@
                         <Export-Package>
                             org.wso2.carbon.event.tracer.*
                         </Export-Package>
-                        <!--<Import-Package>-->
-                        <!--org.apache.log4j; version="0.0.0",-->
-                        <!--org.apache.log4j.spi; version="0.0.0",-->
-                        <!--org.wso2.carbon.logging.appenders; version="0.0.0"-->
-                        <!--</Import-Package>-->
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.utils</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-lang.wso2</groupId>
-            <artifactId>commons-lang</artifactId>
-        </dependency>
-    </dependencies>
 
 </project>

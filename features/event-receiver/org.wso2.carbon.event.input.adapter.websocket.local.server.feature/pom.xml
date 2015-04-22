@@ -30,7 +30,6 @@
     <artifactId>org.wso2.carbon.event.input.adapter.websocket.local.server.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Event Input Websocket - Local Adapter Server Feature</name>
-    <version>1.0.0-SNAPSHOT</version>
     <url>http://wso2.org</url>
     <description>This feature contains the bundles required for Input Websocket - Local Event Adapter functionality
     </description>

@@ -26,7 +26,6 @@
 
     <artifactId>org.wso2.carbon.event.input.adapter.mqtt</artifactId>
     <packaging>bundle</packaging>
-    <version>1.0.0-SNAPSHOT</version>
     <name>WSO2 Carbon - Event Input MQTT Adapter Module</name>
     <description>org.wso2.carbon.event.input.adapter.mqtt provides the back-end functionality of input mqtt adapter
     </description>
@@ -50,6 +49,7 @@
             <artifactId>mqtt-client</artifactId>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -64,7 +64,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -72,7 +71,6 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -80,11 +78,11 @@
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Private-Package>
                             org.wso2.carbon.event.input.adapter.mqtt.internal,
-                            org.org.wso2.carbon.event.input.adapter.mqtt.internal
+                            org.wso2.carbon.event.input.adapter.mqtt.internal.*
                         </Private-Package>
                         <Export-Package>
                             !org.wso2.carbon.event.input.adapter.mqtt.internal,
-                            !org.org.wso2.carbon.event.input.adapter.mqtt.internal.*,
+                            !org.wso2.carbon.event.input.adapter.mqtt.internal.*,
                             org.wso2.carbon.event.input.adapter.mqtt.*,
                         </Export-Package>
                         <Import-Package>
@@ -100,7 +98,5 @@
             </plugin>
         </plugins>
     </build>
-    <properties>
-    </properties>
 
 </project>

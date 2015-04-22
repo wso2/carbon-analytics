@@ -117,9 +117,6 @@
             </plugin>
         </plugins>
     </build>
-    <properties>
-    </properties>
-
 
 </project>
 

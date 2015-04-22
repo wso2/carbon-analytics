@@ -23,10 +23,6 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-
-
-
-    <version>1.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.event.output.adapter.kafka</artifactId>
     <packaging>bundle</packaging>
@@ -35,20 +31,6 @@
         functionality of output kafka adaptor
     </description>
     <url>http://wso2.org</url>
-
-    <repositories>
-        <repository>
-            <id>wso2-maven2-repository</id>
-            <name>WSO2 Maven2 Repository</name>
-            <url>http://dist.wso2.org/maven2</url>
-        </repository>
-
-        <repository>
-            <id>MarketceteraRepo</id>
-            <name>MarketceteraRepoy</name>
-            <url>http://repo.marketcetera.org/maven/</url>
-        </repository>
-    </repositories>
 
     <dependencies>
         <dependency>

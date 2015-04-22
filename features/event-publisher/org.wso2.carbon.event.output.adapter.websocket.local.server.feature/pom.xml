@@ -29,7 +29,6 @@
     <artifactId>org.wso2.carbon.event.output.adapter.websocket.local.server.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Event Output Websocket - Local Adapter Server Feature</name>
-    <version>1.0.0-SNAPSHOT</version>
     <url>http://wso2.org</url>
     <description>This feature contains the bundles required for Websocket - Local Event Adapter functionality</description>
 

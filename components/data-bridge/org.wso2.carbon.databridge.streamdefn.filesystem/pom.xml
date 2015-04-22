@@ -79,9 +79,12 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Private-Package>
+                            org.wso2.carbon.databridge.streamdefn.filesystem.internal,
                             org.wso2.carbon.databridge.streamdefn.filesystem.internal.*
                         </Private-Package>
                         <Export-Package>
+                            !org.wso2.carbon.databridge.streamdefn.filesystem.internal,
+                            !org.wso2.carbon.databridge.streamdefn.filesystem.internal.*,
                             org.wso2.carbon.databridge.streamdefn.filesystem.*
                         </Export-Package>
                         <Import-Package>org.osgi.framework,*;resolution:=optional</Import-Package>

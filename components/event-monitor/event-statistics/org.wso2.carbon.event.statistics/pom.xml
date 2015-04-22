@@ -49,6 +49,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -66,8 +67,10 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
-
-                        <Private-Package>org.wso2.carbon.event.statistics.internal.*</Private-Package>
+                        <Private-Package>
+                            org.wso2.carbon.event.statistics.internal,
+                            org.wso2.carbon.event.statistics.internal.*
+                        </Private-Package>
                         <Export-Package>
                             !org.wso2.carbon.event.statistics.internal,
                             !org.wso2.carbon.event.statistics.internal.*,

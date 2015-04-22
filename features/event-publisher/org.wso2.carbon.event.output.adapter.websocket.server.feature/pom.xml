@@ -30,7 +30,6 @@
     <artifactId>org.wso2.carbon.event.output.adapter.websocket.server.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Event Output Websocket Adapter Server Feature</name>
-    <version>1.0.0-SNAPSHOT</version>
     <url>http://wso2.org</url>
     <description>This feature contains the bundles required for Websocket Event Adapter functionality</description>
 
@@ -44,6 +43,7 @@
             <artifactId>tyrus-standalone-client</artifactId>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>

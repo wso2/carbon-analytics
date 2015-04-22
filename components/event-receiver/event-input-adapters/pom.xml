@@ -26,7 +26,6 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>event-input-adapters</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Event Input Adapters Module</name>
     <description>This is a Carbon bundle that represent the event-adapter module.</description>
@@ -45,6 +44,7 @@
         <module>org.wso2.carbon.event.input.adapter.email</module>
         <module>org.wso2.carbon.event.input.adapter.file</module>
     </modules>
+
 </project>
 
 

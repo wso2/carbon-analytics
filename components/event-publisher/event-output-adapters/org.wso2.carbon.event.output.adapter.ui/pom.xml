@@ -16,7 +16,8 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
@@ -25,7 +26,6 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <version>1.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.event.output.adapter.ui</artifactId>
     <packaging>bundle</packaging>
@@ -34,10 +34,11 @@
         ui event adapter
     </description>
     <url>http://wso2.org</url>
+
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon.analytics-common</groupId>
-            <artifactId>org.wso2.carbon.event.output.adapter.core</artifactId><!--TODO: Move to top-pom -->
+            <artifactId>org.wso2.carbon.event.output.adapter.core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
@@ -60,6 +61,7 @@
             <artifactId>gson</artifactId>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -87,11 +89,13 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Private-Package>
-                            org.wso2.carbon.event.output.adapter.ui.internal.*;
+                            org.wso2.carbon.event.output.adapter.ui.internal,
+                            org.wso2.carbon.event.output.adapter.ui.internal.*
                         </Private-Package>
                         <Export-Package>
-                            org.wso2.carbon.event.output.adapter.ui.*,
-                            !org.wso2.carbon.event.output.adapter.ui.internal.*
+                            !org.wso2.carbon.event.output.adapter.ui.internal,
+                            !org.wso2.carbon.event.output.adapter.ui.internal.*,
+                            org.wso2.carbon.event.output.adapter.ui.*
                         </Export-Package>
                         <Import-Package>
                             org.wso2.carbon.event.output.adapter.core.*,

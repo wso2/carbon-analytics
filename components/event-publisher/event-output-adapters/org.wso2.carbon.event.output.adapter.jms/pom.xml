@@ -81,9 +81,11 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Private-Package>
+                            org.wso2.carbon.event.output.adapter.jms.internal,
                             org.wso2.carbon.event.output.adapter.jms.internal.*
                         </Private-Package>
                         <Export-Package>
+                            !org.wso2.carbon.event.output.adapter.jms.internal,
                             !org.wso2.carbon.event.output.adapter.jms.internal.*,
                             org.wso2.carbon.event.output.adapter.jms.*,
                         </Export-Package>

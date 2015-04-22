@@ -77,7 +77,7 @@
                         </goals>
                         <configuration>
                             <id>org.wso2.carbon.databridge.datareceiver</id>
-                            <propertiesFile>../../../etc/feature.properties</propertiesFile>
+                            <propertiesFile>../../etc/feature.properties</propertiesFile>
                             <includedFeatures>
                                 <includedFeatureDef>
                                     org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.core.server.feature:${carbon.analytics.common.version}

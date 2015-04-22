@@ -22,7 +22,6 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <version>1.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.event.input.adapter.wso2event</artifactId>
     <packaging>bundle</packaging>
@@ -33,7 +32,6 @@
     <url>http://wso2.org</url>
 
     <dependencies>
-
         <dependency>
             <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.event.input.adapter.core</artifactId>
@@ -66,7 +64,6 @@
 
     <build>
         <plugins>
-
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-scr-plugin</artifactId>
@@ -79,7 +76,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -87,7 +83,6 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -95,11 +90,11 @@
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Private-Package>
                             org.wso2.carbon.event.input.adapter.wso2event.internal,
-                            org.org.wso2.carbon.event.input.adapter.wso2event.internal
+                            org.wso2.carbon.event.input.adapter.wso2event.internal.*,
                         </Private-Package>
                         <Export-Package>
                             !org.wso2.carbon.event.input.adapter.wso2event.internal,
-                            !org.org.wso2.carbon.event.input.adapter.wso2event.internal.*,
+                            !org.wso2.carbon.event.input.adapter.wso2event.internal.*,
                             org.wso2.carbon.event.input.adapter.wso2event.*,
                         </Export-Package>
                         <Import-Package>
@@ -115,9 +110,6 @@
             </plugin>
         </plugins>
     </build>
-    <properties>
-    </properties>
-
 
 </project>
 

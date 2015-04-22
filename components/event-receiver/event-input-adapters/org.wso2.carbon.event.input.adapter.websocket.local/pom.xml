@@ -28,7 +28,6 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.event.input.adapter.websocket.local</artifactId>
     <packaging>bundle</packaging>
-    <version>1.0.0-SNAPSHOT</version>
     <name>WSO2 Carbon - Event Input Websocket Adapter Local Module</name>
     <description>org.wso2.carbon.event.input.adapter.websocket.local provides the back-end
         functionality of input websocket adapter
@@ -64,7 +63,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -72,7 +70,6 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -80,12 +77,12 @@
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Private-Package>
                             org.wso2.carbon.event.input.adapter.websocket.local.internal,
-                            org.org.wso2.carbon.event.input.adapter.websocket.local.internal
+                            org.wso2.carbon.event.input.adapter.websocket.local.internal.*
                         </Private-Package>
                         <Export-Package>
                             !org.wso2.carbon.event.input.adapter.websocket.local.internal,
-                            !org.org.wso2.carbon.event.input.adapter.websocket.local.internal.*,
-                            org.wso2.carbon.event.input.adapter.websocket.local.*,
+                            !org.wso2.carbon.event.input.adapter.websocket.local.internal.*,
+                            org.wso2.carbon.event.input.adapter.websocket.local.*
                         </Export-Package>
                         <Import-Package>
                             org.wso2.carbon.event.input.adapter.core,
@@ -100,9 +97,6 @@
             </plugin>
         </plugins>
     </build>
-    <properties>
-    </properties>
-
 
 </project>
 

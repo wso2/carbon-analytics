@@ -69,6 +69,7 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Private-Package>
+                            org.wso2.carbon.event.output.adapter.core.internal,
                             org.wso2.carbon.event.output.adapter.core.internal.*
                         </Private-Package>
                         <Export-Package>

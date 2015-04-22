@@ -51,7 +51,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.3</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
@@ -62,9 +61,11 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Private-Package>
+                            org.wso2.carbon.databridge.receiver.binary.internal,
                             org.wso2.carbon.databridge.receiver.binary.internal.*
                         </Private-Package>
                         <Export-Package>
+                            !org.wso2.carbon.databridge.receiver.binary.internal,
                             !org.wso2.carbon.databridge.receiver.binary.internal.*,
                             org.wso2.carbon.databridge.receiver.binary.*
                         </Export-Package>
