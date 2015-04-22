@@ -157,6 +157,19 @@ public class FileEventAdapter implements InputEventAdapter {
     private void createFileAdapterListener() {
         log.info("New subscriber added for " + eventAdapterConfiguration.getName());
 
+
+        String delayInMillisProperty = eventAdapterConfiguration.getProperties().get(FileEventAdapterConstants.EVENT_ADAPTER_DELAY_MILLIS);
+        int delayInMillis = FileEventAdapterConstants.DEFAULT_DELAY_MILLIS;
+        if(delayInMillisProperty != null && (! delayInMillisProperty.trim().isEmpty())){
+            delayInMillis = Integer.parseInt(delayInMillisProperty);
+        }
+
+        boolean startFromEnd = false;
+        String startFromEndProperty = eventAdapterConfiguration.getProperties().get(FileEventAdapterConstants.EVENT_ADAPTER_START_FROM_END);
+        if(startFromEndProperty != null && (! startFromEndProperty.trim().isEmpty())){
+            startFromEnd = Boolean.parseBoolean(startFromEndProperty);
+        }
+
         ConcurrentHashMap<String, FileTailerManager> tailerManagerConcurrentHashMap = tailerMap
                 .get(eventAdapterConfiguration.getName());
         if (tailerManagerConcurrentHashMap == null) {
@@ -172,7 +185,7 @@ public class FileEventAdapter implements InputEventAdapter {
 
         if (fileTailerManager == null) {
             FileTailerListener listener = new FileTailerListener(new File(filepath).getName());
-            Tailer tailer = new Tailer(new File(filepath), listener);
+            Tailer tailer = new Tailer(new File(filepath), listener,delayInMillis,startFromEnd);
             fileTailerManager = new FileTailerManager(tailer, listener);
             listener.addListener(id, eventAdapterListener);
             tailerManagerConcurrentHashMap.put(filepath, fileTailerManager);

@@ -35,5 +35,10 @@ public final class FileEventAdapterConstants {
     public static final String MAX_THREAD_NAME = "maxThread";
     public static final String DEFAULT_KEEP_ALIVE_TIME_NAME = "defaultKeepAliveTime";
     public static final String JOB_QUEUE_SIZE_NAME = "jobQueueSize";
+    public static final String EVENT_ADAPTER_DELAY_MILLIS = "delayInMillis";
+    public static final String EVENT_ADAPTER_DELAY_MILLIS_HINT = "delayInMillis.hint";
+    public static final String EVENT_ADAPTER_START_FROM_END = "startFromEnd";
+    public static final String EVENT_ADAPTER_START_FROM_END_HINT = "startFromEnd.hint";
+    public static final int DEFAULT_DELAY_MILLIS = 1000;
 
 }

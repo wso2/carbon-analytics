@@ -96,28 +96,12 @@ public class WSO2EventAdapterFactory extends OutputEventAdapterFactory {
                 resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_PROP_PUBLISH_TIMEOUT_MS));
         publishingModeProperty.setHint(resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_CONF_WSO2EVENT_HINT_PUBLISH_TIMEOUT_MS));
 
-        // set stream definition
-//        Property streamDefinitionProperty = new Property(WSO2EventAdapterConstants.ADAPTER_STATIC_CONFIG_STREAM_NAME);
-//        streamDefinitionProperty.setDisplayName(
-//                resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_STATIC_CONFIG_STREAM_NAME));
-//        streamDefinitionProperty.setRequired(true);
-
-
-        // set stream version
-//        Property streamVersionProperty = new Property(WSO2EventAdapterConstants.ADAPTER_STATIC_CONFIG_STREAM_VERSION);
-//        streamVersionProperty.setDisplayName(
-//                resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_STATIC_CONFIG_STREAM_VERSION));
-//        streamVersionProperty.setDefaultValue("1.0.0");
-//        streamVersionProperty.setRequired(true);
-
         propertyList.add(ipProperty);
         propertyList.add(authenticatorIpProperty);
         propertyList.add(userNameProperty);
         propertyList.add(passwordProperty);
         propertyList.add(protocolProperty);
         propertyList.add(publishingModeProperty);
-//        propertyList.add(streamDefinitionProperty);
-//        propertyList.add(streamVersionProperty);
 
         return propertyList;
     }

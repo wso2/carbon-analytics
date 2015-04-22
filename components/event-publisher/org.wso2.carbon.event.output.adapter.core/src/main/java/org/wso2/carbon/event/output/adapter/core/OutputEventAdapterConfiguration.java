@@ -26,6 +26,7 @@ public class OutputEventAdapterConfiguration {
     private String name;
     private String type;
     private String messageFormat;
+    private String outputStreamIdOfWso2eventMessageFormat;
     private Map<String, String> staticProperties;
 
     public String getName() {
@@ -60,6 +61,14 @@ public class OutputEventAdapterConfiguration {
         this.staticProperties = staticProperties;
     }
 
+    public String getOutputStreamIdOfWso2eventMessageFormat() {
+        return outputStreamIdOfWso2eventMessageFormat;
+    }
+
+    public void setOutputStreamIdOfWso2eventMessageFormat(String outputStreamIdOfWso2eventMessageFormat) {
+        this.outputStreamIdOfWso2eventMessageFormat = outputStreamIdOfWso2eventMessageFormat;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -70,10 +79,13 @@ public class OutputEventAdapterConfiguration {
         if (messageFormat != null ? !messageFormat.equals(that.messageFormat) : that.messageFormat != null)
             return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (outputStreamIdOfWso2eventMessageFormat != null ? !outputStreamIdOfWso2eventMessageFormat.equals(that.outputStreamIdOfWso2eventMessageFormat) : that.outputStreamIdOfWso2eventMessageFormat != null)
+            return false;
         if (staticProperties != null ? !staticProperties.equals(that.staticProperties) : that.staticProperties != null)
             return false;
-        return !(type != null ? !type.equals(that.type) : that.type != null);
+        if (type != null ? !type.equals(that.type) : that.type != null) return false;
 
+        return true;
     }
 
     @Override
@@ -81,6 +93,7 @@ public class OutputEventAdapterConfiguration {
         int result = name != null ? name.hashCode() : 0;
         result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (messageFormat != null ? messageFormat.hashCode() : 0);
+        result = 31 * result + (outputStreamIdOfWso2eventMessageFormat != null ? outputStreamIdOfWso2eventMessageFormat.hashCode() : 0);
         result = 31 * result + (staticProperties != null ? staticProperties.hashCode() : 0);
         return result;
     }
