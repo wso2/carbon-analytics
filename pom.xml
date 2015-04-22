@@ -684,6 +684,17 @@
                 <version>${carbon.analytics.common.version}</version>
                 <type>zip</type>
             </dependency>
+            <dependency>
+                <groupId>com.jayway.jsonpath</groupId>
+                <artifactId>json-path</artifactId>
+                <version>${jsonpath.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.minidev</groupId>
+                <artifactId>json-smart</artifactId>
+                <version>${jsonsmart.version}</version>
+            </dependency>
+
             <!--<dependency>-->
             <!--<groupId>org.wso2.carbon.analytics-common</groupId>-->
             <!--<artifactId>org.wso2.carbon.analytics.dashboard.ui.feature</artifactId>-->
