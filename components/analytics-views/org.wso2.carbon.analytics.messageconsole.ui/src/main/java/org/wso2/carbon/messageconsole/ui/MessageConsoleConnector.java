@@ -78,8 +78,8 @@ public class MessageConsoleConnector {
     private static final String LUCENE = "lucene";
     private static final String ERROR = "ERROR";
 
-    public static final String RECORD_ID = "bam_unique_rec_id";
-    public static final String TIMESTAMP = "bam_rec_timestamp";
+    public static final String RECORD_ID = "_unique_rec_id";
+    public static final String TIMESTAMP = "_timestamp";
     public static final int TYPE_LIST_RECORD = 1;
     public static final int TYPE_CREATE_RECORD = 2;
     public static final int TYPE_UPDATE_RECORD = 3;

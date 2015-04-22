@@ -47,6 +47,7 @@ public class AnalyticsDSConnector {
 
     private AnalyticsSchema getSchema(StreamDefinition streamDefinition) {
         Map<String, AnalyticsSchema.ColumnType> columns = new HashMap<>();
+        columns.put(AnalyticsDatasinkConstants.STREAM_VERSION_KEY, AnalyticsSchema.ColumnType.STRING);
         populateColumnSchema(AnalyticsDatasinkConstants.EVENT_META_DATA_TYPE,
                 streamDefinition.getMetaData(), columns);
         populateColumnSchema(AnalyticsDatasinkConstants.EVENT_CORRELATION_DATA_TYPE,

@@ -445,7 +445,7 @@
                                 listAction: function (postData, jtParams) {
                                     var postData = {};
                                     postData['tableName'] = $("#tableSelect").val();
-                                    postData['bam_unique_rec_id'] = rowData.record.bam_unique_rec_id;
+                                    postData['_unique_rec_id'] = rowData.record._unique_rec_id;
                                     return arbitraryFieldListActionMethod(postData, jtParams);
                                 }
                                 <c:if test="${permissions != null && permissions.isPutRecord()}">
@@ -460,7 +460,7 @@
                                 <c:if test="${permissions != null && permissions.isDeleteRecord()}">,
                                 deleteAction: function (postData) {
                                     postData['tableName'] = $("#tableSelect").val();
-                                    postData['bam_unique_rec_id'] = rowData.record.bam_unique_rec_id;
+                                    postData['_unique_rec_id'] = rowData.record._unique_rec_id;
                                     return arbitraryFieldDeleteActionMethod(postData);
                                 }
                                 </c:if>
@@ -484,11 +484,11 @@
                                 data.form.validationEngine('detach');
                             },
                             fields: {
-                                bam_unique_rec_id: {
+                                _unique_rec_id: {
                                     type: 'hidden',
                                     key: true,
                                     list: false,
-                                    defaultValue: rowData.record.bam_unique_rec_id
+                                    defaultValue: rowData.record._unique_rec_id
                                 },
                                 Name: {
                                     title: 'Name',
@@ -513,6 +513,9 @@
         }
 
         function createJTable() {
+            $("#resultsTable").show();
+            var workAreaWidth = $(".styledLeft").width();
+            $("#AnalyticsTableContainer").width(workAreaWidth - 20);
             var table = $("#tableSelect").val();
             if (table != '-1') {
                 $.getJSON("/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=" + typeTableInfo + "&tableName=" + table,
@@ -553,7 +556,7 @@
                                           fields[val.name].inputClass = 'validate[custom[number]]';
                                       }
                                   }
-                                  if (val.name == 'bam_unique_rec_id' || val.name == 'bam_rec_timestamp') {
+                                  if (val.name == '_unique_rec_id' || val.name == '_timestamp') {
                                       fields[val.name].edit = false;
                                       fields[val.name].create = false;
                                   }
@@ -634,7 +637,8 @@
                                                style="display: none">
                                     </c:if>
                                     <c:if test="${permissions != null && permissions.isDeleteRecord()}">
-                                        <input type="button" id="purgeRecordButton" value="Schedule Data Purging"
+                                        <input type="button" id="purgeRecordButton" class="button"
+                                               value="Schedule Data Purging"
                                                style="display: none">
                                     </c:if>
                                 </td>
@@ -652,7 +656,7 @@
                                 <tr>
                                     <td>By Query</td>
                                     <td>
-                                        Search Query: <textarea id="query" rows="1" cols="100"></textarea>
+                                        <textarea id="query" rows="4" cols="100" placeholder="Search Query"></textarea>
                                     </td>
                                 </tr>
                             </c:if>
@@ -767,19 +771,31 @@
         </div>
         <div id="purgeRecordPopup">
             <form id="dataPurgingForm" action="javascript:scheduleDataPurge()">
-                <label> Enable Data Purging:
-                    <input type="checkbox" id="dataPurgingCheckBox">
-                </label>
-                <br/>
-                <label> Schedule Time (Either cron string or HH:MM):
-                    <input type="text" id="dataPurgingScheudleTime" disabled="disabled" class="validate[required]">
-                </label>
-                <br/>
-                <label> Purge Record Older Than (Days):
-                    <input type="text" id="dataPurgingDay" disabled="disabled"
-                           class="validate[custom[integer],min[1]]" value="1">
-                </label>
-                <input type="submit" value="Save">
+                <table class="normal">
+                    <tbody>
+                    <tr>
+                        <td>Enable Data Purging</td>
+                        <td><input type="checkbox" id="dataPurgingCheckBox"></td>
+                    </tr>
+                    <tr>
+                        <td>Schedule Time (Either cron string or HH:MM):</td>
+                        <td><input type="text" id="dataPurgingScheudleTime" disabled="disabled"
+                                   class="validate[required]"></td>
+                    </tr>
+                    <tr>
+                        <td>Purge Record Older Than (Days)</td>
+                        <td><input type="text" id="dataPurgingDay" disabled="disabled"
+                                   class="validate[custom[integer],min[1]]"></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <table class="styledLeft">
+                    <tbody>
+                    <tr>
+                        <td class="buttonRow"><input type="submit" value="Submit"></td>
+                    </tr>
+                    </tbody>
+                </table>
             </form>
         </div>
     </div>

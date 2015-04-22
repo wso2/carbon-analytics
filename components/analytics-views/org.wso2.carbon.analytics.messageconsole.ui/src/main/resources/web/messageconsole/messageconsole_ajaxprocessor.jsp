@@ -83,12 +83,12 @@
             break;
         }
         case MessageConsoleConnector.TYPE_LIST_ARBITRARY_RECORD: {
-            String recordId = request.getParameter("bam_unique_rec_id");
+            String recordId = request.getParameter("_unique_rec_id");
             out.print(connector.getArbitraryFields(tableName, recordId));
             break;
         }
         case MessageConsoleConnector.TYPE_CRATE_ARBITRARY_RECORD: {
-            String recordId = request.getParameter("bam_unique_rec_id");
+            String recordId = request.getParameter("_unique_rec_id");
             String fieldName = request.getParameter("Name");
             String fieldValue = request.getParameter("Value");
             String fieldType = request.getParameter("Type");
@@ -96,7 +96,7 @@
             break;
         }
         case MessageConsoleConnector.TYPE_UPDATE_ARBITRARY_RECORD: {
-            String recordId = request.getParameter("bam_unique_rec_id");
+            String recordId = request.getParameter("_unique_rec_id");
             String fieldName = request.getParameter("Name");
             String fieldValue = request.getParameter("Value");
             String fieldType = request.getParameter("Type");
@@ -104,7 +104,7 @@
             break;
         }
         case MessageConsoleConnector.TYPE_DELETE_ARBITRARY_RECORD: {
-            String recordId = request.getParameter("bam_unique_rec_id");
+            String recordId = request.getParameter("_unique_rec_id");
             String fieldName = request.getParameter("Name");
             out.print(connector.deleteArbitraryField(tableName, recordId, fieldName));
             break;
