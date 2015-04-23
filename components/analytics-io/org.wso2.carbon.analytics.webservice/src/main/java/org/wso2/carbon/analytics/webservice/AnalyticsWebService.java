@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
+import org.wso2.carbon.analytics.dataservice.commons.CategorySearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
@@ -29,10 +30,10 @@ import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsSchemaBean;
+import org.wso2.carbon.analytics.webservice.beans.CategorySearchResultEntryBean;
 import org.wso2.carbon.analytics.webservice.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.webservice.beans.IndexConfigurationBean;
 import org.wso2.carbon.analytics.webservice.beans.RecordBean;
-import org.wso2.carbon.analytics.webservice.beans.SearchResultEntryBean;
 import org.wso2.carbon.analytics.webservice.beans.SubCategoriesBean;
 import org.wso2.carbon.analytics.webservice.exception.AnalyticsWebServiceException;
 import org.wso2.carbon.analytics.webservice.internal.ServiceHolder;
@@ -491,12 +492,13 @@ public class AnalyticsWebService extends AbstractAdmin {
         return subCategoriesBean;
     }
 
-    private SearchResultEntryBean[] getSearchResultEntryBeans(SubCategories subCategories) {
-        SearchResultEntryBean[] searchResultEntryBeans = new SearchResultEntryBean[subCategories.getCategories().size()];
+    private CategorySearchResultEntryBean[] getSearchResultEntryBeans(SubCategories subCategories) {
+        CategorySearchResultEntryBean[] searchResultEntryBeans =
+                new CategorySearchResultEntryBean[subCategories.getCategories().size()];
         int i = 0;
-        for (SearchResultEntry searchResultEntry : subCategories.getCategories()) {
-            SearchResultEntryBean resultEntryBean = new SearchResultEntryBean();
-            resultEntryBean.setId(searchResultEntry.getId());
+        for (CategorySearchResultEntry searchResultEntry : subCategories.getCategories()) {
+            CategorySearchResultEntryBean resultEntryBean = new CategorySearchResultEntryBean();
+            resultEntryBean.setCategoryName(searchResultEntry.getCategoryName());
             resultEntryBean.setScore(searchResultEntry.getScore());
             searchResultEntryBeans[i++] = resultEntryBean;
         }

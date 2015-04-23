@@ -23,6 +23,7 @@ import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
+import org.wso2.carbon.analytics.dataservice.commons.CategorySearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
@@ -389,7 +390,7 @@ public class Utils {
         drillDownRequest.setTableName(bean.getTableName());
         drillDownRequest.setRecordCount(bean.getRecordCount());
         drillDownRequest.setRecordStartIndex(bean.getRecordStart());
-        drillDownRequest.setLanguageQuery(bean.getQuery());
+        drillDownRequest.setQuery(bean.getQuery());
         drillDownRequest.setScoreFunction(bean.getScoreFunction());
         drillDownRequest.setCategoryPaths(createCategoryPaths(bean.getCategories()));
         drillDownRequest.setRanges(createDrillDownRanges(bean.getRanges()));
@@ -404,7 +405,9 @@ public class Utils {
         drillDownRequest.setQuery(bean.getQuery());
         drillDownRequest.setScoreFunction(bean.getScoreFunction());
         List<String> path = bean.getCategoryPath();
-        drillDownRequest.setPath(path.toArray(new String[path.size()]));
+        if (path != null) {
+            drillDownRequest.setPath(path.toArray(new String[path.size()]));
+        }
         return drillDownRequest;
     }
 
@@ -412,8 +415,8 @@ public class Utils {
         SubCategoriesBean bean = new SubCategoriesBean();
         bean.setCategoryPath(categories.getPath());
         List<String> subCategories = new ArrayList<>();
-        for (SearchResultEntry entry : categories.getCategories()) {
-            subCategories.add(entry.getId());
+        for (CategorySearchResultEntry entry : categories.getCategories()) {
+            subCategories.add(entry.getCategoryName());
         }
         bean.setCategories(subCategories);
         return bean;

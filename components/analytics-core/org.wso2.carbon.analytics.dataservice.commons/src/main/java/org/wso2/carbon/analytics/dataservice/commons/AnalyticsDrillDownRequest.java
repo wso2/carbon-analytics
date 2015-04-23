@@ -39,7 +39,7 @@ public class AnalyticsDrillDownRequest implements Serializable {
     //Field name which is bucketed.
     private String rangeField;
     // language query
-    private  String languageQuery;
+    private  String query;
     // represents the score function and the values
     private String scoreFunction;
     // maximum records for each category in each facet
@@ -51,14 +51,14 @@ public class AnalyticsDrillDownRequest implements Serializable {
 
     public AnalyticsDrillDownRequest(String tableName,
                                      Map<String, AnalyticsCategoryPath> categoryPaths, String rangeField,
-                                     List<AnalyticsDrillDownRange> ranges, String languageQuery,
+                                     List<AnalyticsDrillDownRange> ranges, String query,
                                      String scoreFunction, int recordCount,
                                      int recordStart) {
         this.tableName = tableName;
         this.categoryPaths = categoryPaths;
         this.rangeField = rangeField;
         this.ranges = ranges;
-        this.languageQuery = languageQuery;
+        this.query = query;
         this.scoreFunction = scoreFunction;
         this.recordCount = recordCount;
         this.recordStart = recordStart;
@@ -127,41 +127,37 @@ public class AnalyticsDrillDownRequest implements Serializable {
      * Returns the query expression.
      * @return the expression in regex or lucene
      */
-    public String getLanguageQuery() {
-        return languageQuery;
+    public String getQuery() {
+        return query;
     }
 
     /**
      * Sets the query expression in lucene or regex.
-     * @param languageQuery
+     * @param query
      */
-    public void setLanguageQuery(String languageQuery) {
-        this.languageQuery = languageQuery;
+    public void setQuery(String query) {
+        this.query = query;
     }
 
     /**
      * Returns the number of maximum records per a child facet in each facet field in drilldown result.
-     * @return the number of records in a child facet in max.
+     * @return the number of records in a child facet in max. Default value is 10, if not set.
      */
     public int getRecordCount() {
-        if (recordCount < 0) {
-            return 0;
-        }
+
         return recordCount;
     }
 
     /**
      * Sets the maximum number of records that can be there in a child facet in a facet field of result.
-     * @param recordCount The maximum number of records in achild facet.
+     * @param recordCount The maximum number of records in achild facet.Default value is 0, if not set
      */
     public void setRecordCount(int recordCount) {
         this.recordCount = recordCount;
     }
 
     public int getRecordStartIndex() {
-        if (recordStart < 0) {
-            return 0;
-        }
+
         return recordStart;
     }
 

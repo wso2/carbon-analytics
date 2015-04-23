@@ -25,8 +25,10 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterException;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema.ColumnType;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -354,6 +356,14 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         }
     }
 
+    private void writeIndexRecordsWithFacets(int tenantId, String tableName, int n, int batch) throws AnalyticsException {
+        List<Record> records;
+        for (int i = 0; i < n; i++) {
+            records = AnalyticsRecordStoreTest.generateRecordsWithFacets(tenantId, tableName, i, batch, -1, -1);
+            this.service.put(records);
+        }
+    }
+
     @Test
     public void testMultipleDataRecordAddRetrieveWithKeys() throws AnalyticsException {
         int tenantId = 1;
@@ -413,7 +423,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         Map<String, IndexType> columns = new HashMap<String, IndexType>();
         columns.put("tenant", IndexType.INTEGER);
         columns.put("ip", IndexType.STRING);
-        columns.put("log", IndexType.STRING);        
+        columns.put("log", IndexType.STRING);
         this.service.createTable(tenantId, tableName);
         this.service.setIndices(tenantId, tableName, columns);
         
@@ -440,6 +450,54 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.cleanupTable(tenantId, tableName);
         System.out.println("\n************** END ANALYTICS DS (WITH INDEXING, H2-FILE) PERF TEST **************");
     }
+
+    @Test
+    public void testFacetDataRecordAddReadPerformanceIndex1C() throws AnalyticsException {
+        System.out.println("\n************** START ANALYTICS DS (WITH FACET INDEXING - SINGLE THREAD, H2-FILE) PERF TEST **************");
+
+        int tenantId = 50;
+        String tableName = "TableX";
+        this.cleanupTable(tenantId, tableName);
+        int n = 250, batch = 200;
+        Map<String, IndexType> columns = new HashMap<String, IndexType>();
+        columns.put("tenant", IndexType.INTEGER);
+        columns.put("ip", IndexType.STRING);
+        columns.put("log", IndexType.STRING);
+        columns.put("location", IndexType.FACET);
+        this.service.createTable(tenantId, tableName);
+        this.service.setIndices(tenantId, tableName, columns);
+
+        long start = System.currentTimeMillis();
+        this.writeIndexRecordsWithFacets(tenantId, tableName, n, batch);
+        this.service.waitForIndexing(DEFAULT_WAIT_TIME);
+        long end = System.currentTimeMillis();
+        System.out.println("* Records: " + (n * batch));
+        System.out.println("* Write Time: " + (end - start) + " ms.");
+        System.out.println("* Write Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
+        start = System.currentTimeMillis();
+        List<Record> recordsIn = GenericUtils.listRecords(this.service,
+                                                          this.service.get(tenantId, tableName, 3, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+        Assert.assertEquals(recordsIn.size(), (n * batch));
+        end = System.currentTimeMillis();
+        System.out.println("* Read Time: " + (end - start) + " ms.");
+        System.out.println("* Read Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
+        start = System.currentTimeMillis();
+        AnalyticsDrillDownRequest drillDownRequest = new AnalyticsDrillDownRequest();
+        drillDownRequest.setTableName(tableName);
+        drillDownRequest.setRecordStartIndex(0);
+        drillDownRequest.setRecordCount(75);
+        drillDownRequest.setQuery("log:exception");
+        drillDownRequest.setScoreFunction("_weight");
+        AnalyticsCategoryPath path = new AnalyticsCategoryPath(new String[]{"SomeLocation", "SomeInnerLocation"});
+        drillDownRequest.addCategoryPath("location", path);
+        List<SearchResultEntry> results = this.service.drillDownSearch(tenantId, drillDownRequest);
+        end = System.currentTimeMillis();
+        Assert.assertEquals(results.size(), 75);
+        System.out.println("* Search Result Count: " + results.size() + " Time: " + (end - start) + " ms.");
+
+        this.cleanupTable(tenantId, tableName);
+        System.out.println("\n************** END ANALYTICS DS (WITH INDEXING, H2-FILE) PERF TEST **************");
+    }
     
     private void writeIndexRecords(final int tenantId, final String tableName, final int n, 
             final int batch, final int nThreads) throws AnalyticsException {
@@ -450,6 +508,29 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
                 public void run() {
                     try {
                         writeIndexRecords(tenantId, tableName, n, batch);
+                    } catch (AnalyticsException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+        }
+        try {
+            es.shutdown();
+            es.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            throw new AnalyticsException(e.getMessage(), e);
+        }
+    }
+
+    private void writeIndexRecordsWithFacets(final int tenantId, final String tableName, final int n,
+                                   final int batch, final int nThreads) throws AnalyticsException {
+        ExecutorService es = Executors.newFixedThreadPool(nThreads);
+        for (int i = 0; i < nThreads; i++) {
+            es.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        writeIndexRecordsWithFacets(tenantId, tableName, n, batch);
                     } catch (AnalyticsException e) {
                         throw new RuntimeException(e);
                     }
@@ -499,6 +580,58 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         Assert.assertEquals(results.size(), 75);
         System.out.println("* Search Result Count: " + results.size() + " Time: " + (end - start) + " ms.");
         
+        this.cleanupTable(tenantId, tableName);
+        System.out.println("\n************** END ANALYTICS DS (WITH INDEXING - MULTIPLE THREADS, H2-FILE) PERF TEST **************");
+    }
+
+    @Test
+    public void testFacetDataRecordAddReadPerformanceIndexNC() throws AnalyticsException {
+        System.out.println("\n************** START ANALYTICS DS (WITH FACET INDEXING - MULTIPLE THREADS, H2-FILE) PERF TEST **************");
+
+        int tenantId = 50;
+        String tableName = "TableX";
+        this.cleanupTable(tenantId, tableName);
+        int n = 50, batch = 200, nThreads = 5;
+        Map<String, IndexType> columns = new HashMap<String, IndexType>();
+        columns.put("tenant", IndexType.INTEGER);
+        columns.put("ip", IndexType.STRING);
+        columns.put("log", IndexType.STRING);
+        columns.put("location", IndexType.FACET);
+        this.service.createTable(tenantId, tableName);
+        this.service.setIndices(tenantId, tableName, columns);
+
+        long start = System.currentTimeMillis();
+        this.writeIndexRecordsWithFacets(tenantId, tableName, n, batch, nThreads);
+        this.service.waitForIndexing(DEFAULT_WAIT_TIME);
+        long end = System.currentTimeMillis();
+        System.out.println("* Records: " + (n * batch * nThreads));
+        System.out.println("* Write Time: " + (end - start) + " ms.");
+        System.out.println("* Write Throughput (TPS): " + (n * batch * nThreads) / (double) (end - start) * 1000.0);
+        start = System.currentTimeMillis();
+        List<Record> recordsIn = GenericUtils.listRecords(this.service,
+                                                          this.service.get(tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+        Assert.assertEquals(recordsIn.size(), (n * batch * nThreads));
+        end = System.currentTimeMillis();
+        System.out.println("* Read Time: " + (end - start) + " ms.");
+        System.out.println("* Read Throughput (TPS): " + (n * batch * nThreads) / (double) (end - start) * 1000.0);
+        start = System.currentTimeMillis();
+        AnalyticsDrillDownRequest drillDownRequest = new AnalyticsDrillDownRequest();
+        drillDownRequest.setTableName(tableName);
+        drillDownRequest.setRecordStartIndex(0);
+        drillDownRequest.setRecordCount(75);
+        drillDownRequest.setQuery("log:exception");
+        drillDownRequest.setScoreFunction("_weight");
+        AnalyticsCategoryPath path = new AnalyticsCategoryPath(new String[]{"SomeLocation", "SomeInnerLocation"});
+        drillDownRequest.addCategoryPath("location", path);
+        List<SearchResultEntry> results = this.service.drillDownSearch(tenantId, drillDownRequest);
+        end = System.currentTimeMillis();
+        Assert.assertEquals(results.size(), 75);
+        System.out.println("* Drilldown Result Count: " + results.size() + " Time: " + (end - start) + " ms.");
+        start = System.currentTimeMillis();
+        int count = this.service.drillDownSearchCount(tenantId, drillDownRequest);
+        end = System.currentTimeMillis();
+        Assert.assertEquals(count, 50000);
+        System.out.println("* DrilldownSearch Result Count: " + count + " Time: " + (end - start) + " ms.");
         this.cleanupTable(tenantId, tableName);
         System.out.println("\n************** END ANALYTICS DS (WITH INDEXING - MULTIPLE THREADS, H2-FILE) PERF TEST **************");
     }

@@ -29,10 +29,10 @@ public class SubCategories implements Serializable {
 
     private static final long serialVersionUID = -4760813079030890572L;
     private String[] path;
-    private List<SearchResultEntry> categories;
+    private List<CategorySearchResultEntry> categories;
 
     public SubCategories(String[] path,
-                         List<SearchResultEntry> categories) {
+                         List<CategorySearchResultEntry> categories) {
         this.path = path;
         this.categories = categories;
     }
@@ -45,11 +45,11 @@ public class SubCategories implements Serializable {
         this.path = path;
     }
 
-    public List<SearchResultEntry> getCategories() {
+    public List<CategorySearchResultEntry> getCategories() {
         return categories;
     }
 
-    public void setCategories(List<SearchResultEntry> categories) {
+    public void setCategories(List<CategorySearchResultEntry> categories) {
         this.categories = categories;
     }
 }

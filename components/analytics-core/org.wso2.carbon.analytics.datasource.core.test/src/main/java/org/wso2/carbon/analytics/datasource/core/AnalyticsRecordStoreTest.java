@@ -21,6 +21,7 @@ package org.wso2.carbon.analytics.datasource.core;
 import org.apache.commons.collections.IteratorUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
@@ -75,6 +76,10 @@ public class AnalyticsRecordStoreTest {
     public static List<Record> generateRecords(int tenantId, String tableName, int i, int c, long time, int timeOffset) {
         return generateRecords(tenantId, tableName, i, c, time, timeOffset, true);
     }
+
+    public static List<Record> generateRecordsWithFacets(int tenantId, String tableName, int i, int c, long time, int timeOffset) {
+        return generateRecordsWithFacets(tenantId, tableName, i, c, time, timeOffset, true);
+    }
     
     public static List<Record> generateRecords(int tenantId, String tableName, int i, int c, long time, int timeOffset,
             boolean generateRecordIds) {
@@ -90,6 +95,37 @@ public class AnalyticsRecordStoreTest {
             values.put("important", i % 2 == 0 ? true : false);
             values.put("sequence", i + 104050000L);
             values.put("summary", "Joey asks, how you doing?");
+            values.put("log", "Exception in Sequence[" + i + "," + j + "]");
+            if (time != -1) {
+                timeTmp = time;
+                time += timeOffset;
+            } else {
+                timeTmp = System.currentTimeMillis();
+            }
+            result.add(new Record(generateRecordIds ? GenericUtils.generateRecordID() : null, tenantId, tableName, values, timeTmp));
+        }
+        return result;
+    }
+
+    public static List<Record> generateRecordsWithFacets(int tenantId, String tableName, int i, int c, long time, int timeOffset,
+                                               boolean generateRecordIds) {
+        List<Record> result = new ArrayList<Record>();
+        Map<String, Object> values;
+        AnalyticsCategoryPath afacet;
+        long timeTmp;
+        for (int j = 0; j < c; j++) {
+            values = new HashMap<String, Object>();
+            afacet = new AnalyticsCategoryPath();
+            afacet.setWeight(new Double(Math.random() % 5.0).floatValue());
+            afacet.setPath(new String[]{"SomeLocation","SomeInnerLocation","AVillage"});
+            values.put("server_name", "ESB-" + i);
+            values.put("ip", "192.168.0." + (i % 256));
+            values.put("tenant", i);
+            values.put("spam_index", i + 0.3454452);
+            values.put("important", i % 2 == 0 ? true : false);
+            values.put("sequence", i + 104050000L);
+            values.put("summary", "Joey asks, how you doing?");
+            values.put("location", afacet);
             values.put("log", "Exception in Sequence[" + i + "," + j + "]");
             if (time != -1) {
                 timeTmp = time;

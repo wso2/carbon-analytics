@@ -20,7 +20,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,13 +30,15 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CategoryDrillDownRequestBean {
 
+    @XmlElement(name = "tableName")
     private String tableName;
+    @XmlElement(name = "fieldName")
     private String fieldName;
     @XmlElement(name = "categoryPath", required = false)
     private List<String> categoryPath;
-    @XmlElement(name = "query", required = false, defaultValue = "*:*")
+    @XmlElement(name = "query", required = false)
     private String query;
-    @XmlElement(name = "scoreFunction", required = false, defaultValue = "_weight")
+    @XmlElement(name = "scoreFunction", required = false)
     private String scoreFunction;
 
     public String getTableName() {
@@ -73,9 +74,6 @@ public class CategoryDrillDownRequestBean {
     }
 
     public List<String> getCategoryPath() {
-        if (categoryPath == null) {
-            return new ArrayList<>(0);
-        }
         return categoryPath;
     }
 
