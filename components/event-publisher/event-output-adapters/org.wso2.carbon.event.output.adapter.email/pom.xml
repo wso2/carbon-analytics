@@ -17,7 +17,7 @@
     <parent>
         <artifactId>event-output-adapters</artifactId>
         <groupId>org.wso2.carbon.analytics-common</groupId>
-        <version>1.0.0</version>
+        <version>1.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
