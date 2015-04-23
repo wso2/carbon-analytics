@@ -18,6 +18,7 @@
 package org.wso2.carbon.analytics.servlet;
 
 import com.google.gson.GsonBuilder;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
 import org.wso2.carbon.analytics.servlet.exception.AnalyticsAPIAuthenticationException;
 import org.wso2.carbon.analytics.servlet.internal.ServiceHolder;
@@ -82,8 +83,7 @@ public class AnalyticsTableProcessor extends HttpServlet {
                     if (!securityEnabled)
                         tableNames = ServiceHolder.getAnalyticsDataService().listTables(tenantIdParam);
                     else tableNames = ServiceHolder.getSecureAnalyticsDataService().listTables(userName);
-                    PrintWriter output = resp.getWriter();
-                    output.append(new GsonBuilder().create().toJson(tableNames));
+                    resp.getOutputStream().write(GenericUtils.serializeObject(tableNames));
                     resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());

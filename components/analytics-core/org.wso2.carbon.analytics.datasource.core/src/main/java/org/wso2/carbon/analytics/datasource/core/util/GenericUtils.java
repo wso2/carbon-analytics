@@ -184,11 +184,9 @@ public class GenericUtils {
             } else if (value instanceof AnalyticsCategoryPath) {
                 buffer.put(DATA_TYPE_CATEGORY);
                 AnalyticsCategoryPath analyticsCategoryPath = (AnalyticsCategoryPath) value;
-                buffer.putFloat(analyticsCategoryPath.getWeight());
-                buffer.putInt(AnalyticsCategoryPath.getCombinedPath(analyticsCategoryPath.getPath())
-                                      .getBytes(DEFAULT_CHARSET).length);
-                buffer.put(AnalyticsCategoryPath.getCombinedPath(analyticsCategoryPath.getPath())
-                                   .getBytes(DEFAULT_CHARSET));
+                binData = GenericUtils.serializeObject(analyticsCategoryPath);
+                buffer.putInt(binData.length);
+                buffer.put(binData);
             } else if (value == null) {
                 buffer.put(DATA_TYPE_NULL);
             } else {
@@ -226,11 +224,9 @@ public class GenericUtils {
                 count += Integer.SIZE / 8;
                 count += ((byte[]) value).length;
             } else if (value instanceof AnalyticsCategoryPath) {
-                count += Float.SIZE / 8;
                 count += Integer.SIZE / 8;
                 AnalyticsCategoryPath analyticsCategoryPath = (AnalyticsCategoryPath) value;
-                count += AnalyticsCategoryPath.getCombinedPath(analyticsCategoryPath.getPath())
-                        .getBytes(DEFAULT_CHARSET).length;
+                count += GenericUtils.serializeObject(analyticsCategoryPath).length;
             } else if (value != null) {
                 throw new AnalyticsException("Invalid column value type in calculating column "
                                              + "values length: " + value.getClass());
@@ -297,13 +293,10 @@ public class GenericUtils {
                         value = binData;
                         break;
                     case DATA_TYPE_CATEGORY:
-                        float weight = buffer.getFloat();
                         size = buffer.getInt();
-                        buff = new byte[size];
-                        buffer.get(buff, 0, size);
-                        value = new String(buff, DEFAULT_CHARSET);
-                        value = new AnalyticsCategoryPath(weight, AnalyticsCategoryPath
-                                .getPathAsArray((String) value));
+                        binData = new byte[size];
+                        buffer.get(binData);
+                        value = GenericUtils.deserializeObject(binData);
                         break;
                     case DATA_TYPE_NULL:
                         value = null;

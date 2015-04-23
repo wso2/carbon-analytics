@@ -530,7 +530,7 @@ public class AnalyticsResource extends AbstractResource {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON})
     @Produces({ MediaType.APPLICATION_JSON })
-    @Path("facets")
+    @Path("facets11")
     public Response insertFacetRecords(List<RecordBean> recordBeans)
             throws AnalyticsException {
         AnalyticsDataService ads = Utils.getAnalyticsDataService();
@@ -593,7 +593,7 @@ public class AnalyticsResource extends AbstractResource {
         AnalyticsDrillDownRequest anss = new AnalyticsDrillDownRequest();
         anss.addCategoryPath("testField", path);
         anss.setScoreFunction("2*_weight");
-        anss.setLanguageQuery(null);
+        anss.setQuery(null);
         anss.setTableName("test");
         anss.setRecordCount(records);
 
@@ -621,7 +621,7 @@ public class AnalyticsResource extends AbstractResource {
         anss.setRanges(ranges);
         AnalyticsCategoryPath path = new AnalyticsCategoryPath(new String[]{"2015"});
         anss.addCategoryPath("testField", path);
-        anss.setLanguageQuery(null);
+        anss.setQuery(null);
         anss.setTableName("test");
         anss.setRecordCount(1);
         List<SearchResultEntry> g = ads.drillDownSearch(-1234, anss);
@@ -643,7 +643,7 @@ public class AnalyticsResource extends AbstractResource {
         anss.setRanges(ranges);
         AnalyticsCategoryPath path = new AnalyticsCategoryPath(new String[]{"2015"});
         anss.addCategoryPath("testField", path);
-        anss.setLanguageQuery(null);
+        anss.setQuery(null);
         anss.setTableName("test");
         anss.setRecordCount(1);
 
@@ -651,7 +651,6 @@ public class AnalyticsResource extends AbstractResource {
         DrillDownRequestBean dd = new DrillDownRequestBean();
         dd.setTableName("test");
         dd.setQuery("field1:record1");
-        dd.setIncludeIds(true);
         dd.setRecordCount(1);
         dd.setRecordStart(0);
         dd.setScoreFunction("1");
@@ -866,7 +865,7 @@ public class AnalyticsResource extends AbstractResource {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON})
     @Produces({ MediaType.APPLICATION_JSON })
-    @Path(Constants.ResourcePath.DRILLDOWNCOUNT)
+    @Path(Constants.ResourcePath.DRILLDOWNRANGECOUNT)
     public Response drillDownRangeCount(DrillDownRequestBean requestBean,
                                    @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
             throws AnalyticsException {
@@ -895,7 +894,7 @@ public class AnalyticsResource extends AbstractResource {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON})
     @Produces({ MediaType.APPLICATION_JSON })
-    @Path(Constants.ResourcePath.DRILLDOWNCOUNT)
+    @Path(Constants.ResourcePath.DRILLDOWNCATEGORIES)
     public Response drillDownCategories(CategoryDrillDownRequestBean requestBean,
                                    @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
             throws AnalyticsException {

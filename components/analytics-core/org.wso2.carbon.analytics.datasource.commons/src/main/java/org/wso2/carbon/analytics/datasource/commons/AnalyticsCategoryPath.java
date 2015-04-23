@@ -40,7 +40,6 @@ public class AnalyticsCategoryPath implements Serializable{
     private static final long serialVersionUID = -6817819400713291618L;
     private String[] path;
     private float weight;
-    private static final String SEPARATOR = "/";
 
     public AnalyticsCategoryPath() { }
     
@@ -69,27 +68,8 @@ public class AnalyticsCategoryPath implements Serializable{
         return path;
     }
 
-
-    /**
-     * Combine the category path array to a single string separated by "/"
-     * @param path String array path to be combined
-     * @return Combined String
-     */
-    public static String getCombinedPath(String[] path) {
-        StringBuilder fulPath = new StringBuilder(path[0]);
-        for(int i = 1;i < path.length; i++) {
-            fulPath.append(SEPARATOR);
-            fulPath.append(path[i]);
-        }
-        return fulPath.toString();
-    }
-
     public void setPath(String[] path) {
         this.path = path;
-    }
-
-    public static String[] getPathAsArray(String path) {
-        return path.split(SEPARATOR);
     }
 
     public float getWeight() {

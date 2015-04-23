@@ -18,32 +18,30 @@
  */
 package org.wso2.carbon.analytics.dataservice.commons;
 
-import java.io.Serializable;
-
 /**
  * This represents a search result entry from Indexer.
  */
-public class SearchResultEntry implements Comparable<SearchResultEntry>, Serializable {
-    
-    private String id;
-    
+public class CategorySearchResultEntry implements Comparable<CategorySearchResultEntry> {
+
+    private String categoryName;
+
     private float score;
-    
-    public SearchResultEntry(String id, float score) {
-        this.id = id;
+
+    public CategorySearchResultEntry(String category, float score) {
+        this.categoryName = category;
         this.score = score;
     }
-    
-    public String getId() {
-        return id;
+
+    public String getCategoryName() {
+        return categoryName;
     }
-    
+
     public float getScore() {
         return score;
     }
 
     @Override
-    public int compareTo(SearchResultEntry obj) {
+    public int compareTo(CategorySearchResultEntry obj) {
         if (this.score > obj.score) {
             return 1;
         } else if (this.score < obj.score) {

@@ -33,18 +33,16 @@ public class DrillDownRequestBean {
 
     @XmlElement(name = "tableName")
     private String tableName;
-    @XmlElement(name = "categories")
+    @XmlElement(name = "categories", required = false)
     private List<DrillDownPathBean> categories;
     @XmlElement(name = "query")
     private String query;
     @XmlElement(name = "scoreFunction", required = false)
     private String scoreFunction;
-    @XmlElement(name = "recordCount", required = false, defaultValue = "10")
+    @XmlElement(name = "recordCount")
     private int recordCount;
-    @XmlElement(name = "recordStart", required = false, defaultValue = "0")
+    @XmlElement(name = "recordStart")
     private  int recordStart;
-    @XmlElement(name = "includeIds", required = false, defaultValue = "false")
-    private boolean includeIds;
     @XmlElement(name = "ranges", required = false)
     private List<DrillDownRangeBean> ranges;
     @XmlElement(name = "rangeField", required = false)
@@ -99,14 +97,6 @@ public class DrillDownRequestBean {
 
     public void setRecordStart(int recordStart) {
         this.recordStart = recordStart;
-    }
-
-    public boolean isIncludeIds() {
-        return includeIds;
-    }
-
-    public void setIncludeIds(boolean includeIds) {
-        this.includeIds = includeIds;
     }
 
     public List<DrillDownRangeBean> getRanges() {

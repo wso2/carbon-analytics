@@ -100,5 +100,9 @@ public class Constants {
 		public static final String DRILLDOWN = "drilldown";
 
 		public static final String DRILLDOWNCOUNT = "drilldowncount";
+
+        public static final String DRILLDOWNRANGECOUNT = "rangecount";
+
+        public static final String DRILLDOWNCATEGORIES = "facets";
     }
 }
