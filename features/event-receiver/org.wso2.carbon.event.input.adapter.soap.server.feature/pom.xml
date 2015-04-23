@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>event-receiver-feature</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -30,11 +30,8 @@
     <artifactId>org.wso2.carbon.event.input.adapter.soap.server.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Event Input Soap Adapter Server Feature</name>
-    <version>1.0.0-SNAPSHOT</version>
     <url>http://wso2.org</url>
     <description>This feature contains the bundles required for Input Soap Event Adapter functionality</description>
-
-
 
     <build>
         <plugins>

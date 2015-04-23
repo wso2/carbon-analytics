@@ -18,7 +18,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>application-deployer</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -52,9 +52,11 @@
                         <Bundle-Vendor>WSO2 Inc</Bundle-Vendor>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Private-Package>
+                            org.wso2.carbon.event.application.deployer.internal,
                             org.wso2.carbon.event.application.deployer.internal.*
                         </Private-Package>
                         <Export-Package>
+                            !org.wso2.carbon.event.application.deployer.internal,
                             !org.wso2.carbon.event.application.deployer.internal.*,
                             org.wso2.carbon.event.application.deployer.*
                         </Export-Package>

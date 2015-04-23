@@ -22,14 +22,13 @@
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>event-input-adapters</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.event.input.adapter.websocket</artifactId>
     <packaging>bundle</packaging>
-    <version>1.0.0-SNAPSHOT</version>
     <name>WSO2 Carbon - Event Input Websocket Adapter Module</name>
     <description>org.wso2.carbon.event.input.adapter.websocket provides the back-end
         functionality of input websocket adapter, using external web socket server.
@@ -54,6 +53,7 @@
             <artifactId>tyrus-standalone-client</artifactId>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -68,7 +68,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -83,12 +82,12 @@
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Private-Package>
                             org.wso2.carbon.event.input.adapter.websocket.internal,
-                            org.org.wso2.carbon.event.input.adapter.websocket.internal
+                            org.wso2.carbon.event.input.adapter.websocket.internal.*
                         </Private-Package>
                         <Export-Package>
                             !org.wso2.carbon.event.input.adapter.websocket.internal,
-                            !org.org.wso2.carbon.event.input.adapter.websocket.internal.*,
-                            org.wso2.carbon.event.input.adapter.websocket.*,
+                            !org.wso2.carbon.event.input.adapter.websocket.internal.*,
+                            org.wso2.carbon.event.input.adapter.websocket.*
                         </Export-Package>
                         <Import-Package>
                             org.wso2.carbon.event.input.adapter.core,
@@ -96,7 +95,7 @@
                             <!--org.glassfish.tyrus.client.*,-->     <!--Commenting this out since dynamic import is enabled.-->
                             !javax.xml.namespace,
                             javax.xml.namespace; version=0.0.0,
-                            *;resolution:=optional,
+                            *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
@@ -104,6 +103,5 @@
             </plugin>
         </plugins>
     </build>
-    <properties>
-    </properties>
+
 </project>

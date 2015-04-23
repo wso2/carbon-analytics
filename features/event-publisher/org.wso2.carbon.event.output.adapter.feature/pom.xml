@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>event-publisher-feature</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -28,16 +28,11 @@
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Event Publisher Output Adapter Feature</name>
     <url>http://wso2.org</url>
-    <version>1.0.0-SNAPSHOT</version>
     <description>
         This feature bundles all the output adapters.
     </description>
 
-
-
-
     <dependencies>
-
         <dependency>
             <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.event.output.adapter.server.feature</artifactId>
@@ -167,8 +162,6 @@
                                 <includedFeatureDef>
                                     org.wso2.carbon.analytics-common:org.wso2.carbon.event.output.adapter.server.feature:${carbon.analytics.common.version}
                                 </includedFeatureDef>
-
-
                                 <includedFeatureDef>
                                     org.wso2.carbon.analytics-common:org.wso2.carbon.event.output.adapter.email.server.feature:${carbon.analytics.common.version}
                                 </includedFeatureDef>
@@ -212,8 +205,6 @@
                                     org.wso2.carbon.analytics-common:org.wso2.carbon.event.output.adapter.cassandra.server.feature:${carbon.analytics.common.version}
                                 </includedFeatureDef>
                             </includedFeatures>
-
-
                         </configuration>
                     </execution>
                 </executions>

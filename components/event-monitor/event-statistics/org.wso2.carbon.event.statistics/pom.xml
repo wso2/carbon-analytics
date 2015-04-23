@@ -21,13 +21,13 @@
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>event-statistics</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.event.statistics</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Event Statistics</name>
     <description>org.wso2.carbon.event.statistics provides the back-end functionality</description>
@@ -49,6 +49,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -66,8 +67,10 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
-
-                        <Private-Package>org.wso2.carbon.event.statistics.internal.*</Private-Package>
+                        <Private-Package>
+                            org.wso2.carbon.event.statistics.internal,
+                            org.wso2.carbon.event.statistics.internal.*
+                        </Private-Package>
                         <Export-Package>
                             !org.wso2.carbon.event.statistics.internal,
                             !org.wso2.carbon.event.statistics.internal.*,

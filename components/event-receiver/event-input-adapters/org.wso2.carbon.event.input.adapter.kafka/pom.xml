@@ -19,11 +19,11 @@
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>event-input-adapters</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.event.input.adapter.kafka</artifactId>
     <packaging>bundle</packaging>
@@ -32,21 +32,6 @@
         functionality of input kafka adaptor
     </description>
     <url>http://wso2.org</url>
-
-
-    <repositories>
-    <repository>
-        <id>wso2-maven2-repository</id>
-        <name>WSO2 Maven2 Repository</name>
-        <url>http://dist.wso2.org/maven2</url>
-    </repository>
-
-    <repository>
-        <id>MarketceteraRepo</id>
-        <name>MarketceteraRepoy</name>
-        <url>http://repo.marketcetera.org/maven/</url>
-    </repository>
-    </repositories>
 
     <dependencies>
         <dependency>
@@ -66,9 +51,9 @@
             <artifactId>kafka_2.10</artifactId>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
-
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-scr-plugin</artifactId>
@@ -81,7 +66,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -89,7 +73,6 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -117,9 +100,6 @@
             </plugin>
         </plugins>
     </build>
-    <properties>
-    </properties>
-
 
 </project>
 

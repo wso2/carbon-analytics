@@ -15,19 +15,15 @@
 ~ CONDITIONS OF ANY KIND, either express or implied.  See the License for the
 ~ specific language governing permissions and limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>event-input-adapters</artifactId>
         <groupId>org.wso2.carbon.analytics-common</groupId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
     <artifactId>org.wso2.carbon.event.input.adapter.file</artifactId>
-
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Event Input File Adapter Module</name>
     <description>org.wso2.carbon.event.input.adapter.file provides the back-end functionality of input file adapter
@@ -63,7 +59,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -78,11 +73,11 @@
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Private-Package>
                             org.wso2.carbon.event.input.adapter.file.internal,
-                            org.org.wso2.carbon.event.input.adapter.file.internal
+                            org.wso2.carbon.event.input.adapter.file.internal.*
                         </Private-Package>
                         <Export-Package>
                             !org.wso2.carbon.event.input.adapter.file.internal,
-                            !org.org.wso2.carbon.event.input.adapter.file.internal.*,
+                            !org.wso2.carbon.event.input.adapter.file.internal.*,
                             org.wso2.carbon.event.input.adapter.file.*,
                         </Export-Package>
                         <Import-Package>

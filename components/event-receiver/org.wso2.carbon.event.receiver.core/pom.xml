@@ -18,13 +18,12 @@
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>event-receiver</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.event.receiver.core</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Event Receiver Core</name>
     <description>Provides core/backend functionality for Event Receiver component</description>
@@ -92,13 +91,14 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Private-Package>
+                            org.wso2.carbon.event.receiver.core.internal,
                             org.wso2.carbon.event.receiver.core.internal.*,
                             org.slf4j.*,
                             com.jayway.jsonpath.*
                         </Private-Package>
                         <Export-Package>
-                            <!--Todo fix-->
-                            <!--!org.wso2.carbon.event.receiver.core.internal.*,-->
+                            !org.wso2.carbon.event.receiver.core.internal,
+                            !org.wso2.carbon.event.receiver.core.internal.*,
                             !org.slf4j.*,
                             !com.jayway.jsonpath.*,
                             org.wso2.carbon.event.receiver.*
@@ -110,7 +110,6 @@
                             org.wso2.carbon.event.input.adapter.manager.core.*,
                             *;resolution:=optional
                         </Import-Package>
-                        <!--<Bundle-Activator>org.wso2.carbon.event.receiver.Activator</Bundle-Activator>-->
                         <DynamicImport-Package>*</DynamicImport-Package>
                         <Axis2Deployer>EventReceiverDeployer</Axis2Deployer>
                         <Axis2RequiredServices>
