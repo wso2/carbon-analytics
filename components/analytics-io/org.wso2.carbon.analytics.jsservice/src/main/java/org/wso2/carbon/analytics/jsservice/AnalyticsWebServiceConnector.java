@@ -378,8 +378,7 @@ public class AnalyticsWebServiceConnector {
         }
         if (queryBean != null) {
             try {
-                RecordBean[] searchResults = analyticsWebServiceStub.search(tableName,
-                                                                            queryBean.getLanguage(), queryBean.getQuery(), queryBean.getStart(),
+                RecordBean[] searchResults = analyticsWebServiceStub.search(tableName, queryBean.getQuery(), queryBean.getStart(),
                                                                             queryBean.getCount());
                 List<Record> records = Utils.getRecordBeans(searchResults);
                 if (logger.isDebugEnabled()) {
@@ -407,8 +406,7 @@ public class AnalyticsWebServiceConnector {
         }
         if (queryBean != null) {
             try {
-                int result = analyticsWebServiceStub.searchCount(tableName,
-                                                                 queryBean.getLanguage(), queryBean.getQuery());
+                int result = analyticsWebServiceStub.searchCount(tableName, queryBean.getQuery());
                 if (logger.isDebugEnabled()) {
                     logger.debug("Search count : " + result);
                 }

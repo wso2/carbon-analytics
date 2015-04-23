@@ -61,6 +61,7 @@
         var typeGetPurgingTask = '<%= MessageConsoleConnector.TYPE_GET_PURGING_TASK_INFO%>';
         var typeSavePurgingTask = '<%= MessageConsoleConnector.TYPE_SAVE_PURGING_TASK_INFO%>';
         var typeListTable = '<%= MessageConsoleConnector.TYPE_LIST_TABLE%>';
+        var typeGetFacetNameList = '<%= MessageConsoleConnector.TYPE_GET_FACET_NAME_LIST%>';
 
         var tablePopupAction;
 

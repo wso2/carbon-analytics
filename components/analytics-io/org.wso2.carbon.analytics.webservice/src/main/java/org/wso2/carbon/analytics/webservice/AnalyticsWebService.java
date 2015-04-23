@@ -32,6 +32,7 @@ import org.wso2.carbon.analytics.webservice.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.webservice.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.webservice.beans.IndexConfigurationBean;
 import org.wso2.carbon.analytics.webservice.beans.RecordBean;
+import org.wso2.carbon.analytics.webservice.beans.SearchResultEntryBean;
 import org.wso2.carbon.analytics.webservice.beans.SubCategoriesBean;
 import org.wso2.carbon.analytics.webservice.exception.AnalyticsWebServiceException;
 import org.wso2.carbon.analytics.webservice.internal.ServiceHolder;
@@ -472,21 +473,13 @@ public class AnalyticsWebService extends AbstractAdmin {
      */
     public SubCategoriesBean drillDownCategories(DrillDownRequestBean drillDownRequest)
             throws AnalyticsWebServiceException {
-
-        CategoryDrillDownRequest categoryDrillDownRequest = new CategoryDrillDownRequest();
-        categoryDrillDownRequest.setTableName(drillDownRequest.getTableName());
-        categoryDrillDownRequest.setFieldName(drillDownRequest.getFieldName());
-        categoryDrillDownRequest.setPath(drillDownRequest.getPath());
-        categoryDrillDownRequest.setQuery(drillDownRequest.getQuery());
-        categoryDrillDownRequest.setScoreFunction(drillDownRequest.getScoreFunction());
-
         SubCategoriesBean subCategoriesBean = new SubCategoriesBean();
         try {
-            SubCategories subCategories = analyticsDataAPI.drillDownCategories(getUsername(), categoryDrillDownRequest);
+            SubCategories subCategories = analyticsDataAPI.drillDownCategories(getUsername(), getCategoryDrillDownRequest(drillDownRequest));
             subCategoriesBean.setPath(subCategories.getPath());
-
-
-            subCategoriesBean.setCategories();
+            if (subCategories.getCategories() != null) {
+                subCategoriesBean.setCategories(getSearchResultEntryBeans(subCategories));
+            }
         } catch (AnalyticsIndexException e) {
             logger.error("Unable to get drill down category information for table[" + drillDownRequest.getTableName() + "] and " +
                          "field[" + drillDownRequest.getFieldName() + "] due to " + e.getMessage(), e);
@@ -496,5 +489,27 @@ public class AnalyticsWebService extends AbstractAdmin {
                                                            .getMessage(), e);
         }
         return subCategoriesBean;
+    }
+
+    private SearchResultEntryBean[] getSearchResultEntryBeans(SubCategories subCategories) {
+        SearchResultEntryBean[] searchResultEntryBeans = new SearchResultEntryBean[subCategories.getCategories().size()];
+        int i = 0;
+        for (SearchResultEntry searchResultEntry : subCategories.getCategories()) {
+            SearchResultEntryBean resultEntryBean = new SearchResultEntryBean();
+            resultEntryBean.setId(searchResultEntry.getId());
+            resultEntryBean.setScore(searchResultEntry.getScore());
+            searchResultEntryBeans[i++] = resultEntryBean;
+        }
+        return searchResultEntryBeans;
+    }
+
+    private CategoryDrillDownRequest getCategoryDrillDownRequest(DrillDownRequestBean drillDownRequest) {
+        CategoryDrillDownRequest categoryDrillDownRequest = new CategoryDrillDownRequest();
+        categoryDrillDownRequest.setTableName(drillDownRequest.getTableName());
+        categoryDrillDownRequest.setFieldName(drillDownRequest.getFieldName());
+        categoryDrillDownRequest.setPath(drillDownRequest.getPath());
+        categoryDrillDownRequest.setQuery(drillDownRequest.getQuery());
+        categoryDrillDownRequest.setScoreFunction(drillDownRequest.getScoreFunction());
+        return categoryDrillDownRequest;
     }
 }

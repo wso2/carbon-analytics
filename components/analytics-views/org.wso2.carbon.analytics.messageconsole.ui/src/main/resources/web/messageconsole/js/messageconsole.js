@@ -7,71 +7,71 @@ function getArbitraryFields(rowData) {
     $img.click(function () {
         $('#AnalyticsTableContainer').jtable('openChildTable',
                                              $img.closest('tr'), //Parent row
-                                             {
-                                                 title: 'Arbitrary Fields',
-                                                 selecting: true,
-                                                 messages: {
-                                                     addNewRecord: 'Add new arbitrary field'
-                                                 },
-                                                 actions: {
-                                                     // For Details: http://jtable.org/Demo/FunctionsAsActions
-                                                     listAction: function (postData, jtParams) {
-                                                         var postData = {};
-                                                         postData['tableName'] = $("#tableSelect").val();
-                                                         postData['_unique_rec_id'] = rowData.record._unique_rec_id;
-                                                         return arbitraryFieldListActionMethod(postData, jtParams);
-                                                     },
-                                                     createAction: function (postData) {
-                                                         return arbitraryFieldCreateActionMethod(postData);
-                                                     },
-                                                     updateAction: function (postData) {
-                                                         return arbitraryFieldUpdateActionMethod(postData);
-                                                     },
-                                                     deleteAction: function (postData) {
-                                                         postData['tableName'] = $("#tableSelect").val();
-                                                         postData['_unique_rec_id'] = rowData.record._unique_rec_id;
-                                                         return arbitraryFieldDeleteActionMethod(postData);
-                                                     }
-                                                 },
-                                                 deleteConfirmation: function (data) {
-                                                     arbitraryColumnName = data.record.Name;
-                                                 },
-                                                 rowsRemoved: function (event, data) {
-                                                     arbitraryColumnName = "";
-                                                 },
-                                                 formCreated: function (event, data) {
-                                                     data.form.validationEngine();
-                                                 },
-                                                 //Validate form when it is being submitted
-                                                 formSubmitting: function (event, data) {
-                                                     return data.form.validationEngine('validate');
-                                                 },
-                                                 //Dispose validation logic when form is closed
-                                                 formClosed: function (event, data) {
-                                                     data.form.validationEngine('hide');
-                                                     data.form.validationEngine('detach');
-                                                 },
-                                                 fields: {
-                                                     _unique_rec_id: {
-                                                         type: 'hidden',
-                                                         key: true,
-                                                         list: false,
-                                                         defaultValue: rowData.record._unique_rec_id
-                                                     },
-                                                     Name: {
-                                                         title: 'Name',
-                                                         inputClass: 'validate[required]'
-                                                     },
-                                                     Value: {
-                                                         title: 'Value'
-                                                     },
-                                                     Type: {
-                                                         title: 'Type',
-                                                         options: ["STRING", "INTEGER", "LONG", "BOOLEAN", "FLOAT", "DOUBLE"],
-                                                         list: false
-                                                     }
-                                                 }
-                                             }, function (data) { //opened handler
+                {
+                    title: 'Arbitrary Fields',
+                    selecting: true,
+                    messages: {
+                        addNewRecord: 'Add new arbitrary field'
+                    },
+                    actions: {
+                        // For Details: http://jtable.org/Demo/FunctionsAsActions
+                        listAction: function (postData, jtParams) {
+                            var postData = {};
+                            postData['tableName'] = $("#tableSelect").val();
+                            postData['_unique_rec_id'] = rowData.record._unique_rec_id;
+                            return arbitraryFieldListActionMethod(postData, jtParams);
+                        },
+                        createAction: function (postData) {
+                            return arbitraryFieldCreateActionMethod(postData);
+                        },
+                        updateAction: function (postData) {
+                            return arbitraryFieldUpdateActionMethod(postData);
+                        },
+                        deleteAction: function (postData) {
+                            postData['tableName'] = $("#tableSelect").val();
+                            postData['_unique_rec_id'] = rowData.record._unique_rec_id;
+                            return arbitraryFieldDeleteActionMethod(postData);
+                        }
+                    },
+                    deleteConfirmation: function (data) {
+                        arbitraryColumnName = data.record.Name;
+                    },
+                    rowsRemoved: function (event, data) {
+                        arbitraryColumnName = "";
+                    },
+                    formCreated: function (event, data) {
+                        data.form.validationEngine();
+                    },
+                    //Validate form when it is being submitted
+                    formSubmitting: function (event, data) {
+                        return data.form.validationEngine('validate');
+                    },
+                    //Dispose validation logic when form is closed
+                    formClosed: function (event, data) {
+                        data.form.validationEngine('hide');
+                        data.form.validationEngine('detach');
+                    },
+                    fields: {
+                        _unique_rec_id: {
+                            type: 'hidden',
+                            key: true,
+                            list: false,
+                            defaultValue: rowData.record._unique_rec_id
+                        },
+                        Name: {
+                            title: 'Name',
+                            inputClass: 'validate[required]'
+                        },
+                        Value: {
+                            title: 'Value'
+                        },
+                        Type: {
+                            title: 'Type',
+                            options: ["STRING", "INTEGER", "LONG", "BOOLEAN", "FLOAT", "DOUBLE"],
+                            list: false
+                        }
+                    }
+                }, function (data) { //opened handler
                     data.childTable.jtable('load');
                 }
         );
@@ -82,17 +82,17 @@ function getArbitraryFields(rowData) {
 function arbitraryFieldListActionMethod(postData, jtParams) {
     return $.Deferred(function ($dfd) {
         $.ajax({
-                   url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeListArbitraryRecord,
-                   type: 'POST',
-                   dataType: 'json',
-                   data: postData,
-                   success: function (data) {
-                       $dfd.resolve(data);
-                   },
-                   error: function () {
-                       $dfd.reject();
-                   }
-               }
+                    url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeListArbitraryRecord,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: postData,
+                    success: function (data) {
+                        $dfd.resolve(data);
+                    },
+                    error: function () {
+                        $dfd.reject();
+                    }
+                }
         );
     });
 }
@@ -108,17 +108,17 @@ function arbitraryFieldCreateActionMethod(postData) {
     }
     return $.Deferred(function ($dfd) {
         $.ajax({
-                   url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeCreateArbitraryRecord + "&tableName=" + $("#tableSelect").val() + "&_unique_rec_id=" + recordId,
-                   type: 'POST',
-                   dataType: 'json',
-                   data: postData,
-                   success: function (data) {
-                       $dfd.resolve(data);
-                   },
-                   error: function () {
-                       $dfd.reject();
-                   }
-               }
+                    url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeCreateArbitraryRecord + "&tableName=" + $("#tableSelect").val() + "&_unique_rec_id=" + recordId,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: postData,
+                    success: function (data) {
+                        $dfd.resolve(data);
+                    },
+                    error: function () {
+                        $dfd.reject();
+                    }
+                }
         );
     });
 }
@@ -134,17 +134,17 @@ function arbitraryFieldUpdateActionMethod(postData) {
     }
     return $.Deferred(function ($dfd) {
         $.ajax({
-                   url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeUpdateArbitraryRecord + "&tableName=" + $("#tableSelect").val() + "&_unique_rec_id=" + recordId,
-                   type: 'POST',
-                   dataType: 'json',
-                   data: postData,
-                   success: function (data) {
-                       $dfd.resolve(data);
-                   },
-                   error: function () {
-                       $dfd.reject();
-                   }
-               }
+                    url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeUpdateArbitraryRecord + "&tableName=" + $("#tableSelect").val() + "&_unique_rec_id=" + recordId,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: postData,
+                    success: function (data) {
+                        $dfd.resolve(data);
+                    },
+                    error: function () {
+                        $dfd.reject();
+                    }
+                }
         );
     });
 }
@@ -153,17 +153,17 @@ function arbitraryFieldDeleteActionMethod(postData) {
     postData["Name"] = arbitraryColumnName;
     return $.Deferred(function ($dfd) {
         $.ajax({
-                   url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeDeleteArbitraryRecord,
-                   type: 'POST',
-                   dataType: 'json',
-                   data: postData,
-                   success: function (data) {
-                       $dfd.resolve(data);
-                   },
-                   error: function () {
-                       $dfd.reject();
-                   }
-               }
+                    url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeDeleteArbitraryRecord,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: postData,
+                    success: function (data) {
+                        $dfd.resolve(data);
+                    },
+                    error: function () {
+                        $dfd.reject();
+                    }
+                }
         );
     });
 }
@@ -240,17 +240,17 @@ function listActionMethod(jtParams) {
     postData["query"] = $("#query").val();
     return $.Deferred(function ($dfd) {
         $.ajax({
-                   url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeListRecord,
-                   type: 'POST',
-                   dataType: 'json',
-                   data: postData,
-                   success: function (data) {
-                       $dfd.resolve(data);
-                   },
-                   error: function () {
-                       $dfd.reject();
-                   }
-               }
+                    url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeListRecord,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: postData,
+                    success: function (data) {
+                        $dfd.resolve(data);
+                    },
+                    error: function () {
+                        $dfd.reject();
+                    }
+                }
         );
     });
 }
@@ -258,35 +258,35 @@ function listActionMethod(jtParams) {
 function createActionMethod(postData) {
     return $.Deferred(function ($dfd) {
         $.ajax({
-                   url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeCreateRecord + '&tableName=' + $("#tableSelect").val(),
-                   type: 'POST',
-                   dataType: 'json',
-                   data: postData,
-                   success: function (data) {
-                       $dfd.resolve(data);
-                   },
-                   error: function () {
-                       $dfd.reject();
-                   }
-               });
+            url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeCreateRecord + '&tableName=' + $("#tableSelect").val(),
+            type: 'POST',
+            dataType: 'json',
+            data: postData,
+            success: function (data) {
+                $dfd.resolve(data);
+            },
+            error: function () {
+                $dfd.reject();
+            }
+        });
     });
 }
 
 function updateActionMethod(postData) {
     return $.Deferred(function ($dfd) {
         $.ajax({
-                   url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?' +
-                        'type=' + typeUpdateRecord + '&tableName=' + $("#tableSelect").val(),
-                   type: 'POST',
-                   dataType: 'json',
-                   data: postData,
-                   success: function (data) {
-                       $dfd.resolve(data);
-                   },
-                   error: function () {
-                       $dfd.reject();
-                   }
-               });
+            url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?' +
+                 'type=' + typeUpdateRecord + '&tableName=' + $("#tableSelect").val(),
+            type: 'POST',
+            dataType: 'json',
+            data: postData,
+            success: function (data) {
+                $dfd.resolve(data);
+            },
+            error: function () {
+                $dfd.reject();
+            }
+        });
     });
 }
 
@@ -295,17 +295,17 @@ function deleteRecords(postData) {
     postData["tableName"] = $("#tableSelect").val();
     return $.Deferred(function ($dfd) {
         $.ajax({
-                   url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeDeleteRecord,
-                   type: 'POST',
-                   dataType: 'json',
-                   data: postData,
-                   success: function (data) {
-                       $dfd.resolve(data);
-                   },
-                   error: function () {
-                       $dfd.reject();
-                   }
-               }
+                    url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeDeleteRecord,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: postData,
+                    success: function (data) {
+                        $dfd.resolve(data);
+                    },
+                    error: function () {
+                        $dfd.reject();
+                    }
+                }
         );
     });
 }
@@ -320,10 +320,12 @@ function tableSelectChange() {
         $("#deleteTableButton").show();
         $("#editTableButton").show();
         $("#purgeRecordButton").show();
+        loadFacetNames();
     } else {
         $("#deleteTableButton").hide();
         $("#editTableButton").hide();
         $("#purgeRecordButton").hide();
+        $('#facetListSelect').find('option:gt(0)').remove();
     }
     try {
         $('#DeleteAllButton').hide();
@@ -352,6 +354,21 @@ function scheduleDataPurge() {
                var label = document.getElementById('dataPurgingMsgLabel');
                label.style.display = 'block';
                label.innerHTML = result;
-           });
+           }
+    );
     return true;
+}
+
+function loadFacetNames() {
+    $('#facetListSelect').find('option:gt(0)').remove();
+    $.get('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeGetFacetNameList + '&tableName=' + $("#tableSelect").val(),
+          function (result) {
+              var resultObj = jQuery.parseJSON(result);
+              var facetNames = "";
+              $(resultObj).each(function (key, tableName) {
+                  facetNames += "<option value=" + tableName + ">" + tableName + "</option>";
+              });
+              $("#facetListSelect").append(facetNames);
+          }
+    );
 }

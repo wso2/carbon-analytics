@@ -141,6 +141,10 @@
             out.print(connector.getTableList());
             break;
         }
+        case MessageConsoleConnector.TYPE_GET_FACET_NAME_LIST: {
+            out.print(connector.getFacetColumnNameList(tableName));
+            break;
+        }
     }
 
     // Preventing page getting cache

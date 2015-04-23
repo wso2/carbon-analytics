@@ -75,7 +75,6 @@ public class MessageConsoleConnector {
     private static final String MESSAGE_CONSOLE = "MessageConsole";
     private static final String ANALYTICS_WEB_SERVICE = "AnalyticsWebService";
     private static final String OK = "OK";
-    private static final String LUCENE = "lucene";
     private static final String ERROR = "ERROR";
 
     public static final String RECORD_ID = "_unique_rec_id";
@@ -95,6 +94,7 @@ public class MessageConsoleConnector {
     public static final int TYPE_GET_PURGING_TASK_INFO = 13;
     public static final int TYPE_SAVE_PURGING_TASK_INFO = 14;
     public static final int TYPE_LIST_TABLE = 15;
+    public static final int TYPE_GET_FACET_NAME_LIST = 16;
 
     private static final GsonBuilder RESPONSE_RESULT_BUILDER = new GsonBuilder().registerTypeAdapter(ResponseResult.class,
                                                                                                      new ResponseResultSerializer());
@@ -156,7 +156,6 @@ public class MessageConsoleConnector {
     }
 
     public String getTableList() {
-        Gson gson = new Gson();
         String[] tableList = null;
         try {
             tableList = analyticsWebServiceStub.listTables();
@@ -169,7 +168,7 @@ public class MessageConsoleConnector {
             }
             tableList = new String[0];
         }
-        return gson.toJson(tableList);
+        return new Gson().toJson(tableList);
     }
 
     public String getRecords(String tableName, long timeFrom, long timeTo, int startIndex, int pageSize,
@@ -185,8 +184,8 @@ public class MessageConsoleConnector {
         try {
             RecordBean[] resultRecordBeans;
             if (searchQuery != null && !searchQuery.isEmpty()) {
-                resultRecordBeans = analyticsWebServiceStub.search(tableName, LUCENE, searchQuery, startIndex, pageSize);
-                responseResult.setTotalRecordCount(analyticsWebServiceStub.searchCount(tableName, LUCENE, searchQuery));
+                resultRecordBeans = analyticsWebServiceStub.search(tableName, searchQuery, startIndex, pageSize);
+                responseResult.setTotalRecordCount(analyticsWebServiceStub.searchCount(tableName, searchQuery));
             } else {
                 resultRecordBeans = analyticsWebServiceStub.getByRange(tableName, 1, null, timeFrom, timeTo, startIndex, pageSize);
                 responseResult.setTotalRecordCount(analyticsWebServiceStub.getRecordCount(tableName, timeFrom, timeTo));
@@ -774,7 +773,6 @@ public class MessageConsoleConnector {
     }
 
     public String getDataPurgingDetails(String table) {
-        Gson gson = new Gson();
         ScheduleTask scheduleTask = new ScheduleTask();
         try {
             ScheduleTaskInfo dataPurgingDetails = messageConsoleStub.getDataPurgingDetails(table);
@@ -785,6 +783,23 @@ public class MessageConsoleConnector {
         } catch (Exception e) {
             log.error("Unable to get schedule task information for table:" + table, e);
         }
-        return gson.toJson(scheduleTask);
+        return new Gson().toJson(scheduleTask);
+    }
+
+    public String getFacetColumnNameList(String table) {
+        List<String> facetNameList = new ArrayList<>();
+        try {
+            IndexConfigurationBean indices = analyticsWebServiceStub.getIndices(table);
+            if (indices != null && indices.getIndices() != null) {
+                for (IndexEntryBean indexEntryBean : indices.getIndices()) {
+                    if ("FACET".equalsIgnoreCase(indexEntryBean.getIndexType())) {
+                        facetNameList.add(indexEntryBean.getFieldName());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("Unable to get facet column list for table:" + table, e);
+        }
+        return new Gson().toJson(facetNameList.toArray(new String[facetNameList.size()]));
     }
 }

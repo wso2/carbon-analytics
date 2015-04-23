@@ -59,6 +59,27 @@
                     <xs:element minOccurs="0" name="indexType" nillable="true" type="xs:string"></xs:element>
                 </xs:sequence>
             </xs:complexType>
+            <xs:complexType name="DrillDownRequestBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="fieldName" nillable="true" type="xs:string"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="path" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="query" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="scoreFunction" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="SubCategoriesBean">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="categories" nillable="true" type="ax213:SearchResultEntryBean"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="path" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="SearchResultEntryBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="id" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="score" type="xs:float"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
         </xs:schema>
         <xs:schema xmlns:ax214="http://beans.webservice.analytics.carbon.wso2.org/xsd" xmlns:ax212="http://exception.webservice.analytics.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://webservice.analytics.carbon.wso2.org">
             <xs:import namespace="http://exception.webservice.analytics.carbon.wso2.org/xsd"></xs:import>
@@ -67,23 +88,6 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="AnalyticsWebServiceException" nillable="true" type="ax212:AnalyticsWebServiceException"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getById">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
-                        <xs:element minOccurs="0" name="numPartitionsHint" type="xs:int"></xs:element>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="xs:string"></xs:element>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="ids" nillable="true" type="xs:string"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getByIdResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax214:RecordBean"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -124,6 +128,23 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="getById">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="numPartitionsHint" type="xs:int"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="xs:string"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="ids" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getByIdResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax214:RecordBean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="setTableSchema">
                 <xs:complexType>
                     <xs:sequence>
@@ -132,17 +153,10 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getTableSchema">
+            <xs:element name="createTable">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getTableSchemaResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax214:AnalyticsSchemaBean"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -157,6 +171,20 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" type="xs:boolean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTableSchema">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTableSchemaResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax214:AnalyticsSchemaBean"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -207,13 +235,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="createTable">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
             <xs:element name="setIndices">
                 <xs:complexType>
                     <xs:sequence>
@@ -247,7 +268,6 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
-                        <xs:element minOccurs="0" name="language" nillable="true" type="xs:string"></xs:element>
                         <xs:element minOccurs="0" name="query" nillable="true" type="xs:string"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
@@ -263,6 +283,20 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="maxWait" type="xs:long"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="drillDownCategories">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="drillDownRequest" nillable="true" type="ax214:DrillDownRequestBean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="drillDownCategoriesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax214:SubCategoriesBean"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -284,7 +318,6 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"></xs:element>
-                        <xs:element minOccurs="0" name="language" nillable="true" type="xs:string"></xs:element>
                         <xs:element minOccurs="0" name="query" nillable="true" type="xs:string"></xs:element>
                         <xs:element minOccurs="0" name="start" type="xs:int"></xs:element>
                         <xs:element minOccurs="0" name="count" type="xs:int"></xs:element>
@@ -326,6 +359,12 @@
     </wsdl:message>
     <wsdl:message name="deleteByIdsRequest">
         <wsdl:part name="parameters" element="ns:deleteByIds"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="drillDownCategoriesRequest">
+        <wsdl:part name="parameters" element="ns:drillDownCategories"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="drillDownCategoriesResponse">
+        <wsdl:part name="parameters" element="ns:drillDownCategoriesResponse"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getByRangeRequest">
         <wsdl:part name="parameters" element="ns:getByRange"></wsdl:part>
@@ -416,6 +455,11 @@
         <wsdl:operation name="deleteByIds">
             <wsdl:input message="ns:deleteByIdsRequest" wsaw:Action="urn:deleteByIds"></wsdl:input>
             <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:deleteByIdsAnalyticsWebServiceAnalyticsWebServiceException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="drillDownCategories">
+            <wsdl:input message="ns:drillDownCategoriesRequest" wsaw:Action="urn:drillDownCategories"></wsdl:input>
+            <wsdl:output message="ns:drillDownCategoriesResponse" wsaw:Action="urn:drillDownCategoriesResponse"></wsdl:output>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:drillDownCategoriesAnalyticsWebServiceAnalyticsWebServiceException"></wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="getByRange">
             <wsdl:input message="ns:getByRangeRequest" wsaw:Action="urn:getByRange"></wsdl:input>
@@ -533,6 +577,18 @@
             <wsdl:input>
                 <soap:body use="literal"></soap:body>
             </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="drillDownCategories">
+            <soap:operation soapAction="urn:drillDownCategories" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
             <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap:fault>
             </wsdl:fault>
@@ -741,6 +797,18 @@
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap12:fault>
             </wsdl:fault>
         </wsdl:operation>
+        <wsdl:operation name="drillDownCategories">
+            <soap12:operation soapAction="urn:drillDownCategories" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
         <wsdl:operation name="getByRange">
             <soap12:operation soapAction="urn:getByRange" style="document"></soap12:operation>
             <wsdl:input>
@@ -929,6 +997,15 @@
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"></mime:content>
             </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="drillDownCategories">
+            <http:operation location="drillDownCategories"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="getByRange">
             <http:operation location="getByRange"></http:operation>
