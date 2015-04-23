@@ -85,5 +85,4 @@ public class AnalyticsSchema implements Serializable {
         }
         return true;
     }
-    
 }

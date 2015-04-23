@@ -17,6 +17,7 @@
 
 package org.wso2.carbon.analytics.dataservice.commons;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,7 +26,7 @@ import java.util.Map;
 /**
  *Contains the resulting facet count and the matched ids of a category.
  */
-public class DrillDownResultEntry {
+public class DrillDownResultEntry implements Serializable{
     private String category;
     private String[] categoryPath;
     private List<String> recordIds;

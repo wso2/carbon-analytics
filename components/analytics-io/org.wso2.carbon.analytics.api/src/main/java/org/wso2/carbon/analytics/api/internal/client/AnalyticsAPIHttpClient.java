@@ -19,7 +19,6 @@ package org.wso2.carbon.analytics.api.internal.client;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import org.apache.axiom.om.util.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,6 +28,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.params.AllClientPNames;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
@@ -38,7 +38,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.util.EntityUtils;
 import org.wso2.carbon.analytics.api.RemoteRecordIterator;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceAuthenticationException;
@@ -59,12 +58,8 @@ import org.wso2.carbon.analytics.io.commons.RemoteRecordGroup;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -81,6 +76,7 @@ public class AnalyticsAPIHttpClient {
     private String protocol;
     private String sessionId;
     private DefaultHttpClient httpClient;
+    private Gson gson;
 
     private AnalyticsAPIHttpClient(String protocol, String hostname, int port,
                                    int maxPerRoute, int maxConnection,
@@ -95,9 +91,10 @@ public class AnalyticsAPIHttpClient {
         connectionManager.setDefaultMaxPerRoute(maxPerRoute);
         connectionManager.setMaxTotal(maxConnection);
         BasicHttpParams params = new BasicHttpParams();
-        params.setParameter(CoreConnectionPNames.SO_TIMEOUT, socketTimeout);
-        params.setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, connectionTimeout);
+        params.setParameter(AllClientPNames.SO_TIMEOUT, socketTimeout);
+        params.setParameter(AllClientPNames.CONNECTION_TIMEOUT, connectionTimeout);
         this.httpClient = new DefaultHttpClient(connectionManager, params);
+        gson = new GsonBuilder().create();
     }
 
     public static void init(AnalyticsDataConfiguration dataConfiguration) throws AnalyticsServiceException {
@@ -121,7 +118,7 @@ public class AnalyticsAPIHttpClient {
                 .setParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.LOGIN_OPERATION);
         try {
             HttpGet getMethod = new HttpGet(builder.build().toString());
-            getMethod.addHeader(AnalyticsAPIConstants.AUTHORIZATION_HEADER, "Basic " + Base64.encode(
+            getMethod.addHeader(AnalyticsAPIConstants.AUTHORIZATION_HEADER, AnalyticsAPIConstants.BASIC_AUTH_HEADER + Base64.encode(
                     (username + AnalyticsAPIConstants.SEPARATOR
                             + password).getBytes()));
             HttpResponse httpResponse = httpClient.execute(getMethod);
@@ -129,7 +126,7 @@ public class AnalyticsAPIHttpClient {
                 EntityUtils.consume(httpResponse.getEntity());
                 throw new AnalyticsServiceAuthenticationException("Authentication failed for user : " + username);
             }
-            String response = getResponse(httpResponse);
+            String response = getResponseString(httpResponse);
             if (response.startsWith(AnalyticsAPIConstants.SESSION_ID)) {
                 String[] reponseElements = response.split(AnalyticsAPIConstants.SEPARATOR);
                 if (reponseElements.length == 2) {
@@ -157,7 +154,7 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    private String getResponse(HttpResponse httpResponse) throws AnalyticsServiceException {
+    private String getResponseString(HttpResponse httpResponse) throws AnalyticsServiceException {
         BufferedReader br = null;
         try {
             br = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()));
@@ -201,7 +198,7 @@ public class AnalyticsAPIHttpClient {
             postMethod.setEntity(new UrlEncodedFormEntity(params));
             HttpResponse httpResponse = httpClient.execute(postMethod);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
-                String response = getResponse(httpResponse);
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to create the table - " + tableName + " for tenant id : "
                         + tenantId + ". " + response);
             } else {
@@ -218,29 +215,25 @@ public class AnalyticsAPIHttpClient {
     public void setTableSchema(int tenantId, String username, String tableName,
                                AnalyticsSchema schema, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
-        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants
-                .SCHEMA_PROCESSOR_SERVICE_URI);
-        String jsonSchema = new GsonBuilder().create().toJson(schema);
+        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.SCHEMA_PROCESSOR_SERVICE_URI)
+                .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.SET_SCHEMA_OPERATION)
+                .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled))
+                .addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId))
+                .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName);
+        if (!securityEnabled) {
+            builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
+        } else {
+            builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
+        }
         try {
             HttpPost postMethod = new HttpPost(builder.build().toString());
             postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
-            List<NameValuePair> params = new ArrayList<>();
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.
-                    SET_SCHEMA_OPERATION));
-            if (!securityEnabled) {
-                params.add(new BasicNameValuePair(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId)));
-            } else {
-                params.add(new BasicNameValuePair(AnalyticsAPIConstants.USERNAME_PARAM, username));
-            }
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled)));
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName));
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.SCHEMA_PARAM, jsonSchema));
-            postMethod.setEntity(new UrlEncodedFormEntity(params));
+            postMethod.setEntity(new ByteArrayEntity(GenericUtils.serializeObject(schema)));
             HttpResponse httpResponse = httpClient.execute(postMethod);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
-                String response = getResponse(httpResponse);
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to set the schema for the table - " + tableName
-                        + ", schema - " + jsonSchema + " for tenant id : " + tenantId + ". " + response);
+                        + ", schema - " + gson.toJson(schema) + " for tenant id : " + tenantId + ". " + response);
             } else {
                 EntityUtils.consume(httpResponse.getEntity());
             }
@@ -267,12 +260,18 @@ public class AnalyticsAPIHttpClient {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
-            String response = getResponse(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to get the schema for the table - " + tableName
                         + " for tenant id : " + tenantId + ". " + response);
             } else {
-                return new GsonBuilder().create().fromJson(response, AnalyticsSchema.class);
+                Object analyticsSchemaObject = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                if (analyticsSchemaObject != null && analyticsSchemaObject instanceof AnalyticsSchema) {
+                    return (AnalyticsSchema) analyticsSchemaObject;
+                } else {
+                    throw new AnalyticsServiceException(getUnexpectedResponseReturnedErrorMsg("getting the table schema",
+                            tableName, "analytics schema object ", analyticsSchemaObject));
+                }
             }
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceAuthenticationException("Malformed URL provided. " + e.getMessage(), e);
@@ -298,7 +297,7 @@ public class AnalyticsAPIHttpClient {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
-            String response = getResponse(httpResponse);
+            String response = getResponseString(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to check the existence for the table - " + tableName
                         + " for tenant id : " + tenantId + ". " + response);
@@ -324,6 +323,7 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public List<String> listTables(int tenantId, String username, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants
@@ -339,14 +339,18 @@ public class AnalyticsAPIHttpClient {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
-            String response = getResponse(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to get the list of tables for tenant id : "
                         + tenantId + ". " + response);
             } else {
-                Type tableNamesListType = new TypeToken<List<String>>() {
-                }.getType();
-                return new Gson().fromJson(response, tableNamesListType);
+                Object listOfTablesObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                if (listOfTablesObj != null && listOfTablesObj instanceof List) {
+                    return (List<String>) listOfTablesObj;
+                } else {
+                    throw new AnalyticsServiceException(getUnexpectedResponseReturnedErrorMsg("getting list of tables",
+                            null, "list of tables", listOfTablesObj));
+                }
             }
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceAuthenticationException("Malformed URL provided. "
@@ -373,7 +377,7 @@ public class AnalyticsAPIHttpClient {
             deleteMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(deleteMethod);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
-                String response = getResponse(httpResponse);
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to create the table - " + tableName + " for tenant id : " + tenantId + ". " + response);
             } else {
                 EntityUtils.consume(httpResponse.getEntity());
@@ -402,7 +406,7 @@ public class AnalyticsAPIHttpClient {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
-            String response = getResponse(httpResponse);
+            String response = getResponseString(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to get the record count for the table - " + tableName
                         + ", time from : " + timeFrom + " , timeTo : " + timeTo
@@ -432,8 +436,8 @@ public class AnalyticsAPIHttpClient {
     public void putRecords(String username, List<Record> records, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.RECORD_PROCESSOR_SERVICE_URI)
-        .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.PUT_RECORD_OPERATION)
-        .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
+                .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.PUT_RECORD_OPERATION)
+                .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
         if (securityEnabled) {
             builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
         }
@@ -443,14 +447,20 @@ public class AnalyticsAPIHttpClient {
             postMethod.setEntity(new ByteArrayEntity(GenericUtils.serializeObject(records)));
             HttpResponse httpResponse = httpClient.execute(postMethod);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
-                String response = getResponse(httpResponse);
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to put the records. " + response);
-            }else {
-                List<String> recordIds = (List<String>) GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
-                int index = 0;
-                for (Record record: records){
-                    record.setId(recordIds.get(index));
-                    index++;
+            } else {
+                Object recordIdsObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                if (recordIdsObj != null && recordIdsObj instanceof List) {
+                    List<String> recordIds = (List<String>) recordIdsObj;
+                    int index = 0;
+                    for (Record record : records) {
+                        record.setId(recordIds.get(index));
+                        index++;
+                    }
+                } else {
+                    throw new AnalyticsServiceException(getUnexpectedResponseReturnedErrorMsg("putting the records",
+                            null, "list of strings", recordIdsObj));
                 }
             }
         } catch (URISyntaxException e) {
@@ -477,7 +487,7 @@ public class AnalyticsAPIHttpClient {
             HttpDelete deleteMethod = new HttpDelete(builder.build().toString());
             deleteMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(deleteMethod);
-            String response = getResponse(httpResponse);
+            String response = getResponseString(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to delete the record count for the table - " + tableName
                         + ", time from : " + timeFrom + " , timeTo : " + timeTo
@@ -495,7 +505,7 @@ public class AnalyticsAPIHttpClient {
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.RECORD_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.DELETE_RECORDS_IDS_OPERATION)
                 .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
-                .addParameter(AnalyticsAPIConstants.RECORD_IDS_PARAM, new Gson().toJson(recordIds))
+                .addParameter(AnalyticsAPIConstants.RECORD_IDS_PARAM, gson.toJson(recordIds))
                 .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
         if (!securityEnabled) {
             builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
@@ -506,7 +516,7 @@ public class AnalyticsAPIHttpClient {
             HttpDelete deleteMethod = new HttpDelete(builder.build().toString());
             deleteMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(deleteMethod);
-            String response = getResponse(httpResponse);
+            String response = getResponseString(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to delete the record count for the table - " + tableName
                         + ", records - " + recordIds
@@ -522,13 +532,14 @@ public class AnalyticsAPIHttpClient {
     public void setIndices(int tenantId, String username, String tableName, Map<String, IndexType> columns,
                            List<String> scoreParams, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
-        Gson gson = new Gson();
-        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI);
+        builder.setScheme(protocol).setHost(hostname).setPort(port)
+                .setPath(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI);
         try {
             HttpPost postMethod = new HttpPost(builder.build().toString());
             postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             List<NameValuePair> params = new ArrayList<>();
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.SET_INDICES_OPERATION));
+            params.add(new BasicNameValuePair(AnalyticsAPIConstants.OPERATION,
+                    AnalyticsAPIConstants.SET_INDICES_OPERATION));
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName));
             String indexJson = gson.toJson(columns);
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.INDEX_PARAM, indexJson));
@@ -540,10 +551,11 @@ public class AnalyticsAPIHttpClient {
             } else {
                 params.add(new BasicNameValuePair(AnalyticsAPIConstants.USERNAME_PARAM, username));
             }
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled)));
+            params.add(new BasicNameValuePair(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM,
+                    String.valueOf(securityEnabled)));
             postMethod.setEntity(new UrlEncodedFormEntity(params));
             HttpResponse httpResponse = httpClient.execute(postMethod);
-            String response = getResponse(httpResponse);
+            String response = getResponseString(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String errorMsg = "Unable to set the index for table - " + tableName
                         + " with index  - " + indexJson
@@ -560,7 +572,9 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public Map<String, IndexType> getIndices(int tenantId, String username, String tableName, boolean securityEnabled) throws AnalyticsServiceException {
+    @SuppressWarnings("unchecked")
+    public Map<String, IndexType> getIndices(int tenantId, String username, String tableName, boolean securityEnabled)
+            throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.GET_INDICES_OPERATION)
@@ -575,23 +589,30 @@ public class AnalyticsAPIHttpClient {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
-            String response = getResponse(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to get the index for table - " + tableName
                         + " for tenant id : " + tenantId + ". " + response);
             } else {
-                Type indexMap = new TypeToken<Map<String, IndexType>>() {
-                }.getType();
-                return new Gson().fromJson(response, indexMap);
+                Object indicesObject = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                if (indicesObject != null && indicesObject instanceof Map) {
+                    return (Map<String, IndexType>) indicesObject;
+                } else {
+                    throw new AnalyticsServiceException(getUnexpectedResponseReturnedErrorMsg("getting the indices",
+                            tableName, "Map of indices object", indicesObject));
+                }
             }
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceAuthenticationException("Malformed URL provided. " + e.getMessage(), e);
         } catch (IOException e) {
-            throw new AnalyticsServiceAuthenticationException("Error while connecting to the remote service. " + e.getMessage(), e);
+            throw new AnalyticsServiceAuthenticationException("Error while connecting to the remote service. "
+                    + e.getMessage(), e);
         }
     }
 
-    public List<String> getScoreParams(int tenantId, String username, String tableName, boolean securityEnabled) throws AnalyticsServiceException {
+    @SuppressWarnings("unchecked")
+    public List<String> getScoreParams(int tenantId, String username, String tableName, boolean securityEnabled)
+            throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.GET_SCORE_PARAMS_OPERATION)
@@ -606,14 +627,18 @@ public class AnalyticsAPIHttpClient {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
-            String response = getResponse(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to get the index for table - " + tableName
                         + " for tenant id : " + tenantId + ". " + response);
             } else {
-                Type scoreListType = new TypeToken<List<String>>() {
-                }.getType();
-                return new Gson().fromJson(response, scoreListType);
+                Object scoreParamsObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                if (scoreParamsObj != null && scoreParamsObj instanceof List) {
+                    return (List<String>) scoreParamsObj;
+                } else {
+                    throw new AnalyticsServiceException(getUnexpectedResponseReturnedErrorMsg("getting score params",
+                            tableName, "list of strings for score params", scoreParamsObj));
+                }
             }
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceAuthenticationException("Malformed URL provided. " + e.getMessage(), e);
@@ -622,6 +647,24 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
+    private String getUnexpectedResponseReturnedErrorMsg(String operationName, String tableName, String expectedResult,
+                                                         Object foundObj) {
+        StringBuilder errorMsgBuilder = new StringBuilder();
+        errorMsgBuilder.append("Unexpected response returned from remote analytics service when trying the get the ");
+        errorMsgBuilder.append(operationName);
+        if (tableName != null) {
+            errorMsgBuilder.append(" for table : ");
+            errorMsgBuilder.append(tableName);
+        } else {
+            errorMsgBuilder.append(". ");
+        }
+        errorMsgBuilder.append("Expected type : ");
+        errorMsgBuilder.append(expectedResult);
+        errorMsgBuilder.append("but found : ");
+        if (foundObj == null) errorMsgBuilder.append("NULL.");
+        else errorMsgBuilder.append(foundObj.getClass().getCanonicalName());
+        return errorMsgBuilder.toString();
+    }
 
     public void clearIndices(int tenantId, String username, String tableName, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
@@ -639,7 +682,7 @@ public class AnalyticsAPIHttpClient {
             deleteMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(deleteMethod);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
-                String response = getResponse(httpResponse);
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to get the index for table - " + tableName
                         + " for tenant id : " + tenantId + ". " + response);
             } else {
@@ -652,6 +695,7 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public List<SearchResultEntry> search(int tenantId, String username, String tableName, String query,
                                           int start, int count, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
@@ -671,15 +715,19 @@ public class AnalyticsAPIHttpClient {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
-            String response = getResponse(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to search the table - " + tableName
                         + " for tenant id : " + tenantId + " with query : " + query + ". "
                         + response);
             } else {
-                Type searchResultType = new TypeToken<List<SearchResultEntry>>() {
-                }.getType();
-                return new Gson().fromJson(response, searchResultType);
+                Object searchResultObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                if (searchResultObj != null && searchResultObj instanceof List) {
+                    return (List<SearchResultEntry>) searchResultObj;
+                } else {
+                    throw new AnalyticsServiceException(getUnexpectedResponseReturnedErrorMsg("searching the table",
+                            tableName, "List of Search Result Entry objects", searchResultObj));
+                }
             }
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceAuthenticationException("Malformed URL provided. " + e.getMessage(), e);
@@ -705,7 +753,7 @@ public class AnalyticsAPIHttpClient {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
-            String response = getResponse(httpResponse);
+            String response = getResponseString(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to search the table - " + tableName
                         + " for tenant id : " + tenantId + " with query : " + query + ". "
@@ -742,7 +790,7 @@ public class AnalyticsAPIHttpClient {
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.MAX_WAIT_PARAM, String.valueOf(maxWait)));
             postMethod.setEntity(new UrlEncodedFormEntity(params));
             HttpResponse httpResponse = httpClient.execute(postMethod);
-            String response = getResponse(httpResponse);
+            String response = getResponseString(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to configure max wait: " + maxWait + " for indexing. "
                         + response);
@@ -764,7 +812,7 @@ public class AnalyticsAPIHttpClient {
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.DESTROY_OPERATION));
             postMethod.setEntity(new UrlEncodedFormEntity(params));
             HttpResponse httpResponse = httpClient.execute(postMethod);
-            String response = getResponse(httpResponse);
+            String response = getResponseString(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Unable to destroy the process . "
                         + response);
@@ -776,8 +824,9 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public RecordGroup[] getRecordGroup(int tenantId, String username, String tableName, int numPartitionsHint, List<String> columns, long timeFrom,
-                                        long timeTo, int recordsFrom, int recordsCount, boolean securityEnabled) throws AnalyticsServiceException {
+    public RecordGroup[] getRecordGroup(int tenantId, String username, String tableName, int numPartitionsHint,
+                                        List<String> columns, long timeFrom, long timeTo, int recordsFrom,
+                                        int recordsCount, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.ANALYTIC_RECORD_READ_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.GET_RANGE_RECORD_GROUP_OPERATION)
@@ -794,35 +843,28 @@ public class AnalyticsAPIHttpClient {
         } else {
             builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
         }
-        ObjectInputStream objIn = null;
         try {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
-                String response = getResponse(httpResponse);
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to destroy the process . "
                         + response);
             } else {
-                objIn = new ObjectInputStream(httpResponse.getEntity().getContent());
-                return (RemoteRecordGroup[]) objIn.readObject();
+                Object remoteRecordGroupObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                if (remoteRecordGroupObj != null && remoteRecordGroupObj instanceof RemoteRecordGroup[]) {
+                    return (RecordGroup[]) remoteRecordGroupObj;
+                } else {
+                    throw new AnalyticsServiceAuthenticationException(getUnexpectedResponseReturnedErrorMsg("getting " +
+                            "the record group", tableName, "Array of RemoteRecordGroup", remoteRecordGroupObj));
+                }
             }
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceAuthenticationException("Malformed URL provided. " + e.getMessage(), e);
         } catch (IOException e) {
             throw new AnalyticsServiceAuthenticationException("Error while connecting to the remote service. "
                     + e.getMessage(), e);
-        } catch (ClassNotFoundException e) {
-            throw new AnalyticsServiceException("Unable to load the class when trying to deserialize the object. "
-                    + e.getMessage(), e);
-        } finally {
-            if (objIn != null) {
-                try {
-                    objIn.close();
-                } catch (IOException e) {
-                    log.warn("Error while closing the stream! " + e.getMessage());
-                }
-            }
         }
     }
 
@@ -842,33 +884,28 @@ public class AnalyticsAPIHttpClient {
         } else {
             builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
         }
-        ObjectInputStream objIn = null;
         try {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
-                String response = getResponse(httpResponse);
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to destroy the process . "
                         + response);
             } else {
-                objIn = new ObjectInputStream(httpResponse.getEntity().getContent());
-                return (RemoteRecordGroup[]) objIn.readObject();
+                Object remoteRecordGroupObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                if (remoteRecordGroupObj != null && remoteRecordGroupObj instanceof RemoteRecordGroup[]) {
+                    return (RecordGroup[]) remoteRecordGroupObj;
+                } else {
+                    throw new AnalyticsServiceAuthenticationException(getUnexpectedResponseReturnedErrorMsg("getting " +
+                            "the record group", tableName, "Array of RemoteRecordGroup", remoteRecordGroupObj));
+                }
             }
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceAuthenticationException("Malformed URL provided. " + e.getMessage(), e);
         } catch (IOException e) {
-            throw new AnalyticsServiceAuthenticationException("Error while connecting to the remote service. " + e.getMessage(), e);
-        } catch (ClassNotFoundException e) {
-            throw new AnalyticsServiceException("Unable to load the class when trying to deserialize the object. " + e.getMessage(), e);
-        } finally {
-            if (objIn != null) {
-                try {
-                    objIn.close();
-                } catch (IOException e) {
-                    log.warn("Error while closing the stream! " + e.getMessage());
-                }
-            }
+            throw new AnalyticsServiceAuthenticationException("Error while connecting to the remote service. "
+                    + e.getMessage(), e);
         }
     }
 
@@ -876,41 +913,21 @@ public class AnalyticsAPIHttpClient {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.ANALYTIC_RECORD_READ_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.READ_RECORD_OPERATION);
-        ByteArrayOutputStream out = null;
-        ObjectOutputStream os = null;
         try {
             HttpPost postMethod = new HttpPost(builder.build().toString());
             postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
-            out = new ByteArrayOutputStream();
-            os = new ObjectOutputStream(out);
-            os.writeObject(recordGroup);
-            postMethod.setEntity(new ByteArrayEntity(out.toByteArray()));
+            postMethod.setEntity(new ByteArrayEntity(GenericUtils.serializeObject(recordGroup)));
             HttpResponse httpResponse = httpClient.execute(postMethod);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
-                String response = getResponse(httpResponse);
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to read the record group. "
                         + response);
             }
-            return new RemoteRecordIterator<Record>(httpResponse.getEntity().getContent());
+            return new RemoteRecordIterator<>(httpResponse.getEntity().getContent());
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceAuthenticationException("Malformed URL provided. " + e.getMessage(), e);
         } catch (IOException e) {
             throw new AnalyticsServiceAuthenticationException("Error while connecting to the remote service. " + e.getMessage(), e);
-        } finally {
-            if (os != null) {
-                try {
-                    os.close();
-                } catch (IOException e) {
-                    log.warn("Error while closing object stream! " + e.getMessage());
-                }
-            }
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    log.warn("Error while closing output stream! " + e.getMessage());
-                }
-            }
         }
     }
 
@@ -922,7 +939,7 @@ public class AnalyticsAPIHttpClient {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
-            String response = getResponse(httpResponse);
+            String response = getResponseString(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 throw new AnalyticsServiceException("Error while checking the pagination support. " + response);
             }
@@ -947,9 +964,10 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public List<SearchResultEntry> drillDownSearch(int tenantId, String username,
-                                                                   AnalyticsDrillDownRequest drillDownRequest,
-                                                                   boolean securityEnabled) {
+                                                   AnalyticsDrillDownRequest drillDownRequest,
+                                                   boolean securityEnabled) {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.SEARCH_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.DRILL_DOWN_SEARCH_OPERATION)
@@ -965,11 +983,18 @@ public class AnalyticsAPIHttpClient {
             postMethod.setEntity(new ByteArrayEntity(GenericUtils.serializeObject(drillDownRequest)));
             HttpResponse httpResponse = httpClient.execute(postMethod);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
-                String response = getResponse(httpResponse);
-                throw new AnalyticsServiceException("Unable to read the DrillDown Request Object. "
-                        + response);
+                String response = getResponseString(httpResponse);
+                throw new AnalyticsServiceException("Unable to process the DrillDown Request. " + response);
+            } else {
+                Object searchResultListObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                if (searchResultListObj != null && searchResultListObj instanceof List) {
+                    return (List<SearchResultEntry>) searchResultListObj;
+                } else {
+                    throw new AnalyticsServiceException(getUnexpectedResponseReturnedErrorMsg("preforming drill down search",
+                            drillDownRequest.getTableName(), "list of search result entry", searchResultListObj));
+                }
             }
-            return (List<SearchResultEntry>) GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceException("Malformed URL provided. " + e.getMessage(), e);
         } catch (IOException e) {
@@ -978,8 +1003,8 @@ public class AnalyticsAPIHttpClient {
     }
 
     public int drillDownSearchCount(int tenantId, String username,
-                                                   AnalyticsDrillDownRequest drillDownRequest,
-                                                   boolean securityEnabled) {
+                                    AnalyticsDrillDownRequest drillDownRequest,
+                                    boolean securityEnabled) {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.SEARCH_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.DRILL_DOWN_SEARCH_COUNT_OPERATION)
@@ -995,11 +1020,18 @@ public class AnalyticsAPIHttpClient {
             postMethod.setEntity(new ByteArrayEntity(GenericUtils.serializeObject(drillDownRequest)));
             HttpResponse httpResponse = httpClient.execute(postMethod);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
-                String response = getResponse(httpResponse);
-                throw new AnalyticsServiceException("Unable to read the DrillDown Request Object. "
-                                                    + response);
+                String response = getResponseString(httpResponse);
+                throw new AnalyticsServiceException("Unable to process the drillDown request. "
+                        + response);
+            } else {
+                Object searchCountObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                if (searchCountObj != null && searchCountObj instanceof Integer) {
+                    return (Integer) searchCountObj;
+                } else {
+                    throw new AnalyticsServiceException(getUnexpectedResponseReturnedErrorMsg("preforming drill down search count",
+                            drillDownRequest.getTableName(), "number of search result", searchCountObj));
+                }
             }
-            return ((Integer) GenericUtils.deserializeObject(httpResponse.getEntity().getContent()));
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceException("Malformed URL provided. " + e.getMessage(), e);
         } catch (IOException e) {
@@ -1008,8 +1040,8 @@ public class AnalyticsAPIHttpClient {
     }
 
     public SubCategories drillDownCategories(int tenantId, String username,
-                                                   CategoryDrillDownRequest drillDownRequest,
-                                                   boolean securityEnabled) {
+                                             CategoryDrillDownRequest drillDownRequest,
+                                             boolean securityEnabled) {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.SEARCH_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.DRILL_DOWN_SEARCH_CATEGORY_OPERATION)
@@ -1025,11 +1057,19 @@ public class AnalyticsAPIHttpClient {
             postMethod.setEntity(new ByteArrayEntity(GenericUtils.serializeObject(drillDownRequest)));
             HttpResponse httpResponse = httpClient.execute(postMethod);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
-                String response = getResponse(httpResponse);
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to read the Category drilldown object. "
-                                                    + response);
+                        + response);
+            } else {
+                Object drillDownCategoriesObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                if (drillDownCategoriesObj != null && drillDownCategoriesObj instanceof SubCategories) {
+                    return (SubCategories) drillDownCategoriesObj;
+                } else {
+                    throw new AnalyticsServiceException(getUnexpectedResponseReturnedErrorMsg("preforming drill down" +
+                                    " search for categories", drillDownRequest.getTableName(),
+                            "object of sub categories", drillDownCategoriesObj));
+                }
             }
-            return (SubCategories) GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceException("Malformed URL provided. " + e.getMessage(), e);
         } catch (IOException e) {
@@ -1037,6 +1077,7 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public List<AnalyticsDrillDownRange> drillDownRangeCount(int tenantId, String username,
                                                              AnalyticsDrillDownRequest drillDownRequest,
                                                              boolean securityEnabled) {
@@ -1055,11 +1096,18 @@ public class AnalyticsAPIHttpClient {
             postMethod.setEntity(new ByteArrayEntity(GenericUtils.serializeObject(drillDownRequest)));
             HttpResponse httpResponse = httpClient.execute(postMethod);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
-                String response = getResponse(httpResponse);
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to read the Analytics drilldown object. "
-                                                    + response);
+                        + response);
+            }else {
+                Object listOfReangeObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                if (listOfReangeObj != null && listOfReangeObj instanceof List) {
+                    return (List<AnalyticsDrillDownRange>) listOfReangeObj;
+                } else {
+                    throw new AnalyticsServiceException(getUnexpectedResponseReturnedErrorMsg("preforming drill down range count",
+                            drillDownRequest.getTableName(), "list of analytics drill down ranges", listOfReangeObj));
+                }
             }
-            return (List<AnalyticsDrillDownRange>) GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceException("Malformed URL provided. " + e.getMessage(), e);
         } catch (IOException e) {

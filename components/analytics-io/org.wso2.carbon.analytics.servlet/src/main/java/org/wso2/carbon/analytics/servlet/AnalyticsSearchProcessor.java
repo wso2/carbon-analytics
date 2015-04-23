@@ -24,6 +24,7 @@ import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
 import org.wso2.carbon.analytics.servlet.exception.AnalyticsAPIAuthenticationException;
 import org.wso2.carbon.analytics.servlet.internal.ServiceHolder;
@@ -38,6 +39,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -78,10 +80,10 @@ public class AnalyticsSearchProcessor extends HttpServlet {
                     List<SearchResultEntry> searchResult;
                     if (!securityEnabled) searchResult = ServiceHolder.getAnalyticsDataService().search(tenantIdParam,
                             tableName, query, start, count);
-                    else searchResult = ServiceHolder.getSecureAnalyticsDataService().search(userName, tableName,
-                            query, start, count);
-                    PrintWriter output = resp.getWriter();
-                    output.append(new GsonBuilder().create().toJson(searchResult));
+                    else searchResult = ServiceHolder.getSecureAnalyticsDataService().search(userName, tableName, query, start, count);
+                    //Have to do this because there is possibility of getting sublist which cannot be serialized
+                    searchResult = new ArrayList<>(searchResult);
+                    resp.getOutputStream().write(GenericUtils.serializeObject(searchResult));
                     resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());

@@ -18,6 +18,7 @@
 package org.wso2.carbon.analytics.servlet;
 
 import com.google.gson.GsonBuilder;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
 import org.wso2.carbon.analytics.servlet.exception.AnalyticsAPIAuthenticationException;
 import org.wso2.carbon.analytics.servlet.internal.ServiceHolder;
@@ -40,7 +41,7 @@ public class AnalyticsTableSchemaProcessor extends HttpServlet {
     /**
      * set schema
      *
-     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param req  HttpRequest which has the required parameters to do the operation.
      * @param resp HttpResponse which returns the result of the intended operation.
      * @throws ServletException
      * @throws IOException
@@ -63,16 +64,21 @@ public class AnalyticsTableSchemaProcessor extends HttpServlet {
             String userName = req.getParameter(AnalyticsAPIConstants.USERNAME_PARAM);
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.SET_SCHEMA_OPERATION)) {
                 String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
-                String jsonSchema = req.getParameter(AnalyticsAPIConstants.SCHEMA_PARAM);
-                AnalyticsSchema schema = new GsonBuilder().create().fromJson(jsonSchema, AnalyticsSchema.class);
-                try {
-                    if (!securityEnabled)
-                        ServiceHolder.getAnalyticsDataService().setTableSchema(tenantId, tableName, schema);
-                    else
-                        ServiceHolder.getSecureAnalyticsDataService().setTableSchema(userName, tableName, schema);
-                    resp.setStatus(HttpServletResponse.SC_OK);
-                } catch (AnalyticsException e) {
-                    resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
+                Object analyticsSchemeObj = GenericUtils.deserializeObject(req.getInputStream());
+                if (analyticsSchemeObj != null && analyticsSchemeObj instanceof AnalyticsSchema) {
+                    AnalyticsSchema schema = (AnalyticsSchema) analyticsSchemeObj;
+                    try {
+                        if (!securityEnabled)
+                            ServiceHolder.getAnalyticsDataService().setTableSchema(tenantId, tableName, schema);
+                        else
+                            ServiceHolder.getSecureAnalyticsDataService().setTableSchema(userName, tableName, schema);
+                        resp.setStatus(HttpServletResponse.SC_OK);
+                    } catch (AnalyticsException e) {
+                        resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
+                    }
+                } else {
+                    resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unexpected content passed with the request! " +
+                            "Expected analytics schema but found " + analyticsSchemeObj);
                 }
             } else {
                 resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : " + operation
@@ -84,7 +90,7 @@ public class AnalyticsTableSchemaProcessor extends HttpServlet {
     /**
      * Get table schema.
      *
-     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param req  HttpRequest which has the required parameters to do the operation.
      * @param resp HttpResponse which returns the result of the intended operation.
      * @throws ServletException
      * @throws IOException
@@ -113,8 +119,7 @@ public class AnalyticsTableSchemaProcessor extends HttpServlet {
                         schema = ServiceHolder.getAnalyticsDataService().getTableSchema(tenantId, tableName);
                     else
                         schema = ServiceHolder.getSecureAnalyticsDataService().getTableSchema(userName, tableName);
-                    PrintWriter outputWriter = resp.getWriter();
-                    outputWriter.append(new GsonBuilder().create().toJson(schema));
+                    resp.getOutputStream().write(GenericUtils.serializeObject(schema));
                     resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());

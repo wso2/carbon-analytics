@@ -20,6 +20,7 @@ package org.wso2.carbon.analytics.servlet;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.servlet.exception.AnalyticsAPIAuthenticationException;
@@ -145,8 +146,7 @@ public class AnalyticsIndexProcessor extends HttpServlet {
                     if (!securityEnabled)
                         indexTypeMap = ServiceHolder.getAnalyticsDataService().getIndices(tenantIdParam, tableName);
                     else indexTypeMap = ServiceHolder.getSecureAnalyticsDataService().getIndices(username, tableName);
-                    PrintWriter output = resp.getWriter();
-                    output.append(new GsonBuilder().create().toJson(indexTypeMap));
+                    resp.getOutputStream().write(GenericUtils.serializeObject(indexTypeMap));
                     resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
@@ -158,8 +158,7 @@ public class AnalyticsIndexProcessor extends HttpServlet {
                         scoreParams = ServiceHolder.getAnalyticsDataService().getScoreParams(tenantIdParam, tableName);
                     else
                         scoreParams = ServiceHolder.getSecureAnalyticsDataService().getScoreParams(username, tableName);
-                    PrintWriter output = resp.getWriter();
-                    output.append(new GsonBuilder().create().toJson(scoreParams));
+                    resp.getOutputStream().write(GenericUtils.serializeObject(scoreParams));
                     resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());
