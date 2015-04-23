@@ -52,8 +52,8 @@ public class AnalyticsSparkSQLTest {
         System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");
         AnalyticsServiceHolder.setHazelcastInstance(null);
         AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
-        this.service = new AnalyticsDataServiceImpl();
-        ServiceHolder.setAnalyticsDataService(this.service);
+        System.setProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
+        this.service = ServiceHolder.getAnalyticsDataService();
         ServiceHolder.setAnalyticskExecutor(new SparkAnalyticsExecutor("localhost", 0));
     }
     
@@ -61,6 +61,7 @@ public class AnalyticsSparkSQLTest {
     public void done() throws NamingException, AnalyticsException, IOException {
         ServiceHolder.getAnalyticskExecutor().stop();        
         this.service.destroy();
+        System.clearProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP);
     }
     
     @Test

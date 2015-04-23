@@ -18,9 +18,9 @@
 package org.wso2.carbon.analytics.spark.core.internal;
 
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
-import org.wso2.carbon.application.deployer.Feature;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.TaskManager;
 import org.wso2.carbon.ntask.core.service.TaskService;
@@ -29,9 +29,6 @@ import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * This class holds the OSGI services registered with Declarative service component.
@@ -69,6 +66,9 @@ public class ServiceHolder {
     }
 
     public static AnalyticsDataService getAnalyticsDataService() {
+        if (analyticsDataService == null) {
+            analyticsDataService = AnalyticsServiceHolder.getAnalyticsDataService();
+        }
         return analyticsDataService;
     }
 
