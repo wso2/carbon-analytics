@@ -303,6 +303,10 @@ function addEventPublisher(form, streamNameWithVersion) {
         var customMappingEnabled = "disable";
 
         if (((advancedMappingCounter % 2) != 0)) {
+
+            var toStreamName = document.getElementById("property_Required_stream_name").value;
+            var toStreamVersion = document.getElementById("property_Required_stream_version").value;
+
             var metaDataTable = document.getElementById("outputMetaDataTable");
             if (metaDataTable.rows.length > 1) {
                 metaData = getWSO2EventDataValues(metaDataTable);
@@ -325,9 +329,18 @@ function addEventPublisher(form, streamNameWithVersion) {
             new Ajax.Request('../eventpublisher/add_event_publisher_ajaxprocessor.jsp', {
                 method:'POST',
                 asynchronous:false,
-                parameters:{eventPublisher:eventPublisherName, streamNameWithVersion:streamNameWithVersion,
-                    eventAdapterInfo:eventAdapterInfo, mappingType:"wso2event", outputParameters:outputPropertyParameterString,
-                    metaData:metaData, correlationData:correlationData, payloadData:payloadData, customMappingValue:customMappingEnabled},
+                parameters:{
+                    eventPublisher:eventPublisherName,
+                    streamNameWithVersion:streamNameWithVersion,
+                    eventAdapterInfo:eventAdapterInfo,
+                    mappingType:"wso2event",
+                    outputParameters:outputPropertyParameterString,
+                    metaData:metaData,
+                    correlationData:correlationData,
+                    payloadData:payloadData,
+                    customMappingValue:customMappingEnabled,
+                    toStreamName:toStreamName,
+                    toStreamVersion:toStreamVersion},
                 onSuccess:function (response) {
                     if ("true" == response.responseText.trim()) {
                         CARBON.showInfoDialog("Event publisher added successfully!!", function () {

@@ -18,6 +18,7 @@ import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.publisher.core.config.EventOutputProperty;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConfiguration;
+import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
 import org.wso2.carbon.event.publisher.core.config.mapping.WSO2EventOutputMapping;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherStreamValidationException;
@@ -85,6 +86,10 @@ public class WSO2EventOutputMapper implements OutputMapper {
 
         //try {
         wso2EventOutputMapping = (WSO2EventOutputMapping) eventPublisherConfiguration.getOutputMapping();
+        if(wso2EventOutputMapping.getToEventName()==null || wso2EventOutputMapping.getToEventName().isEmpty() || wso2EventOutputMapping.getToEventVersion()==null || wso2EventOutputMapping.getToEventVersion().isEmpty()){
+            wso2EventOutputMapping.setToEventName(inputStreamDefinition.getName());
+            wso2EventOutputMapping.setToEventVersion(inputStreamDefinition.getVersion());
+        }
         if (!wso2EventOutputMapping.isCustomMappingEnabled()) {
             //outputStreamDefinition = new StreamDefinition(outputStreamName, outputStreamVersion);
             //outputStreamDefinition.setMetaData(inputStreamDefinition.getMetaData());
@@ -170,6 +175,7 @@ public class WSO2EventOutputMapper implements OutputMapper {
         Event eventObject = new Event();
         if (eventData.length > 0) {
 
+            eventObject.setStreamId(wso2EventOutputMapping.getToEventName() + EventPublisherConstants.STREAM_ID_SEPERATOR + wso2EventOutputMapping.getToEventVersion());
             List<EventOutputProperty> metaWSO2EventOutputPropertyConfiguration = wso2EventOutputMapping.getMetaWSO2EventOutputPropertyConfiguration();
             List<EventOutputProperty> correlationWSO2EventOutputPropertyConfiguration = wso2EventOutputMapping.getCorrelationWSO2EventOutputPropertyConfiguration();
             List<EventOutputProperty> payloadWSO2EventOutputPropertyConfiguration = wso2EventOutputMapping.getPayloadWSO2EventOutputPropertyConfiguration();
@@ -209,6 +215,7 @@ public class WSO2EventOutputMapper implements OutputMapper {
     public Object convertToTypedInputEvent(Object[] eventData) throws EventPublisherConfigurationException {
 
         Event eventObject = new Event();
+        eventObject.setStreamId(wso2EventOutputMapping.getToEventName() + EventPublisherConstants.STREAM_ID_SEPERATOR + wso2EventOutputMapping.getToEventVersion());
 
         if (noOfMetaData > 0) {
             List<Object> metaData = new ArrayList<Object>();

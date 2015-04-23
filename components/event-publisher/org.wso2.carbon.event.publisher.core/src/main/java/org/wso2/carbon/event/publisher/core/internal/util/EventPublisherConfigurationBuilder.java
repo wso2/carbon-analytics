@@ -189,6 +189,22 @@ public class EventPublisherConfigurationBuilder {
             }
         }
 
+        String toStreamName = "";
+        String toStreamVersion = "";
+
+        String customMappingEnabledAttribute = mappingElement.getAttributeValue(new QName(EventPublisherConstants.ENABLE_CONST));
+        if (customMappingEnabledAttribute != null && customMappingEnabledAttribute.equalsIgnoreCase(EventPublisherConstants.ENABLE_CONST)) {
+            OMElement toOMElement = mappingElement.getFirstChildWithName(new QName(EventPublisherConstants.EF_CONF_NS, EventPublisherConstants.EF_ELEMENT_TO));
+            toStreamName = toOMElement.getAttributeValue(new QName(EventPublisherConstants.EF_ATTR_STREAM_NAME));
+            toStreamVersion = toOMElement.getAttributeValue(new QName(EventPublisherConstants.EF_ATTR_VERSION));
+        }
+
+        if(toStreamName == null || toStreamName.isEmpty() || toStreamVersion == null ||toStreamVersion.isEmpty()){
+            outputEventAdapterConfiguration.setOutputStreamIdOfWso2eventMessageFormat(fromStreamName + EventPublisherConstants.STREAM_ID_SEPERATOR + fromStreamVersion);
+        }else{
+            outputEventAdapterConfiguration.setOutputStreamIdOfWso2eventMessageFormat(toStreamName + EventPublisherConstants.STREAM_ID_SEPERATOR + toStreamVersion);
+        }
+
         if (mappingType.equalsIgnoreCase(EventPublisherConstants.EF_WSO2EVENT_MAPPING_TYPE)) {
             if (!validateSupportedMapping(toEventAdapterType, MessageType.WSO2EVENT)) {
                 throw new EventPublisherConfigurationException("WSO2Event Mapping is not supported by event adapter type " + toEventAdapterType);

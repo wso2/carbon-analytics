@@ -12,8 +12,7 @@
   ~ CONDITIONS OF ANY KIND, either express or implied.  See the License for the
   ~ specific language governing permissions and limitations under the License.
   --%>
-<%@ page import="org.wso2.carbon.event.receiver.ui.EventReceiverUIConstants" %>
-<%@ page import="org.wso2.carbon.event.receiver.ui.EventReceiverUIUtils" %>
+<%@ page import="org.wso2.carbon.event.publisher.ui.EventPublisherUIConstants" %>
 <%@ page import="org.wso2.carbon.event.stream.stub.EventStreamAdminServiceStub" %>
 <%@ page import="org.wso2.carbon.event.stream.stub.types.EventStreamAttributeDto" %>
 <%@ page import="org.wso2.carbon.event.stream.stub.types.EventStreamDefinitionDto" %>
@@ -21,9 +20,9 @@
 <%@ page import="org.wso2.carbon.event.publisher.ui.EventPublisherUIUtils" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
-<fmt:bundle basename="org.wso2.carbon.event.receiver.ui.i18n.Resources">
-    <link type="text/css" href="../eventreceiver/css/eventReceiver.css" rel="stylesheet"/>
-    <script type="text/javascript" src="../eventreceiver/js/event_receiver.js"></script>
+<fmt:bundle basename="org.wso2.carbon.event.publisher.ui.i18n.Resources">
+    <link type="text/css" href="../eventpublisher/css/eventPublisher.css" rel="stylesheet"/>
+    <script type="text/javascript" src="../eventpublisher/js/event_publisher.js"></script>
 
     <%
         String streamId = request.getParameter("streamNameWithVersion");
@@ -47,7 +46,7 @@
 
         <tr>
             <td class="leftCol-med">
-                <fmt:message key="from.event.stream"/>
+                <fmt:message key="to.event.stream"/>
                 <span class="required">*</span>
             </td>
             <td>
@@ -58,7 +57,7 @@
         </tr>
         <tr>
             <td class="leftCol-med">
-                <fmt:message key="from.event.version"/>
+                <fmt:message key="to.event.version"/>
                 <span class="required">*</span>
             </td>
             <td>

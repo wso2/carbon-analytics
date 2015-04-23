@@ -280,6 +280,9 @@
             <%
                 if (firstMappingTypeName != null) {
                     if (firstMappingTypeName.equals("wso2event")) {
+
+
+
             %>
             <jsp:include page="wso2event_mapping_ui.jsp" flush="true">
                 <jsp:param name="streamNameWithVersion"

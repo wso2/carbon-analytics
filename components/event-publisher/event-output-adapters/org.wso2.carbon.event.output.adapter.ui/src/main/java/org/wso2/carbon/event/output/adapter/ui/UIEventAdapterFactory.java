@@ -52,19 +52,6 @@ public class UIEventAdapterFactory extends OutputEventAdapterFactory{
     @Override
     public List<Property> getStaticPropertyList() {
         List<Property> staticPropertyList = new ArrayList<Property>();
-
-        Property outputStreamName = new Property(UIEventAdapterConstants.ADAPTER_UI_OUTPUT_STREAM_NAME);
-        outputStreamName.setDisplayName(
-                resourceBundle.getString(UIEventAdapterConstants.ADAPTER_UI_OUTPUT_STREAM_NAME));
-        outputStreamName.setRequired(true);
-        staticPropertyList.add(outputStreamName);
-
-        Property outputStreamVersion = new Property(UIEventAdapterConstants.ADAPTER_UI_OUTPUT_STREAM_VERSION);
-        outputStreamVersion.setDisplayName(
-                resourceBundle.getString(UIEventAdapterConstants.ADAPTER_UI_OUTPUT_STREAM_VERSION));
-        outputStreamVersion.setRequired(false);
-        staticPropertyList.add(outputStreamVersion);
-
         return staticPropertyList;
     }
 

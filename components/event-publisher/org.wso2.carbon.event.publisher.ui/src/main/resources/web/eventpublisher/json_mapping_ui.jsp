@@ -13,73 +13,61 @@
   ~ specific language governing permissions and limitations under the License.
   --%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ page import="org.wso2.carbon.event.receiver.ui.EventReceiverUIUtils" %>
-<%@ page import="org.wso2.carbon.event.stream.stub.EventStreamAdminServiceStub" %>
-<%@ page import="org.wso2.carbon.event.stream.stub.types.EventStreamDefinitionDto" %>
-<%@ page import="java.util.List" %>
 
-<fmt:bundle basename="org.wso2.carbon.event.receiver.ui.i18n.Resources">
-    <link type="text/css" href="../eventreceiver/css/eventReceiver.css" rel="stylesheet"/>
-    <script type="text/javascript" src="../eventreceiver/js/event_receiver.js"></script>
-
-    <%
-        String streamId = request.getParameter("streamNameWithVersion");
-        EventStreamAdminServiceStub eventStreamAdminServiceStub = EventReceiverUIUtils.getEventStreamAdminService(config, session, request);
-        EventStreamDefinitionDto streamDefinitionDto = eventStreamAdminServiceStub.getStreamDefinitionDto(streamId);
-
-        List<String> attributeList = EventReceiverUIUtils.getAttributeListWithPrefix(streamDefinitionDto);
-
-    %>
+<fmt:bundle basename="org.wso2.carbon.event.publisher.ui.i18n.Resources">
+    <link type="text/css" href="../eventpublisher/css/eventPublisher.css" rel="stylesheet"/>
+    <script type="text/javascript" src="../eventpublisher/js/event_publisher.js"></script>
 
     <table class="styledLeft noBorders spacer-bot"
            style="width:100%">
         <tbody>
-        <tr fromElementKey="inputJsonMapping">
-            <td colspan="2" class="middle-header">
-                <fmt:message key="event.receiver.mapping.json"/>
+        <tr name="outputJSONMapping">
+            <td colspan="3" class="middle-header">
+                <fmt:message key="json.mapping"/>
             </td>
         </tr>
-        <tr fromElementKey="inputJsonMapping">
+        <tr>
+            <td class="leftCol-med" colspan="1"><fmt:message key="output.mapping.content"/><span
+                    class="required">*</span></td>
             <td colspan="2">
-
-                <h6><fmt:message key="jsonpath.expression.header"/></h6>
-
-                <table id="addJsonpathExprTable" class="normal">
-                    <tbody>
-                    <%
-                        int counter = 0;
-                        for (String attributeData : attributeList) {
-
-                            String[] attributeValues = attributeData.split(" ");
-                    %>
-                    <tr>
-                        <td class="col-small"><fmt:message
-                                key="event.receiver.property.jsonpath"/> :
-                        </td>
-                        <td>
-                            <input type="text" id="inputPropertyValue_<%=counter%>"/>
-                        </td>
-                        <td class="col-small"><fmt:message key="event.receiver.property.mappedto"/> :
-                        </td>
-                        <td>
-                            <input type="text" id="inputPropertyName_<%=counter%>"
-                                   value="<%=attributeValues[0]%>" readonly="true"/>
-                        </td>
-                        <td><input type="text" id="inputPropertyType_<%=counter%>"
-                                   value="<%=attributeValues[1]%>" readonly="true"/>
-                        </td>
-                        <td class="col-small"><fmt:message
-                                key="event.receiver.property.default"/></td>
-                        <td><input type="text" id="inputPropertyDefault_<%=counter%>"/></td>
-                    </tr>
-                    <%
-                            counter++;
-                        } %>
-                    </tbody>
-                </table>
+                <input id="inline_json" type="radio" checked="checked" value="content"
+                       name="inline_json" onclick="enable_disable_Registry(this)">
+                <label for="inline_json"><fmt:message key="inline.input"/></label>
+                <input id="registry_json" type="radio" value="reg" name="registry_json"
+                       onclick="enable_disable_Registry(this)">
+                <label for="registry_json"><fmt:message key="registry.input"/></label>
             </td>
         </tr>
-
+        <tr name="outputJSONMappingInline" id="outputJSONMappingInline">
+            <td colspan="3">
+                <p>
+                    <textarea id="jsonSourceText"
+                              style="border:solid 1px rgb(204, 204, 204); width: 99%;
+                                     height: 150px; margin-top: 5px;"
+                              name="jsonSource" rows="30"></textarea>
+                </p>
+            </td>
+        </tr>
+        <tr name="outputJSONMappingRegistry" style="display:none" id="outputJSONMappingRegistry">
+            <td class="leftCol-med" colspan="1"><fmt:message key="resource.path"/><span
+                    class="required">*</span></td>
+            <td colspan="1">
+                <input type="text" id="jsonSourceRegistry" disabled="disabled" class="initE"
+                       value=""
+                       style="width:100%"/>
+            </td>
+            <td class="nopadding" style="border:none" colspan="1">
+                <a href="#registryBrowserLink" class="registry-picker-icon-link"
+                   style="padding-left:20px"
+                   onclick="showRegistryBrowser('jsonSourceRegistry','/_system/config');"><fmt:message
+                        key="conf.registry"/></a>
+                <a href="#registryBrowserLink"
+                   class="registry-picker-icon-link"
+                   style="padding-left:20px"
+                   onclick="showRegistryBrowser('jsonSourceRegistry', '/_system/governance');"><fmt:message
+                        key="gov.registry"/></a>
+            </td>
+        </tr>
         </tbody>
     </table>
 </fmt:bundle>

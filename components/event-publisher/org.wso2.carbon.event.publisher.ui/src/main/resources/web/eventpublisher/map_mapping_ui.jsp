@@ -13,10 +13,10 @@
   ~ specific language governing permissions and limitations under the License.
   --%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ page import="org.wso2.carbon.event.receiver.ui.EventReceiverUIUtils" %>
 <%@ page import="org.wso2.carbon.event.stream.stub.EventStreamAdminServiceStub" %>
 <%@ page import="org.wso2.carbon.event.stream.stub.types.EventStreamDefinitionDto" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.wso2.carbon.event.publisher.ui.EventPublisherUIUtils" %>
 
 <fmt:bundle basename="org.wso2.carbon.event.receiver.ui.i18n.Resources">
     <link type="text/css" href="../eventreceiver/css/eventReceiver.css" rel="stylesheet"/>
@@ -24,52 +24,56 @@
 
     <%
         String streamId = request.getParameter("streamNameWithVersion");
-        EventStreamAdminServiceStub eventStreamAdminServiceStub = EventReceiverUIUtils.getEventStreamAdminService(config, session, request);
+        EventStreamAdminServiceStub eventStreamAdminServiceStub = EventPublisherUIUtils.getEventStreamAdminService(config, session, request);
         EventStreamDefinitionDto streamDefinitionDto = eventStreamAdminServiceStub.getStreamDefinitionDto(streamId);
-        List<String> attributeList = EventReceiverUIUtils.getAttributeListWithPrefix(streamDefinitionDto);
+        List<String> attributeList = EventPublisherUIUtils.getAttributeListWithPrefix(streamDefinitionDto);
 
     %>
 
     <table class="styledLeft noBorders spacer-bot"
            style="width:100%">
         <tbody>
-        <tr fromElementKey="inputMapMapping">
+        <tr name="outputMapMapping">
             <td colspan="2" class="middle-header">
-                <fmt:message key="event.receiver.mapping.map"/>
+                <fmt:message key="map.mapping"/>
             </td>
         </tr>
-        <tr fromElementKey="inputMapMapping">
+        <tr name="outputMapMapping">
             <td colspan="2">
 
-                <h6><fmt:message key="map.mapping.header"/></h6>
-                <table id="addMapDataTable" class="normal">
+                <table class="styledLeft noBorders spacer-bot" id="outputMapPropertiesTable"
+                       style="display:none">
+                    <thead>
+                    <th class="leftCol-med"><fmt:message key="property.name"/></th>
+                    <th class="leftCol-med"><fmt:message key="property.value.of"/></th>
+                    <th><fmt:message key="actions"/></th>
+                    </thead>
+                </table>
+                <div class="noDataDiv-plain" id="noOutputMapProperties">
+                    <fmt:message key="no.map.properties.defined"/>
+                </div>
+                <table id="addOutputMapProperties" class="normal">
                     <tbody>
-                    <%
-                        int counter = 0;
-                        for (String attributeData : attributeList) {
-                            String[] attributeDataValues = attributeData.split(" ");
-                    %>
                     <tr>
-                        <td class="col-small"><fmt:message key="event.receiver.property.name"/> :
-                        </td>
+                        <td class="col-small"><fmt:message key="property.name"/> :</td>
                         <td>
-                            <input type="text" id="inputMapPropName_<%=counter%>"/>
+                            <input type="text" id="outputMapPropName"/>
                         </td>
-                        <td class="col-small"><fmt:message
-                                key="event.receiver.property.valueof"/> :
-                        </td>
+                        <td class="col-small"><fmt:message key="property.value.of"/> :</td>
                         <td>
-                            <input type="text" id="inputMapPropValueOf_<%=counter%>"
-                                   value="<%=attributeDataValues[0]%>" readonly="true"/>
+                            <select id="outputMapPropValueOf">
+                                <% for (String attributeData : attributeList) {
+                                    String[] attributeValues = attributeData.split(" ");
+                                %>
+                                <option value="<%=attributeValues[0]%>"><%=attributeValues[0]%>
+                                </option>
+                                <% }%>
+                            </select>
                         </td>
-                        <td><fmt:message key="event.receiver.property.type"/>:
-
-                            <input type="text" id="inputMapPropType_<%=counter%>"
-                                   value="<%=attributeDataValues[1]%>" readonly="true"/>
+                        <td><input type="button" class="button" value="<fmt:message key="add"/>"
+                                   onclick="addOutputMapProperty()"/>
                         </td>
                     </tr>
-                    <% counter++;
-                    } %>
                     </tbody>
                 </table>
             </td>

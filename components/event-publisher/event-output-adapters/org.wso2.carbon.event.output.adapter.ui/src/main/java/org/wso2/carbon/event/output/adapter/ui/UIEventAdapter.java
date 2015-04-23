@@ -26,6 +26,7 @@ import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
+import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterRuntimeException;
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.output.adapter.ui.internal.UIOutputCallbackControllerServiceImpl;
 import org.wso2.carbon.event.output.adapter.ui.internal.ds.UIEventAdaptorServiceInternalValueHolder;
@@ -61,19 +62,12 @@ public class UIEventAdapter implements OutputEventAdapter {
 
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
 
-        if(eventAdapterConfiguration.getStaticProperties().get(UIEventAdapterConstants
-                .ADAPTER_UI_OUTPUT_STREAM_VERSION) == null || " ".equals(eventAdapterConfiguration
-                .getStaticProperties().get(UIEventAdapterConstants
-                        .ADAPTER_UI_OUTPUT_STREAM_VERSION))){
-            eventAdapterConfiguration.getStaticProperties().put(UIEventAdapterConstants.ADAPTER_UI_OUTPUT_STREAM_VERSION,
-                    UIEventAdapterConstants.ADAPTER_UI_DEFAULT_OUTPUT_STREAM_VERSION);
 
+        streamId = eventAdapterConfiguration.getOutputStreamIdOfWso2eventMessageFormat();
+        System.out.println(streamId);
+        if(streamId == null || streamId.isEmpty()){
+            throw new OutputEventAdapterRuntimeException("UI event adapter needs a output stream id");
         }
-
-        streamId = eventAdapterConfiguration.getStaticProperties().get(
-                UIEventAdapterConstants.ADAPTER_UI_OUTPUT_STREAM_NAME) + UIEventAdapterConstants.ADAPTER_UI_COLON +
-                eventAdapterConfiguration.getStaticProperties().get(UIEventAdapterConstants
-                        .ADAPTER_UI_OUTPUT_STREAM_VERSION);
 
         ConcurrentHashMap<Integer,ConcurrentHashMap<String, String>> tenantSpecifcEventOutputAdapterMap =
                 UIEventAdaptorServiceInternalValueHolder.getTenantSpecificOutputEventStreamAdapterMap();

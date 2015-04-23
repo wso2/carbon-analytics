@@ -30,6 +30,7 @@
 
         String customMapping = request.getParameter("customMappingValue");
         boolean customMappingEnabled = EventPublisherUIConstants.STRING_LITERAL_ENABLE.equalsIgnoreCase(customMapping);
+        String toStreamNameWithVersion = "";
 
         if (eventAdapterType == null ) {
             throw new Exception("Could not retrieve event adapter type information properly");
@@ -59,75 +60,75 @@
         }
 
         if (mappingType.equals("wso2event")) {
-
-            String metaDataSet = request.getParameter("metaData");
-
             EventMappingPropertyDto[] metaWSO2EventConfiguration = null;
-
-            if (metaDataSet != null && !metaDataSet.equals("")) {
-                String[] properties = metaDataSet.split("\\$=");
-                if (properties != null) {
-                    // construct property array for each property
-                    metaWSO2EventConfiguration = new EventMappingPropertyDto[properties.length];
-                    int index = 0;
-                    for (String property : properties) {
-                        String[] propertyConfiguration = property.split("\\^=");
-                        if (propertyConfiguration != null) {
-                            metaWSO2EventConfiguration[index] = new EventMappingPropertyDto();
-                            metaWSO2EventConfiguration[index].setName(propertyConfiguration[0].trim());
-                            metaWSO2EventConfiguration[index].setValueOf(propertyConfiguration[1].trim());
-                            index++;
-                        }
-                    }
-
-                }
-            }
-
-            String correlationDataSet = request.getParameter("correlationData");
             EventMappingPropertyDto[] correlationWSO2EventConfiguration = null;
-
-            if (correlationDataSet != null && !correlationDataSet.equals("")) {
-                String[] properties = correlationDataSet.split("\\$=");
-                if (properties != null) {
-                    // construct property array for each property
-                    correlationWSO2EventConfiguration = new EventMappingPropertyDto[properties.length];
-                    int index = 0;
-                    for (String property : properties) {
-                        String[] propertyConfiguration = property.split("\\^=");
-                        if (propertyConfiguration != null) {
-                            correlationWSO2EventConfiguration[index] = new EventMappingPropertyDto();
-                            correlationWSO2EventConfiguration[index].setName(propertyConfiguration[0].trim());
-                            correlationWSO2EventConfiguration[index].setValueOf(propertyConfiguration[1].trim());
-                            index++;
-                        }
-                    }
-
-                }
-            }
-
-            String payloadDataSet = request.getParameter("payloadData");
             EventMappingPropertyDto[] payloadWSO2EventConfiguration = null;
 
-            if (payloadDataSet != null && !payloadDataSet.equals("")) {
-                String[] properties = payloadDataSet.split("\\$=");
-                if (properties != null) {
-                    // construct property array for each property
-                    payloadWSO2EventConfiguration = new EventMappingPropertyDto[properties.length];
-                    int index = 0;
-                    for (String property : properties) {
-                        String[] propertyConfiguration = property.split("\\^=");
-                        if (propertyConfiguration != null) {
-                            payloadWSO2EventConfiguration[index] = new EventMappingPropertyDto();
-                            payloadWSO2EventConfiguration[index].setName(propertyConfiguration[0].trim());
-                            payloadWSO2EventConfiguration[index].setValueOf(propertyConfiguration[1].trim());
-                            index++;
-                        }
-                    }
+            if(customMappingEnabled){
+                toStreamNameWithVersion = request.getParameter("toStreamName") + EventPublisherUIConstants.STREAM_VERSION_DELIMITER + request.getParameter("toStreamVersion");
 
+                String metaDataSet = request.getParameter("metaData");
+                if (metaDataSet != null && !metaDataSet.equals("")) {
+                    String[] properties = metaDataSet.split("\\$=");
+                    if (properties != null) {
+                        // construct property array for each property
+                        metaWSO2EventConfiguration = new EventMappingPropertyDto[properties.length];
+                        int index = 0;
+                        for (String property : properties) {
+                            String[] propertyConfiguration = property.split("\\^=");
+                            if (propertyConfiguration != null) {
+                                metaWSO2EventConfiguration[index] = new EventMappingPropertyDto();
+                                metaWSO2EventConfiguration[index].setName(propertyConfiguration[0].trim());
+                                metaWSO2EventConfiguration[index].setValueOf(propertyConfiguration[1].trim());
+                                index++;
+                            }
+                        }
+
+                    }
+                }
+
+                String correlationDataSet = request.getParameter("correlationData");
+                if (correlationDataSet != null && !correlationDataSet.equals("")) {
+                    String[] properties = correlationDataSet.split("\\$=");
+                    if (properties != null) {
+                        // construct property array for each property
+                        correlationWSO2EventConfiguration = new EventMappingPropertyDto[properties.length];
+                        int index = 0;
+                        for (String property : properties) {
+                            String[] propertyConfiguration = property.split("\\^=");
+                            if (propertyConfiguration != null) {
+                                correlationWSO2EventConfiguration[index] = new EventMappingPropertyDto();
+                                correlationWSO2EventConfiguration[index].setName(propertyConfiguration[0].trim());
+                                correlationWSO2EventConfiguration[index].setValueOf(propertyConfiguration[1].trim());
+                                index++;
+                            }
+                        }
+
+                    }
+                }
+
+                String payloadDataSet = request.getParameter("payloadData");
+                if (payloadDataSet != null && !payloadDataSet.equals("")) {
+                    String[] properties = payloadDataSet.split("\\$=");
+                    if (properties != null) {
+                        // construct property array for each property
+                        payloadWSO2EventConfiguration = new EventMappingPropertyDto[properties.length];
+                        int index = 0;
+                        for (String property : properties) {
+                            String[] propertyConfiguration = property.split("\\^=");
+                            if (propertyConfiguration != null) {
+                                payloadWSO2EventConfiguration[index] = new EventMappingPropertyDto();
+                                payloadWSO2EventConfiguration[index].setName(propertyConfiguration[0].trim());
+                                payloadWSO2EventConfiguration[index].setValueOf(propertyConfiguration[1].trim());
+                                index++;
+                            }
+                        }
+
+                    }
                 }
             }
             // add event adapter via admin service
-            stub.deployWSO2EventPublisherConfiguration(eventPublisherName, streamNameWithVersion, eventAdapterType, metaWSO2EventConfiguration, correlationWSO2EventConfiguration, payloadWSO2EventConfiguration, eventPublisherProperties, customMappingEnabled);
+            stub.deployWSO2EventPublisherConfiguration(eventPublisherName, streamNameWithVersion, eventAdapterType, metaWSO2EventConfiguration, correlationWSO2EventConfiguration, payloadWSO2EventConfiguration, eventPublisherProperties, customMappingEnabled, toStreamNameWithVersion);
             msg = "true";
         } else if (mappingType.equals("text")) {
             String dataSet = request.getParameter("textData");
