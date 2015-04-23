@@ -99,8 +99,8 @@
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}
                                 </importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.as.runtimes.cxf:${carbon.deployment.version}
-                                </importFeatureDef>
+                                <!--<importFeatureDef>org.wso2.carbon.as.runtimes.cxf:${carbon.deployment.version}-->
+                                <!--</importFeatureDef>-->
                             </importFeatures>
                         </configuration>
                     </execution>

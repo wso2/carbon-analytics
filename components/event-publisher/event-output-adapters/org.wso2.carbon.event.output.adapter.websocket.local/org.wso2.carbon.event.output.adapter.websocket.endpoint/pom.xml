@@ -49,7 +49,6 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 

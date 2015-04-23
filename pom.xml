@@ -700,12 +700,12 @@
             </dependency>
 
             <!--carbon-deployment features start-->
-            <dependency>
-                <groupId>org.wso2.carbon.deployment</groupId>
-                <artifactId>org.wso2.carbon.as.runtimes.cxf.feature</artifactId>
-                <version>${carbon.deployment.version}</version>
-                <type>zip</type>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>org.wso2.carbon.deployment</groupId>-->
+                <!--<artifactId>org.wso2.carbon.as.runtimes.cxf.feature</artifactId>-->
+                <!--<version>${carbon.deployment.version}</version>-->
+                <!--<type>zip</type>-->
+            <!--</dependency>-->
             <!--carbon-deployment features stop-->
 
             <!--features end-->
@@ -909,7 +909,7 @@
         <!--<carbon.kernel.imp.pkg.version>[4.3.0, 4.4.0)</carbon.kernel.imp.pkg.version>-->
 
         <carbon.commons.version>4.3.4</carbon.commons.version>
-        <carbon.deployment.version>4.3.1</carbon.deployment.version>
+        <!--<carbon.deployment.version>4.3.1</carbon.deployment.version>-->
         <!--<carbon.commons.imp.pkg.version>[4.3.0, 4.4.0)</carbon.commons.imp.pkg.version>-->
 
         <!--CEP versions-->
@@ -957,7 +957,7 @@
         <httpcore.httpcomponents.wso2.version>4.3.3.wso2v1</httpcore.httpcomponents.wso2.version>
         <apache.httpcore.version>4.2.4</apache.httpcore.version>
         <javax.version>2.0</javax.version>
-        <cxf.version>2.6.2</cxf.version>
+        <cxf.version>2.6.0</cxf.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.scm.id>my-scm-server</project.scm.id>
