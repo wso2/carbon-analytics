@@ -735,8 +735,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <encoding>UTF-8</encoding>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
         </plugins>
@@ -911,7 +911,7 @@
         <!--<carbon.commons.imp.pkg.version>[4.3.0, 4.4.0)</carbon.commons.imp.pkg.version>-->
 
         <!--CEP versions-->
-        <siddhi.version>3.0.0-M1</siddhi.version>
+        <siddhi.version>3.0.0-SNAPSHOT</siddhi.version>
 
         <orbit.version.json>2.0.0.wso2v1</orbit.version.json>
         <carbon.p2.plugin.version>1.5.3</carbon.p2.plugin.version>
