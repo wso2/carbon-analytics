@@ -17,6 +17,9 @@
 */
 package org.wso2.carbon.analytics.api.exception;
 
+/**
+ * This is a generic runtime analytics service exception to express some error occurred when processing the request.
+ */
 public class AnalyticsServiceException extends RuntimeException {
 
     private static final long serialVersionUID = 5649198479245947311L;

@@ -20,7 +20,6 @@ package org.wso2.carbon.analytics.api;
 public class AnalyticsDataConstants {
     private AnalyticsDataConstants() {
     }
-
     public static final String ANALYTICS_DATA_CONFIGURATION_FILE_NAME = "analytics-data-config.xml";
     public static final String ANALYTICS_CONFIG_DIR = "analytics";
 }

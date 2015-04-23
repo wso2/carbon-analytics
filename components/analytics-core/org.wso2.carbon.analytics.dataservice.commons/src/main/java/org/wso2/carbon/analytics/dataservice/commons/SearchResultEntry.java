@@ -18,10 +18,12 @@
  */
 package org.wso2.carbon.analytics.dataservice.commons;
 
+import java.io.Serializable;
+
 /**
  * This represents a search result entry from Indexer.
  */
-public class SearchResultEntry implements Comparable<SearchResultEntry> {
+public class SearchResultEntry implements Comparable<SearchResultEntry>, Serializable {
     
     private String id;
     

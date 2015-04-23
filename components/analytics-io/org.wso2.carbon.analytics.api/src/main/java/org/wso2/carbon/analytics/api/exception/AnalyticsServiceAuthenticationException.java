@@ -17,6 +17,10 @@
 */
 package org.wso2.carbon.analytics.api.exception;
 
+/**
+ * This exception will be thrown when any illegal access to the analytics service is performed.
+ */
+
 public class AnalyticsServiceAuthenticationException extends AnalyticsServiceException {
 
     private static final long serialVersionUID = -1219049789506340710L;

@@ -1,5 +1,5 @@
 <AnalyticsDataConfiguration>
-    <Mode>LOCAL</Mode>
+    <Mode>REMOTE</Mode>
     <URL>http://localhost:9763</URL>
     <Username>admin</Username>
     <Password>admin</Password>

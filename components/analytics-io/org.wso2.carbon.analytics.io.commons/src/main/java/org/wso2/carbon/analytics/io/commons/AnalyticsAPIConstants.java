@@ -32,10 +32,8 @@ public class AnalyticsAPIConstants {
     public static final String USERNAME_PARAM = "username";
     public static final String ENABLE_SECURITY_PARAM = "enableSecurity";
     public static final String TABLE_NAME_PARAM = "table_name";
-    public static final String SCHEMA_PARAM = "table_schema";
     public static final String TIME_FROM_PARAM = "timeFrom";
     public static final String TIME_TO_PARAM = "timeTo";
-    public static final String RECORDS_PARAM = "records";
     public static final String RECORD_IDS_PARAM = "recordIds";
     public static final String INDEX_PARAM = "index";
     public static final String SCORE_PARAM = "score";
@@ -51,6 +49,7 @@ public class AnalyticsAPIConstants {
     public static final String SESSION_ID = "__sessionId";
     public static final String PAGINATION_SUPPORT = "__paginationSupport";
     public static final String AUTHORIZATION_HEADER = "Authorization";
+    public static final String BASIC_AUTH_HEADER = "Basic ";
     public static final String SEPARATOR = ":";
     public static final String RECORD_COUNT = "__recordCount";
     public static final String SEARCH_COUNT = "__searchCount";
