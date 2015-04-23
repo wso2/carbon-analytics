@@ -310,6 +310,25 @@
             $("#column-details tbody").on("change", ".score-param-class", function () {
                 $(this).parents("tr:eq(0)").find(".select").prop("disabled", this.checked);
             });
+
+            $("#addFacet").on("click", function () {
+                var facetName = $("#facetListSelect").val();
+                $("#facetSearchTable").find('tbody').
+                        append($('<tr>').append($('<td>').append($('<label>').text(facetName))).
+                                       append($('<td>').append($('<select>').addClass('facetSelect1').append(function () {
+                                                  options = ["ONE", "TWO", "THREE", "FOUR"];
+                                                  var $container = $('<select></select>');
+                                                  $container.append($('<option>').val('-1').text('Please select a category'));
+                                                  $.each(options, function (val) {
+                                                      $container.append($('<option>').val('test').text('test'));
+                                                  });
+                                                  return $container.html();
+                                              }))));
+                $('.facetSelect1').bind('change', function () {
+                    $(this).closest("tr").append($('<td>').append($('<select>')));
+                });
+                return true;
+            });
         });
 
         function createTable() {
@@ -663,11 +682,18 @@
                                 <tr>
                                     <td>By Facet</td>
                                     <td>
-                                        <select id="facetListSelect" onchange="alert('hi');">
+                                        <select id="facetListSelect">
                                             <option value="-1">Select a Facet</option>
                                         </select>
-                                        <input id="addFacet" type="button" value="Add" onclick="alert('test');"
-                                               class="button">
+                                        <input id="addFacet" type="button" value="Add" class="button">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td>
+                                        <table id="facetSearchTable" class="normal">
+                                            <tbody></tbody>
+                                        </table>
                                     </td>
                                 </tr>
                             </c:if>
