@@ -957,7 +957,7 @@
         <httpcore.httpcomponents.wso2.version>4.3.3.wso2v1</httpcore.httpcomponents.wso2.version>
         <apache.httpcore.version>4.2.4</apache.httpcore.version>
         <javax.version>2.0</javax.version>
-        <cxf.version>2.6.0</cxf.version>
+        <cxf.version>2.6.1</cxf.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.scm.id>my-scm-server</project.scm.id>
