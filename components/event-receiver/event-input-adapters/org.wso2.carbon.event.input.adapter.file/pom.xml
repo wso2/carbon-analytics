@@ -25,9 +25,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
     <artifactId>org.wso2.carbon.event.input.adapter.file</artifactId>
-
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Event Input File Adapter Module</name>
     <description>org.wso2.carbon.event.input.adapter.file provides the back-end functionality of input file adapter
@@ -63,7 +61,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -78,11 +75,11 @@
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Private-Package>
                             org.wso2.carbon.event.input.adapter.file.internal,
-                            org.org.wso2.carbon.event.input.adapter.file.internal
+                            org.wso2.carbon.event.input.adapter.file.internal.*
                         </Private-Package>
                         <Export-Package>
                             !org.wso2.carbon.event.input.adapter.file.internal,
-                            !org.org.wso2.carbon.event.input.adapter.file.internal.*,
+                            !org.wso2.carbon.event.input.adapter.file.internal.*,
                             org.wso2.carbon.event.input.adapter.file.*,
                         </Export-Package>
                         <Import-Package>

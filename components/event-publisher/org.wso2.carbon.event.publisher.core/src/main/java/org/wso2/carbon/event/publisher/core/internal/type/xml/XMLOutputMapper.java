@@ -173,9 +173,11 @@ public class XMLOutputMapper implements OutputMapper {
     private void generateTemplateXMLEvent(StreamDefinition streamDefinition) {
 
         OMFactory factory = OMAbstractFactory.getOMFactory();
-        OMElement templateEventElement = factory.createOMElement(new QName(
-                EventPublisherConstants.EVENT_PARENT_TAG));
-        templateEventElement.declareDefaultNamespace(EventPublisherConstants.EVENT_DEFAULT_NAMESPACE);
+        OMElement compositeEventElement = factory.createOMElement(new QName(
+                EventPublisherConstants.MULTIPLE_EVENTS_PARENT_TAG));
+
+        OMElement templateEventElement = factory.createOMElement(new QName(EventPublisherConstants.EVENT_PARENT_TAG));
+        compositeEventElement.addChild(templateEventElement);
 
         List<Attribute> metaDatAttributes = streamDefinition.getMetaData();
         if (metaDatAttributes != null && metaDatAttributes.size() > 0) {
@@ -192,7 +194,7 @@ public class XMLOutputMapper implements OutputMapper {
             templateEventElement.addChild(createPropertyElement(factory, "", payloadAttributes, EventPublisherConstants.EVENT_PAYLOAD_TAG));
         }
 
-        outputXMLText = templateEventElement.toString();
+        outputXMLText = compositeEventElement.toString();
 
     }
 
@@ -201,12 +203,10 @@ public class XMLOutputMapper implements OutputMapper {
                                                    String propertyTag) {
         OMElement parentPropertyElement = factory.createOMElement(new QName(
                 propertyTag));
-        parentPropertyElement.declareDefaultNamespace(EventPublisherConstants.EVENT_DEFAULT_NAMESPACE);
 
         for (Attribute attribute : attributeList) {
             OMElement propertyElement = factory.createOMElement(new QName(
                     attribute.getName()));
-            propertyElement.declareDefaultNamespace(EventPublisherConstants.EVENT_DEFAULT_NAMESPACE);
             propertyElement.setText(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX + dataPrefix + attribute.getName() + EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX);
             parentPropertyElement.addChild(propertyElement);
         }

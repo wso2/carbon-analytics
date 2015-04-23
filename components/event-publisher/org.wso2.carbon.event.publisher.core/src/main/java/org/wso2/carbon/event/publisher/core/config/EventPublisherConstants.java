@@ -84,12 +84,12 @@ public final class EventPublisherConstants {
 
     public static final String NO_DEPENDENCY_INFO_MSG = "No dependency information available for this event publisher";
 
-
+    public static final String MULTIPLE_EVENTS_PARENT_TAG = "events";
     public static final String EVENT_PARENT_TAG = "event";
     public static final String EVENT_META_TAG = "metaData";
     public static final String EVENT_CORRELATION_TAG = "correlationData";
     public static final String EVENT_PAYLOAD_TAG = "payloadData";
-    public static final String EVENT_DEFAULT_NAMESPACE = "http://wso2.org/carbon/event";
+    public static final String EVENT_DEFAULT_NAMESPACE = "http://wso2.org/carbon/events";
     public static final String TEMPLATE_EVENT_ATTRIBUTE_PREFIX = "{{";
     public static final String TEMPLATE_EVENT_ATTRIBUTE_POSTFIX = "}}";
     public static final String EVENT_ATTRIBUTE_VALUE_SEPARATOR = ":";

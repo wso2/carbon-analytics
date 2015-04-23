@@ -37,7 +37,6 @@
         <dependency>
             <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.event.output.adapter.core</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.axis2.transport</groupId>
@@ -78,9 +77,11 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Private-Package>
+                            org.wso2.carbon.event.output.adapter.http.internal,
                             org.wso2.carbon.event.output.adapter.http.internal.*
                         </Private-Package>
                         <Export-Package>
+                            !org.wso2.carbon.event.output.adapter.http.internal,
                             !org.wso2.carbon.event.output.adapter.http.internal.*,
                             org.wso2.carbon.event.output.adapter.http.*
                         </Export-Package>

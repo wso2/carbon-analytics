@@ -30,7 +30,6 @@
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Event Receiver UI Feature</name>
     <url>http://wso2.org</url>
-    <version>1.0.0-SNAPSHOT</version>
     <description>This feature contains the bundles required for Front-end Event Receiver functionality</description>
 
     <dependencies>

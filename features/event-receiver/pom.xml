@@ -33,7 +33,6 @@
     <name>WSO2 Carbon - Event Receiver Aggregate Feature</name>
     <url>http://maven.apache.org</url>
 
-
     <modules>
         <module>org.wso2.carbon.event.receiver.feature</module>
         <module>org.wso2.carbon.event.receiver.ui.feature</module>
@@ -50,7 +49,6 @@
         <module>org.wso2.carbon.event.input.adapter.mqtt.server.feature</module>
         <module>org.wso2.carbon.event.input.adapter.wso2event.server.feature</module>
         <module>org.wso2.carbon.event.input.adapter.feature</module>
-
     </modules>
 
 

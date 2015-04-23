@@ -30,11 +30,9 @@
     <artifactId>org.wso2.carbon.event.receiver.server.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Event Receiver Server Feature</name>
-    <version>1.0.0-SNAPSHOT</version>
     <url>http://wso2.org</url>
     <description>This feature contains the core bundles required for Back-end Event Receiver functionality
     </description>
-
 
     <dependencies>
         <dependency>
@@ -54,6 +52,18 @@
             <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.event.stream.server.feature</artifactId>
             <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.minidev</groupId>
+            <artifactId>json-smart</artifactId>
         </dependency>
     </dependencies>
 
@@ -88,6 +98,10 @@
                                 <bundleDef>
                                     org.wso2.carbon.analytics-common:org.wso2.carbon.event.receiver.admin:${carbon.analytics.common.version}
                                 </bundleDef>
+                                <bundleDef>com.jayway.jsonpath:json-path:${jsonpath.version}
+                                </bundleDef>
+                                <bundleDef>org.slf4j:slf4j-api:${slf4j.version}</bundleDef>
+                                <bundleDef>net.minidev:json-smart:${jsonsmart.version}</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}</importFeatureDef>

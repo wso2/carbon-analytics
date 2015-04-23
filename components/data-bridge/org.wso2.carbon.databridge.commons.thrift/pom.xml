@@ -54,14 +54,10 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
-
-                        <!--<Private-Package>org.wso2.carbon.agent.commons.internal.*</Private-Package>-->
                         <Export-Package>
                             org.wso2.carbon.databridge.commons.thrift.*
                         </Export-Package>
-
                         <Import-Package>org.osgi.framework, *;resolution:=optional</Import-Package>
-                        <!--<Bundle-Activator>org.wso2.carbon.agent.commons.Activator</Bundle-Activator>-->
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>

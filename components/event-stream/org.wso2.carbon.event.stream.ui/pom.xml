@@ -30,7 +30,6 @@
     </description>
     <url>http://wso2.org</url>
 
-
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
@@ -50,13 +49,11 @@
         </dependency>
     </dependencies>
 
-
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
