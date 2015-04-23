@@ -28,7 +28,6 @@
 <script type="text/javascript" src="../resources/js/resource_util.js"></script>
 <jsp:include page="../resources/resources-i18n-ajaxprocessor.jsp"/>
 <link rel="stylesheet" type="text/css" href="../resources/css/registry.css"/>
-<link rel="stylesheet" href="../eventreceiver/css/codemirror.css"/>
 <link rel="stylesheet" href="../eventreceiver/css/eventReceiver.css"/>
 <script type="text/javascript" src="../ajax/js/prototype.js"></script>
 <script type="text/javascript"

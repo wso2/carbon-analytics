@@ -36,7 +36,6 @@
 <script type="text/javascript" src="../resources/js/resource_util.js"></script>
 <jsp:include page="../resources/resources-i18n-ajaxprocessor.jsp"/>
 <link rel="stylesheet" type="text/css" href="../resources/css/registry.css"/>
-<link rel="stylesheet" href="../eventpublisher/css/codemirror.css"/>
 <script type="text/javascript" src="../ajax/js/prototype.js"></script>
 <script type="text/javascript"
         src="../eventpublisher/js/create_eventPublisher_helper.js"></script>
