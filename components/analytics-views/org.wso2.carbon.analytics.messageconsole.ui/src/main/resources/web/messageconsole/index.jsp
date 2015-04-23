@@ -314,20 +314,34 @@
             $("#addFacet").on("click", function () {
                 var facetName = $("#facetListSelect").val();
                 $("#facetSearchTable").find('tbody').
-                        append($('<tr>').append($('<td>').append($('<label>').text(facetName))).
-                                       append($('<td>').append($('<select>').addClass('facetSelect1').append(function () {
-                                                  options = ["ONE", "TWO", "THREE", "FOUR"];
+                        append($('<tr>').
+                                       append($('<td>').append($('<label>').text(facetName))).
+                                       append($('<td>').
+                                                      append($('<select>').addClass('facetSelect1').
+                                                                     append(function () {
+                                                                                var options = ["ONE", "TWO", "THREE", "FOUR"];
                                                   var $container = $('<select></select>');
                                                   $container.append($('<option>').val('-1').text('Please select a category'));
                                                   $.each(options, function (val) {
-                                                      $container.append($('<option>').val('test').text('test'));
+                                                      $container.append($('<option>').val('test').text(val));
                                                   });
-                                                  return $container.html();
-                                              }))));
-                $('.facetSelect1').bind('change', function () {
-                    $(this).closest("tr").append($('<td>').append($('<select>')));
-                });
+                                                                                return $container.html();
+                                                                            }))).
+                                       append($('<td>').append($('<input type="button" value="Remove">')))
+                );
                 return true;
+            });
+
+            $('#facetSearchTable').on('change', '.facetSelect1', function (event) {
+                $(this).closest("tr").find('td:last').before($('<td>').append($('<select>').addClass('facetSelect1').append(function () {
+                    var options = ["ONE", "TWO", "THREE", "FOUR"];
+                    var $container = $('<select></select>');
+                    $container.append($('<option>').val('-1').text('Please select a category'));
+                    $.each(options, function (val) {
+                        $container.append($('<option>').val('test').text(val));
+                    });
+                    return $container.html();
+                })));
             });
         });
 
