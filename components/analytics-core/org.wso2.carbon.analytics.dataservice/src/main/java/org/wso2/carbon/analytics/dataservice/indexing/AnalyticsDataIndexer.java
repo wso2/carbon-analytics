@@ -22,7 +22,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.DoubleDocValuesField;
 import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.FloatField;
@@ -894,13 +893,12 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         try {
             Expression funcExpression;
             if (scoreFunction == null || scoreFunction.trim().isEmpty()) {
-                funcExpression = JavascriptCompiler.compile(INDEX_INTERNAL_WEIGHT_FIELD);
+                funcExpression = JavascriptCompiler.compile(INDEX_INTERNAL_SCORE_FIELD);
             } else {
                 funcExpression = JavascriptCompiler.compile(scoreFunction);
             }
             SimpleBindings bindings = new SimpleBindings();
             bindings.add(new SortField(INDEX_INTERNAL_SCORE_FIELD, SortField.Type.SCORE));
-            bindings.add(new SortField(INDEX_INTERNAL_WEIGHT_FIELD, SortField.Type.DOUBLE));
             for (String scoreParam : scoreParams) {
                 bindings.add(new SortField(scoreParam, SortField.Type.DOUBLE));
             }
@@ -1152,8 +1150,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             facetsConfig.setHierarchical(name, true);
             AnalyticsCategoryPath analyticsCategoryPath = (AnalyticsCategoryPath) obj;
             //the field name for dimensions will be "$ + {name}"
-            //   facetsConfig.setIndexFieldName(name, new StringBuilder("$").append(name).toString());
-            doc.add(new DoubleDocValuesField(INDEX_INTERNAL_WEIGHT_FIELD, analyticsCategoryPath.getWeight()));
+            //facetsConfig.setIndexFieldName(name, new StringBuilder("$").append(name).toString());
             doc.add(new FacetField(name, analyticsCategoryPath.getPath()));
             try {
 

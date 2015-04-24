@@ -37,9 +37,15 @@
         } catch (UnauthenticatedUserException e) {
             out.print("{ \"status\": \"Unauthenticated\", \"message\": \"Error while authenticating: " +
                       e.getMessage() + "\" }");
+            return;
         }
     } else {
-        connector = new AnalyticsWebServiceConnector(configContext, serverURL, cookie);
+        if (cookie != null && !cookie.isEmpty()) {
+            connector = new AnalyticsWebServiceConnector(configContext, serverURL, cookie);
+        } else {
+            out.print("{ \"status\": \"Unauthenticated\", \"message\": \"Cookie is not set: }");
+            return;
+        }
     }
     int type = 0;
     String typeParam = request.getParameter("type");
@@ -49,9 +55,11 @@
 
     String tableName = request.getParameter("tableName");
     if (type != AnalyticsWebServiceConnector.TYPE_LIST_TABLES &&
-        type != AnalyticsWebServiceConnector.TYPE_PUT_RECORDS) {
+        type != AnalyticsWebServiceConnector.TYPE_PUT_RECORDS &&
+            type != AnalyticsWebServiceConnector.TYPE_PAGINATION_SUPPORTED) {
         if (tableName == null || tableName.isEmpty()) {
             out.print("{ \"status\": \"Failed\", \"message\": \"Table name param is empty\" }");
+            return;
         }
     }
 
@@ -74,11 +82,11 @@
                 break;
             }
             case AnalyticsWebServiceConnector.TYPE_GET_BY_RANGE: {
-                long timeFrom = Long.parseLong(request.getParameter("timeFrom"));
-                long timeTo = Long.parseLong(request.getParameter("timeTo"));
-                int start = Integer.parseInt(request.getParameter("start"));
-                int count = Integer.parseInt(request.getParameter("count"));
-                out.print(connector.getRecordsByRange(tableName, timeFrom, timeTo, start, count));
+                String from = request.getParameter("timeFrom");
+                String to = request.getParameter("timeTo");
+                String start = request.getParameter("start");
+                String count = request.getParameter("count");
+                out.print(connector.getRecordsByRange(tableName, from, to, start, count));
                 break;
             }
             case AnalyticsWebServiceConnector.TYPE_GET_BY_ID: {
@@ -191,8 +199,10 @@
             }
             default:
                 out.print("{ \"status\": \"Failed\", \"message\": \"Unidentified operation\" }");
+                return;
         }
     } else {
         out.print("{ \"status\": \"Failed\", \"message\": \"AnalyticsWebServiceConnector is unavailable\" }");
+        return;
     }
 %>

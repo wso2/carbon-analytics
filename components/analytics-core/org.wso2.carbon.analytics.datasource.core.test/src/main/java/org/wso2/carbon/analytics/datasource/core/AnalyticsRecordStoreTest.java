@@ -116,7 +116,6 @@ public class AnalyticsRecordStoreTest {
         for (int j = 0; j < c; j++) {
             values = new HashMap<String, Object>();
             afacet = new AnalyticsCategoryPath();
-            afacet.setWeight(new Double(Math.random() % 5.0).floatValue());
             afacet.setPath(new String[]{"SomeLocation","SomeInnerLocation","AVillage"});
             values.put("server_name", "ESB-" + i);
             values.put("ip", "192.168.0." + (i % 256));

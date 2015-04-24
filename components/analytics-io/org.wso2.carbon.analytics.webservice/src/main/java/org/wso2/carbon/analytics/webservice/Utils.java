@@ -112,7 +112,6 @@ public class Utils {
             if (entry.getValue() instanceof AnalyticsCategoryPath) {
                 AnalyticsCategoryPath analyticsCategoryPath = (AnalyticsCategoryPath) entry.getValue();
                 AnalyticsCategoryPathBean categoryPathBean = new AnalyticsCategoryPathBean();
-                categoryPathBean.setWeight(analyticsCategoryPath.getWeight());
                 categoryPathBean.setPath(analyticsCategoryPath.getPath());
                 bean.setFieldName(entry.getKey());
                 bean.setAnalyticsCategoryPathBeanValue(categoryPathBean);
@@ -394,7 +393,6 @@ public class Utils {
             case RecordValueEntryBean.FACET: {
                 AnalyticsCategoryPath analyticsCategoryPath = new AnalyticsCategoryPath();
                 if (recordValueEntryBean.getAnalyticsCategoryPathBeanValue() != null) {
-                    analyticsCategoryPath.setWeight(recordValueEntryBean.getAnalyticsCategoryPathBeanValue().getWeight());
                     analyticsCategoryPath.setPath(recordValueEntryBean.getAnalyticsCategoryPathBeanValue().getPath());
                 }
                 resultObj = analyticsCategoryPath;

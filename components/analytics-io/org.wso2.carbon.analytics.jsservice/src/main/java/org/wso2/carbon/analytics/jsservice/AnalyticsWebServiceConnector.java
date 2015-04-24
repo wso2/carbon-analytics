@@ -24,6 +24,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.jsservice.beans.AnalyticsSchemaBean;
@@ -31,6 +32,7 @@ import org.wso2.carbon.analytics.jsservice.beans.IndexConfigurationBean;
 import org.wso2.carbon.analytics.jsservice.beans.QueryBean;
 import org.wso2.carbon.analytics.jsservice.beans.Record;
 import org.wso2.carbon.analytics.jsservice.beans.ResponseBean;
+import org.wso2.carbon.analytics.jsservice.exception.JSServiceException;
 import org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceStub;
 import org.wso2.carbon.analytics.webservice.stub.beans.RecordBean;
 
@@ -248,19 +250,32 @@ public class AnalyticsWebServiceConnector {
         }
     }
 
-    public String getRecordsByRange(String tableName, long timeFrom, long timeTo, int recordsFrom, int count) {
+    public String getRecordsByRange(String tableName, String timeFrom, String timeTo, String recordsFrom, String count) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking getRecordByRange for tableName: " + tableName);
         }
         try {
+            long from = validateNumericValue("timeFrom", timeFrom).longValue();
+            long to = validateNumericValue("timeTo", timeTo).longValue();
+            int start = validateNumericValue("start", recordsFrom).intValue();
+            int recordCount = validateNumericValue("count", count).intValue();
+
             RecordBean[] recordBeans = analyticsWebServiceStub.getByRange(tableName, 1, null,
-                                                                          timeFrom, timeTo, recordsFrom, count);
+                                                                          from, to, start, recordCount);
             List<Record> records = Utils.getRecordBeans(recordBeans);
             return gson.toJson(records);
         } catch (Exception e) {
-            logger.error("failed to get records from table: " + tableName + " : " + e.getMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get records from table: " +
-                                                                     tableName + ": " + e.getMessage()));
+            logger.error("failed to get records from table: '" + tableName + "', " + e.getMessage(), e);
+            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get records from table: '" +
+                                                                     tableName + "', " + e.getMessage()));
+        }
+    }
+
+    private Long validateNumericValue(String field, String value) throws JSServiceException {
+        if (value == null || !NumberUtils.isNumber(value)) {
+            throw new JSServiceException("'" + field + "' is not numeric");
+        } else {
+            return Long.parseLong(value);
         }
     }
 

@@ -117,35 +117,18 @@ public class Utils {
         return records;
     }
 
-    @SuppressWarnings("unchecked")
     private static Map<String, Object> validateAndReturn(Map<String, Object> values)
             throws AnalyticsIndexException {
         Map<String, Object> valueMap = new LinkedHashMap<>(0);
         for (Map.Entry<String, Object> recordEntry : values.entrySet()) {
-            //TODO : AnalyticsCategoryPath is mapped to a linkedList by jackson json.
-            // Currently checking the type and convert it manually to categoryPath type.
-            if (recordEntry.getValue() instanceof LinkedHashMap) {
-                Map<String, Object> keyValPairMap = (LinkedHashMap<String, Object>) recordEntry.getValue();
-                List<String> pathList = (ArrayList<String>) keyValPairMap.get(Constants.FacetAttributes.PATH);
-                Object weightObj = keyValPairMap.get(Constants.FacetAttributes.WEIGHT);
-                Number weight;
-                if (weightObj instanceof Integer) {
-                    weight = (Integer) weightObj;
-                } else if (weightObj instanceof Double) {
-                    weight = (Double) weightObj;
-                } else if (weightObj == null) {
-                    weight = DEFAUL_CATEGORYPATH_WEIGHT;
-                } else {
-                    throw new AnalyticsIndexException("Category Weight should be a float/integer value");
-                }
+            if (recordEntry.getValue() instanceof List) {
+                List<String> pathList = (List<String>) recordEntry.getValue();
                 if (pathList != null && pathList.size() > 0) {
                     String[] path = pathList.toArray(new String[pathList.size()]);
-                    if (keyValPairMap.keySet().size() <= CATEGORYPATH_FIELD_COUNT) {
-                        AnalyticsCategoryPath categoryPath = new
-                                AnalyticsCategoryPath(path);
-                        categoryPath.setWeight(weight.floatValue());
-                        valueMap.put(recordEntry.getKey(), categoryPath);
-                    }
+
+                    AnalyticsCategoryPath categoryPath = new
+                            AnalyticsCategoryPath(path);
+                    valueMap.put(recordEntry.getKey(), categoryPath);
                 } else {
                     throw new AnalyticsIndexException("Category path cannot be empty");
                 }

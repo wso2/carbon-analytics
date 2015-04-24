@@ -1,19 +1,17 @@
 /*
  * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.wso2.carbon.analytics.datasource.commons;
@@ -39,7 +37,6 @@ public class AnalyticsCategoryPath implements Serializable{
 
     private static final long serialVersionUID = -6817819400713291618L;
     private String[] path;
-    private float weight;
 
     public AnalyticsCategoryPath() { }
     
@@ -50,17 +47,6 @@ public class AnalyticsCategoryPath implements Serializable{
      * @param path array of strings representing the category path.
      */
     public AnalyticsCategoryPath(String[] path) {
-        this.weight = 1.0f;
-        this.path = path;
-    }
-    /**
-     * Creates a hierarchical Category with the given weight and the array of Strings representing
-     * the hierarchical category
-     * @param weight Weight of the category, set it to 1.0 if weights are not necessary
-     * @param path String array which represent the category path.
-     */
-    public AnalyticsCategoryPath(float weight, String[] path) {
-        this.weight = weight;
         this.path = path;
     }
 
@@ -70,17 +56,5 @@ public class AnalyticsCategoryPath implements Serializable{
 
     public void setPath(String[] path) {
         this.path = path;
-    }
-
-    public float getWeight() {
-        return weight;
-    }
-
-    /**
-     * Set a weight for the facet category
-     * @param weight weight in float ( set is as 1.0 if weights are not needed)
-     */
-    public void setWeight(float weight) {
-        this.weight = weight;
     }
 }

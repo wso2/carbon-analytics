@@ -14,26 +14,17 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.analytics.webservice.beans;
-
-import java.io.Serializable;
+package org.wso2.carbon.analytics.jsservice.exception;
 
 /**
- * This class represents a  facet value object in a row. use this object to insert facet values in a record
+ * This class represents the jsservice layer exceptions
  */
-public class AnalyticsCategoryPathBean implements Serializable {
-
-    private static final long serialVersionUID = -7272867456721628819L;
-    private String[] path;
-
-    public AnalyticsCategoryPathBean() {
+public class JSServiceException extends Exception{
+    public JSServiceException(String message) {
+        super(message);
     }
 
-    public String[] getPath() {
-        return path;
-    }
-
-    public void setPath(String[] path) {
-        this.path = path;
+    public JSServiceException(String message, Throwable throwable) {
+        super(message, throwable);
     }
 }

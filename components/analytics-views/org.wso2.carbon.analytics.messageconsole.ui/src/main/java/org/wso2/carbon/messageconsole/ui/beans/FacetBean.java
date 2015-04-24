@@ -25,18 +25,9 @@ import java.util.List;
  */
 public class FacetBean {
 
-    private float weight;
     private List<String> path;
 
     public FacetBean() {
-    }
-
-    public float getWeight() {
-        return weight;
-    }
-
-    public void setWeight(float weight) {
-        this.weight = weight;
     }
 
     public List<String> getPath() {
