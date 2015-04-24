@@ -318,10 +318,9 @@
                     $("#facetSearchTable").find('tbody').
                             append($('<tr>').
                                            append($('<td>').append($('<label>').text(facetName))).
-                                           append($('<td>').
-                                                          append($('<select>').addClass('facetSelect1').
-                                                                         append(function () {
-                                                                                    var $container = $('<select></select>');
+                                                               append($('<td>').append(function () {
+                                                                          var $container =
+                                                                                  $('<select class="facetSelect1"></select>');
                                                                                     $container.append($('<option>').val('-1').text('Please select a category'));
                                                                                     $.post('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeGetFacetCategories,
                                                                                             {
@@ -334,15 +333,14 @@
                                                                                                $.each(categories,
                                                                                                       function (index,
                                                                                                                 val) {
-                                                                                                          console.log(val);
                                                                                                           $container.append($('<option>').val(val).text(val));
                                                                                                       });
                                                                                            }
                                                                                     );
-                                                                                    return $container.html();
-                                                                                }))).
-                                           append($('<td>').append($('<input type="button" value="Remove" class="del">')))
-                    );
+                                                                          return $container;
+                                                                      })).
+                                                               append($('<td>').append($('<input type="button" value="Remove" class="del">'))
+                                                       ));
                 }
             });
 
@@ -353,20 +351,20 @@
                     $(this).closest('tr').find('td').slice($(this).parents('td')[0].cellIndex + 1, tdLength - 1).remove();
                 }
                 if (facetName != '-1') {
-                    console.log($(this).closest('td').prev().find("label").text());
-                    var path = {};
+                    var path = [];
                     $(this).closest('td').prevAll().find("select").each(function (index, node) {
-                        path[index] = $(node).val();
+                        path.push($(node).val());
                     });
-
-                    $(this).closest("tr").find('td:last').before($('<td>').append($('<select>').addClass('facetSelect1').append(function () {
-                        var $container = $('<select></select>');
+                    path.push(facetName);
+                    var field = $(this).closest('td').prevAll().find("label").text();
+                    $(this).closest("tr").find('td:last').before($('<td>').append(function () {
+                        var $container = $('<select class="facetSelect1"></select>');
                         $container.append($('<option>').val('-1').text('Please select a category'));
                         $.post('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeGetFacetCategories,
                                 {
                                     tableName: $("#tableSelect").val(),
-                                    categoryPath: path,
-                                    fieldName: facetName
+                                    categoryPath: JSON.stringify(path),
+                                    fieldName: field
                                 },
                                function (result) {
                                    var categories = JSON.parse(result);
@@ -375,8 +373,8 @@
                                    });
                                }
                         );
-                        return $container.html();
-                    })));
+                        return $container;
+                    }));
                 }
             });
 
