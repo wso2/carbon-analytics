@@ -34,11 +34,14 @@ import org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceAnalyticsWeb
 import org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceStub;
 import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsCategoryPathBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsSchemaBean;
+import org.wso2.carbon.analytics.webservice.stub.beans.CategorySearchResultEntryBean;
+import org.wso2.carbon.analytics.webservice.stub.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.IndexConfigurationBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.IndexEntryBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.RecordBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.RecordValueEntryBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.SchemaColumnBean;
+import org.wso2.carbon.analytics.webservice.stub.beans.SubCategoriesBean;
 import org.wso2.carbon.messageconsole.ui.beans.Column;
 import org.wso2.carbon.messageconsole.ui.beans.FacetBean;
 import org.wso2.carbon.messageconsole.ui.beans.Permissions;
@@ -95,6 +98,7 @@ public class MessageConsoleConnector {
     public static final int TYPE_SAVE_PURGING_TASK_INFO = 14;
     public static final int TYPE_LIST_TABLE = 15;
     public static final int TYPE_GET_FACET_NAME_LIST = 16;
+    public static final int TYPE_GET_FACET_CATEGORIES = 17;
 
     private static final GsonBuilder RESPONSE_RESULT_BUILDER = new GsonBuilder().registerTypeAdapter(ResponseResult.class,
                                                                                                      new ResponseResultSerializer());
@@ -421,17 +425,19 @@ public class MessageConsoleConnector {
                 break;
             }
             case "FACET": {
-                FacetBean facetBean = new Gson().fromJson(value, FACET_BEAN_TYPE);
-                if (facetBean != null) {
-                    AnalyticsCategoryPathBean categoryPathBean = new AnalyticsCategoryPathBean();
-                    categoryPathBean.setWeight(facetBean.getWeight());
-                    if (facetBean.getPath() != null) {
-                        String[] paths = new String[facetBean.getPath().size()];
-                        categoryPathBean.setPath(facetBean.getPath().toArray(paths));
+                if (value != null && !value.isEmpty()) {
+                    FacetBean facetBean = new Gson().fromJson(value, FACET_BEAN_TYPE);
+                    if (facetBean != null) {
+                        AnalyticsCategoryPathBean categoryPathBean = new AnalyticsCategoryPathBean();
+                        categoryPathBean.setWeight(facetBean.getWeight());
+                        if (facetBean.getPath() != null) {
+                            String[] paths = new String[facetBean.getPath().size()];
+                            categoryPathBean.setPath(facetBean.getPath().toArray(paths));
+                        }
+                        recordValueEntryBean.setAnalyticsCategoryPathBeanValue(categoryPathBean);
                     }
-                    recordValueEntryBean.setAnalyticsCategoryPathBeanValue(categoryPathBean);
-                    recordValueEntryBean.setType("FACET");
                 }
+                recordValueEntryBean.setType("FACET");
                 break;
             }
             default: {
@@ -801,5 +807,30 @@ public class MessageConsoleConnector {
             log.error("Unable to get facet column list for table:" + table, e);
         }
         return new Gson().toJson(facetNameList.toArray(new String[facetNameList.size()]));
+    }
+
+    public String getFacetCategoryList(String table, String fieldName, String categoryPaths) {
+        DrillDownRequestBean drillDownRequestBean = new DrillDownRequestBean();
+        drillDownRequestBean.setTableName(table);
+        drillDownRequestBean.setFieldName(fieldName);
+        if (categoryPaths != null && !categoryPaths.isEmpty()) {
+
+        } else {
+            drillDownRequestBean.setPath(null);
+        }
+        List<String> categories = new ArrayList<>();
+        try {
+            SubCategoriesBean subCategoriesBean = analyticsWebServiceStub.drillDownCategories(drillDownRequestBean);
+            if (subCategoriesBean != null && subCategoriesBean.getCategories() != null) {
+                for (CategorySearchResultEntryBean categorySearchResultEntryBean : subCategoriesBean.getCategories()) {
+                    categories.add(categorySearchResultEntryBean.getCategoryName());
+                }
+            }
+            Thread.sleep(5000);
+        } catch (Exception e) {
+            log.error("Unable to get facet sub category for table[" + table + "], field [" + fieldName + "] and " +
+                      "path[" + categoryPaths + "]", e);
+        }
+        return new Gson().toJson(categories);
     }
 }

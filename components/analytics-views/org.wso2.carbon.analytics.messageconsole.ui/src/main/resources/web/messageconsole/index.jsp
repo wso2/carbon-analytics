@@ -62,6 +62,7 @@
         var typeSavePurgingTask = '<%= MessageConsoleConnector.TYPE_SAVE_PURGING_TASK_INFO%>';
         var typeListTable = '<%= MessageConsoleConnector.TYPE_LIST_TABLE%>';
         var typeGetFacetNameList = '<%= MessageConsoleConnector.TYPE_GET_FACET_NAME_LIST%>';
+        var typeGetFacetCategories = '<%= MessageConsoleConnector.TYPE_GET_FACET_CATEGORIES%>';
 
         var tablePopupAction;
 
@@ -311,37 +312,76 @@
                 $(this).parents("tr:eq(0)").find(".select").prop("disabled", this.checked);
             });
 
-            $("#addFacet").on("click", function () {
-                var facetName = $("#facetListSelect").val();
-                $("#facetSearchTable").find('tbody').
-                        append($('<tr>').
-                                       append($('<td>').append($('<label>').text(facetName))).
-                                       append($('<td>').
-                                                      append($('<select>').addClass('facetSelect1').
-                                                                     append(function () {
-                                                                                var options = ["ONE", "TWO", "THREE", "FOUR"];
-                                                  var $container = $('<select></select>');
-                                                  $container.append($('<option>').val('-1').text('Please select a category'));
-                                                  $.each(options, function (val) {
-                                                      $container.append($('<option>').val('test').text(val));
-                                                  });
-                                                                                return $container.html();
-                                                                            }))).
-                                       append($('<td>').append($('<input type="button" value="Remove">')))
-                );
-                return true;
+            $('#facetListSelect').on('change', function () {
+                var facetName = $(this).val();
+                if (facetName != -1) {
+                    $("#facetSearchTable").find('tbody').
+                            append($('<tr>').
+                                           append($('<td>').append($('<label>').text(facetName))).
+                                           append($('<td>').
+                                                          append($('<select>').addClass('facetSelect1').
+                                                                         append(function () {
+                                                                                    var $container = $('<select></select>');
+                                                                                    $container.append($('<option>').val('-1').text('Please select a category'));
+                                                                                    $.post('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeGetFacetCategories,
+                                                                                            {
+                                                                                                tableName: $("#tableSelect").val(),
+                                                                                                categoryPath: "",
+                                                                                                fieldName: facetName
+                                                                                            },
+                                                                                           function (result) {
+                                                                                               var categories = JSON.parse(result);
+                                                                                               $.each(categories,
+                                                                                                      function (index,
+                                                                                                                val) {
+                                                                                                          console.log(val);
+                                                                                                          $container.append($('<option>').val(val).text(val));
+                                                                                                      });
+                                                                                           }
+                                                                                    );
+                                                                                    return $container.html();
+                                                                                }))).
+                                           append($('<td>').append($('<input type="button" value="Remove" class="del">')))
+                    );
+                }
             });
 
             $('#facetSearchTable').on('change', '.facetSelect1', function (event) {
-                $(this).closest("tr").find('td:last').before($('<td>').append($('<select>').addClass('facetSelect1').append(function () {
-                    var options = ["ONE", "TWO", "THREE", "FOUR"];
-                    var $container = $('<select></select>');
-                    $container.append($('<option>').val('-1').text('Please select a category'));
-                    $.each(options, function (val) {
-                        $container.append($('<option>').val('test').text(val));
+                var facetName = $(this).val();
+                var tdLength = $(this).closest('tr').find('td').size();
+                if (tdLength > 2) {
+                    $(this).closest('tr').find('td').slice($(this).parents('td')[0].cellIndex + 1, tdLength - 1).remove();
+                }
+                if (facetName != '-1') {
+                    console.log($(this).closest('td').prev().find("label").text());
+                    var path = {};
+                    $(this).closest('td').prevAll().find("select").each(function (index, node) {
+                        path[index] = $(node).val();
                     });
-                    return $container.html();
-                })));
+
+                    $(this).closest("tr").find('td:last').before($('<td>').append($('<select>').addClass('facetSelect1').append(function () {
+                        var $container = $('<select></select>');
+                        $container.append($('<option>').val('-1').text('Please select a category'));
+                        $.post('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeGetFacetCategories,
+                                {
+                                    tableName: $("#tableSelect").val(),
+                                    categoryPath: path,
+                                    fieldName: facetName
+                                },
+                               function (result) {
+                                   var categories = JSON.parse(result);
+                                   $.each(categories, function (index, val) {
+                                       $container.append($('<option>').val(val).text(val));
+                                   });
+                               }
+                        );
+                        return $container.html();
+                    })));
+                }
+            });
+
+            $("#facetSearchTable tbody").on("click", ".del", function () {
+                $(this).parent().parent().remove();
             });
         });
 
@@ -699,7 +739,6 @@
                                         <select id="facetListSelect">
                                             <option value="-1">Select a Facet</option>
                                         </select>
-                                        <input id="addFacet" type="button" value="Add" class="button">
                                     </td>
                                 </tr>
                                 <tr>
