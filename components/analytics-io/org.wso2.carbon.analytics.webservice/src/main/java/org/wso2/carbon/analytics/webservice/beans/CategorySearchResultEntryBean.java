@@ -18,7 +18,7 @@ package org.wso2.carbon.analytics.webservice.beans;
 import java.io.Serializable;
 
 /**
- * The Class SearchResultEntryBean.
+ * The Class CategorySearchResultEntryBean.
  */
 
 public class CategorySearchResultEntryBean implements Serializable {

@@ -145,6 +145,12 @@
             out.print(connector.getFacetColumnNameList(tableName));
             break;
         }
+        case MessageConsoleConnector.TYPE_GET_FACET_CATEGORIES: {
+            out.print(connector.getFacetCategoryList(tableName,
+                                                     request.getParameter("fieldName"),
+                                                     request.getParameter("categoryPath")));
+            break;
+        }
     }
 
     // Preventing page getting cache
