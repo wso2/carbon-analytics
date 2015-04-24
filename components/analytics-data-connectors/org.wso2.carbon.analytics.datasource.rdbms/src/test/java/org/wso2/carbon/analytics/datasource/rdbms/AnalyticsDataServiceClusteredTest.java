@@ -52,6 +52,7 @@ public class AnalyticsDataServiceClusteredTest extends AnalyticsDataServiceTest 
         this.service.destroy();
         Hazelcast.shutdownAll();
         AnalyticsServiceHolder.setHazelcastInstance(null);
+        AnalyticsServiceHolder.setAnalyticsDataService(null);
     }
     
 }

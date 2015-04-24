@@ -121,8 +121,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
 
     private static final int INDEXING_SCHEDULE_PLAN_RETRY_COUNT = 3;
 
-    private static final String DISABLE_INDEXING_ENV_PROP = "disableIndexing";
-
+    public static final String DISABLE_INDEXING_ENV_PROP = "disableIndexing";
+    
     private static final int WAIT_INDEX_TIME_INTERVAL = 1000;
 
     private static final String INDEX_OP_DATA_ATTRIBUTE = "__INDEX_OP_DATA__";

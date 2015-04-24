@@ -42,12 +42,15 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
+import java.nio.file.Paths;
 import java.util.*;
 
 /**
  * Generic utility methods for analytics data source implementations.
  */
 public class GenericUtils {
+
+    private static final String CUSTOM_WSO2_CONF_DIR_NAME = "wso2conf";
 
     private static final String DATA_SOURCES_FIELD = "dataSources";
 
@@ -485,7 +488,7 @@ public class GenericUtils {
         }
     }
     
-    public static String getAnalyticsConfDirectory() {
+    public static String getAnalyticsConfDirectory() throws AnalyticsException {
         File confDir = null;
         try {
             confDir = new File(CarbonUtils.getCarbonConfigDirPath());
@@ -493,24 +496,32 @@ public class GenericUtils {
             /* some kind of an exception can be thrown if we are in a non-Carbon env */
         }
         if (confDir == null || !confDir.exists()) {
-            confDir = new File(getCustomAnalyticsConfDirectory());
-            if (!confDir.exists()) {
-                throw new IllegalStateException("The Java system property '" + WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP + 
-                        "' must be set to initialize non-Carbon env analytics");
-            }
+            return getCustomAnalyticsConfDirectory();
+        } else {
+            return confDir.getAbsolutePath();
+        }
+    }
+    
+    private static String getCustomAnalyticsConfDirectory() throws AnalyticsException {
+        String path = System.getProperty(WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP);
+        if (path == null) {
+            path = Paths.get("").toAbsolutePath().toString() + File.separator + CUSTOM_WSO2_CONF_DIR_NAME;
+        }
+        File confDir = new File(path);
+        if (!confDir.exists()) {
+            throw new AnalyticsException("The custom WSO2 configuration directory does not exist at '" + path + "'. "
+                    + "This can be given by correctly pointing to a valid configuration directory by setting the "
+                    + "Java system property '" + WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP + "'.");
         }
         return confDir.getAbsolutePath();
     }
     
-    private static String getCustomAnalyticsConfDirectory() {
-        return System.getProperty(WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP);
-    }
-    
     private static DataSourceRepository createGlobalCustomDataSourceRepo() throws DataSourceException {
-        String confDir = getCustomAnalyticsConfDirectory();
-        if (confDir == null || confDir.isEmpty()) {
-            throw new IllegalStateException("The Java system property '" + WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP + 
-                    "' must be set to initialize non-Carbon env analytics");
+        String confDir;
+        try {
+            confDir = getCustomAnalyticsConfDirectory();
+        } catch (AnalyticsException e) {
+            throw new DataSourceException("Error creating global custom data source repo: " + e.getMessage(), e);
         }
         String dataSourcesDir = confDir + File.separator + DataSourceConstants.DATASOURCES_DIRECTORY_NAME;
         File dataSourcesFolder = new File(dataSourcesDir);
@@ -567,6 +578,14 @@ public class GenericUtils {
     
     public static void clearGlobalCustomDataSourceRepo() {
         globalCustomRepo = null;
+    }
+    
+    public static boolean isCarbonServer() {
+        try {
+            return CarbonUtils.getCarbonHome() != null;
+        } catch (Throwable e) {
+            return false;
+        }
     }
     
 }

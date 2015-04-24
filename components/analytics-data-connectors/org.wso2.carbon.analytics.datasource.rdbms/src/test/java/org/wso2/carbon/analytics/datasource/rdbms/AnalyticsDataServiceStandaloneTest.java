@@ -24,9 +24,7 @@ import javax.naming.NamingException;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceImpl;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
-import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerImpl;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
@@ -40,13 +38,16 @@ public class AnalyticsDataServiceStandaloneTest extends AnalyticsDataServiceTest
         GenericUtils.clearGlobalCustomDataSourceRepo();
         System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");
         AnalyticsServiceHolder.setHazelcastInstance(null);
-        AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
-        this.init(new AnalyticsDataServiceImpl());
+        AnalyticsServiceHolder.setAnalyticsClusterManager(null);
+        System.setProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
+        this.init(AnalyticsServiceHolder.getAnalyticsDataService());
     }
     
     @AfterClass
     public void done() throws NamingException, AnalyticsException, IOException {
         this.service.destroy();
+        System.clearProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP);
+        AnalyticsServiceHolder.setAnalyticsDataService(null);
     }
     
 }
