@@ -58,6 +58,7 @@ public class Utils {
             record.setId(recordBean.getId());
             record.setTableName(recordBean.getTableName());
             record.setValues(validateAndReturn(recordBean.getValues()));
+            records.add(record);
         }
         return records;
     }
