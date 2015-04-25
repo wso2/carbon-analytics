@@ -113,6 +113,8 @@ public class MessageConsoleConnector {
     private static final Type FACET_BEAN_TYPE = new TypeToken<FacetBean>() {
     }.getType();
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+    public static final Type STRING_ARRAY_TYPE = new TypeToken<String[]>() {
+    }.getType();
 
     private MessageConsoleStub messageConsoleStub;
     private AnalyticsWebServiceStub analyticsWebServiceStub;
@@ -812,7 +814,8 @@ public class MessageConsoleConnector {
         drillDownRequestBean.setTableName(table);
         drillDownRequestBean.setFieldName(fieldName);
         if (categoryPaths != null && !categoryPaths.isEmpty()) {
-
+            String[] path = new Gson().fromJson(categoryPaths, STRING_ARRAY_TYPE);
+            drillDownRequestBean.setPath(path);
         } else {
             drillDownRequestBean.setPath(null);
         }
@@ -824,7 +827,6 @@ public class MessageConsoleConnector {
                     categories.add(categorySearchResultEntryBean.getCategoryName());
                 }
             }
-            Thread.sleep(5000);
         } catch (Exception e) {
             log.error("Unable to get facet sub category for table[" + table + "], field [" + fieldName + "] and " +
                       "path[" + categoryPaths + "]", e);
