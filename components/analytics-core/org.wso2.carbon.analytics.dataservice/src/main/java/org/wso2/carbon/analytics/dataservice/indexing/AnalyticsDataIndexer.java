@@ -82,7 +82,6 @@ import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
-import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
@@ -866,9 +865,10 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                                                                                 range.getFrom(), range.getTo(), true, false));
             }
             if (drillDownRequest.getCategoryPaths() != null && !drillDownRequest.getCategoryPaths().isEmpty()) {
-                for (Map.Entry<String, AnalyticsCategoryPath> entry : drillDownRequest.getCategoryPaths()
+                for (Map.Entry<String, List<String>> entry : drillDownRequest.getCategoryPaths()
                         .entrySet()) {
-                    drillDownQuery.add(entry.getKey(), entry.getValue().getPath());
+                    List<String> path = entry.getValue();
+                    drillDownQuery.add(entry.getKey(), path.toArray(new String[path.size()]));
                 }
             }
             return drillDownQuery;
@@ -1144,13 +1144,13 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         if (obj == null) {
             doc.add(new StringField(name, NULL_INDEX_VALUE, Store.NO));
         }
-        if (obj instanceof AnalyticsCategoryPath && type == IndexType.FACET) {
+        if (obj instanceof List && type == IndexType.FACET) {
             facetsConfig.setMultiValued(name, true);
             facetsConfig.setHierarchical(name, true);
-            AnalyticsCategoryPath analyticsCategoryPath = (AnalyticsCategoryPath) obj;
+            List<String> Path = (List<String>) obj;
             //the field name for dimensions will be "$ + {name}"
             //      //facetsConfig.setIndexFieldName(name, new StringBuilder("$").append(name).toString());
-            doc.add(new FacetField(name, analyticsCategoryPath.getPath()));
+            doc.add(new FacetField(name, Path.toArray(new String[Path.size()])));
         }
     }
 

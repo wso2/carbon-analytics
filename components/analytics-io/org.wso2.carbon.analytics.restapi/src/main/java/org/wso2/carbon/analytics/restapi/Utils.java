@@ -28,7 +28,6 @@ import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
-import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
@@ -47,6 +46,7 @@ import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -125,9 +125,7 @@ public class Utils {
                 List<String> pathList = (List<String>) recordEntry.getValue();
                 if (pathList.size() > 0) {
                     String[] path = pathList.toArray(new String[pathList.size()]);
-                    AnalyticsCategoryPath categoryPath = new
-                            AnalyticsCategoryPath(path);
-                    valueMap.put(recordEntry.getKey(), categoryPath);
+                    valueMap.put(recordEntry.getKey(), path);
                 } else {
                     throw new AnalyticsIndexException("Category path cannot be empty");
                 }
@@ -427,12 +425,13 @@ public class Utils {
     }
 
 
-    private static Map<String, AnalyticsCategoryPath> createCategoryPaths(
+    private static Map<String, List<String>> createCategoryPaths(
             List<DrillDownPathBean> bean) {
-        Map<String, AnalyticsCategoryPath> categoryPaths = new LinkedHashMap<>();
+        Map<String, List<String>> categoryPaths = new LinkedHashMap<>();
         for (DrillDownPathBean drillDownPathBean : bean) {
+            String[] path = drillDownPathBean.getPath();
             categoryPaths.put(drillDownPathBean.getFieldName(),
-                              new AnalyticsCategoryPath(drillDownPathBean.getPath()));
+                              Arrays.asList(path));
         }
         return categoryPaths;
     }

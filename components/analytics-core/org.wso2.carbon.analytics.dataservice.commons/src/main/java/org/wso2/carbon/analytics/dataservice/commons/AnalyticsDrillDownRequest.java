@@ -16,8 +16,6 @@
 
 package org.wso2.carbon.analytics.dataservice.commons;
 
-import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
-
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,7 +31,7 @@ public class AnalyticsDrillDownRequest implements Serializable {
     //table name on which the drill down is performed
     private String tableName;
     //List of facets / List of category path to drill down
-    private Map<String, AnalyticsCategoryPath> categoryPaths;
+    private Map<String, List<String>> categoryPaths;
     //List of Range facets/buckets to drilldown
     private List<AnalyticsDrillDownRange> ranges;
     //Field name which is bucketed.
@@ -50,7 +48,7 @@ public class AnalyticsDrillDownRequest implements Serializable {
     }
 
     public AnalyticsDrillDownRequest(String tableName,
-                                     Map<String, AnalyticsCategoryPath> categoryPaths, String rangeField,
+                                     Map<String, List<String>> categoryPaths, String rangeField,
                                      List<AnalyticsDrillDownRange> ranges, String query,
                                      String scoreFunction, int recordCount,
                                      int recordStart) {
@@ -84,7 +82,7 @@ public class AnalyticsDrillDownRequest implements Serializable {
      * returns the list of Facets being queried.
      * @return list of facets
      */
-    public Map<String, AnalyticsCategoryPath> getCategoryPaths() {
+    public Map<String, List<String>> getCategoryPaths() {
         return categoryPaths;
     }
 
@@ -92,7 +90,7 @@ public class AnalyticsDrillDownRequest implements Serializable {
      * Sets the facets.
      * @param categoryPaths list of facets
      */
-    public void setCategoryPaths(Map<String, AnalyticsCategoryPath> categoryPaths) {
+    public void setCategoryPaths(Map<String, List<String>> categoryPaths) {
         this.categoryPaths = categoryPaths;
     }
 
@@ -100,7 +98,7 @@ public class AnalyticsDrillDownRequest implements Serializable {
      * Adds a facets to existing list of facets.
      * @param categoryPath the facet object being inserted
      */
-    public void addCategoryPath(String field, AnalyticsCategoryPath categoryPath) {
+    public void addCategoryPath(String field, List<String> categoryPath) {
         if (categoryPaths == null) {
             categoryPaths = new LinkedHashMap<>();
         }

@@ -20,7 +20,6 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
-import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema.ColumnType;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -109,10 +108,10 @@ public class Utils {
         List<RecordValueEntryBean> beans = new ArrayList<>(values.size());
         for (Map.Entry<String, Object> entry : values.entrySet()) {
             RecordValueEntryBean bean = new RecordValueEntryBean();
-            if (entry.getValue() instanceof AnalyticsCategoryPath) {
-                AnalyticsCategoryPath analyticsCategoryPath = (AnalyticsCategoryPath) entry.getValue();
+            if (entry.getValue() instanceof List) {
+                List<String> analyticsCategoryPath = (List<String>) entry.getValue();
                 AnalyticsCategoryPathBean categoryPathBean = new AnalyticsCategoryPathBean();
-                categoryPathBean.setPath(analyticsCategoryPath.getPath());
+                categoryPathBean.setPath(analyticsCategoryPath.toArray(new String[analyticsCategoryPath.size()]));
                 bean.setFieldName(entry.getKey());
                 bean.setAnalyticsCategoryPathBeanValue(categoryPathBean);
                 bean.setType(RecordValueEntryBean.FACET);
@@ -391,9 +390,9 @@ public class Utils {
                 break;
             }
             case RecordValueEntryBean.FACET: {
-                AnalyticsCategoryPath analyticsCategoryPath = new AnalyticsCategoryPath();
+                List<String> analyticsCategoryPath = new ArrayList<>();
                 if (recordValueEntryBean.getAnalyticsCategoryPathBeanValue() != null) {
-                    analyticsCategoryPath.setPath(recordValueEntryBean.getAnalyticsCategoryPathBeanValue().getPath());
+                    analyticsCategoryPath.addAll(Arrays.asList(recordValueEntryBean.getAnalyticsCategoryPathBeanValue().getPath()));
                 }
                 resultObj = analyticsCategoryPath;
                 break;

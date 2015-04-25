@@ -28,7 +28,6 @@ import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
-import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema.ColumnType;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -39,6 +38,7 @@ import org.wso2.carbon.base.MultitenantConstants;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -488,7 +488,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         drillDownRequest.setRecordCount(75);
         drillDownRequest.setQuery("log:exception");
         drillDownRequest.setScoreFunction("_weight");
-        AnalyticsCategoryPath path = new AnalyticsCategoryPath(new String[]{"SomeLocation", "SomeInnerLocation"});
+        List<String> path = Arrays.asList(new String[]{"SomeLocation", "SomeInnerLocation"});
         drillDownRequest.addCategoryPath("location", path);
         List<SearchResultEntry> results = this.service.drillDownSearch(tenantId, drillDownRequest);
         end = System.currentTimeMillis();
@@ -621,7 +621,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         drillDownRequest.setRecordCount(75);
         drillDownRequest.setQuery("log:exception");
         drillDownRequest.setScoreFunction("_weight");
-        AnalyticsCategoryPath path = new AnalyticsCategoryPath(new String[]{"SomeLocation", "SomeInnerLocation"});
+        List<String> path = Arrays.asList(new String[]{"SomeLocation", "SomeInnerLocation"});
         drillDownRequest.addCategoryPath("location", path);
         List<SearchResultEntry> results = this.service.drillDownSearch(tenantId, drillDownRequest);
         end = System.currentTimeMillis();

@@ -20,7 +20,6 @@ import com.google.gson.Gson;
 import org.apache.axiom.om.util.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
@@ -28,7 +27,6 @@ import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
-import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
@@ -39,7 +37,6 @@ import org.wso2.carbon.analytics.restapi.UnauthenticatedUserException;
 import org.wso2.carbon.analytics.restapi.Utils;
 import org.wso2.carbon.analytics.restapi.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.restapi.beans.CategoryDrillDownRequestBean;
-import org.wso2.carbon.analytics.restapi.beans.DrillDownPathBean;
 import org.wso2.carbon.analytics.restapi.beans.DrillDownRangeBean;
 import org.wso2.carbon.analytics.restapi.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.restapi.beans.IndexConfigurationBean;
@@ -74,8 +71,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -519,155 +514,6 @@ public class AnalyticsResource extends AbstractResource {
         } else {
             throw new AnalyticsException("List of records are empty");
         }
-    }
-
-    /**
-     * Inserts or update a list of records. Update only happens if there are matching record ids
-     * @param recordBeans the list of the record beans
-     * @return the response
-     * @throws AnalyticsException
-     */
-    @POST
-    @Consumes({ MediaType.APPLICATION_JSON})
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Path("facets11")
-    public Response insertFacetRecords(List<RecordBean> recordBeans)
-            throws AnalyticsException {
-        AnalyticsDataService ads = Utils.getAnalyticsDataService();
-        List<Record> l = new ArrayList<Record>();
-
-        String[] str = new String[]{"2015", "Jan", "24"};
-        AnalyticsCategoryPath acp = new AnalyticsCategoryPath(str);
-        Map<String, Object> values = new HashMap<String, Object>();
-        values.put("testField", acp);
-        values.put("number", 1);
-        values.put("number1", 5);
-        Record r = new Record(-1234,"test",values);
-
-        String[] str1 = new String[]{"2015", "Feb", "21"};
-        AnalyticsCategoryPath acp1 = new AnalyticsCategoryPath(str1);
-        Map<String, Object> values1 = new HashMap<String, Object>();
-        values1.put("testField", acp1);
-        values1.put("number", 2);
-        values1.put("number1", 2);
-        Record rr = new Record(-1234,"test",values1);
-
-        String[] str2 = new String[]{"2015", "Feb", "23"};
-        AnalyticsCategoryPath acp2 = new AnalyticsCategoryPath(str2);
-        Map<String, Object> values2 = new HashMap<String, Object>();
-        values2.put("testField", acp2);
-        values2.put("number", 3);
-        values2.put("number1", 1);
-        Record rrr = new Record(-1234,"test",values2);
-
-        l.add(r);
-        l.add(rr);
-        l.add(rrr);
-        ads.put(l);
-
-        List<String> ids = new ArrayList<String>();
-        ids.add(r.getId());
-        ids.add(rr.getId());
-        ids.add(rrr.getId());
-        RecordGroup[] aaaa = ads.get(-1234, "test", 0, null, ids);
-        List<Record> ddddd = GenericUtils.listRecords(ads, aaaa);
-        List<RecordBean> fff = Utils.createRecordBeans(ddddd);
-
-        return Response.ok(fff).build();
-    }
-
-    /**
-     * Inserts or update a list of records. Update only happens if there are matching record ids
-     * @param recordBeans the list of the record beans
-     * @return the response
-     * @throws AnalyticsException
-     */
-    @POST
-    @Consumes({ MediaType.APPLICATION_JSON})
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Path("drill/{categories}/{records}")
-    public Response drilldown(@PathParam("categories")int categories, @PathParam("records")int records, List<RecordBean> recordBeans)
-            throws AnalyticsException {
-        AnalyticsDataService ads = Utils.getAnalyticsDataService();
-        AnalyticsCategoryPath path = new AnalyticsCategoryPath(new String[]{"2015", "Feb"});
-        AnalyticsDrillDownRequest anss = new AnalyticsDrillDownRequest();
-        anss.addCategoryPath("testField", path);
-        anss.setScoreFunction("2*_weight");
-        anss.setQuery(null);
-        anss.setTableName("test");
-        anss.setRecordCount(records);
-
-        return Response.ok(ads.drillDownSearch(-1234, anss)).build();
-    }
-
-    /**
-     * Inserts or update a list of records. Update only happens if there are matching record ids
-     * @param recordBeans the list of the record beans
-     * @return the response
-     * @throws AnalyticsException
-     */
-    @POST
-    @Consumes({ MediaType.APPLICATION_JSON})
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Path("drillresult")
-    public Response drilldownRange(List<RecordBean> recordBeans)
-            throws AnalyticsException {
-        AnalyticsDataService ads = Utils.getAnalyticsDataService();
-        AnalyticsDrillDownRequest anss = new AnalyticsDrillDownRequest();
-        List<AnalyticsDrillDownRange> ranges = new ArrayList<>();
-        ranges.add(new AnalyticsDrillDownRange("-1 --- 1.5", -1, 1.5));
-        ranges.add(new AnalyticsDrillDownRange("1.5 --- 3.1", 1.5, 3.1));
-        ranges.add(new AnalyticsDrillDownRange("3 --- 6", 3, 6));
-        anss.setRanges(ranges);
-        AnalyticsCategoryPath path = new AnalyticsCategoryPath(new String[]{"2015"});
-        anss.addCategoryPath("testField", path);
-        anss.setQuery(null);
-        anss.setTableName("test");
-        anss.setRecordCount(1);
-        List<SearchResultEntry> g = ads.drillDownSearch(-1234, anss);
-        return Response.ok(g).build();
-    }
-
-    @POST
-    @Consumes({ MediaType.APPLICATION_JSON})
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Path("drillreq")
-    public Response dri()
-            throws AnalyticsException {
-        AnalyticsDataService ads = Utils.getAnalyticsDataService();
-        AnalyticsDrillDownRequest anss = new AnalyticsDrillDownRequest();
-        List<AnalyticsDrillDownRange> ranges = new ArrayList<>();
-        ranges.add(new AnalyticsDrillDownRange("-1 --- 1.5", -1, 1.5));
-        ranges.add(new AnalyticsDrillDownRange("1.5 --- 3.1", 1.5, 3.1));
-        ranges.add(new AnalyticsDrillDownRange("3 --- 6", 3, 6));
-        anss.setRanges(ranges);
-        AnalyticsCategoryPath path = new AnalyticsCategoryPath(new String[]{"2015"});
-        anss.addCategoryPath("testField", path);
-        anss.setQuery(null);
-        anss.setTableName("test");
-        anss.setRecordCount(1);
-
-
-        DrillDownRequestBean dd = new DrillDownRequestBean();
-        dd.setTableName("test");
-        dd.setQuery("field1:record1");
-        dd.setRecordCount(1);
-        dd.setRecordStart(0);
-        dd.setScoreFunction("1");
-
-        List<DrillDownPathBean> p = new ArrayList<>();
-        DrillDownPathBean d = new DrillDownPathBean("field3", new String[]{"A", "B"});
-        p.add(d);
-        List<DrillDownRangeBean> b = new ArrayList<>();
-        DrillDownRangeBean ff = new DrillDownRangeBean("label",12334,679898);
-        b.add(ff);
-         dd.setRanges(b);
-            dd.setRangeField("fieldName");
-        dd.setCategories(p);
-        AnalyticsDrillDownRequest tg = Utils.createDrilldownRequest(dd);
-        AnalyticsDataService e = Utils.getAnalyticsDataService();
-        List<SearchResultEntry> h = e.drillDownSearch(-1234, tg);
-        return Response.ok(h).build();
     }
 
     /**

@@ -20,7 +20,6 @@ package org.wso2.carbon.analytics.datasource.core.util;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.w3c.dom.Document;
-import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -30,20 +29,39 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.ndatasource.common.DataSourceConstants;
 import org.wso2.carbon.ndatasource.common.DataSourceConstants.DataSourceStatusModes;
 import org.wso2.carbon.ndatasource.common.DataSourceException;
-import org.wso2.carbon.ndatasource.core.*;
+import org.wso2.carbon.ndatasource.core.CarbonDataSource;
+import org.wso2.carbon.ndatasource.core.DataSourceManager;
+import org.wso2.carbon.ndatasource.core.DataSourceMetaInfo;
+import org.wso2.carbon.ndatasource.core.DataSourceRepository;
+import org.wso2.carbon.ndatasource.core.DataSourceService;
+import org.wso2.carbon.ndatasource.core.DataSourceStatus;
+import org.wso2.carbon.ndatasource.core.SystemDataSourcesConfiguration;
 import org.wso2.carbon.ndatasource.core.utils.DataSourceUtils;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.xml.bind.JAXBContext;
-
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Generic utility methods for analytics data source implementations.
@@ -181,9 +199,9 @@ public class GenericUtils {
                 binData = (byte[]) value;
                 buffer.putInt(binData.length);
                 buffer.put(binData);
-            } else if (value instanceof AnalyticsCategoryPath) {
+            } else if (value instanceof List) {
                 buffer.put(DATA_TYPE_CATEGORY);
-                AnalyticsCategoryPath analyticsCategoryPath = (AnalyticsCategoryPath) value;
+                List<String> analyticsCategoryPath = (List<String>) value;
                 binData = GenericUtils.serializeObject(analyticsCategoryPath);
                 buffer.putInt(binData.length);
                 buffer.put(binData);
@@ -223,9 +241,9 @@ public class GenericUtils {
             } else if (value instanceof byte[]) {
                 count += Integer.SIZE / 8;
                 count += ((byte[]) value).length;
-            } else if (value instanceof AnalyticsCategoryPath) {
+            } else if (value instanceof List) {
                 count += Integer.SIZE / 8;
-                AnalyticsCategoryPath analyticsCategoryPath = (AnalyticsCategoryPath) value;
+                List<String> analyticsCategoryPath = (List<String>) value;
                 count += GenericUtils.serializeObject(analyticsCategoryPath).length;
             } else if (value != null) {
                 throw new AnalyticsException("Invalid column value type in calculating column "

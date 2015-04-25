@@ -21,7 +21,6 @@ package org.wso2.carbon.analytics.datasource.core;
 import org.apache.commons.collections.IteratorUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.wso2.carbon.analytics.datasource.commons.AnalyticsCategoryPath;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
@@ -31,8 +30,12 @@ import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 import javax.naming.Context;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class contains tests related to {@link AnalyticsRecordStore}.
@@ -111,12 +114,12 @@ public class AnalyticsRecordStoreTest {
                                                boolean generateRecordIds) {
         List<Record> result = new ArrayList<Record>();
         Map<String, Object> values;
-        AnalyticsCategoryPath afacet;
+        List<String> afacet;
         long timeTmp;
         for (int j = 0; j < c; j++) {
             values = new HashMap<String, Object>();
-            afacet = new AnalyticsCategoryPath();
-            afacet.setPath(new String[]{"SomeLocation","SomeInnerLocation","AVillage"});
+            afacet = new ArrayList<>();
+            afacet.addAll(Arrays.asList(new String[]{"SomeLocation","SomeInnerLocation","AVillage"}));
             values.put("server_name", "ESB-" + i);
             values.put("ip", "192.168.0." + (i % 256));
             values.put("tenant", i);
