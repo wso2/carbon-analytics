@@ -1137,37 +1137,27 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
 
-    private Document checkAndAddTaxonomyDocEntries(Document doc, IndexType type,
+    private void checkAndAddTaxonomyDocEntries(Document doc, IndexType type,
                                                    String name, Object obj,
-                                                   TaxonomyWriter taxonomyWriter)
+                                                   FacetsConfig facetsConfig)
             throws AnalyticsIndexException {
         if (obj == null) {
             doc.add(new StringField(name, NULL_INDEX_VALUE, Store.NO));
-            return doc;
         }
         if (obj instanceof AnalyticsCategoryPath && type == IndexType.FACET) {
-
-            FacetsConfig facetsConfig = new FacetsConfig();
             facetsConfig.setMultiValued(name, true);
             facetsConfig.setHierarchical(name, true);
             AnalyticsCategoryPath analyticsCategoryPath = (AnalyticsCategoryPath) obj;
             //the field name for dimensions will be "$ + {name}"
-    //      //facetsConfig.setIndexFieldName(name, new StringBuilder("$").append(name).toString());
+            //      //facetsConfig.setIndexFieldName(name, new StringBuilder("$").append(name).toString());
             doc.add(new FacetField(name, analyticsCategoryPath.getPath()));
-            try {
-                Document translatedDoc = facetsConfig.build(taxonomyWriter, doc);
-                return translatedDoc;
-            } catch (IOException e) {
-                throw new AnalyticsIndexException("Error while adding Taxonomy entry: " + e.getMessage(), e);
-            }
-        }else {
-            return doc;
         }
     }
 
     private Document generateIndexDoc(Record record, Map<String, IndexType> columns,
-                   TaxonomyWriter taxonomyWriter) throws AnalyticsIndexException {
+                   TaxonomyWriter taxonomyWriter) throws AnalyticsIndexException, IOException {
         Document doc = new Document();
+        FacetsConfig config = new FacetsConfig();
         doc.add(new StringField(INDEX_ID_INTERNAL_FIELD, record.getId(), Store.YES));
         doc.add(new LongField(INDEX_INTERNAL_TIMESTAMP_FIELD, record.getTimestamp(), Store.NO));
         /* make the best effort to store in the given timestamp, or else, 
@@ -1176,10 +1166,9 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         for (Map.Entry<String, IndexType> entry : columns.entrySet()) {
             name = entry.getKey();
             this.checkAndAddDocEntry(doc, entry.getValue(), name, record.getValue(name));
-            doc = this.checkAndAddTaxonomyDocEntries(doc, entry.getValue(), name,
-                                                     record.getValue(name),taxonomyWriter);
+            this.checkAndAddTaxonomyDocEntries(doc, entry.getValue(), name, record.getValue(name), config);
         }
-        return doc;
+        return config.build(taxonomyWriter, doc);
     }
     
     private void checkInvalidIndexNames(Set<String> columns) throws AnalyticsIndexException {
