@@ -145,8 +145,10 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     private static final String INDEX_INTERNAL_SCORE_FIELD = "_score";
 
     private static final String INDEX_INTERNAL_WEIGHT_FIELD = "_weight";
-    
+
     private static final String NULL_INDEX_VALUE = "";
+
+    private static final java.lang.String DEFAULT_SCORE = "1";
 
     private AnalyticsIndexDefinitionRepository repository;
     
@@ -893,7 +895,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         try {
             Expression funcExpression;
             if (scoreFunction == null || scoreFunction.trim().isEmpty()) {
-                funcExpression = JavascriptCompiler.compile(INDEX_INTERNAL_SCORE_FIELD);
+                funcExpression = JavascriptCompiler.compile(DEFAULT_SCORE);
             } else {
                 funcExpression = JavascriptCompiler.compile(scoreFunction);
             }
@@ -1150,10 +1152,9 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             facetsConfig.setHierarchical(name, true);
             AnalyticsCategoryPath analyticsCategoryPath = (AnalyticsCategoryPath) obj;
             //the field name for dimensions will be "$ + {name}"
-            //facetsConfig.setIndexFieldName(name, new StringBuilder("$").append(name).toString());
+    //      //facetsConfig.setIndexFieldName(name, new StringBuilder("$").append(name).toString());
             doc.add(new FacetField(name, analyticsCategoryPath.getPath()));
             try {
-
                 Document translatedDoc = facetsConfig.build(taxonomyWriter, doc);
                 return translatedDoc;
             } catch (IOException e) {

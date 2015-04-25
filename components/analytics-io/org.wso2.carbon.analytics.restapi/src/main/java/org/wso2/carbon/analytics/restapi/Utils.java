@@ -123,9 +123,8 @@ public class Utils {
         for (Map.Entry<String, Object> recordEntry : values.entrySet()) {
             if (recordEntry.getValue() instanceof List) {
                 List<String> pathList = (List<String>) recordEntry.getValue();
-                if (pathList != null && pathList.size() > 0) {
+                if (pathList.size() > 0) {
                     String[] path = pathList.toArray(new String[pathList.size()]);
-
                     AnalyticsCategoryPath categoryPath = new
                             AnalyticsCategoryPath(path);
                     valueMap.put(recordEntry.getKey(), categoryPath);

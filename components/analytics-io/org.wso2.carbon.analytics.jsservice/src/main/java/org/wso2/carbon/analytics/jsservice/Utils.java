@@ -88,7 +88,6 @@ public class Utils {
                 case "FACET":
                     AnalyticsCategoryPathBean categoryPathBean = valueEntryBean.getAnalyticsCategoryPathBeanValue();
                     Map<String, Object> facet = new LinkedHashMap<>();
-                    facet.put("weight", categoryPathBean.getWeight());
                     facet.put("path", categoryPathBean.getPath());
                     columnValues.put(valueEntryBean.getFieldName(), facet);
                     break;
@@ -110,30 +109,12 @@ public class Utils {
         return records.toArray(new  RecordBean[records.size()]);
     }
 
-    @SuppressWarnings("unchecked")
     private static AnalyticsCategoryPathBean validateAndReturn(Object value) {
-        //TODO : AnalyticsCategoryPath is mapped to a linkedList by jackson json.
-        // Currently checking the type and convert it manually to categoryPath type.
-        Map<String, Object> keyValPairMap = (LinkedHashMap<String, Object>) value;
-        List<String> pathList = (ArrayList<String>) keyValPairMap.get(Constants.FacetAttributes.PATH);
-        Object weightObj = keyValPairMap.get(Constants.FacetAttributes.WEIGHT);
-        Number weight;
+        List<String> pathList = (ArrayList<String>) value;
         AnalyticsCategoryPathBean categoryPathBean = new AnalyticsCategoryPathBean();
-        if (weightObj instanceof Integer) {
-            weight = (Integer) weightObj;
-        } else if (weightObj instanceof Double) {
-            weight = (Double) weightObj;
-        } else if (weightObj == null) {
-            weight = DEFAUL_CATEGORYPATH_WEIGHT;
-        } else {
-            weight = DEFAUL_CATEGORYPATH_WEIGHT;
-        }
         if (pathList != null && pathList.size() > 0) {
             String[] path = pathList.toArray(new String[pathList.size()]);
-            if (keyValPairMap.keySet().size() <= CATEGORYPATH_FIELD_COUNT) {
-                categoryPathBean.setPath(path);
-                categoryPathBean.setWeight(weight.floatValue());
-            }
+            categoryPathBean.setPath(path);
         }
         return categoryPathBean;
     }

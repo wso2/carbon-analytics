@@ -98,6 +98,7 @@ public class MessageConsoleConnector {
     public static final int TYPE_SAVE_PURGING_TASK_INFO = 14;
     public static final int TYPE_LIST_TABLE = 15;
     public static final int TYPE_GET_FACET_NAME_LIST = 16;
+    public static final int TYPE_GET_FACET_CATEGORIES = 17;
 
     private static final GsonBuilder RESPONSE_RESULT_BUILDER = new GsonBuilder().registerTypeAdapter(ResponseResult.class,
                                                                                                      new ResponseResultSerializer());
@@ -265,7 +266,6 @@ public class MessageConsoleConnector {
                 AnalyticsCategoryPathBean analyticsCategoryPathBeanValue = entityBean.getAnalyticsCategoryPathBeanValue();
                 FacetBean facetBean = new FacetBean();
                 if (analyticsCategoryPathBeanValue != null) {
-                    facetBean.setWeight(analyticsCategoryPathBeanValue.getWeight());
                     facetBean.setPath(Arrays.asList(analyticsCategoryPathBeanValue.getPath()));
                 }
                 value = String.valueOf(new Gson().toJson(facetBean));
@@ -428,16 +428,14 @@ public class MessageConsoleConnector {
                     FacetBean facetBean = new Gson().fromJson(value, FACET_BEAN_TYPE);
                     if (facetBean != null) {
                         AnalyticsCategoryPathBean categoryPathBean = new AnalyticsCategoryPathBean();
-                        categoryPathBean.setWeight(facetBean.getWeight());
                         if (facetBean.getPath() != null) {
                             String[] paths = new String[facetBean.getPath().size()];
                             categoryPathBean.setPath(facetBean.getPath().toArray(paths));
                         }
                         recordValueEntryBean.setAnalyticsCategoryPathBeanValue(categoryPathBean);
                     }
-                    recordValueEntryBean.setAnalyticsCategoryPathBeanValue(categoryPathBean);
-                    recordValueEntryBean.setType("FACET");
                 }
+                recordValueEntryBean.setType("FACET");
                 break;
             }
             default: {
