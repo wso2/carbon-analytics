@@ -1105,7 +1105,7 @@
         <carbon.commons.version>4.4.0</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.3.6, 4.4.0)</carbon.commons.imp.pkg.version>
         <carbon.event-processing.version>2.0.4-SNAPSHOT</carbon.event-processing.version>
-        <carbon.analytics.common.version>1.0.0-SNAPSHOT</carbon.analytics.common.version>
+        <carbon.analytics.common.version>1.0.1-SNAPSHOT</carbon.analytics.common.version>
 
         <carbon.analytics.version>1.0.3-SNAPSHOT</carbon.analytics.version>
         <carbon.analytics.imp.pkg.version>[1.0.3-SNAPSHOT, 1.1.0)</carbon.analytics.imp.pkg.version>
