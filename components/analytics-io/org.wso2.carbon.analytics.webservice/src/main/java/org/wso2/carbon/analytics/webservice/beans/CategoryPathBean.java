@@ -16,34 +16,35 @@
 * under the License.
 */
 
-package org.wso2.carbon.messageconsole.ui.beans;
+package org.wso2.carbon.analytics.webservice.beans;
 
-import java.util.List;
+import java.io.Serializable;
 
 /**
- * This class represent the Facet object
+ * This represent the Category path object for a single field.
  */
-public class FacetBean {
+public class CategoryPathBean implements Serializable {
+    private static final long serialVersionUID = 8808404133188807003L;
 
-    private String field;
-    private List<String> path;
+    private String fieldName;
+    private String[] path;
 
-    public FacetBean() {
+    public CategoryPathBean() {
     }
 
-    public String getField() {
-        return field;
+    public String getFieldName() {
+        return fieldName;
     }
 
-    public void setField(String field) {
-        this.field = field;
+    public void setFieldName(String fieldName) {
+        this.fieldName = fieldName;
     }
 
-    public List<String> getPath() {
+    public String[] getPath() {
         return path;
     }
 
-    public void setPath(List<String> path) {
+    public void setPath(String[] path) {
         this.path = path;
     }
 }

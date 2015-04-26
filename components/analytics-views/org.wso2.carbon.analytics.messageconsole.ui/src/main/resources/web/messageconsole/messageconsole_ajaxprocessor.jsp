@@ -50,7 +50,8 @@
                 timeTo = timeTo.concat("000");
                 to = Long.parseLong(timeTo);
             }
-            out.print(connector.getRecords(tableName, from, to, startIndex, pageSize, query));
+            String facets = request.getParameter("facets");
+            out.print(connector.getRecords(tableName, from, to, startIndex, pageSize, query, facets));
             break;
         }
         case MessageConsoleConnector.TYPE_UPDATE_RECORD: {

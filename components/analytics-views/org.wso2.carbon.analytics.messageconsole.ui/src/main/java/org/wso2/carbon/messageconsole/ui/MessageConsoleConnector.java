@@ -33,9 +33,11 @@ import org.wso2.carbon.analytics.messageconsole.stub.beans.ScheduleTaskInfo;
 import org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceAnalyticsWebServiceExceptionException;
 import org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceStub;
 import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsCategoryPathBean;
+import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsDrillDownRequestBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsSchemaBean;
+import org.wso2.carbon.analytics.webservice.stub.beans.CategoryDrillDownRequestBean;
+import org.wso2.carbon.analytics.webservice.stub.beans.CategoryPathBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.CategorySearchResultEntryBean;
-import org.wso2.carbon.analytics.webservice.stub.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.IndexConfigurationBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.IndexEntryBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.RecordBean;
@@ -115,6 +117,8 @@ public class MessageConsoleConnector {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
     public static final Type STRING_ARRAY_TYPE = new TypeToken<String[]>() {
     }.getType();
+    public static final Type FACET_LIST_TYPE = new TypeToken<List<FacetBean>>() {
+    }.getType();
 
     private MessageConsoleStub messageConsoleStub;
     private AnalyticsWebServiceStub analyticsWebServiceStub;
@@ -178,18 +182,24 @@ public class MessageConsoleConnector {
     }
 
     public String getRecords(String tableName, long timeFrom, long timeTo, int startIndex, int pageSize,
-                             String searchQuery) {
+                             String searchQuery, String facetsJsonString) {
         if (log.isDebugEnabled()) {
             log.debug("Search Query: " + searchQuery);
             log.debug("timeFrom: " + timeFrom);
             log.debug("timeTo: " + timeTo);
             log.debug("Start Index: " + startIndex);
             log.debug("Page Size: " + pageSize);
+            log.debug("Facet String: " + facetsJsonString);
         }
         ResponseResult responseResult = new ResponseResult();
         try {
             RecordBean[] resultRecordBeans;
-            if (searchQuery != null && !searchQuery.isEmpty()) {
+            List<FacetBean> facetsList = new Gson().fromJson(facetsJsonString, FACET_LIST_TYPE);
+            if (!facetsList.isEmpty()) {
+                AnalyticsDrillDownRequestBean requestBean = getAnalyticsDrillDownRequestBean(tableName, startIndex, pageSize, searchQuery, facetsList);
+                resultRecordBeans = analyticsWebServiceStub.drillDownSearch(requestBean);
+                responseResult.setTotalRecordCount(analyticsWebServiceStub.drillDownSearchCount(requestBean));
+            } else if (searchQuery != null && !searchQuery.isEmpty()) {
                 resultRecordBeans = analyticsWebServiceStub.search(tableName, searchQuery, startIndex, pageSize);
                 responseResult.setTotalRecordCount(analyticsWebServiceStub.searchCount(tableName, searchQuery));
             } else {
@@ -215,6 +225,29 @@ public class MessageConsoleConnector {
             responseResult.setMessage(errorMsg);
         }
         return RESPONSE_RESULT_BUILDER.serializeNulls().create().toJson(responseResult);
+    }
+
+    private AnalyticsDrillDownRequestBean getAnalyticsDrillDownRequestBean(String tableName, int startIndex,
+                                                                           int pageSize, String searchQuery,
+                                                                           List<FacetBean> facetsList) {
+        AnalyticsDrillDownRequestBean requestBean = new AnalyticsDrillDownRequestBean();
+        requestBean.setTableName(tableName);
+        requestBean.setRecordStart(startIndex);
+        requestBean.setRecordCount(pageSize);
+        if (searchQuery != null && searchQuery.isEmpty()) {
+            searchQuery = null;
+        }
+        requestBean.setQuery(searchQuery);
+        CategoryPathBean[] pathBeans = new CategoryPathBean[facetsList.size()];
+        for (int i = 0; i < facetsList.size(); i++) {
+            FacetBean facetBean = facetsList.get(i);
+            CategoryPathBean categoryPathBean = new CategoryPathBean();
+            categoryPathBean.setFieldName(facetBean.getField());
+            categoryPathBean.setPath(facetBean.getPath().toArray(new String[facetBean.getPath().size()]));
+            pathBeans[i] = categoryPathBean;
+        }
+        requestBean.setCategoryPaths(pathBeans);
+        return requestBean;
     }
 
     private Record getRecord(RecordBean recordBean, boolean
@@ -810,7 +843,7 @@ public class MessageConsoleConnector {
     }
 
     public String getFacetCategoryList(String table, String fieldName, String categoryPaths) {
-        DrillDownRequestBean drillDownRequestBean = new DrillDownRequestBean();
+        CategoryDrillDownRequestBean drillDownRequestBean = new CategoryDrillDownRequestBean();
         drillDownRequestBean.setTableName(table);
         drillDownRequestBean.setFieldName(fieldName);
         if (categoryPaths != null && !categoryPaths.isEmpty()) {

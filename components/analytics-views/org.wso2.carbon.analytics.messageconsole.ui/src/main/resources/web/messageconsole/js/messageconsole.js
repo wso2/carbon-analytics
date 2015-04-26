@@ -169,7 +169,6 @@ function arbitraryFieldDeleteActionMethod(postData) {
 }
 
 function createJTable() {
-
     var table = $("#tableSelect").val();
     if (table != '-1') {
         $.getJSON("/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=" + typeTableInfo + "&tableName=" + table,
@@ -238,6 +237,20 @@ function listActionMethod(jtParams) {
     postData["timeFrom"] = $("#timeFrom").val();
     postData["timeTo"] = $("#timeTo").val();
     postData["query"] = $("#query").val();
+    var facets = [];
+    $('#facetSearchTable > tbody  > tr').each(function () {
+        var facet = {};
+        var row = $(this);
+        facet.field = row.find("label").text();
+        facet.path = [];
+        row.find("select").each(function (index, node) {
+            if ($(node).val() != '-1') {
+                facet.path.push($(node).val());
+            }
+        });
+        facets.push(facet);
+    });
+    postData["facets"] = JSON.stringify(facets);
     return $.Deferred(function ($dfd) {
         $.ajax({
                     url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeListRecord,
@@ -326,6 +339,7 @@ function tableSelectChange() {
         $("#editTableButton").hide();
         $("#purgeRecordButton").hide();
         $('#facetListSelect').find('option:gt(0)').remove();
+        $('#facetSearchTable tr').remove();
     }
     try {
         $('#DeleteAllButton').hide();

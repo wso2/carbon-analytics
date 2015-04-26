@@ -21,6 +21,8 @@ package org.wso2.carbon.analytics.webservice;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategorySearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
@@ -29,9 +31,12 @@ import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexExc
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.analytics.webservice.beans.AnalyticsDrillDownRangeBean;
+import org.wso2.carbon.analytics.webservice.beans.AnalyticsDrillDownRequestBean;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsSchemaBean;
+import org.wso2.carbon.analytics.webservice.beans.CategoryDrillDownRequestBean;
+import org.wso2.carbon.analytics.webservice.beans.CategoryPathBean;
 import org.wso2.carbon.analytics.webservice.beans.CategorySearchResultEntryBean;
-import org.wso2.carbon.analytics.webservice.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.webservice.beans.IndexConfigurationBean;
 import org.wso2.carbon.analytics.webservice.beans.RecordBean;
 import org.wso2.carbon.analytics.webservice.beans.SubCategoriesBean;
@@ -39,8 +44,11 @@ import org.wso2.carbon.analytics.webservice.exception.AnalyticsWebServiceExcepti
 import org.wso2.carbon.analytics.webservice.internal.ServiceHolder;
 import org.wso2.carbon.core.AbstractAdmin;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class is the service class for analytics data service web service.
@@ -466,13 +474,13 @@ public class AnalyticsWebService extends AbstractAdmin {
     }
 
     /**
-     * Returns the subcategories of a facet field, given DrillDownRequestBean
+     * Returns the subcategories of a facet field, given CategoryDrillDownRequestBean
      *
      * @param drillDownRequest The category drilldown object which contains the category drilldown information
      * @return SubCategoriesBean instance that contains the immediate category information
      * @throws AnalyticsWebServiceException
      */
-    public SubCategoriesBean drillDownCategories(DrillDownRequestBean drillDownRequest)
+    public SubCategoriesBean drillDownCategories(CategoryDrillDownRequestBean drillDownRequest)
             throws AnalyticsWebServiceException {
         SubCategoriesBean subCategoriesBean = new SubCategoriesBean();
         try {
@@ -505,7 +513,7 @@ public class AnalyticsWebService extends AbstractAdmin {
         return searchResultEntryBeans;
     }
 
-    private CategoryDrillDownRequest getCategoryDrillDownRequest(DrillDownRequestBean drillDownRequest) {
+    private CategoryDrillDownRequest getCategoryDrillDownRequest(CategoryDrillDownRequestBean drillDownRequest) {
         CategoryDrillDownRequest categoryDrillDownRequest = new CategoryDrillDownRequest();
         categoryDrillDownRequest.setTableName(drillDownRequest.getTableName());
         categoryDrillDownRequest.setFieldName(drillDownRequest.getFieldName());
@@ -513,5 +521,78 @@ public class AnalyticsWebService extends AbstractAdmin {
         categoryDrillDownRequest.setQuery(drillDownRequest.getQuery());
         categoryDrillDownRequest.setScoreFunction(drillDownRequest.getScoreFunction());
         return categoryDrillDownRequest;
+    }
+
+    /**
+     * Returns the drill down results of a search query, given AnalyticsDrillDownRequestBean
+     *
+     * @param drillDownRequest The drilldown object which contains the drilldown information
+     * @return An arrays of {@link RecordBean}s
+     * @throws AnalyticsWebServiceException
+     */
+    public RecordBean[] drillDownSearch(AnalyticsDrillDownRequestBean drillDownRequest)
+            throws AnalyticsWebServiceException {
+        try {
+            List<SearchResultEntry> searchResults = analyticsDataAPI.drillDownSearch(getUsername(),
+                                                                                     getAnalyticsDrillDownRequest(drillDownRequest));
+            List<String> recordIds = Utils.getRecordIds(searchResults);
+            List<Record> records = GenericUtils.listRecords(analyticsDataAPI,
+                                                            analyticsDataAPI.get(getUsername(), drillDownRequest.getTableName(),
+                                                                                 DEFAULT_NUM_PARTITIONS_HINT, null, recordIds));
+            List<RecordBean> recordBeans = Utils.createRecordBeans(records);
+            RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
+            return recordBeans.toArray(resultRecordBeans);
+        } catch (AnalyticsException e) {
+            logger.error("Unable to get drill down information due to " + e.getMessage(), e);
+            throw new AnalyticsWebServiceException("Unable to get drill down information due to " + e.getMessage(), e);
+        }
+    }
+
+    private AnalyticsDrillDownRequest getAnalyticsDrillDownRequest(AnalyticsDrillDownRequestBean drillDownRequest) {
+        AnalyticsDrillDownRequest analyticsDrillDownRequest = new AnalyticsDrillDownRequest();
+        analyticsDrillDownRequest.setTableName(drillDownRequest.getTableName());
+        analyticsDrillDownRequest.setQuery(drillDownRequest.getQuery());
+        analyticsDrillDownRequest.setRangeField(drillDownRequest.getRangeField());
+        analyticsDrillDownRequest.setRecordCount(drillDownRequest.getRecordCount());
+        analyticsDrillDownRequest.setRecordStartIndex(drillDownRequest.getRecordStart());
+        analyticsDrillDownRequest.setScoreFunction(drillDownRequest.getScoreFunction());
+        if (drillDownRequest.getCategoryPaths() != null) {
+            Map<String, List<String>> categoryPath = new HashMap<>();
+            for (CategoryPathBean categoryPathBean : drillDownRequest.getCategoryPaths()) {
+                categoryPath.put(categoryPathBean.getFieldName(), Arrays.asList(categoryPathBean.getPath()));
+            }
+            analyticsDrillDownRequest.setCategoryPaths(categoryPath);
+        }
+        if (drillDownRequest.getRanges() != null) {
+            List<AnalyticsDrillDownRange> drillDownRanges = new ArrayList<>();
+            for (AnalyticsDrillDownRangeBean analyticsDrillDownRangeBean : drillDownRequest.getRanges()) {
+                AnalyticsDrillDownRange drillDownRange = new AnalyticsDrillDownRange();
+                drillDownRange.setLabel(analyticsDrillDownRangeBean.getLabel());
+                drillDownRange.setFrom(analyticsDrillDownRangeBean.getFrom());
+                drillDownRange.setTo(analyticsDrillDownRangeBean.getTo());
+                drillDownRange.setScore(analyticsDrillDownRangeBean.getScore());
+                drillDownRanges.add(drillDownRange);
+            }
+            analyticsDrillDownRequest.setRanges(drillDownRanges);
+        }
+        return analyticsDrillDownRequest;
+    }
+
+    /**
+     * Returns the count of results of a search query, given AnalyticsDrillDownRequestBean
+     *
+     * @param drillDownRequest The drilldown object which contains the drilldown information
+     * @return the count of the records which match the drilldown query
+     * @throws AnalyticsWebServiceException
+     */
+    public int drillDownSearchCount(AnalyticsDrillDownRequestBean drillDownRequest)
+            throws AnalyticsWebServiceException {
+        try {
+            return analyticsDataAPI.drillDownSearchCount(getUsername(), getAnalyticsDrillDownRequest(drillDownRequest));
+        } catch (AnalyticsIndexException e) {
+            logger.error("Unable to get drill down search count information due to " + e.getMessage(), e);
+            throw new AnalyticsWebServiceException("Unable to get drill down search count information due to " + e
+                    .getMessage(), e);
+        }
     }
 }

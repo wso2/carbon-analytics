@@ -43,7 +43,8 @@
     <script src="js/jquery.validationEngine-en.js" type="text/javascript"></script>
     <script src="js/jquery.jtable.min.js" type="text/javascript"></script>
     <script src="js/jquery.datetimepicker.js" type="text/javascript"></script>
-    <script src="js/messageconsole.js" type="text/javascript"></script>
+    <script src="js/messageconsole.js?version=<%= java.lang.Math.round(java.lang.Math.random() * 2) %>"
+            type="text/javascript"></script>
 
     <script type="text/javascript">
         var typeCreateRecord = '<%= MessageConsoleConnector.TYPE_CREATE_RECORD%>';
@@ -321,7 +322,7 @@
                                                                append($('<td>').append(function () {
                                                                           var $container =
                                                                                   $('<select class="facetSelect1"></select>');
-                                                                                    $container.append($('<option>').val('-1').text('Please select a category'));
+                                                                                                                                 $container.append($('<option>').val('-1').text('Select a category'));
                                                                                     $.post('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeGetFacetCategories,
                                                                                             {
                                                                                                 tableName: $("#tableSelect").val(),
@@ -359,7 +360,7 @@
                     var field = $(this).closest('td').prevAll().find("label").text();
                     $(this).closest("tr").find('td:last').before($('<td>').append(function () {
                         var $container = $('<select class="facetSelect1"></select>');
-                        $container.append($('<option>').val('-1').text('Please select a category'));
+                        $container.append($('<option>').val('-1').text('Select a category'));
                         $.post('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeGetFacetCategories,
                                 {
                                     tableName: $("#tableSelect").val(),
@@ -845,7 +846,7 @@
                     <tbody>
                     <tr>
                         <td class="buttonRow">
-                            <input type="submit" value="Submit" class="button">
+                            <input type="submit" value="Save" class="button">
                         </td>
                     </tr>
                     </tbody>
@@ -880,7 +881,7 @@
                 <table class="styledLeft">
                     <tbody>
                     <tr>
-                        <td class="buttonRow"><input type="submit" value="Submit"></td>
+                        <td class="buttonRow"><input type="submit" value="Save"></td>
                     </tr>
                     </tbody>
                 </table>

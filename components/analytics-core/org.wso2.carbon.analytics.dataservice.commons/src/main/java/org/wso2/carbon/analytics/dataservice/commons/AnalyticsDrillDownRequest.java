@@ -63,8 +63,7 @@ public class AnalyticsDrillDownRequest implements Serializable {
     }
 
     /**
-     * returns the table name.
-     * @return
+     * @returns the table name.
      */
     public String getTableName() {
         return tableName;

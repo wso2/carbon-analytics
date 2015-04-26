@@ -22,7 +22,7 @@ import java.io.Serializable;
  * This bean class represents the drill down information to perform drilldown operations
  * (search and count)
  */
-public class DrillDownRequestBean implements Serializable {
+public class CategoryDrillDownRequestBean implements Serializable {
 
     private static final long serialVersionUID = 491563554715534955L;
     private String tableName;
@@ -31,8 +31,7 @@ public class DrillDownRequestBean implements Serializable {
     private String query;
     private String scoreFunction;
 
-
-    public DrillDownRequestBean() {
+    public CategoryDrillDownRequestBean() {
     }
 
     public String getTableName() {
