@@ -943,6 +943,14 @@ public class JMSTaskManager {
                 log.debug("JMS Connection for event adapter : " + eventAdapterName + " created and started");
 
             } catch (JMSException e) {
+                if (connection != null) {
+                    log.warn("Closing connection due to error:" + e.getMessage());
+                    try {
+                        connection.close();
+                    } catch (JMSException ex) {
+                        log.error("Error when cleaning up connection:" + ex.getMessage(), e);
+                    }
+                }
                 handleException("Error acquiring a JMS connection to : " + getConnFactoryJNDIName() +
                         " using JNDI properties : " + jmsProperties, e);
             }
