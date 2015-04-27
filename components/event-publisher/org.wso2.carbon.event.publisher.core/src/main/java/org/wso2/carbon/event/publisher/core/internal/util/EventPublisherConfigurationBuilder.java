@@ -34,6 +34,7 @@ import org.wso2.carbon.event.publisher.core.config.OutputMapperFactory;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherStreamValidationException;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherValidationException;
+import org.wso2.carbon.event.publisher.core.internal.EventPublisher;
 import org.wso2.carbon.event.publisher.core.internal.ds.EventPublisherServiceValueHolder;
 import org.wso2.carbon.event.publisher.core.internal.util.helper.EventPublisherConfigurationHelper;
 import org.wso2.carbon.event.publisher.core.internal.util.helper.XmlFormatter;
@@ -193,7 +194,7 @@ public class EventPublisherConfigurationBuilder {
         String toStreamVersion = "";
 
         String customMappingEnabledAttribute = mappingElement.getAttributeValue(new QName(EventPublisherConstants.ENABLE_CONST));
-        if (customMappingEnabledAttribute != null && customMappingEnabledAttribute.equalsIgnoreCase(EventPublisherConstants.ENABLE_CONST)) {
+        if (mappingType.equalsIgnoreCase(EventPublisherConstants.EF_WSO2EVENT_MAPPING_TYPE) && customMappingEnabledAttribute != null && customMappingEnabledAttribute.equalsIgnoreCase(EventPublisherConstants.ENABLE_CONST)) {
             OMElement toOMElement = mappingElement.getFirstChildWithName(new QName(EventPublisherConstants.EF_CONF_NS, EventPublisherConstants.EF_ELEMENT_TO));
             toStreamName = toOMElement.getAttributeValue(new QName(EventPublisherConstants.EF_ATTR_STREAM_NAME));
             toStreamVersion = toOMElement.getAttributeValue(new QName(EventPublisherConstants.EF_ATTR_VERSION));

@@ -17,7 +17,6 @@
     String mappingType = request.getParameter("mappingType");
     String streamNameWithVersion = request.getParameter("streamNameWithVersion");
     if (mappingType.equals("wso2event")) {
-        System.out.println("ITS WSO2 event");
 %>
 <jsp:include page="wso2event_mapping_ui.jsp" flush="true">
     <jsp:param name="streamNameWithVersion" value="<%=streamNameWithVersion%>"/>

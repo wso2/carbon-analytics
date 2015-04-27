@@ -172,7 +172,7 @@ public class EventReceiverConfigurationBuilder {
         String fromStreamName="";
         String fromStreamVersion="";
         String customMappingEnabledAttribute = mappingElement.getAttributeValue(new QName(EventReceiverConstants.ER_ATTR_CUSTOM_MAPPING_ENABLED));
-        if (customMappingEnabledAttribute != null && customMappingEnabledAttribute.equalsIgnoreCase(EventReceiverConstants.ENABLE_CONST)) {
+        if (mappingType.equalsIgnoreCase(EventReceiverConstants.ER_WSO2EVENT_MAPPING_TYPE) && customMappingEnabledAttribute != null && customMappingEnabledAttribute.equalsIgnoreCase(EventReceiverConstants.ENABLE_CONST)) {
             OMElement fromOMElement = mappingElement.getFirstChildWithName(new QName(EventReceiverConstants.ER_CONF_NS, EventReceiverConstants.ER_ELEMENT_FROM));
             fromStreamName = fromOMElement.getAttributeValue(new QName(EventReceiverConstants.ER_ATTR_STREAM_NAME));
             fromStreamVersion = fromOMElement.getAttributeValue(new QName(EventReceiverConstants.ER_ATTR_VERSION));

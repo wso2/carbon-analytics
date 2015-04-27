@@ -256,7 +256,7 @@
                         // construct event receiver property array for each event receiver property
                         textEbProperties = new EventMappingPropertyDto[properties.length];
                         int index = 0;
-                        for (String property : properties) {
+                        for (String property : properties){
                             String[] propertyStringArr = property.split("\\^=");
                             if (propertyStringArr != null) {
                                 textEbProperties[index] = new EventMappingPropertyDto();
