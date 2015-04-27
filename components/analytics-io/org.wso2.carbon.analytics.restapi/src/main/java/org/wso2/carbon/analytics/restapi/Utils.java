@@ -429,6 +429,9 @@ public class Utils {
         Map<String, List<String>> categoryPaths = new LinkedHashMap<>();
         for (DrillDownPathBean drillDownPathBean : bean) {
             String[] path = drillDownPathBean.getPath();
+            if (path == null) {
+                path = new String[]{};
+            }
             categoryPaths.put(drillDownPathBean.getFieldName(),
                               Arrays.asList(path));
         }
