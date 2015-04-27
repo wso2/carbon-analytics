@@ -301,6 +301,8 @@ public class MessageConsoleConnector {
                 FacetBean facetBean = new FacetBean();
                 if (analyticsCategoryPathBeanValue != null && analyticsCategoryPathBeanValue.getPath() != null) {
                     facetBean.setPath(Arrays.asList(analyticsCategoryPathBeanValue.getPath()));
+                } else {
+                    facetBean.setPath(new ArrayList<String>(0));
                 }
                 value = String.valueOf(new Gson().toJson(facetBean));
                 break;
