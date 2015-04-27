@@ -340,6 +340,7 @@ function tableSelectChange() {
         $("#purgeRecordButton").hide();
         $('#facetListSelect').find('option:gt(0)').remove();
         $('#facetSearchTable tr').remove();
+        $('#query').val('');
     }
     try {
         $('#DeleteAllButton').hide();

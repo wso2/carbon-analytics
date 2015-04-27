@@ -83,6 +83,9 @@
             $("#deleteTableButton").hide();
             $("#editTableButton").hide();
             $("#purgeRecordButton").hide();
+            $('#facetListSelect').find('option:gt(0)').remove();
+            $('#facetSearchTable tr').remove();
+            $('#query').val('');
             try {
                 $('#DeleteAllButton').hide();
                 if (tableLoaded == true) {
@@ -152,7 +155,7 @@
                 $(this).val('Delete');
                 $(this).attr('class', 'del');
                 var appendTxt =
-                        "<tr><td><input type='text' name='column'/></td><td><select class='select'><option value='STRING'>STRING</option><option value='INTEGER'>INTEGER</option><option value='LONG'>LONG</option><option value='BOOLEAN'>BOOLEAN</option><option value='FLOAT'>FLOAT</option><option value='DOUBLE'>DOUBLE</option><c:if test="${permissions != null && permissions.isSetIndex()}"><option value='FACET'>FACET</option></c:if></select></td><td><input type='checkbox' name='primary'/></td><c:if test="${permissions != null && permissions.isSetIndex()}"><td><input type='checkbox' name='index'/></td><td><input type='checkbox' name='scoreParam' class='score-param-class'/></td></c:if><td><input class='add' type='button' value='Add More'/></td></tr>";
+                        "<tr><td><input type='text' name='column'/></td><td><select class='select'><option value='STRING'>STRING</option><option value='INTEGER'>INTEGER</option><option value='LONG'>LONG</option><option value='BOOLEAN'>BOOLEAN</option><option value='FLOAT'>FLOAT</option><option value='DOUBLE'>DOUBLE</option><c:if test="${permissions != null && permissions.isSetIndex()}"><option value='FACET'>FACET</option></c:if></select></td><td><input type='checkbox' name='primary'/></td><c:if test="${permissions != null && (permissions.isSetIndex() || permissions.isGetIndex())}"><td><input type='checkbox' <c:if test="${!permissions.isSetIndex()}"> disabled='disabled'</c:if> name='index'/></td><td><input type='checkbox' <c:if test="${!permissions.isSetIndex()}"> disabled='disabled'</c:if> name='scoreParam' class='score-param-class'/></td></c:if><td><input class='add' type='button' value='Add More'/></td></tr>";
                 $("#column-details tbody tr:last").after(appendTxt);
             });
 
@@ -255,31 +258,45 @@
                                selectElement.options[3] = new Option('BOOLEAN', 'BOOLEAN');
                                selectElement.options[4] = new Option('FLOAT', 'FLOAT');
                                selectElement.options[5] = new Option('DOUBLE', 'DOUBLE');
-                               <c:if test="${permissions != null && permissions.isSetIndex()}">
+                               <c:if test="${permissions != null && (permissions.isSetIndex() || permissions.isGetIndex())}">
                                selectElement.options[5] = new Option('FACET', 'FACET');
+                               <c:if test="${!permissions.isSetIndex()}">
+                               selectElement.options[5].setAttribute('disabled', 'true');
+                               </c:if>
                                </c:if>
                                selectElement.value = resultArray[i].type;
                                selectElement.className = "select";
+                               <c:if test="${permissions != null && !permissions.isSetIndex()}">
+                               if ('FACET' == resultArray[i].type) {
+                                   selectElement.setAttribute('disabled', 'true');
+                               }
+                               </c:if>
                                typeCell.appendChild(selectElement);
 
                                var primaryCell = row.insertCell(cellNo++);
                                var primaryCheckElement = document.createElement('input');
                                primaryCheckElement.type = "checkbox";
                                primaryCheckElement.checked = resultArray[i].primary;
-
                                primaryCell.appendChild(primaryCheckElement);
-                               <c:if test="${permissions != null && permissions.isSetIndex()}">
+
+                               <c:if test="${permissions != null && (permissions.isSetIndex() || permissions.isGetIndex())}">
                                var indexCell = row.insertCell(cellNo++);
                                var indexCheckElement = document.createElement('input');
                                indexCheckElement.type = "checkbox";
                                indexCheckElement.checked = resultArray[i].index;
-
+                               <c:if test="${!permissions.isSetIndex()}">
+                               indexCheckElement.setAttribute('disabled', 'true');
+                               </c:if>
                                indexCell.appendChild(indexCheckElement);
+
                                var scoreParamCell = row.insertCell(cellNo++);
                                var scoreParamCheckElement = document.createElement('input');
                                scoreParamCheckElement.type = "checkbox";
                                scoreParamCheckElement.className = "score-param-class";
                                scoreParamCheckElement.checked = resultArray[i].scoreParam;
+                               <c:if test="${!permissions.isSetIndex()}">
+                               scoreParamCheckElement.setAttribute('disabled', 'true');
+                               </c:if>
                                scoreParamCell.appendChild(scoreParamCheckElement);
                                if (resultArray[i].scoreParam) {
                                    selectElement.disabled = true;
@@ -315,33 +332,42 @@
 
             $('#facetListSelect').on('change', function () {
                 var facetName = $(this).val();
+                var exist = false;
                 if (facetName != -1) {
-                    $("#facetSearchTable").find('tbody').
-                            append($('<tr>').
-                                           append($('<td>').append($('<label>').text(facetName))).
-                                                               append($('<td>').append(function () {
-                                                                          var $container =
-                                                                                  $('<select class="facetSelect1"></select>');
-                                                                                                                                 $container.append($('<option>').val('-1').text('Select a category'));
-                                                                                    $.post('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeGetFacetCategories,
-                                                                                            {
-                                                                                                tableName: $("#tableSelect").val(),
-                                                                                                categoryPath: "",
-                                                                                                fieldName: facetName
-                                                                                            },
-                                                                                           function (result) {
-                                                                                               var categories = JSON.parse(result);
-                                                                                               $.each(categories,
-                                                                                                      function (index,
-                                                                                                                val) {
-                                                                                                          $container.append($('<option>').val(val).text(val));
-                                                                                                      });
-                                                                                           }
-                                                                                    );
-                                                                          return $container;
-                                                                      })).
-                                                               append($('<td>').append($('<input type="button" value="Remove" class="del">'))
-                                                       ));
+                    $('#facetSearchTable > tbody  > tr').each(function () {
+                        var row = $(this);
+                        if (facetName == row.find("label").text()) {
+                            exist = true;
+                        }
+                    });
+                    if (!exist) {
+                        $("#facetSearchTable").find('tbody').
+                                append($('<tr>').
+                                               append($('<td>').append($('<label>').text(facetName))).
+                                               append($('<td>').append(function () {
+                                                          var $container =
+                                                                  $('<select class="facetSelect1"></select>');
+                                                          $container.append($('<option>').val('-1').text('Select a category'));
+                                                          $.post('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeGetFacetCategories,
+                                                                  {
+                                                                      tableName: $("#tableSelect").val(),
+                                                                      categoryPath: "",
+                                                                      fieldName: facetName
+                                                                  },
+                                                                 function (result) {
+                                                                     var categories = JSON.parse(result);
+                                                                     $.each(categories,
+                                                                            function (index,
+                                                                                      val) {
+                                                                                $container.append($('<option>').val(val).text(val));
+                                                                            });
+                                                                 }
+                                                          );
+                                                          return $container;
+                                                      })).
+                                               append($('<td>').append($('<input type="button" value="Remove" class="del">'))
+                                       ));
+                    }
                 }
             });
 
@@ -812,7 +838,7 @@
                         <th>Column</th>
                         <th>Type</th>
                         <th>Primary key</th>
-                        <c:if test="${permissions != null && permissions.isSetIndex()}">
+                        <c:if test="${permissions != null && (permissions.isSetIndex() || permissions.isGetIndex())}">
                             <th>Index</th>
                             <th>Score Param</th>
                         </c:if>
@@ -834,9 +860,11 @@
                             </c:if>
                         </select></td>
                         <td><input type="checkbox" name="primary"/></td>
-                        <c:if test="${permissions != null && permissions.isSetIndex()}">
-                            <td><input type="checkbox" name="index"/></td>
-                            <td><input type="checkbox" name="scoreParam" class="score-param-class"/></td>
+                        <c:if test="${permissions != null && (permissions.isSetIndex() || permissions.isGetIndex())}">
+                            <td><input type="checkbox" <c:if test="${!permissions.isSetIndex()}"> disabled="disabled"
+                            </c:if> name="index"/></td>
+                            <td><input type="checkbox" <c:if test="${!permissions.isSetIndex()}"> disabled="disabled"
+                            </c:if> name="scoreParam" class="score-param-class"/></td>
                         </c:if>
                         <td><input class="add" type="button" value="Add More"/></td>
                     </tr>
