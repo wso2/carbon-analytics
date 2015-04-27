@@ -14,12 +14,11 @@
   ~ specific language governing permissions and limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>data-bridge-feature</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -52,41 +51,6 @@
 
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<!-- inherited version -->
-				<configuration>
-					<encoding>UTF-8</encoding>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>src/main/resources</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>resources</directory>
-                                    <includes>
-                                        <include>build.properties</include>
-                                        <include>conf/data-bridge-config.xml</include>
-                                        <include>p2.inf</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.wso2.maven</groupId>
                 <artifactId>carbon-p2-plugin</artifactId>
@@ -100,7 +64,7 @@
                         </goals>
                         <configuration>
                             <id>org.wso2.carbon.databridge.core.server</id>
-							<propertiesFile>../../../etc/feature.properties</propertiesFile>
+							<propertiesFile>../../etc/feature.properties</propertiesFile>
                             <adviceFile>
                                 <properties>
 									<propertyDef>org.wso2.carbon.p2.category.type:server</propertyDef>

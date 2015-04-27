@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <!--
-*
 * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 
 *  WSO2 Inc. licenses this file to you under the Apache License,
@@ -16,13 +15,13 @@
 * KIND, either express or implied.  See the License for the
 * specific language governing permissions and limitations
 * under the License..
-  -->
+-->
 
 <DataAgentsConfiguration>
     <Agent>
         <Name>Thrift</Name>
-        <DataEndpointClass>org.wso2.carbon.databridge.agent.internal.endpoint.thrift.ThriftDataEndpoint</DataEndpointClass>
-        <!--<TrustSore>src/main/resources/client-truststore.jks</TrustSore>-->
+        <DataEndpointClass>org.wso2.carbon.databridge.agent.endpoint.thrift.ThriftDataEndpoint</DataEndpointClass>
+        <!--<TrustSore>src/test/resources/client-truststore.jks</TrustSore>-->
         <!--<TrustSorePassword>wso2carbon</TrustSorePassword>-->
         <QueueSize>32768</QueueSize>
         <BatchSize>10000</BatchSize>
@@ -39,9 +38,8 @@
 
     <Agent>
         <Name>Binary</Name>
-        <DataEndpointClass>org.wso2.carbon.databridge.agent.internal.endpoint.binary.BinaryDataEndpoint
-        </DataEndpointClass>
-        <!--<TrustSore>src/main/resources/client-truststore.jks</TrustSore>-->
+        <DataEndpointClass>org.wso2.carbon.databridge.agent.endpoint.binary.BinaryDataEndpoint</DataEndpointClass>
+        <!--<TrustSore>src/test/resources/client-truststore.jks</TrustSore>-->
         <!--<TrustSorePassword>wso2carbon</TrustSorePassword>-->
         <QueueSize>32768</QueueSize>
         <BatchSize>10000</BatchSize>
@@ -56,6 +54,4 @@
         <SecureMinIdleTimeInPool>5000</SecureMinIdleTimeInPool>
     </Agent>
 </DataAgentsConfiguration>
-
-
 

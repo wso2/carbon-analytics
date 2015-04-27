@@ -1,0 +1,149 @@
+<!--
+  ~ Copyright (c) 2005 - 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  ~ use this file except in compliance with the License. You may obtain a copy
+  ~ of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software distributed
+  ~ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+  ~ CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations under the License.
+  -->
+<serviceGroup>
+    <service name="EventPublisherAdminService" scope="transportsession">
+        <transports>
+            <transport>https</transport>
+        </transports>
+        <messageReceivers>
+            <messageReceiver mep="http://www.w3.org/ns/wsdl/robust-in-only"
+                             class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver"/>
+            <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
+                             class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver"/>
+            <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
+                             class="org.apache.axis2.rpc.receivers.RPCMessageReceiver"/>
+        </messageReceivers>
+        <parameter name="ServiceClass" locked="false">
+            org.wso2.carbon.event.publisher.admin.EventPublisherAdminService
+        </parameter>
+
+        <parameter name="AuthorizationAction" locked="false">
+            /permission/admin/manage/event-publish
+        </parameter>
+
+        <operation name="getAllActiveEventPublisherConfigurations">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/manage/event-publish
+            </parameter>
+        </operation>
+        <operation name="getAllStreamSpecificActiveEventPublisherConfigurations">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/manage/event-publish
+            </parameter>
+        </operation>
+
+        <operation name="undeployActiveEventPublisherConfiguration">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/manage/event-publish
+            </parameter>
+        </operation>
+        <operation name="getAllInactiveEventPublisherConfigurations">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/manage/event-publish
+            </parameter>
+        </operation>
+        <operation name="undeployInactiveEventPublisherConfiguration">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/manage/event-publish
+            </parameter>
+        </operation>
+        <operation name="getInactiveEventPublisherConfigurationContent">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/manage/event-publish
+            </parameter>
+        </operation>
+        <operation name="editInactiveEventPublisherConfiguration">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/manage/event-publish
+            </parameter>
+        </operation>
+        <operation name="getActiveEventPublisherConfigurationContent">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/manage/event-publish
+            </parameter>
+        </operation>
+        <operation name="editActiveEventPublisherConfiguration">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/manage/event-publish
+            </parameter>
+        </operation>
+        <operation name="deployEventPublisherConfiguration">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/manage/event-publish
+            </parameter>
+        </operation>
+        <operation name="deployWSO2EventPublisherConfiguration">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/manage/event-publish
+            </parameter>
+        </operation>
+        <operation name="deployTextEventPublisherConfiguration">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/manage/event-publish
+            </parameter>
+        </operation>
+        <operation name="deployXmlEventPublisherConfiguration">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/manage/event-publish
+            </parameter>
+        </operation>
+        <operation name="deployMapEventPublisherConfiguration">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/manage/event-publish
+            </parameter>
+        </operation>
+        <operation name="deployJsonEventPublisherConfiguration">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/manage/event-publish
+            </parameter>
+        </operation>
+        <operation name="getActiveEventPublisherConfiguration">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/manage/event-publish
+            </parameter>
+        </operation>
+        <operation name="setStatisticsEnabled">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/manage/event-publish
+            </parameter>
+        </operation>
+        <operation name="setTracingEnabled">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/manage/event-publish
+            </parameter>
+        </operation>
+        <operation name="getActiveEventPublisherConfiguration">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/manage/event-publish
+            </parameter>
+        </operation>
+        <operation name="getOutputAdapterConfigurationSchema">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/manage/event-publish
+            </parameter>
+        </operation>
+        <operation name="getAllOutputAdapterTypes">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/manage/event-publish
+            </parameter>
+        </operation>
+
+
+    </service>
+    <!--<parameter name="adminService" locked="true">true</parameter>-->
+    <parameter name="adminService" locked="true">false</parameter>
+    <!--<parameter name="hiddenService" locked="true">true</parameter>-->
+    <parameter name="hiddenService" locked="true">false</parameter>
+</serviceGroup>

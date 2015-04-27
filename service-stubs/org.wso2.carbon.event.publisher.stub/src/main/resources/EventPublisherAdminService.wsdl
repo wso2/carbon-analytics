@@ -1,0 +1,1070 @@
+
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://admin.publisher.event.carbon.wso2.org" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ax2102="http://admin.publisher.event.carbon.wso2.org/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://admin.publisher.event.carbon.wso2.org">
+    <wsdl:documentation>EventPublisherAdminService</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema xmlns:ax2103="http://admin.publisher.event.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://admin.publisher.event.carbon.wso2.org">
+            <xs:import namespace="http://admin.publisher.event.carbon.wso2.org/xsd"></xs:import>
+            <xs:element name="undeployInactiveEventPublisherConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="undeployActiveEventPublisherConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setTracingEnabled">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="flag" type="xs:boolean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setStatisticsEnabled">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="flag" type="xs:boolean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getOutputAdapterConfigurationSchema">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="adopterType" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getOutputAdapterConfigurationSchemaResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2103:OutputAdapterConfigurationDto"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getInactiveEventPublisherConfigurationContent">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getInactiveEventPublisherConfigurationContentResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllStreamSpecificActiveEventPublisherConfigurations">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="streamId" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllStreamSpecificActiveEventPublisherConfigurationsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2103:EventPublisherConfigurationInfoDto"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllOutputAdapterTypes">
+                <xs:complexType>
+                    <xs:sequence></xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllOutputAdapterTypesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllInactiveEventPublisherConfigurations">
+                <xs:complexType>
+                    <xs:sequence></xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllInactiveEventPublisherConfigurationsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2103:EventPublisherConfigurationFileDto"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllActiveEventPublisherConfigurations">
+                <xs:complexType>
+                    <xs:sequence></xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllActiveEventPublisherConfigurationsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2103:EventPublisherConfigurationInfoDto"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getActiveEventPublisherConfigurationContent">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getActiveEventPublisherConfigurationContentResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getActiveEventPublisherConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getActiveEventPublisherConfigurationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2103:EventPublisherConfigurationDto"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="editInactiveEventPublisherConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventPublisherConfiguration" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="editActiveEventPublisherConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventPublisherConfiguration" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployXmlEventPublisherConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="textData" nillable="true" type="xs:string"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2103:BasicOutputAdapterPropertyDto"></xs:element>
+                        <xs:element minOccurs="0" name="dataFrom" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="mappingEnabled" type="xs:boolean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployWSO2EventPublisherConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="metaData" nillable="true" type="ax2103:EventMappingPropertyDto"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="correlationData" nillable="true" type="ax2103:EventMappingPropertyDto"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="payloadData" nillable="true" type="ax2103:EventMappingPropertyDto"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2103:BasicOutputAdapterPropertyDto"></xs:element>
+                        <xs:element minOccurs="0" name="mappingEnabled" type="xs:boolean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployTextEventPublisherConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="textData" nillable="true" type="xs:string"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2103:BasicOutputAdapterPropertyDto"></xs:element>
+                        <xs:element minOccurs="0" name="dataFrom" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="mappingEnabled" type="xs:boolean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployMapEventPublisherConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="mapData" nillable="true" type="ax2103:EventMappingPropertyDto"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2103:BasicOutputAdapterPropertyDto"></xs:element>
+                        <xs:element minOccurs="0" name="mappingEnabled" type="xs:boolean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployJsonEventPublisherConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="streamNameWithVersion" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="jsonData" nillable="true" type="xs:string"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputPropertyConfiguration" nillable="true" type="ax2103:BasicOutputAdapterPropertyDto"></xs:element>
+                        <xs:element minOccurs="0" name="dataFrom" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="mappingEnabled" type="xs:boolean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployEventPublisherConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventPublisherConfigXml" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://admin.publisher.event.carbon.wso2.org/xsd">
+            <xs:complexType name="OutputAdapterConfigurationDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="outputEventAdapterDynamicProperties" nillable="true" type="ax2102:DetailOutputAdapterPropertyDto"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="outputEventAdapterStaticProperties" nillable="true" type="ax2102:DetailOutputAdapterPropertyDto"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="supportedMessageFormats" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="DetailOutputAdapterPropertyDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="defaultValue" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="displayName" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="hint" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="key" nillable="true" type="xs:string"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="options" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="required" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="secured" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="value" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="EventPublisherConfigurationInfoDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="editable" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="enableStats" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="enableTracing" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="inputStreamId" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="messageFormat" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="outputAdapterType" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="EventPublisherConfigurationFileDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="deploymentStatusMsg" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="EventPublisherConfigurationDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="customMappingEnabled" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="eventPublisherName" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="fromStreamNameWithVersion" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="jsonOutputMappingDto" nillable="true" type="ax2102:JSONOutputMappingDto"></xs:element>
+                    <xs:element minOccurs="0" name="mapOutputMappingDto" nillable="true" type="ax2102:MapOutputMappingDto"></xs:element>
+                    <xs:element minOccurs="0" name="messageFormat" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="streamDefinition" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="textOutputMappingDto" nillable="true" type="ax2102:TextOutputMappingDto"></xs:element>
+                    <xs:element minOccurs="0" name="toAdapterConfigurationDto" nillable="true" type="ax2102:OutputAdapterConfigurationDto"></xs:element>
+                    <xs:element minOccurs="0" name="wso2EventOutputMappingDto" nillable="true" type="ax2102:WSO2EventOutputMappingDto"></xs:element>
+                    <xs:element minOccurs="0" name="xmlOutputMappingDto" nillable="true" type="ax2102:XMLOutputMappingDto"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="JSONOutputMappingDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="mappingText" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="registryResource" type="xs:boolean"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="MapOutputMappingDto">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="eventMappingProperties" nillable="true" type="ax2102:EventMappingPropertyDto"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="EventMappingPropertyDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="valueOf" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="TextOutputMappingDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="mappingText" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="registryResource" type="xs:boolean"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="WSO2EventOutputMappingDto">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="correlationWSO2EventMappingProperties" nillable="true" type="ax2102:EventMappingPropertyDto"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="metaWSO2EventMappingProperties" nillable="true" type="ax2102:EventMappingPropertyDto"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="payloadWSO2EventMappingProperties" nillable="true" type="ax2102:EventMappingPropertyDto"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="XMLOutputMappingDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="mappingXMLText" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="registryResource" type="xs:boolean"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="BasicOutputAdapterPropertyDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="key" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="static" type="xs:boolean"></xs:element>
+                    <xs:element minOccurs="0" name="value" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="getInactiveEventPublisherConfigurationContentRequest">
+        <wsdl:part name="parameters" element="ns:getInactiveEventPublisherConfigurationContent"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getInactiveEventPublisherConfigurationContentResponse">
+        <wsdl:part name="parameters" element="ns:getInactiveEventPublisherConfigurationContentResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deployWSO2EventPublisherConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:deployWSO2EventPublisherConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deployWSO2EventPublisherConfigurationResponse"></wsdl:message>
+    <wsdl:message name="deployXmlEventPublisherConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:deployXmlEventPublisherConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deployXmlEventPublisherConfigurationResponse"></wsdl:message>
+    <wsdl:message name="editInactiveEventPublisherConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:editInactiveEventPublisherConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="editInactiveEventPublisherConfigurationResponse"></wsdl:message>
+    <wsdl:message name="getAllInactiveEventPublisherConfigurationsRequest">
+        <wsdl:part name="parameters" element="ns:getAllInactiveEventPublisherConfigurations"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllInactiveEventPublisherConfigurationsResponse">
+        <wsdl:part name="parameters" element="ns:getAllInactiveEventPublisherConfigurationsResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deployEventPublisherConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:deployEventPublisherConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deployEventPublisherConfigurationResponse"></wsdl:message>
+    <wsdl:message name="getActiveEventPublisherConfigurationContentRequest">
+        <wsdl:part name="parameters" element="ns:getActiveEventPublisherConfigurationContent"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getActiveEventPublisherConfigurationContentResponse">
+        <wsdl:part name="parameters" element="ns:getActiveEventPublisherConfigurationContentResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deployJsonEventPublisherConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:deployJsonEventPublisherConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deployJsonEventPublisherConfigurationResponse"></wsdl:message>
+    <wsdl:message name="undeployInactiveEventPublisherConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:undeployInactiveEventPublisherConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="undeployInactiveEventPublisherConfigurationResponse"></wsdl:message>
+    <wsdl:message name="undeployActiveEventPublisherConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:undeployActiveEventPublisherConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="undeployActiveEventPublisherConfigurationResponse"></wsdl:message>
+    <wsdl:message name="setStatisticsEnabledRequest">
+        <wsdl:part name="parameters" element="ns:setStatisticsEnabled"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="setStatisticsEnabledResponse"></wsdl:message>
+    <wsdl:message name="deployMapEventPublisherConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:deployMapEventPublisherConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deployMapEventPublisherConfigurationResponse"></wsdl:message>
+    <wsdl:message name="getOutputAdapterConfigurationSchemaRequest">
+        <wsdl:part name="parameters" element="ns:getOutputAdapterConfigurationSchema"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getOutputAdapterConfigurationSchemaResponse">
+        <wsdl:part name="parameters" element="ns:getOutputAdapterConfigurationSchemaResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllStreamSpecificActiveEventPublisherConfigurationsRequest">
+        <wsdl:part name="parameters" element="ns:getAllStreamSpecificActiveEventPublisherConfigurations"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllStreamSpecificActiveEventPublisherConfigurationsResponse">
+        <wsdl:part name="parameters" element="ns:getAllStreamSpecificActiveEventPublisherConfigurationsResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="editActiveEventPublisherConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:editActiveEventPublisherConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="editActiveEventPublisherConfigurationResponse"></wsdl:message>
+    <wsdl:message name="getAllActiveEventPublisherConfigurationsRequest">
+        <wsdl:part name="parameters" element="ns:getAllActiveEventPublisherConfigurations"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllActiveEventPublisherConfigurationsResponse">
+        <wsdl:part name="parameters" element="ns:getAllActiveEventPublisherConfigurationsResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="setTracingEnabledRequest">
+        <wsdl:part name="parameters" element="ns:setTracingEnabled"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="setTracingEnabledResponse"></wsdl:message>
+    <wsdl:message name="deployTextEventPublisherConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:deployTextEventPublisherConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deployTextEventPublisherConfigurationResponse"></wsdl:message>
+    <wsdl:message name="getAllOutputAdapterTypesRequest">
+        <wsdl:part name="parameters" element="ns:getAllOutputAdapterTypes"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllOutputAdapterTypesResponse">
+        <wsdl:part name="parameters" element="ns:getAllOutputAdapterTypesResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getActiveEventPublisherConfigurationRequest">
+        <wsdl:part name="parameters" element="ns:getActiveEventPublisherConfiguration"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getActiveEventPublisherConfigurationResponse">
+        <wsdl:part name="parameters" element="ns:getActiveEventPublisherConfigurationResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="EventPublisherAdminServicePortType">
+        <wsdl:operation name="getInactiveEventPublisherConfigurationContent">
+            <wsdl:input message="ns:getInactiveEventPublisherConfigurationContentRequest" wsaw:Action="urn:getInactiveEventPublisherConfigurationContent"></wsdl:input>
+            <wsdl:output message="ns:getInactiveEventPublisherConfigurationContentResponse" wsaw:Action="urn:getInactiveEventPublisherConfigurationContentResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployWSO2EventPublisherConfiguration">
+            <wsdl:input message="ns:deployWSO2EventPublisherConfigurationRequest" wsaw:Action="urn:deployWSO2EventPublisherConfiguration"></wsdl:input>
+            <wsdl:output message="ns:deployWSO2EventPublisherConfigurationResponse" wsaw:Action="urn:deployWSO2EventPublisherConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployXmlEventPublisherConfiguration">
+            <wsdl:input message="ns:deployXmlEventPublisherConfigurationRequest" wsaw:Action="urn:deployXmlEventPublisherConfiguration"></wsdl:input>
+            <wsdl:output message="ns:deployXmlEventPublisherConfigurationResponse" wsaw:Action="urn:deployXmlEventPublisherConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editInactiveEventPublisherConfiguration">
+            <wsdl:input message="ns:editInactiveEventPublisherConfigurationRequest" wsaw:Action="urn:editInactiveEventPublisherConfiguration"></wsdl:input>
+            <wsdl:output message="ns:editInactiveEventPublisherConfigurationResponse" wsaw:Action="urn:editInactiveEventPublisherConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllInactiveEventPublisherConfigurations">
+            <wsdl:input message="ns:getAllInactiveEventPublisherConfigurationsRequest" wsaw:Action="urn:getAllInactiveEventPublisherConfigurations"></wsdl:input>
+            <wsdl:output message="ns:getAllInactiveEventPublisherConfigurationsResponse" wsaw:Action="urn:getAllInactiveEventPublisherConfigurationsResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployEventPublisherConfiguration">
+            <wsdl:input message="ns:deployEventPublisherConfigurationRequest" wsaw:Action="urn:deployEventPublisherConfiguration"></wsdl:input>
+            <wsdl:output message="ns:deployEventPublisherConfigurationResponse" wsaw:Action="urn:deployEventPublisherConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveEventPublisherConfigurationContent">
+            <wsdl:input message="ns:getActiveEventPublisherConfigurationContentRequest" wsaw:Action="urn:getActiveEventPublisherConfigurationContent"></wsdl:input>
+            <wsdl:output message="ns:getActiveEventPublisherConfigurationContentResponse" wsaw:Action="urn:getActiveEventPublisherConfigurationContentResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployJsonEventPublisherConfiguration">
+            <wsdl:input message="ns:deployJsonEventPublisherConfigurationRequest" wsaw:Action="urn:deployJsonEventPublisherConfiguration"></wsdl:input>
+            <wsdl:output message="ns:deployJsonEventPublisherConfigurationResponse" wsaw:Action="urn:deployJsonEventPublisherConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployInactiveEventPublisherConfiguration">
+            <wsdl:input message="ns:undeployInactiveEventPublisherConfigurationRequest" wsaw:Action="urn:undeployInactiveEventPublisherConfiguration"></wsdl:input>
+            <wsdl:output message="ns:undeployInactiveEventPublisherConfigurationResponse" wsaw:Action="urn:undeployInactiveEventPublisherConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployActiveEventPublisherConfiguration">
+            <wsdl:input message="ns:undeployActiveEventPublisherConfigurationRequest" wsaw:Action="urn:undeployActiveEventPublisherConfiguration"></wsdl:input>
+            <wsdl:output message="ns:undeployActiveEventPublisherConfigurationResponse" wsaw:Action="urn:undeployActiveEventPublisherConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setStatisticsEnabled">
+            <wsdl:input message="ns:setStatisticsEnabledRequest" wsaw:Action="urn:setStatisticsEnabled"></wsdl:input>
+            <wsdl:output message="ns:setStatisticsEnabledResponse" wsaw:Action="urn:setStatisticsEnabledResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployMapEventPublisherConfiguration">
+            <wsdl:input message="ns:deployMapEventPublisherConfigurationRequest" wsaw:Action="urn:deployMapEventPublisherConfiguration"></wsdl:input>
+            <wsdl:output message="ns:deployMapEventPublisherConfigurationResponse" wsaw:Action="urn:deployMapEventPublisherConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getOutputAdapterConfigurationSchema">
+            <wsdl:input message="ns:getOutputAdapterConfigurationSchemaRequest" wsaw:Action="urn:getOutputAdapterConfigurationSchema"></wsdl:input>
+            <wsdl:output message="ns:getOutputAdapterConfigurationSchemaResponse" wsaw:Action="urn:getOutputAdapterConfigurationSchemaResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllStreamSpecificActiveEventPublisherConfigurations">
+            <wsdl:input message="ns:getAllStreamSpecificActiveEventPublisherConfigurationsRequest" wsaw:Action="urn:getAllStreamSpecificActiveEventPublisherConfigurations"></wsdl:input>
+            <wsdl:output message="ns:getAllStreamSpecificActiveEventPublisherConfigurationsResponse" wsaw:Action="urn:getAllStreamSpecificActiveEventPublisherConfigurationsResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editActiveEventPublisherConfiguration">
+            <wsdl:input message="ns:editActiveEventPublisherConfigurationRequest" wsaw:Action="urn:editActiveEventPublisherConfiguration"></wsdl:input>
+            <wsdl:output message="ns:editActiveEventPublisherConfigurationResponse" wsaw:Action="urn:editActiveEventPublisherConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllActiveEventPublisherConfigurations">
+            <wsdl:input message="ns:getAllActiveEventPublisherConfigurationsRequest" wsaw:Action="urn:getAllActiveEventPublisherConfigurations"></wsdl:input>
+            <wsdl:output message="ns:getAllActiveEventPublisherConfigurationsResponse" wsaw:Action="urn:getAllActiveEventPublisherConfigurationsResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setTracingEnabled">
+            <wsdl:input message="ns:setTracingEnabledRequest" wsaw:Action="urn:setTracingEnabled"></wsdl:input>
+            <wsdl:output message="ns:setTracingEnabledResponse" wsaw:Action="urn:setTracingEnabledResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployTextEventPublisherConfiguration">
+            <wsdl:input message="ns:deployTextEventPublisherConfigurationRequest" wsaw:Action="urn:deployTextEventPublisherConfiguration"></wsdl:input>
+            <wsdl:output message="ns:deployTextEventPublisherConfigurationResponse" wsaw:Action="urn:deployTextEventPublisherConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllOutputAdapterTypes">
+            <wsdl:input message="ns:getAllOutputAdapterTypesRequest" wsaw:Action="urn:getAllOutputAdapterTypes"></wsdl:input>
+            <wsdl:output message="ns:getAllOutputAdapterTypesResponse" wsaw:Action="urn:getAllOutputAdapterTypesResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveEventPublisherConfiguration">
+            <wsdl:input message="ns:getActiveEventPublisherConfigurationRequest" wsaw:Action="urn:getActiveEventPublisherConfiguration"></wsdl:input>
+            <wsdl:output message="ns:getActiveEventPublisherConfigurationResponse" wsaw:Action="urn:getActiveEventPublisherConfigurationResponse"></wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="EventPublisherAdminServiceSoap11Binding" type="ns:EventPublisherAdminServicePortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"></soap:binding>
+        <wsdl:operation name="deployWSO2EventPublisherConfiguration">
+            <soap:operation soapAction="urn:deployWSO2EventPublisherConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getInactiveEventPublisherConfigurationContent">
+            <soap:operation soapAction="urn:getInactiveEventPublisherConfigurationContent" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployXmlEventPublisherConfiguration">
+            <soap:operation soapAction="urn:deployXmlEventPublisherConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllInactiveEventPublisherConfigurations">
+            <soap:operation soapAction="urn:getAllInactiveEventPublisherConfigurations" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editInactiveEventPublisherConfiguration">
+            <soap:operation soapAction="urn:editInactiveEventPublisherConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployEventPublisherConfiguration">
+            <soap:operation soapAction="urn:deployEventPublisherConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveEventPublisherConfigurationContent">
+            <soap:operation soapAction="urn:getActiveEventPublisherConfigurationContent" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployJsonEventPublisherConfiguration">
+            <soap:operation soapAction="urn:deployJsonEventPublisherConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployInactiveEventPublisherConfiguration">
+            <soap:operation soapAction="urn:undeployInactiveEventPublisherConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployActiveEventPublisherConfiguration">
+            <soap:operation soapAction="urn:undeployActiveEventPublisherConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setStatisticsEnabled">
+            <soap:operation soapAction="urn:setStatisticsEnabled" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployMapEventPublisherConfiguration">
+            <soap:operation soapAction="urn:deployMapEventPublisherConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getOutputAdapterConfigurationSchema">
+            <soap:operation soapAction="urn:getOutputAdapterConfigurationSchema" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllStreamSpecificActiveEventPublisherConfigurations">
+            <soap:operation soapAction="urn:getAllStreamSpecificActiveEventPublisherConfigurations" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllActiveEventPublisherConfigurations">
+            <soap:operation soapAction="urn:getAllActiveEventPublisherConfigurations" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editActiveEventPublisherConfiguration">
+            <soap:operation soapAction="urn:editActiveEventPublisherConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setTracingEnabled">
+            <soap:operation soapAction="urn:setTracingEnabled" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployTextEventPublisherConfiguration">
+            <soap:operation soapAction="urn:deployTextEventPublisherConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllOutputAdapterTypes">
+            <soap:operation soapAction="urn:getAllOutputAdapterTypes" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveEventPublisherConfiguration">
+            <soap:operation soapAction="urn:getActiveEventPublisherConfiguration" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="EventPublisherAdminServiceSoap12Binding" type="ns:EventPublisherAdminServicePortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"></soap12:binding>
+        <wsdl:operation name="deployWSO2EventPublisherConfiguration">
+            <soap12:operation soapAction="urn:deployWSO2EventPublisherConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getInactiveEventPublisherConfigurationContent">
+            <soap12:operation soapAction="urn:getInactiveEventPublisherConfigurationContent" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployXmlEventPublisherConfiguration">
+            <soap12:operation soapAction="urn:deployXmlEventPublisherConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllInactiveEventPublisherConfigurations">
+            <soap12:operation soapAction="urn:getAllInactiveEventPublisherConfigurations" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editInactiveEventPublisherConfiguration">
+            <soap12:operation soapAction="urn:editInactiveEventPublisherConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployEventPublisherConfiguration">
+            <soap12:operation soapAction="urn:deployEventPublisherConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveEventPublisherConfigurationContent">
+            <soap12:operation soapAction="urn:getActiveEventPublisherConfigurationContent" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployJsonEventPublisherConfiguration">
+            <soap12:operation soapAction="urn:deployJsonEventPublisherConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployInactiveEventPublisherConfiguration">
+            <soap12:operation soapAction="urn:undeployInactiveEventPublisherConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployActiveEventPublisherConfiguration">
+            <soap12:operation soapAction="urn:undeployActiveEventPublisherConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setStatisticsEnabled">
+            <soap12:operation soapAction="urn:setStatisticsEnabled" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployMapEventPublisherConfiguration">
+            <soap12:operation soapAction="urn:deployMapEventPublisherConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getOutputAdapterConfigurationSchema">
+            <soap12:operation soapAction="urn:getOutputAdapterConfigurationSchema" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllStreamSpecificActiveEventPublisherConfigurations">
+            <soap12:operation soapAction="urn:getAllStreamSpecificActiveEventPublisherConfigurations" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllActiveEventPublisherConfigurations">
+            <soap12:operation soapAction="urn:getAllActiveEventPublisherConfigurations" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editActiveEventPublisherConfiguration">
+            <soap12:operation soapAction="urn:editActiveEventPublisherConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setTracingEnabled">
+            <soap12:operation soapAction="urn:setTracingEnabled" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployTextEventPublisherConfiguration">
+            <soap12:operation soapAction="urn:deployTextEventPublisherConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllOutputAdapterTypes">
+            <soap12:operation soapAction="urn:getAllOutputAdapterTypes" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveEventPublisherConfiguration">
+            <soap12:operation soapAction="urn:getActiveEventPublisherConfiguration" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="EventPublisherAdminServiceHttpBinding" type="ns:EventPublisherAdminServicePortType">
+        <http:binding verb="POST"></http:binding>
+        <wsdl:operation name="deployWSO2EventPublisherConfiguration">
+            <http:operation location="deployWSO2EventPublisherConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getInactiveEventPublisherConfigurationContent">
+            <http:operation location="getInactiveEventPublisherConfigurationContent"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployXmlEventPublisherConfiguration">
+            <http:operation location="deployXmlEventPublisherConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllInactiveEventPublisherConfigurations">
+            <http:operation location="getAllInactiveEventPublisherConfigurations"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editInactiveEventPublisherConfiguration">
+            <http:operation location="editInactiveEventPublisherConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployEventPublisherConfiguration">
+            <http:operation location="deployEventPublisherConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveEventPublisherConfigurationContent">
+            <http:operation location="getActiveEventPublisherConfigurationContent"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployJsonEventPublisherConfiguration">
+            <http:operation location="deployJsonEventPublisherConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployInactiveEventPublisherConfiguration">
+            <http:operation location="undeployInactiveEventPublisherConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="undeployActiveEventPublisherConfiguration">
+            <http:operation location="undeployActiveEventPublisherConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setStatisticsEnabled">
+            <http:operation location="setStatisticsEnabled"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployMapEventPublisherConfiguration">
+            <http:operation location="deployMapEventPublisherConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getOutputAdapterConfigurationSchema">
+            <http:operation location="getOutputAdapterConfigurationSchema"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllStreamSpecificActiveEventPublisherConfigurations">
+            <http:operation location="getAllStreamSpecificActiveEventPublisherConfigurations"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllActiveEventPublisherConfigurations">
+            <http:operation location="getAllActiveEventPublisherConfigurations"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="editActiveEventPublisherConfiguration">
+            <http:operation location="editActiveEventPublisherConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setTracingEnabled">
+            <http:operation location="setTracingEnabled"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deployTextEventPublisherConfiguration">
+            <http:operation location="deployTextEventPublisherConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllOutputAdapterTypes">
+            <http:operation location="getAllOutputAdapterTypes"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveEventPublisherConfiguration">
+            <http:operation location="getActiveEventPublisherConfiguration"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="EventPublisherAdminService">
+        <wsdl:port name="EventPublisherAdminServiceHttpsSoap11Endpoint" binding="ns:EventPublisherAdminServiceSoap11Binding">
+            <soap:address location="https://192.168.1.6:9443/services/EventPublisherAdminService.EventPublisherAdminServiceHttpsSoap11Endpoint/"></soap:address>
+        </wsdl:port>
+        <wsdl:port name="EventPublisherAdminServiceHttpsSoap12Endpoint" binding="ns:EventPublisherAdminServiceSoap12Binding">
+            <soap12:address location="https://192.168.1.6:9443/services/EventPublisherAdminService.EventPublisherAdminServiceHttpsSoap12Endpoint/"></soap12:address>
+        </wsdl:port>
+        <wsdl:port name="EventPublisherAdminServiceHttpsEndpoint" binding="ns:EventPublisherAdminServiceHttpBinding">
+            <http:address location="https://192.168.1.6:9443/services/EventPublisherAdminService.EventPublisherAdminServiceHttpsEndpoint/"></http:address>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

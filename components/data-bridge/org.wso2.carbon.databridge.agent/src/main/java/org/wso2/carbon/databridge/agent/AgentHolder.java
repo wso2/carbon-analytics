@@ -19,16 +19,16 @@ package org.wso2.carbon.databridge.agent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.conf.AgentConfiguration;
 import org.wso2.carbon.databridge.agent.conf.DataAgentsConfiguration;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 import org.wso2.carbon.utils.CarbonUtils;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import java.io.*;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -77,9 +77,9 @@ public class AgentHolder {
 
     public synchronized DataEndpointAgent getDataEndpointAgent(String type)
             throws DataEndpointAgentConfigurationException {
-        DataEndpointAgent agent = this.dataEndpointAgents.get(type);
+        DataEndpointAgent agent = this.dataEndpointAgents.get(type.toLowerCase());
         if (agent == null) {
-            throw new DataEndpointAgentConfigurationException("No data agent configured for the type: " + type);
+            throw new DataEndpointAgentConfigurationException("No data agent configured for the type: " + type.toLowerCase());
         }
         return agent;
     }
@@ -101,6 +101,25 @@ public class AgentHolder {
             DataAgentsConfiguration dataAgentsConfiguration = (DataAgentsConfiguration)
                     jaxbUnmarshaller.unmarshal(file);
             dataAgentsConfiguration.validateConfigurations();
+
+            for (AgentConfiguration agentConfiguration : dataAgentsConfiguration.getAgentConfigurations()) {
+
+                if (agentConfiguration.getTrustStore() == null) {
+                    agentConfiguration.setTrustStore(System.getProperty("javax.net.ssl.trustStore"));
+                    if (agentConfiguration.getTrustStore() == null) {
+                        throw new DataEndpointAgentConfigurationException("No trustStore found");
+                    }
+                }
+
+                if (agentConfiguration.getTrustStorePassword() == null) {
+                    agentConfiguration.setTrustStorePassword(System.getProperty("javax.net.ssl.trustStorePassword"));
+                    if (agentConfiguration.getTrustStorePassword() == null) {
+                        throw new DataEndpointAgentConfigurationException("No trustStore password found");
+                    }
+                }
+
+            }
+
             return dataAgentsConfiguration;
         } catch (JAXBException e) {
             throw new DataEndpointAgentConfigurationException("Error while loading the configuration file "
@@ -112,7 +131,7 @@ public class AgentHolder {
     private void addAgentConfiguration(AgentConfiguration agentConfiguration, boolean defaultAgent)
             throws DataEndpointAgentConfigurationException {
         DataEndpointAgent agent = new DataEndpointAgent(agentConfiguration);
-        dataEndpointAgents.put(agent.getAgentConfiguration().getDataEndpointName(), agent);
+        dataEndpointAgents.put(agent.getAgentConfiguration().getDataEndpointName().toLowerCase(), agent);
         if (defaultAgent) {
             defaultDataEndpointAgentName = agent.getAgentConfiguration().getDataEndpointName();
         }
