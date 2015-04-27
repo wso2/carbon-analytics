@@ -28,7 +28,6 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.jsservice.beans.AnalyticsSchemaBean;
-import org.wso2.carbon.analytics.jsservice.beans.IndexConfigurationBean;
 import org.wso2.carbon.analytics.jsservice.beans.QueryBean;
 import org.wso2.carbon.analytics.jsservice.beans.Record;
 import org.wso2.carbon.analytics.jsservice.beans.ResponseBean;
@@ -37,7 +36,6 @@ import org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceStub;
 import org.wso2.carbon.analytics.webservice.stub.beans.RecordBean;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -312,61 +310,15 @@ public class AnalyticsWebServiceConnector {
             }
             RecordBean[] recordBeans = Utils.getRecords(records);
             try {
-                analyticsWebServiceStub.put(recordBeans);
-                return gson.toJson(handleResponse(ResponseStatus.CREATED, "Successfully created records"));
+                RecordBean[] beansWithIds = analyticsWebServiceStub.put(recordBeans);
+                List<String> ids = Utils.getIds(beansWithIds);
+                return gson.toJson(ids);
             } catch (Exception e) {
                 logger.error("Failed to put records: " + e.getMessage(), e);
                 return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to put records: " + e.getMessage()));
             }
         } else {
             return gson.toJson(handleResponse(ResponseStatus.FAILED, "Record list is empty"));
-        }
-    }
-
-    public String setIndices(String tableName,
-                               String indexInfoAsString) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Invoking setIndices for tableName : " +
-                         tableName);
-        }
-        IndexConfigurationBean indexInfo = gson.fromJson(indexInfoAsString, IndexConfigurationBean.class);
-        if (indexInfo != null) {
-            org.wso2.carbon.analytics.webservice.stub.beans.IndexConfigurationBean
-                    indexConfigurationBean = Utils.createIndexConfiguration(indexInfo);
-            try {
-                analyticsWebServiceStub.setIndices(tableName, indexConfigurationBean);
-                return gson.toJson(handleResponse(ResponseStatus.CREATED, "Successfully set indices in table: " +
-                                                              tableName));
-            } catch (Exception e) {
-                logger.error("Failed to set indices for table: " + tableName + " : " + e.getMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to set indices for table: " +
-                                                  tableName + ": " + e.getMessage()));
-            }
-        } else {
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Index information is not provided"));
-        }
-    }
-
-    public String getIndices(String tableName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Invoking getIndices for tableName : " +
-                         tableName);
-        }
-        try {
-            org.wso2.carbon.analytics.webservice.
-                    stub.beans.IndexConfigurationBean indexInfo = analyticsWebServiceStub.getIndices(tableName);
-            String[] scoreParams = indexInfo.getScoreParams();
-            IndexConfigurationBean indexConfigurationBean = new IndexConfigurationBean();
-            indexConfigurationBean.setIndices(Utils.createIndexTypeBeanMap(indexInfo.getIndices()));
-            indexConfigurationBean.setScoreParams(Arrays.asList(scoreParams));
-            if (logger.isDebugEnabled()) {
-                logger.debug("Getting indices : " + indexConfigurationBean.getIndices().keySet());
-            }
-            return gson.toJson(indexConfigurationBean);
-        } catch (Exception e) {
-            logger.error("Failed to get indices for table: " + tableName + " : " + e.getMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get indices for table: " +
-                                                                     tableName + ": " + e.getMessage()));
         }
     }
 

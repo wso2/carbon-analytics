@@ -25,6 +25,8 @@ public class SchemaColumnBean implements Serializable {
     private static final long serialVersionUID = -4156435823075540631L;
     private String columnName;
     private String columnType;
+    private boolean isIndex;
+    private boolean isScoreParam;
 
     public SchemaColumnBean() {
     }
@@ -43,5 +45,22 @@ public class SchemaColumnBean implements Serializable {
 
     public void setColumnType(String columnType) {
         this.columnType = columnType;
+    }
+
+
+    public boolean isIndex() {
+        return isIndex;
+    }
+
+    public void setIndex(boolean isIndex) {
+        this.isIndex = isIndex;
+    }
+
+    public boolean isScoreParam() {
+        return isScoreParam;
+    }
+
+    public void setScoreParam(boolean isScoreParam) {
+        this.isScoreParam = isScoreParam;
     }
 }

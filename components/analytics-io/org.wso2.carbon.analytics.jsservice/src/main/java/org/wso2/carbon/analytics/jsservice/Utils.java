@@ -18,12 +18,10 @@ package org.wso2.carbon.analytics.jsservice;
 
 import org.apache.axiom.om.util.Base64;
 import org.wso2.carbon.analytics.jsservice.beans.AnalyticsSchemaBean;
+import org.wso2.carbon.analytics.jsservice.beans.ColumnDefinitionBean;
 import org.wso2.carbon.analytics.jsservice.beans.ColumnTypeBean;
-import org.wso2.carbon.analytics.jsservice.beans.IndexConfigurationBean;
-import org.wso2.carbon.analytics.jsservice.beans.IndexTypeBean;
 import org.wso2.carbon.analytics.jsservice.beans.Record;
 import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsCategoryPathBean;
-import org.wso2.carbon.analytics.webservice.stub.beans.IndexEntryBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.RecordBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.RecordValueEntryBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.SchemaColumnBean;
@@ -48,8 +46,6 @@ import java.util.Map;
 public class Utils {
 
     private static final String DEFAUL_CHARSETT = "UTF-8";
-    public static final int CATEGORYPATH_FIELD_COUNT = 2;
-    public static final float DEFAUL_CATEGORYPATH_WEIGHT = 1.0f;
 
     public static List<Record> getRecordBeans(RecordBean[] recordBeans) {
         List<Record> records = new ArrayList<>();
@@ -61,6 +57,16 @@ public class Utils {
             records.add(record);
         }
         return records;
+    }
+
+    public static List<String> getIds(RecordBean[] beans) {
+        List<String> ids = new ArrayList<>();
+        if (beans != null) {
+            for (RecordBean bean : beans) {
+                ids.add(bean.getId());
+            }
+        }
+        return ids;
     }
 
     private static Map<String, Object> validateAndReturn(RecordValueEntryBean[] values) {
@@ -105,6 +111,7 @@ public class Utils {
             record.setId(recordBean.getId());
             record.setTableName(recordBean.getTableName());
             record.setValues(getRecordValueEntryBeans(recordBean.getValues()));
+            records.add(record);
         }
         return records.toArray(new  RecordBean[records.size()]);
     }
@@ -127,19 +134,19 @@ public class Utils {
             Object value = entry.getValue();
             if (value instanceof Integer) {
                 recordValueEntryBean.setType("INTEGER");
-                recordValueEntryBean.setIntValue(((Integer) value).intValue());
+                recordValueEntryBean.setIntValue(((Integer) value));
             } else if (value instanceof Long) {
                 recordValueEntryBean.setType("LONG");
-                recordValueEntryBean.setLongValue(((Long) value).longValue());
+                recordValueEntryBean.setLongValue(((Long) value));
             } else if (value instanceof Double) {
                 recordValueEntryBean.setType("DOUBLE");
-                recordValueEntryBean.setDoubleValue(((Double) value).doubleValue());
+                recordValueEntryBean.setDoubleValue(((Double) value));
             } else if (value instanceof Float) {
                 recordValueEntryBean.setType("FLOAT");
-                recordValueEntryBean.setFloatValue(((Float) value).floatValue());
+                recordValueEntryBean.setFloatValue(((Float) value));
             } else if (value instanceof Boolean) {
                 recordValueEntryBean.setType("BOOLEAN");
-                recordValueEntryBean.setBooleanValue(((Boolean) value).booleanValue());
+                recordValueEntryBean.setBooleanValue(((Boolean) value));
             } else if (value instanceof String) {
                 recordValueEntryBean.setType("STRING");
                 recordValueEntryBean.setStringValue(value.toString());
@@ -152,73 +159,6 @@ public class Utils {
         return recordValueEntryBeans.toArray(new RecordValueEntryBean[recordValueEntryBeans.size()]);
     }
 
-    public static org.wso2.carbon.analytics.webservice
-            .stub.beans.IndexConfigurationBean createIndexConfiguration(IndexConfigurationBean indexInfoBean) {
-        org.wso2.carbon.analytics.webservice.stub.beans.IndexConfigurationBean
-                indexInfo = new org.wso2.carbon.analytics.webservice.stub.beans.IndexConfigurationBean();
-        indexInfo.setIndices(getIndices(indexInfoBean.getIndices()));
-        indexInfo.setScoreParams(getScoreParams(indexInfoBean.getScoreParams()));
-        return indexInfo;
-    }
-
-    private static String[] getScoreParams(List<String> scoreParams) {
-        return scoreParams.toArray(new String[scoreParams.size()]);
-    }
-
-    private static IndexEntryBean[] getIndices(Map<String, IndexTypeBean> indices) {
-        List<IndexEntryBean> indexEntryBeans = new ArrayList<>();
-        for (Map.Entry<String, IndexTypeBean> entry : indices.entrySet()) {
-            IndexEntryBean bean = new IndexEntryBean();
-            bean.setFieldName(entry.getKey());
-            bean.setIndexType(entry.getValue().toString());
-            indexEntryBeans.add(bean);
-        }
-        return indexEntryBeans.toArray(new IndexEntryBean[indexEntryBeans.size()]);
-    }
-
-    /**
-     * Creates the index type bean from index type.
-     *
-     * @param indexType the index type
-     * @return the index type bean
-     */
-    public static IndexTypeBean createIndexTypeBean(String indexType) {
-        switch (indexType) {
-            case "BOOLEAN":
-                return IndexTypeBean.BOOLEAN;
-            case "FLOAT":
-                return IndexTypeBean.FLOAT;
-            case "DOUBLE":
-                return IndexTypeBean.DOUBLE;
-            case "INTEGER":
-                return IndexTypeBean.INTEGER;
-            case "LONG":
-                return IndexTypeBean.LONG;
-            case "STRING":
-                return IndexTypeBean.STRING;
-            case "FACET":
-                return IndexTypeBean.FACET;
-            default:
-                return IndexTypeBean.STRING;
-        }
-    }
-
-    /**
-     * Creates the index type bean map from index type map.
-     *
-     * @param indexEntries the index type map
-     * @return the map
-     */
-    public static Map<String, IndexTypeBean> createIndexTypeBeanMap(
-            IndexEntryBean[] indexEntries) {
-        Map<String, IndexTypeBean> indexTypeBeans = new LinkedHashMap<>();
-        for (IndexEntryBean indexEntryBean : indexEntries) {
-            indexTypeBeans.put(indexEntryBean.getFieldName(),
-                               createIndexTypeBean(indexEntryBean.getIndexType()));
-        }
-        return indexTypeBeans;
-    }
-
     /**
      * Create a Analytics schema from a bean class
      *
@@ -229,7 +169,7 @@ public class Utils {
             webservice.stub.beans.AnalyticsSchemaBean createAnalyticsSchema(AnalyticsSchemaBean analyticsSchemaBean) {
         org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsSchemaBean
                 schemaBean = new org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsSchemaBean();
-        schemaBean.setColumns(createSchemaColumns(analyticsSchemaBean.getColumns()));
+ //       schemaBean.setColumns(createSchemaColumns(analyticsSchemaBean.getColumns()));
         schemaBean.setPrimaryKeys(createPrimaryKeys(analyticsSchemaBean.getPrimaryKeys()));
         return schemaBean;
     }
@@ -257,18 +197,18 @@ public class Utils {
      */
     public static AnalyticsSchemaBean createTableSchemaBean(
             org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsSchemaBean analyticsSchema) {
-        Map<String, ColumnTypeBean> columnTypeBeanTypes = new HashMap<String, ColumnTypeBean>();
-        List<String> primaryKeys = new ArrayList<String>();
+        Map<String, ColumnDefinitionBean> columnDefinitions = new HashMap<>();
+        List<String> primaryKeys = new ArrayList<>();
         if (analyticsSchema.getColumns() != null) {
             for (SchemaColumnBean columnBean :
                     analyticsSchema.getColumns()) {
-                columnTypeBeanTypes.put(columnBean.getColumnName(), getColumnTypeBean(columnBean.getColumnType()));
+  //              columnDefinitions.put(columnBean.getColumnName(), getColumnTypeBean(columnBean.getColumnType()));
             }
         }
         if (analyticsSchema.getPrimaryKeys() != null) {
             primaryKeys = Arrays.asList(analyticsSchema.getPrimaryKeys());
         }
-        return new AnalyticsSchemaBean(columnTypeBeanTypes, primaryKeys);
+        return new AnalyticsSchemaBean(columnDefinitions, primaryKeys);
     }
 
     /**
@@ -277,25 +217,37 @@ public class Utils {
      * @param columnType the ColumnType to be converted to bean type
      * @return ColumnTypeBean instance
      */
-    private static ColumnTypeBean getColumnTypeBean(String columnType) {
+    private static ColumnDefinitionBean getColumnTypeBean(String columnType, boolean isIndexed, boolean isScoreParam) {
+        ColumnDefinitionBean bean = new ColumnDefinitionBean();
         switch (columnType) {
             case "STRING":
-                return ColumnTypeBean.STRING;
+                bean.setType(ColumnTypeBean.STRING);
+                break;
             case "INTEGER":
-                return ColumnTypeBean.INT;
+                bean.setType(ColumnTypeBean.INT);
+                break;
             case "LONG":
-                return ColumnTypeBean.LONG;
+                bean.setType(ColumnTypeBean.LONG);
+                break;
             case "FLOAT":
-                return ColumnTypeBean.FLOAT;
+                bean.setType(ColumnTypeBean.FLOAT);
+                break;
             case "DOUBLE":
-                return ColumnTypeBean.DOUBLE;
+                bean.setType(ColumnTypeBean.DOUBLE);
+                break;
             case "BOOLEAN":
-                return ColumnTypeBean.BOOLEAN;
+                bean.setType(ColumnTypeBean.BOOLEAN);
+                break;
             case "BINARY":
-                return ColumnTypeBean.BINARY;
+                bean.setType(ColumnTypeBean.BINARY);
+                break;
             default:
-                return ColumnTypeBean.STRING;
+                bean.setType(ColumnTypeBean.STRING);
         }
+
+        bean.setIndex(isIndexed);
+        bean.setScoreParam(isScoreParam);
+        return bean;
     }
 
     public static String[] authenticate(String authHeader) throws UnauthenticatedUserException{

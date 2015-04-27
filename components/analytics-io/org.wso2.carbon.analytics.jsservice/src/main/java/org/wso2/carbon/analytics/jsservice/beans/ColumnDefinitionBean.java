@@ -20,45 +20,44 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
-import java.util.Map;
 
 /**
- * Bean class for representing the table schema
+ * This class represents the the column definition information
  */
-@XmlRootElement(name = "analyticsSchema")
+@XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class AnalyticsSchemaBean {
+public class ColumnDefinitionBean {
 
-    @XmlElement(name = "columns", required = true)
-    private Map<String, ColumnDefinitionBean> columns;
+    @XmlElement(name = "type")
+    private ColumnTypeBean type;
 
-    @XmlElement(name = "primaryKeys", required = true)
-    private List<String> primaryKeys;
+    @XmlElement(name = "isScoreParam", required = false)
+    private boolean isScoreParam;
 
-    public AnalyticsSchemaBean(){
+    @XmlElement(name = "isIndex", required = false)
+    private boolean isIndex;
 
+    public ColumnTypeBean getType() {
+        return type;
     }
 
-    public AnalyticsSchemaBean(
-            Map<String, ColumnDefinitionBean> columns, List<String> primaryKeys) {
-        this.columns = columns;
-        this.primaryKeys = primaryKeys;
+    public void setType(ColumnTypeBean type) {
+        this.type = type;
     }
 
-    public Map<String, ColumnDefinitionBean> getColumns() {
-        return columns;
+    public boolean isScoreParam() {
+        return isScoreParam;
     }
 
-    public void setColumns(Map<String, ColumnDefinitionBean> columns) {
-        this.columns = columns;
+    public void setScoreParam(boolean isScoreParam) {
+        this.isScoreParam = isScoreParam;
     }
 
-    public List<String> getPrimaryKeys() {
-        return primaryKeys;
+    public boolean isIndex() {
+        return isIndex;
     }
 
-    public void setPrimaryKeys(List<String> primaryKeys) {
-        this.primaryKeys = primaryKeys;
+    public void setIndex(boolean isIndex) {
+        this.isIndex = isIndex;
     }
 }

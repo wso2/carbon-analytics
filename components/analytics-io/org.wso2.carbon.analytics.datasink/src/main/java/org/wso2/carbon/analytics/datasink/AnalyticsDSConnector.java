@@ -20,6 +20,7 @@ package org.wso2.carbon.analytics.datasink;
 import org.wso2.carbon.analytics.datasink.internal.util.AnalyticsDatasinkConstants;
 import org.wso2.carbon.analytics.datasink.internal.util.ServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
+import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.databridge.commons.Attribute;
@@ -46,8 +47,10 @@ public class AnalyticsDSConnector {
     }
 
     private AnalyticsSchema getSchema(StreamDefinition streamDefinition) {
-        Map<String, AnalyticsSchema.ColumnType> columns = new HashMap<>();
-        columns.put(AnalyticsDatasinkConstants.STREAM_VERSION_KEY, AnalyticsSchema.ColumnType.STRING);
+        Map<String, ColumnDefinition> columns = new HashMap<>();
+        ColumnDefinition keyColumnDef = new ColumnDefinition();
+        keyColumnDef.setType(AnalyticsSchema.ColumnType.STRING);
+        columns.put(AnalyticsDatasinkConstants.STREAM_VERSION_KEY, keyColumnDef);
         populateColumnSchema(AnalyticsDatasinkConstants.EVENT_META_DATA_TYPE,
                 streamDefinition.getMetaData(), columns);
         populateColumnSchema(AnalyticsDatasinkConstants.EVENT_CORRELATION_DATA_TYPE,
@@ -121,37 +124,45 @@ public class AnalyticsDSConnector {
         }
     }
 
-    private void populateColumnSchema(String type, List<Attribute> attributes, Map<String, AnalyticsSchema.ColumnType> schema) {
+    private void populateColumnSchema(String type, List<Attribute> attributes, Map<String, ColumnDefinition> schema) {
         if (attributes == null) {
             return;
         }
         AnalyticsSchema.ColumnType columnType;
+        ColumnDefinition columnDefinition = new ColumnDefinition();
         String columnName;
         for (Attribute attribute : attributes) {
             columnName = getAttributeKey(type, attribute.getName());
             switch (attribute.getType()) {
                 case STRING:
                     columnType = AnalyticsSchema.ColumnType.STRING;
+                    columnDefinition.setType(columnType);
                     break;
                 case BOOL:
                     columnType = AnalyticsSchema.ColumnType.BOOLEAN;
+                    columnDefinition.setType(columnType);
                     break;
                 case DOUBLE:
                     columnType = AnalyticsSchema.ColumnType.DOUBLE;
+                    columnDefinition.setType(columnType);
                     break;
                 case FLOAT:
                     columnType = AnalyticsSchema.ColumnType.FLOAT;
+                    columnDefinition.setType(columnType);
                     break;
                 case INT:
                     columnType = AnalyticsSchema.ColumnType.INTEGER;
+                    columnDefinition.setType(columnType);
                     break;
                 case LONG:
                     columnType = AnalyticsSchema.ColumnType.LONG;
+                    columnDefinition.setType(columnType);
                     break;
                 default:
                     columnType = AnalyticsSchema.ColumnType.BINARY;
+                    columnDefinition.setType(columnType);
             }
-            schema.put(columnName, columnType);
+            schema.put(columnName, columnDefinition);
         }
     }
 

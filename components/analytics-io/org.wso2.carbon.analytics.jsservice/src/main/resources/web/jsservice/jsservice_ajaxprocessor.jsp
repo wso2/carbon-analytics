@@ -121,21 +121,6 @@
                 out.print(connector.deleteRecordsByIds(tableName, recordIdsAsString));
                 break;
             }
-            case AnalyticsWebServiceConnector.TYPE_SET_INDICES: {
-                StringBuilder buffer = new StringBuilder();
-                BufferedReader reader = request.getReader();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    buffer.append(line);
-                }
-                String indicesAsString = buffer.toString();
-                out.print(connector.setIndices(tableName, indicesAsString));
-                break;
-            }
-            case AnalyticsWebServiceConnector.TYPE_GET_INDICES: {
-                out.print(connector.getIndices(tableName));
-                break;
-            }
             case AnalyticsWebServiceConnector.TYPE_CLEAR_INDICES: {
                 out.print(connector.clearIndices(tableName));
                 break;

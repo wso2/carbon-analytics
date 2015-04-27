@@ -71,7 +71,6 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceImpl;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDirectory;
 import org.wso2.carbon.analytics.dataservice.AnalyticsQueryParser;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
-import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterException;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
@@ -82,6 +81,8 @@ import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
+import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
@@ -147,11 +148,13 @@ public class AnalyticsDataIndexer implements GroupEventListener {
 
     private static final String NULL_INDEX_VALUE = "";
 
+    private static final String EMPTY_FACET_VALUE = "EMPTY_FACET_VALUE!";
+
     private static final java.lang.String DEFAULT_SCORE = "1";
 
-    private AnalyticsIndexDefinitionRepository repository;
+ //   private AnalyticsIndexDefinitionRepository repository;
     
-    private Map<String, Map<String, IndexType>> indexDefs = new HashMap<>();
+    private Map<String, AnalyticsSchema> indexDefs = new HashMap<>();
 
     private Map<String, List<String>> scoreParams = new HashMap<>();
     
@@ -178,7 +181,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         this.analyticsRecordStore = analyticsRecordStore;    	
     	this.analyticsFileSystem = analyticsFileSystem;
     	this.shardCount = shardCount;
-        this.repository = new AnalyticsIndexDefinitionRepository(this.getFileSystem());
+    //    this.repository = new AnalyticsIndexDefinitionRepository(this.getFileSystem());
     }
     
     /**
@@ -244,9 +247,9 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return shardCount;
     }
     
-    public AnalyticsIndexDefinitionRepository getRepository() {
-        return repository;
-    }
+//    public AnalyticsIndexDefinitionRepository getRepository() {
+//        return repository;
+//    }
     
     private void insertIndexOperationRecords(List<Record> indexOpRecords) throws AnalyticsException {
         /* each record will be in its own table */
@@ -355,7 +358,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     
     private void processIndexUpdateOpBatches(int shardIndex, 
             Collection<List<IndexOperation>> indexUpdateOpBatches) throws AnalyticsException {
-        Map<String, IndexType> indices;
+        Map<String, ColumnDefinition> indices;
         Record firstRecord;
         List<Record> records;
         for (List<IndexOperation> indexOpBatch : indexUpdateOpBatches) {
@@ -557,7 +560,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         try {
             reader = this.getCombinedIndexReader(tenantId, tableName);
             IndexSearcher searcher = new IndexSearcher(reader, searchExecutor);
-            Map<String, IndexType> indices = this.lookupIndices(tenantId, tableName);
+            Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, tableName);
             Query indexQuery = new AnalyticsQueryParser(this.luceneAnalyzer, indices).parse(query);
             TopScoreDocCollector collector = TopScoreDocCollector.create(count, true);
             searcher.search(indexQuery, collector);
@@ -587,7 +590,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         try {
             reader = this.getCombinedIndexReader(tenantId, tableName);
             IndexSearcher searcher = new IndexSearcher(reader);
-            Map<String, IndexType> indices = this.lookupIndices(tenantId, tableName);
+            Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, tableName);
             Query indexQuery = new AnalyticsQueryParser(this.luceneAnalyzer, indices).parse(query);
             TotalHitCountCollector collector = new TotalHitCountCollector();
             searcher.search(indexQuery, collector);
@@ -644,7 +647,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         IndexSearcher searcher = new IndexSearcher(indexReader);
         List<AnalyticsDrillDownRange> drillDownRanges = new ArrayList<>();
         drillDownRanges.addAll(drillDownRequest.getRanges());
-        Map<String, IndexType> indices = this.lookupIndices(tenantId, drillDownRequest.getTableName());
+        Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, drillDownRequest.getTableName());
         Query indexQuery = new MatchAllDocsQuery();
         FacetsCollector fc = new FacetsCollector();
         if (drillDownRequest.getQuery() != null) {
@@ -653,10 +656,9 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
         FacetsCollector.search(searcher, indexQuery, Integer.MAX_VALUE, fc);
         DoubleRange[] ranges = this.createRangeBuckets(drillDownRanges);
-        List<String> scoreParams = this.lookupScoreParams(tenantId, drillDownRequest.getTableName());
-        ValueSource valueSource = this.getCompiledScoreFunction(drillDownRequest.getScoreFunction(), scoreParams);
+        ValueSource valueSource = this.getCompiledScoreFunction(drillDownRequest.getScoreFunction(), indices);
         Facets facets;
-        if (scoreParams.contains(drillDownRequest.getRangeField())) {
+        if (scoreParams.keySet().contains(drillDownRequest.getRangeField())) {
             facets = new DoubleRangeFacetCounts(drillDownRequest.getRangeField(), valueSource, fc, ranges);
         } else {
             facets = new DoubleRangeFacetCounts(drillDownRequest.getRangeField(), fc, ranges);
@@ -734,7 +736,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             taxonomyReader = new DirectoryTaxonomyReader(taxonomyIndexDir);
             IndexSearcher indexSearcher = new IndexSearcher(indexReader);
             FacetsCollector facetsCollector = new FacetsCollector(true);
-            Map<String, IndexType> indices = this.lookupIndices(tenantId,
+            Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId,
                                                                 drillDownRequest.getTableName());
             FacetsConfig config = this.getFacetsConfigurations(indices);
             DrillSideways drillSideways = new DrillSideways(indexSearcher, config, taxonomyReader);
@@ -765,7 +767,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             taxonomyReader = new DirectoryTaxonomyReader(taxonomyIndexDir);
             IndexSearcher indexSearcher = new IndexSearcher(indexReader);
             FacetsCollector facetsCollector = new FacetsCollector(true);
-            Map<String, IndexType> indices = this.lookupIndices(tenantId, drillDownRequest.getTableName());
+            Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, drillDownRequest.getTableName());
             FacetsConfig config = this.getFacetsConfigurations(indices);
             DrillSideways drillSideways = new DrillSideways(indexSearcher, config, taxonomyReader);
             Query queryObj = new MatchAllDocsQuery();
@@ -779,9 +781,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             }
             drillDownQuery.add(drillDownRequest.getFieldName(), path);
             drillSideways.search(drillDownQuery, facetsCollector);
-            List<String> scoreParams = this.lookupScoreParams(tenantId, drillDownRequest.getTableName());
             ValueSource valueSource = this.getCompiledScoreFunction(drillDownRequest.getScoreFunction(),
-                                                                    scoreParams);
+                                                                    indices);
             Facets facets = new TaxonomyFacetSumValueSource(taxonomyReader, config, facetsCollector,
                                             valueSource);
             FacetResult facetResult = facets.getTopChildren(Integer.MAX_VALUE, drillDownRequest.getFieldName(),
@@ -813,7 +814,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             indexReader = DirectoryReader.open(indexDir);
             taxonomyReader = new DirectoryTaxonomyReader(taxonomyIndexDir);
             IndexSearcher indexSearcher = new IndexSearcher(indexReader);
-            Map<String, IndexType> indices = this.lookupIndices(tenantId,
+            Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId,
                                                                 drillDownRequest.getTableName());
             FacetsConfig config = this.getFacetsConfigurations(indices);
             DrillSideways drillSideways = new DrillSideways(indexSearcher, config, taxonomyReader);
@@ -849,7 +850,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     }
 
     private DrillDownQuery createDrillDownQuery(AnalyticsDrillDownRequest drillDownRequest,
-                                                Map<String, IndexType> indices, FacetsConfig config,
+                                                Map<String, ColumnDefinition> indices, FacetsConfig config,
                                                 String rangeField,
                                                 AnalyticsDrillDownRange range)
             throws AnalyticsIndexException {
@@ -884,10 +885,10 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
 
-    private FacetsConfig getFacetsConfigurations(Map<String, IndexType> indices) {
+    private FacetsConfig getFacetsConfigurations(Map<String, ColumnDefinition> indices) {
         FacetsConfig config = new FacetsConfig();
-        for (Map.Entry<String, IndexType> entry : indices.entrySet()) {
-            if (entry.getValue().equals(IndexType.FACET)) {
+        for (Map.Entry<String, ColumnDefinition> entry : indices.entrySet()) {
+            if (entry.getValue().getType().equals(AnalyticsSchema.ColumnType.FACET)) {
                 String indexField = entry.getKey();
                 config.setHierarchical(indexField, true);
                 config.setMultiValued(indexField, true);
@@ -896,7 +897,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return config;
     }
 
-    private ValueSource getCompiledScoreFunction(String scoreFunction, List<String> scoreParams)
+    private ValueSource getCompiledScoreFunction(String scoreFunction, Map<String, ColumnDefinition> scoreParams)
             throws AnalyticsIndexException {
         try {
             Expression funcExpression;
@@ -905,12 +906,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             } else {
                 funcExpression = JavascriptCompiler.compile(scoreFunction);
             }
-            SimpleBindings bindings = new SimpleBindings();
-            bindings.add(new SortField(INDEX_INTERNAL_SCORE_FIELD, SortField.Type.SCORE));
-            for (String scoreParam : scoreParams) {
-                bindings.add(new SortField(scoreParam, SortField.Type.DOUBLE));
-            }
-            return funcExpression.getValueSource(bindings);
+            return getValueSource(scoreParams, funcExpression);
         } catch (ParseException e) {
             throw new AnalyticsIndexException("Error while evaluating the score function:" +
                                               e.getMessage(), e);
@@ -918,6 +914,35 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             throw new AnalyticsIndexException("Error while evaluating the score function: "
                                               + e.getMessage(), e);
         }
+    }
+
+    private ValueSource getValueSource(Map<String, ColumnDefinition> scoreParams,
+                                       Expression funcExpression) throws AnalyticsIndexException {
+        SimpleBindings bindings = new SimpleBindings();
+        bindings.add(new SortField(INDEX_INTERNAL_SCORE_FIELD, SortField.Type.SCORE));
+        for (Map.Entry<String, ColumnDefinition> entry : scoreParams.entrySet()) {
+            if (entry.getValue().isScoreParam()) {
+                switch (entry.getValue().getType()) {
+                    case DOUBLE:
+                        bindings.add(new SortField(entry.getKey(), SortField.Type.DOUBLE));
+                        break;
+                    case FLOAT:
+                        bindings.add(new SortField(entry.getKey(), SortField.Type.FLOAT));
+                        break;
+                    case INTEGER:
+                        bindings.add(new SortField(entry.getKey(), SortField.Type.INT));
+                        break;
+                    case LONG:
+                        bindings.add(new SortField(entry.getKey(), SortField.Type.LONG));
+                        break;
+                    default:
+                        throw new AnalyticsIndexException("Cannot resolve data type: " +
+                            entry.getValue().getType()+ " for scoreParam: " + entry.getKey());
+                }
+
+            }
+        }
+        return funcExpression.getValueSource(bindings);
     }
 
     public List<SearchResultEntry> getDrillDownRecords(int tenantId,
@@ -1049,7 +1074,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     }
     
     private void updateIndex(int shardIndex, List<Record> recordBatch, 
-            Map<String, IndexType> columns) throws AnalyticsIndexException {
+            Map<String, ColumnDefinition> columns) throws AnalyticsIndexException {
         Record firstRecord = recordBatch.get(0);
         int tenantId = firstRecord.getTenantId();
         String tableName = firstRecord.getTableName();
@@ -1073,7 +1098,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
     
-    private void checkAndAddDocEntry(Document doc, IndexType type, String name, Object obj)
+    private void checkAndAddDocEntry(Document doc, AnalyticsSchema.ColumnType type, String name, Object obj)
             throws AnalyticsIndexException {
         if (obj == null) {
             doc.add(new StringField(name, NULL_INDEX_VALUE, Store.NO));
@@ -1143,24 +1168,26 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
 
-    private void checkAndAddTaxonomyDocEntries(Document doc, IndexType type,
+    private void checkAndAddTaxonomyDocEntries(Document doc, AnalyticsSchema.ColumnType type,
                                                    String name, Object obj,
                                                    FacetsConfig facetsConfig)
             throws AnalyticsIndexException {
         if (obj == null) {
             doc.add(new StringField(name, NULL_INDEX_VALUE, Store.NO));
         }
-        if (obj instanceof List && type == IndexType.FACET) {
+        if (obj instanceof List && type == AnalyticsSchema.ColumnType.FACET) {
             facetsConfig.setMultiValued(name, true);
             facetsConfig.setHierarchical(name, true);
-            List<String> Path = (List<String>) obj;
-            //the field name for dimensions will be "$ + {name}"
-            //      //facetsConfig.setIndexFieldName(name, new StringBuilder("$").append(name).toString());
+            List<String> Path = new ArrayList<>();
+                    Path.addAll((List<String>) obj);
+            if (Path.isEmpty()) {
+                Path.add(EMPTY_FACET_VALUE);
+            }
             doc.add(new FacetField(name, Path.toArray(new String[Path.size()])));
         }
     }
 
-    private Document generateIndexDoc(Record record, Map<String, IndexType> columns,
+    private Document generateIndexDoc(Record record, Map<String, ColumnDefinition> columns,
                    TaxonomyWriter taxonomyWriter) throws AnalyticsIndexException, IOException {
         Document doc = new Document();
         FacetsConfig config = new FacetsConfig();
@@ -1169,10 +1196,10 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         /* make the best effort to store in the given timestamp, or else, 
          * fall back to a compatible format, or else, lastly, string */
         String name;
-        for (Map.Entry<String, IndexType> entry : columns.entrySet()) {
+        for (Map.Entry<String, ColumnDefinition> entry : columns.entrySet()) {
             name = entry.getKey();
-            this.checkAndAddDocEntry(doc, entry.getValue(), name, record.getValue(name));
-            this.checkAndAddTaxonomyDocEntries(doc, entry.getValue(), name, record.getValue(name), config);
+            this.checkAndAddDocEntry(doc, entry.getValue().getType(), name, record.getValue(name));
+            this.checkAndAddTaxonomyDocEntries(doc, entry.getValue().getType(), name, record.getValue(name), config);
         }
         return config.build(taxonomyWriter, doc);
     }
@@ -1212,55 +1239,24 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             }
         }
     }
-    
-    public void setIndices(int tenantId, String tableName, Map<String, IndexType> columns,
-                           List<String> scoreParams) throws AnalyticsIndexException {
-        this.checkInvalidIndexNames(columns.keySet());
-        String tableId = this.generateTableId(tenantId, tableName);
-        this.indexDefs.put(tableId, columns);
-        this.getRepository().setIndices(tenantId, tableName, columns);
-        this.setScoreParams(tenantId, tableName, scoreParams, columns);
-        this.notifyClusterIndexChange(tenantId, tableName);
-    }
 
-    public void setIndices(int tenantId, String tableName, Map<String, IndexType> columns)
-            throws AnalyticsIndexException {
-        this.checkInvalidIndexNames(columns.keySet());
-        String tableId = this.generateTableId(tenantId, tableName);
-        this.indexDefs.put(tableId, columns);
-        this.getRepository().setIndices(tenantId, tableName, columns);
-        this.setScoreParams(tenantId, tableName, new ArrayList<String>(0), columns);
-        this.notifyClusterIndexChange(tenantId, tableName);
-    }
-
-    public void setScoreParams(int tenantId, String tableName, List<String> scoreParams,
-                               Map<String, IndexType> columns) throws AnalyticsIndexException {
-        if (scoreParams != null) {
-            this.checkInvalidScoreParams(scoreParams, columns);
-            String tableId = this.generateTableId(tenantId, tableName);
-            this.scoreParams.put(tableId, scoreParams);
-            this.getRepository().setScoreParams(tenantId, tableName, scoreParams);
+    public Map<String, ColumnDefinition> lookupIndices(int tenantId, String tableName) throws AnalyticsIndexException {
+        AnalyticsSchema schema = this.indexDefs.get(tableName);
+        Map<String, ColumnDefinition> indices;
+        try {
+            if (schema == null) {
+                schema = this.getAnalyticsRecordStore().getTableSchema(tenantId, tableName);
+                this.indexDefs.put(tableName, schema);
+            }
+        } catch (AnalyticsException e) {
+            log.error("Error while looking up indices: " + e.getMessage(), e);
+            throw new AnalyticsIndexException("Error while looking up indices: " + e.getMessage(), e);
         }
-    }
-
-    public Map<String, IndexType> lookupIndices(int tenantId, String tableName) throws AnalyticsIndexException {
-        String tableId = this.generateTableId(tenantId, tableName);
-        Map<String, IndexType> cols = this.indexDefs.get(tableId);
-        if (cols == null) {
-            cols = this.getRepository().getIndices(tenantId, tableName);
-            this.indexDefs.put(tableId, cols);
+        indices = schema.getColumns();
+        if (indices == null) {
+            indices = new HashMap<>();
         }
-        return cols; 
-    }
-
-    public List<String> lookupScoreParams(int tenantId, String tableName) throws AnalyticsIndexException {
-        String tableId = this.generateTableId(tenantId, tableName);
-        List<String> scoreParams = this.scoreParams.get(tableId);
-        if (scoreParams == null) {
-            scoreParams = this.getRepository().getScoreParams(tenantId, tableName);
-            this.scoreParams.put(tableId, scoreParams);
-        }
-        return scoreParams;
+        return indices;
     }
     
     private String generateDirPath(String tableId) {
@@ -1359,15 +1355,10 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
     
-    public void clearIndices(int tenantId, String tableName) throws AnalyticsIndexException {
+    public void clearIndexData(int tenantId, String tableName) throws AnalyticsIndexException {
         String tableId = this.generateTableId(tenantId, tableName);
-        this.indexDefs.remove(tableId);
-        this.scoreParams.remove(tableId);
-        this.getRepository().clearAllIndices(tenantId, tableName);
-        this.closeAndRemoveIndexDirs(tenantId, tableName);
         /* delete all global index data, not only local ones */
         this.deleteIndexData(tenantId, tableName);
-        this.notifyClusterIndexChange(tenantId, tableName);
     }
     
     private String generateShardedTableId(int tenantId, String tableName, String shardId) {
@@ -1392,18 +1383,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         this.indexDefs.remove(tableId);
         this.scoreParams.remove(tableId);
         this.closeAndRemoveIndexDirs(tenantId, tableName);
-    }
-    
-    private void notifyClusterIndexChange(int tenantId, 
-            String tableName) throws AnalyticsIndexException {
-        AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
-        if (acm.isClusteringEnabled()) {
-            try {
-                acm.executeAll(ANALYTICS_INDEXING_GROUP, new IndexChangeMessage(tenantId, tableName));
-            } catch (AnalyticsClusterException e) {
-                throw new AnalyticsIndexException("Error in cluster index notification: " + e.getMessage(), e);
-            }
-        }
     }
     
     private void closeAndRemoveIndexDirs(int tenantId, String tableName) throws AnalyticsIndexException {
@@ -1601,38 +1580,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             return "OK";
         }
     }
-    
-    /**
-     * This is executed to stop all indexing operations in the current node.
-     */
-    public static class IndexChangeMessage implements Callable<String>, Serializable {
 
-        private static final long serialVersionUID = -7722819207554840105L;
-
-        private int tenantId;
-        
-        private String tableName;
-        
-        public IndexChangeMessage(int tenantId, String tableName) {
-            this.tenantId = tenantId;
-            this.tableName = tableName;
-        }
-        
-        @Override
-        public String call() throws Exception {
-            AnalyticsDataService ads = AnalyticsServiceHolder.getAnalyticsDataService();
-            if (ads == null) {
-                throw new AnalyticsException("The analytics data service implementation is not registered");
-            }
-            /* these cluster messages are specific to AnalyticsDataServiceImpl */
-            if (ads instanceof AnalyticsDataServiceImpl) {
-                AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
-                adsImpl.getIndexer().clusterNoficationReceived(this.tenantId, this.tableName);
-            }
-            return "OK";
-        }
-    }
-    
     /**
      * This is executed to start indexing operations in the current node.
      */

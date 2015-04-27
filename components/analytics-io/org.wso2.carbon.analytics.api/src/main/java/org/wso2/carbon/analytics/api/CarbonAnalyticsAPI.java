@@ -24,7 +24,6 @@ import org.wso2.carbon.analytics.api.internal.client.AnalyticsAPIHttpClient;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
-import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
@@ -42,7 +41,6 @@ import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
@@ -72,6 +70,17 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
             AnalyticsAPIHttpClient.getInstance().createTable(tenantId, null, tableName, false);
+        }
+    }
+
+    @Override
+    public void clearIndexData(int tenantId, String tableName) throws AnalyticsIndexException {
+        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+            ServiceHolder.getAnalyticsDataService().clearIndexData(tenantId, tableName);
+        } else {
+            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
+                                                                         analyticsDataConfiguration.getPassword());
+            AnalyticsAPIHttpClient.getInstance().clearIndices(tenantId, null, tableName, false);
         }
     }
 
@@ -192,6 +201,18 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
                     analyticsDataConfiguration.getPassword());
             AnalyticsAPIHttpClient.getInstance().createTable(MultitenantConstants.INVALID_TENANT_ID,
                     username, tableName, true);
+        }
+    }
+
+    @Override
+    public void clearIndexData(String username, String tableName) throws AnalyticsException {
+        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+            ServiceHolder.getSecureAnalyticsDataService().clearIndexData(username, tableName);
+        } else {
+            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
+                                                                         analyticsDataConfiguration.getPassword());
+            AnalyticsAPIHttpClient.getInstance().clearIndices(MultitenantConstants.INVALID_TENANT_ID,
+                                                              username, tableName, false);
         }
     }
 
@@ -341,67 +362,6 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public void setIndices(String username, String tableName, Map<String, IndexType> columns) throws AnalyticsIndexException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
-            ServiceHolder.getSecureAnalyticsDataService().setIndices(username, tableName, columns);
-        } else {
-            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
-                    analyticsDataConfiguration.getPassword());
-            AnalyticsAPIHttpClient.getInstance().setIndices(MultitenantConstants.INVALID_TENANT_ID, username,
-                    tableName, columns, null, true);
-        }
-    }
-
-    @Override
-    public void setIndices(String username, String tableName, Map<String, IndexType> columns, List<String> scoreParams)
-            throws AnalyticsIndexException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
-            ServiceHolder.getSecureAnalyticsDataService().setIndices(username, tableName, columns, scoreParams);
-        } else {
-            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
-                    analyticsDataConfiguration.getPassword());
-            AnalyticsAPIHttpClient.getInstance().setIndices(MultitenantConstants.INVALID_TENANT_ID, username,
-                    tableName, columns, scoreParams, true);
-        }
-    }
-
-    @Override
-    public Map<String, IndexType> getIndices(String username, String tableName) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
-            return ServiceHolder.getSecureAnalyticsDataService().getIndices(username, tableName);
-        } else {
-            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
-                    analyticsDataConfiguration.getPassword());
-            return AnalyticsAPIHttpClient.getInstance().getIndices(MultitenantConstants.INVALID_TENANT_ID, username,
-                    tableName, true);
-        }
-    }
-
-    @Override
-    public List<String> getScoreParams(String username, String tableName) throws AnalyticsException, AnalyticsIndexException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
-            return ServiceHolder.getSecureAnalyticsDataService().getScoreParams(username, tableName);
-        } else {
-            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
-                    analyticsDataConfiguration.getPassword());
-            return AnalyticsAPIHttpClient.getInstance().getScoreParams(MultitenantConstants.INVALID_TENANT_ID, username,
-                    tableName, true);
-        }
-    }
-
-    @Override
-    public void clearIndices(String username, String tableName) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
-            ServiceHolder.getSecureAnalyticsDataService().clearIndices(username, tableName);
-        } else {
-            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
-                    analyticsDataConfiguration.getPassword());
-            AnalyticsAPIHttpClient.getInstance().clearIndices(MultitenantConstants.INVALID_TENANT_ID, username,
-                    tableName, true);
-        }
-    }
-
-    @Override
     public List<SearchResultEntry> search(String username, String tableName, String query, int start, int count) throws AnalyticsIndexException, AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             return ServiceHolder.getSecureAnalyticsDataService().search(username, tableName, query, start, count);
@@ -508,63 +468,6 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
             AnalyticsAPIHttpClient.getInstance().deleteRecords(tenantId, null, tableName, ids, false);
-        }
-    }
-
-    @Override
-    public void setIndices(int tenantId, String tableName, Map<String, IndexType> columns) throws AnalyticsIndexException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
-            ServiceHolder.getAnalyticsDataService().setIndices(tenantId, tableName, columns);
-        } else {
-            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
-                    analyticsDataConfiguration.getPassword());
-            AnalyticsAPIHttpClient.getInstance().setIndices(tenantId, null, tableName, columns, null, false);
-        }
-    }
-
-    @Override
-    public void setIndices(int tenantId, String tableName, Map<String, IndexType> columns, List<String> scoreParams)
-            throws AnalyticsIndexException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
-            ServiceHolder.getAnalyticsDataService().setIndices(tenantId, tableName, columns);
-        } else {
-            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
-                    analyticsDataConfiguration.getPassword());
-            AnalyticsAPIHttpClient.getInstance().setIndices(tenantId, null, tableName, columns, scoreParams, false);
-        }
-    }
-
-    @Override
-    public Map<String, IndexType> getIndices(int tenantId, String tableName) throws
-            AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
-            return ServiceHolder.getAnalyticsDataService().getIndices(tenantId, tableName);
-        } else {
-            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
-                    analyticsDataConfiguration.getPassword());
-            return AnalyticsAPIHttpClient.getInstance().getIndices(tenantId, null, tableName, false);
-        }
-    }
-
-    @Override
-    public List<String> getScoreParams(int tenantId, String tableName) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
-            return ServiceHolder.getAnalyticsDataService().getScoreParams(tenantId, tableName);
-        } else {
-            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
-                    analyticsDataConfiguration.getPassword());
-            return AnalyticsAPIHttpClient.getInstance().getScoreParams(tenantId, null, tableName, false);
-        }
-    }
-
-    @Override
-    public void clearIndices(int tenantId, String tableName) throws AnalyticsException {
-        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
-            ServiceHolder.getAnalyticsDataService().clearIndices(tenantId, tableName);
-        } else {
-            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
-                    analyticsDataConfiguration.getPassword());
-            AnalyticsAPIHttpClient.getInstance().clearIndices(tenantId, null, tableName, false);
         }
     }
 

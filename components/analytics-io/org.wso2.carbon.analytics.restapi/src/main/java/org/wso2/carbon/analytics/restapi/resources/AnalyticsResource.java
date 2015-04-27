@@ -24,7 +24,6 @@ import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
-import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
@@ -39,7 +38,6 @@ import org.wso2.carbon.analytics.restapi.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.restapi.beans.CategoryDrillDownRequestBean;
 import org.wso2.carbon.analytics.restapi.beans.DrillDownRangeBean;
 import org.wso2.carbon.analytics.restapi.beans.DrillDownRequestBean;
-import org.wso2.carbon.analytics.restapi.beans.IndexConfigurationBean;
 import org.wso2.carbon.analytics.restapi.beans.QueryBean;
 import org.wso2.carbon.analytics.restapi.beans.RecordBean;
 import org.wso2.carbon.analytics.restapi.beans.SubCategoriesBean;
@@ -73,7 +71,6 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * The Class AnalyticsResource represents the REST APIs for
@@ -516,69 +513,6 @@ public class AnalyticsResource extends AbstractResource {
         }
     }
 
-    /**
-	 * Sets the indices.
-	 * @param tableName the table name
-	 * @param indexInfo the columns bean containing all the indices
-	 * @return the response
-	 * @throws AnalyticsException
-	 */
-	@POST
-	@Consumes({ MediaType.APPLICATION_JSON})
-	@Produces({ MediaType.APPLICATION_JSON })
-	@Path("tables/{tableName}/indices")
-	public Response setIndices(@PathParam("tableName") String tableName,
-	                           IndexConfigurationBean indexInfo,
-                               @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
-            throws AnalyticsException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Invoking setIndices for tableName : " +
-                         tableName);
-        }
-        SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
-        String username = authenticate(authHeader);
-        if (indexInfo != null) {
-            Map<String, IndexType> columns = Utils.createIndexTypeMap(indexInfo.getIndices());
-            if (logger.isDebugEnabled()) {
-                logger.debug("Setting indices : " + columns.keySet());
-            }
-            analyticsDataService.setIndices(username, tableName, columns,indexInfo.getScoreParams());
-            return handleResponse(ResponseStatus.CREATED, "Successfully set indices in table: " +
-                                                          tableName);
-        } else {
-            throw new AnalyticsException("Indices are empty");
-        }
-    }
-
-	/**
-	 * Gets the indices.
-	 * @param tableName the table name
-	 * @return the indices
-	 * @throws AnalyticsException
-	 */
-	@GET
-	@Produces({ MediaType.APPLICATION_JSON })
-	@Path("tables/{tableName}/indices")
-	public Response getIndices(@PathParam("tableName") String tableName,
-                               @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
-            throws AnalyticsException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Invoking getIndices for tableName : " +
-                         tableName);
-        }
-        SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
-        String username = authenticate(authHeader);
-        Map<String, IndexType> columns = analyticsDataService.getIndices(username, tableName);
-        List<String> scoreParams = analyticsDataService.getScoreParams(username, tableName);
-        IndexConfigurationBean indexConfigurationBean = new IndexConfigurationBean();
-        indexConfigurationBean.setIndices(Utils.createIndexTypeBeanMap(columns));
-        indexConfigurationBean.setScoreParams(scoreParams);
-        if (logger.isDebugEnabled()) {
-            logger.debug("Getting indices : " + indexConfigurationBean.getIndices().keySet());
-        }
-        return Response.ok(indexConfigurationBean).build();
-	}
-
 	/**
 	 * Clear indices.
 	 * @param tableName the table name
@@ -592,12 +526,12 @@ public class AnalyticsResource extends AbstractResource {
                                  @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                                                                      throws AnalyticsException {
         if (logger.isDebugEnabled()) {
-            logger.debug("Invoking clearIndices for tableName : " +
+            logger.debug("Invoking clearIndexData for tableName : " +
                          tableName);
         }
         SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
-        analyticsDataService.clearIndices(username, tableName);
+        analyticsDataService.clearIndexData(username, tableName);
         return handleResponse(ResponseStatus.SUCCESS, "Successfully cleared indices in table: " +
                                                           tableName);
 	}

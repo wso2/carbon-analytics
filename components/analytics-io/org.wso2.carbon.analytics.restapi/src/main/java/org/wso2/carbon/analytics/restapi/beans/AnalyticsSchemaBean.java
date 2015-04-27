@@ -33,7 +33,7 @@ import java.util.Map;
 public class AnalyticsSchemaBean {
 
     @XmlElement(name = "columns", required = true)
-    private Map<String, ColumnTypeBean> columns;
+    private Map<String, ColumnDefinitionBean> columns;
 
     @XmlElement(name = "primaryKeys", required = true)
     private List<String> primaryKeys;
@@ -43,16 +43,16 @@ public class AnalyticsSchemaBean {
     }
 
     public AnalyticsSchemaBean(
-            Map<String, ColumnTypeBean> columns, List<String> primaryKeys) {
+            Map<String, ColumnDefinitionBean> columns, List<String> primaryKeys) {
         this.columns = columns;
         this.primaryKeys = primaryKeys;
     }
 
-    public Map<String, ColumnTypeBean> getColumns() {
+    public Map<String, ColumnDefinitionBean> getColumns() {
         return columns;
     }
 
-    public void setColumns(Map<String, ColumnTypeBean> columns) {
+    public void setColumns(Map<String, ColumnDefinitionBean> columns) {
         this.columns = columns;
     }
 

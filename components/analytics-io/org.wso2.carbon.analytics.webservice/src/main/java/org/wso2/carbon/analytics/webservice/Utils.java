@@ -17,17 +17,15 @@
 package org.wso2.carbon.analytics.webservice;
 
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
-import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema.ColumnType;
+import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsCategoryPathBean;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsSchemaBean;
-import org.wso2.carbon.analytics.webservice.beans.IndexConfigurationBean;
-import org.wso2.carbon.analytics.webservice.beans.IndexEntryBean;
 import org.wso2.carbon.analytics.webservice.beans.RecordBean;
 import org.wso2.carbon.analytics.webservice.beans.RecordValueEntryBean;
 import org.wso2.carbon.analytics.webservice.beans.SchemaColumnBean;
@@ -124,61 +122,6 @@ public class Utils {
     }
 
     /**
-     * Creates the index type bean from index type.
-     *
-     * @param indexType the index type
-     * @return the index type bean
-     */
-    public static String createIndexTypeBean(IndexType indexType) {
-        switch (indexType) {
-            case BOOLEAN:
-                return BeanIndexType.BOOLEAN;
-            case FLOAT:
-                return BeanIndexType.FLOAT;
-            case DOUBLE:
-                return BeanIndexType.DOUBLE;
-            case INTEGER:
-                return BeanIndexType.INTEGER;
-            case LONG:
-                return BeanIndexType.LONG;
-            case STRING:
-                return BeanIndexType.STRING;
-            case FACET:
-                return BeanIndexType.FACET;
-            default:
-                return BeanIndexType.STRING;
-        }
-    }
-
-    /**
-     * Creates the index type from index type bean.
-     *
-     * @param type the index type bean
-     * @return the index type
-     */
-
-    public static IndexType createIndexType(String type) {
-        switch (type) {
-            case BeanIndexType.BOOLEAN:
-                return IndexType.BOOLEAN;
-            case BeanIndexType.FLOAT:
-                return IndexType.FLOAT;
-            case BeanIndexType.DOUBLE:
-                return IndexType.DOUBLE;
-            case BeanIndexType.INTEGER:
-                return IndexType.INTEGER;
-            case BeanIndexType.LONG:
-                return IndexType.LONG;
-            case BeanIndexType.STRING:
-                return IndexType.STRING;
-            case BeanIndexType.FACET:
-                return IndexType.FACET;
-            default:
-                return IndexType.STRING;
-        }
-    }
-
-    /**
      * Gets the record ids from search results.
      *
      * @param searchResults the search results
@@ -199,14 +142,16 @@ public class Utils {
      * @return Analytics schema
      */
     public static AnalyticsSchema createAnalyticsSchema(AnalyticsSchemaBean analyticsSchemaBean) {
-        Map<String, ColumnType> columnTypes = null;
+        Map<String, ColumnDefinition> columnTypes = null;
         if (analyticsSchemaBean == null) {
             return null;
         }
         if (analyticsSchemaBean.getColumns() != null) {
             columnTypes = new HashMap<>();
             for (SchemaColumnBean columnBean : analyticsSchemaBean.getColumns()) {
-                columnTypes.put(columnBean.getColumnName(), getColumnType(columnBean.getColumnType()));
+                columnTypes.put(columnBean.getColumnName(),
+                                getColumnDefinition(columnBean.getColumnType(), columnBean.isIndex(),
+                                                    columnBean.isScoreParam()));
             }
         }
         List<String> primaryKeys = null;
@@ -230,11 +175,13 @@ public class Utils {
         List<SchemaColumnBean> columnBeans = new ArrayList<>();
         List<String> primaryKeys = new ArrayList<>();
         if (analyticsSchema.getColumns() != null) {
-            for (Map.Entry<String, ColumnType> columnTypeEntry :
+            for (Map.Entry<String, ColumnDefinition> columnTypeEntry :
                     analyticsSchema.getColumns().entrySet()) {
                 SchemaColumnBean bean = new SchemaColumnBean();
                 bean.setColumnName(columnTypeEntry.getKey());
                 bean.setColumnType(getColumnTypeBean(columnTypeEntry.getValue()));
+                bean.setScoreParam(columnTypeEntry.getValue().isScoreParam());
+                bean.setIndex(columnTypeEntry.getValue().isIndexed());
                 columnBeans.add(bean);
             }
         }
@@ -251,37 +198,51 @@ public class Utils {
      * @param type ColumnType Bean to be converted to ColumnType
      * @return ColumnType instance
      */
-    private static ColumnType getColumnType(String type) {
+    private static ColumnDefinition getColumnDefinition(String type, boolean isIndex,
+                                                        boolean isScoreParam) {
+        ColumnDefinition columnDefinition = new ColumnDefinition();
         switch (type) {
             case RecordValueEntryBean.STRING:
-                return ColumnType.STRING;
+                columnDefinition.setType(ColumnType.STRING);
+                break;
             case RecordValueEntryBean.INTEGER:
-                return ColumnType.INTEGER;
+                columnDefinition.setType(ColumnType.INTEGER);
+                break;
             case RecordValueEntryBean.LONG:
-                return ColumnType.LONG;
+                columnDefinition.setType(ColumnType.LONG);
+                break;
             case RecordValueEntryBean.FLOAT:
-                return ColumnType.FLOAT;
+                columnDefinition.setType(ColumnType.FLOAT);
+                break;
             case RecordValueEntryBean.DOUBLE:
-                return ColumnType.DOUBLE;
+                columnDefinition.setType(ColumnType.DOUBLE);
+                break;
             case RecordValueEntryBean.BOOLEAN:
-                return ColumnType.BOOLEAN;
+                columnDefinition.setType(ColumnType.BOOLEAN);
+                break;
             case RecordValueEntryBean.BINARY:
-                return ColumnType.BINARY;
+                columnDefinition.setType(ColumnType.BINARY);
+                break;
             case RecordValueEntryBean.FACET:
-                return ColumnType.FACET;
+                columnDefinition.setType(ColumnType.FACET);
+                break;
             default:
-                return ColumnType.STRING;
+                columnDefinition.setType(ColumnType.STRING);
         }
+        columnDefinition.setIndexed(isIndex);
+        columnDefinition.setScoreParam(isScoreParam);
+        return columnDefinition;
     }
 
     /**
      * convert a column type to bean type
      *
-     * @param columnType the ColumnType to be converted to bean type
+     * @param columnDefinition the ColumnType to be converted to bean type
      * @return ColumnTypeBean instance
      */
-    private static String getColumnTypeBean(ColumnType columnType) {
-        switch (columnType) {
+    private static String getColumnTypeBean(ColumnDefinition columnDefinition) {
+
+        switch (columnDefinition.getType()) {
             case STRING:
                 return RecordValueEntryBean.STRING;
             case INTEGER:
@@ -310,56 +271,6 @@ public class Utils {
         } catch (UserStoreException e) {
             throw new AnalyticsException("Unable to get tenantId for user: " + username, e);
         }
-    }
-
-    private static class BeanIndexType {
-        public static final String STRING = "STRING";
-        public static final String LONG = "LONG";
-        public static final String FLOAT = "FLOAT";
-        public static final String DOUBLE = "DOUBLE";
-        public static final String BOOLEAN = "BOOLEAN";
-        public static final String BINARY = "BINARY";
-        public static final String INTEGER = "INTEGER";
-        public static final String FACET = "FACET";
-        public static final String SCOREPARAM = "SCOREPARAM";
-    }
-
-    public static IndexConfigurationBean getIndexConfiguration(Map<String, IndexType> indices, List<String>
-            scoreParams) {
-        IndexConfigurationBean indexConfigurationBean = new IndexConfigurationBean();
-        IndexEntryBean[] indexEntryBeans = new IndexEntryBean[indices.size()];
-        int i = 0;
-        for (Map.Entry<String, IndexType> index : indices.entrySet()) {
-            IndexEntryBean indexEntryBean = new IndexEntryBean();
-            indexEntryBean.setFieldName(index.getKey());
-            indexEntryBean.setIndexType(index.getValue().name());
-            indexEntryBeans[i++] = indexEntryBean;
-        }
-        indexConfigurationBean.setIndices(indexEntryBeans);
-        if (scoreParams != null) {
-            String[] scoreParamsArray = new String[scoreParams.size()];
-            scoreParamsArray = scoreParams.toArray(scoreParamsArray);
-            indexConfigurationBean.setScoreParams(scoreParamsArray);
-        }
-        return indexConfigurationBean;
-    }
-
-    public static Map<String, IndexType> getIndices(IndexConfigurationBean indexConfigurationBean) {
-        Map<String, IndexType> indexTypeMap = new HashMap<>();
-        if (indexConfigurationBean != null && indexConfigurationBean.getIndices() != null) {
-            for (IndexEntryBean indexEntryBean : indexConfigurationBean.getIndices()) {
-                indexTypeMap.put(indexEntryBean.getFieldName(), createIndexType(indexEntryBean.getIndexType()));
-            }
-        }
-        return indexTypeMap;
-    }
-
-    public static List<String> getScoreParam(IndexConfigurationBean indexConfigurationBean) {
-        List<String> scoreParams = null;
-        if (indexConfigurationBean != null && indexConfigurationBean.getScoreParams() != null) {
-            scoreParams = Arrays.asList(indexConfigurationBean.getScoreParams());
-        }
-        return scoreParams;
     }
 
     private static Object getValue(RecordValueEntryBean recordValueEntryBean) {

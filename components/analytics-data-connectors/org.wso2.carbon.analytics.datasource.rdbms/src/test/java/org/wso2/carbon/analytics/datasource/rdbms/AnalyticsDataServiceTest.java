@@ -71,7 +71,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
     }
     
     private void indexAddRetrieve(int tenantId) throws AnalyticsException {
-        this.service.clearIndices(tenantId, "T1");
+//        this.service.clearIndices(tenantId, "T1");
         Map<String, IndexType> columns = new HashMap<String, IndexType>();
         columns.put("C1", IndexType.STRING);
         columns.put("C2", IndexType.STRING);
@@ -79,17 +79,17 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         columns.put("C4", IndexType.LONG);
         columns.put("C5", IndexType.DOUBLE);
         columns.put("C6", IndexType.FLOAT);
-        this.service.setIndices(tenantId, "T1", columns);
-        Map<String, IndexType> columnsIn = service.getIndices(tenantId, "T1");
-        Assert.assertEquals(columnsIn, columns);
-        this.service.clearIndices(tenantId, "T1");
+//        this.service.setIndices(tenantId, "T1", columns);
+//        Map<String, IndexType> columnsIn = service.getIndices(tenantId, "T1");
+//        Assert.assertEquals(columnsIn, columns);
+//        this.service.clearIndices(tenantId, "T1");
     }
     
     private void cleanupTable(int tenantId, String tableName) throws AnalyticsException {
         if (this.service.tableExists(tenantId, tableName)) {
             this.service.deleteTable(tenantId, tableName);
         }
-        this.service.clearIndices(tenantId, tableName);
+        this.service.clearIndexData(tenantId, tableName);
     }
     
     private List<Record> generateIndexRecords(int tenantId, String tableName, int n, long startTimestamp) {
@@ -124,7 +124,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         columns.put("FL1", IndexType.FLOAT);
         columns.put("BL1", IndexType.BOOLEAN);
         this.service.createTable(tenantId, tableName);
-        this.service.setIndices(tenantId, tableName, columns);
+//        this.service.setIndices(tenantId, tableName, columns);
         List<Record> records = this.generateIndexRecords(tenantId, tableName, n, 0);
         this.service.put(records);
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
@@ -186,7 +186,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         columns.put("FL1", IndexType.FLOAT);
         columns.put("BL1", IndexType.BOOLEAN);
         this.service.createTable(tenantId, tableName);
-        this.service.setIndices(tenantId, tableName, columns);
+//        this.service.setIndices(tenantId, tableName, columns);
         List<Record> records = this.generateIndexRecords(tenantId, tableName, 100, 0);
         this.service.put(records);
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
@@ -217,7 +217,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         List<Record> records = new ArrayList<Record>();
         records.add(record);
         records.add(record2);
-        this.service.setIndices(tenantId, tableName, columns);
+//        this.service.setIndices(tenantId, tableName, columns);
         this.service.put(records);
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
         List<SearchResultEntry> result = this.service.search(tenantId, tableName, "STR1:tea", 0, 10);
@@ -263,7 +263,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         columns.put("INT1", IndexType.INTEGER);
         columns.put("STR1", IndexType.STRING);
         this.service.createTable(tenantId, tableName);
-        this.service.setIndices(tenantId, tableName, columns);
+//        this.service.setIndices(tenantId, tableName, columns);
         List<Record> records = this.generateIndexRecords(tenantId, tableName, 98, 0);
         this.service.put(records);
         List<String> ids = new ArrayList<String>();
@@ -293,7 +293,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         columns.put("INT1", IndexType.INTEGER);
         columns.put("STR1", IndexType.STRING);
         this.service.createTable(tenantId, tableName);
-        this.service.setIndices(tenantId, tableName, columns);
+//        this.service.setIndices(tenantId, tableName, columns);
         List<Record> records = this.generateIndexRecords(tenantId, tableName, n, 1000);
         this.service.put(records);
         List<Record> recordsIn = GenericUtils.listRecords(this.service,
@@ -376,8 +376,8 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         List<String> primaryKeys = new ArrayList<String>();
         primaryKeys.add("tenant");
         primaryKeys.add("log");
-        AnalyticsSchema schema = new AnalyticsSchema(columns, primaryKeys);
-        this.service.setTableSchema(tenantId, tableName, schema);
+//        AnalyticsSchema schema = new AnalyticsSchema(columns, primaryKeys);
+//        this.service.setTableSchema(tenantId, tableName, schema);
         List<Record> records = AnalyticsRecordStoreTest.generateRecords(tenantId, tableName, 1, 75, -1, -1, false);
         this.service.put(records);
         List<Record> recordsIn = GenericUtils.listRecords(this.service,
@@ -395,15 +395,15 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         Assert.assertEquals(recordsIn.size(), 77);
         Assert.assertEquals(new HashSet<Record>(recordsIn), new HashSet<Record>(records));
         primaryKeys.clear();
-        schema = new AnalyticsSchema(columns, primaryKeys);
-        this.service.setTableSchema(tenantId, tableName, schema);
+//        schema = new AnalyticsSchema(columns, primaryKeys);
+//        this.service.setTableSchema(tenantId, tableName, schema);
         records = AnalyticsRecordStoreTest.generateRecords(tenantId, tableName, 1, 10, -1, -1, false);
         this.service.put(records);
         recordsIn = GenericUtils.listRecords(this.service,
                 this.service.get(tenantId, tableName, 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 87);
-        schema = new AnalyticsSchema(null, null);
-        this.service.setTableSchema(tenantId, tableName, schema);
+//        schema = new AnalyticsSchema(null, null);
+//        this.service.setTableSchema(tenantId, tableName, schema);
         records = AnalyticsRecordStoreTest.generateRecords(tenantId, tableName, 1, 10, -1, -1, false);
         this.service.put(records);
         recordsIn = GenericUtils.listRecords(this.service,
@@ -425,7 +425,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         columns.put("ip", IndexType.STRING);
         columns.put("log", IndexType.STRING);
         this.service.createTable(tenantId, tableName);
-        this.service.setIndices(tenantId, tableName, columns);
+//        this.service.setIndices(tenantId, tableName, columns);
         
         long start = System.currentTimeMillis();
         this.writeIndexRecords(tenantId, tableName, n, batch);
@@ -465,7 +465,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         columns.put("log", IndexType.STRING);
         columns.put("location", IndexType.FACET);
         this.service.createTable(tenantId, tableName);
-        this.service.setIndices(tenantId, tableName, columns);
+//        this.service.setIndices(tenantId, tableName, columns);
 
         long start = System.currentTimeMillis();
         this.writeIndexRecordsWithFacets(tenantId, tableName, n, batch);
@@ -558,7 +558,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         columns.put("ip", IndexType.STRING);
         columns.put("log", IndexType.STRING);        
         this.service.createTable(tenantId, tableName);
-        this.service.setIndices(tenantId, tableName, columns);
+//        this.service.setIndices(tenantId, tableName, columns);
         
         long start = System.currentTimeMillis();
         this.writeIndexRecords(tenantId, tableName, n, batch, nThreads);
@@ -598,7 +598,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         columns.put("log", IndexType.STRING);
         columns.put("location", IndexType.FACET);
         this.service.createTable(tenantId, tableName);
-        this.service.setIndices(tenantId, tableName, columns);
+//        this.service.setIndices(tenantId, tableName, columns);
 
         long start = System.currentTimeMillis();
         this.writeIndexRecordsWithFacets(tenantId, tableName, n, batch, nThreads);

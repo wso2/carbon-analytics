@@ -24,21 +24,21 @@ import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategorySearchResultEntry;
-import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
+import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.restapi.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.restapi.beans.CategoryDrillDownRequestBean;
+import org.wso2.carbon.analytics.restapi.beans.ColumnDefinitionBean;
 import org.wso2.carbon.analytics.restapi.beans.ColumnTypeBean;
 import org.wso2.carbon.analytics.restapi.beans.DrillDownPathBean;
 import org.wso2.carbon.analytics.restapi.beans.DrillDownRangeBean;
 import org.wso2.carbon.analytics.restapi.beans.DrillDownRequestBean;
-import org.wso2.carbon.analytics.restapi.beans.IndexTypeBean;
 import org.wso2.carbon.analytics.restapi.beans.RecordBean;
 import org.wso2.carbon.analytics.restapi.beans.SubCategoriesBean;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -52,7 +52,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * This class represents a set of utility functionalities for the analytics REST API.
@@ -183,92 +182,6 @@ public class Utils {
     }
 
     /**
-     * Creates the index type bean from index type.
-     *
-     * @param indexType the index type
-     * @return the index type bean
-     */
-    public static IndexTypeBean createIndexTypeBean(IndexType indexType) {
-        switch (indexType) {
-            case BOOLEAN:
-                return IndexTypeBean.BOOLEAN;
-            case FLOAT:
-                return IndexTypeBean.FLOAT;
-            case DOUBLE:
-                return IndexTypeBean.DOUBLE;
-            case INTEGER:
-                return IndexTypeBean.INTEGER;
-            case LONG:
-                return IndexTypeBean.LONG;
-            case STRING:
-                return IndexTypeBean.STRING;
-            case FACET:
-                return IndexTypeBean.FACET;
-            default:
-                return IndexTypeBean.STRING;
-        }
-    }
-
-    /**
-     * Creates the index type from index type bean.
-     *
-     * @param indexTypeBean the index type bean
-     * @return the index type
-     */
-    public static IndexType createIndexType(IndexTypeBean indexTypeBean) {
-        switch (indexTypeBean) {
-            case BOOLEAN:
-                return IndexType.BOOLEAN;
-            case FLOAT:
-                return IndexType.FLOAT;
-            case DOUBLE:
-                return IndexType.DOUBLE;
-            case INTEGER:
-                return IndexType.INTEGER;
-            case LONG:
-                return IndexType.LONG;
-            case STRING:
-                return IndexType.STRING;
-            case FACET:
-                return IndexType.FACET;
-            default:
-                return IndexType.STRING;
-        }
-    }
-
-    /**
-     * Creates the index type bean map fron index type map.
-     *
-     * @param indexTypeMap the index type map
-     * @return the map
-     */
-    public static Map<String, IndexTypeBean> createIndexTypeBeanMap(
-            Map<String, IndexType> indexTypeMap) {
-        Map<String, IndexTypeBean> indexTypeBeanMap = new HashMap<>();
-        Set<String> columns = indexTypeMap.keySet();
-        for (String column : columns) {
-            indexTypeBeanMap.put(column, createIndexTypeBean(indexTypeMap.get(column)));
-        }
-        return indexTypeBeanMap;
-    }
-
-    /**
-     * Creates the index type map from index type bean map.
-     *
-     * @param indexTypeBeanMap the index type bean map
-     * @return the map
-     */
-    public static Map<String, IndexType> createIndexTypeMap(
-            Map<String, IndexTypeBean> indexTypeBeanMap) {
-        Map<String, IndexType> indexTypeMap = new HashMap<>();
-        Set<String> columns = indexTypeBeanMap.keySet();
-        for (String column : columns) {
-            indexTypeMap.put(column, createIndexType(indexTypeBeanMap.get(column)));
-        }
-        return indexTypeMap;
-    }
-
-    /**
      * Gets the record ids from search results.
      *
      * @param searchResults the search results
@@ -330,11 +243,11 @@ public class Utils {
      * @return Analytics schema
      */
     public static AnalyticsSchema createAnalyticsSchema(AnalyticsSchemaBean analyticsSchemaBean) {
-        Map<String, AnalyticsSchema.ColumnType> columnTypes = new HashMap<>();
-        for (Map.Entry<String, ColumnTypeBean> columnEntry : analyticsSchemaBean.getColumns().entrySet()) {
-            columnTypes.put(columnEntry.getKey(), getColumnType(columnEntry.getValue()));
+        Map<String, ColumnDefinition> columnDefinitions = new HashMap<>();
+        for (Map.Entry<String, ColumnDefinitionBean> entry : analyticsSchemaBean.getColumns().entrySet()) {
+            columnDefinitions.put(entry.getKey(), getColumnType(entry.getValue()));
         }
-        return new AnalyticsSchema(columnTypes, analyticsSchemaBean.getPrimaryKeys());
+        return new AnalyticsSchema(columnDefinitions, analyticsSchemaBean.getPrimaryKeys());
     }
 
     /**
@@ -344,18 +257,18 @@ public class Utils {
      * @return Table schema bean
      */
     public static AnalyticsSchemaBean createTableSchemaBean(AnalyticsSchema analyticsSchema) {
-        Map<String, ColumnTypeBean> columnTypeBeanTypes = new HashMap<>();
+        Map<String, ColumnDefinitionBean> columnDefinitions = new HashMap<>();
         List<String> primaryKeys = new ArrayList<>();
         if (analyticsSchema.getColumns() != null) {
-            for (Map.Entry<String, AnalyticsSchema.ColumnType> columnTypeEntry :
+            for (Map.Entry<String, ColumnDefinition> columns :
                     analyticsSchema.getColumns().entrySet()) {
-                columnTypeBeanTypes.put(columnTypeEntry.getKey(), getColumnTypeBean(columnTypeEntry.getValue()));
+                columnDefinitions.put(columns.getKey(), getColumnTypeBean(columns.getValue()));
             }
         }
         if (analyticsSchema.getPrimaryKeys() != null) {
             primaryKeys = analyticsSchema.getPrimaryKeys();
         }
-        return new AnalyticsSchemaBean(columnTypeBeanTypes, primaryKeys);
+        return new AnalyticsSchemaBean(columnDefinitions, primaryKeys);
     }
 
     /**
@@ -441,55 +354,84 @@ public class Utils {
     /**
      * convert a column type bean to ColumnType
      *
-     * @param columnTypeBean ColumnType Bean to be converted to ColumnType
+     * @param columnDefinitionBean ColumnType Bean to be converted to ColumnType
      * @return ColumnType instance
      */
-    private static AnalyticsSchema.ColumnType getColumnType(ColumnTypeBean columnTypeBean) {
-        switch (columnTypeBean) {
+    private static ColumnDefinition getColumnType(ColumnDefinitionBean columnDefinitionBean) {
+        ColumnDefinition columnDefinition = new ColumnDefinition();
+        switch (columnDefinitionBean.getType()) {
             case STRING:
-                return AnalyticsSchema.ColumnType.STRING;
-            case INT:
-                return AnalyticsSchema.ColumnType.INTEGER;
+                columnDefinition.setType(AnalyticsSchema.ColumnType.STRING);
+                break;
+            case INTEGER:
+                columnDefinition.setType(AnalyticsSchema.ColumnType.INTEGER);
+                break;
             case LONG:
-                return AnalyticsSchema.ColumnType.LONG;
+                columnDefinition.setType(AnalyticsSchema.ColumnType.LONG);
+                break;
             case FLOAT:
-                return AnalyticsSchema.ColumnType.FLOAT;
+                columnDefinition.setType(AnalyticsSchema.ColumnType.FLOAT);
+                break;
             case DOUBLE:
-                return AnalyticsSchema.ColumnType.DOUBLE;
+                columnDefinition.setType(AnalyticsSchema.ColumnType.DOUBLE);
+                break;
             case BOOLEAN:
-                return AnalyticsSchema.ColumnType.BOOLEAN;
+                columnDefinition.setType(AnalyticsSchema.ColumnType.BOOLEAN);
+                break;
             case BINARY:
-                return AnalyticsSchema.ColumnType.BINARY;
+                columnDefinition.setType(AnalyticsSchema.ColumnType.BINARY);
+                break;
+            case FACET:
+                columnDefinition.setType(AnalyticsSchema.ColumnType.FACET);
+                break;
             default:
-                return AnalyticsSchema.ColumnType.STRING;
+                columnDefinition.setType(AnalyticsSchema.ColumnType.STRING);
         }
+
+        columnDefinition.setIndexed(columnDefinitionBean.isIndex());
+        columnDefinition.setScoreParam(columnDefinitionBean.isScoreParam());
+        return columnDefinition;
     }
 
     /**
      * convert a column type to bean type
      *
-     * @param columnType the ColumnType to be converted to bean type
+     * @param columnDefinition the ColumnType to be converted to bean type
      * @return ColumnTypeBean instance
      */
-    private static ColumnTypeBean getColumnTypeBean(AnalyticsSchema.ColumnType columnType) {
-        switch (columnType) {
+    private static ColumnDefinitionBean getColumnTypeBean(ColumnDefinition columnDefinition) {
+        ColumnDefinitionBean bean = new ColumnDefinitionBean();
+        switch (columnDefinition.getType()) {
             case STRING:
-                return ColumnTypeBean.STRING;
+                bean.setType(ColumnTypeBean.STRING);
+                break;
             case INTEGER:
-                return ColumnTypeBean.INT;
+                bean.setType(ColumnTypeBean.INTEGER);
+                break;
             case LONG:
-                return ColumnTypeBean.LONG;
+                bean.setType(ColumnTypeBean.LONG);
+                break;
             case FLOAT:
-                return ColumnTypeBean.FLOAT;
+                bean.setType(ColumnTypeBean.FLOAT);
+                break;
             case DOUBLE:
-                return ColumnTypeBean.DOUBLE;
+                bean.setType(ColumnTypeBean.DOUBLE);
+                break;
             case BOOLEAN:
-                return ColumnTypeBean.BOOLEAN;
+                bean.setType(ColumnTypeBean.BOOLEAN);
+                break;
             case BINARY:
-                return ColumnTypeBean.BINARY;
+                bean.setType(ColumnTypeBean.BINARY);
+                break;
+            case FACET:
+                bean.setType(ColumnTypeBean.FACET);
+                break;
             default:
-                return ColumnTypeBean.STRING;
+                bean.setType(ColumnTypeBean.STRING);
         }
+        bean.setIndex(columnDefinition.isIndexed());
+        bean.setScoreParam(columnDefinition.isScoreParam());
+        return bean;
     }
 
     private static int getTenantId(String username) throws AnalyticsException {

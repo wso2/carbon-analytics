@@ -32,8 +32,8 @@ public enum  ColumnTypeBean {
     @XmlEnumValue("STRING")
     STRING,
 
-    @XmlEnumValue("INT")
-    INT,
+    @XmlEnumValue("INTEGER")
+    INTEGER,
 
     @XmlEnumValue("LONG")
     LONG,
@@ -48,6 +48,9 @@ public enum  ColumnTypeBean {
     BOOLEAN,
 
     @XmlEnumValue("BINARY")
-    BINARY
+    BINARY,
+
+    @XmlEnumValue("FACET")
+    FACET
 
 }

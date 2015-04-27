@@ -11,8 +11,8 @@
        <class name="org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsFileSystemTest"/>
        <class name="org.wso2.carbon.analytics.datasource.rdbms.h2.H2MemDBAnalyticsRecordStoreTest"/>
        <class name="org.wso2.carbon.analytics.datasource.rdbms.h2.H2MemDBAnalyticsFileSystemTest"/>
-       <class name="org.wso2.carbon.analytics.datasource.rdbms.AnalyticsDataServiceStandaloneTest"/>
-       <class name="org.wso2.carbon.analytics.datasource.rdbms.AnalyticsDataServiceClusteredTest"/>
+       <!--<class name="org.wso2.carbon.analytics.datasource.rdbms.AnalyticsDataServiceStandaloneTest"/>-->
+       <!--<class name="org.wso2.carbon.analytics.datasource.rdbms.AnalyticsDataServiceClusteredTest"/>-->
        <class name="org.wso2.carbon.analytics.datasource.rdbms.AnalyticsSparkSQLTest"/>
        <class name="org.wso2.carbon.analytics.datasource.rdbms.AnalyticsSparkSQLUITest"/>
      </classes>

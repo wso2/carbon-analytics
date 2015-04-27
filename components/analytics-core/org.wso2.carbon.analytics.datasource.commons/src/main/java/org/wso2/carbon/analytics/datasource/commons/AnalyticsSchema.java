@@ -29,18 +29,18 @@ public class AnalyticsSchema implements Serializable {
     
     private static final long serialVersionUID = -4696693702436657326L;
 
-    private Map<String, ColumnType> columns;
+    private Map<String, ColumnDefinition> columns;
     
     private List<String> primaryKeys;
     
     public AnalyticsSchema() { }
     
-    public AnalyticsSchema(Map<String, ColumnType> columns, List<String> primaryKeys) {
+    public AnalyticsSchema(Map<String, ColumnDefinition> columns, List<String> primaryKeys) {
         this.columns = columns;
         this.primaryKeys = primaryKeys;
     }
     
-    public Map<String, ColumnType> getColumns() {
+    public Map<String, ColumnDefinition> getColumns() {
         return columns;
     }
     
@@ -66,7 +66,7 @@ public class AnalyticsSchema implements Serializable {
             hash1 = this.columns.hashCode();
         }
         if (this.primaryKeys != null) {
-            hash1 = this.primaryKeys.hashCode();
+            hash2 = this.primaryKeys.hashCode();
         }
         return hash1 * hash2;
     }

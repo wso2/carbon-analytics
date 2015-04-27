@@ -20,7 +20,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -32,7 +31,6 @@ import java.util.Map.Entry;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "record")
-@XmlType(propOrder = { "id", "tableName", "timestamp", "values" })
 public class RecordBean {
 
     /** The id. */

@@ -46,6 +46,9 @@ public enum  ColumnTypeBean {
     BOOLEAN,
 
     @XmlEnumValue("BINARY")
-    BINARY
+    BINARY,
+
+    @XmlEnumValue("FACET")
+    FACET
 
 }

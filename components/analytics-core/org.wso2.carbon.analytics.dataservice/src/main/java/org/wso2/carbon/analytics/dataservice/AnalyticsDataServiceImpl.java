@@ -23,7 +23,6 @@ import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
-import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
@@ -137,6 +136,11 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public void createTable(int tenantId, String tableName) throws AnalyticsException {
         this.getAnalyticsRecordStore().createTable(tenantId, tableName);
+    }
+
+    @Override
+    public void clearIndexData(int tenantId, String tableName) throws AnalyticsIndexException {
+        this.getIndexer().clearIndexData(tenantId, tableName);
     }
     
     @Override
@@ -313,18 +317,6 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     @Override
-    public void setIndices(int tenantId, String tableName, 
-            Map<String, IndexType> columns) throws AnalyticsIndexException {
-        this.getIndexer().setIndices(tenantId, tableName, columns);
-    }
-
-    @Override
-    public void setIndices(int tenantId, String tableName, Map<String, IndexType> columns,
-                           List<String> scoreParams) throws AnalyticsIndexException {
-        this.getIndexer().setIndices(tenantId, tableName, columns, scoreParams);
-    }
-
-    @Override
     public List<SearchResultEntry> search(int tenantId, String tableName, String query,
             int start, int count) throws AnalyticsIndexException, AnalyticsException {
         return this.getIndexer().search(tenantId, tableName, query, start, count);
@@ -361,21 +353,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         return this.getIndexer().drillDownRangeCount(tenantId, drillDownRequest);
     }
 
-    @Override
-    public Map<String, IndexType> getIndices(int tenantId, 
-            String tableName) throws AnalyticsIndexException, AnalyticsException {
-        return this.getIndexer().lookupIndices(tenantId, tableName);
-    }
-
-    @Override
-    public List<String> getScoreParams(int tenantId, String tableName)
-            throws AnalyticsIndexException, AnalyticsException {
-        return this.getIndexer().lookupScoreParams(tenantId, tableName);
-    }
-
-    @Override
-    public void clearIndices(int tenantId, String tableName) throws AnalyticsIndexException, AnalyticsException {
-        this.getIndexer().clearIndices(tenantId, tableName);
+    private void clearIndices(int tenantId, String tableName) throws AnalyticsIndexException, AnalyticsException {
+        this.getIndexer().clearIndexData(tenantId, tableName);
     }
 
     @Override

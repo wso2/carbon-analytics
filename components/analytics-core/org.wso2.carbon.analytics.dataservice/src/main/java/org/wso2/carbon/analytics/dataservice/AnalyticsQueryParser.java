@@ -27,8 +27,9 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.util.BytesRefBuilder;
 import org.apache.lucene.util.NumericUtils;
-import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsDataIndexer;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
+import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 
 import java.util.Map;
 
@@ -38,22 +39,22 @@ import java.util.Map;
  */
 public class AnalyticsQueryParser extends QueryParser {
 
-    private Map<String, IndexType> indices;
+    private Map<String, ColumnDefinition> indices;
     
-    public AnalyticsQueryParser(Analyzer analyzer, Map<String, IndexType> indices) {
+    public AnalyticsQueryParser(Analyzer analyzer, Map<String, ColumnDefinition> indices) {
         super(null, analyzer);
         this.indices = indices;
     }
     
     @Override
     public Query getRangeQuery(String field, String part1, String part2, boolean si, boolean ei) throws ParseException {
-        IndexType type = this.indices.get(field);
+        AnalyticsSchema.ColumnType type = this.indices.get(field).getType();
         if (type == null) {
             /* check for special fields */
             if (AnalyticsDataIndexer.INDEX_ID_INTERNAL_FIELD.equals(field)) {
-                type = IndexType.STRING;
+                type = AnalyticsSchema.ColumnType.STRING;
             } else if (AnalyticsDataIndexer.INDEX_INTERNAL_TIMESTAMP_FIELD.equals(field)) {
-                type = IndexType.LONG;
+                type = AnalyticsSchema.ColumnType.LONG;
             } 
         }
         if (type != null) {
@@ -101,13 +102,13 @@ public class AnalyticsQueryParser extends QueryParser {
         if (field == null) {
             throw new RuntimeException("Invalid query, a term must have a field");
         }
-        IndexType type = this.indices.get(field);
+        AnalyticsSchema.ColumnType type = this.indices.get(field).getType();
         if (type == null) {
             /* check for special fields */
             if (AnalyticsDataIndexer.INDEX_ID_INTERNAL_FIELD.equals(field)) {
-                type = IndexType.STRING;
+                type = AnalyticsSchema.ColumnType.STRING;
             } else if (AnalyticsDataIndexer.INDEX_INTERNAL_TIMESTAMP_FIELD.equals(field)) {
-                type = IndexType.LONG;
+                type = AnalyticsSchema.ColumnType.STRING.LONG;
             } 
         }
         if (type != null) {

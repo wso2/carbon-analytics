@@ -37,7 +37,6 @@ import org.wso2.carbon.analytics.webservice.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.webservice.beans.CategoryDrillDownRequestBean;
 import org.wso2.carbon.analytics.webservice.beans.CategoryPathBean;
 import org.wso2.carbon.analytics.webservice.beans.CategorySearchResultEntryBean;
-import org.wso2.carbon.analytics.webservice.beans.IndexConfigurationBean;
 import org.wso2.carbon.analytics.webservice.beans.RecordBean;
 import org.wso2.carbon.analytics.webservice.beans.SubCategoriesBean;
 import org.wso2.carbon.analytics.webservice.exception.AnalyticsWebServiceException;
@@ -334,46 +333,6 @@ public class AnalyticsWebService extends AbstractAdmin {
     }
 
     /**
-     * Sets the indices for a given table under the given tenant. The indices must be
-     * saved in a persistent storage under analytics data service, to be able to lookup the
-     * indices later, i.e. these indices should be in-effect after a server restart.
-     *
-     * @param tableName              The table name
-     * @param indexConfigurationBean A IndexConfigurationBean that contains a set of columns to create indices for,
-     *                               and their data types
-     * @throws AnalyticsWebServiceException
-     */
-    public void setIndices(String tableName, IndexConfigurationBean indexConfigurationBean)
-            throws AnalyticsWebServiceException {
-        try {
-            analyticsDataAPI.setIndices(getUsername(), tableName, Utils.getIndices(indexConfigurationBean), Utils.getScoreParam(indexConfigurationBean));
-        } catch (AnalyticsIndexException e) {
-            logger.error("Unable to set indices for table[" + tableName + "] due to " + e.getMessage(), e);
-            throw new AnalyticsWebServiceException("Unable to set indices from table[" + tableName + "] due to " + e
-                    .getMessage(), e);
-        }
-    }
-
-    /**
-     * Returns the declared indices for a given table under the given tenant.
-     *
-     * @param tableName The table name
-     * @return IndexConfigurationBean that contains arrays of IndexEntryBean and an String array that consist of
-     * Score Params
-     * @throws AnalyticsWebServiceException
-     */
-    public IndexConfigurationBean getIndices(String tableName) throws AnalyticsWebServiceException {
-        try {
-            return Utils.getIndexConfiguration(analyticsDataAPI.getIndices(getUsername(), tableName),
-                                               analyticsDataAPI.getScoreParams(getUsername(), tableName));
-        } catch (AnalyticsException e) {
-            logger.error("Unable to get indices from table[" + tableName + "] due to " + e.getMessage(), e);
-            throw new AnalyticsWebServiceException("Unable to get indices from table[" + tableName + "] due to " + e
-                    .getMessage(), e);
-        }
-    }
-
-    /**
      * Clears all the indices for the given table.
      *
      * @param tableName The table name
@@ -381,7 +340,7 @@ public class AnalyticsWebService extends AbstractAdmin {
      */
     public void clearIndices(String tableName) throws AnalyticsWebServiceException {
         try {
-            analyticsDataAPI.clearIndices(getUsername(), tableName);
+            analyticsDataAPI.clearIndexData(getUsername(), tableName);
         } catch (AnalyticsException e) {
             logger.error("Unable to clear indices from table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to clear indices from table[" + tableName + "] due to " + e

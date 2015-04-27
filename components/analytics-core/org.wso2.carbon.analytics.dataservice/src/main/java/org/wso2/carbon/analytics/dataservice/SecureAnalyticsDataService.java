@@ -20,7 +20,6 @@ package org.wso2.carbon.analytics.dataservice;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
-import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
@@ -33,7 +32,6 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutEx
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordReader;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * This interface validate user permissions before execute analytics data service operations.
@@ -49,6 +47,15 @@ public interface SecureAnalyticsDataService extends AnalyticsRecordReader {
      * @throws org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
      */
     void createTable(String username, String tableName) throws AnalyticsException;
+
+    /**
+     * Clears the index data of the table. This will delete all the index information
+     * up to the current moment.
+     * @param username  The username of the user that invoke this method
+     * @param tableName The name of the table to clear the index data from
+     * @throws AnalyticsException
+     */
+    void clearIndexData(String username, String tableName) throws AnalyticsException;
 
     /**
      * Sets the schema for the target analytics table, if there is already one assigned, it will be
@@ -206,57 +213,6 @@ public interface SecureAnalyticsDataService extends AnalyticsRecordReader {
      */
     void delete(String username, String tableName, List<String> ids)
             throws AnalyticsException, AnalyticsTableNotAvailableException;
-
-    /**
-     * Sets the indices for a given table under the given tenant. The indices must be
-     * saved in a persistent storage under analytics data service, to be able to lookup the
-     * indices later, i.e. these indices should be in-effect after a server restart.
-     *
-     * @param username  The username of the user that invoke this method
-     * @param tableName The table name
-     * @param columns   The set of columns to create indices for, and their data types
-     * @throws org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException
-     */
-    void setIndices(String username, String tableName, Map<String, IndexType> columns) throws AnalyticsIndexException;
-
-    /**
-     * Sets the indices for a given table under the given tenant. The indices must be
-     * saved in a persistent storage under analytics data service, to be able to lookup the
-     * indices later, i.e. these indices should be in-effect after a server restart.
-     *
-     * @param username  The username of the user that invoke this method
-     * @param tableName The table name
-     * @param columns   The set of columns to create indices for, and their data types
-     * @param scoreParams The set of columns which is used as score parameters
-     * @throws org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException
-     */
-    void setIndices(String username, String tableName, Map<String, IndexType> columns, List<String> scoreParams)
-            throws AnalyticsIndexException;
-
-    /**
-     * Returns the declared indices for a given table under the given tenant.
-     *
-     * @param username  The username of the user that invoke this method
-     * @param tableName The table name
-     * @return List of indices of the table
-     * @throws AnalyticsIndexException
-     * @throws AnalyticsException
-     */
-    Map<String, IndexType> getIndices(String username, String tableName)
-            throws AnalyticsIndexException, AnalyticsException;
-
-
-    List<String> getScoreParams(String username, String tableName) throws AnalyticsException,
-                                                                          AnalyticsIndexException;
-    /**
-     * Clears all the indices for the given table.
-     *
-     * @param username  The username of the user that invoke this method
-     * @param tableName The table name
-     * @throws AnalyticsIndexException
-     * @throws AnalyticsException
-     */
-    void clearIndices(String username, String tableName) throws AnalyticsIndexException, AnalyticsException;
 
     /**
      * Searches the data with a given search query.

@@ -21,7 +21,6 @@ package org.wso2.carbon.analytics.dataservice;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
-import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
@@ -34,7 +33,6 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutEx
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordReader;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * This interface represents the analytics data service operations.
@@ -49,7 +47,16 @@ public interface AnalyticsDataService extends AnalyticsRecordReader {
      * @throws AnalyticsException
      */
     void createTable(int tenantId, String tableName) throws AnalyticsException;
-    
+
+    /**
+     * Clears the index data of the table. This will delete all the index information
+     * up to the current moment.
+     * @param tenantId The tenant which this table belongs to
+     * @param tableName The name of the table to clear the index data from
+     * @throws AnalyticsException
+     */
+    void clearIndexData(int tenantId, String tableName) throws AnalyticsIndexException;
+
     /**
      * Sets the schema for the target analytics table, if there is already one assigned, it will be 
      * overwritten.
@@ -194,61 +201,7 @@ public interface AnalyticsDataService extends AnalyticsRecordReader {
      */
     void delete(int tenantId, String tableName, List<String> ids) 
             throws AnalyticsException, AnalyticsTableNotAvailableException;
-    
-    /**
-     * Sets the indices for a given table under the given tenant. The indices must be
-     * saved in a persistent storage under analytics data service, to be able to lookup the 
-     * indices later, i.e. these indices should be in-effect after a server restart.
-     * @param tenantId The tenant id
-     * @param tableName The table name
-     * @param columns The set of columns to create indices for, and their data types
-     * @throws org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException
-     */
-    void setIndices(int tenantId, String tableName, Map<String, IndexType> columns) throws AnalyticsIndexException;
 
-    /**
-     * Sets the indices for a given table under the given tenant. The indices must be
-     * saved in a persistent storage under analytics data service, to be able to lookup the
-     * indices later, i.e. these indices should be in-effect after a server restart.
-     * @param tenantId The tenant id
-     * @param tableName The table name
-     * @param columns The set of columns to create indices for, and their data types
-     * @param scoreParams The set of columns which are used as score parameters
-     * @throws org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException
-     */
-    void setIndices(int tenantId, String tableName, Map<String, IndexType> columns, List<String> scoreParams)
-            throws AnalyticsIndexException;
-    
-    /**
-     * Returns the declared indices for a given table under the given tenant.
-     * @param tenantId The tenant id
-     * @param tableName The table name
-     * @return List of indices of the table
-     * @throws AnalyticsIndexException
-     * @throws AnalyticsException 
-     */
-    Map<String, IndexType> getIndices(int tenantId, String tableName) throws AnalyticsIndexException, AnalyticsException;
-
-
-    /**
-     * Returns the list of scoring parameters which were defined for scoring function, if any.
-     * @param tenantId the tenant id
-     * @param tableName the table name
-     * @return The list of scoring parameters
-     * @throws AnalyticsIndexException
-     * @throws AnalyticsException
-     */
-    List<String> getScoreParams(int tenantId, String tableName) throws AnalyticsIndexException, AnalyticsException;
-    
-    /**
-     * Clears all the indices for the given table.
-     * @param tenantId The tenant id
-     * @param tableName The table name
-     * @throws AnalyticsIndexException
-     * @throws AnalyticsException 
-     */
-    void clearIndices(int tenantId, String tableName) throws AnalyticsIndexException, AnalyticsException;
-    
     /**
      * Searches the data with a given search query.
      * @param tenantId The tenant id

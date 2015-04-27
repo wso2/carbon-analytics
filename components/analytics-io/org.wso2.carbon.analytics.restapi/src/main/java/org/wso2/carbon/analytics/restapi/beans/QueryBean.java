@@ -19,28 +19,22 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 import java.util.Map;
 
 /**
  * The Class QueryBean.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(propOrder = { "tenantId", "tableName", "columns", "query", "start", "count" })
 @XmlRootElement(name = "query")
 public class QueryBean {
-	
-	/** The tenant id. */
-	@XmlElement(required = true)
-	private int tenantId;
-	
+
 	/** The table name. */
 	@XmlElement(required = true)
 	private String tableName;
 	
 	/** The columns. */
 	@XmlElement(required = false)
-	private Map<String, IndexTypeBean> columns;
+	private Map<String, ColumnTypeBean> columns;
 	
 	/** The query. */
 	@XmlElement(required = false)
@@ -53,22 +47,6 @@ public class QueryBean {
 	/** The count. */
 	@XmlElement(required = false)
 	private int count;
-
-	/**
-	 * Gets the tenant id.
-	 * @return the tenant id
-	 */
-	public int getTenantId() {
-		return tenantId;
-	}
-
-	/**
-	 * Sets the tenant id.
-	 * @param tenantId the new tenant id
-	 */
-	public void setTenantId(int tenantId) {
-		this.tenantId = tenantId;
-	}
 
 	/**
 	 * Gets the table name.
@@ -90,7 +68,7 @@ public class QueryBean {
 	 * Gets the columns.
 	 * @return the columns
 	 */
-	public Map<String, IndexTypeBean> getColumns() {
+	public Map<String, ColumnTypeBean> getColumns() {
 		return columns;
 	}
 
@@ -98,7 +76,7 @@ public class QueryBean {
 	 * Sets the columns.
 	 * @param columns the columns
 	 */
-	public void setColumns(Map<String, IndexTypeBean> columns) {
+	public void setColumns(Map<String, ColumnTypeBean> columns) {
 		this.columns = columns;
 	}
 

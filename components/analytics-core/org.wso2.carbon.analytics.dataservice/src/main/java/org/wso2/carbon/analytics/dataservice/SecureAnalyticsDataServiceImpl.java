@@ -20,7 +20,6 @@ package org.wso2.carbon.analytics.dataservice;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
-import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
@@ -35,7 +34,6 @@ import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * The implementation of {@link SecureAnalyticsDataService}.
@@ -56,6 +54,16 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
                                                            "permission to create table");
         }
         analyticsDataService.createTable(tenantId, tableName);
+    }
+
+    @Override
+    public void clearIndexData(String username, String tableName) throws AnalyticsException {
+        int tenantId = getTenantId(username);
+        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_DELETE_INDEXING)) {
+            throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                           "permission to delete index data");
+        }
+        analyticsDataService.clearIndexData(tenantId, tableName);
     }
 
     @Override
@@ -187,68 +195,6 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
                                                            "permission to delete records");
         }
         analyticsDataService.delete(tenantId, tableName, ids);
-    }
-
-    @Override
-    public void setIndices(String username, String tableName, Map<String, IndexType> columns)
-            throws AnalyticsIndexException {
-        try {
-            int tenantId = getTenantId(username);
-            if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_SET_INDEXING)) {
-                throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
-                                                               "permission to set indices");
-            }
-            analyticsDataService.setIndices(tenantId, tableName, columns);
-        } catch (AnalyticsException e) {
-            throw new AnalyticsIndexException(e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public void setIndices(String username, String tableName, Map<String, IndexType> columns,
-                           List<String> scoreParams) throws AnalyticsIndexException {
-        try {
-            int tenantId = getTenantId(username);
-            if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_SET_INDEXING)) {
-                throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
-                                                               "permission to set indices");
-            }
-            analyticsDataService.setIndices(tenantId, tableName, columns, scoreParams);
-        } catch (AnalyticsException e) {
-            throw new AnalyticsIndexException(e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public Map<String, IndexType> getIndices(String username, String tableName)
-            throws AnalyticsIndexException, AnalyticsException {
-        int tenantId = getTenantId(username);
-        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_GET_INDEXING)) {
-            throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
-                                                           "permission to get indices");
-        }
-        return analyticsDataService.getIndices(tenantId, tableName);
-    }
-
-    @Override
-    public List<String> getScoreParams(String username, String tableName)
-            throws AnalyticsException, AnalyticsIndexException {
-        int tenantId = getTenantId(username);
-        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_GET_INDEXING)) {
-            throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
-                                                           "permission to get score parameters");
-        }
-        return analyticsDataService.getScoreParams(tenantId, tableName);
-    }
-
-    @Override
-    public void clearIndices(String username, String tableName) throws AnalyticsIndexException, AnalyticsException {
-        int tenantId = getTenantId(username);
-        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_DELETE_INDEXING)) {
-            throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
-                                                           "permission to clear indices");
-        }
-        analyticsDataService.clearIndices(tenantId, tableName);
     }
 
     @Override
