@@ -16,10 +16,14 @@
 
 package org.wso2.carbon.analytics.datasource.commons;
 
+import java.io.Serializable;
+
 /**
  * This class represents a defintion of a column in an analytics schema.
  */
-public class ColumnDefinition {
+public class ColumnDefinition implements Serializable {
+
+    private static final long serialVersionUID = 1806609078873096460L;
 
     private String name;
 
