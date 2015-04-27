@@ -115,8 +115,6 @@ public final class WSO2EventAdapter implements OutputEventAdapter {
     @Override
     public void publish(Object message, Map<String, String> dynamicProperties) {
         Event event = (Event) (message);
-        //StreamDefinition streamDefinition = (StreamDefinition) ((Object[]) message)[1];
-        //event.setStreamId(streamId);
 
         if (isBlockingMode) {
             dataPublisher.publish(event);

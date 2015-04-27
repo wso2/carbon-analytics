@@ -62,9 +62,7 @@ public class UIEventAdapter implements OutputEventAdapter {
 
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
 
-
         streamId = eventAdapterConfiguration.getOutputStreamIdOfWso2eventMessageFormat();
-        System.out.println(streamId);
         if(streamId == null || streamId.isEmpty()){
             throw new OutputEventAdapterRuntimeException("UI event adapter needs a output stream id");
         }
