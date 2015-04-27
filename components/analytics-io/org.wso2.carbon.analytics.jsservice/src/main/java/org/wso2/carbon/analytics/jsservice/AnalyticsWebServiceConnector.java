@@ -244,7 +244,7 @@ public class AnalyticsWebServiceConnector {
             }
             return gson.toJson(handleResponse(ResponseStatus.SUCCESS, (new Long(recordCount)).toString()));
         } catch (Exception e) {
-            logger.error("Failed to get record count for table: " + tableName);
+            logger.error("Failed to get record count for table: " + tableName + ": " + e.getMessage(), e);
             return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get record count for table: " +
                                                                      tableName + ": " + e.getMessage()));
         }

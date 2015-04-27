@@ -868,7 +868,13 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 for (Map.Entry<String, List<String>> entry : drillDownRequest.getCategoryPaths()
                         .entrySet()) {
                     List<String> path = entry.getValue();
-                    drillDownQuery.add(entry.getKey(), path.toArray(new String[path.size()]));
+                    String[] pathAsArray;
+                    if (path == null || path.isEmpty()) {
+                        pathAsArray = new String[]{};
+                    } else {
+                        pathAsArray = path.toArray(new String[path.size()]);
+                    }
+                    drillDownQuery.add(entry.getKey(), pathAsArray);
                 }
             }
             return drillDownQuery;

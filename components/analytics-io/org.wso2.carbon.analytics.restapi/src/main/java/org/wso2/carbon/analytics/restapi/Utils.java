@@ -124,8 +124,7 @@ public class Utils {
             if (recordEntry.getValue() instanceof List) {
                 List<String> pathList = (List<String>) recordEntry.getValue();
                 if (pathList.size() > 0) {
-                    String[] path = pathList.toArray(new String[pathList.size()]);
-                    valueMap.put(recordEntry.getKey(), path);
+                    valueMap.put(recordEntry.getKey(), pathList);
                 } else {
                     throw new AnalyticsIndexException("Category path cannot be empty");
                 }
