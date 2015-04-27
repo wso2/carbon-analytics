@@ -250,8 +250,7 @@ public class MessageConsoleConnector {
         return requestBean;
     }
 
-    private Record getRecord(RecordBean recordBean, boolean
-            withDefaultColumn) {
+    private Record getRecord(RecordBean recordBean, boolean withDefaultColumn) {
         Record record = new Record();
         if (recordBean != null) {
             List<Column> columns = new ArrayList<>();
@@ -300,7 +299,7 @@ public class MessageConsoleConnector {
             case "FACET": {
                 AnalyticsCategoryPathBean analyticsCategoryPathBeanValue = entityBean.getAnalyticsCategoryPathBeanValue();
                 FacetBean facetBean = new FacetBean();
-                if (analyticsCategoryPathBeanValue != null) {
+                if (analyticsCategoryPathBeanValue != null && analyticsCategoryPathBeanValue.getPath() != null) {
                     facetBean.setPath(Arrays.asList(analyticsCategoryPathBeanValue.getPath()));
                 }
                 value = String.valueOf(new Gson().toJson(facetBean));

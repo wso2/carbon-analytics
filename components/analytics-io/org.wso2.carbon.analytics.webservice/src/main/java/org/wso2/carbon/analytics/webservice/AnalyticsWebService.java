@@ -559,7 +559,8 @@ public class AnalyticsWebService extends AbstractAdmin {
         if (drillDownRequest.getCategoryPaths() != null) {
             Map<String, List<String>> categoryPath = new HashMap<>();
             for (CategoryPathBean categoryPathBean : drillDownRequest.getCategoryPaths()) {
-                categoryPath.put(categoryPathBean.getFieldName(), Arrays.asList(categoryPathBean.getPath()));
+                categoryPath.put(categoryPathBean.getFieldName(), categoryPathBean.getPath() != null ?
+                                                                  Arrays.asList(categoryPathBean.getPath()) : null);
             }
             analyticsDrillDownRequest.setCategoryPaths(categoryPath);
         }
