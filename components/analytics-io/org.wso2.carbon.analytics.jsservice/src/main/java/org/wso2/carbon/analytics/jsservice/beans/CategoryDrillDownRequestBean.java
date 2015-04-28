@@ -30,8 +30,6 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CategoryDrillDownRequestBean {
 
-    @XmlElement(name = "tableName")
-    private String tableName;
     @XmlElement(name = "fieldName")
     private String fieldName;
     @XmlElement(name = "categoryPath", required = false)
@@ -40,10 +38,6 @@ public class CategoryDrillDownRequestBean {
     private String query;
     @XmlElement(name = "scoreFunction", required = false)
     private String scoreFunction;
-
-    public String getTableName() {
-        return tableName;
-    }
 
     public String getFieldName() {
         return fieldName;

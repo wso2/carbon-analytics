@@ -22,9 +22,17 @@ public class Constants {
 
 	public static final long MILLISECONDSPERSECOND = 1000;
     public static final String BASIC_AUTH_HEADER = "Basic";
+    public static final String AUTHORIZATION_HEADER = "Authorization";
+    public static final String OPERATION_TYPE = "type";
+    public static final String TABLE_NAME = "tableName";
+    public static final String TIME_FROM = "timeFrom";
+    public static final String TIME_TO = "timeTo";
+    public static final String START = "start";
+    public static final String COUNT = "count";
+    public static final String WAIT_TIME = "waitTime";
 
 
-	/**
+    /**
 	 * Instantiates a new constants.
 	 */
 	private Constants() {
@@ -59,46 +67,4 @@ public class Constants {
 		private Status() {
 		}
 	}
-
-    public final static class FacetAttributes {
-
-        /** The constant representing weight attribute */
-        public static final String WEIGHT = "weight";
-
-        /**The constant representing path attribute */
-        public static final String PATH = "path";
-    }
-
-    /**
-     * The Class ResourcePath.
-     */
-    public static final class ResourcePath {
-
-        /** Token generator method name. */
-        public static final String GENERATE_TOKEN = "generate_token";
-        
-        /** The Constant root context. */
-        public static final String ROOT_CONTEXT = "/";
-
-		/** The Constant tables. */
-		public static final String TABLES = "tables";
-
-		/** The Constant table_exists. */
-		public static final String TABLE_EXISTS = "table_exists";
-
-		/** The Constant records. */
-		public static final String RECORDS = "records";
-
-		/** The Constant search. */
-		public static final String SEARCH = "search";
-
-		/** The Constant search_count. */
-		public static final String SEARCH_COUNT = "search_count";
-
-		public static final String INDEXING_DONE = "indexing_done";
-
-		public static final String DRILLDOWN = "drilldown";
-
-		public static final String DRILLDOWNCOUNT = "drilldowncount";
-    }
 }

@@ -265,10 +265,10 @@ public class Utils {
     }
 
     public static org.wso2.carbon.analytics.webservice.stub.beans.CategoryDrillDownRequestBean createCategoryDrillDownRequest(
-            CategoryDrillDownRequestBean queryBean) {
+            String tableName, CategoryDrillDownRequestBean queryBean) {
         org.wso2.carbon.analytics.webservice.stub.beans.CategoryDrillDownRequestBean bean = new
                 org.wso2.carbon.analytics.webservice.stub.beans.CategoryDrillDownRequestBean();
-        bean.setTableName(queryBean.getTableName());
+        bean.setTableName(tableName);
         bean.setScoreFunction(queryBean.getScoreFunction());
         bean.setPath(queryBean.getCategoryPath().toArray(new String[queryBean.getCategoryPath().size()]));
         bean.setFieldName(queryBean.getFieldName());
@@ -277,9 +277,9 @@ public class Utils {
     }
 
     public static AnalyticsDrillDownRequestBean createDrillDownSearchRequest(
-            DrillDownRequestBean queryBean) {
+            String tableName, DrillDownRequestBean queryBean) {
         AnalyticsDrillDownRequestBean bean = new AnalyticsDrillDownRequestBean();
-        bean.setTableName(queryBean.getTableName());
+        bean.setTableName(tableName);
         bean.setQuery(queryBean.getQuery());
         bean.setScoreFunction(queryBean.getScoreFunction());
         bean.setRecordCount(queryBean.getRecordCount());

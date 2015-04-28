@@ -30,8 +30,6 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class DrillDownRequestBean {
 
-    @XmlElement(name = "tableName")
-    private String tableName;
     @XmlElement(name = "categories")
     private List<DrillDownPathBean> categories;
     @XmlElement(name = "query")
@@ -46,14 +44,6 @@ public class DrillDownRequestBean {
     private List<DrillDownRangeBean> ranges;
     @XmlElement(name = "rangeField", required = false)
     private String rangeField;
-
-    public String getTableName() {
-        return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
-    }
 
     public List<DrillDownPathBean> getCategories() {
         return categories;

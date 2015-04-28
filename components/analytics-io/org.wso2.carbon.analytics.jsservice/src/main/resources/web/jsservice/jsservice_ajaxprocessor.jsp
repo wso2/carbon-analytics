@@ -22,14 +22,16 @@
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ page import="java.io.BufferedReader" %>
+<%@ page import="org.wso2.carbon.analytics.jsservice.Constants" %>
 
-<%
+<%!
+%><%
     String serverURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);
     ConfigurationContext configContext = (ConfigurationContext) config.getServletContext().
             getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
     String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
     AnalyticsWebServiceConnector connector = null;
-    String authParam = request.getHeader("Authorization");
+    String authParam = request.getHeader(Constants.AUTHORIZATION_HEADER);
     if (authParam != null) {
         try {
             String[] credentials = Utils.authenticate(authParam);
@@ -48,12 +50,12 @@
         }
     }
     int type = 0;
-    String typeParam = request.getParameter("type");
+    String typeParam = request.getParameter(Constants.OPERATION_TYPE);
     if (typeParam != null && !typeParam.isEmpty()) {
         type = Integer.parseInt(typeParam);
     }
 
-    String tableName = request.getParameter("tableName");
+    String tableName = request.getParameter(Constants.TABLE_NAME);
     if (type != AnalyticsWebServiceConnector.TYPE_LIST_TABLES &&
         type != AnalyticsWebServiceConnector.TYPE_PUT_RECORDS &&
             type != AnalyticsWebServiceConnector.TYPE_PAGINATION_SUPPORTED) {
@@ -82,10 +84,10 @@
                 break;
             }
             case AnalyticsWebServiceConnector.TYPE_GET_BY_RANGE: {
-                String from = request.getParameter("timeFrom");
-                String to = request.getParameter("timeTo");
-                String start = request.getParameter("start");
-                String count = request.getParameter("count");
+                String from = request.getParameter(Constants.TIME_FROM);
+                String to = request.getParameter(Constants.TIME_TO);
+                String start = request.getParameter(Constants.START);
+                String count = request.getParameter(Constants.COUNT);
                 out.print(connector.getRecordsByRange(tableName, from, to, start, count));
                 break;
             }
@@ -105,8 +107,8 @@
                 break;
             }
             case AnalyticsWebServiceConnector.TYPE_DELETE_BY_RANGE: {
-                long timeFrom = Long.parseLong(request.getParameter("timeFrom"));
-                long timeTo = Long.parseLong(request.getParameter("timeTo"));
+                long timeFrom = Long.parseLong(request.getParameter(Constants.TIME_FROM));
+                long timeTo = Long.parseLong(request.getParameter(Constants.TIME_TO));
                 out.print(connector.deleteRecordsByRange(tableName, timeFrom, timeTo));
                 break;
             }
@@ -178,8 +180,41 @@
                 break;
             }
             case AnalyticsWebServiceConnector.TYPE_WAIT_FOR_INDEXING: {
-                long waitTime = Long.parseLong(request.getParameter("waitTime"));
+                long waitTime = Long.parseLong(request.getParameter(Constants.WAIT_TIME));
                 out.print(connector.waitForIndexing(waitTime));
+                break;
+            }
+            case AnalyticsWebServiceConnector.TYPE_DRILLDOWN_CATEGORIES: {
+                StringBuilder buffer = new StringBuilder();
+                BufferedReader reader = request.getReader();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                String requestAsString = buffer.toString();
+                out.print(connector.drillDownCategories(tableName, requestAsString));
+                break;
+            }
+            case AnalyticsWebServiceConnector.TYPE_DRILLDOWN_SEARCH: {
+                StringBuilder buffer = new StringBuilder();
+                BufferedReader reader = request.getReader();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                String requestAsString = buffer.toString();
+                out.print(connector.drillDownSearch(tableName, requestAsString));
+                break;
+            }
+            case AnalyticsWebServiceConnector.TYPE_DRILLDOWN_SEARCH_COUNT: {
+                StringBuilder buffer = new StringBuilder();
+                BufferedReader reader = request.getReader();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                String requestAsString = buffer.toString();
+                out.print(connector.drillDownSearchCount(tableName, requestAsString));
                 break;
             }
             default:
