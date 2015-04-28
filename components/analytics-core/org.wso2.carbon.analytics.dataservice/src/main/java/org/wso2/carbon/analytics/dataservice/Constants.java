@@ -21,7 +21,6 @@ package org.wso2.carbon.analytics.dataservice;
  * This class hold constants that required for data service
  */
 public class Constants {
-
     public static final String PERMISSION_LIST_TABLE = "/permission/admin/manage/analytics/table/list";
     public static final String PERMISSION_CREATE_TABLE = "/permission/admin/manage/analytics/table/create";
     public static final String PERMISSION_DROP_TABLE = "/permission/admin/manage/analytics/table/drop";
@@ -34,6 +33,5 @@ public class Constants {
     public static final String PERMISSION_GET_INDEXING = "/permission/admin/manage/analytics/indexing/get";
     public static final String PERMISSION_DELETE_INDEXING = "/permission/admin/manage/analytics/indexing/delete";
     public static final String DEFAULT_CHARSET = "UTF8";
-    public static final String ANALYTICS_INDICES_FILE_EXTENSION = "xml";
-    public static final String ANALYTICS_INDICES_DEPLOYMENT_DIR_NAME = "analytics-indices";
+    public static final String ANALYTICS_SCHEMA_FILE_EXTENSION = "xml";
 }

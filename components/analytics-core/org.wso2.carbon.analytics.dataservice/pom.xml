@@ -79,7 +79,7 @@
                         <Export-Package>org.wso2.carbon.analytics.dataservice.*</Export-Package>
                         <Import-Package>org.apache.lucene.*;version="[4.10.3, 5.0.0)"</Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
-                        <WSO2-Application-Deployer>Analytics Index CApp Deployer</WSO2-Application-Deployer>
+                        <WSO2-Application-Deployer>Analytics Schema CApp Deployer</WSO2-Application-Deployer>
                     </instructions>
                 </configuration>
             </plugin>
