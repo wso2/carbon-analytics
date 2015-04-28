@@ -706,11 +706,11 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         Map<String, Float> mergedResults = new LinkedHashMap<>();
         List<CategorySearchResultEntry> finalResult = new ArrayList<>();
         for (CategorySearchResultEntry perShardResults : searchResults) {
-                Float score = mergedResults.get(perShardResults.getCategoryName());
+                Float score = mergedResults.get(perShardResults.getCategoryValue());
                 if (score != null) {
                     score += perShardResults.getScore();
                 } else {
-                    mergedResults.put(perShardResults.getCategoryName(), perShardResults.getScore());
+                    mergedResults.put(perShardResults.getCategoryValue(), perShardResults.getScore());
                 }
         }
         for (Map.Entry<String, Float> entry : mergedResults.entrySet()) {

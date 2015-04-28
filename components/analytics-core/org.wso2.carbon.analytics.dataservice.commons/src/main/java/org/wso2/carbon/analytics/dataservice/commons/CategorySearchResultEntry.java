@@ -23,17 +23,17 @@ package org.wso2.carbon.analytics.dataservice.commons;
  */
 public class CategorySearchResultEntry implements Comparable<CategorySearchResultEntry> {
 
-    private String categoryName;
+    private String categoryValue;
 
     private float score;
 
     public CategorySearchResultEntry(String category, float score) {
-        this.categoryName = category;
+        this.categoryValue = category;
         this.score = score;
     }
 
-    public String getCategoryName() {
-        return categoryName;
+    public String getCategoryValue() {
+        return categoryValue;
     }
 
     public float getScore() {

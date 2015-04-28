@@ -288,7 +288,7 @@ public class Utils {
         bean.setCategoryPath(categories.getPath());
         List<String> subCategories = new ArrayList<>();
         for (CategorySearchResultEntry entry : categories.getCategories()) {
-            subCategories.add(entry.getCategoryName());
+            subCategories.add(entry.getCategoryValue());
         }
         bean.setCategories(subCategories);
         return bean;
