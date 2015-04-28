@@ -139,7 +139,7 @@ public class EventReceiverConfigurationBuilder {
             throw new EventReceiverValidationException("Event Adapter with type: " + fromEventAdapterType + " does not exist", fromEventAdapterType);
         }
 
-        InputEventAdapterConfiguration inputEventAdapterConfiguration = getInputEventAdapterConfiguration(fromEventAdapterType,eventReceiverName,mappingType);
+        InputEventAdapterConfiguration inputEventAdapterConfiguration = getInputEventAdapterConfiguration(fromEventAdapterType, eventReceiverName, mappingType);
 
         Iterator fromElementPropertyIterator = fromElement.getChildrenWithName(
                 new QName(EventReceiverConstants.ER_CONF_NS, EventReceiverConstants.ER_ELEMENT_PROPERTY)
@@ -168,6 +168,23 @@ public class EventReceiverConfigurationBuilder {
             } else {
                 log.warn("To property " + propertyName + " with value " + propertyValue + " is dropped as its irrelevant of input adapter type:" + fromEventAdapterType);
             }
+        }
+        String fromStreamName="";
+        String fromStreamVersion="";
+        String customMappingEnabledAttribute = mappingElement.getAttributeValue(new QName(EventReceiverConstants.ER_ATTR_CUSTOM_MAPPING_ENABLED));
+        if (mappingType.equalsIgnoreCase(EventReceiverConstants.ER_WSO2EVENT_MAPPING_TYPE) && customMappingEnabledAttribute != null && customMappingEnabledAttribute.equalsIgnoreCase(EventReceiverConstants.ENABLE_CONST)) {
+            OMElement fromOMElement = mappingElement.getFirstChildWithName(new QName(EventReceiverConstants.ER_CONF_NS, EventReceiverConstants.ER_ELEMENT_FROM));
+            fromStreamName = fromOMElement.getAttributeValue(new QName(EventReceiverConstants.ER_ATTR_STREAM_NAME));
+            fromStreamVersion = fromOMElement.getAttributeValue(new QName(EventReceiverConstants.ER_ATTR_VERSION));
+        }
+
+        String toStreamName = toElement.getAttributeValue(new QName(EventReceiverConstants.ER_ATTR_STREAM_NAME));
+        String toStreamVersion = toElement.getAttributeValue(new QName(EventReceiverConstants.ER_ATTR_VERSION));
+
+        if(fromStreamName == null || fromStreamName.isEmpty() || fromStreamVersion == null ||fromStreamVersion.isEmpty()){
+            inputEventAdapterConfiguration.setInputStreamIdOfWso2eventMessageFormat(toStreamName + EventReceiverConstants.STREAM_NAME_VER_DELIMITER + toStreamVersion);
+        }else{
+            inputEventAdapterConfiguration.setInputStreamIdOfWso2eventMessageFormat(fromStreamName + EventReceiverConstants.STREAM_NAME_VER_DELIMITER + fromStreamVersion);
         }
 
         if (mappingType.equalsIgnoreCase(EventReceiverConstants.ER_WSO2EVENT_MAPPING_TYPE)) {
@@ -211,9 +228,6 @@ public class EventReceiverConfigurationBuilder {
                 throw new EventReceiverConfigurationException("Illegal exception occurred ", e);
             }
         }
-
-        String toStreamName = toElement.getAttributeValue(new QName(EventReceiverConstants.ER_ATTR_STREAM_NAME));
-        String toStreamVersion = toElement.getAttributeValue(new QName(EventReceiverConstants.ER_ATTR_VERSION));
 
         if (!validateStreamDetails(toStreamName, toStreamVersion, tenantId)) {
             throw new EventReceiverStreamValidationException("Stream " + toStreamName + ":" + toStreamVersion + " does not exist", toStreamName + ":" + toStreamVersion);

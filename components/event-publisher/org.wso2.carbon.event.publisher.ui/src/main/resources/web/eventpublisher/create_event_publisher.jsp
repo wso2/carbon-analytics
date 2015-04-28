@@ -42,7 +42,7 @@
 
 <script type="text/javascript">
     jQuery(document).ready(function () {
-        showMappingContext();
+        showEventStreamDefinition();
     });
 
 </script>
@@ -100,6 +100,8 @@
         }
 
         String streamDefinition = attributes;
+        String streamName = streamDefinitionDto.getName();
+        String streamVersion = streamDefinitionDto.getVersion();
 
         List<String> attributeList = EventPublisherUIUtils.getAttributeListWithPrefix(streamDefinitionDto);
 %>
@@ -371,20 +373,21 @@
 <tr>
     <td><fmt:message key="message.format"/><span class="required">*</span></td>
     <td><select name="mappingTypeFilter"
-                onchange="showMappingContext()" id="mappingTypeFilter">
+                onchange="showEventStreamDefinition()" id="mappingTypeFilter">
         <%
             String[] messageFormats = outputAdapterConfigurationDto.getSupportedMessageFormats();
-
+            String firstMappingTypeName = null;
 
             if (messageFormats != null) {
+                firstMappingTypeName = messageFormats[0];
                 for (String mappingType : messageFormats) {
         %>
         <option><%=mappingType%>
         </option>
         <%
                 }
-            }
-        }
+
+
         %>
 
     </select>
@@ -409,371 +412,27 @@
 <tr>
 <td class="formRaw" colspan="2">
 <div id="outerDiv" style="display:none">
-
-<div id="innerDiv1" style="display:none">
-
-    <table class="styledLeft noBorders spacer-bot"
-           style="width:100%">
-        <tbody>
-        <tr name="outputWSO2EventMapping">
-            <td colspan="2" class="middle-header">
-                <fmt:message key="wso2event.mapping"/>
-            </td>
-        </tr>
-        <tr name="outputWSO2EventMapping">
-            <td colspan="2">
-
-                <h6><fmt:message key="property.data.type.meta"/></h6>
-                <table class="styledLeft noBorders spacer-bot" id="outputMetaDataTable"
-                       style="display:none">
-                    <thead>
-                    <th class="leftCol-med"><fmt:message key="property.name"/></th>
-                    <th class="leftCol-med"><fmt:message key="property.value.of"/></th>
-                    <th><fmt:message key="actions"/></th>
-                    </thead>
-                </table>
-                <div class="noDataDiv-plain" id="noOutputMetaData">
-                    <fmt:message key="no.meta.defined.message"/>
-                </div>
-                <table id="addMetaData" class="normal">
-                    <tbody>
-                    <tr>
-                        <td class="col-small"><fmt:message key="property.name"/> :</td>
-                        <td>
-                            <input type="text" id="outputMetaDataPropName"/>
-                        </td>
-                        <td class="col-small"><fmt:message key="property.value.of"/> :
-                        </td>
-                        <td>
-                            <select id="outputMetaDataPropValueOf">
-                                <% for (String attributeData : attributeList) {
-                                    String[] attributeValues = attributeData.split(" ");
-                                %>
-                                <option value="<%=attributeValues[0]%>"><%=attributeValues[0]%>
-                                </option>
-                                <% }%>
-                            </select>
-                        </td>
-                        <td><input type="button" class="button"
-                                   value="<fmt:message key="add"/>"
-                                   onclick="addOutputWSO2EventProperty('Meta')"/>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </td>
-        </tr>
-
-
-        <tr name="outputWSO2EventMapping">
-            <td colspan="2">
-
-                <h6><fmt:message key="property.data.type.correlation"/></h6>
-                <table class="styledLeft noBorders spacer-bot"
-                       id="outputCorrelationDataTable" style="display:none">
-                    <thead>
-                    <th class="leftCol-med"><fmt:message key="property.name"/></th>
-                    <th class="leftCol-med"><fmt:message key="property.value.of"/></th>
-                    <th><fmt:message key="actions"/></th>
-                    </thead>
-                </table>
-                <div class="noDataDiv-plain" id="noOutputCorrelationData">
-                    <fmt:message key="no.correlation.defined.message"/>
-                </div>
-                <table id="addCorrelationData" class="normal">
-                    <tbody>
-                    <tr>
-                        <td class="col-small"><fmt:message key="property.name"/> :</td>
-                        <td>
-                            <input type="text" id="outputCorrelationDataPropName"/>
-                        </td>
-                        <td class="col-small"><fmt:message key="property.value.of"/> :
-                        </td>
-                        <td>
-                            <select id="outputCorrelationDataPropValueOf">
-                                <% for (String attributeData : attributeList) {
-                                    String[] attributeValues = attributeData.split(" ");
-                                %>
-                                <option value="<%=attributeValues[0]%>"><%=attributeValues[0]%>
-                                </option>
-                                <% }%>
-                            </select>
-                        </td>
-                        <td><input type="button" class="button"
-                                   value="<fmt:message key="add"/>"
-                                   onclick="addOutputWSO2EventProperty('Correlation')"/>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </td>
-        </tr>
-        <tr name="outputWSO2EventMapping">
-            <td colspan="2">
-
-                <h6><fmt:message key="property.data.type.payload"/></h6>
-                <table class="styledLeft noBorders spacer-bot"
-                       id="outputPayloadDataTable" style="display:none">
-                    <thead>
-                    <th class="leftCol-med"><fmt:message key="property.name"/></th>
-                    <th class="leftCol-med"><fmt:message key="property.value.of"/></th>
-                    <th><fmt:message key="actions"/></th>
-                    </thead>
-                </table>
-                <div class="noDataDiv-plain" id="noOutputPayloadData">
-                    <fmt:message key="no.payload.defined.message"/>
-                </div>
-                <table id="addPayloadData" class="normal">
-                    <tbody>
-                    <tr>
-                        <td class="col-small"><fmt:message key="property.name"/> :</td>
-                        <td>
-                            <input type="text" id="outputPayloadDataPropName"/>
-                        </td>
-                        <td class="col-small"><fmt:message key="property.value.of"/> :
-                        </td>
-                        <td>
-                            <select id="outputPayloadDataPropValueOf">
-                                <% for (String attributeData : attributeList) {
-                                    String[] attributeValues = attributeData.split(" ");
-                                %>
-                                <option value="<%=attributeValues[0]%>"><%=attributeValues[0]%>
-                                </option>
-                                <% }%>
-                            </select>
-                        </td>
-                        <td><input type="button" class="button"
-                                   value="<fmt:message key="add"/>"
-                                   onclick="addOutputWSO2EventProperty('Payload')"/>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </td>
-        </tr>
-
-        </tbody>
-    </table>
-</div>
-
-
-<div id="innerDiv2" style="display:none">
-    <table class="styledLeft noBorders spacer-bot"
-           style="width:100%">
-        <tbody>
-        <tr name="outputTextMapping">
-            <td colspan="3" class="middle-header">
-                <fmt:message key="text.mapping"/>
-            </td>
-        </tr>
-        <tr>
-            <td class="leftCol-med" colspan="1"><fmt:message key="output.mapping.content"/><span
-                    class="required">*</span></td>
-            <td colspan="2">
-                <input id="inline_text" type="radio" checked="checked" value="content"
-                       name="inline_text" onclick="enable_disable_Registry(this)">
-                <label for="inline_text"><fmt:message key="inline.input"/></label>
-                <input id="registry_text" type="radio" value="reg" name="registry_text"
-                       onclick="enable_disable_Registry(this)">
-                <label for="registry_text"><fmt:message key="registry.input"/></label>
-            </td>
-        </tr>
-        <tr name="outputTextMappingInline" id="outputTextMappingInline">
-            <td colspan="3">
-                <p>
-                    <textarea id="textSourceText" name="textSourceText"
-                              style="border:solid 1px rgb(204, 204, 204); width: 99%;
-    height: 150px; margin-top: 5px;"
-                              name="textSource" rows="30"></textarea>
-                </p>
-            </td>
-        </tr>
-        <tr name="outputTextMappingRegistry" style="display:none" id="outputTextMappingRegistry">
-            <td class="leftCol-med" colspan="1"><fmt:message key="resource.path"/><span
-                    class="required">*</span></td>
-            <td colspan="1"><input type="text" id="textSourceRegistry" disabled="disabled"
-                                   class="initE"
-                                   value=""
-                                   style="width:100%"/></td>
-
-            <td class="nopadding" style="border:none" colspan="1">
-                <a href="#registryBrowserLink" class="registry-picker-icon-link"
-                   style="padding-left:20px"
-                   onclick="showRegistryBrowser('textSourceRegistry','/_system/config');"><fmt:message
-                        key="conf.registry"/></a>
-                <a href="#registryBrowserLink"
-                   class="registry-picker-icon-link"
-                   style="padding-left:20px"
-                   onclick="showRegistryBrowser('textSourceRegistry', '/_system/governance');"><fmt:message
-                        key="gov.registry"/></a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-
-<div id="innerDiv3" style="display:none">
-    <table class="styledLeft noBorders spacer-bot"
-           style="width:100%">
-        <tbody>
-        <tr name="outputXMLMapping">
-            <td colspan="3" class="middle-header">
-                <fmt:message key="xml.mapping"/>
-            </td>
-        </tr>
-        <tr>
-            <td class="leftCol-med" colspan="1"><fmt:message key="output.mapping.content"/><span
-                    class="required">*</span></td>
-            <td colspan="2">
-                <input id="inline_xml" type="radio" checked="checked" value="content"
-                       name="inline_xml" onclick="enable_disable_Registry(this)">
-                <label for="inline_xml"><fmt:message key="inline.input"/></label>
-                <input id="registry_xml" type="radio" value="reg" name="registry_xml"
-                       onclick="enable_disable_Registry(this)">
-                <label for="registry_xml"><fmt:message key="registry.input"/></label>
-            </td>
-        </tr>
-        <tr name="outputXMLMappingInline" id="outputXMLMappingInline">
-            <td colspan="3">
-                <p>
-                    <textarea id="xmlSourceText"
-                              style="border:solid 1px rgb(204, 204, 204); width: 99%;
-                                     height: 150px; margin-top: 5px;"
-                              name="xmlSource" rows="30"></textarea>
-                </p>
-            </td>
-        </tr>
-        <tr name="outputXMLMappingRegistry" style="display:none" id="outputXMLMappingRegistry">
-            <td class="leftCol-med" colspan="1"><fmt:message key="resource.path"/><span
-                    class="required">*</span></td>
-            <td colspan="1">
-                <input type="text" id="xmlSourceRegistry" disabled="disabled" class="initE" value=""
-                       style="width:100%"/>
-            </td>
-            <td class="nopadding" style="border:none" colspan="1">
-                <a href="#registryBrowserLink" class="registry-picker-icon-link"
-                   style="padding-left:20px"
-                   onclick="showRegistryBrowser('xmlSourceRegistry','/_system/config');"><fmt:message
-                        key="conf.registry"/></a>
-                <a href="#registryBrowserLink"
-                   class="registry-picker-icon-link"
-                   style="padding-left:20px"
-                   onclick="showRegistryBrowser('xmlSourceRegistry', '/_system/governance');"><fmt:message
-                        key="gov.registry"/></a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-
-
-<div id="innerDiv4" style="display:none">
-    <table class="styledLeft noBorders spacer-bot"
-           style="width:100%">
-        <tbody>
-        <tr name="outputMapMapping">
-            <td colspan="2" class="middle-header">
-                <fmt:message key="map.mapping"/>
-            </td>
-        </tr>
-        <tr name="outputMapMapping">
-            <td colspan="2">
-
-                <table class="styledLeft noBorders spacer-bot" id="outputMapPropertiesTable"
-                       style="display:none">
-                    <thead>
-                    <th class="leftCol-med"><fmt:message key="property.name"/></th>
-                    <th class="leftCol-med"><fmt:message key="property.value.of"/></th>
-                    <th><fmt:message key="actions"/></th>
-                    </thead>
-                </table>
-                <div class="noDataDiv-plain" id="noOutputMapProperties">
-                    <fmt:message key="no.map.properties.defined"/>
-                </div>
-                <table id="addOutputMapProperties" class="normal">
-                    <tbody>
-                    <tr>
-                        <td class="col-small"><fmt:message key="property.name"/> :</td>
-                        <td>
-                            <input type="text" id="outputMapPropName"/>
-                        </td>
-                        <td class="col-small"><fmt:message key="property.value.of"/> :</td>
-                        <td>
-                            <select id="outputMapPropValueOf">
-                                <% for (String attributeData : attributeList) {
-                                    String[] attributeValues = attributeData.split(" ");
-                                %>
-                                <option value="<%=attributeValues[0]%>"><%=attributeValues[0]%>
-                                </option>
-                                <% }%>
-                            </select>
-                        </td>
-                        <td><input type="button" class="button" value="<fmt:message key="add"/>"
-                                   onclick="addOutputMapProperty()"/>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </td>
-        </tr>
-
-        </tbody>
-    </table>
-</div>
-
-<div id="innerDiv5" style="display:none">
-    <table class="styledLeft noBorders spacer-bot"
-           style="width:100%">
-        <tbody>
-        <tr name="outputJSONMapping">
-            <td colspan="3" class="middle-header">
-                <fmt:message key="json.mapping"/>
-            </td>
-        </tr>
-        <tr>
-            <td class="leftCol-med" colspan="1"><fmt:message key="output.mapping.content"/><span
-                    class="required">*</span></td>
-            <td colspan="2">
-                <input id="inline_json" type="radio" checked="checked" value="content"
-                       name="inline_json" onclick="enable_disable_Registry(this)">
-                <label for="inline_json"><fmt:message key="inline.input"/></label>
-                <input id="registry_json" type="radio" value="reg" name="registry_json"
-                       onclick="enable_disable_Registry(this)">
-                <label for="registry_json"><fmt:message key="registry.input"/></label>
-            </td>
-        </tr>
-        <tr name="outputJSONMappingInline" id="outputJSONMappingInline">
-            <td colspan="3">
-                <p>
-                    <textarea id="jsonSourceText"
-                              style="border:solid 1px rgb(204, 204, 204); width: 99%;
-                                     height: 150px; margin-top: 5px;"
-                              name="jsonSource" rows="30"></textarea>
-                </p>
-            </td>
-        </tr>
-        <tr name="outputJSONMappingRegistry" style="display:none" id="outputJSONMappingRegistry">
-            <td class="leftCol-med" colspan="1"><fmt:message key="resource.path"/><span
-                    class="required">*</span></td>
-            <td colspan="1">
-                <input type="text" id="jsonSourceRegistry" disabled="disabled" class="initE"
-                       value=""
-                       style="width:100%"/>
-            </td>
-            <td class="nopadding" style="border:none" colspan="1">
-                <a href="#registryBrowserLink" class="registry-picker-icon-link"
-                   style="padding-left:20px"
-                   onclick="showRegistryBrowser('jsonSourceRegistry','/_system/config');"><fmt:message
-                        key="conf.registry"/></a>
-                <a href="#registryBrowserLink"
-                   class="registry-picker-icon-link"
-                   style="padding-left:20px"
-                   onclick="showRegistryBrowser('jsonSourceRegistry', '/_system/governance');"><fmt:message
-                        key="gov.registry"/></a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+                <%if (firstMappingTypeName != null) {
+                    if (firstMappingTypeName.equals("wso2event")) {%>
+                        <jsp:include page="wso2event_mapping_ui.jsp" flush="true">
+                            <jsp:param name="streamNameWithVersion"
+                                       value="<%=streamId%>"/>
+                        </jsp:include>
+                <%}else if (firstMappingTypeName.equals("xml")) {%>
+                    <jsp:include page="xml_mapping_ui.jsp" flush="true"/>
+                <%} else if (firstMappingTypeName.equals("map")) {%>
+                    <jsp:include page="map_mapping_ui.jsp" flush="true">
+                        <jsp:param name="streamNameWithVersion"
+                                   value="<%=streamId%>"/>
+                    </jsp:include>
+                <%} else if (firstMappingTypeName.equals("text")) {%>
+                    <jsp:include page="text_mapping_ui.jsp" flush="true"/>
+                <%} else if (firstMappingTypeName.equals("json")) {%>
+                    <jsp:include page="json_mapping_ui.jsp" flush="true"/>
+                <%}
+            }
+        }
+    }%>
 </div>
 
 

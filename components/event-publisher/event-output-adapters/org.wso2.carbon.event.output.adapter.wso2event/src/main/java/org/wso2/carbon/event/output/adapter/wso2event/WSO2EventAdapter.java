@@ -43,7 +43,6 @@ public final class WSO2EventAdapter implements OutputEventAdapter {
     private DataPublisher dataPublisher = null;
     private boolean isBlockingMode = false;
     private long timeout = 0;
-    private String streamId;
 
     public WSO2EventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
             Map<String, String> globalProperties) {
@@ -57,10 +56,6 @@ public final class WSO2EventAdapter implements OutputEventAdapter {
      */
     @Override
     public void init() {
-        streamId = eventAdapterConfiguration.getStaticProperties().get(
-                WSO2EventAdapterConstants.ADAPTER_STATIC_CONFIG_STREAM_NAME) + ":" +
-                eventAdapterConfiguration.getStaticProperties().get(WSO2EventAdapterConstants
-                        .ADAPTER_STATIC_CONFIG_STREAM_VERSION);
         String configPath = globalProperties.get(ADAPTOR_CONF_PATH);
         if (configPath != null) {
             AgentHolder.setConfigPath(configPath);
@@ -120,8 +115,6 @@ public final class WSO2EventAdapter implements OutputEventAdapter {
     @Override
     public void publish(Object message, Map<String, String> dynamicProperties) {
         Event event = (Event) (message);
-        //StreamDefinition streamDefinition = (StreamDefinition) ((Object[]) message)[1];
-        event.setStreamId(streamId);
 
         if (isBlockingMode) {
             dataPublisher.publish(event);

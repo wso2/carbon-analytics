@@ -367,7 +367,8 @@ public class EventPublisherAdminService extends AbstractAdmin {
                                                       EventMappingPropertyDto[] correlationData,
                                                       EventMappingPropertyDto[] payloadData,
                                                       BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
-                                                      boolean mappingEnabled)
+                                                      boolean mappingEnabled,
+                                                      String toStreamNameWithVersion)
             throws AxisFault {
 
         if (checkEventPublisherValidity(eventPublisherName)) {
@@ -416,6 +417,10 @@ public class EventPublisherAdminService extends AbstractAdmin {
                             outputEventAttributes.add(wso2EventOutputPropertyConfiguration.getValueOf());
                         }
                     }
+                    String[] toStreamProperties = toStreamNameWithVersion.split(":");
+                    wso2EventOutputMapping.setToEventName(toStreamProperties[0]);
+                    wso2EventOutputMapping.setToEventVersion(toStreamProperties[1]);
+
                 }
 
                 eventPublisherConfiguration.setOutputMapping(wso2EventOutputMapping);
@@ -719,6 +724,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
                     }
                 }
             }
+
         }
 
         eventPublisherConfiguration.setToAdapterConfiguration(outputEventAdapterConfiguration);
