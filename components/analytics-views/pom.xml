@@ -33,6 +33,7 @@
     <modules>
         <module>org.wso2.carbon.analytics.messageconsole</module>
         <module>org.wso2.carbon.analytics.messageconsole.ui</module>
+        <module>org.wso2.carbon.analytics.dashboard.ui</module>
     </modules>
 
 </project>

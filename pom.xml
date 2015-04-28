@@ -834,6 +834,20 @@
                 <version>${protobuf.fragment.version}</version>
             </dependency>
             <!-- END hbase + hadoop client dependencies -->
+
+            <!-- START Analytics Dashboard UI -->
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.dashboard.ui</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.dashboard.ui.feature</artifactId>
+                <type>zip</type>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <!-- END Analytics Dashboard UI -->
         </dependencies>
     </dependencyManagement>
 
