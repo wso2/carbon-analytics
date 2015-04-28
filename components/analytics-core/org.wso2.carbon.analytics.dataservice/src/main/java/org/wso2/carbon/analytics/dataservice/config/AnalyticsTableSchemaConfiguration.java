@@ -42,8 +42,8 @@ public class AnalyticsTableSchemaConfiguration {
         this.columnDefinitions = columnDefinitions;
     }
 
-    private List<ColumnDefinition> getColumnsList() {
-        List<ColumnDefinition> indexColMap = new ArrayList<>();
+    private List<ColumnDefinition> getAnalyticsSchemaColumns() {
+       List<ColumnDefinition> schemaColumns = new ArrayList<>();
         if (columnDefinitions != null) {
             for (AnalyticsColumnDefinition schemaColumn : columnDefinitions) {
                 ColumnDefinition columnDefinition = new ColumnDefinition();
@@ -51,10 +51,10 @@ public class AnalyticsTableSchemaConfiguration {
                 columnDefinition.setIndexed(schemaColumn.indexed);
                 columnDefinition.setScoreParam(schemaColumn.scoreParam);
                 columnDefinition.setType(schemaColumn.type);
-                indexColMap.add(columnDefinition);
+                schemaColumns.add(columnDefinition);
             }
         }
-        return indexColMap;
+        return schemaColumns;
     }
 
     private List<String> getPrimaryKeys(){
@@ -70,7 +70,7 @@ public class AnalyticsTableSchemaConfiguration {
     }
 
     public AnalyticsSchema getAnalyticsSchema() {
-        return new AnalyticsSchema(getColumnsList(), getPrimaryKeys());
+        return new AnalyticsSchema(getAnalyticsSchemaColumns(), getPrimaryKeys());
     }
 
     public static class AnalyticsColumnDefinition {
