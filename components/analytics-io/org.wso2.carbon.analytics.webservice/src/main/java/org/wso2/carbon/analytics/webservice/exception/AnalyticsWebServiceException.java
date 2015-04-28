@@ -18,10 +18,12 @@
 
 package org.wso2.carbon.analytics.webservice.exception;
 
+import org.apache.axis2.AxisFault;
+
 /**
  * This class represents analytics web service related exceptions.
  */
-public class AnalyticsWebServiceException extends Exception {
+public class AnalyticsWebServiceException extends AxisFault {
     private static final long serialVersionUID = -7927112708244405107L;
 
     public AnalyticsWebServiceException(String message) {

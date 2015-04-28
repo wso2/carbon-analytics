@@ -38,8 +38,6 @@ import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.CategoryDrillDownRequestBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.CategoryPathBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.CategorySearchResultEntryBean;
-import org.wso2.carbon.analytics.webservice.stub.beans.IndexConfigurationBean;
-import org.wso2.carbon.analytics.webservice.stub.beans.IndexEntryBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.RecordBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.RecordValueEntryBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.SchemaColumnBean;
@@ -659,28 +657,23 @@ public class MessageConsoleConnector {
         String msg;
         List<TableSchemaColumn> columnList = new Gson().fromJson(detailsJsonString, TABLE_SCHEMA_TYPE);
         List<String> primaryKeys = new ArrayList<>();
-        List<String> scoreParams = new ArrayList<>();
         List<SchemaColumnBean> schemaColumnBeans = new ArrayList<>();
-        List<IndexEntryBean> entryBeans = new ArrayList<>();
         for (TableSchemaColumn schemaColumn : columnList) {
             if (schemaColumn.getColumn() != null && !schemaColumn.getColumn().isEmpty()) {
-                if (schemaColumn.isScoreParam()) {
-                    scoreParams.add(schemaColumn.getColumn());
-                    schemaColumn.setType("INTEGER");
-                }
                 if (schemaColumn.isPrimary()) {
                     primaryKeys.add(schemaColumn.getColumn());
                 }
                 SchemaColumnBean schemaColumnBean = new SchemaColumnBean();
                 schemaColumnBean.setColumnName(schemaColumn.getColumn());
                 schemaColumnBean.setColumnType(schemaColumn.getType());
-                schemaColumnBeans.add(schemaColumnBean);
-                if (schemaColumn.isIndex() || "FACET".equals(schemaColumn.getType()) || schemaColumn.isScoreParam()) {
-                    IndexEntryBean indexEntryBean = new IndexEntryBean();
-                    indexEntryBean.setFieldName(schemaColumn.getColumn());
-                    indexEntryBean.setIndexType(schemaColumn.getType());
-                    entryBeans.add(indexEntryBean);
+                if (schemaColumn.isScoreParam()) {
+                    schemaColumnBean.setColumnType("INTEGER");
+                    schemaColumnBean.setScoreParam(true);
                 }
+                if (schemaColumn.isIndex() || "FACET".equals(schemaColumn.getType())) {
+                    schemaColumnBean.setIndex(true);
+                }
+                schemaColumnBeans.add(schemaColumnBean);
             }
         }
         try {
@@ -693,15 +686,6 @@ public class MessageConsoleConnector {
             String[] primaryKeyArray = new String[primaryKeys.size()];
             analyticsSchemaBean.setPrimaryKeys(primaryKeys.toArray(primaryKeyArray));
             analyticsWebServiceStub.setTableSchema(table, analyticsSchemaBean);
-            PermissionBean permissionBean = messageConsoleStub.getAvailablePermissions();
-            if (permissionBean.getSetIndex()) {
-                IndexConfigurationBean configurationBean = new IndexConfigurationBean();
-                IndexEntryBean[] indexEntryBeans = new IndexEntryBean[entryBeans.size()];
-                configurationBean.setIndices(entryBeans.toArray(indexEntryBeans));
-                String[] scoreParamArray = new String[scoreParams.size()];
-                configurationBean.setScoreParams(scoreParams.toArray(scoreParamArray));
-                analyticsWebServiceStub.setIndices(table, configurationBean);
-            }
             msg = "Successfully saved table information";
         } catch (Exception e) {
             log.error("Unable to save table information: " + e.getMessage(), e);
@@ -738,36 +722,12 @@ public class MessageConsoleConnector {
                     TableSchemaColumn schemaColumn = new TableSchemaColumn();
                     schemaColumn.setColumn(resultColumn.getColumnName());
                     schemaColumn.setType(resultColumn.getColumnType());
+                    schemaColumn.setIndex(resultColumn.getIndex());
+                    schemaColumn.setScoreParam(resultColumn.getScoreParam());
                     if (primaryKeys != null && primaryKeys.contains(resultColumn.getColumnName())) {
                         schemaColumn.setPrimary(true);
                     }
                     schemaColumnMap.put(resultColumn.getColumnName(), schemaColumn);
-                }
-            }
-            PermissionBean permissionBean = messageConsoleStub.getAvailablePermissions();
-            if (permissionBean.getGetIndex()) {
-                IndexConfigurationBean indexConfigurationBean = analyticsWebServiceStub.getIndices(table);
-                if (indexConfigurationBean != null && indexConfigurationBean.getIndices() != null) {
-                    for (IndexEntryBean indexEntryBean : indexConfigurationBean.getIndices()) {
-                        if (schemaColumnMap.containsKey(indexEntryBean.getFieldName())) {
-                            schemaColumnMap.get(indexEntryBean.getFieldName()).setIndex(true);
-                            schemaColumnMap.get(indexEntryBean.getFieldName()).setType(indexEntryBean.getIndexType());
-                        } else {
-                            TableSchemaColumn schemaColumn = new TableSchemaColumn();
-                            schemaColumn.setColumn(indexEntryBean.getFieldName());
-                            schemaColumn.setType(indexEntryBean.getIndexType());
-                            schemaColumn.setPrimary(false);
-                            schemaColumn.setIndex(true);
-                            schemaColumnMap.put(indexEntryBean.getFieldName(), schemaColumn);
-                        }
-                    }
-                }
-                if (indexConfigurationBean != null && indexConfigurationBean.getScoreParams() != null) {
-                    for (String scoreParam : indexConfigurationBean.getScoreParams()) {
-                        if (schemaColumnMap.containsKey(scoreParam)) {
-                            schemaColumnMap.get(scoreParam).setScoreParam(true);
-                        }
-                    }
                 }
             }
         } catch (Exception e) {
@@ -829,11 +789,11 @@ public class MessageConsoleConnector {
     public String getFacetColumnNameList(String table) {
         List<String> facetNameList = new ArrayList<>();
         try {
-            IndexConfigurationBean indices = analyticsWebServiceStub.getIndices(table);
-            if (indices != null && indices.getIndices() != null) {
-                for (IndexEntryBean indexEntryBean : indices.getIndices()) {
-                    if ("FACET".equalsIgnoreCase(indexEntryBean.getIndexType())) {
-                        facetNameList.add(indexEntryBean.getFieldName());
+            AnalyticsSchemaBean tableSchema = analyticsWebServiceStub.getTableSchema(table);
+            if (tableSchema != null && tableSchema.getColumns() != null) {
+                for (SchemaColumnBean schemaColumnBean : tableSchema.getColumns()) {
+                    if ("FACET".equalsIgnoreCase(schemaColumnBean.getColumnType())) {
+                        facetNameList.add(schemaColumnBean.getColumnName());
                     }
                 }
             }
