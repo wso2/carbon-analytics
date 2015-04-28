@@ -23,11 +23,11 @@ import org.apache.axis2.deployment.DeploymentException;
  * This class represents the exception to be thrown when there are some problems encountered
  * when deploying the analytics index artifact.
  */
-public class AnalyticsIndexDeploymentException extends DeploymentException {
+public class AnalyticsTableSchemaDeploymentException extends DeploymentException {
 
     private static final long serialVersionUID = 8461345583602711724L;
 
-    public AnalyticsIndexDeploymentException(String message, Throwable cause) {
+    public AnalyticsTableSchemaDeploymentException(String message, Throwable cause) {
         super(message, cause);
     }
 }

@@ -21,8 +21,11 @@ import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.Constants;
-import org.wso2.carbon.analytics.dataservice.config.AnalyticsIndexConfiguration;
+import org.wso2.carbon.analytics.dataservice.config.AnalyticsTableSchemaConfiguration;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.application.deployer.AppDeployerConstants;
 import org.wso2.carbon.application.deployer.CarbonApplication;
 import org.wso2.carbon.application.deployer.config.Artifact;
@@ -37,11 +40,11 @@ import java.io.File;
 import java.util.List;
 
 /**
- * This class represents the implementation of Carbon application deployer for analytics index.
+ * This class represents the implementation of Carbon application deployer for analytics table schema.
  */
-public class AnalyticsIndexCAppDeployer implements AppDeploymentHandler {
-    private static final Log log = LogFactory.getLog(AnalyticsIndexCAppDeployer.class);
-    private static final String TYPE = "analytics/index";
+public class AnalyticsTableSchemaCAppDeployer implements AppDeploymentHandler {
+    private static final Log log = LogFactory.getLog(AnalyticsTableSchemaCAppDeployer.class);
+    private static final String TYPE = "analytics/schema";
 
     @Override
     public void deployArtifacts(CarbonApplication carbonApplication, AxisConfiguration axisConfiguration)
@@ -73,32 +76,33 @@ public class AnalyticsIndexCAppDeployer implements AppDeploymentHandler {
         }
     }
 
-    private void deploy(String deploymentFilePath) throws AnalyticsIndexDeploymentException {
+    private void deploy(String deploymentFilePath) throws AnalyticsTableSchemaDeploymentException {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        File deploymentFile  = new File(deploymentFilePath);
+        File deploymentFile = new File(deploymentFilePath);
         try {
-            log.info("Deploying analytics indices from file : " + deploymentFile.getName() + " for tenant id :" + tenantId);
-            JAXBContext context = JAXBContext.newInstance(AnalyticsIndexConfiguration.class);
+            log.info("Deploying analytics table schema from file : " + deploymentFile.getName()
+                    + " for tenant id :" + tenantId);
+            JAXBContext context = JAXBContext.newInstance(AnalyticsTableSchemaConfiguration.class);
             Unmarshaller un = context.createUnmarshaller();
-            AnalyticsIndexConfiguration configuration =
-                    (AnalyticsIndexConfiguration) un.unmarshal(deploymentFile);
-//            AnalyticsServiceHolder.getAnalyticsDataService().setIndices(tenantId,
-//                    getTableNameFromAnalyticsIndexFileName(deploymentFile.getName()),
-//                    configuration.getIndexColumnsMap(), configuration.getScoreParams());
+            AnalyticsTableSchemaConfiguration configuration =
+                    (AnalyticsTableSchemaConfiguration) un.unmarshal(deploymentFile);
+            AnalyticsServiceHolder.getAnalyticsDataService().setTableSchema(tenantId,
+                    getTableNameFromAnalyticsSchemaFileName(deploymentFilePath),
+                    configuration.getAnalyticsSchema());
         } catch (JAXBException e) {
             String errorMsg = "Error while reading from the file : " + deploymentFile.getAbsolutePath();
             log.error(errorMsg, e);
-            throw new AnalyticsIndexDeploymentException(errorMsg, e);
-//        } catch (AnalyticsIndexException e) {
-//            String errorMsg = "Error setting the indices from file : " + deploymentFile.getAbsolutePath();
-//            log.error(errorMsg, e);
-//            throw new AnalyticsIndexDeploymentException(errorMsg, e);
+            throw new AnalyticsTableSchemaDeploymentException(errorMsg, e);
+        } catch (AnalyticsException e) {
+            String errorMsg = "Error setting the indices from file : " + deploymentFile.getAbsolutePath();
+            log.error(errorMsg, e);
+            throw new AnalyticsTableSchemaDeploymentException(errorMsg, e);
         }
     }
 
-    private String getTableNameFromAnalyticsIndexFileName(String filePath) {
+    private String getTableNameFromAnalyticsSchemaFileName(String filePath) {
         String fileName = new File(filePath).getName();
-        return fileName.substring(0, fileName.length() - Constants.ANALYTICS_INDICES_FILE_EXTENSION.length() - 1);
+        return fileName.substring(0, fileName.length() - Constants.ANALYTICS_SCHEMA_FILE_EXTENSION.length() - 1);
     }
 
     @Override
@@ -127,25 +131,24 @@ public class AnalyticsIndexCAppDeployer implements AppDeploymentHandler {
                         artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_PENDING);
                     } catch (DeploymentException e) {
                         artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_FAILED);
-                        log.error("Error occured while trying to undeploy : " + artifact.getName());
+                        log.error("Error occurred while trying to undeploy : " + artifact.getName());
                     }
                 }
             }
         }
     }
 
-    private void undeploy(String fileName) throws AnalyticsIndexDeploymentException {
+    private void undeploy(String fileName) throws AnalyticsTableSchemaDeploymentException {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        log.info("Undeploying the analytics indices from file : "+ fileName +" for tenant id :" + tenantId);
-        String tableName = getTableNameFromAnalyticsIndexFileName(fileName);
-//        try {
-//            AnalyticsServiceHolder.getAnalyticsDataService().setIndices(tenantId,
-//                    tableName, new HashMap<String, IndexType>(), new ArrayList<String>());
-//        } catch (AnalyticsIndexException e) {
-//            String errorMsg = "Error undeploying the analytics index file : " + fileName
-//                    + " for tenant id : " + tenantId;
-//            log.error(errorMsg, e);
-//            throw new AnalyticsIndexDeploymentException(errorMsg, e);
-//        }
+        log.info("Undeploying the analytics table schema from file : " + fileName + " for tenant id :" + tenantId);
+        String tableName = getTableNameFromAnalyticsSchemaFileName(fileName);
+        try {
+            AnalyticsServiceHolder.getAnalyticsDataService().setTableSchema(tenantId, tableName, new AnalyticsSchema());
+        } catch (AnalyticsException e) {
+            String errorMsg = "Error undeploying the analytics table schema file : " + fileName
+                    + " for tenant id : " + tenantId;
+            log.error(errorMsg, e);
+            throw new AnalyticsTableSchemaDeploymentException(errorMsg, e);
+        }
     }
 }

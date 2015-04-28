@@ -108,7 +108,7 @@ public class AnalyticsQueryParser extends QueryParser {
             if (AnalyticsDataIndexer.INDEX_ID_INTERNAL_FIELD.equals(field)) {
                 type = AnalyticsSchema.ColumnType.STRING;
             } else if (AnalyticsDataIndexer.INDEX_INTERNAL_TIMESTAMP_FIELD.equals(field)) {
-                type = AnalyticsSchema.ColumnType.STRING.LONG;
+                type = AnalyticsSchema.ColumnType.LONG;
             } 
         }
         if (type != null) {

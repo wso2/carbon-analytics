@@ -29,7 +29,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerImpl;
-import org.wso2.carbon.analytics.dataservice.deployment.AnalyticsIndexCAppDeployer;
+import org.wso2.carbon.analytics.dataservice.deployment.AnalyticsTableSchemaCAppDeployer;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceService;
 import org.wso2.carbon.application.deployer.handler.AppDeploymentHandler;
 import org.wso2.carbon.user.core.service.RealmService;
@@ -63,9 +63,9 @@ public class AnalyticsDataServiceComponent {
             SecureAnalyticsDataServiceImpl secureAnalyticsDataService = new SecureAnalyticsDataServiceImpl(analyticsDataService);
             bundleContext.registerService(AnalyticsDataService.class, analyticsDataService, null);
             bundleContext.registerService(SecureAnalyticsDataService.class, secureAnalyticsDataService, null);
-            AnalyticsIndexCAppDeployer indexCAppDeployer = new AnalyticsIndexCAppDeployer();
+            AnalyticsTableSchemaCAppDeployer schemaCAppDeployer = new AnalyticsTableSchemaCAppDeployer();
             bundleContext.registerService(
-                    AppDeploymentHandler.class.getName(), indexCAppDeployer, null);
+                    AppDeploymentHandler.class.getName(), schemaCAppDeployer, null);
             if (log.isDebugEnabled()) {
                 log.debug("Finished AnalyticsDataServiceComponent#activate");
             }

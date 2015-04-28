@@ -27,9 +27,7 @@ import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategorySearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
-import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.datasource.commons.Record;
-import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsDrillDownRangeBean;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsDrillDownRequestBean;
@@ -100,7 +98,7 @@ public class AnalyticsWebService extends AbstractAdmin {
     public void setTableSchema(String tableName, AnalyticsSchemaBean schema) throws AnalyticsWebServiceException {
         try {
             analyticsDataAPI.setTableSchema(getUsername(), tableName, Utils.createAnalyticsSchema(schema));
-        } catch (AnalyticsException e) {
+        } catch (Exception e) {
             logger.error("Unable to set table schema[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to set table schema due to " + e.getMessage(), e);
         }
@@ -117,7 +115,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             throws AnalyticsWebServiceException {
         try {
             return Utils.createTableSchemaBean(analyticsDataAPI.getTableSchema(getUsername(), tableName));
-        } catch (AnalyticsException e) {
+        } catch (Exception e) {
             logger.error("Unable to get table schema[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to get table schema for table[" + tableName + "] due to " + e
                     .getMessage(), e);
@@ -134,7 +132,7 @@ public class AnalyticsWebService extends AbstractAdmin {
     public boolean tableExists(String tableName) throws AnalyticsWebServiceException {
         try {
             return analyticsDataAPI.tableExists(getUsername(), tableName);
-        } catch (AnalyticsException e) {
+        } catch (Exception e) {
             logger.error("Unable to check table[" + tableName + "] exist due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to check status of the table[" + tableName + "] due to " + e
                     .getMessage(), e);
@@ -151,7 +149,7 @@ public class AnalyticsWebService extends AbstractAdmin {
     public void deleteTable(String tableName) throws AnalyticsWebServiceException {
         try {
             analyticsDataAPI.deleteTable(getUsername(), tableName);
-        } catch (AnalyticsException e) {
+        } catch (Exception e) {
             logger.error("Unable to delete table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to delete table[" + tableName + "] due to " + e.getMessage(), e);
         }
@@ -172,7 +170,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             } else {
                 return new String[0];
             }
-        } catch (AnalyticsException e) {
+        } catch (Exception e) {
             logger.error("Unable to get table name list due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to list tables due to " + e.getMessage(), e);
         }
@@ -193,7 +191,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             throws AnalyticsWebServiceException {
         try {
             return analyticsDataAPI.getRecordCount(getUsername(), tableName, timeFrom, timeTo);
-        } catch (AnalyticsException e) {
+        } catch (Exception e) {
             logger.error("Unable to get record count for table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to get record count for table[" + tableName + "] due to " + e
                     .getMessage(), e);
@@ -220,7 +218,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             List<Record> records = Utils.getRecords(username, recordBeanList);
             analyticsDataAPI.put(username, records);
             recordBeans = Utils.createRecordBeans(records).toArray(recordBeans);
-        } catch (AnalyticsException e) {
+        } catch (Exception e) {
             logger.error("Unable to put records  due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to add record due to " + e.getMessage(), e);
         }
@@ -256,7 +254,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             List<RecordBean> recordBeans = Utils.createRecordBeans(records);
             RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
             return recordBeans.toArray(resultRecordBeans);
-        } catch (AnalyticsException e) {
+        } catch (Exception e) {
             logger.error("Unable to get records from table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to get record from table[" + tableName + "] due to " + e
                     .getMessage(), e);
@@ -290,7 +288,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             List<RecordBean> recordBeans = Utils.createRecordBeans(records);
             RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
             return recordBeans.toArray(resultRecordBeans);
-        } catch (AnalyticsException e) {
+        } catch (Exception e) {
             logger.error("Unable to get records from table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to get record from table[" + tableName + "] due to " + e
                     .getMessage(), e);
@@ -308,7 +306,7 @@ public class AnalyticsWebService extends AbstractAdmin {
     public void deleteByRange(String tableName, long timeFrom, long timeTo) throws AnalyticsWebServiceException {
         try {
             analyticsDataAPI.delete(getUsername(), tableName, timeFrom, timeTo);
-        } catch (AnalyticsException e) {
+        } catch (Exception e) {
             logger.error("Unable to delete records from table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to delete record from table[" + tableName + "] due to " + e
                     .getMessage(), e);
@@ -325,7 +323,7 @@ public class AnalyticsWebService extends AbstractAdmin {
     public void deleteByIds(String tableName, String[] ids) throws AnalyticsWebServiceException {
         try {
             analyticsDataAPI.delete(getUsername(), tableName, Arrays.asList(ids));
-        } catch (AnalyticsException e) {
+        } catch (Exception e) {
             logger.error("Unable to delete records from table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to delete record from table[" + tableName + "] due to " + e
                     .getMessage(), e);
@@ -341,7 +339,7 @@ public class AnalyticsWebService extends AbstractAdmin {
     public void clearIndices(String tableName) throws AnalyticsWebServiceException {
         try {
             analyticsDataAPI.clearIndexData(getUsername(), tableName);
-        } catch (AnalyticsException e) {
+        } catch (Exception e) {
             logger.error("Unable to clear indices from table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to clear indices from table[" + tableName + "] due to " + e
                     .getMessage(), e);
@@ -368,7 +366,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             List<RecordBean> recordBeans = Utils.createRecordBeans(records);
             RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
             return recordBeans.toArray(resultRecordBeans);
-        } catch (AnalyticsException e) {
+        } catch (Exception e) {
             logger.error("Unable to get search result for table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to get search result from table[" + tableName + "] due to " + e
                     .getMessage(), e);
@@ -386,7 +384,7 @@ public class AnalyticsWebService extends AbstractAdmin {
     public int searchCount(String tableName, String query) throws AnalyticsWebServiceException {
         try {
             return analyticsDataAPI.searchCount(getUsername(), tableName, query);
-        } catch (AnalyticsIndexException e) {
+        } catch (Exception e) {
             logger.error("Unable to get search count for table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to get search count from table[" + tableName + "] due to "
                                                    + e.getMessage(), e);
@@ -402,7 +400,7 @@ public class AnalyticsWebService extends AbstractAdmin {
     public void waitForIndexing(long maxWait) throws AnalyticsWebServiceException {
         try {
             analyticsDataAPI.waitForIndexing(maxWait);
-        } catch (AnalyticsException e) {
+        } catch (Exception e) {
             logger.error("An exception occurred: " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("An exception occurred: " + e.getMessage(), e);
         }
@@ -417,7 +415,7 @@ public class AnalyticsWebService extends AbstractAdmin {
     public void destroy() throws AnalyticsWebServiceException {
         try {
             analyticsDataAPI.destroy();
-        } catch (AnalyticsException e) {
+        } catch (Exception e) {
             logger.error("An exception occurred: " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("An exception occurred: " + e.getMessage(), e);
         }
@@ -448,7 +446,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             if (subCategories.getCategories() != null) {
                 subCategoriesBean.setCategories(getSearchResultEntryBeans(subCategories));
             }
-        } catch (AnalyticsIndexException e) {
+        } catch (Exception e) {
             logger.error("Unable to get drill down category information for table[" + drillDownRequest.getTableName() + "] and " +
                          "field[" + drillDownRequest.getFieldName() + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to get drill down category information for " +
@@ -501,7 +499,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             List<RecordBean> recordBeans = Utils.createRecordBeans(records);
             RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
             return recordBeans.toArray(resultRecordBeans);
-        } catch (AnalyticsException e) {
+        } catch (Exception e) {
             logger.error("Unable to get drill down information due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to get drill down information due to " + e.getMessage(), e);
         }
@@ -549,7 +547,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             throws AnalyticsWebServiceException {
         try {
             return analyticsDataAPI.drillDownSearchCount(getUsername(), getAnalyticsDrillDownRequest(drillDownRequest));
-        } catch (AnalyticsIndexException e) {
+        } catch (Exception e) {
             logger.error("Unable to get drill down search count information due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to get drill down search count information due to " + e
                     .getMessage(), e);
