@@ -21,6 +21,7 @@ import org.wso2.carbon.analytics.jsservice.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.jsservice.beans.CategoryDrillDownRequestBean;
 import org.wso2.carbon.analytics.jsservice.beans.ColumnDefinitionBean;
 import org.wso2.carbon.analytics.jsservice.beans.ColumnTypeBean;
+import org.wso2.carbon.analytics.jsservice.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.jsservice.beans.Record;
 import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsCategoryPathBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.CategorySearchResultEntryBean;
@@ -270,7 +271,13 @@ public class Utils {
         return bean;
     }
 
-    public static org.wso2.carbon.analytics.jsservice.beans.SubCategoriesBean getsubCategories(
+    public static org.wso2.carbon.analytics.webservice.stub.beans.CategoryDrillDownRequestBean createDrillDownSearchRequest(
+            DrillDownRequestBean queryBean) {
+        return null;
+
+    }
+
+    public static org.wso2.carbon.analytics.jsservice.beans.SubCategoriesBean getSubCategories(
             SubCategoriesBean searchResults) {
         org.wso2.carbon.analytics.jsservice.beans.SubCategoriesBean bean =
                 new org.wso2.carbon.analytics.jsservice.beans.SubCategoriesBean();

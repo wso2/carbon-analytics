@@ -477,7 +477,7 @@ public class AnalyticsWebServiceConnector {
                         Utils.createCategoryDrillDownRequest(queryBean);
                 org.wso2.carbon.analytics.webservice.stub.beans.SubCategoriesBean searchResults =
                         analyticsWebServiceStub.drillDownCategories(requestBean);
-                SubCategoriesBean subCategories = Utils.getsubCategories(searchResults);
+                SubCategoriesBean subCategories = Utils.getSubCategories(searchResults);
                 if (logger.isDebugEnabled()) {
                     logger.debug("DrilldownCategory Result -- path: " + subCategories.getCategoryPath() +
                                  " values :" + subCategories.getCategories());
@@ -506,10 +506,10 @@ public class AnalyticsWebServiceConnector {
                 DrillDownRequestBean queryBean =
                         gson.fromJson(queryAsString,DrillDownRequestBean.class);
                 org.wso2.carbon.analytics.webservice.stub.beans.CategoryDrillDownRequestBean requestBean =
-                        Utils.createCategoryDrillDownRequest(queryBean);
+                        Utils.createDrillDownSearchRequest(queryBean);
                 org.wso2.carbon.analytics.webservice.stub.beans.SubCategoriesBean searchResults =
                         analyticsWebServiceStub.drillDownCategories(requestBean);
-                SubCategoriesBean subCategories = Utils.getsubCategories(searchResults);
+                SubCategoriesBean subCategories = Utils.getSubCategories(searchResults);
                 if (logger.isDebugEnabled()) {
                     logger.debug("DrilldownCategory Result -- path: " + subCategories.getCategoryPath() +
                                  " values :" + subCategories.getCategories());
