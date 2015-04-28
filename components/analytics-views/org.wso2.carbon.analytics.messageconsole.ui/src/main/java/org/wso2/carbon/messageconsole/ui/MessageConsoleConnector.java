@@ -20,6 +20,7 @@ package org.wso2.carbon.messageconsole.ui;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.client.Options;
@@ -378,8 +379,13 @@ public class MessageConsoleConnector {
             responseRecord.setRecord(getRecord(recordBeans[0], true));
             responseRecord.setResult(OK);
         } catch (Exception e) {
-            String errorMsg = "Unable to add record {column: " + Arrays.toString(columns) + ", values: " + Arrays
-                    .toString(values) + " } to table :" + table;
+            String errorMsg;
+            if (e instanceof JsonSyntaxException) {
+                errorMsg = "One of the Facet column has an invalid JSON format.";
+            } else {
+                errorMsg = "Unable to add record {column: " + Arrays.toString(columns) + ", values: " + Arrays
+                        .toString(values) + " } to table :" + table;
+            }
             log.error(errorMsg, e);
             responseRecord.setResult(ERROR);
             responseRecord.setMessage(errorMsg);
@@ -486,8 +492,13 @@ public class MessageConsoleConnector {
             responseRecord.setRecord(getRecord(recordBeans[0], true));
             responseRecord.setResult(OK);
         } catch (Exception e) {
-            String errorMsg = "Unable to update record {id: " + recordId + ", column: " + Arrays.toString(columns) + ", " +
-                              "values: " + Arrays.toString(values) + " } to table :" + table;
+            String errorMsg;
+            if (e instanceof JsonSyntaxException) {
+                errorMsg = "One of the Facet column has an invalid JSON format.";
+            } else {
+                errorMsg = "Unable to add record {column: " + Arrays.toString(columns) + ", values: " + Arrays
+                        .toString(values) + " } to table :" + table;
+            }
             log.error(errorMsg, e);
             responseRecord.setResult(ERROR);
             responseRecord.setMessage(errorMsg);
