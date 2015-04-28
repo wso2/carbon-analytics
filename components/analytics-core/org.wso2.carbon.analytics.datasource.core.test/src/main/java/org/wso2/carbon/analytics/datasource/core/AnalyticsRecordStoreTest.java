@@ -120,7 +120,7 @@ public class AnalyticsRecordStoreTest {
         for (int j = 0; j < c; j++) {
             values = new HashMap<String, Object>();
             afacet = new ArrayList<>();
-            afacet.addAll(Arrays.asList(new String[]{"SomeLocation","SomeInnerLocation","AVillage"}));
+            afacet.addAll(Arrays.asList(new String[] {"SomeLocation", "SomeInnerLocation", "AVillage"}));
             values.put("server_name", "ESB-" + i);
             values.put("ip", "192.168.0." + (i % 256));
             values.put("tenant", i);

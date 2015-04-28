@@ -46,7 +46,6 @@ import org.wso2.carbon.analytics.api.internal.AnalyticsDataConfiguration;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
-import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
@@ -526,87 +525,6 @@ public class AnalyticsAPIHttpClient {
             throw new AnalyticsServiceAuthenticationException("Malformed URL provided. " + e.getMessage(), e);
         } catch (IOException e) {
             throw new AnalyticsServiceAuthenticationException("Error while connecting to the remote service. " + e.getMessage(), e);
-        }
-    }
-
-    public void setIndices(int tenantId, String username, String tableName, Map<String, IndexType> columns,
-                           List<String> scoreParams, boolean securityEnabled) throws AnalyticsServiceException {
-        URIBuilder builder = new URIBuilder();
-        builder.setScheme(protocol).setHost(hostname).setPort(port)
-                .setPath(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI);
-        try {
-            HttpPost postMethod = new HttpPost(builder.build().toString());
-            postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
-            List<NameValuePair> params = new ArrayList<>();
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.OPERATION,
-                    AnalyticsAPIConstants.SET_INDICES_OPERATION));
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName));
-            String indexJson = gson.toJson(columns);
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.INDEX_PARAM, indexJson));
-            if (scoreParams != null) {
-                params.add(new BasicNameValuePair(AnalyticsAPIConstants.SCORE_PARAM, gson.toJson(scoreParams)));
-            }
-            if (!securityEnabled) {
-                params.add(new BasicNameValuePair(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId)));
-            } else {
-                params.add(new BasicNameValuePair(AnalyticsAPIConstants.USERNAME_PARAM, username));
-            }
-            params.add(new BasicNameValuePair(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM,
-                    String.valueOf(securityEnabled)));
-            postMethod.setEntity(new UrlEncodedFormEntity(params));
-            HttpResponse httpResponse = httpClient.execute(postMethod);
-            String response = getResponseString(httpResponse);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
-                String errorMsg = "Unable to set the index for table - " + tableName
-                        + " with index  - " + indexJson
-                        + " for tenant id : " + tenantId + ". " + response;
-                if (securityEnabled) errorMsg = "Unable to set the index for table - " + tableName
-                        + " with index  - " + indexJson
-                        + " for username : " + username + ". " + response;
-                throw new AnalyticsServiceException(errorMsg);
-            }
-        } catch (URISyntaxException e) {
-            throw new AnalyticsServiceAuthenticationException("Malformed URL provided. " + e.getMessage(), e);
-        } catch (IOException e) {
-            throw new AnalyticsServiceAuthenticationException("Error while connecting to the remote service. " + e.getMessage(), e);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public Map<String, IndexType> getIndices(int tenantId, String username, String tableName, boolean securityEnabled)
-            throws AnalyticsServiceException {
-        URIBuilder builder = new URIBuilder();
-        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI)
-                .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.GET_INDICES_OPERATION)
-                .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
-                .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
-        if (!securityEnabled) {
-            builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
-        } else {
-            builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
-        }
-        try {
-            HttpGet getMethod = new HttpGet(builder.build().toString());
-            getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
-            HttpResponse httpResponse = httpClient.execute(getMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
-                String response = getResponseString(httpResponse);
-                throw new AnalyticsServiceException("Unable to get the index for table - " + tableName
-                        + " for tenant id : " + tenantId + ". " + response);
-            } else {
-                Object indicesObject = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
-                if (indicesObject != null && indicesObject instanceof Map) {
-                    return (Map<String, IndexType>) indicesObject;
-                } else {
-                    throw new AnalyticsServiceException(getUnexpectedResponseReturnedErrorMsg("getting the indices",
-                            tableName, "Map of indices object", indicesObject));
-                }
-            }
-        } catch (URISyntaxException e) {
-            throw new AnalyticsServiceAuthenticationException("Malformed URL provided. " + e.getMessage(), e);
-        } catch (IOException e) {
-            throw new AnalyticsServiceAuthenticationException("Error while connecting to the remote service. "
-                    + e.getMessage(), e);
         }
     }
 

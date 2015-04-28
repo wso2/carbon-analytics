@@ -25,6 +25,8 @@ import java.io.Serializable;
  */
 public class SearchResultEntry implements Comparable<SearchResultEntry>, Serializable {
     
+    private static final long serialVersionUID = 843580266763606577L;
+
     private String id;
     
     private float score;

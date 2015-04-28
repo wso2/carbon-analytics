@@ -26,7 +26,10 @@ import java.util.Map;
 /**
  *Contains the resulting facet count and the matched ids of a category.
  */
-public class DrillDownResultEntry implements Serializable{
+public class DrillDownResultEntry implements Serializable {
+
+    private static final long serialVersionUID = -6227491464673947835L;
+    
     private String category;
     private String[] categoryPath;
     private List<String> recordIds;

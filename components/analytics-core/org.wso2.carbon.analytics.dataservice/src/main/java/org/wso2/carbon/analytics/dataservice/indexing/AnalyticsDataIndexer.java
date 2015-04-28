@@ -77,7 +77,6 @@ import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategorySearchResultEntry;
-import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
@@ -1225,18 +1224,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         if (columns.contains(INDEX_INTERNAL_WEIGHT_FIELD)) {
             throw new AnalyticsIndexException("The column index '" + INDEX_INTERNAL_WEIGHT_FIELD +
                     "' is a reserved name");
-        }
-    }
-
-    private void checkInvalidScoreParams(List<String> scoreParams, Map<String, IndexType> columns)
-            throws AnalyticsIndexException {
-        for (String scoreParam : scoreParams) {
-            IndexType type = columns.get(scoreParam);
-            if (type != IndexType.DOUBLE && type != IndexType.FLOAT && type != IndexType.INTEGER
-                && type != IndexType.LONG) {
-                throw new AnalyticsIndexException("'" + scoreParam +
-                                                  "' is not indexed as a numeric column");
-            }
         }
     }
 
