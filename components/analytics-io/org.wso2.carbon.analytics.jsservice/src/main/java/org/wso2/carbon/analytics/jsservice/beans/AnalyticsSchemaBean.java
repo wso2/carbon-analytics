@@ -53,4 +53,12 @@ public class AnalyticsSchemaBean {
     public List<String> getPrimaryKeys() {
         return primaryKeys;
     }
+
+    public void setColumns(Map<String, ColumnDefinitionBean> columns) {
+        this.columns = columns;
+    }
+
+    public void setPrimaryKeys(List<String> primaryKeys) {
+        this.primaryKeys = primaryKeys;
+    }
 }

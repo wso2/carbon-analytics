@@ -31,7 +31,7 @@ public enum  ColumnTypeBean {
     STRING,
 
     @XmlEnumValue("INTEGER")
-    INT,
+    INTEGER,
 
     @XmlEnumValue("LONG")
     LONG,

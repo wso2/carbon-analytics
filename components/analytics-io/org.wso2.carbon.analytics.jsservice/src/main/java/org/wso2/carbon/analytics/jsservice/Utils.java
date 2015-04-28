@@ -238,7 +238,7 @@ public class Utils {
                 bean.setType(ColumnTypeBean.STRING);
                 break;
             case "INTEGER":
-                bean.setType(ColumnTypeBean.INT);
+                bean.setType(ColumnTypeBean.INTEGER);
                 break;
             case "LONG":
                 bean.setType(ColumnTypeBean.LONG);
