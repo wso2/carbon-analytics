@@ -156,7 +156,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public void setTableSchema(int tenantId, String tableName, AnalyticsSchema schema)
             throws AnalyticsTableNotAvailableException, AnalyticsException {
-        this.checkInvalidIndexNames(schema.getColumns().keySet());
+        this.checkInvalidIndexNames(schema.getColumns());
         this.checkInvalidScoreParams(schema.getColumns());
         this.getAnalyticsRecordStore().setTableSchema(tenantId, tableName, schema);
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
@@ -172,25 +172,29 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         this.schemaMap.remove(GenericUtils.calculateTableIdentity(tenantId, tableName));
     }
 
-    private void checkInvalidIndexNames(Set<String> columns) throws AnalyticsIndexException {
-        for (String column : columns) {
+    private void checkInvalidIndexNames(Map<String, ColumnDefinition> columns) throws AnalyticsIndexException {
+        if (columns == null) {
+            return;
+        }
+        Set<String> columnNames = columns.keySet();
+        for (String column : columnNames) {
             if (column.contains(" ")) {
                 throw new AnalyticsIndexException("Index columns cannot have a space in the name: '" + column + "'");
             }
         }
-        if (columns.contains(INDEX_ID_INTERNAL_FIELD)) {
+        if (columnNames.contains(INDEX_ID_INTERNAL_FIELD)) {
             throw new AnalyticsIndexException("The column index '" + INDEX_ID_INTERNAL_FIELD +
                                               "' is a reserved name");
         }
-        if (columns.contains(INDEX_INTERNAL_TIMESTAMP_FIELD)) {
+        if (columnNames.contains(INDEX_INTERNAL_TIMESTAMP_FIELD)) {
             throw new AnalyticsIndexException("The column index '" + INDEX_INTERNAL_TIMESTAMP_FIELD +
                                               "' is a reserved name");
         }
-        if (columns.contains(INDEX_INTERNAL_SCORE_FIELD)) {
+        if (columnNames.contains(INDEX_INTERNAL_SCORE_FIELD)) {
             throw new AnalyticsIndexException("The column index '" + INDEX_INTERNAL_SCORE_FIELD +
                                               "' is a reserved name");
         }
-        if (columns.contains(INDEX_INTERNAL_WEIGHT_FIELD)) {
+        if (columnNames.contains(INDEX_INTERNAL_WEIGHT_FIELD)) {
             throw new AnalyticsIndexException("The column index '" + INDEX_INTERNAL_WEIGHT_FIELD +
                                               "' is a reserved name");
         }
@@ -198,6 +202,9 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     private void checkInvalidScoreParams(Map<String, ColumnDefinition> columns)
             throws AnalyticsIndexException {
+        if (columns == null) {
+            return;
+        }
         for (Map.Entry<String,ColumnDefinition> entry : columns.entrySet()) {
             AnalyticsSchema.ColumnType type =  entry.getValue().getType();
             if (type != AnalyticsSchema.ColumnType.DOUBLE && type != AnalyticsSchema.ColumnType.FLOAT &&

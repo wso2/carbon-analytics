@@ -28,7 +28,6 @@ import java.util.List;
 /**
  * JAXB configuration class for the analytics table schema for the Carbon application deployer.
  */
-
 @XmlRootElement(name = "AnalyticsTableSchema")
 public class AnalyticsTableSchemaConfiguration {
     private List<AnalyticsColumnDefinition> columnDefinitions;

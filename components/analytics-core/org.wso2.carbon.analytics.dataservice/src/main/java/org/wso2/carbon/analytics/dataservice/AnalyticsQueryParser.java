@@ -102,7 +102,11 @@ public class AnalyticsQueryParser extends QueryParser {
         if (field == null) {
             throw new RuntimeException("Invalid query, a term must have a field");
         }
-        AnalyticsSchema.ColumnType type = this.indices.get(field).getType();
+        AnalyticsSchema.ColumnType type = null;
+        ColumnDefinition column = this.indices.get(field);
+        if (column != null) {
+            type = column.getType();
+        }
         if (type == null) {
             /* check for special fields */
             if (AnalyticsDataIndexer.INDEX_ID_INTERNAL_FIELD.equals(field)) {

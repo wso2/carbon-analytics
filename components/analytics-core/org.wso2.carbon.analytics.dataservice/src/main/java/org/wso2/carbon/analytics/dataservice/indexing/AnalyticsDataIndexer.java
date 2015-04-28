@@ -1163,6 +1163,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void checkAndAddTaxonomyDocEntries(Document doc, AnalyticsSchema.ColumnType type,
                                                    String name, Object obj,
                                                    FacetsConfig facetsConfig)
@@ -1315,7 +1316,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     }
     
     public void clearIndexData(int tenantId, String tableName) throws AnalyticsIndexException {
-        String tableId = this.generateTableId(tenantId, tableName);
         /* delete all global index data, not only local ones */
         this.deleteIndexData(tenantId, tableName);
     }
@@ -1325,33 +1325,9 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return this.generateTableId(tenantId, tableName) + "/" + shardId;
     }
     
-    private boolean isShardedTableId(int tenantId, String tableName, String shardedTableId) {
-        return shardedTableId.startsWith(this.generateTableId(tenantId, tableName) + "/");
-    }
-    
     private String generateTableId(int tenantId, String tableName) {
         /* the table names are not case-sensitive */
         return tenantId + "_" + tableName.toLowerCase();
-    }
-    
-    private void clusterNoficationReceived(int tenantId, String tableName) throws AnalyticsIndexException {
-        /* remove the entry from the cache, this will force the next index operations to load
-         * the index definition from the back-end store, this makes sure, we have optimum cache cleanup
-         * and improves memory usage for tenant partitioning */
-        String tableId = this.generateTableId(tenantId, tableName);
-        this.indexDefs.remove(tableId);
-        this.scoreParams.remove(tableId);
-        this.closeAndRemoveIndexDirs(tenantId, tableName);
-    }
-    
-    private void closeAndRemoveIndexDirs(int tenantId, String tableName) throws AnalyticsIndexException {
-        Set<String> ids = new HashSet<>();
-        for (String id : this.indexDirs.keySet()) {
-            if (this.isShardedTableId(tenantId, tableName, id)) {
-                ids.add(id);
-            }
-        }
-        this.closeAndRemoveIndexDirs(ids);
     }
     
     private void closeAndRemoveIndexDir(String tableId) throws AnalyticsIndexException {
