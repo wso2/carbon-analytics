@@ -38,6 +38,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -49,6 +50,7 @@ import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
  */
 public class AnalyticsDataBackupTool {
 
+    private static final String TABLE_SCHEMA_FILE_NAME = "__TABLE_SCHEMA__";
     private static final int INDEX_PROCESS_WAIT_TIME = 5;
     private static final int RECORD_BATCH_SIZE = 200;
     
@@ -156,16 +158,22 @@ public class AnalyticsDataBackupTool {
             long timeFrom, long timeTo) {
         try {
             System.out.print("Restoring table '" + table + "'..");
+            service.createTable(tenantId, table);
             File myDir = new File(baseDir.getAbsolutePath() + File.separator + table);
             if (!myDir.isDirectory()) {
                 System.out.println(myDir.getAbsolutePath() + " is not a directory to contain table data, skipping.");
                 return;
             }
+            AnalyticsSchema schema = readTableSchema(baseDir.getAbsolutePath());
+            service.setTableSchema(tenantId, table, schema);
             File[] files = myDir.listFiles();
             List<Record> recordBatch = new ArrayList<>(RECORD_BATCH_SIZE);
             Record record;
             int count = 0;
             for (File file : files) {
+                if (file.getName().equalsIgnoreCase(TABLE_SCHEMA_FILE_NAME)) {
+                    continue;
+                }
                 if (count % 5000 == 0) {
                     System.out.print(".");
                 }
@@ -208,6 +216,8 @@ public class AnalyticsDataBackupTool {
             if (!myDir.exists()) {
                 myDir.mkdir();
             }
+            AnalyticsSchema schema = service.getTableSchema(tenantId, table);
+            writeTableSchema(schema, myDir.getAbsolutePath());
             RecordGroup[] rgs = service.get(tenantId, table, 1, null, timeFrom, timeTo, 0, -1);
             Iterator<Record> recordItr;
             int count = 0;
@@ -230,6 +240,25 @@ public class AnalyticsDataBackupTool {
             System.out.println();
         } catch (Exception e) {
             System.out.println("Error in backing up table: " + table + " - " + e.getMessage());
+        }
+    }
+    
+    private static void writeTableSchema(AnalyticsSchema schema, String basePath) throws IOException {
+        String filePath = basePath + File.separator + TABLE_SCHEMA_FILE_NAME;
+        byte[] data = GenericUtils.serializeObject(schema);
+        FileOutputStream fileOut = null;
+        DataOutputStream dataOut = null;
+        try {
+            fileOut = new FileOutputStream(filePath);
+            dataOut = new DataOutputStream(fileOut);
+            dataOut.write(data);
+        } finally {
+            if (dataOut != null) {
+                dataOut.close();
+            }
+            if (fileOut != null) {
+                fileOut.close();
+            }
         }
     }
     
@@ -257,6 +286,22 @@ public class AnalyticsDataBackupTool {
         try {
             fileIn = new FileInputStream(file);
             return (Record) GenericUtils.deserializeObject(fileIn);
+        } finally {
+            if (fileIn != null) {
+                fileIn.close();
+            }
+        }
+    }
+    
+    private static AnalyticsSchema readTableSchema(String basePath) throws IOException {
+        File file = new File(basePath + File.separator + TABLE_SCHEMA_FILE_NAME);
+        if (!file.exists()) {
+            return new AnalyticsSchema();
+        }
+        FileInputStream fileIn = null;
+        try {
+            fileIn = new FileInputStream(file);
+            return (AnalyticsSchema) GenericUtils.deserializeObject(fileIn);
         } finally {
             if (fileIn != null) {
                 fileIn.close();
