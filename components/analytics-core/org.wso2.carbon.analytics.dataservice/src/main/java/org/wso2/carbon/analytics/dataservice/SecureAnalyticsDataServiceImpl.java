@@ -59,7 +59,7 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     @Override
     public void clearIndexData(String username, String tableName) throws AnalyticsException {
         int tenantId = getTenantId(username);
-        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_DELETE_INDEXING)) {
+        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_DELETE_RECORD)) {
             throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
                                                            "permission to delete index data");
         }

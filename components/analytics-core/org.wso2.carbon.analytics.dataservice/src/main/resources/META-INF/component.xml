@@ -61,23 +61,5 @@
             <DisplayName>Delete</DisplayName>
             <ResourceId>/permission/admin/manage/analytics/records/delete</ResourceId>
         </ManagementPermission>
-
-        <!--Indexing related permissions-->
-        <ManagementPermission>
-            <DisplayName>Indexing</DisplayName>
-            <ResourceId>/permission/admin/manage/analytics/indexing</ResourceId>
-        </ManagementPermission>
-        <ManagementPermission>
-            <DisplayName>Set</DisplayName>
-            <ResourceId>/permission/admin/manage/analytics/indexing/set</ResourceId>
-        </ManagementPermission>
-        <ManagementPermission>
-            <DisplayName>Get</DisplayName>
-            <ResourceId>/permission/admin/manage/analytics/indexing/get</ResourceId>
-        </ManagementPermission>
-        <ManagementPermission>
-            <DisplayName>Delete</DisplayName>
-            <ResourceId>/permission/admin/manage/analytics/indexing/delete</ResourceId>
-        </ManagementPermission>
     </ManagementPermissions>
 </component>
