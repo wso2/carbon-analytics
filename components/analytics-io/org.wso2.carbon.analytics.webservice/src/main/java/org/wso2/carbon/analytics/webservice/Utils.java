@@ -152,12 +152,11 @@ public class Utils {
      * @return Analytics schema
      */
     public static AnalyticsSchema createAnalyticsSchema(AnalyticsSchemaBean analyticsSchemaBean) {
-        List<ColumnDefinition> columnTypes = null;
+        List<ColumnDefinition> columnTypes = new ArrayList<>();
         if (analyticsSchemaBean == null) {
             return null;
         }
         if (analyticsSchemaBean.getColumns() != null) {
-            columnTypes = new ArrayList<>();
             for (SchemaColumnBean columnBean : analyticsSchemaBean.getColumns()) {
                 columnTypes.add(getColumnDefinition(columnBean.getColumnName(), columnBean.getColumnType(), 
                         columnBean.isIndex(), columnBean.isScoreParam()));
