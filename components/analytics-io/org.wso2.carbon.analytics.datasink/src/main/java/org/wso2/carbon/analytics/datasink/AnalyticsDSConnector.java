@@ -38,7 +38,9 @@ public class AnalyticsDSConnector {
     public void addStream(int tenantId, StreamDefinition streamDefinition) throws AnalyticsException {
         String tableName = generateTableName(streamDefinition);
         ServiceHolder.getAnalyticsDataService().createTable(tenantId, tableName);
-        ServiceHolder.getAnalyticsDataService().setTableSchema(tenantId, tableName, getSchema(streamDefinition));
+        AnalyticsSchema currentTableSchema = ServiceHolder.getAnalyticsDataService().getTableSchema(tenantId, tableName);
+        AnalyticsSchema streamSchema = getSchema(streamDefinition);
+        ServiceHolder.getAnalyticsDataService().setTableSchema(tenantId, tableName, getUpdatedSchemaForStream(currentTableSchema, streamSchema));
     }
 
     public void insertEvents(int tenantId, List<Event> events) throws StreamDefinitionStoreException,
@@ -46,9 +48,27 @@ public class AnalyticsDSConnector {
         ServiceHolder.getAnalyticsDataService().put(convertEventsToRecord(tenantId, events));
     }
 
+    private AnalyticsSchema getUpdatedSchemaForStream(AnalyticsSchema currentTableSchema, AnalyticsSchema newStreamSchema) {
+        Set<Map.Entry<String, ColumnDefinition>> streamColumns = newStreamSchema.getColumns().entrySet();
+        Map<String, ColumnDefinition> currentSchemaColumns = currentTableSchema.getColumns();
+        if (currentSchemaColumns == null) {
+            List<String> primaryKeys;
+            if (currentTableSchema.getPrimaryKeys() == null) primaryKeys = new ArrayList<>();
+            else primaryKeys = currentTableSchema.getPrimaryKeys();
+            currentTableSchema = new AnalyticsSchema(new ArrayList<ColumnDefinition>(), primaryKeys);
+            currentSchemaColumns = currentTableSchema.getColumns();
+        }
+        for (Map.Entry<String, ColumnDefinition> aColumn : streamColumns) {
+            if (currentSchemaColumns.get(aColumn.getKey()) == null) {
+                currentSchemaColumns.put(aColumn.getKey(), aColumn.getValue());
+            }
+        }
+        return currentTableSchema;
+    }
+
     private AnalyticsSchema getSchema(StreamDefinition streamDefinition) {
         List<ColumnDefinition> columns = new ArrayList<>();
-        ColumnDefinition keyColumnDef = new ColumnDefinition(AnalyticsDatasinkConstants.STREAM_VERSION_KEY, 
+        ColumnDefinition keyColumnDef = new ColumnDefinition(AnalyticsDatasinkConstants.STREAM_VERSION_KEY,
                 AnalyticsSchema.ColumnType.STRING);
         columns.add(keyColumnDef);
         populateColumnSchema(AnalyticsDatasinkConstants.EVENT_META_DATA_TYPE,
