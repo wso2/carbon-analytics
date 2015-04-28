@@ -39,9 +39,11 @@ public class AnalyticsSchema implements Serializable {
     public AnalyticsSchema() { }
     
     public AnalyticsSchema(List<ColumnDefinition> columns, List<String> primaryKeys) {
-        this.columns = new LinkedHashMap<>(columns.size());
-        for (ColumnDefinition column : columns) {
-            this.columns.put(column.getName(), column);
+        if (columns != null) {
+            this.columns = new LinkedHashMap<>(columns.size());
+            for (ColumnDefinition column : columns) {
+                this.columns.put(column.getName(), column);
+            }
         }
         this.primaryKeys = primaryKeys;
     }
