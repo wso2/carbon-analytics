@@ -68,6 +68,9 @@ public class AnalyticsWebServiceConnector {
     public static final int TYPE_TABLE_EXISTS = 17;
     public static final int TYPE_WAIT_FOR_INDEXING = 18;
     public static final int TYPE_PAGINATION_SUPPORTED = 19;
+    public static final int TYPE_DRILLDOWN_CATEGORIES = 20;
+    public static final int TYPE_DRILLDOWN_SEARCH = 21;
+    public static final int TYPE_DRILLDOWN_SEARCH_COUNT = 22;
 
     public AnalyticsWebServiceConnector(ConfigurationContext configCtx, String backendServerURL, String cookie) {
         try {
@@ -474,7 +477,7 @@ public class AnalyticsWebServiceConnector {
                 CategoryDrillDownRequestBean queryBean =
                          gson.fromJson(queryAsString,CategoryDrillDownRequestBean.class);
                 org.wso2.carbon.analytics.webservice.stub.beans.CategoryDrillDownRequestBean requestBean =
-                        Utils.createCategoryDrillDownRequest(queryBean);
+                        Utils.createCategoryDrillDownRequest(tableName, queryBean);
                 org.wso2.carbon.analytics.webservice.stub.beans.SubCategoriesBean searchResults =
                         analyticsWebServiceStub.drillDownCategories(requestBean);
                 SubCategoriesBean subCategories = Utils.getSubCategories(searchResults);
@@ -505,30 +508,59 @@ public class AnalyticsWebServiceConnector {
             try {
                 DrillDownRequestBean queryBean =
                         gson.fromJson(queryAsString,DrillDownRequestBean.class);
-                org.wso2.carbon.analytics.webservice.stub.beans.CategoryDrillDownRequestBean requestBean =
-                        Utils.createDrillDownSearchRequest(queryBean);
-                org.wso2.carbon.analytics.webservice.stub.beans.SubCategoriesBean searchResults =
-                        analyticsWebServiceStub.drillDownCategories(requestBean);
-                SubCategoriesBean subCategories = Utils.getSubCategories(searchResults);
+                org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsDrillDownRequestBean requestBean =
+                        Utils.createDrillDownSearchRequest(tableName, queryBean);
+                RecordBean[] records =
+                        analyticsWebServiceStub.drillDownSearch(requestBean);
+                List<Record> recordBeans = Utils.getRecordBeans(records);
                 if (logger.isDebugEnabled()) {
-                    logger.debug("DrilldownCategory Result -- path: " + subCategories.getCategoryPath() +
-                                 " values :" + subCategories.getCategories());
-
+                    for (Record record : recordBeans) {
+                        logger.debug("Drilldown Search Result -- Record Id: " + record.getId() + " values :" +
+                                     record.toString());
+                    }
                 }
-                return gson.toJson(subCategories);
+                return gson.toJson(recordBeans);
             } catch (Exception e) {
-                logger.error("Failed to perform categoryDrilldown on table: " + tableName + " : " +
+                logger.error("Failed to perform DrilldownSearch on table: " + tableName + " : " +
                              e.getMessage(), e);
                 return gson.toJson(handleResponse(ResponseStatus.FAILED,
-                                                  "Failed to perform Category Drilldown on table: " +
+                                                  "Failed to perform DrilldownSearch on table: " +
                                                   tableName + ": " + e.getMessage()));
             }
         } else {
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Category drilldown parameters " +
+            return gson.toJson(handleResponse(ResponseStatus.FAILED, "drilldownSearch parameters " +
                                                                      "are not provided"));
         }
     }
 
+    public String drillDownSearchCount(String tableName, String queryAsString) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Invoking drillDownCategories for tableName : " + tableName);
+        }
+        if (queryAsString != null) {
+            try {
+                DrillDownRequestBean queryBean =
+                        gson.fromJson(queryAsString,DrillDownRequestBean.class);
+                org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsDrillDownRequestBean requestBean =
+                        Utils.createDrillDownSearchRequest(tableName, queryBean);
+                int count =
+                        analyticsWebServiceStub.drillDownSearchCount(requestBean);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Search count Result -- Record Count: " + count);
+                }
+                return gson.toJson(count);
+            } catch (Exception e) {
+                logger.error("Failed to perform DrilldownSearch Count on table: " + tableName + " : " +
+                             e.getMessage(), e);
+                return gson.toJson(handleResponse(ResponseStatus.FAILED,
+                                                  "Failed to perform DrilldownSearch Count on table: " +
+                                                  tableName + ": " + e.getMessage()));
+            }
+        } else {
+            return gson.toJson(handleResponse(ResponseStatus.FAILED, "drilldownSearch parameters " +
+                                                                     "are not provided"));
+        }
+    }
 
     public ResponseBean handleResponse(ResponseStatus responseStatus, String message) {
         ResponseBean response;
@@ -552,7 +584,7 @@ public class AnalyticsWebServiceConnector {
                 response = getResponseMessage(Constants.Status.UNAUTHORIZED, message);
                 break;
             case UNAUTHENTICATED:
-                response = getResponseMessage(Constants.Status.UNAUTHORIZED, message);
+                response = getResponseMessage(Constants.Status.UNAUTHENTICATED, message);
                 break;
             case NON_EXISTENT:
                 response = getResponseMessage(Constants.Status.NON_EXISTENT, message);

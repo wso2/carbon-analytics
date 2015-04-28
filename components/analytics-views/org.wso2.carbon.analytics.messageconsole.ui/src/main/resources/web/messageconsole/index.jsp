@@ -631,6 +631,11 @@
                                           list: val.display,
                                           key: val.key
                                       };
+                                      if (val.type == 'FACET') {
+                                          fields[val.name].placeholder = '{&quot;path&quot;:[&quot;Category 1&quot;, &quot;Category 2&quot;]}';
+                                      } else {
+                                          fields[val.name].placeholder = val.type;
+                                      }
                                       if (val.type == 'STRING' || val.type == 'FACET') {
                                           fields[val.name].type = 'textarea';
                                       } else if (val.type == 'INTEGER' || val.type == 'LONG') {
@@ -715,10 +720,8 @@
                                         <input type="button" id="deleteTableButton" value="Delete Table" class="button"
                                                style="display: none">
                                     </c:if>
-                                    <c:if test="${permissions != null && permissions.isCreateTable()}">
                                         <input type="button" id="editTableButton" value="Edit Table" class="button"
                                                style="display: none">
-                                    </c:if>
                                     <c:if test="${permissions != null && permissions.isDeleteRecord()}">
                                         <input type="button" id="purgeRecordButton" class="button"
                                                value="Schedule Data Purging"
