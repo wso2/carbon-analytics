@@ -90,7 +90,7 @@ public class AnalyticsResource extends AbstractResource {
     private static final String STR_JSON_COMMA = ",";
     private static final String STR_JSON_ARRAY_CLOSING_SQUARE_BRACKET = "]";
     private static final String AUTHORIZATION_HEADER = "Authorization";
-    private static final String DEFAUL_CHARSETT = "UTF-8";
+    private static final String DEFAULT_CHARSET = "UTF-8";
 
     /**
 	 * Creates the table.
@@ -521,7 +521,7 @@ public class AnalyticsResource extends AbstractResource {
 	 */
 	@DELETE
 	@Produces({ MediaType.APPLICATION_JSON })
-	@Path("tables/{tableName}/indices")
+	@Path("tables/{tableName}/indexData")
 	public Response clearIndices(@PathParam("tableName") String tableName,
                                  @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                                                                      throws AnalyticsException {
@@ -802,7 +802,7 @@ public class AnalyticsResource extends AbstractResource {
             // Authorization: Basic base64credentials
             String base64Credentials = authHeader.substring(Constants.BASIC_AUTH_HEADER.length()).trim();
             String credentials = new String(Base64.decode(base64Credentials),
-                                            Charset.forName(DEFAUL_CHARSETT));
+                                            Charset.forName(DEFAULT_CHARSET));
             // credentials = username:password
             final String[] values = credentials.split(":", 2);
             username = values[0];

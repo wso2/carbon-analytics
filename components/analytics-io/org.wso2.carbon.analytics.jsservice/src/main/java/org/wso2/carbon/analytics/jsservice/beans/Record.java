@@ -21,7 +21,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -121,25 +120,10 @@ public class Record {
 	public long getTimestamp() {
 		return timestamp;
 	}
-
-	/**
-	 * Gets the not null values.
-	 * @return the not null values
-	 */
-	public Map<String, Object> getNotNullValues() {
-		Map<String, Object> result = this.getValues();
-		Iterator<Entry<String, Object>> itr = result.entrySet().iterator();
-		while (itr.hasNext()) {
-			if (itr.next().getValue() == null) {
-				itr.remove();
-			}
-		}
-		return result;
-	}
 	
 	@Override
 	public String toString(){
-		List<String> valueList = new ArrayList<String>();
+		List<String> valueList = new ArrayList<>();
 		for (Entry<String, Object> entry : values.entrySet()) {
 			valueList.add(entry.getKey() + ":" + entry.getValue());
 		}

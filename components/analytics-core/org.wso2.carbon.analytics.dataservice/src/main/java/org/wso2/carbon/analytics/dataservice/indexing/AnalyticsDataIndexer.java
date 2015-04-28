@@ -77,7 +77,6 @@ import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategorySearchResultEntry;
-import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
@@ -144,15 +143,11 @@ public class AnalyticsDataIndexer implements GroupEventListener {
 
     private static final String INDEX_INTERNAL_SCORE_FIELD = "_score";
 
-    private static final String INDEX_INTERNAL_WEIGHT_FIELD = "_weight";
-
     private static final String NULL_INDEX_VALUE = "";
 
     private static final String EMPTY_FACET_VALUE = "EMPTY_FACET_VALUE!";
 
     private static final java.lang.String DEFAULT_SCORE = "1";
-
- //   private AnalyticsIndexDefinitionRepository repository;
     
     private Map<String, AnalyticsSchema> indexDefs = new HashMap<>();
 
@@ -1203,42 +1198,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
         return config.build(taxonomyWriter, doc);
     }
-    
-    private void checkInvalidIndexNames(Set<String> columns) throws AnalyticsIndexException {
-        for (String column : columns) {
-            if (column.contains(" ")) {
-                throw new AnalyticsIndexException("Index columns cannot have a space in the name: '" + column + "'");
-            }
-        }
-        if (columns.contains(INDEX_ID_INTERNAL_FIELD)) {
-            throw new AnalyticsIndexException("The column index '" + INDEX_ID_INTERNAL_FIELD + 
-                    "' is a reserved name");
-        }
-        if (columns.contains(INDEX_INTERNAL_TIMESTAMP_FIELD)) {
-            throw new AnalyticsIndexException("The column index '" + INDEX_INTERNAL_TIMESTAMP_FIELD + 
-                    "' is a reserved name");
-        }
-        if (columns.contains(INDEX_INTERNAL_SCORE_FIELD)) {
-            throw new AnalyticsIndexException("The column index '" + INDEX_INTERNAL_SCORE_FIELD +
-                    "' is a reserved name");
-        }
-        if (columns.contains(INDEX_INTERNAL_WEIGHT_FIELD)) {
-            throw new AnalyticsIndexException("The column index '" + INDEX_INTERNAL_WEIGHT_FIELD +
-                    "' is a reserved name");
-        }
-    }
-
-    private void checkInvalidScoreParams(List<String> scoreParams, Map<String, IndexType> columns)
-            throws AnalyticsIndexException {
-        for (String scoreParam : scoreParams) {
-            IndexType type = columns.get(scoreParam);
-            if (type != IndexType.DOUBLE && type != IndexType.FLOAT && type != IndexType.INTEGER
-                && type != IndexType.LONG) {
-                throw new AnalyticsIndexException("'" + scoreParam +
-                                                  "' is not indexed as a numeric column");
-            }
-        }
-    }
 
     public Map<String, ColumnDefinition> lookupIndices(int tenantId, String tableName) throws AnalyticsIndexException {
         AnalyticsSchema schema = this.indexDefs.get(tableName);
@@ -1386,7 +1345,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     }
     
     private void closeAndRemoveIndexDirs(int tenantId, String tableName) throws AnalyticsIndexException {
-        Set<String> ids = new HashSet<String>();
+        Set<String> ids = new HashSet<>();
         for (String id : this.indexDirs.keySet()) {
             if (this.isShardedTableId(tenantId, tableName, id)) {
                 ids.add(id);

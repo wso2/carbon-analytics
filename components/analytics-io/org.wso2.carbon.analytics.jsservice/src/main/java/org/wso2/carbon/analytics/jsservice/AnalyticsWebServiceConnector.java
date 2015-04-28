@@ -28,9 +28,12 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.jsservice.beans.AnalyticsSchemaBean;
+import org.wso2.carbon.analytics.jsservice.beans.CategoryDrillDownRequestBean;
+import org.wso2.carbon.analytics.jsservice.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.jsservice.beans.QueryBean;
 import org.wso2.carbon.analytics.jsservice.beans.Record;
 import org.wso2.carbon.analytics.jsservice.beans.ResponseBean;
+import org.wso2.carbon.analytics.jsservice.beans.SubCategoriesBean;
 import org.wso2.carbon.analytics.jsservice.exception.JSServiceException;
 import org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceStub;
 import org.wso2.carbon.analytics.webservice.stub.beans.RecordBean;
@@ -53,7 +56,6 @@ public class AnalyticsWebServiceConnector {
     public static final int TYPE_DELETE_BY_ID = 3;
     public static final int TYPE_DELETE_BY_RANGE = 4;
     public static final int TYPE_DELETE_TABLE = 5;
-    public static final int TYPE_GET_INDICES = 6;
     public static final int TYPE_GET_RECORD_COUNT = 7;
     public static final int TYPE_GET_BY_ID = 8;
     public static final int TYPE_GET_BY_RANGE = 9;
@@ -62,7 +64,6 @@ public class AnalyticsWebServiceConnector {
     public static final int TYPE_PUT_RECORDS = 12;
     public static final int TYPE_SEARCH = 13;
     public static final int TYPE_SEARCH_COUNT = 14;
-    public static final int TYPE_SET_INDICES = 15;
     public static final int TYPE_SET_SCHEMA = 16;
     public static final int TYPE_TABLE_EXISTS = 17;
     public static final int TYPE_WAIT_FOR_INDEXING = 18;
@@ -211,13 +212,14 @@ public class AnalyticsWebServiceConnector {
             logger.debug("Invoking deleteRecords for tableName : " +
                          tableName);
         }
-        Type idsListType = new TypeToken<List<String>>(){}.getType();
-        List<String> ids = gson.fromJson(idsAsString, idsListType);
-        if (ids != null) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("deleting the records for ids :" + ids);
-            }
+
+        if (idsAsString != null) {
             try {
+                Type idsListType = new TypeToken<List<String>>(){}.getType();
+                List<String> ids = gson.fromJson(idsAsString, idsListType);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("deleting the records for ids :" + ids);
+                }
                 analyticsWebServiceStub.deleteByIds(tableName, ids.toArray(new String[ids.size()]));
                 return gson.toJson(handleResponse(ResponseStatus.SUCCESS, "Successfully deleted records in table: " +
                                                                           tableName));
@@ -278,20 +280,25 @@ public class AnalyticsWebServiceConnector {
     }
 
     public String getRecordsByIds(String tableName, String idsAsString) {
-        Type idsType = new TypeToken<List<String>>(){}.getType();
-        List<String> ids = gson.fromJson(idsAsString, idsType);
-        String[] idArray = ids.toArray(new String[ids.size()]);
-        if (logger.isDebugEnabled()) {
-            logger.debug("Invoking getRecordsByIds for tableName: " + tableName);
-        }
-        try {
-            RecordBean[] recordBeans = analyticsWebServiceStub.getById(tableName, 1, null, idArray);
-            List<Record> records = Utils.getRecordBeans(recordBeans);
-            return gson.toJson(records);
-        } catch (Exception e) {
-            logger.error("failed to get records from table: " + tableName + " : " + e.getMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get records from table: " +
-                                                                     tableName + ": " + e.getMessage()));
+        if (idsAsString != null) {
+            try {
+                Type idsType = new TypeToken<List<String>>() {
+                }.getType();
+                List<String> ids = gson.fromJson(idsAsString, idsType);
+                String[] idArray = ids.toArray(new String[ids.size()]);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Invoking getRecordsByIds for tableName: " + tableName);
+                }
+                RecordBean[] recordBeans = analyticsWebServiceStub.getById(tableName, 1, null, idArray);
+                List<Record> records = Utils.getRecordBeans(recordBeans);
+                return gson.toJson(records);
+            } catch (Exception e) {
+                logger.error("failed to get records from table: " + tableName + " : " + e.getMessage(), e);
+                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get records from table: " +
+                                                                         tableName + ": " + e.getMessage()));
+            }
+        } else {
+            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Id list is empty"));
         }
     }
 
@@ -299,17 +306,18 @@ public class AnalyticsWebServiceConnector {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking insertRecords");
         }
-        Type recordListType = new TypeToken<List<Record>>(){}.getType();
-        List<Record> records = gson.fromJson(recordsAsString, recordListType);
-        if (records != null) {
-            if (logger.isDebugEnabled()) {
-                for (Record record : records) {
-                    logger.debug(" inserting -- Record Id: " + record.getId() + " values :" +
-                                 record.toString());
-                }
-            }
-            RecordBean[] recordBeans = Utils.getRecords(records);
+
+        if (recordsAsString != null) {
             try {
+                Type recordListType = new TypeToken<List<Record>>(){}.getType();
+                List<Record> records = gson.fromJson(recordsAsString, recordListType);
+                if (logger.isDebugEnabled()) {
+                    for (Record record : records) {
+                        logger.debug(" inserting -- Record Id: " + record.getId() + " values :" +
+                                     record.toString());
+                    }
+                }
+                RecordBean[] recordBeans = Utils.getRecords(records);
                 RecordBean[] beansWithIds = analyticsWebServiceStub.put(recordBeans);
                 List<String> ids = Utils.getIds(beansWithIds);
                 return gson.toJson(ids);
@@ -322,9 +330,9 @@ public class AnalyticsWebServiceConnector {
         }
     }
 
-    public String clearIndices(String tableName) {
+    public String clearIndexData(String tableName) {
         if (logger.isDebugEnabled()) {
-            logger.debug("Invoking clearIndices for tableName : " +
+            logger.debug("Invoking clearIndexData for tableName : " +
                          tableName);
         }
         try {
@@ -339,13 +347,14 @@ public class AnalyticsWebServiceConnector {
     }
 
     public String search(String tableName, String queryAsString) {
-        QueryBean queryBean = gson.fromJson(queryAsString, QueryBean.class);
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking search for tableName : " + tableName);
         }
-        if (queryBean != null) {
+        if (queryAsString != null) {
             try {
-                RecordBean[] searchResults = analyticsWebServiceStub.search(tableName, queryBean.getQuery(), queryBean.getStart(),
+                QueryBean queryBean = gson.fromJson(queryAsString, QueryBean.class);
+                RecordBean[] searchResults = analyticsWebServiceStub.search(tableName, queryBean.getQuery(),
+                                                                            queryBean.getStart(),
                                                                             queryBean.getCount());
                 List<Record> records = Utils.getRecordBeans(searchResults);
                 if (logger.isDebugEnabled()) {
@@ -367,12 +376,12 @@ public class AnalyticsWebServiceConnector {
     }
 
     public String searchCount(String tableName, String queryAsString) {
-        QueryBean queryBean = gson.fromJson(queryAsString, QueryBean.class);
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking search count for tableName : " + tableName);
         }
-        if (queryBean != null) {
+        if (queryAsString != null) {
             try {
+                QueryBean queryBean = gson.fromJson(queryAsString, QueryBean.class);
                 int result = analyticsWebServiceStub.searchCount(tableName, queryBean.getQuery());
                 if (logger.isDebugEnabled()) {
                     logger.debug("Search count : " + result);
@@ -405,14 +414,15 @@ public class AnalyticsWebServiceConnector {
 
     public String setTableSchema(String tableName,
                                    String schemaAsString) {
-        AnalyticsSchemaBean analyticsSchemaBean = gson.fromJson(schemaAsString, AnalyticsSchemaBean.class);
+
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking setTableSchema for tableName : " + tableName);
         }
-        if (analyticsSchemaBean != null) {
-            org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsSchemaBean
-                    analyticsSchema = Utils.createAnalyticsSchema(analyticsSchemaBean);
+        if (schemaAsString != null) {
             try {
+                AnalyticsSchemaBean analyticsSchemaBean = gson.fromJson(schemaAsString, AnalyticsSchemaBean.class);
+                org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsSchemaBean
+                        analyticsSchema = Utils.createAnalyticsSchema(analyticsSchemaBean);
                 analyticsWebServiceStub.setTableSchema(tableName, analyticsSchema);
                 return gson.toJson(handleResponse(ResponseStatus.SUCCESS, "Successfully set table schema for table: "
                                                                           + tableName));
@@ -452,6 +462,70 @@ public class AnalyticsWebServiceConnector {
             logger.error("Failed to check pagination support" + e.getMessage(), e);
             return gson.toJson(handleResponse(ResponseStatus.FAILED,
                                               "Failed to check pagination support: " + e.getMessage()));
+        }
+    }
+
+    public String drillDownCategories(String tableName, String queryAsString) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Invoking drillDownCategories for tableName : " + tableName);
+        }
+        if (queryAsString != null) {
+            try {
+                CategoryDrillDownRequestBean queryBean =
+                         gson.fromJson(queryAsString,CategoryDrillDownRequestBean.class);
+                org.wso2.carbon.analytics.webservice.stub.beans.CategoryDrillDownRequestBean requestBean =
+                        Utils.createCategoryDrillDownRequest(queryBean);
+                org.wso2.carbon.analytics.webservice.stub.beans.SubCategoriesBean searchResults =
+                        analyticsWebServiceStub.drillDownCategories(requestBean);
+                SubCategoriesBean subCategories = Utils.getsubCategories(searchResults);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("DrilldownCategory Result -- path: " + subCategories.getCategoryPath() +
+                                 " values :" + subCategories.getCategories());
+
+                }
+                return gson.toJson(subCategories);
+            } catch (Exception e) {
+                logger.error("Failed to perform categoryDrilldown on table: " + tableName + " : " +
+                             e.getMessage(), e);
+                return gson.toJson(handleResponse(ResponseStatus.FAILED,
+                                                  "Failed to perform Category Drilldown on table: " +
+                                                  tableName + ": " + e.getMessage()));
+            }
+        } else {
+            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Category drilldown parameters " +
+                                                                     "are not provided"));
+        }
+    }
+
+    public String drillDownSearch(String tableName, String queryAsString) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Invoking drillDownCategories for tableName : " + tableName);
+        }
+        if (queryAsString != null) {
+            try {
+                DrillDownRequestBean queryBean =
+                        gson.fromJson(queryAsString,DrillDownRequestBean.class);
+                org.wso2.carbon.analytics.webservice.stub.beans.CategoryDrillDownRequestBean requestBean =
+                        Utils.createCategoryDrillDownRequest(queryBean);
+                org.wso2.carbon.analytics.webservice.stub.beans.SubCategoriesBean searchResults =
+                        analyticsWebServiceStub.drillDownCategories(requestBean);
+                SubCategoriesBean subCategories = Utils.getsubCategories(searchResults);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("DrilldownCategory Result -- path: " + subCategories.getCategoryPath() +
+                                 " values :" + subCategories.getCategories());
+
+                }
+                return gson.toJson(subCategories);
+            } catch (Exception e) {
+                logger.error("Failed to perform categoryDrilldown on table: " + tableName + " : " +
+                             e.getMessage(), e);
+                return gson.toJson(handleResponse(ResponseStatus.FAILED,
+                                                  "Failed to perform Category Drilldown on table: " +
+                                                  tableName + ": " + e.getMessage()));
+            }
+        } else {
+            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Category drilldown parameters " +
+                                                                     "are not provided"));
         }
     }
 

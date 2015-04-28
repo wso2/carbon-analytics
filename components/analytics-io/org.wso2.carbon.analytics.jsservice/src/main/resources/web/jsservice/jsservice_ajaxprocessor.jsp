@@ -122,7 +122,7 @@
                 break;
             }
             case AnalyticsWebServiceConnector.TYPE_CLEAR_INDICES: {
-                out.print(connector.clearIndices(tableName));
+                out.print(connector.clearIndexData(tableName));
                 break;
             }
             case AnalyticsWebServiceConnector.TYPE_PUT_RECORDS: {

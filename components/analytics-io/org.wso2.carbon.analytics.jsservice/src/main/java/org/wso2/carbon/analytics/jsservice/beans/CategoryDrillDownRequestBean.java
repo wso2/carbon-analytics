@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.analytics.restapi.beans;
+package org.wso2.carbon.analytics.jsservice.beans;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
