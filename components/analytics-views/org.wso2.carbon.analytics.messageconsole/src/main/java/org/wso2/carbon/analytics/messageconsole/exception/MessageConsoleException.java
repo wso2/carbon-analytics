@@ -18,10 +18,12 @@
 
 package org.wso2.carbon.analytics.messageconsole.exception;
 
+import org.apache.axis2.AxisFault;
+
 /**
  * This exception class represent message console related general exceptions.
  */
-public class MessageConsoleException extends Exception {
+public class MessageConsoleException extends AxisFault {
 
     private static final long serialVersionUID = -5572070535908392204L;
 

@@ -147,6 +147,7 @@
                 document.getElementById('msgLabel').style.display = 'none';
             });
 
+            <c:if test="${permissions != null && permissions.isCreateTable()}">
             $("#column-details tbody").on("click", ".del", function () {
                 $(this).parent().parent().remove();
             });
@@ -155,9 +156,10 @@
                 $(this).val('Delete');
                 $(this).attr('class', 'del');
                 var appendTxt =
-                        "<tr><td><input type='text' name='column'/></td><td><select class='select'><option value='STRING'>STRING</option><option value='INTEGER'>INTEGER</option><option value='LONG'>LONG</option><option value='BOOLEAN'>BOOLEAN</option><option value='FLOAT'>FLOAT</option><option value='DOUBLE'>DOUBLE</option><c:if test="${permissions != null && permissions.isSetIndex()}"><option value='FACET'>FACET</option></c:if></select></td><td><input type='checkbox' name='primary'/></td><c:if test="${permissions != null && (permissions.isSetIndex() || permissions.isGetIndex())}"><td><input type='checkbox' <c:if test="${!permissions.isSetIndex()}"> disabled='disabled'</c:if> name='index'/></td><td><input type='checkbox' <c:if test="${!permissions.isSetIndex()}"> disabled='disabled'</c:if> name='scoreParam' class='score-param-class'/></td></c:if><td><input class='add' type='button' value='Add More'/></td></tr>";
+                        "<tr><td><input type='text' name='column'/></td><td><select class='select'><option value='STRING'>STRING</option><option value='INTEGER'>INTEGER</option><option value='LONG'>LONG</option><option value='BOOLEAN'>BOOLEAN</option><option value='FLOAT'>FLOAT</option><option value='DOUBLE'>DOUBLE</option><option value='FACET'>FACET</option></select></td><td><input type='checkbox' name='primary'/></td><td><input type='checkbox' name='index'/></td><td><input type='checkbox' name='scoreParam' class='score-param-class'/></td><td><input class='add' type='button' value='Add More'/></td></tr>";
                 $("#column-details tbody tr:last").after(appendTxt);
             });
+            </c:if>
 
             $("#deleteTableButton").on("click", function () {
                 $("#table-delete-confirm").dialog({
@@ -258,19 +260,9 @@
                                selectElement.options[3] = new Option('BOOLEAN', 'BOOLEAN');
                                selectElement.options[4] = new Option('FLOAT', 'FLOAT');
                                selectElement.options[5] = new Option('DOUBLE', 'DOUBLE');
-                               <c:if test="${permissions != null && (permissions.isSetIndex() || permissions.isGetIndex())}">
                                selectElement.options[5] = new Option('FACET', 'FACET');
-                               <c:if test="${!permissions.isSetIndex()}">
-                               selectElement.options[5].setAttribute('disabled', 'true');
-                               </c:if>
-                               </c:if>
                                selectElement.value = resultArray[i].type;
                                selectElement.className = "select";
-                               <c:if test="${permissions != null && !permissions.isSetIndex()}">
-                               if ('FACET' == resultArray[i].type) {
-                                   selectElement.setAttribute('disabled', 'true');
-                               }
-                               </c:if>
                                typeCell.appendChild(selectElement);
 
                                var primaryCell = row.insertCell(cellNo++);
@@ -279,14 +271,10 @@
                                primaryCheckElement.checked = resultArray[i].primary;
                                primaryCell.appendChild(primaryCheckElement);
 
-                               <c:if test="${permissions != null && (permissions.isSetIndex() || permissions.isGetIndex())}">
                                var indexCell = row.insertCell(cellNo++);
                                var indexCheckElement = document.createElement('input');
                                indexCheckElement.type = "checkbox";
                                indexCheckElement.checked = resultArray[i].index;
-                               <c:if test="${!permissions.isSetIndex()}">
-                               indexCheckElement.setAttribute('disabled', 'true');
-                               </c:if>
                                indexCell.appendChild(indexCheckElement);
 
                                var scoreParamCell = row.insertCell(cellNo++);
@@ -294,14 +282,10 @@
                                scoreParamCheckElement.type = "checkbox";
                                scoreParamCheckElement.className = "score-param-class";
                                scoreParamCheckElement.checked = resultArray[i].scoreParam;
-                               <c:if test="${!permissions.isSetIndex()}">
-                               scoreParamCheckElement.setAttribute('disabled', 'true');
-                               </c:if>
                                scoreParamCell.appendChild(scoreParamCheckElement);
                                if (resultArray[i].scoreParam) {
                                    selectElement.disabled = true;
                                }
-                               </c:if>
 
                                var buttonCell = row.insertCell(cellNo++);
                                var delButtonElement = document.createElement('input');
@@ -838,14 +822,13 @@
                         <th>Column</th>
                         <th>Type</th>
                         <th>Primary key</th>
-                        <c:if test="${permissions != null && (permissions.isSetIndex() || permissions.isGetIndex())}">
-                            <th>Index</th>
-                            <th>Score Param</th>
-                        </c:if>
+                        <th>Index</th>
+                        <th>Score Param</th>
                         <th>&nbsp;</th>
                     </tr>
                     </thead>
                     <tbody>
+                    <c:if test="${permissions != null && permissions.isCreateTable()}">
                     <tr>
                         <td><input type="text" name="column"/></td>
                         <td><select class="select">
@@ -855,21 +838,17 @@
                             <option value="BOOLEAN">BOOLEAN</option>
                             <option value="FLOAT">FLOAT</option>
                             <option value="DOUBLE">DOUBLE</option>
-                            <c:if test="${permissions != null && permissions.isSetIndex()}">
-                                <option value="FACET">FACET</option>
-                            </c:if>
+                            <option value="FACET">FACET</option>
                         </select></td>
                         <td><input type="checkbox" name="primary"/></td>
-                        <c:if test="${permissions != null && (permissions.isSetIndex() || permissions.isGetIndex())}">
-                            <td><input type="checkbox" <c:if test="${!permissions.isSetIndex()}"> disabled="disabled"
-                            </c:if> name="index"/></td>
-                            <td><input type="checkbox" <c:if test="${!permissions.isSetIndex()}"> disabled="disabled"
-                            </c:if> name="scoreParam" class="score-param-class"/></td>
-                        </c:if>
+                        <td><input type="checkbox" name="index"/></td>
+                        <td><input type="checkbox" name="scoreParam" class="score-param-class"/></td>
                         <td><input class="add" type="button" value="Add More"/></td>
                     </tr>
+                    </c:if>
                     </tbody>
                 </table>
+                <c:if test="${permissions != null && permissions.isCreateTable()}">
                 <table class="styledLeft">
                     <tbody>
                     <tr>
@@ -879,6 +858,7 @@
                     </tr>
                     </tbody>
                 </table>
+                </c:if>
             </form>
         </div>
     </div>
@@ -916,6 +896,7 @@
             </form>
         </div>
     </div>
-    </fmt:bundle>
+</div>
+</fmt:bundle>
 </body>
 </html>

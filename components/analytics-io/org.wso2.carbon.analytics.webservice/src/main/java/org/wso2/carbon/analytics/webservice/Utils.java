@@ -18,7 +18,6 @@ package org.wso2.carbon.analytics.webservice;
 
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
-import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema.ColumnType;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
@@ -53,20 +52,25 @@ public class Utils {
     public static List<Record> getRecords(String username, List<RecordBean> recordBeans) throws AnalyticsException {
         List<Record> records = new ArrayList<>();
         int tenantId = getTenantId(username);
-        for (RecordBean recordBean : recordBeans) {
-            if (recordBean.getTableName().isEmpty()) {
-                throw new AnalyticsException("TableName cannot be empty!");
+        if (recordBeans != null) {
+            for (RecordBean recordBean : recordBeans) {
+                if (recordBean != null) {
+                    if (recordBean.getTableName().isEmpty()) {
+                        throw new AnalyticsException("TableName cannot be empty!");
+                    }
+                    records.add(new Record(recordBean.getId(), tenantId, recordBean.getTableName(), validateAndReturn(recordBean.getValues())));
+                }
             }
-            records.add(new Record(recordBean.getId(), tenantId, recordBean.getTableName(), validateAndReturn(recordBean.getValues())));
         }
         return records;
     }
 
-    private static Map<String, Object> validateAndReturn(RecordValueEntryBean[] values)
-            throws AnalyticsIndexException {
+    private static Map<String, Object> validateAndReturn(RecordValueEntryBean[] values) {
         Map<String, Object> valueMap = new LinkedHashMap<>();
-        for (RecordValueEntryBean recordEntry : values) {
-            valueMap.put(recordEntry.getFieldName(), getValue(recordEntry));
+        if (values != null) {
+            for (RecordValueEntryBean recordEntry : values) {
+                valueMap.put(recordEntry.getFieldName(), getValue(recordEntry));
+            }
         }
         return valueMap;
     }
@@ -79,9 +83,11 @@ public class Utils {
      */
     public static List<RecordBean> createRecordBeans(List<Record> records) {
         List<RecordBean> recordBeans = new ArrayList<>();
-        for (Record record : records) {
-            RecordBean recordBean = createRecordBean(record);
-            recordBeans.add(recordBean);
+        if (records != null) {
+            for (Record record : records) {
+                RecordBean recordBean = createRecordBean(record);
+                recordBeans.add(recordBean);
+            }
         }
         return recordBeans;
     }
@@ -97,7 +103,9 @@ public class Utils {
         recordBean.setId(record.getId());
         recordBean.setTableName(record.getTableName());
         recordBean.setTimestamp(record.getTimestamp());
-        recordBean.setValues(createRecordEntryBeans(record.getValues()));
+        if (record.getValues() != null) {
+            recordBean.setValues(createRecordEntryBeans(record.getValues()));
+        }
         return recordBean;
     }
 
@@ -129,8 +137,10 @@ public class Utils {
      */
     public static List<String> getRecordIds(List<SearchResultEntry> searchResults) {
         List<String> ids = new ArrayList<>();
-        for (SearchResultEntry searchResult : searchResults) {
-            ids.add(searchResult.getId());
+        if (searchResults != null) {
+            for (SearchResultEntry searchResult : searchResults) {
+                ids.add(searchResult.getId());
+            }
         }
         return ids;
     }
@@ -167,15 +177,12 @@ public class Utils {
      * @return Table schema bean
      */
     public static AnalyticsSchemaBean createTableSchemaBean(AnalyticsSchema analyticsSchema) {
-
         if (analyticsSchema == null) {
             return null;
         }
         List<SchemaColumnBean> columnBeans = new ArrayList<>();
-        List<String> primaryKeys = new ArrayList<>();
         if (analyticsSchema.getColumns() != null) {
-            for (Map.Entry<String, ColumnDefinition> columnTypeEntry :
-                    analyticsSchema.getColumns().entrySet()) {
+            for (Map.Entry<String, ColumnDefinition> columnTypeEntry : analyticsSchema.getColumns().entrySet()) {
                 SchemaColumnBean bean = new SchemaColumnBean();
                 bean.setColumnName(columnTypeEntry.getKey());
                 bean.setColumnType(getColumnTypeBean(columnTypeEntry.getValue()));
@@ -184,6 +191,7 @@ public class Utils {
                 columnBeans.add(bean);
             }
         }
+        List<String> primaryKeys = new ArrayList<>();
         if (analyticsSchema.getPrimaryKeys() != null) {
             primaryKeys = analyticsSchema.getPrimaryKeys();
         }
@@ -238,7 +246,6 @@ public class Utils {
      * @return ColumnTypeBean instance
      */
     private static String getColumnTypeBean(ColumnDefinition columnDefinition) {
-
         switch (columnDefinition.getType()) {
             case STRING:
                 return RecordValueEntryBean.STRING;

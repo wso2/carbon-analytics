@@ -30,9 +30,6 @@ public class Permissions {
     private boolean listRecord;
     private boolean putRecord;
     private boolean deleteRecord;
-    private boolean setIndex;
-    private boolean getIndex;
-    private boolean deleteIndex;
 
     public Permissions() {
     }
@@ -91,29 +88,5 @@ public class Permissions {
 
     public void setDeleteRecord(boolean deleteRecord) {
         this.deleteRecord = deleteRecord;
-    }
-
-    public boolean isSetIndex() {
-        return setIndex;
-    }
-
-    public void setSetIndex(boolean setIndex) {
-        this.setIndex = setIndex;
-    }
-
-    public boolean isGetIndex() {
-        return getIndex;
-    }
-
-    public void setGetIndex(boolean getIndex) {
-        this.getIndex = getIndex;
-    }
-
-    public boolean isDeleteIndex() {
-        return deleteIndex;
-    }
-
-    public void setDeleteIndex(boolean deleteIndex) {
-        this.deleteIndex = deleteIndex;
     }
 }
