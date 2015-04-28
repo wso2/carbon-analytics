@@ -23,6 +23,7 @@
         <module>components/analytics-processors</module>
         <module>components/analytics-data-agents</module>
         <module>components/analytics-views</module>
+        <module>components/analytics-tools</module>
         <module>features/analytics-data-agents</module>
         <module>features/analytics-core</module>
         <module>features/analytics-data-connectors</module>
@@ -207,6 +208,11 @@
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.dataservice</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.tools.backup</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>

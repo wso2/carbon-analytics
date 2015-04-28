@@ -129,7 +129,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     
     private static final String SHARD_INDEX_DATA_DELETE_RECORDS_TABLE_PREFIX = "__SHARD_INDEX_DELETE_RECORDS__";
 
-    private static final int SHARD_INDEX_DATA_RECORD_TENANT_ID = -1000;
+    public static final int SHARD_INDEX_DATA_RECORD_TENANT_ID = -1000;
     
     private static final String ANALYTICS_INDEXING_GROUP = "__ANALYTICS_INDEXING_GROUP__";
 

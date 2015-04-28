@@ -46,6 +46,27 @@
     <script src="js/messageconsole.js?version=<%= java.lang.Math.round(java.lang.Math.random() * 2) %>"
             type="text/javascript"></script>
 
+    <style media="screen" type="text/css">
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: rgba(255, 255, 255, .8) url('images/ajax-loader.gif') 50% 50% no-repeat;
+        }
+
+        body.loading {
+            overflow: hidden;
+        }
+
+        body.loading .modal {
+            display: block;
+        }
+    </style>
+
     <script type="text/javascript">
         var typeCreateRecord = '<%= MessageConsoleConnector.TYPE_CREATE_RECORD%>';
         var typeListRecord = '<%= MessageConsoleConnector.TYPE_LIST_RECORD%>';
@@ -97,7 +118,15 @@
         }
 
         $(document).ready(function () {
-            $.ajaxSetup({cache: false});
+            $.ajaxSetup({
+                beforeSend: function () {
+                    $("body").addClass("loading");
+                },
+                complete: function () {
+                    $("body").removeClass("loading");
+                },
+                cache: false
+            });
             loadTableSelect();
             $("#DeleteAllButton").hide();
             jQuery('#timeFrom').datetimepicker({
@@ -901,5 +930,6 @@
     </div>
 </div>
 </fmt:bundle>
+<div class="modal"></div>
 </body>
 </html>
