@@ -23,9 +23,7 @@ import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * JAXB configuration class for the analytics table schema for the Carbon application deployer.
@@ -44,8 +42,8 @@ public class AnalyticsTableSchemaConfiguration {
         this.columnDefinitions = columnDefinitions;
     }
 
-    private Map<String, ColumnDefinition> getColumnsMap() {
-        Map<String, ColumnDefinition> indexColMap = new HashMap<>();
+    private List<ColumnDefinition> getColumnsList() {
+        List<ColumnDefinition> indexColMap = new ArrayList<>();
         if (columnDefinitions != null) {
             for (AnalyticsColumnDefinition schemaColumn : columnDefinitions) {
                 ColumnDefinition columnDefinition = new ColumnDefinition();
@@ -53,7 +51,7 @@ public class AnalyticsTableSchemaConfiguration {
                 columnDefinition.setIndexed(schemaColumn.indexed);
                 columnDefinition.setScoreParam(schemaColumn.scoreParam);
                 columnDefinition.setType(schemaColumn.type);
-                indexColMap.put(schemaColumn.columnName, columnDefinition);
+                indexColMap.add(columnDefinition);
             }
         }
         return indexColMap;
@@ -72,7 +70,7 @@ public class AnalyticsTableSchemaConfiguration {
     }
 
     public AnalyticsSchema getAnalyticsSchema() {
-        return new AnalyticsSchema(getColumnsMap(), getPrimaryKeys());
+        return new AnalyticsSchema(getColumnsList(), getPrimaryKeys());
     }
 
     public static class AnalyticsColumnDefinition {
