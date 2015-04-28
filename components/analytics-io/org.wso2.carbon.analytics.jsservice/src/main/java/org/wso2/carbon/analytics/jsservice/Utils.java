@@ -18,13 +18,17 @@ package org.wso2.carbon.analytics.jsservice;
 
 import org.apache.axiom.om.util.Base64;
 import org.wso2.carbon.analytics.jsservice.beans.AnalyticsSchemaBean;
+import org.wso2.carbon.analytics.jsservice.beans.CategoryDrillDownRequestBean;
 import org.wso2.carbon.analytics.jsservice.beans.ColumnDefinitionBean;
 import org.wso2.carbon.analytics.jsservice.beans.ColumnTypeBean;
+import org.wso2.carbon.analytics.jsservice.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.jsservice.beans.Record;
 import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsCategoryPathBean;
+import org.wso2.carbon.analytics.webservice.stub.beans.CategorySearchResultEntryBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.RecordBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.RecordValueEntryBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.SchemaColumnBean;
+import org.wso2.carbon.analytics.webservice.stub.beans.SubCategoriesBean;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.user.api.UserRealm;
@@ -45,7 +49,7 @@ import java.util.Map;
  */
 public class Utils {
 
-    private static final String DEFAUL_CHARSETT = "UTF-8";
+    private static final String DEFAULT_CHARSET = "UTF-8";
 
     public static List<Record> getRecordBeans(RecordBean[] recordBeans) {
         List<Record> records = new ArrayList<>();
@@ -117,7 +121,7 @@ public class Utils {
     }
 
     private static AnalyticsCategoryPathBean validateAndReturn(Object value) {
-        List<String> pathList = (ArrayList<String>) value;
+        List<String> pathList = (List<String>) value;
         AnalyticsCategoryPathBean categoryPathBean = new AnalyticsCategoryPathBean();
         if (pathList != null && pathList.size() > 0) {
             String[] path = pathList.toArray(new String[pathList.size()]);
@@ -169,7 +173,7 @@ public class Utils {
             webservice.stub.beans.AnalyticsSchemaBean createAnalyticsSchema(AnalyticsSchemaBean analyticsSchemaBean) {
         org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsSchemaBean
                 schemaBean = new org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsSchemaBean();
- //       schemaBean.setColumns(createSchemaColumns(analyticsSchemaBean.getColumns()));
+        schemaBean.setColumns(createSchemaColumns(analyticsSchemaBean.getColumns()));
         schemaBean.setPrimaryKeys(createPrimaryKeys(analyticsSchemaBean.getPrimaryKeys()));
         return schemaBean;
     }
@@ -178,12 +182,14 @@ public class Utils {
         return primaryKeys.toArray(new String[primaryKeys.size()]);
     }
 
-    private static SchemaColumnBean[] createSchemaColumns(Map<String, ColumnTypeBean> columns) {
+    private static SchemaColumnBean[] createSchemaColumns(Map<String, ColumnDefinitionBean> columns) {
         List<SchemaColumnBean> columnBeans = new ArrayList<>();
-        for (Map.Entry<String, ColumnTypeBean> entry : columns.entrySet()) {
+        for (Map.Entry<String, ColumnDefinitionBean> entry : columns.entrySet()) {
             SchemaColumnBean bean = new SchemaColumnBean();
             bean.setColumnName(entry.getKey());
-            bean.setColumnType(entry.getValue().toString());
+            bean.setColumnType(entry.getValue().getType().toString());
+            bean.setIndex(entry.getValue().isIndex());
+            bean.setScoreParam(entry.getValue().isScoreParam());
             columnBeans.add(bean);
         }
         return columnBeans.toArray(new SchemaColumnBean[columnBeans.size()]);
@@ -202,7 +208,10 @@ public class Utils {
         if (analyticsSchema.getColumns() != null) {
             for (SchemaColumnBean columnBean :
                     analyticsSchema.getColumns()) {
-  //              columnDefinitions.put(columnBean.getColumnName(), getColumnTypeBean(columnBean.getColumnType()));
+                columnDefinitions.put(columnBean.getColumnName(),
+                                      getColumnTypeBean(columnBean.getColumnType(),
+                                                        columnBean.getIndex(),
+                                                        columnBean.getScoreParam()));
             }
         }
         if (analyticsSchema.getPrimaryKeys() != null) {
@@ -250,6 +259,43 @@ public class Utils {
         return bean;
     }
 
+    public static org.wso2.carbon.analytics.webservice.stub.beans.CategoryDrillDownRequestBean createCategoryDrillDownRequest(
+            CategoryDrillDownRequestBean queryBean) {
+        org.wso2.carbon.analytics.webservice.stub.beans.CategoryDrillDownRequestBean bean = new
+                org.wso2.carbon.analytics.webservice.stub.beans.CategoryDrillDownRequestBean();
+        bean.setTableName(queryBean.getTableName());
+        bean.setScoreFunction(queryBean.getScoreFunction());
+        bean.setPath(queryBean.getCategoryPath().toArray(new String[queryBean.getCategoryPath().size()]));
+        bean.setFieldName(queryBean.getFieldName());
+        bean.setQuery(queryBean.getQuery());
+        return bean;
+    }
+
+    public static org.wso2.carbon.analytics.webservice.stub.beans.CategoryDrillDownRequestBean createDrillDownSearchRequest(
+            DrillDownRequestBean queryBean) {
+        return null;
+
+    }
+
+    public static org.wso2.carbon.analytics.jsservice.beans.SubCategoriesBean getSubCategories(
+            SubCategoriesBean searchResults) {
+        org.wso2.carbon.analytics.jsservice.beans.SubCategoriesBean bean =
+                new org.wso2.carbon.analytics.jsservice.beans.SubCategoriesBean();
+        bean.setCategories(getCategories(searchResults.getCategories()));
+        bean.setCategoryPath(searchResults.getPath());
+        return bean;
+    }
+
+    private static List<String> getCategories(CategorySearchResultEntryBean[] categories) {
+        List<String> subCategories = new ArrayList<>();
+        if (categories != null) {
+            for (CategorySearchResultEntryBean bean : categories) {
+                subCategories.add(bean.getCategoryName());
+            }
+        }
+        return subCategories;
+    }
+
     public static String[] authenticate(String authHeader) throws UnauthenticatedUserException{
 
         String credentials[];
@@ -257,7 +303,7 @@ public class Utils {
             // Authorization: Basic base64credentials
             String base64Credentials = authHeader.substring(Constants.BASIC_AUTH_HEADER.length()).trim();
             String tempCredentials = new String(Base64.decode(base64Credentials),
-                                                Charset.forName(DEFAUL_CHARSETT));
+                                                Charset.forName(DEFAULT_CHARSET));
             // credentials = username:password
             final String[] values = tempCredentials.split(":", 2);
             String username = values[0];

@@ -153,9 +153,6 @@ public class MessageConsoleConnector {
             permissions.setPutRecord(permissionBean.getPutRecord());
             permissions.setSearchRecord(permissionBean.getSearchRecord());
             permissions.setDeleteRecord(permissionBean.getDeleteRecord());
-            permissions.setGetIndex(permissionBean.getGetIndex());
-            permissions.setSetIndex(permissionBean.getSetIndex());
-            permissions.setDeleteIndex(permissionBean.getDeleteIndex());
         } catch (Exception e) {
             throw new MessageConsoleException("Unable to check granted message console permissions due to: " + e
                     .getMessage(), e);
@@ -623,11 +620,16 @@ public class MessageConsoleConnector {
         try {
             RecordBean originalRecord = getRecordBean(table, recordId);
             if (originalRecord != null) {
-                RecordValueEntryBean[] columns = originalRecord.getValues();
-                RecordValueEntryBean[] newColumnsList = new RecordValueEntryBean[columns.length + 1];
                 int i = 0;
-                for (RecordValueEntryBean column : columns) {
-                    newColumnsList[i++] = column;
+                RecordValueEntryBean[] newColumnsList;
+                RecordValueEntryBean[] columns = originalRecord.getValues();
+                if (columns != null) {
+                    newColumnsList = new RecordValueEntryBean[columns.length + 1];
+                    for (RecordValueEntryBean column : columns) {
+                        newColumnsList[i++] = column;
+                    }
+                } else {
+                    newColumnsList = new RecordValueEntryBean[1];
                 }
                 RecordValueEntryBean newArbitraryField = new RecordValueEntryBean();
                 newArbitraryField.setFieldName(fieldName);

@@ -75,12 +75,6 @@ public class MessageConsoleService extends AbstractAdmin {
                                                                           CarbonConstants.UI_PERMISSION_ACTION));
             permission.setDeleteRecord(authorizationManager.isUserAuthorized(username, Constants.PERMISSION_DELETE_RECORD,
                                                                              CarbonConstants.UI_PERMISSION_ACTION));
-            permission.setSetIndex(authorizationManager.isUserAuthorized(username, Constants.PERMISSION_SET_INDEXING,
-                                                                         CarbonConstants.UI_PERMISSION_ACTION));
-            permission.setGetIndex(authorizationManager.isUserAuthorized(username, Constants.PERMISSION_GET_INDEXING,
-                                                                         CarbonConstants.UI_PERMISSION_ACTION));
-            permission.setDeleteIndex(authorizationManager.isUserAuthorized(username, Constants.PERMISSION_DELETE_INDEXING,
-                                                                            CarbonConstants.UI_PERMISSION_ACTION));
         } catch (UserStoreException e) {
             throw new MessageConsoleException("Unable to get user permission details due to " + e.getMessage(), e);
         }

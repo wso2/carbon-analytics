@@ -17,7 +17,6 @@
 package org.wso2.carbon.analytics.restapi;
 
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
@@ -57,26 +56,6 @@ import java.util.Map;
  * This class represents a set of utility functionalities for the analytics REST API.
  */
 public class Utils {
-
-    public static final int CATEGORYPATH_FIELD_COUNT = 2;
-    public static final float DEFAUL_CATEGORYPATH_WEIGHT = 1.0f;
-
-    /**
-     * Gets the analytics data service.
-     *
-     * @return the analytics data service
-     * @throws AnalyticsException
-     */
-    public static AnalyticsDataService getAnalyticsDataService() throws AnalyticsException {
-        AnalyticsDataService analyticsDataService;
-        analyticsDataService = (AnalyticsDataService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                .getOSGiService(AnalyticsDataService.class,
-                                null);
-        if (analyticsDataService == null) {
-            throw new AnalyticsException("AnalyticsDataService is not available.");
-        }
-        return analyticsDataService;
-    }
 
     /**
      * Gets the analytics data service.
@@ -309,7 +288,7 @@ public class Utils {
         bean.setCategoryPath(categories.getPath());
         List<String> subCategories = new ArrayList<>();
         for (CategorySearchResultEntry entry : categories.getCategories()) {
-            subCategories.add(entry.getCategoryName());
+            subCategories.add(entry.getCategoryValue());
         }
         bean.setCategories(subCategories);
         return bean;

@@ -143,15 +143,11 @@ public class AnalyticsDataIndexer implements GroupEventListener {
 
     private static final String INDEX_INTERNAL_SCORE_FIELD = "_score";
 
-    private static final String INDEX_INTERNAL_WEIGHT_FIELD = "_weight";
-
     private static final String NULL_INDEX_VALUE = "";
 
     private static final String EMPTY_FACET_VALUE = "EMPTY_FACET_VALUE!";
 
     private static final java.lang.String DEFAULT_SCORE = "1";
-
- //   private AnalyticsIndexDefinitionRepository repository;
     
     private Map<String, AnalyticsSchema> indexDefs = new HashMap<>();
 
@@ -710,11 +706,11 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         Map<String, Float> mergedResults = new LinkedHashMap<>();
         List<CategorySearchResultEntry> finalResult = new ArrayList<>();
         for (CategorySearchResultEntry perShardResults : searchResults) {
-                Float score = mergedResults.get(perShardResults.getCategoryName());
+                Float score = mergedResults.get(perShardResults.getCategoryValue());
                 if (score != null) {
                     score += perShardResults.getScore();
                 } else {
-                    mergedResults.put(perShardResults.getCategoryName(), perShardResults.getScore());
+                    mergedResults.put(perShardResults.getCategoryValue(), perShardResults.getScore());
                 }
         }
         for (Map.Entry<String, Float> entry : mergedResults.entrySet()) {
@@ -1167,6 +1163,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void checkAndAddTaxonomyDocEntries(Document doc, AnalyticsSchema.ColumnType type,
                                                    String name, Object obj,
                                                    FacetsConfig facetsConfig)
@@ -1202,30 +1199,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
         return config.build(taxonomyWriter, doc);
     }
-    
-    private void checkInvalidIndexNames(Set<String> columns) throws AnalyticsIndexException {
-        for (String column : columns) {
-            if (column.contains(" ")) {
-                throw new AnalyticsIndexException("Index columns cannot have a space in the name: '" + column + "'");
-            }
-        }
-        if (columns.contains(INDEX_ID_INTERNAL_FIELD)) {
-            throw new AnalyticsIndexException("The column index '" + INDEX_ID_INTERNAL_FIELD + 
-                    "' is a reserved name");
-        }
-        if (columns.contains(INDEX_INTERNAL_TIMESTAMP_FIELD)) {
-            throw new AnalyticsIndexException("The column index '" + INDEX_INTERNAL_TIMESTAMP_FIELD + 
-                    "' is a reserved name");
-        }
-        if (columns.contains(INDEX_INTERNAL_SCORE_FIELD)) {
-            throw new AnalyticsIndexException("The column index '" + INDEX_INTERNAL_SCORE_FIELD +
-                    "' is a reserved name");
-        }
-        if (columns.contains(INDEX_INTERNAL_WEIGHT_FIELD)) {
-            throw new AnalyticsIndexException("The column index '" + INDEX_INTERNAL_WEIGHT_FIELD +
-                    "' is a reserved name");
-        }
-    }
 
     public Map<String, ColumnDefinition> lookupIndices(int tenantId, String tableName) throws AnalyticsIndexException {
         AnalyticsSchema schema = this.indexDefs.get(tableName);
@@ -1236,8 +1209,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 this.indexDefs.put(tableName, schema);
             }
         } catch (AnalyticsException e) {
-            log.error("Error while looking up indices: " + e.getMessage(), e);
-            throw new AnalyticsIndexException("Error while looking up indices: " + e.getMessage(), e);
+            log.error("Error while looking up table Schema: " + e.getMessage(), e);
+            throw new AnalyticsIndexException("Error while looking up Table Schema: " + e.getMessage(), e);
         }
         indices = schema.getColumns();
         if (indices == null) {
@@ -1343,7 +1316,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     }
     
     public void clearIndexData(int tenantId, String tableName) throws AnalyticsIndexException {
-        String tableId = this.generateTableId(tenantId, tableName);
         /* delete all global index data, not only local ones */
         this.deleteIndexData(tenantId, tableName);
     }
@@ -1353,33 +1325,9 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return this.generateTableId(tenantId, tableName) + "/" + shardId;
     }
     
-    private boolean isShardedTableId(int tenantId, String tableName, String shardedTableId) {
-        return shardedTableId.startsWith(this.generateTableId(tenantId, tableName) + "/");
-    }
-    
     private String generateTableId(int tenantId, String tableName) {
         /* the table names are not case-sensitive */
         return tenantId + "_" + tableName.toLowerCase();
-    }
-    
-    private void clusterNoficationReceived(int tenantId, String tableName) throws AnalyticsIndexException {
-        /* remove the entry from the cache, this will force the next index operations to load
-         * the index definition from the back-end store, this makes sure, we have optimum cache cleanup
-         * and improves memory usage for tenant partitioning */
-        String tableId = this.generateTableId(tenantId, tableName);
-        this.indexDefs.remove(tableId);
-        this.scoreParams.remove(tableId);
-        this.closeAndRemoveIndexDirs(tenantId, tableName);
-    }
-    
-    private void closeAndRemoveIndexDirs(int tenantId, String tableName) throws AnalyticsIndexException {
-        Set<String> ids = new HashSet<String>();
-        for (String id : this.indexDirs.keySet()) {
-            if (this.isShardedTableId(tenantId, tableName, id)) {
-                ids.add(id);
-            }
-        }
-        this.closeAndRemoveIndexDirs(ids);
     }
     
     private void closeAndRemoveIndexDir(String tableId) throws AnalyticsIndexException {

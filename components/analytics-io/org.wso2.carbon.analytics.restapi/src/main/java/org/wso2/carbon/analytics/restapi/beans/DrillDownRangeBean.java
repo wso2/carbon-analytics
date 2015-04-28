@@ -40,12 +40,6 @@ public class DrillDownRangeBean {
 
     }
 
-    public DrillDownRangeBean(String label, double from, double to) {
-        this.label = label;
-        this.from = from;
-        this.to = to;
-    }
-
     public DrillDownRangeBean(String label, double from, double to, double score) {
         this.label = label;
         this.from = from;
@@ -55,10 +49,6 @@ public class DrillDownRangeBean {
 
     public double getFrom() {
         return from;
-    }
-
-    public void setFrom(double from) {
-        this.from = from;
     }
 
     public double getTo() {
@@ -71,17 +61,5 @@ public class DrillDownRangeBean {
 
     public String getLabel() {
         return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public double getScore() {
-        return score;
-    }
-
-    public void setScore(double score) {
-        this.score = score;
     }
 }

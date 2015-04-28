@@ -60,22 +60,10 @@ public class Constants {
 		}
 	}
 
-    public final static class FacetAttributes {
-
-        /** The constant representing weight attribute */
-        public static final String WEIGHT = "weight";
-
-        /**The constant representing path attribute */
-        public static final String PATH = "path";
-    }
-
     /**
      * The Class ResourcePath.
      */
     public static final class ResourcePath {
-
-        /** Token generator method name. */
-        public static final String GENERATE_TOKEN = "generate_token";
         
         /** The Constant root context. */
         public static final String ROOT_CONTEXT = "/";

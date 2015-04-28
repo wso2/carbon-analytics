@@ -30,6 +30,7 @@ import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfigPr
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfiguration;
 import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsDataIndexer;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
+import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -53,6 +54,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
@@ -64,6 +66,14 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private static final String ANALYTICS_DATASERVICE_GROUP = "__ANALYTICS_DATASERVICE_GROUP__";
     
     private static final String ANALYTICS_DS_CONFIG_FILE = "analytics-dataservice-config.xml";
+
+    public static final String INDEX_ID_INTERNAL_FIELD = "_id";
+
+    public static final String INDEX_INTERNAL_TIMESTAMP_FIELD = "_timestamp";
+
+    private static final String INDEX_INTERNAL_SCORE_FIELD = "_score";
+
+    private static final String INDEX_INTERNAL_WEIGHT_FIELD = "_weight";
     
     private AnalyticsRecordStore analyticsRecordStore;
     
@@ -146,6 +156,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public void setTableSchema(int tenantId, String tableName, AnalyticsSchema schema)
             throws AnalyticsTableNotAvailableException, AnalyticsException {
+        this.checkInvalidIndexNames(schema.getColumns());
+        this.checkInvalidScoreParams(schema.getColumns());
         this.getAnalyticsRecordStore().setTableSchema(tenantId, tableName, schema);
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         if (acm.isClusteringEnabled()) {
@@ -158,6 +170,50 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     
     private void invalidateAnalyticsSchema(int tenantId, String tableName) {
         this.schemaMap.remove(GenericUtils.calculateTableIdentity(tenantId, tableName));
+    }
+
+    private void checkInvalidIndexNames(Map<String, ColumnDefinition> columns) throws AnalyticsIndexException {
+        if (columns == null) {
+            return;
+        }
+        Set<String> columnNames = columns.keySet();
+        for (String column : columnNames) {
+            if (column.contains(" ")) {
+                throw new AnalyticsIndexException("Index columns cannot have a space in the name: '" + column + "'");
+            }
+        }
+        if (columnNames.contains(INDEX_ID_INTERNAL_FIELD)) {
+            throw new AnalyticsIndexException("The column index '" + INDEX_ID_INTERNAL_FIELD +
+                                              "' is a reserved name");
+        }
+        if (columnNames.contains(INDEX_INTERNAL_TIMESTAMP_FIELD)) {
+            throw new AnalyticsIndexException("The column index '" + INDEX_INTERNAL_TIMESTAMP_FIELD +
+                                              "' is a reserved name");
+        }
+        if (columnNames.contains(INDEX_INTERNAL_SCORE_FIELD)) {
+            throw new AnalyticsIndexException("The column index '" + INDEX_INTERNAL_SCORE_FIELD +
+                                              "' is a reserved name");
+        }
+        if (columnNames.contains(INDEX_INTERNAL_WEIGHT_FIELD)) {
+            throw new AnalyticsIndexException("The column index '" + INDEX_INTERNAL_WEIGHT_FIELD +
+                                              "' is a reserved name");
+        }
+    }
+
+    private void checkInvalidScoreParams(Map<String, ColumnDefinition> columns)
+            throws AnalyticsIndexException {
+        if (columns == null) {
+            return;
+        }
+        for (Map.Entry<String,ColumnDefinition> entry : columns.entrySet()) {
+            AnalyticsSchema.ColumnType type =  entry.getValue().getType();
+            if (type != AnalyticsSchema.ColumnType.DOUBLE && type != AnalyticsSchema.ColumnType.FLOAT &&
+                type != AnalyticsSchema.ColumnType.INTEGER && type != AnalyticsSchema.ColumnType.LONG &&
+                    entry.getValue().isScoreParam()) {
+                throw new AnalyticsIndexException("'" + entry.getKey() +
+                                                  "' is not indexed as a numeric column");
+            }
+        }
     }
     
     @Override

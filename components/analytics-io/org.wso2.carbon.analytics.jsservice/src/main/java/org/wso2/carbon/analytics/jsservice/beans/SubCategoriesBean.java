@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.analytics.restapi.beans;
+package org.wso2.carbon.analytics.jsservice.beans;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -50,5 +50,13 @@ public class SubCategoriesBean {
 
     public void setCategoryPath(String[] categoryPath) {
         this.categoryPath = categoryPath;
+    }
+
+    public String[] getCategoryPath() {
+        return categoryPath;
+    }
+
+    public List<String> getCategories() {
+        return categories;
     }
 }

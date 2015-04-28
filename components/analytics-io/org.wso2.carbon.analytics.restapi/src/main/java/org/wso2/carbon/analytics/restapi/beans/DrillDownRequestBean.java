@@ -52,10 +52,6 @@ public class DrillDownRequestBean {
         return tableName;
     }
 
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
-    }
-
     public List<DrillDownPathBean> getCategories() {
         if (categories == null) {
             return new ArrayList<>();
@@ -63,40 +59,20 @@ public class DrillDownRequestBean {
         return categories;
     }
 
-    public void setCategories(List<DrillDownPathBean> categories) {
-        this.categories = categories;
-    }
-
     public String getQuery() {
         return query;
-    }
-
-    public void setQuery(String query) {
-        this.query = query;
     }
 
     public String getScoreFunction() {
         return scoreFunction;
     }
 
-    public void setScoreFunction(String scoreFunction) {
-        this.scoreFunction = scoreFunction;
-    }
-
     public int getRecordCount() {
         return recordCount;
     }
 
-    public void setRecordCount(int recordCount) {
-        this.recordCount = recordCount;
-    }
-
     public int getRecordStart() {
         return recordStart;
-    }
-
-    public void setRecordStart(int recordStart) {
-        this.recordStart = recordStart;
     }
 
     public List<DrillDownRangeBean> getRanges() {
@@ -106,15 +82,7 @@ public class DrillDownRequestBean {
         return ranges;
     }
 
-    public void setRanges(List<DrillDownRangeBean> ranges) {
-        this.ranges = ranges;
-    }
-
     public String getRangeField() {
         return rangeField;
-    }
-
-    public void setRangeField(String rangeField) {
-        this.rangeField = rangeField;
     }
 }

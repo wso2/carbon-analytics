@@ -34,35 +34,8 @@ public class PermissionBean implements Serializable {
     private boolean listRecord;
     private boolean putRecord;
     private boolean deleteRecord;
-    private boolean setIndex;
-    private boolean getIndex;
-    private boolean deleteIndex;
 
     public PermissionBean() {
-    }
-
-    public boolean isDeleteIndex() {
-        return deleteIndex;
-    }
-
-    public void setDeleteIndex(boolean deleteIndex) {
-        this.deleteIndex = deleteIndex;
-    }
-
-    public boolean isGetIndex() {
-        return getIndex;
-    }
-
-    public void setGetIndex(boolean getIndex) {
-        this.getIndex = getIndex;
-    }
-
-    public boolean isSetIndex() {
-        return setIndex;
-    }
-
-    public void setSetIndex(boolean setIndex) {
-        this.setIndex = setIndex;
     }
 
     public boolean isDeleteRecord() {

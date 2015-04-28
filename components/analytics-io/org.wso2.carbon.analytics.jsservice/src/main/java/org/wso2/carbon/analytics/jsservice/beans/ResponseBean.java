@@ -46,27 +46,9 @@ public class ResponseBean {
 	/**
 	 * Instantiates a new response bean.
 	 * @param status the status
-	 * @param message the message
-	 */
-	public ResponseBean(String status, String message) {
-		this.status = status;
-		this.message = message;
-	}
-
-	/**
-	 * Instantiates a new response bean.
-	 * @param status the status
 	 */
 	public ResponseBean(String status) {
 		this.status = status;
-	}
-
-	/**
-	 * Gets the status.
-	 * @return the status
-	 */
-	public String getStatus() {
-		return status;
 	}
 
 	/**

@@ -463,7 +463,7 @@ public class AnalyticsWebService extends AbstractAdmin {
         int i = 0;
         for (CategorySearchResultEntry searchResultEntry : subCategories.getCategories()) {
             CategorySearchResultEntryBean resultEntryBean = new CategorySearchResultEntryBean();
-            resultEntryBean.setCategoryName(searchResultEntry.getCategoryName());
+            resultEntryBean.setCategoryName(searchResultEntry.getCategoryValue());
             resultEntryBean.setScore(searchResultEntry.getScore());
             searchResultEntryBeans[i++] = resultEntryBean;
         }

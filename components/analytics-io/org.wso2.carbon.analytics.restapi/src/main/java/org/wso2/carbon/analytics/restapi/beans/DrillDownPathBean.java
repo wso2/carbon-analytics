@@ -48,26 +48,6 @@ public class DrillDownPathBean {
     private  String fieldName;
 
     /**
-     * Create a hierarchical fieldName with a given path and fieldName with 1.0.
-     * Use this constructor when the categoryPaths need to be given for drill down search
-     * in DrillDownRequest objects
-     * @param path array of strings representing the fieldName path.
-     */
-    public DrillDownPathBean(String[] path) {
-        this.path = path;
-    }
-    /**
-     * Creates a hierarchical Category with the given fieldName and the array of Strings representing
-     * the hierarchical fieldName
-     * @param fieldName Weight of the fieldName, set it to 1.0 if weights are not necessary
-     * @param path String array which represent the fieldName path.
-     */
-    public DrillDownPathBean(String fieldName, String[] path) {
-        this.fieldName = fieldName;
-        this.path = path;
-    }
-
-    /**
      * This constructor is for jax-rs json serialization/deserialization
      */
     public DrillDownPathBean() {
@@ -78,19 +58,7 @@ public class DrillDownPathBean {
         return path;
     }
 
-    public void setPath(String[] path) {
-        this.path = path;
-    }
-
     public String getFieldName() {
         return fieldName;
-    }
-
-    /**
-     * Set a fieldName for the facet fieldName
-     * @param fieldName fieldName in float ( set is as 1.0 if weights are not needed)
-     */
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
     }
 }

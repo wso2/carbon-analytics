@@ -57,27 +57,11 @@ public class QueryBean {
 	}
 
 	/**
-	 * Sets the table name.
-	 * @param tableName the new table name
-	 */
-	public void setTableName(String tableName) {
-		this.tableName = tableName;
-	}
-
-	/**
 	 * Gets the columns.
 	 * @return the columns
 	 */
 	public Map<String, ColumnTypeBean> getColumns() {
 		return columns;
-	}
-
-	/**
-	 * Sets the columns.
-	 * @param columns the columns
-	 */
-	public void setColumns(Map<String, ColumnTypeBean> columns) {
-		this.columns = columns;
 	}
 
 	/**
@@ -89,14 +73,6 @@ public class QueryBean {
 	}
 
 	/**
-	 * Sets the query.
-	 * @param query the new query
-	 */
-	public void setQuery(String query) {
-		this.query = query;
-	}
-
-	/**
 	 * Gets the start.
 	 * @return the start
 	 */
@@ -105,26 +81,10 @@ public class QueryBean {
 	}
 
 	/**
-	 * Sets the start.
-	 * @param start the new start
-	 */
-	public void setStart(int start) {
-		this.start = start;
-	}
-
-	/**
 	 * Gets the count.
 	 * @return the count
 	 */
 	public int getCount() {
 		return count;
-	}
-
-	/**
-	 * Sets the count.
-	 * @param count the new count
-	 */
-	public void setCount(int count) {
-		this.count = count;
 	}
 }
