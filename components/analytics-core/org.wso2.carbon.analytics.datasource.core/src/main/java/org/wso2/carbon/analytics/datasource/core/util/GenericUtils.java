@@ -387,7 +387,7 @@ public class GenericUtils {
     public static String generateRecordID() {
         StringBuilder builder = new StringBuilder();
         builder.append(System.currentTimeMillis());
-        builder.append(Math.random());
+        builder.append(Math.random() * Math.random());
         return builder.toString();
     }
 
