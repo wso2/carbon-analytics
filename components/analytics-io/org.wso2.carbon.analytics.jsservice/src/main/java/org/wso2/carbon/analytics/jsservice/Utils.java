@@ -58,12 +58,14 @@ public class Utils {
 
     public static List<Record> getRecordBeans(RecordBean[] recordBeans) {
         List<Record> records = new ArrayList<>();
-        for (RecordBean recordBean : recordBeans) {
-            Record record = new Record();
-            record.setId(recordBean.getId());
-            record.setTableName(recordBean.getTableName());
-            record.setValues(validateAndReturn(recordBean.getValues()));
-            records.add(record);
+        if (recordBeans != null) {
+            for (RecordBean recordBean : recordBeans) {
+                Record record = new Record();
+                record.setId(recordBean.getId());
+                record.setTableName(recordBean.getTableName());
+                record.setValues(validateAndReturn(recordBean.getValues()));
+                records.add(record);
+            }
         }
         return records;
     }
@@ -270,7 +272,10 @@ public class Utils {
                 org.wso2.carbon.analytics.webservice.stub.beans.CategoryDrillDownRequestBean();
         bean.setTableName(tableName);
         bean.setScoreFunction(queryBean.getScoreFunction());
-        bean.setPath(queryBean.getCategoryPath().toArray(new String[queryBean.getCategoryPath().size()]));
+        List<String> drillDownPath = queryBean.getCategoryPath();
+        if (drillDownPath != null) {
+            bean.setPath(drillDownPath.toArray(new String[drillDownPath.size()]));
+        }
         bean.setFieldName(queryBean.getFieldName());
         bean.setQuery(queryBean.getQuery());
         return bean;
@@ -293,12 +298,14 @@ public class Utils {
     private static AnalyticsDrillDownRangeBean[] createRanges(
             List<DrillDownRangeBean> ranges) {
         List<AnalyticsDrillDownRangeBean> beans = new ArrayList<>();
-        for (DrillDownRangeBean range : ranges) {
-            AnalyticsDrillDownRangeBean bean = new AnalyticsDrillDownRangeBean();
-            bean.setFrom(range.getFrom());
-            bean.setTo(range.getTo());
-            bean.setLabel(range.getLabel());
-            beans.add(bean);
+        if (ranges != null) {
+            for (DrillDownRangeBean range : ranges) {
+                AnalyticsDrillDownRangeBean bean = new AnalyticsDrillDownRangeBean();
+                bean.setFrom(range.getFrom());
+                bean.setTo(range.getTo());
+                bean.setLabel(range.getLabel());
+                beans.add(bean);
+            }
         }
         return beans.toArray(new AnalyticsDrillDownRangeBean[beans.size()]);
     }

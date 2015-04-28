@@ -99,7 +99,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             throw new AnalyticsException("Error in creating analytics data service from configuration: " + 
                     e.getMessage(), e);
         }
-        this.indexer = new AnalyticsDataIndexer(this.analyticsRecordStore, this.analyticsFileSystem, config.getShardCount(), luceneAnalyzer);
+        this.indexer = new AnalyticsDataIndexer(this.analyticsRecordStore, this.analyticsFileSystem, this,
+                                                config.getShardCount(), luceneAnalyzer);
         AnalyticsServiceHolder.setAnalyticsDataService(this);
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         if (acm.isClusteringEnabled()) {
@@ -219,7 +220,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public AnalyticsSchema getTableSchema(int tenantId, String tableName) throws AnalyticsTableNotAvailableException,
             AnalyticsException {
-        return this.getAnalyticsRecordStore().getTableSchema(tenantId, tableName);
+        return this.lookupSchema(tenantId, tableName);
     }
 
     @Override
