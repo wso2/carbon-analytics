@@ -21,9 +21,14 @@ import org.wso2.carbon.analytics.jsservice.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.jsservice.beans.CategoryDrillDownRequestBean;
 import org.wso2.carbon.analytics.jsservice.beans.ColumnDefinitionBean;
 import org.wso2.carbon.analytics.jsservice.beans.ColumnTypeBean;
+import org.wso2.carbon.analytics.jsservice.beans.DrillDownPathBean;
+import org.wso2.carbon.analytics.jsservice.beans.DrillDownRangeBean;
 import org.wso2.carbon.analytics.jsservice.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.jsservice.beans.Record;
 import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsCategoryPathBean;
+import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsDrillDownRangeBean;
+import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsDrillDownRequestBean;
+import org.wso2.carbon.analytics.webservice.stub.beans.CategoryPathBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.CategorySearchResultEntryBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.RecordBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.RecordValueEntryBean;
@@ -271,10 +276,42 @@ public class Utils {
         return bean;
     }
 
-    public static org.wso2.carbon.analytics.webservice.stub.beans.CategoryDrillDownRequestBean createDrillDownSearchRequest(
+    public static AnalyticsDrillDownRequestBean createDrillDownSearchRequest(
             DrillDownRequestBean queryBean) {
-        return null;
+        AnalyticsDrillDownRequestBean bean = new AnalyticsDrillDownRequestBean();
+        bean.setTableName(queryBean.getTableName());
+        bean.setQuery(queryBean.getQuery());
+        bean.setScoreFunction(queryBean.getScoreFunction());
+        bean.setRecordCount(queryBean.getRecordCount());
+        bean.setRecordStart(queryBean.getRecordStart());
+        bean.setRangeField(queryBean.getRangeField());
+        bean.setCategoryPaths(createCategoryPathBeans(queryBean.getCategories()));
+        bean.setRanges(createRanges(queryBean.getRanges()));
+        return bean;
+    }
 
+    private static AnalyticsDrillDownRangeBean[] createRanges(
+            List<DrillDownRangeBean> ranges) {
+        List<AnalyticsDrillDownRangeBean> beans = new ArrayList<>();
+        for (DrillDownRangeBean range : ranges) {
+            AnalyticsDrillDownRangeBean bean = new AnalyticsDrillDownRangeBean();
+            bean.setFrom(range.getFrom());
+            bean.setTo(range.getTo());
+            bean.setLabel(range.getLabel());
+            beans.add(bean);
+        }
+        return beans.toArray(new AnalyticsDrillDownRangeBean[beans.size()]);
+    }
+
+    private static CategoryPathBean[] createCategoryPathBeans(List<DrillDownPathBean> categories) {
+        List<CategoryPathBean> beans = new ArrayList<>();
+        for (DrillDownPathBean category : categories) {
+            CategoryPathBean bean = new CategoryPathBean();
+            bean.setFieldName(category.getFieldName());
+            bean.setPath(category.getPath());
+            beans.add(bean);
+        }
+        return beans.toArray(new CategoryPathBean[beans.size()]);
     }
 
     public static org.wso2.carbon.analytics.jsservice.beans.SubCategoriesBean getSubCategories(

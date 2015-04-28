@@ -505,30 +505,59 @@ public class AnalyticsWebServiceConnector {
             try {
                 DrillDownRequestBean queryBean =
                         gson.fromJson(queryAsString,DrillDownRequestBean.class);
-                org.wso2.carbon.analytics.webservice.stub.beans.CategoryDrillDownRequestBean requestBean =
+                org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsDrillDownRequestBean requestBean =
                         Utils.createDrillDownSearchRequest(queryBean);
-                org.wso2.carbon.analytics.webservice.stub.beans.SubCategoriesBean searchResults =
-                        analyticsWebServiceStub.drillDownCategories(requestBean);
-                SubCategoriesBean subCategories = Utils.getSubCategories(searchResults);
+                RecordBean[] records =
+                        analyticsWebServiceStub.drillDownSearch(requestBean);
+                List<Record> recordBeans = Utils.getRecordBeans(records);
                 if (logger.isDebugEnabled()) {
-                    logger.debug("DrilldownCategory Result -- path: " + subCategories.getCategoryPath() +
-                                 " values :" + subCategories.getCategories());
-
+                    for (Record record : recordBeans) {
+                        logger.debug("Drilldown Search Result -- Record Id: " + record.getId() + " values :" +
+                                     record.toString());
+                    }
                 }
-                return gson.toJson(subCategories);
+                return gson.toJson(recordBeans);
             } catch (Exception e) {
-                logger.error("Failed to perform categoryDrilldown on table: " + tableName + " : " +
+                logger.error("Failed to perform DrilldownSearch on table: " + tableName + " : " +
                              e.getMessage(), e);
                 return gson.toJson(handleResponse(ResponseStatus.FAILED,
-                                                  "Failed to perform Category Drilldown on table: " +
+                                                  "Failed to perform DrilldownSearch on table: " +
                                                   tableName + ": " + e.getMessage()));
             }
         } else {
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Category drilldown parameters " +
+            return gson.toJson(handleResponse(ResponseStatus.FAILED, "drilldownSearch parameters " +
                                                                      "are not provided"));
         }
     }
 
+    public String drillDownSearchCount(String tableName, String queryAsString) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Invoking drillDownCategories for tableName : " + tableName);
+        }
+        if (queryAsString != null) {
+            try {
+                DrillDownRequestBean queryBean =
+                        gson.fromJson(queryAsString,DrillDownRequestBean.class);
+                org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsDrillDownRequestBean requestBean =
+                        Utils.createDrillDownSearchRequest(queryBean);
+                int count =
+                        analyticsWebServiceStub.drillDownSearchCount(requestBean);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Search count Result -- Record Count: " + count);
+                }
+                return gson.toJson(count);
+            } catch (Exception e) {
+                logger.error("Failed to perform DrilldownSearch Count on table: " + tableName + " : " +
+                             e.getMessage(), e);
+                return gson.toJson(handleResponse(ResponseStatus.FAILED,
+                                                  "Failed to perform DrilldownSearch Count on table: " +
+                                                  tableName + ": " + e.getMessage()));
+            }
+        } else {
+            return gson.toJson(handleResponse(ResponseStatus.FAILED, "drilldownSearch parameters " +
+                                                                     "are not provided"));
+        }
+    }
 
     public ResponseBean handleResponse(ResponseStatus responseStatus, String message) {
         ResponseBean response;
