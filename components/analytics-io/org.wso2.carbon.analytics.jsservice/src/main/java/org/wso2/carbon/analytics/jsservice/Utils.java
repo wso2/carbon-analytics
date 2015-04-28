@@ -169,7 +169,7 @@ public class Utils {
             webservice.stub.beans.AnalyticsSchemaBean createAnalyticsSchema(AnalyticsSchemaBean analyticsSchemaBean) {
         org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsSchemaBean
                 schemaBean = new org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsSchemaBean();
- //       schemaBean.setColumns(createSchemaColumns(analyticsSchemaBean.getColumns()));
+        schemaBean.setColumns(createSchemaColumns(analyticsSchemaBean.getColumns()));
         schemaBean.setPrimaryKeys(createPrimaryKeys(analyticsSchemaBean.getPrimaryKeys()));
         return schemaBean;
     }

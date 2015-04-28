@@ -1249,8 +1249,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 this.indexDefs.put(tableName, schema);
             }
         } catch (AnalyticsException e) {
-            log.error("Error while looking up indices: " + e.getMessage(), e);
-            throw new AnalyticsIndexException("Error while looking up indices: " + e.getMessage(), e);
+            log.error("Error while looking up table Schema: " + e.getMessage(), e);
+            throw new AnalyticsIndexException("Error while looking up Table Schema: " + e.getMessage(), e);
         }
         indices = schema.getColumns();
         if (indices == null) {
