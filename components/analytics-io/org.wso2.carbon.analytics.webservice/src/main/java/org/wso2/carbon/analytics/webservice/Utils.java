@@ -34,7 +34,6 @@ import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,6 +101,7 @@ public class Utils {
         return recordBean;
     }
 
+    @SuppressWarnings("unchecked")
     private static RecordValueEntryBean[] createRecordEntryBeans(Map<String, Object> values) {
         List<RecordValueEntryBean> beans = new ArrayList<>(values.size());
         for (Map.Entry<String, Object> entry : values.entrySet()) {
@@ -142,16 +142,15 @@ public class Utils {
      * @return Analytics schema
      */
     public static AnalyticsSchema createAnalyticsSchema(AnalyticsSchemaBean analyticsSchemaBean) {
-        Map<String, ColumnDefinition> columnTypes = null;
+        List<ColumnDefinition> columnTypes = null;
         if (analyticsSchemaBean == null) {
             return null;
         }
         if (analyticsSchemaBean.getColumns() != null) {
-            columnTypes = new HashMap<>();
+            columnTypes = new ArrayList<>();
             for (SchemaColumnBean columnBean : analyticsSchemaBean.getColumns()) {
-                columnTypes.put(columnBean.getColumnName(),
-                                getColumnDefinition(columnBean.getColumnType(), columnBean.isIndex(),
-                                                    columnBean.isScoreParam()));
+                columnTypes.add(getColumnDefinition(columnBean.getColumnName(), columnBean.getColumnType(), 
+                        columnBean.isIndex(), columnBean.isScoreParam()));
             }
         }
         List<String> primaryKeys = null;
@@ -193,12 +192,9 @@ public class Utils {
     }
 
     /**
-     * convert a column type bean to ColumnType
-     *
-     * @param type ColumnType Bean to be converted to ColumnType
-     * @return ColumnType instance
+     * Converts a column type bean to ColumnType.
      */
-    private static ColumnDefinition getColumnDefinition(String type, boolean isIndex,
+    private static ColumnDefinition getColumnDefinition(String name, String type, boolean isIndex,
                                                         boolean isScoreParam) {
         ColumnDefinition columnDefinition = new ColumnDefinition();
         switch (type) {
@@ -229,6 +225,7 @@ public class Utils {
             default:
                 columnDefinition.setType(ColumnType.STRING);
         }
+        columnDefinition.setName(name);
         columnDefinition.setIndexed(isIndex);
         columnDefinition.setScoreParam(isScoreParam);
         return columnDefinition;

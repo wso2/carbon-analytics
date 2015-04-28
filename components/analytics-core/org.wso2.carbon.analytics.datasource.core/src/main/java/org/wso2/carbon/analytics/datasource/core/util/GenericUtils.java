@@ -41,6 +41,7 @@ import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.xml.bind.JAXBContext;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -161,6 +162,7 @@ public class GenericUtils {
         return secondaryBuffer.array();
     }
 
+    @SuppressWarnings("unchecked")
     public static byte[] encodeElement(String name, Object value) throws AnalyticsException {
         ByteBuffer buffer = ByteBuffer.allocate(calculateBufferSizePerElement(name, value));
         String strVal;
@@ -199,7 +201,7 @@ public class GenericUtils {
                 binData = (byte[]) value;
                 buffer.putInt(binData.length);
                 buffer.put(binData);
-            } else if (value instanceof List) {
+            } else if (value instanceof List<?>) {
                 buffer.put(DATA_TYPE_CATEGORY);
                 List<String> analyticsCategoryPath = (List<String>) value;
                 binData = GenericUtils.serializeObject(analyticsCategoryPath);
@@ -217,6 +219,7 @@ public class GenericUtils {
         return buffer.array();
     }
 
+    @SuppressWarnings("unchecked")
     private static int calculateBufferSizePerElement(String name, Object value) throws AnalyticsException {
         int count = 0;
          /* column name length value + data type (including null) */
@@ -241,7 +244,7 @@ public class GenericUtils {
             } else if (value instanceof byte[]) {
                 count += Integer.SIZE / 8;
                 count += ((byte[]) value).length;
-            } else if (value instanceof List) {
+            } else if (value instanceof List<?>) {
                 count += Integer.SIZE / 8;
                 List<String> analyticsCategoryPath = (List<String>) value;
                 count += GenericUtils.serializeObject(analyticsCategoryPath).length;

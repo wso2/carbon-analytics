@@ -47,10 +47,10 @@ public class AnalyticsDSConnector {
     }
 
     private AnalyticsSchema getSchema(StreamDefinition streamDefinition) {
-        Map<String, ColumnDefinition> columns = new HashMap<>();
-        ColumnDefinition keyColumnDef = new ColumnDefinition();
-        keyColumnDef.setType(AnalyticsSchema.ColumnType.STRING);
-        columns.put(AnalyticsDatasinkConstants.STREAM_VERSION_KEY, keyColumnDef);
+        List<ColumnDefinition> columns = new ArrayList<>();
+        ColumnDefinition keyColumnDef = new ColumnDefinition(AnalyticsDatasinkConstants.STREAM_VERSION_KEY, 
+                AnalyticsSchema.ColumnType.STRING);
+        columns.add(keyColumnDef);
         populateColumnSchema(AnalyticsDatasinkConstants.EVENT_META_DATA_TYPE,
                 streamDefinition.getMetaData(), columns);
         populateColumnSchema(AnalyticsDatasinkConstants.EVENT_CORRELATION_DATA_TYPE,
@@ -124,45 +124,37 @@ public class AnalyticsDSConnector {
         }
     }
 
-    private void populateColumnSchema(String type, List<Attribute> attributes, Map<String, ColumnDefinition> schema) {
+    private void populateColumnSchema(String type, List<Attribute> attributes, List<ColumnDefinition> schema) {
         if (attributes == null) {
             return;
         }
         AnalyticsSchema.ColumnType columnType;
-        ColumnDefinition columnDefinition = new ColumnDefinition();
         String columnName;
         for (Attribute attribute : attributes) {
             columnName = getAttributeKey(type, attribute.getName());
             switch (attribute.getType()) {
                 case STRING:
                     columnType = AnalyticsSchema.ColumnType.STRING;
-                    columnDefinition.setType(columnType);
                     break;
                 case BOOL:
                     columnType = AnalyticsSchema.ColumnType.BOOLEAN;
-                    columnDefinition.setType(columnType);
                     break;
                 case DOUBLE:
                     columnType = AnalyticsSchema.ColumnType.DOUBLE;
-                    columnDefinition.setType(columnType);
                     break;
                 case FLOAT:
                     columnType = AnalyticsSchema.ColumnType.FLOAT;
-                    columnDefinition.setType(columnType);
                     break;
                 case INT:
                     columnType = AnalyticsSchema.ColumnType.INTEGER;
-                    columnDefinition.setType(columnType);
                     break;
                 case LONG:
                     columnType = AnalyticsSchema.ColumnType.LONG;
-                    columnDefinition.setType(columnType);
                     break;
                 default:
-                    columnType = AnalyticsSchema.ColumnType.BINARY;
-                    columnDefinition.setType(columnType);
+                    columnType = AnalyticsSchema.ColumnType.STRING;
             }
-            schema.put(columnName, columnDefinition);
+            schema.add(new ColumnDefinition(columnName, columnType));
         }
     }
 

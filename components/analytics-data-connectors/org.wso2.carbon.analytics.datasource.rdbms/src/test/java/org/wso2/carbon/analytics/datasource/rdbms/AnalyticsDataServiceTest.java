@@ -30,6 +30,7 @@ import org.wso2.carbon.analytics.dataservice.commons.IndexType;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema.ColumnType;
+import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
@@ -71,18 +72,21 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
     }
     
     private void indexAddRetrieve(int tenantId) throws AnalyticsException {
-//        this.service.clearIndices(tenantId, "T1");
-        Map<String, IndexType> columns = new HashMap<String, IndexType>();
-        columns.put("C1", IndexType.STRING);
-        columns.put("C2", IndexType.STRING);
-        columns.put("C3", IndexType.INTEGER);
-        columns.put("C4", IndexType.LONG);
-        columns.put("C5", IndexType.DOUBLE);
-        columns.put("C6", IndexType.FLOAT);
-//        this.service.setIndices(tenantId, "T1", columns);
-//        Map<String, IndexType> columnsIn = service.getIndices(tenantId, "T1");
-//        Assert.assertEquals(columnsIn, columns);
-//        this.service.clearIndices(tenantId, "T1");
+        this.service.setTableSchema(tenantId, "T1", new AnalyticsSchema());
+        List<ColumnDefinition> columns = new ArrayList<>();
+        columns.add(new ColumnDefinition("C1", ColumnType.STRING));
+        columns.add(new ColumnDefinition("C2", ColumnType.BOOLEAN));
+        columns.add(new ColumnDefinition("C3", ColumnType.INTEGER));
+        columns.add(new ColumnDefinition("C4", ColumnType.LONG));
+        columns.add(new ColumnDefinition("C5", ColumnType.FLOAT));
+        columns.add(new ColumnDefinition("C6", ColumnType.DOUBLE));
+        columns.add(new ColumnDefinition("C7", ColumnType.BINARY));
+        columns.add(new ColumnDefinition("C8", ColumnType.FACET));
+        AnalyticsSchema schema = new AnalyticsSchema(columns, null);
+        this.service.setTableSchema(tenantId, "T1", schema);
+        AnalyticsSchema schemaIn = this.service.getTableSchema(tenantId, "T1");
+        Assert.assertEquals(schemaIn, schemaIn);
+        this.service.setTableSchema(tenantId, "T1", new AnalyticsSchema());
     }
     
     private void cleanupTable(int tenantId, String tableName) throws AnalyticsException {

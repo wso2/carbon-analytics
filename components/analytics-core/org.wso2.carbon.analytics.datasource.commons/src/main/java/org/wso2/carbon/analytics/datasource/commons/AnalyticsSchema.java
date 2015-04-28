@@ -19,6 +19,7 @@
 package org.wso2.carbon.analytics.datasource.commons;
 
 import java.io.Serializable;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,12 +32,17 @@ public class AnalyticsSchema implements Serializable {
 
     private Map<String, ColumnDefinition> columns;
     
+    /** primary keys are set separately rather than having in {@link ColumnDefinition} 
+     * to optimize the lookup of just the primary keys when required */
     private List<String> primaryKeys;
     
     public AnalyticsSchema() { }
     
-    public AnalyticsSchema(Map<String, ColumnDefinition> columns, List<String> primaryKeys) {
-        this.columns = columns;
+    public AnalyticsSchema(List<ColumnDefinition> columns, List<String> primaryKeys) {
+        this.columns = new LinkedHashMap<>(columns.size());
+        for (ColumnDefinition column : columns) {
+            this.columns.put(column.getName(), column);
+        }
         this.primaryKeys = primaryKeys;
     }
     

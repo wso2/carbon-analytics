@@ -116,6 +116,7 @@ public class Utils {
         return records;
     }
 
+    @SuppressWarnings("unchecked")
     private static Map<String, Object> validateAndReturn(Map<String, Object> values)
             throws AnalyticsIndexException {
         Map<String, Object> valueMap = new LinkedHashMap<>(0);
@@ -243,9 +244,9 @@ public class Utils {
      * @return Analytics schema
      */
     public static AnalyticsSchema createAnalyticsSchema(AnalyticsSchemaBean analyticsSchemaBean) {
-        Map<String, ColumnDefinition> columnDefinitions = new HashMap<>();
+        List<ColumnDefinition> columnDefinitions = new ArrayList<>();
         for (Map.Entry<String, ColumnDefinitionBean> entry : analyticsSchemaBean.getColumns().entrySet()) {
-            columnDefinitions.put(entry.getKey(), getColumnType(entry.getValue()));
+            columnDefinitions.add(getColumnType(entry.getKey(), entry.getValue()));
         }
         return new AnalyticsSchema(columnDefinitions, analyticsSchemaBean.getPrimaryKeys());
     }
@@ -352,12 +353,13 @@ public class Utils {
     }
 
     /**
-     * convert a column type bean to ColumnType
+     * Converts a column type bean to ColumnType.
      *
+     * @param name The name of the column
      * @param columnDefinitionBean ColumnType Bean to be converted to ColumnType
      * @return ColumnType instance
      */
-    private static ColumnDefinition getColumnType(ColumnDefinitionBean columnDefinitionBean) {
+    private static ColumnDefinition getColumnType(String name, ColumnDefinitionBean columnDefinitionBean) {
         ColumnDefinition columnDefinition = new ColumnDefinition();
         switch (columnDefinitionBean.getType()) {
             case STRING:
@@ -387,7 +389,7 @@ public class Utils {
             default:
                 columnDefinition.setType(AnalyticsSchema.ColumnType.STRING);
         }
-
+        columnDefinition.setName(name);
         columnDefinition.setIndexed(columnDefinitionBean.isIndex());
         columnDefinition.setScoreParam(columnDefinitionBean.isScoreParam());
         return columnDefinition;
