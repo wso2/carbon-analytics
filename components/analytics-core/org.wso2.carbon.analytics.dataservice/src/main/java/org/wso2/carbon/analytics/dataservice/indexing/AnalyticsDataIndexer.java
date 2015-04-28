@@ -176,7 +176,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         this.analyticsRecordStore = analyticsRecordStore;    	
     	this.analyticsFileSystem = analyticsFileSystem;
     	this.shardCount = shardCount;
-    //    this.repository = new AnalyticsIndexDefinitionRepository(this.getFileSystem());
     }
     
     /**
@@ -241,10 +240,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     public int getShardCount() {
         return shardCount;
     }
-    
-//    public AnalyticsIndexDefinitionRepository getRepository() {
-//        return repository;
-//    }
     
     private void insertIndexOperationRecords(List<Record> indexOpRecords) throws AnalyticsException {
         /* each record will be in its own table */
