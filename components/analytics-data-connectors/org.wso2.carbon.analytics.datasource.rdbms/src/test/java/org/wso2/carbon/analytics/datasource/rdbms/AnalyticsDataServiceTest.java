@@ -457,12 +457,12 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         System.out.println("\n************** END ANALYTICS DS (WITH INDEXING, H2-FILE) PERF TEST **************");
     }
 
-    //@Test
+    @Test
     public void testFacetDataRecordAddReadPerformanceIndex1C() throws AnalyticsException {
         System.out.println("\n************** START ANALYTICS DS (WITH FACET INDEXING - SINGLE THREAD, H2-FILE) PERF TEST **************");
 
         int tenantId = 50;
-        String tableName = "TableX";
+        String tableName = "TableY";
         this.cleanupTable(tenantId, tableName);
         int n = 250, batch = 200;
         List<ColumnDefinition> columns = new ArrayList<>();
@@ -492,8 +492,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         drillDownRequest.setTableName(tableName);
         drillDownRequest.setRecordStartIndex(0);
         drillDownRequest.setRecordCount(75);
-        drillDownRequest.setQuery("log:exception");
-        drillDownRequest.setScoreFunction("_weight");
+        drillDownRequest.setQuery("log: exception");
         List<String> path = Arrays.asList(new String[]{"SomeLocation", "SomeInnerLocation"});
         drillDownRequest.addCategoryPath("location", path);
         List<SearchResultEntry> results = this.service.drillDownSearch(tenantId, drillDownRequest);
@@ -502,7 +501,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         System.out.println("* Search Result Count: " + results.size() + " Time: " + (end - start) + " ms.");
 
         this.cleanupTable(tenantId, tableName);
-        System.out.println("\n************** END ANALYTICS DS (WITH INDEXING, H2-FILE) PERF TEST **************");
+        System.out.println("\n************** END ANALYTICS DS (WITH FACET INDEXING, H2-FILE) PERF TEST **************");
     }
     
     private void writeIndexRecords(final int tenantId, final String tableName, final int n, 
@@ -590,12 +589,12 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         System.out.println("\n************** END ANALYTICS DS (WITH INDEXING - MULTIPLE THREADS, H2-FILE) PERF TEST **************");
     }
 
-    //@Test
+    @Test
     public void testFacetDataRecordAddReadPerformanceIndexNC() throws AnalyticsException {
         System.out.println("\n************** START ANALYTICS DS (WITH FACET INDEXING - MULTIPLE THREADS, H2-FILE) PERF TEST **************");
 
         int tenantId = 50;
-        String tableName = "TableX";
+        String tableName = "TableZ";
         this.cleanupTable(tenantId, tableName);
         int n = 50, batch = 200, nThreads = 5;
         List<ColumnDefinition> columns = new ArrayList<>();
