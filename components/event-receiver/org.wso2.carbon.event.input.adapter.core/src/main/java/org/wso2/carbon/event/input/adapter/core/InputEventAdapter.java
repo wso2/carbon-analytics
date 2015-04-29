@@ -33,4 +33,8 @@ public interface InputEventAdapter {
 
     void destroy();
 
+    boolean isEventDuplicatedInCluster();
+
+    boolean isPolling();
+
 }

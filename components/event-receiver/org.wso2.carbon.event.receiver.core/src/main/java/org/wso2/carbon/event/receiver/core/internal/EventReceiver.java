@@ -19,17 +19,22 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
+import org.wso2.carbon.event.input.adapter.core.InputAdapterRuntime;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterSubscription;
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterException;
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterRuntimeException;
+import org.wso2.carbon.event.processor.manager.core.config.ManagementModeInfo;
+import org.wso2.carbon.event.processor.manager.core.config.Mode;
+import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfiguration;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConstants;
-import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverConfigurationException;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverProcessingException;
 import org.wso2.carbon.event.receiver.core.internal.ds.EventReceiverServiceValueHolder;
+import org.wso2.carbon.event.receiver.core.internal.management.AbstractInputEventDispatcher;
+import org.wso2.carbon.event.receiver.core.internal.management.InputEventDispatcher;
+import org.wso2.carbon.event.receiver.core.internal.management.QueueInputEventDispatcher;
 import org.wso2.carbon.event.receiver.core.internal.util.EventReceiverUtil;
 import org.wso2.carbon.event.receiver.core.internal.util.helper.EventReceiverConfigurationHelper;
 import org.wso2.carbon.event.statistics.EventStatisticsMonitor;
@@ -38,6 +43,7 @@ import org.wso2.carbon.event.stream.core.EventProducerCallback;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 
 public class EventReceiver implements EventProducer {
 
@@ -52,10 +58,13 @@ public class EventReceiver implements EventProducer {
     private EventStatisticsMonitor statisticsMonitor;
     private String beforeTracerPrefix;
     private String afterTracerPrefix;
-    private EventProducerCallback callBack;
+    private AbstractInputEventDispatcher inputEventDispatcher;
+    private InputAdapterRuntime inputAdapterRuntime;
+
 
     public EventReceiver(EventReceiverConfiguration eventReceiverConfiguration,
-                         StreamDefinition exportedStreamDefinition)
+                         StreamDefinition exportedStreamDefinition, ManagementModeInfo modeInfo,
+                         boolean started)
             throws EventReceiverConfigurationException {
         this.eventReceiverConfiguration = eventReceiverConfiguration;
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
@@ -94,17 +103,40 @@ public class EventReceiver implements EventProducer {
 
             String inputEventAdapterName = eventReceiverConfiguration.getFromAdapterConfiguration().getName();
             try {
+                InputEventAdapterSubscription inputEventAdapterSubscription;
                 if (this.customMappingEnabled) {
-                    EventReceiverServiceValueHolder.getInputEventAdapterService().create(
-                            eventReceiverConfiguration.getFromAdapterConfiguration(), new MappedEventSubscription());
+                    inputEventAdapterSubscription = new MappedEventSubscription();
                 } else {
-                    EventReceiverServiceValueHolder.getInputEventAdapterService().create(
-                            eventReceiverConfiguration.getFromAdapterConfiguration(), new TypedEventSubscription());
+                    inputEventAdapterSubscription = new TypedEventSubscription();
                 }
+                inputAdapterRuntime = EventReceiverServiceValueHolder.getInputEventAdapterService().create(
+                        eventReceiverConfiguration.getFromAdapterConfiguration(), inputEventAdapterSubscription);
+
             } catch (InputEventAdapterException e) {
                 throw new EventReceiverConfigurationException("Cannot subscribe to input event adapter :" + inputEventAdapterName + ", error in configuration.", e);
             } catch (InputEventAdapterRuntimeException e) {
                 throw new EventReceiverProcessingException("Cannot subscribe to input event adapter :" + inputEventAdapterName + ", error while connecting by adapter.", e);
+            }
+
+            if (modeInfo.getMode() == Mode.HA) {
+                Lock readLock = EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().getReadLock();
+                inputEventDispatcher = new QueueInputEventDispatcher(tenantId, eventReceiverConfiguration.getEventReceiverName(), readLock);
+                inputEventDispatcher.setSendToOther(!inputAdapterRuntime.isEventDuplicatedInCluster());
+            } else if (modeInfo.getMode() == Mode.Distributed) {
+                inputEventDispatcher = new InputEventDispatcher();
+                inputEventDispatcher.setDrop(inputAdapterRuntime.isEventDuplicatedInCluster());
+            } else {
+                inputEventDispatcher = new InputEventDispatcher();
+            }
+
+            if (modeInfo.getMode() == Mode.HA) {
+                if (started || inputAdapterRuntime.isEventDuplicatedInCluster()) {
+                    inputAdapterRuntime.start();
+                }
+            } else if (modeInfo.getMode() == Mode.Distributed) {
+                inputAdapterRuntime.start();
+            } else {
+                inputAdapterRuntime.start();
             }
         }
     }
@@ -141,7 +173,9 @@ public class EventReceiver implements EventProducer {
 
         try {
             if (object instanceof List) {
-                sendEventList((List<Event>) object);
+                for (Object obj : (List) object) {
+                    processMappedEvent(obj);
+                }
             } else {
                 Object convertedEvent = this.inputMapper.convertToMappedInputEvent(object);
                 if (convertedEvent != null) {
@@ -167,19 +201,22 @@ public class EventReceiver implements EventProducer {
         if (traceEnabled) {
             trace.info(beforeTracerPrefix + obj.toString());
         }
-        Object convertedEvent = null;
         try {
             if (obj instanceof List) {
-                sendEventList((List<Event>) obj);
+                for (Object object : (List) obj) {
+                    processTypedEvent(object);
+                }
             } else {
-                convertedEvent = this.inputMapper.convertToTypedInputEvent(obj);
-                if (convertedEvent instanceof Object[][]) {
-                    Object[][] arrayOfEvents = (Object[][]) convertedEvent;
-                    for (Object[] outObjArray : arrayOfEvents) {
-                        sendEvent(outObjArray);
+                Object convertedEvent = this.inputMapper.convertToTypedInputEvent(obj);
+                if (convertedEvent != null) {
+                    if (convertedEvent instanceof Object[][]) {
+                        Object[][] arrayOfEvents = (Object[][]) convertedEvent;
+                        for (Object[] outObjArray : arrayOfEvents) {
+                            sendEvent(outObjArray);
+                        }
+                    } else {
+                        sendEvent((Object[]) convertedEvent);
                     }
-                } else {
-                    sendEvent((Object[]) convertedEvent);
                 }
             }
         } catch (EventReceiverProcessingException e) {
@@ -194,17 +231,11 @@ public class EventReceiver implements EventProducer {
         if (statisticsEnabled) {
             statisticsMonitor.incrementRequest();
         }
-        this.callBack.sendEventData(outObjArray);
+        this.inputEventDispatcher.onEvent(outObjArray);
     }
 
-    protected void sendEventList(List<Event> events) {
-        if (traceEnabled) {
-            trace.info(afterTracerPrefix + events);
-        }
-        if (statisticsEnabled) {
-            statisticsMonitor.incrementRequest();
-        }
-        this.callBack.sendEvents(events);
+    public AbstractInputEventDispatcher getInputEventDispatcher() {
+        return inputEventDispatcher;
     }
 
     protected void defineEventStream(Object definition) throws EventReceiverConfigurationException {
@@ -232,7 +263,11 @@ public class EventReceiver implements EventProducer {
 
     @Override
     public void setCallBack(EventProducerCallback callBack) {
-        this.callBack = callBack;
+        this.inputEventDispatcher.setCallBack(callBack);
+    }
+
+    public InputAdapterRuntime getInputAdapterRuntime() {
+        return inputAdapterRuntime;
     }
 
     public void destroy() {

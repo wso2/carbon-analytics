@@ -108,5 +108,15 @@ public class EmailEventAdapter implements InputEventAdapter {
 
     }
 
+    @Override
+    public boolean isEventDuplicatedInCluster() {
+        return Boolean.parseBoolean(eventAdapterConfiguration.getProperties().get("receiving.events.duplicated.in.cluster"));
+    }
+
+    @Override
+    public boolean isPolling() {
+        return false;
+    }
+
 
 }
