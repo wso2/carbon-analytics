@@ -38,6 +38,7 @@
         <module>components/event-stream</module>
         <module>components/application-deployer</module>
         <module>components/event-monitor</module>
+        <module>components/event-processor-manager</module>
         <module>components/event-receiver</module>
         <module>components/event-publisher</module>
         <module>features/event-stream</module>
@@ -47,6 +48,7 @@
         <module>features/event-monitor</module>
         <module>features/event-receiver</module>
         <module>features/event-publisher</module>
+        <module>features/event-processor-manager</module>
     </modules>
 
     <dependencyManagement>
@@ -429,6 +431,16 @@
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.analytics.dashboard.batch.admin</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.processor.manager.core</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.processor.manager.commons</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
             <!--<dependency>-->
