@@ -66,4 +66,14 @@ public class WebsocketLocalEventAdapter implements InputEventAdapter {
     public void destroy() {
         //Nothing to do.
     }
+
+    @Override
+    public boolean isEventDuplicatedInCluster() {
+        return Boolean.parseBoolean(eventAdapterConfiguration.getProperties().get("receiving.events.duplicated.in.cluster"));
+    }
+
+    @Override
+    public boolean isPolling() {
+        return false;
+    }
 }
