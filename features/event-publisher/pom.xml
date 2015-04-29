@@ -46,7 +46,7 @@
         <module>org.wso2.carbon.event.output.adapter.wso2event.server.feature</module>
         <module>org.wso2.carbon.event.output.adapter.sms.server.feature</module>
         <module>org.wso2.carbon.event.output.adapter.mqtt.server.feature</module>
-        <!--<module>org.wso2.carbon.event.output.adapter.cassandra.server.feature</module>-->
+        <module>org.wso2.carbon.event.output.adapter.cassandra.server.feature</module>
         <module>org.wso2.carbon.event.output.adapter.feature</module>
         <module>org.wso2.carbon.event.output.adapter.ui.server.feature</module>
     </modules>
