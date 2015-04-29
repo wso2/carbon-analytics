@@ -34,7 +34,7 @@
         </transport>
         <management>
             <!--<hostName>localhost</hostName>-->
-            <port>10000</port>
+            <port>10005</port>
         </management>
     </processing>
 
