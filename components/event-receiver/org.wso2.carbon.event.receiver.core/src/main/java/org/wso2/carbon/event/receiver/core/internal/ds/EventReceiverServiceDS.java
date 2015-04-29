@@ -19,8 +19,10 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterFactory;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterService;
+import org.wso2.carbon.event.processor.manager.core.EventManagementService;
 import org.wso2.carbon.event.receiver.core.EventReceiverService;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverConfigurationException;
+import org.wso2.carbon.event.receiver.core.internal.CarbonEventReceiverManagementService;
 import org.wso2.carbon.event.receiver.core.internal.CarbonEventReceiverService;
 import org.wso2.carbon.event.receiver.core.internal.EventStreamListenerImpl;
 import org.wso2.carbon.event.statistics.EventStatisticsService;
@@ -41,6 +43,9 @@ import java.util.List;
  * @scr.reference name="input.event.adapter.tracker.service"
  * interface="org.wso2.carbon.event.input.adapter.core.InputEventAdapterFactory" cardinality="0..n"
  * policy="dynamic" bind="setEventAdapterType" unbind="unSetEventAdapterType"
+ * @scr.reference name="eventManagement.service"
+ * interface="org.wso2.carbon.event.processor.manager.core.EventManagementService" cardinality="1..1"
+ * policy="dynamic" bind="setEventManagementService" unbind="unsetEventManagementService"
  * @scr.reference name="registry.service"
  * interface="org.wso2.carbon.registry.core.service.RegistryService"
  * cardinality="1..1" policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
@@ -61,8 +66,14 @@ public class EventReceiverServiceDS {
 
     protected void activate(ComponentContext context) {
         try {
+
+
             CarbonEventReceiverService carbonEventReceiverService = new CarbonEventReceiverService();
             EventReceiverServiceValueHolder.registerEventReceiverService(carbonEventReceiverService);
+
+            CarbonEventReceiverManagementService carbonEventReceiverManagementService = new CarbonEventReceiverManagementService();
+            EventReceiverServiceValueHolder.registerReceiverManagementService(carbonEventReceiverManagementService);
+
             context.getBundleContext().registerService(EventReceiverService.class.getName(), carbonEventReceiverService, null);
             if (log.isDebugEnabled()) {
                 log.debug("Successfully deployed EventReceiverService.");
@@ -154,6 +165,15 @@ public class EventReceiverServiceDS {
                 log.error(e.getMessage(), e);
             }
         }
+    }
+
+    protected void setEventManagementService(EventManagementService eventManagementService) {
+        EventReceiverServiceValueHolder.registerEventManagementService(eventManagementService);
+
+    }
+
+    protected void unsetEventManagementService(EventManagementService eventManagementService) {
+        EventReceiverServiceValueHolder.registerEventManagementService(null);
     }
 
 }

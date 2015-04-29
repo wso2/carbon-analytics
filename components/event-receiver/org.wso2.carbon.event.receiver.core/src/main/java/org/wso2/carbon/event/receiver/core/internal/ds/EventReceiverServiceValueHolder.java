@@ -16,7 +16,9 @@ package org.wso2.carbon.event.receiver.core.internal.ds;
 
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterService;
 import org.wso2.carbon.event.input.adapter.core.MessageType;
+import org.wso2.carbon.event.processor.manager.core.EventManagementService;
 import org.wso2.carbon.event.receiver.core.InputMapperFactory;
+import org.wso2.carbon.event.receiver.core.internal.CarbonEventReceiverManagementService;
 import org.wso2.carbon.event.receiver.core.internal.CarbonEventReceiverService;
 import org.wso2.carbon.event.receiver.core.internal.type.json.JSONInputMapperFactory;
 import org.wso2.carbon.event.receiver.core.internal.type.map.MapInputMapperFactory;
@@ -34,10 +36,12 @@ public class EventReceiverServiceValueHolder {
 
     private static InputEventAdapterService inputEventAdapterService;
     private static CarbonEventReceiverService carbonEventReceiverService;
+    private static EventManagementService eventManagementService;
     private static RegistryService registryService;
     private static EventStreamService eventStreamService;
     private static ConcurrentHashMap<String, InputMapperFactory> mappingFactoryMap;
     private static ConfigurationContextService configurationContextService;
+    private static CarbonEventReceiverManagementService carbonEventReceiverManagementService;
 
     static {
         mappingFactoryMap = new ConcurrentHashMap<String, InputMapperFactory>();
@@ -109,4 +113,19 @@ public class EventReceiverServiceValueHolder {
         EventReceiverServiceValueHolder.configurationContextService = configurationContextService;
     }
 
+    public static CarbonEventReceiverManagementService getCarbonEventReceiverManagementService() {
+        return carbonEventReceiverManagementService;
+    }
+
+    public static void registerEventManagementService(EventManagementService eventManagementService) {
+        EventReceiverServiceValueHolder.eventManagementService = eventManagementService;
+    }
+
+    public static EventManagementService getEventManagementService() {
+        return eventManagementService;
+    }
+
+    public static void registerReceiverManagementService(CarbonEventReceiverManagementService eventReceiverManagementService) {
+        EventReceiverServiceValueHolder.carbonEventReceiverManagementService = eventReceiverManagementService;
+    }
 }
