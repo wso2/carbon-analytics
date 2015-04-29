@@ -193,8 +193,8 @@ public class CarbonEventReceiverManagementService extends EventReceiverManagemen
                             PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
                             EventReceiver eventReceiver =
                                     EventReceiverServiceValueHolder.getCarbonEventReceiverService().getEventReceiver(tenantId, eventReceiverName);
-//                            getReadLock().lock();   //TODo check
-//                            getReadLock().unlock();
+                            getReadLock().lock();
+                            getReadLock().unlock();
                             eventReceiver.getInputEventDispatcher().getCallBack().sendEventData(event);
 
                         } catch (Exception e) {

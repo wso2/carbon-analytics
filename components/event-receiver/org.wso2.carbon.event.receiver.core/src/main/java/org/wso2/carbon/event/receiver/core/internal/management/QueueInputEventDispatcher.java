@@ -102,11 +102,11 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher {
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
                 while (true) {
                     try {
-//                        readLock.lock();    //TODo check
-//                        readLock.unlock();
+                        readLock.lock();
+                        readLock.unlock();
                         Object[] event = eventQueue.take();
-//                        readLock.lock();
-//                        readLock.unlock();
+                        readLock.lock();
+                        readLock.unlock();
                         if (!isDrop()) {
                             callBack.sendEventData(event);
                         }
