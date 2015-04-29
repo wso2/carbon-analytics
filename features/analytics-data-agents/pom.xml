@@ -31,7 +31,7 @@
 
     <modules>
         <module>message-tracer-handler</module>
-        <!--<module>jmx</module>-->
+        <module>jmx</module>
     </modules>
 </project>
 
