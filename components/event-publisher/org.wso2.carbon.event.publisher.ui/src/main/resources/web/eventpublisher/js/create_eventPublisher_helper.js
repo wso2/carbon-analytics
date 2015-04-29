@@ -221,58 +221,6 @@ function handleAdvancedMapping() {
     advancedMappingCounter = advancedMappingCounter + 1;
 
 }
-//
-//function showMappingContext() {
-//
-//    var selectedIndex = document.getElementById("mappingTypeFilter").selectedIndex;
-//    var selected_text = document.getElementById("mappingTypeFilter").options[selectedIndex].text;
-//
-//    var innerDiv1 = document.getElementById("innerDiv1");
-//    var innerDiv2 = document.getElementById("innerDiv2");
-//    var innerDiv3 = document.getElementById("innerDiv3");
-//    var innerDiv4 = document.getElementById("innerDiv4");
-//    var innerDiv5 = document.getElementById("innerDiv5");
-//
-//    if (selected_text == 'wso2event') {
-//        innerDiv1.style.display = "";
-//        innerDiv2.style.display = "none";
-//        innerDiv3.style.display = "none";
-//        innerDiv4.style.display = "none";
-//        innerDiv5.style.display = "none";
-//    }
-//
-//    else if (selected_text == 'text') {
-//        innerDiv1.style.display = "none";
-//        innerDiv2.style.display = "";
-//        innerDiv3.style.display = "none";
-//        innerDiv4.style.display = "none";
-//        innerDiv5.style.display = "none";
-//    }
-//
-//    else if (selected_text == 'xml') {
-//        innerDiv1.style.display = "none";
-//        innerDiv2.style.display = "none";
-//        innerDiv3.style.display = "";
-//        innerDiv4.style.display = "none";
-//        innerDiv5.style.display = "none";
-//    }
-//
-//    else if (selected_text == 'map') {
-//        innerDiv1.style.display = "none";
-//        innerDiv2.style.display = "none";
-//        innerDiv3.style.display = "none";
-//        innerDiv4.style.display = "";
-//        innerDiv5.style.display = "none";
-//    }
-//    else if (selected_text == 'json') {
-//        innerDiv1.style.display = "none";
-//        innerDiv2.style.display = "none";
-//        innerDiv3.style.display = "none";
-//        innerDiv4.style.display = "none";
-//        innerDiv5.style.display = "";
-//    }
-//
-//}
 
 function enable_disable_Registry(obj) {
 
