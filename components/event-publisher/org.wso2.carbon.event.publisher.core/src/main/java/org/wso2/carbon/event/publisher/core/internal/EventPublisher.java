@@ -121,6 +121,9 @@ public class EventPublisher implements RawEventConsumer {
     }
 
     public void sendEventData(Object[] eventData) {
+        if ( EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()) {
+            return;
+        }
 
         Map<String, String> dynamicProperties = new HashMap<String, String>(eventPublisherConfiguration.getToAdapterDynamicProperties());
 
