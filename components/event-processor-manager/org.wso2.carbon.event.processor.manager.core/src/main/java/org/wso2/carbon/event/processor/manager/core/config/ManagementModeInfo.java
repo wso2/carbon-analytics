@@ -58,10 +58,10 @@ public class ManagementModeInfo {
         OMElement processing = omElement.getFirstChildWithName(
                 new QName(ConfigurationConstants.PROCESSING_ELEMENT));
         if (processing == null) {
-            throw new ManagementConfigurationException("Invalid XML. No element with name "  + ConfigurationConstants.PROCESSING_ELEMENT + " found.");
+            throw new ManagementConfigurationException("Invalid XML. No element with name "  + ConfigurationConstants.PROCESSING_ELEMENT + " found in file CEP_MANAGEMENT_XML");
         }
         if (processing.getAttribute(new QName(ConfigurationConstants.PROCESSING_MODE_ATTRIBUTE)) == null) {
-            throw new ManagementConfigurationException("Invalid XML. No attribute with name "   + ConfigurationConstants.PROCESSING_MODE_ATTRIBUTE + " found.");
+            throw new ManagementConfigurationException("Invalid XML. No attribute with name "   + ConfigurationConstants.PROCESSING_MODE_ATTRIBUTE + " found in file "+ConfigurationConstants.CEP_MANAGEMENT_XML);
         }
         attribute = processing.getAttribute(new QName(ConfigurationConstants.PROCESSING_MODE_ATTRIBUTE))
                 .getAttributeValue();
@@ -73,7 +73,7 @@ public class ManagementModeInfo {
             OMElement nodeConfig = processing.getFirstChildWithName(
                     new QName(ConfigurationConstants.SN_PERSISTENCE_ELEMENT));
             if (nodeConfig == null) {
-                throw new ManagementConfigurationException("Invalid XML. No element with name " + ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_ELEMENT + " found.");
+                throw new ManagementConfigurationException("Invalid XML. No element with name " + ConfigurationConstants.SN_PERSISTENCE_ELEMENT + " found in file "+ ConfigurationConstants.CEP_MANAGEMENT_XML);
             } else if(nodeType(ConfigurationConstants.ENABLE_ATTRIBUTE,nodeConfig)) {
                 persistenceConfiguration = getPersistConfigurations(nodeConfig);
             }
@@ -88,7 +88,7 @@ public class ManagementModeInfo {
             if (attribute != null) {
                 return attribute.getAttributeValue().equalsIgnoreCase("True");
             } else {
-                throw new ManagementConfigurationException("Invalid XML. No attribute with name " + ConfigurationConstants.PROCESSING_MODE_ATTRIBUTE + " found.");
+                throw new ManagementConfigurationException("Invalid XML. No attribute with name " + ConfigurationConstants.PROCESSING_MODE_ATTRIBUTE + " found in file "+ConfigurationConstants.CEP_MANAGEMENT_XML);
             }
     }
 
