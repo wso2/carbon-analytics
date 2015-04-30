@@ -53,7 +53,7 @@ public final class EventPublisherConstants {
     public static final String ATTR_TYPE_INTEGER = "int";
     public static final String ATTR_TYPE_LONG = "long";
     public static final String ATTR_TYPE_STRING = "string";
-    public static final String ATTR_TYPE_BOOL = "boolean";
+    public static final String ATTR_TYPE_BOOL = "bool";
     public static final String PROPERTY_META_PREFIX = "meta_";
     public static final String PROPERTY_CORRELATION_PREFIX = "correlation_";
 

@@ -54,7 +54,7 @@ public final class EventReceiverConstants {
     public static final String ATTR_TYPE_INT = "int";
     public static final String ATTR_TYPE_LONG = "long";
     public static final String ATTR_TYPE_STRING = "string";
-    public static final String ATTR_TYPE_BOOL = "boolean";
+    public static final String ATTR_TYPE_BOOL = "bool";
     public static final String ER_WSO2EVENT_MAPPING_TYPE = "wso2event";
     public static final String ER_TEXT_MAPPING_TYPE = "text";
     public static final String ER_MAP_MAPPING_TYPE = "map";
