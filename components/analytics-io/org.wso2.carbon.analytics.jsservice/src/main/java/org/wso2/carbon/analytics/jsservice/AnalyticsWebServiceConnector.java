@@ -51,7 +51,7 @@ public class AnalyticsWebServiceConnector {
     private AnalyticsWebServiceStub analyticsWebServiceStub;
     private Gson gson;
 
-    public static final int TYPE_CLEAR_INDICES = 1;
+    public static final int TYPE_CLEAR_INDEX_DATA = 1;
     public static final int TYPE_CREATE_TABLE = 2;
     public static final int TYPE_DELETE_BY_ID = 3;
     public static final int TYPE_DELETE_BY_RANGE = 4;

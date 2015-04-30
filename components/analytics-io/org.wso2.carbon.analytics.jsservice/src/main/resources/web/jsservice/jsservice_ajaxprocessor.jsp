@@ -123,7 +123,7 @@
                 out.print(connector.deleteRecordsByIds(tableName, recordIdsAsString));
                 break;
             }
-            case AnalyticsWebServiceConnector.TYPE_CLEAR_INDICES: {
+            case AnalyticsWebServiceConnector.TYPE_CLEAR_INDEX_DATA: {
                 out.print(connector.clearIndexData(tableName));
                 break;
             }

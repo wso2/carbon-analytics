@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
 /**
- * This class contains the details about category drilldown. This class is used  as an input to get
+ * This class contains the details about category drill down. This class is used  as an input to get
  * the subcategories of a facet field when using drillDownCategories API
  */
 @XmlRootElement(name = "categoryDrillDownRequest")

@@ -48,7 +48,11 @@ public class AnalyticsQueryParser extends QueryParser {
     
     @Override
     public Query getRangeQuery(String field, String part1, String part2, boolean si, boolean ei) throws ParseException {
-        AnalyticsSchema.ColumnType type = this.indices.get(field).getType();
+        AnalyticsSchema.ColumnType type = null;
+        ColumnDefinition column = this.indices.get(field);
+        if (column != null) {
+            type = column.getType();
+        }
         if (type == null) {
             /* check for special fields */
             if (AnalyticsDataIndexer.INDEX_ID_INTERNAL_FIELD.equals(field)) {
