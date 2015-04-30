@@ -38,9 +38,9 @@
            style="width:100%">
         <tbody>
 
-        <tr fromElementKey="inputWso2EventMapping">
+        <tr toElementKey="outputWso2EventMapping">
             <td colspan="2" class="middle-header">
-                <fmt:message key="event.receiver.mapping.wso2event"/>
+                <fmt:message key="wso2event.mapping"/>
             </td>
         </tr>
 

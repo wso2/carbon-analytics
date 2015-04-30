@@ -456,7 +456,7 @@ public class EventStreamAdminService extends AbstractAdmin {
                         .equals("string")) {
                     attributeType = AttributeType.STRING;
                 } else if (eventStreamAttributeDto[i].getAttributeType()
-                        .equals("boolean")) {
+                        .equals("bool")) {
                     attributeType = AttributeType.BOOL;
                 }
                 Attribute attribute = new Attribute(eventStreamAttributeDto[i].getAttributeName(),attributeType);

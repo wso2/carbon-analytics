@@ -64,7 +64,6 @@ public class WSO2EventInputMapper implements InputMapper {
                 throw new EventReceiverStreamValidationException("Error while retrieving stream definition : " + e.getMessage(), fromStreamName + ":" + fromStreamVersion);
             }
         }
-
         validateInputStreamAttributes();
 
         if (importedStreamDefinition != null && eventReceiverConfiguration.getInputMapping().isCustomMappingEnabled()) {
