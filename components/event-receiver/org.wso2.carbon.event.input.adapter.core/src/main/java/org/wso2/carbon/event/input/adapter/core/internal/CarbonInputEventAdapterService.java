@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * EventAdapter service implementation.
@@ -37,14 +39,19 @@ public class CarbonInputEventAdapterService implements InputEventAdapterService 
     private static Log log = LogFactory.getLog(CarbonInputEventAdapterService.class);
     private static final String EVENT_TRACE_LOGGER = "EVENT_TRACE_LOGGER";
     private Logger trace = Logger.getLogger(EVENT_TRACE_LOGGER);
+    private static final String HA_PREFIX = "org.wso2.cep.org.wso2.carbon.event.processor.management.ha";
 
     private Map<String, InputEventAdapterFactory> eventAdapterFactoryMap;
-    private ConcurrentHashMap<Integer, ConcurrentHashMap<String, InputAdapterRuntime>> tenantSpecificEventAdapters;
+    private ConcurrentHashMap<Integer, ConcurrentHashMap<String, CarbonInputAdapterRuntime>> tenantSpecificEventAdapters;
+    private ScheduledExecutorService scheduledExecutorService;
+    private boolean startPolling = false;
 
 
     public CarbonInputEventAdapterService() {
         this.eventAdapterFactoryMap = new ConcurrentHashMap<String, InputEventAdapterFactory>();
-        this.tenantSpecificEventAdapters = new ConcurrentHashMap<Integer, ConcurrentHashMap<String, InputAdapterRuntime>>();
+        this.tenantSpecificEventAdapters = new ConcurrentHashMap<Integer, ConcurrentHashMap<String, CarbonInputAdapterRuntime>>();
+        this.scheduledExecutorService = Executors.newScheduledThreadPool(1);
+
     }
 
     public void registerEventAdapterFactory(InputEventAdapterFactory inputEventAdapterFactory) {
@@ -79,11 +86,11 @@ public class CarbonInputEventAdapterService implements InputEventAdapterService 
     }
 
     @Override
-    public void create(InputEventAdapterConfiguration inputEventAdapterConfiguration, InputEventAdapterSubscription inputEventAdapterSubscription) throws InputEventAdapterException {
+    public InputAdapterRuntime create(InputEventAdapterConfiguration inputEventAdapterConfiguration, InputEventAdapterSubscription inputEventAdapterSubscription) throws InputEventAdapterException {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        ConcurrentHashMap<String, InputAdapterRuntime> eventAdapters = tenantSpecificEventAdapters.get(tenantId);
+        ConcurrentHashMap<String, CarbonInputAdapterRuntime> eventAdapters = tenantSpecificEventAdapters.get(tenantId);
         if (eventAdapters == null) {
-            tenantSpecificEventAdapters.putIfAbsent(tenantId, new ConcurrentHashMap<String, InputAdapterRuntime>());
+            tenantSpecificEventAdapters.putIfAbsent(tenantId, new ConcurrentHashMap<String, CarbonInputAdapterRuntime>());
             eventAdapters = tenantSpecificEventAdapters.get(tenantId);
         }
         InputEventAdapterFactory adapterFactory = eventAdapterFactoryMap.get(inputEventAdapterConfiguration.getType());
@@ -101,9 +108,15 @@ public class CarbonInputEventAdapterService implements InputEventAdapterService 
         }
         Map<String, String> globalProperties = InputEventAdapterServiceValueHolder.getGlobalAdapterConfigs().
                 getAdapterConfig(inputEventAdapterConfiguration.getType()).getGlobalPropertiesAsMap();
-        eventAdapters.put(inputEventAdapterConfiguration.getName(), new InputAdapterRuntime(adapterFactory.
-                createEventAdapter(inputEventAdapterConfiguration, globalProperties), inputEventAdapterConfiguration.getName(),
-                inputEventAdapterSubscription));
+
+        InputEventAdapter inputEventAdapter = adapterFactory.
+                createEventAdapter(inputEventAdapterConfiguration, globalProperties);
+        CarbonInputAdapterRuntime carbonInputAdapterRuntime = new CarbonInputAdapterRuntime(inputEventAdapter, inputEventAdapterConfiguration.getName(),
+                inputEventAdapterSubscription);
+
+        eventAdapters.put(inputEventAdapterConfiguration.getName(), carbonInputAdapterRuntime);
+        return carbonInputAdapterRuntime;
+
     }
 
     /**
@@ -150,14 +163,27 @@ public class CarbonInputEventAdapterService implements InputEventAdapterService 
     @Override
     public void destroy(String name) {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        ConcurrentHashMap<String, InputAdapterRuntime> eventAdapters = tenantSpecificEventAdapters.get(tenantId);
+        ConcurrentHashMap<String, CarbonInputAdapterRuntime> eventAdapters = tenantSpecificEventAdapters.get(tenantId);
         if (eventAdapters == null) {
             return;
         }
-        InputAdapterRuntime inputAdapterRuntime = eventAdapters.remove(name);
-        if (inputAdapterRuntime != null) {
-            inputAdapterRuntime.destroy();
+        CarbonInputAdapterRuntime carbonInputAdapterRuntime = eventAdapters.remove(name);
+        if (carbonInputAdapterRuntime != null) {
+            carbonInputAdapterRuntime.destroy();
         }
+    }
+
+    public ConcurrentHashMap<Integer, ConcurrentHashMap<String, CarbonInputAdapterRuntime>> getTenantSpecificEventAdapters() {
+        return tenantSpecificEventAdapters;
+    }
+
+    public boolean isStartPolling() {
+        return startPolling;
+    }
+
+    @Override
+    public void setStartPolling(boolean startPolling) {
+        this.startPolling = startPolling;
     }
 
 }

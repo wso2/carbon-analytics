@@ -70,6 +70,7 @@
                                 <bundleDef>
                                     org.hectorclient.wso2:hector-core:${hector.wso2.version}
                                 </bundleDef>
+                                    <bundleDef>libthrift.wso2:libthrift:${libthrift.wso2.version.hector}</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}

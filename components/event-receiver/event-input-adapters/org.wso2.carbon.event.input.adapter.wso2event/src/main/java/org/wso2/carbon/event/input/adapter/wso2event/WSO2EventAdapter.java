@@ -23,7 +23,6 @@ import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterException;
 import org.wso2.carbon.event.input.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.input.adapter.wso2event.internal.ds.WSO2EventAdapterServiceValueHolder;
-import org.wso2.carbon.event.input.adapter.wso2event.internal.util.WSO2EventAdapterConstants;
 
 import java.util.Map;
 
@@ -66,6 +65,16 @@ public final class WSO2EventAdapter implements InputEventAdapter {
     @Override
     public void destroy() {
 
+    }
+
+    @Override
+    public boolean isEventDuplicatedInCluster() {
+        return Boolean.parseBoolean(eventAdapterConfiguration.getProperties().get("receiving.events.duplicated.in.cluster"));
+    }
+
+    @Override
+    public boolean isPolling() {
+        return false;
     }
 
     public String getEventAdapterName() {

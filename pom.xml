@@ -38,6 +38,7 @@
         <module>components/event-stream</module>
         <module>components/application-deployer</module>
         <module>components/event-monitor</module>
+        <module>components/event-processor-manager</module>
         <module>components/event-receiver</module>
         <module>components/event-publisher</module>
         <module>features/event-stream</module>
@@ -47,6 +48,7 @@
         <module>features/event-monitor</module>
         <module>features/event-receiver</module>
         <module>features/event-publisher</module>
+        <module>features/event-processor-manager</module>
     </modules>
 
     <dependencyManagement>
@@ -429,6 +431,16 @@
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.analytics.dashboard.batch.admin</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.processor.manager.core</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.processor.manager.commons</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
             <!--<dependency>-->
@@ -925,6 +937,7 @@
         <neethi.osgi.version.range>[2.0.4.wso2v4, 3.1.0)</neethi.osgi.version.range>
         <rampart.wso2.version>1.6.1.wso2v14</rampart.wso2.version>
         <libthrift.wso2.version>0.8.0.wso2v1</libthrift.wso2.version>
+        <libthrift.wso2.version.hector>0.7.0.wso2v2</libthrift.wso2.version.hector>
         <orbit.version.commons.lang>2.6.0.wso2v1</orbit.version.commons.lang>
         <gson.version>2.1</gson.version>
         <slf4j.version>1.7.5</slf4j.version>

@@ -31,9 +31,24 @@ public abstract class InputEventAdapterFactory {
 
     public InputEventAdapterSchema getInputEventAdapterSchema() {
         if (inputEventAdapterSchema == null) {
-            inputEventAdapterSchema = new InputEventAdapterSchema(getType(), getSupportedMessageFormats(), getPropertyList());
+            List<Property> propertyList = getPropertyList();
+            addCommonProperties(propertyList);
+            inputEventAdapterSchema = new InputEventAdapterSchema(getType(), getSupportedMessageFormats(), propertyList);
         }
         return inputEventAdapterSchema;
+    }
+
+    private void addCommonProperties(List<Property> propertyList){
+        if(propertyList == null){
+            return;
+        }
+        Property isDuplicatedInCluster = new Property("receiving.events.duplicated.in.cluster");
+        isDuplicatedInCluster.setDisplayName(
+                "Receiving events duplicated in cluster");
+        isDuplicatedInCluster.setRequired(false);
+        isDuplicatedInCluster.setOptions(new String[]{"true", "false"});
+        isDuplicatedInCluster.setDefaultValue("false");
+        propertyList.add(0,isDuplicatedInCluster);
     }
 
 }

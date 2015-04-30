@@ -16,8 +16,10 @@ package org.wso2.carbon.event.publisher.core.internal.ds;
 
 import org.wso2.carbon.event.output.adapter.core.MessageType;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterService;
+import org.wso2.carbon.event.processor.manager.core.EventManagementService;
 import org.wso2.carbon.event.publisher.core.EventPublisherService;
 import org.wso2.carbon.event.publisher.core.config.OutputMapperFactory;
+import org.wso2.carbon.event.publisher.core.internal.CarbonEventPublisherManagementService;
 import org.wso2.carbon.event.publisher.core.internal.CarbonEventPublisherService;
 import org.wso2.carbon.event.publisher.core.internal.type.json.JSONOutputMapperFactory;
 import org.wso2.carbon.event.publisher.core.internal.type.map.MapOutputMapperFactory;
@@ -39,6 +41,8 @@ public class EventPublisherServiceValueHolder {
     private static CarbonEventPublisherService carbonEventPublisherService;
     private static EventStreamService eventStreamService;
     private static RegistryService registryService;
+    private static CarbonEventPublisherManagementService carbonEventPublisherManagementService;
+    private static EventManagementService eventManagementService;
     private static ConcurrentHashMap<String, OutputMapperFactory> mappingFactoryMap = new ConcurrentHashMap<String, OutputMapperFactory>() {
     };
 
@@ -79,6 +83,19 @@ public class EventPublisherServiceValueHolder {
         EventPublisherServiceValueHolder.registryService = registryService;
     }
 
+    public static CarbonEventPublisherManagementService getCarbonEventPublisherManagementService() {
+        return carbonEventPublisherManagementService;
+    }
+
+    public static void registerPublisherManagementService(CarbonEventPublisherManagementService eventPublisherManagementService) {
+        EventPublisherServiceValueHolder.carbonEventPublisherManagementService = eventPublisherManagementService;
+    }
+
+    public static void registerEventManagementService(EventManagementService eventManagementService) {
+        EventPublisherServiceValueHolder.eventManagementService = eventManagementService;
+
+    }
+
     public static void unSetRegistryService() {
         EventPublisherServiceValueHolder.registryService = null;
     }
@@ -102,6 +119,10 @@ public class EventPublisherServiceValueHolder {
 
     public static EventStatisticsService getEventStatisticsService() {
         return eventStatisticsService;
+    }
+
+    public static EventManagementService getEventManagementService() {
+        return eventManagementService;
     }
 
     public static void registerEventStreamService(EventStreamService eventStreamService) {

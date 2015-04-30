@@ -220,6 +220,15 @@ public class JMSEventAdapter implements InputEventAdapter {
         return table;
     }
 
+    @Override
+    public boolean isEventDuplicatedInCluster() {
+        return Boolean.parseBoolean(eventAdapterConfiguration.getProperties().get("receiving.events.duplicated.in.cluster"));
+    }
+
+    @Override
+    public boolean isPolling() {
+        return false;
+    }
 
     class SubscriptionDetails {
 

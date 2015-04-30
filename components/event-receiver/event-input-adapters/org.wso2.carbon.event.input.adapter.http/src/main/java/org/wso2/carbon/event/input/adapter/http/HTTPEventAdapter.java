@@ -128,4 +128,14 @@ public final class HTTPEventAdapter implements InputEventAdapter {
     public int hashCode() {
         return id.hashCode();
     }
+
+    @Override
+    public boolean isEventDuplicatedInCluster() {
+        return false;
+    }
+
+    @Override
+    public boolean isPolling() {
+        return false;
+    }
 }

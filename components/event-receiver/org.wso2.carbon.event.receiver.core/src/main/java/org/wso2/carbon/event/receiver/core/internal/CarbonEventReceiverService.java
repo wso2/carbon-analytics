@@ -25,6 +25,7 @@ import org.wso2.carbon.event.input.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterSchema;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterService;
 import org.wso2.carbon.event.input.adapter.core.Property;
+import org.wso2.carbon.event.processor.manager.core.config.ManagementModeInfo;
 import org.wso2.carbon.event.receiver.core.EventReceiverService;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfiguration;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfigurationFile;
@@ -52,10 +53,17 @@ public class CarbonEventReceiverService implements EventReceiverService {
     private static final Log log = LogFactory.getLog(CarbonEventReceiverService.class);
     private Map<Integer, Map<String, EventReceiver>> tenantSpecificEventReceiverConfigurationMap;
     private Map<Integer, List<EventReceiverConfigurationFile>> tenantSpecificEventReceiverConfigurationFileMap;
+    private boolean started = false;
+
+    private ManagementModeInfo managementModeInfo;
 
     public CarbonEventReceiverService() {
         tenantSpecificEventReceiverConfigurationMap = new ConcurrentHashMap<Integer, Map<String, EventReceiver>>();
         tenantSpecificEventReceiverConfigurationFileMap = new ConcurrentHashMap<Integer, List<EventReceiverConfigurationFile>>();
+    }
+
+    public void setManagementModeInfo(ManagementModeInfo modeInfo) {
+        this.managementModeInfo = modeInfo;
     }
 
     @Override
@@ -317,7 +325,12 @@ public class CarbonEventReceiverService implements EventReceiverService {
         }
 
         // End; Checking preconditions to add the event receiver
-        EventReceiver eventReceiver = new EventReceiver(eventReceiverConfiguration, exportedStreamDefinition);
+        EventReceiver eventReceiver = new EventReceiver(eventReceiverConfiguration, exportedStreamDefinition,
+                managementModeInfo, started);
+
+        EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().addToPublisherAndServer(
+                tenantId, eventReceiverConfiguration.getEventReceiverName(), exportedStreamDefinition);
+
         try {
             EventReceiverServiceValueHolder.getEventStreamService().subscribe(eventReceiver);
         } catch (EventStreamConfigurationException e) {
@@ -601,6 +614,61 @@ public class CarbonEventReceiverService implements EventReceiverService {
             }
         }
         return encryptedProperties;
+    }
+
+    public Map<Integer, Map<String, EventReceiver>> getTenantSpecificEventReceiverMap() {
+        return tenantSpecificEventReceiverConfigurationMap;
+    }
+
+    public void startInputAdapterRuntimes() {
+        started = true;
+        Map<String, EventReceiver> map;
+        int tenantId;
+        for (Map.Entry<Integer, Map<String, EventReceiver>> pair : tenantSpecificEventReceiverConfigurationMap.entrySet()) {
+            map = pair.getValue();
+            tenantId = pair.getKey();
+            try {
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
+                for (EventReceiver eventReceiver : map.values()) {
+                    eventReceiver.getInputAdapterRuntime().start();
+                }
+            } catch (Exception e) {
+                log.error("Unable to start event adpaters for tenant :" + tenantId, e);
+            } finally {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+    }
+
+    public void startPollingInputAdapterRuntimes() {
+        EventReceiverServiceValueHolder.getInputEventAdapterService().setStartPolling(true);
+        Map<String, EventReceiver> map;
+        int tenantId;
+        for (Map.Entry<Integer, Map<String, EventReceiver>> pair : tenantSpecificEventReceiverConfigurationMap.entrySet()) {
+            map = pair.getValue();
+            tenantId = pair.getKey();
+            try {
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
+                for (EventReceiver eventReceiver : map.values()) {
+                    eventReceiver.getInputAdapterRuntime().startPolling();
+                }
+            } catch (Exception e) {
+                log.error("Unable to start event adpaters for tenant :" + tenantId, e);
+            } finally {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+    }
+
+    public EventReceiver getEventReceiver(int tenantId, String eventReceiverName) {
+        if(tenantSpecificEventReceiverConfigurationMap.containsKey(tenantId)) {
+            return tenantSpecificEventReceiverConfigurationMap.get(tenantId).get(eventReceiverName);
+        }
+        return null;
     }
 //
 //    public void removeEventReceiver(String eventReceiverName,

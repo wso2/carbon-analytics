@@ -30,7 +30,6 @@ import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterExcep
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterRuntimeException;
 import org.wso2.carbon.event.input.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.input.adapter.soap.internal.Axis2ServiceManager;
-import org.wso2.carbon.event.input.adapter.soap.internal.util.SOAPEventAdapterConstants;
 
 import java.util.Map;
 import java.util.UUID;
@@ -109,5 +108,15 @@ public final class SOAPEventAdapter implements InputEventAdapter {
     @Override
     public int hashCode() {
         return id.hashCode();
+    }
+
+    @Override
+    public boolean isEventDuplicatedInCluster() {
+        return Boolean.parseBoolean(eventAdapterConfiguration.getProperties().get("receiving.events.duplicated.in.cluster"));
+    }
+
+    @Override
+    public boolean isPolling() {
+        return false;
     }
 }
