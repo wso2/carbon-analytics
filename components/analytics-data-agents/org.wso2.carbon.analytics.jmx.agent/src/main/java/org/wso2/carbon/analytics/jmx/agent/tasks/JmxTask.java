@@ -24,7 +24,6 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.jmx.agent.JmxAgent;
 import org.wso2.carbon.analytics.jmx.agent.JmxConstant;
 import org.wso2.carbon.analytics.jmx.agent.PublisherUtil;
-import org.wso2.carbon.analytics.jmx.agent.TenantPublisherConfigData;
 import org.wso2.carbon.analytics.jmx.agent.exceptions.JmxConnectionException;
 import org.wso2.carbon.analytics.jmx.agent.exceptions.JmxMBeanException;
 import org.wso2.carbon.analytics.jmx.agent.exceptions.JmxProfileException;
@@ -34,21 +33,20 @@ import org.wso2.carbon.analytics.jmx.agent.profiles.MBeanAttribute;
 import org.wso2.carbon.analytics.jmx.agent.profiles.MBeanAttributeProperty;
 import org.wso2.carbon.analytics.jmx.agent.profiles.Profile;
 import org.wso2.carbon.analytics.jmx.agent.profiles.ProfileManager;
-import org.wso2.carbon.context.CarbonContext;
-import org.wso2.carbon.databridge.agent.thrift.DataPublisher;
-import org.wso2.carbon.databridge.agent.thrift.exception.AgentException;
+import org.wso2.carbon.analytics.jmx.agent.tasks.internal.JmxTaskServiceComponent;
+import org.wso2.carbon.databridge.commons.Attribute;
+import org.wso2.carbon.databridge.commons.AttributeType;
 import org.wso2.carbon.databridge.commons.Event;
-import org.wso2.carbon.databridge.commons.exception.AuthenticationException;
-import org.wso2.carbon.databridge.commons.exception.DifferentStreamDefinitionAlreadyDefinedException;
+import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
-import org.wso2.carbon.databridge.commons.exception.StreamDefinitionException;
-import org.wso2.carbon.databridge.commons.exception.TransportException;
+import org.wso2.carbon.event.stream.core.EventStreamService;
+import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 import org.wso2.carbon.ntask.core.AbstractTask;
 
 import javax.management.openmbean.CompositeData;
 import javax.management.remote.JMXConnector;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class JmxTask extends AbstractTask {
@@ -65,16 +63,13 @@ public class JmxTask extends AbstractTask {
 
     @Override
     public void execute() {
-
         if (log.isDebugEnabled()) {
             log.info("Running the profile : " + this.getProperties().
                     get(JmxConstant.JMX_PROFILE_NAME));
         }
-
         Map<String, String> dataMap = this.getProperties();
         //get profile name
         String profileName = dataMap.get(JmxConstant.JMX_PROFILE_NAME);
-
         //get the profile
         Profile profile;
         try {
@@ -86,7 +81,6 @@ public class JmxTask extends AbstractTask {
             log.error("Exception occurred: ", e);
             return;
         }
-
         if (profile != null) {
             //Publish the data
             try {
@@ -94,110 +88,48 @@ public class JmxTask extends AbstractTask {
                 JmxAgent jmxAgent = new JmxAgent(profile);
                 //Create a Stream name
                 String streamName = STREAM_NAME_PREFIX + profile.getName();
-
                 //Append ".0.0 for the sake of string matching! "
                 String version = Integer.toString(profile.getVersion()) + ".0.0";
-
-                DataPublisher dataPublisher = createDataPublisher(profile);
-                String streamId = dataPublisher.findStreamId(streamName, version);
-
-                if (streamId == null) {
-                    streamId = createStreamDefinition(streamName, version, jmxAgent, dataPublisher);
-                }
-                publishData(streamId, dataPublisher, jmxAgent, profileName);
-
-            } catch (StreamDefinitionException e) {
-                log.error("Stream definition seems to be invalid : " + e);
-            } catch (AgentException e) {
-                log.error(e.getErrorMessage(), e);
-            } catch (MalformedURLException e) {
-                log.error(e.getLocalizedMessage(), e);
-            } catch (AuthenticationException e) {
-                log.error(e.getErrorMessage(), e);
-                //remove all the data publishers
-                TenantPublisherConfigData.getDataPublisherMap().clear();
-                if (log.isDebugEnabled()) {
-                    log.info("Data Publisher hash table cleared");
-                }
-            } catch (TransportException e) {
-                log.error(e);
-            } catch (DifferentStreamDefinitionAlreadyDefinedException e) {
-                log.error(e.getErrorMessage(), e);
+                StreamDefinition streamDefinition = createStreamDefinition(streamName, version, jmxAgent);
+                publishData(streamDefinition, jmxAgent, profileName);
             } catch (MalformedStreamDefinitionException e) {
                 log.error(e.getErrorMessage(), e);
-            } catch (JmxConnectionException e) {
-                log.error(e.getLocalizedMessage(), e);
-            } catch (JmxMBeanException e) {
+            } catch (JmxConnectionException | JmxMBeanException e) {
                 log.error(e.getLocalizedMessage(), e);
             }
         }
     }
 
-    private DataPublisher createDataPublisher(Profile profile)
-            throws AgentException, MalformedURLException, AuthenticationException,
-                   TransportException {
-
-        String dataPublisherReceiverUrl = profile.getDpReceiverAddress();
-        String dataPublisherUname = profile.getDpUserName();
-        String dataPublisherPass = profile.getDpPassword();
-        String dataPublisherReceiverConnectionType = profile.getDpReceiverConnectionType();
-        String dataPublisherSecureConnectionType = profile.getDpSecureUrlConnectionType();
-        String dataPublisherSecureUrl = profile.getDpSecureAddress();
-
-        //get the tenant ID
-        int tenantID = CarbonContext.getThreadLocalCarbonContext().getTenantId();
-
-        //create the key for data publisher storage. Using this key, the correct data
-        //publisher with the correct configuration will be returned
-        String key = dataPublisherSecureConnectionType + dataPublisherSecureUrl +
-                     dataPublisherReceiverConnectionType + dataPublisherReceiverUrl +
-                     dataPublisherUname + dataPublisherPass + String.valueOf(tenantID);
-
-        DataPublisher dataPublisher;
-
-        //check for the availability of the data publisher
-        if (TenantPublisherConfigData.getDataPublisherMap().containsKey(key)) {
-            if (log.isDebugEnabled()) {
-                log.info("DataPublisher exists for tenant " + tenantID);
-            }
-
-            dataPublisher = TenantPublisherConfigData.getDataPublisherMap().get(key);
-
-        } else {
-            if (log.isDebugEnabled()) {
-                log.info("DataPublisher does not exist for tenant " + tenantID);
-            }
-
-            dataPublisher = new DataPublisher(dataPublisherSecureConnectionType +
-                                              dataPublisherSecureUrl,
-                                              dataPublisherReceiverConnectionType +
-                                              dataPublisherReceiverUrl,
-                                              dataPublisherUname, dataPublisherPass);
-
-            TenantPublisherConfigData.getDataPublisherMap().put(key, dataPublisher);
-        }
-
-
-        return dataPublisher;
-    }
-
-    private void publishData(String streamId, DataPublisher dataPublisher,
-                             JmxAgent jmxAgent, String profileName) throws AgentException {
-
+    private void publishData(StreamDefinition streamDef, JmxAgent jmxAgent, String profileName) {
         ArrayList<Object> arrayList = getMBeansDetail(jmxAgent);
         if (arrayList == null) {
             return;
         }
-
         String host = PublisherUtil.getHostAddress();
         if ((jmxAgent.getProfile() != null) && (jmxAgent.getProfile().getUrl() != null)) {
             host = jmxAgent.getProfile().getUrl().substring(18, jmxAgent.getProfile().getUrl().indexOf(FORWARD_SLASH, 19));
         }
-
-        Event jmxEvent = new Event(streamId, System.currentTimeMillis(),
-                                   new Object[]{EVENT_TYPE, host}, null, arrayList.toArray());
-        dataPublisher.publish(jmxEvent);
-
+        EventStreamService eventStreamService = JmxTaskServiceComponent.getEventStreamService();
+        if (eventStreamService != null) {
+            try {
+                eventStreamService.addEventStreamDefinition(streamDef);
+                if (log.isDebugEnabled()) {
+                    log.debug("Added stream definition to event publisher service.");
+                }
+            } catch (EventStreamConfigurationException e) {
+                log.error("Error in adding stream definition to service:" + e.getMessage(), e);
+            }
+            Event tracingEvent = new Event();
+            tracingEvent.setTimeStamp(System.currentTimeMillis());
+            tracingEvent.setStreamId(streamDef.getStreamId());
+            Object[] metaInfo = new Object[]{EVENT_TYPE, host};
+            tracingEvent.setMetaData(metaInfo);
+            tracingEvent.setPayloadData(arrayList.toArray());
+            eventStreamService.publish(tracingEvent);
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully published event");
+            }
+        }
         if (log.isDebugEnabled()) {
             log.info("jmx Event published for " + profileName);
         }
@@ -206,7 +138,6 @@ public class JmxTask extends AbstractTask {
     private ArrayList<Object> getMBeansDetail(JmxAgent jmxAgent) {
         ArrayList<Object> arrayList = new ArrayList<Object>();
         JMXConnector jmxConnector = null;
-
         try {
             jmxConnector = jmxAgent.openJmxConnection();
 
@@ -218,7 +149,6 @@ public class JmxTask extends AbstractTask {
                     if (mBeanAttribute.getProperties() != null) {
                         CompositeData cd = (CompositeData)
                                 jmxAgent.getAttribute(jmxConnector, mBean.getMBeanName(), mBeanAttribute.getAttributeName());
-
                         for (MBeanAttributeProperty mBeanAttributeProperty : mBeanAttribute.getProperties()) {
                             attrValue = cd.get(mBeanAttributeProperty.getPropertyName());
                             addMBeanDetail(arrayList, attrValue);
@@ -259,56 +189,37 @@ public class JmxTask extends AbstractTask {
         }
     }
 
-    private String createStreamDefinition(String streamName, String version, JmxAgent jmxAgent,
-                                        DataPublisher dataPublisher)
-            throws MalformedURLException, StreamDefinitionException,
-                   DifferentStreamDefinitionAlreadyDefinedException, AgentException,
-                   MalformedStreamDefinitionException, JmxConnectionException, JmxMBeanException {
+    private StreamDefinition createStreamDefinition(String streamName, String version, JmxAgent jmxAgent)
+            throws MalformedStreamDefinitionException, JmxConnectionException, JmxMBeanException {
 
-        StringBuilder stringBuilder = new StringBuilder();
-
-        stringBuilder.
-                append("{'name':'").append(streamName).append("',").
-                append("  'version':'").append(version).append("',").
-                append("  'nickName': 'JMX Dump',").
-                append("  'description': 'JMX monitoring data',").
-                append("  'metaData':[").
-                append("          {'name':'clientType','type':'STRING'},").
-                append("          {'name':'host','type':'STRING'}").
-                append("  ],").
-                append("  'payloadData':[");
-
+        StreamDefinition streamDefinition = new StreamDefinition(streamName, version);
+        streamDefinition.setDescription("JMX monitoring data");
+        streamDefinition.setNickName("JMX Dump");
+        List<Attribute> metaDataList = getMetaAttributeList();
+        streamDefinition.setMetaData(metaDataList);
+        List<Attribute> payloadDataList = new ArrayList<>();
         JMXConnector jmxConnector = null;
-
         try {
             jmxConnector = jmxAgent.openJmxConnection();
-
             MBean[] mBeans = jmxAgent.getProfile().getSelectedMBeans();
             //add the attributes
             Object attrValue;
             for (MBean mBean : mBeans) {
                 for (MBeanAttribute mBeanAttribute : mBean.getAttributes()) {
-
                     // If MBean is a composite.
                     if (mBeanAttribute.getProperties() != null) {
                         CompositeData cd = (CompositeData)
                                 jmxAgent.getAttribute(jmxConnector, mBean.getMBeanName(), mBeanAttribute.getAttributeName());
-
                         for (MBeanAttributeProperty mBeanAttributeProperty : mBeanAttribute.getProperties()) {
                             attrValue = cd.get(mBeanAttributeProperty.getPropertyName());
-                            appendColumnName(stringBuilder, attrValue, mBeanAttributeProperty.getAliasName());
+                            payloadDataList.add(getColumnName(attrValue, mBeanAttributeProperty.getAliasName()));
                         }
                     } else {
                         attrValue = jmxAgent.getAttribute(jmxConnector, mBean.getMBeanName(), mBeanAttribute.getAttributeName());
-                        appendColumnName(stringBuilder, attrValue, mBeanAttribute.getAliasName());
+                        payloadDataList.add(getColumnName(attrValue, mBeanAttribute.getAliasName()));
                     }
                 }
             }
-
-            //to delete the last comma
-            stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-            stringBuilder.append("  ]}");
-
         } finally {
             if (jmxConnector != null) {
                 try {
@@ -317,38 +228,35 @@ public class JmxTask extends AbstractTask {
                     log.error("Unable to close Jmx connection.", e);
                 }
             }
-
-            return dataPublisher.defineStream(stringBuilder.toString());
         }
+        streamDefinition.setPayloadData(payloadDataList);
+        return streamDefinition;
     }
 
-    private void appendColumnName(StringBuilder stringBuilder, Object attrValue, String alias) {
+    private List<Attribute> getMetaAttributeList() {
+        List<Attribute> metaDataList = new ArrayList<>();
+        metaDataList.add(new Attribute("clientType", AttributeType.STRING));
+        metaDataList.add(new Attribute("host", AttributeType.STRING));
+        return metaDataList;
+    }
 
-        //if the value is a string
+    private Attribute getColumnName(Object attrValue, String alias) {
+        AttributeType attributeType = null;
         if (attrValue instanceof String) {
-            stringBuilder.append("{'name':'").append(alias).append("','type':'STRING'},");
-        }
-        //if the value is an integer
-        else if (attrValue instanceof Integer) {
-            stringBuilder.append("{'name':'").append(alias).append("','type':'INT'},");
-        }
-        //if the value is a long
-        else if (attrValue instanceof Long) {
-            stringBuilder.append("{'name':'").append(alias).append("','type':'LONG'},");
-        }
-        //if the value is a double
-        else if (attrValue instanceof Double) {
-            stringBuilder.append("{'name':'").append(alias).append("','type':'DOUBLE'},");
-        }
-        //if the value is a boolean
-        else if (attrValue instanceof Boolean) {
-            stringBuilder.append("{'name':'").append(alias).append("','type':'BOOL'},");
-        }
-        //if the value is a float
-        else if (attrValue instanceof Float) {
-            stringBuilder.append("{'name':'").append(alias).append("','type':'FLOAT'},");
+            attributeType = AttributeType.STRING;
+        } else if (attrValue instanceof Integer) {
+            attributeType = AttributeType.INT;
+        } else if (attrValue instanceof Long) {
+            attributeType = AttributeType.LONG;
+        } else if (attrValue instanceof Double) {
+            attributeType = AttributeType.DOUBLE;
+        } else if (attrValue instanceof Boolean) {
+            attributeType = AttributeType.BOOL;
+        } else if (attrValue instanceof Float) {
+            attributeType = AttributeType.FLOAT;
         } else {
             log.error("Missed attribute in stream def: " + alias);
         }
+        return new Attribute(alias, attributeType);
     }
 }

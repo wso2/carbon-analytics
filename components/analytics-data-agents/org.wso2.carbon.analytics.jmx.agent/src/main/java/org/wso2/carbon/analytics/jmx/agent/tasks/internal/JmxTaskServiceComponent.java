@@ -21,17 +21,13 @@ package org.wso2.carbon.analytics.jmx.agent.tasks.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.jmx.agent.JmxConstant;
-import org.wso2.carbon.analytics.jmx.agent.TenantPublisherConfigData;
-import org.wso2.carbon.databridge.agent.thrift.DataPublisher;
+import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
-
-import java.util.Map;
 
 /**
  * @scr.component name="jmxservices.task" immediate="true"
@@ -39,15 +35,13 @@ import java.util.Map;
  * cardinality="1..1" policy="dynamic" bind="setTaskService" unbind="unsetTaskService"
  * @scr.reference name="registry.service"
  * interface="org.wso2.carbon.registry.core.service.RegistryService"
- * cardinality="1..1" policy="dynamic"
- * bind="setRegistryService"
- * unbind="unsetRegistryService"
+ * cardinality="1..1" policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
  * @scr.reference name="registry.loader.default"
  * interface="org.wso2.carbon.registry.core.service.TenantRegistryLoader"
- * cardinality="1..1"
- * policy="dynamic"
- * bind="setRegistryLoader"
- * unbind="unsetRegistryLoader"
+ * cardinality="1..1" policy="dynamic" bind="setRegistryLoader" unbind="unsetRegistryLoader"
+ * @scr.reference name="org.wso2.carbon.event.stream.core.EventStreamService"
+ * interface="org.wso2.carbon.event.stream.core.EventStreamService"
+ * cardinality="1..1" policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
  */
 public class JmxTaskServiceComponent {
 
@@ -56,12 +50,12 @@ public class JmxTaskServiceComponent {
     private static TaskService taskService;
     private static RegistryService registryService;
     private static TenantRegistryLoader tenantRegistryLoader;
+    private static EventStreamService eventStreamService;
 
     protected void activate(ComponentContext ctxt) {
         if (log.isDebugEnabled()) {
             log.debug("Activating the tasks");
         }
-        BundleContext bundleContext = ctxt.getBundleContext();
         try {
             getTaskService().registerTaskType(JmxConstant.JMX_SERVICE_TASK_TYPE);
         } catch (TaskException e) {
@@ -70,15 +64,6 @@ public class JmxTaskServiceComponent {
     }
 
     protected void deactivate(ComponentContext ctxt) {
-        Map<String, DataPublisher> publisherMap = TenantPublisherConfigData.getDataPublisherMap();
-        if (!publisherMap.isEmpty()) {
-            for (String tenantId : publisherMap.keySet()) {
-                DataPublisher dataPublisher = publisherMap.get(tenantId);
-                if (dataPublisher != null) {
-                    dataPublisher.stop();
-                }
-            }
-        }
 
         if (log.isDebugEnabled()) {
             log.debug("Jmx Services task bundle is deactivated ");
@@ -123,6 +108,14 @@ public class JmxTaskServiceComponent {
         JmxTaskServiceComponent.tenantRegistryLoader = null;
     }
 
+    protected void setEventStreamService(EventStreamService eventStreamService) {
+        JmxTaskServiceComponent.eventStreamService = eventStreamService;
+    }
+
+    protected void unsetEventStreamService(EventStreamService eventStreamService) {
+        JmxTaskServiceComponent.eventStreamService = null;
+    }
+
     public static TaskService getTaskService() {
         return taskService;
     }
@@ -133,5 +126,9 @@ public class JmxTaskServiceComponent {
 
     public static TenantRegistryLoader getTenantRegistryLoader() {
         return tenantRegistryLoader;
+    }
+
+    public static EventStreamService getEventStreamService() {
+        return eventStreamService;
     }
 }
