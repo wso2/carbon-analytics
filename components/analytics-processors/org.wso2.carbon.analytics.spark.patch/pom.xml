@@ -116,7 +116,7 @@
                         <Include-Resource>target/patch.jar</Include-Resource>
                         <Bundle-Classpath>patch.jar,.</Bundle-Classpath>
                         <Fragment-Host>spark-core_2.10</Fragment-Host>
-                        <DynamicImport-Package>*</DynamicImport-Package> >
+                        <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>
             </plugin>

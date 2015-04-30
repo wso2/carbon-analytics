@@ -775,12 +775,6 @@
             </dependency>
 
             <dependency>
-                <groupId>commons-configuration.wso2</groupId>
-                <artifactId>commons-configuration</artifactId>
-                <version>1.6.0.wso2v1</version>
-            </dependency>
-
-            <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.messageconsole.ui</artifactId>
                 <version>${carbon.analytics.version}</version>
