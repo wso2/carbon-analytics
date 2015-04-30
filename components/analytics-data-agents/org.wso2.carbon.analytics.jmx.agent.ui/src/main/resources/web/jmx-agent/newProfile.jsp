@@ -508,74 +508,7 @@ function selectAttribute() {
             <div id="profileNameLengthErrorMsg" style="display:none;color:red"> The profile name need to be less than 30 characters.
             </div>
         </td>
-
-
     </tr>
-</table>
-
-<div class="sectionSeperator togglebleTitle">Data Receiver information</div>
-
-<table class="carbonFormTable sectionSub">
-
-    <tr>
-        <td class="labelField leftCol-small">Receiver address:<span class="required">*</span></td>
-        <td>
-            <select name="pubConnType" id="pubConnType">
-                <option value="tcp://">tcp://</option>
-                <option value="https://">https://</option>
-                <option value="http://">http://</option>
-                <option value="ssl://">ssl://</option>
-            </select>
-
-            <input name="pubAddress" type="text" id="pubAddress" value="127.0.0.1:7611"/>
-            <button type="button" onclick="testDataReceiverReceiverURLAvailability()">Check
-                                                                                      Connection
-            </button>
-
-            <div class="sectionHelp">
-                Enter the receiver address in the format "IP_Address:Port".
-            </div>
-        </td>
-    </tr>
-    <tr>
-        <td class="labelField leftCol-small">Secure address:<span class="required">*</span></td>
-        <td>
-            <select name="pubSecureConnType" id="pubSecureConnType">
-                <option value="https://">https://</option>
-                <option value="ssl://">ssl://</option>
-            </select>
-
-            <input name="pubSecureAddress" type="text" id="pubSecureAddress" value="127.0.0.1:7711" />
-            <button type="button" onclick="testDataReceiverSecureURLAvailability()">Check
-                                                                                    Connection
-            </button>
-
-            <div class="sectionHelp">
-                Enter the secure address in the format "IP_Address:Port".
-            </div>
-        </td>
-    </tr>
-
-    <tr>
-        <td class="labelField">User Name:<span class="required">*</span></td>
-        <td><input name="pubUserName" type="text" id="pubUserName" class="required"/>
-
-            <div class="sectionHelp">
-                Enter the data receiver user name.
-            </div>
-        </td>
-    </tr>
-
-    <tr>
-        <td class="labelField">Password:<span class="required">*</span></td>
-        <td><input name="pubUserPass" type="password" id="pubUserPass" class="required"/>
-
-            <div class="sectionHelp">
-                Enter the data receiver password.
-            </div>
-        </td>
-    </tr>
-
     <tr>
         <td class="labelField">Schedule:<span class="required">*</span></td>
         <td>
@@ -594,9 +527,8 @@ function selectAttribute() {
                    class="required"/>
         </td>
     </tr>
-
-
 </table>
+
 <%--</div><!-- sectionSub Div -->--%>
 
 <div class="sectionSeperator togglebleTitle">JMX server information</div>

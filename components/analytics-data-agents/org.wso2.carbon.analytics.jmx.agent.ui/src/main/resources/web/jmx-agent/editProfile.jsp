@@ -454,80 +454,15 @@ jQuery(document).ready(function(){
 
 <div class="sectionHelp">All the fields marked with * are mandatory</div>
 <div class=”sectionSub”>
-<div class="sectionSeperator togglebleTitle">Data Receiver information</div>
+<div class="sectionSeperator togglebleTitle">Basic Information</div>
 
 <table class="carbonFormTable sectionSub">
-
     <tr>
-        <td class="labelField leftCol-small">Receiver address:<span class="required">*</span></td>
+        <td class="labelField leftCol-small">Schedule:<span class="required">*</span></td>
         <td>
-            <select name="pubConnType" id="pubConnType">
-                <option value="tcp://">tcp://</option>
-                <option value="https://">https://</option>
-                <option value="http://">http://</option>
-                <option value="ssl://">ssl://</option>
-            </select>
-
-            <input name="pubAddress" type="text" id="pubAddress"
-                   value="<%=profile.getDpReceiverAddress()%>"/>
-            <button type="button" onclick="testDataReceiverReceiverURLAvailability()">Check
-                                                                                      Connection
-            </button>
-
-            <div class="sectionHelp">
-                Enter the receiver address in the format "IP_Address:Port".
-            </div>
-        </td>
-    </tr>
-    <tr>
-        <td class="labelField leftCol-small">Secure address:<span class="required">*</span></td>
-        <td>
-            <select name="pubSecureConnType" id="pubSecureConnType">
-                <option value="https://">https://</option>
-                <option value="ssl://">ssl://</option>
-            </select>
-
-            <input name="pubSecureAddress" type="text" id="pubSecureAddress"
-                   value="<%=profile.getDpSecureAddress()%>"/>
-            <button type="button" onclick="testDataReceiverSecureURLAvailability()">Check
-                                                                                    Connection
-            </button>
-
-            <div class="sectionHelp">
-                Enter the secure address in the format "IP_Address:Port".
-            </div>
-        </td>
-    </tr>
-
-    <tr>
-        <td class="labelField">User Name:<span class="required">*</span></td>
-        <td><input name="pubUserName" type="text" id="pubUserName"
-                   value="<%=profile.getDpUserName()%>" class="required"/>
-
-            <div class="sectionHelp">
-                Enter the data receiver user name.
-            </div>
-        </td>
-    </tr>
-
-    <tr>
-        <td class="labelField">Password:<span class="required">*</span></td>
-        <td><input name="pubUserPass" type="password" id="pubUserPass"
-                   value="<%=profile.getDpPassword()%>" class="required"/>
-
-            <div class="sectionHelp">
-                Enter the data receiver password.
-            </div>
-        </td>
-    </tr>
-
-    <tr>
-        <td class="labelField">Schedule:<span class="required">*</span></td>
-        <td>
-
 
             <%--</div>--%>
-            <div id="presetCrons">
+            <div id="presetCrons" class="sectionHelp">
                 <select name="presetCronExpr" id="presetCronExpr" onclick="changeCronType()">
                     <option value="0/2 * * ? * *">once every 2 seconds (0/2 * * ? * *)</option>
                     <option value="0/5 * * ? * *">once every 5 seconds (0/5 * * ? * *)</option>
