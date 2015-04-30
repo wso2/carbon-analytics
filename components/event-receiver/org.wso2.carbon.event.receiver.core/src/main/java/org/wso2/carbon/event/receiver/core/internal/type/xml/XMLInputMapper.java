@@ -82,7 +82,7 @@ public class XMLInputMapper implements InputMapper {
                         if (position < 0 || position > xpathDataArray.length) {
                             throw new EventReceiverStreamValidationException("Could not determine the stream position for attribute : "
                                     + inputMappingAttribute.getToElementKey() + " in stream exported by event receiver "
-                                    + exportedStreamDefinition.getStreamId(),exportedStreamDefinition.getStreamId());
+                                    + exportedStreamDefinition.getStreamId(), exportedStreamDefinition.getStreamId());
                         }
                         xpathDataArray[position] = new XPathData(xpath, type, inputMappingAttribute.getDefaultValue());
                     }
@@ -178,8 +178,8 @@ public class XMLInputMapper implements InputMapper {
             OMElement events;
             try {
                 events = (OMElement) this.parentSelectorXpath.selectSingleNode(obj);
-                if(events==null){
-                    throw new RuntimeException("Parent Selector XPath \""+parentSelectorXpath.toString()+"\" cannot be processed on event:"+ obj.toString());
+                if (events == null) {
+                    throw new RuntimeException("Parent Selector XPath \"" + parentSelectorXpath.toString() + "\" cannot be processed on event:" + obj.toString());
                 }
 
                 List<Object[]> objArrayList = new ArrayList<Object[]>();
@@ -239,18 +239,24 @@ public class XMLInputMapper implements InputMapper {
                     if (omElementResult != null) {
                         returnedObj = BeanUtil.deserialize(beanClass,
                                 omElementResult, reflectionBasedObjectSupplier, null);
-                    } else if (xpathData.getDefaultValue() != null) {
-                        if (!beanClass.equals(String.class)) {
-                            Class<?> stringClass = String.class;
-                            Method valueOfMethod = beanClass.getMethod("valueOf", stringClass);
-                            returnedObj = valueOfMethod.invoke(null, xpathData.getDefaultValue());
-                        } else {
-                            returnedObj = xpathData.getDefaultValue();
+                    }
+
+                    if (omElementResult == null || returnedObj == null) {
+                        if (xpathData.getDefaultValue() != null) {
+                            if (!beanClass.equals(String.class)) {
+                                Class<?> stringClass = String.class;
+                                Method valueOfMethod = beanClass.getMethod("valueOf", stringClass);
+                                returnedObj = valueOfMethod.invoke(null, xpathData.getDefaultValue());
+                            } else {
+                                returnedObj = xpathData.getDefaultValue();
+                            }
+                        } else if (!type.equals(EventReceiverConstants.CLASS_FOR_STRING)) {
+                            if (omElementResult == null) {
+                                throw new EventReceiverProcessingException("Unable to parse XPath " + xpathData.getXpath() + " to retrieve required attribute, hence dropping the event "+obj.toString());
+                            } else {
+                                throw new EventReceiverProcessingException("Valid attribute value not found for "+xpathData.getXpath() + " ,hence dropping the event "+obj.toString());
+                            }
                         }
-//                        throw new  EventReceiverProcessingException ("Unable to parse XPath to retrieve required attribute. Sending defaults.");
-//                        log.warn();
-                    } else {
-                        throw new  EventReceiverProcessingException ("Unable to parse XPath "+xpathData.getXpath()+" to retrieve required attribute.");
                     }
                     objList.add(returnedObj);
                 } catch (JaxenException e) {
@@ -259,11 +265,7 @@ public class XMLInputMapper implements InputMapper {
                     throw new EventReceiverProcessingException("Cannot find specified class for type " + type);
                 } catch (AxisFault axisFault) {
                     throw new EventReceiverProcessingException("Error de-serializing OMElement " + omElementResult, axisFault);
-                } catch (NoSuchMethodException e) {
-                    throw new EventReceiverProcessingException("Error trying to convert default value to specified target type.", e);
-                } catch (InvocationTargetException e) {
-                    throw new EventReceiverProcessingException("Error trying to convert default value to specified target type.", e);
-                } catch (IllegalAccessException e) {
+                } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
                     throw new EventReceiverProcessingException("Error trying to convert default value to specified target type.", e);
                 }
             }

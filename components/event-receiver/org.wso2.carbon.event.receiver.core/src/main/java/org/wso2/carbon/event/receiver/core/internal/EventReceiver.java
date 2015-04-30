@@ -182,7 +182,9 @@ public class EventReceiver implements EventProducer {
                     if (convertedEvent instanceof Object[][]) {
                         Object[][] arrayOfEvents = (Object[][]) convertedEvent;
                         for (Object[] outObjArray : arrayOfEvents) {
-                            sendEvent(outObjArray);
+                            if(outObjArray != null){
+                                sendEvent(outObjArray);
+                            }
                         }
                     } else {
                         sendEvent((Object[]) convertedEvent);
@@ -212,7 +214,9 @@ public class EventReceiver implements EventProducer {
                     if (convertedEvent instanceof Object[][]) {
                         Object[][] arrayOfEvents = (Object[][]) convertedEvent;
                         for (Object[] outObjArray : arrayOfEvents) {
-                            sendEvent(outObjArray);
+                            if (outObjArray != null) {
+                                sendEvent(outObjArray);
+                            }
                         }
                     } else {
                         sendEvent((Object[]) convertedEvent);

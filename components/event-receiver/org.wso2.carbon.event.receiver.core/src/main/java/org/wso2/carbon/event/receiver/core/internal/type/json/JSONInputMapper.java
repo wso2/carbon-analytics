@@ -30,6 +30,7 @@ import org.wso2.carbon.event.receiver.core.config.mapping.JSONInputMapping;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverConfigurationException;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverProcessingException;
 import org.wso2.carbon.event.receiver.core.InputMapper;
+import org.wso2.carbon.event.receiver.core.exception.InvalidPropertyValueException;
 import org.wso2.carbon.event.receiver.core.internal.util.helper.EventReceiverConfigurationHelper;
 
 import java.util.ArrayList;
@@ -55,7 +56,7 @@ public class JSONInputMapper implements InputMapper {
         if (eventReceiverConfiguration != null && eventReceiverConfiguration.getInputMapping() instanceof JSONInputMapping) {
             JSONInputMapping jsonInputMapping = (JSONInputMapping) eventReceiverConfiguration.getInputMapping();
             if (jsonInputMapping.isCustomMappingEnabled()) {
-                createAttributeJsonPathList(streamDefinition,jsonInputMapping.getInputMappingAttributes());
+                createAttributeJsonPathList(streamDefinition, jsonInputMapping.getInputMappingAttributes());
             } else {
                 this.noMetaData = streamDefinition.getMetaData() != null ? streamDefinition.getMetaData().size() : 0;
                 this.noCorrelationData += streamDefinition.getCorrelationData() != null ? streamDefinition.getCorrelationData().size() : 0;
@@ -130,19 +131,35 @@ public class JSONInputMapper implements InputMapper {
                 try {
                     Object resultObject = jsonPath.read(jsonString);
                     Object returnedObj = null;
-                    if (resultObject != null) {
-                        returnedObj = getPropertyValue(resultObject, type);
-                    } else if (jsonPathData.getDefaultValue() != null && !jsonPathData.getDefaultValue().isEmpty()) {
-                        returnedObj = getPropertyValue(jsonPathData.getDefaultValue(), type);
-                        log.warn("Unable to parse JSONPath to retrieve required attribute. Sending defaults.");
+
+                    if (resultObject == null) {
+                        if (jsonPathData.getDefaultValue() != null && !jsonPathData.getDefaultValue().isEmpty()) {
+                            returnedObj = getPropertyValue(jsonPathData.getDefaultValue(), type);
+                            log.warn("Unable to parse JSONPath to retrieve required attribute. Sending defaults.");
+                        } else if (!(AttributeType.STRING.equals(jsonPathData.getType()))) {
+                            throw new InvalidPropertyValueException("Found Invalid property value null for attribute ");
+                        }
                     } else {
-                        log.warn("Unable to parse JSONPath to retrieve required attribute. Skipping to next attribute.");
+                        try {
+                            returnedObj = getPropertyValue(resultObject, type);
+                        }catch (NumberFormatException e){
+                            if((! AttributeType.STRING.equals(type)) && jsonPathData.getDefaultValue() != null){
+                                returnedObj = getPropertyValue(jsonPathData.getDefaultValue(), type);
+                            }else {
+                                throw e;
+                            }
+                        }
                     }
                     objList.add(returnedObj);
-                } catch (ClassCastException e) {
-                    log.warn("Unable to cast the input data to required type :" + type);
+                } catch (NumberFormatException e) {
+                    log.error("Unable to cast the input data to required type :" + type + " ,hence dropping the event " + obj.toString(), e);
+                    return null;
                 } catch (InvalidPathException e) {
-                    log.warn("Could not find any matches for the incoming event with JSONPath : " + jsonPath.toString());
+                    log.error("Could not find any matches for the incoming event with JSONPath : " + jsonPath.toString() + " ,hence dropping the event " + obj.toString());
+                    return null;
+                } catch (InvalidPropertyValueException e) {
+                    log.error(e.getMessage() + " ,hence dropping the event : " + obj.toString());
+                    return null;
                 }
             }
             outObjArray = objList.toArray(new Object[objList.size()]);
@@ -172,65 +189,90 @@ public class JSONInputMapper implements InputMapper {
 
         Object attributeArray[] = new Object[noMetaData + noCorrelationData + noPayloadData];
         int attributeCount = 0;
-        if (obj instanceof String) {
-            String jsonString = (String) obj;
 
-            if (noMetaData > 0) {
-                for (Attribute metaData : streamDefinition.getMetaData()) {
+        try {
+            if (obj instanceof String) {
+                String jsonString = (String) obj;
+
+                if (noMetaData > 0) {
                     JsonPath jsonPath = JsonPath.compile("$." + EventReceiverConstants.EVENT_PARENT_TAG + "." + EventReceiverConstants.EVENT_META_TAG);
                     Map<Object, Object> eventMap = jsonPath.read(jsonString);
                     if (eventMap == null) {
                         throw new EventReceiverProcessingException("Missing event MetaData attributes, Event does not match with the stream : " + this.eventReceiverConfiguration.getToStreamName() + ":" + eventReceiverConfiguration.getToStreamVersion());
-                    }
-                    for (Map.Entry<Object, Object> eventAttribute : eventMap.entrySet()) {
-                        if (eventAttribute.getKey().equals(metaData.getName())) {
-                            attributeArray[attributeCount++] = getPropertyValue(eventAttribute.getValue(), metaData.getType());
+                    } else {
+                        for (Attribute metaData : streamDefinition.getMetaData()) {
+                            if (eventMap.containsKey(metaData.getName())) {
+                                attributeArray[attributeCount++] = getPropertyValue(eventMap.get(metaData.getName()), metaData.getType());
+                            } else {
+                                if (AttributeType.STRING.equals(metaData.getType())) {
+                                    attributeArray[attributeCount++] = getPropertyValue(null, metaData.getType());
+                                } else {
+                                    throw new InvalidPropertyValueException("Attribute " + metaData.getName() + " tag not found in the event hence Dropping event " + obj.toString());
+                                }
+                            }
                         }
                     }
-
                 }
-            }
-            if (noCorrelationData > 0) {
-                for (Attribute correlationData : streamDefinition.getCorrelationData()) {
+
+                if (noCorrelationData > 0) {
                     JsonPath jsonPath = JsonPath.compile("$." + EventReceiverConstants.EVENT_PARENT_TAG + "." + EventReceiverConstants.EVENT_CORRELATION_TAG);
                     Map<Object, Object> eventMap = jsonPath.read(jsonString);
                     if (eventMap == null) {
                         throw new EventReceiverProcessingException("Missing CorrelationData attributes, Event does not match with the stream : " + this.eventReceiverConfiguration.getToStreamName() + ":" + eventReceiverConfiguration.getToStreamVersion());
-                    }
-                    for (Map.Entry<Object, Object> eventAttribute : eventMap.entrySet()) {
-
-                        if (eventAttribute.getKey().equals(correlationData.getName())) {
-                            attributeArray[attributeCount++] = getPropertyValue(eventAttribute.getValue(), correlationData.getType());
+                    } else {
+                        for (Attribute correlationData : streamDefinition.getCorrelationData()) {
+                            if (eventMap.containsKey(correlationData.getName())) {
+                                attributeArray[attributeCount++] = getPropertyValue(eventMap.get(correlationData.getName()), correlationData.getType());
+                            } else {
+                                if (AttributeType.STRING.equals(correlationData.getType())) {
+                                    attributeArray[attributeCount++] = getPropertyValue(null, correlationData.getType());
+                                } else {
+                                    throw new InvalidPropertyValueException("Attribute " + correlationData.getName() + " tag not found in the event hence Dropping event " + obj.toString());
+                                }
+                            }
                         }
                     }
-
                 }
-            }
-            if (noPayloadData > 0) {
-                for (Attribute payloadData : streamDefinition.getPayloadData()) {
+                if (noPayloadData > 0) {
                     JsonPath jsonPath = JsonPath.compile("$." + EventReceiverConstants.EVENT_PARENT_TAG + "." + EventReceiverConstants.EVENT_PAYLOAD_TAG);
                     Map<Object, Object> eventMap = jsonPath.read(jsonString);
                     if (eventMap == null) {
                         throw new EventReceiverProcessingException("Missing PayloadData attributes, Event does not match with the stream : " + this.eventReceiverConfiguration.getToStreamName() + ":" + eventReceiverConfiguration.getToStreamVersion());
-                    }
-                    for (Map.Entry<Object, Object> eventAttribute : eventMap.entrySet()) {
-
-                        if (eventAttribute.getKey().equals(payloadData.getName())) {
-                            attributeArray[attributeCount++] = getPropertyValue(eventAttribute.getValue(), payloadData.getType());
+                    } else {
+                        for (Attribute payloadData : streamDefinition.getPayloadData()) {
+                            if (eventMap.containsKey(payloadData.getName())) {
+                                attributeArray[attributeCount++] = getPropertyValue(eventMap.get(payloadData.getName()), payloadData.getType());
+                            } else {
+                                if (AttributeType.STRING.equals(payloadData.getType())) {
+                                    attributeArray[attributeCount++] = getPropertyValue(null, payloadData.getType());
+                                } else {
+                                    throw new InvalidPropertyValueException("Attribute " + payloadData.getName() + " tag not found in the event hence Dropping event " + obj.toString());
+                                }
+                            }
                         }
                     }
-
+                }
+                if (noMetaData + noCorrelationData + noPayloadData != attributeCount) {
+                    throw new EventReceiverProcessingException("Event attributes are not matching with the stream : " + this.eventReceiverConfiguration.getToStreamName() + ":" + eventReceiverConfiguration.getToStreamVersion());
                 }
             }
-            if (noMetaData + noCorrelationData + noPayloadData != attributeCount) {
-                throw new EventReceiverProcessingException("Event attributes are not matching with the stream : " + this.eventReceiverConfiguration.getToStreamName() + ":" + eventReceiverConfiguration.getToStreamVersion());
-            }
+            return attributeArray;
+        } catch (InvalidPropertyValueException e) {
+            log.error(e.getMessage() + "Dropping Event : " + obj.toString());
+            return null;
+        } catch (NumberFormatException e) {
+            log.error("Unable to cast the input data to required type " + " ,hence dropping the event " + obj.toString(), e);
+            return null;
         }
-        return attributeArray;
     }
 
 
-    private Object getPropertyValue(Object propertyValue, AttributeType attributeType) {
+    private Object getPropertyValue(Object propertyValue, AttributeType attributeType) throws InvalidPropertyValueException {
+
+        if ((!AttributeType.STRING.equals(attributeType)) && propertyValue == null) {
+            throw new InvalidPropertyValueException("Found Invalid property value null for attribute ");
+        }
+
         if (AttributeType.BOOL.equals(attributeType)) {
             return Boolean.parseBoolean(propertyValue.toString());
         } else if (AttributeType.DOUBLE.equals(attributeType)) {
@@ -242,8 +284,9 @@ public class JSONInputMapper implements InputMapper {
         } else if (AttributeType.LONG.equals(attributeType)) {
             return Long.parseLong(propertyValue.toString());
         } else {
-            return propertyValue.toString();
+            return propertyValue;
         }
+
     }
 
     private class JsonPathData {
@@ -279,7 +322,7 @@ public class JSONInputMapper implements InputMapper {
             }
         }
 
-        if (streamDefinition.getCorrelationData() != null &&streamDefinition.getCorrelationData().size() > 0) {
+        if (streamDefinition.getCorrelationData() != null && streamDefinition.getCorrelationData().size() > 0) {
             for (Attribute correlationData : streamDefinition.getCorrelationData()) {
                 InputMappingAttribute inputMappingAttribute = getInputMappingAttribute(EventReceiverConstants.CORRELATION_DATA_PREFIX + correlationData.getName(), inputMappingAttributeList);
                 attributeJsonPathDataList.add(new JsonPathData(JsonPath.compile(inputMappingAttribute.getFromElementKey()), inputMappingAttribute.getToElementType(), inputMappingAttribute.getDefaultValue()));
