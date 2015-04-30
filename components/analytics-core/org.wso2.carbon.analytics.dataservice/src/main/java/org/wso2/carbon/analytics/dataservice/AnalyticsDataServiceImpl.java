@@ -259,9 +259,11 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
     
     private AnalyticsSchema lookupSchema(int tenantId, String tableName) throws AnalyticsException {
-        AnalyticsSchema schema = this.schemaMap.get(GenericUtils.calculateTableIdentity(tenantId, tableName));
+        String tableIdentity = GenericUtils.calculateTableIdentity(tenantId, tableName);
+        AnalyticsSchema schema = this.schemaMap.get(tableIdentity);
         if (schema == null) {
             schema = this.getAnalyticsRecordStore().getTableSchema(tenantId, tableName);
+            this.schemaMap.put(tableIdentity, schema);
         }
         return schema;
     }
