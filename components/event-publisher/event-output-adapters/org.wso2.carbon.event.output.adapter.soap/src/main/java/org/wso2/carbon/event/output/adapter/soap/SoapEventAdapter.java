@@ -21,10 +21,13 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
+import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.description.TransportOutDescription;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
@@ -159,7 +162,7 @@ public class SoapEventAdapter implements OutputEventAdapter {
             String[] keyValue;
             Map<String, String> result = new HashMap<String, String>();
             for (String entry : entries) {
-                keyValue = entry.split(SoapEventAdapterConstants.ENTRY_SEPARATOR);
+                keyValue = entry.split(SoapEventAdapterConstants.ENTRY_SEPARATOR, 2);
                 result.put(keyValue[0].trim(), keyValue[1].trim());
             }
             return result;
@@ -194,14 +197,10 @@ public class SoapEventAdapter implements OutputEventAdapter {
                 serviceClient = new ServiceClient(configContext, null);
                 Options options = new Options();
                 options.setTo(new EndpointReference(url));
-                try {
-                    if (headers != null) {
-                        for (Map.Entry<String, String> headerValue : headers.entrySet()) {
-                            options.setProperty(headerValue.getKey(), headerValue.getValue());
-                        }
-                    }
-                } catch (Exception e) {
-                    log.error("Invalid headers : \"" + headers + "\", ignoring headers...");
+
+                if (headers != null) {
+                    serviceClient.engageModule("addressing");
+                    setSoapHeaders(headers, options);
                 }
 
                 if (username != null || password != null) {
@@ -275,6 +274,47 @@ public class SoapEventAdapter implements OutputEventAdapter {
                             "    </wsp:ExactlyOne>\n" +
                             "</wsp:Policy>");
             return PolicyEngine.getPolicy(omElement);
+        }
+
+        private void setSoapHeaders(Map<String, String> headers, Options options) {
+
+            for (Map.Entry<String, String> headerValue : headers.entrySet()) {
+                try {
+                    if (headerValue.getKey().equalsIgnoreCase("SOAPAction")) {
+                        options.setAction(headerValue.getValue());
+                    } else if (headerValue.getKey().equalsIgnoreCase("From")) {
+                        options.setFrom(new EndpointReference(headerValue.getValue()));
+                    } else if (headerValue.getKey().equalsIgnoreCase("FaultTo")) {
+                        options.setFaultTo(new EndpointReference(headerValue.getValue()));
+                    } else if (headerValue.getKey().equalsIgnoreCase("TransportIn")) {
+                        options.setTransportIn(new TransportInDescription(headerValue.getValue()));
+                    } else if (headerValue.getKey().equalsIgnoreCase("TransportInProtocol")) {
+                        options.setTransportInProtocol(headerValue.getValue());
+                    } else if (headerValue.getKey().equalsIgnoreCase("MessageID")) {
+                        options.setMessageId(headerValue.getValue());
+                    } else if (headerValue.getKey().equalsIgnoreCase("RelatesTo")) {
+                        options.addRelatesTo(new RelatesTo(headerValue.getValue()));
+                    } else if (headerValue.getKey().equalsIgnoreCase("ReplyTo")) {
+                        options.setReplyTo(new EndpointReference(headerValue.getValue()));
+                    } else if (headerValue.getKey().equalsIgnoreCase("TransportOut")) {
+                        options.setTransportOut(new TransportOutDescription(headerValue.getValue()));
+                    } else if (headerValue.getKey().equalsIgnoreCase("SoapVersionURI")) {
+                        options.setSoapVersionURI(headerValue.getValue());
+                    } else if (headerValue.getKey().equalsIgnoreCase("To")) {
+                        options.setTo(new EndpointReference(headerValue.getValue()));
+                    } else if (headerValue.getKey().equalsIgnoreCase("ManageSession")) {
+                        options.setManageSession(Boolean.parseBoolean(headerValue.getValue()));
+                    } else {
+                        options.setProperty(headerValue.getKey(), headerValue.getValue());
+                    }
+
+                } catch (Exception e) {
+                    //Catching the exception because there can be several exception thrown from axis2 level and we cannot drop the message because of a header issue
+                    log.warn("Invalid header : \"" + headerValue + "\", ignoring corresponding header..." + e.getMessage());
+                }
+
+            }
+
         }
     }
 }
