@@ -26,8 +26,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import javax.naming.Context;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
@@ -46,10 +44,6 @@ public class AnalyticsFileSystemTest {
     private AnalyticsFileSystem analyticsFileSystem;
     
     private String implementationName;
-    
-    public AnalyticsFileSystemTest() {
-        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, InMemoryICFactory.class.getName());
-    }
     
     public void init(String implementationName, AnalyticsFileSystem analyticsFileSystem) throws AnalyticsException {
         this.implementationName = implementationName;

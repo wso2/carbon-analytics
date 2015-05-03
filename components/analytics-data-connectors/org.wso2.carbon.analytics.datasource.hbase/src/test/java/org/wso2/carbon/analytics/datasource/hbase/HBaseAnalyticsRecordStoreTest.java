@@ -24,10 +24,7 @@ import org.junit.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
-import org.wso2.carbon.analytics.datasource.core.InMemoryICFactory;
 
-import javax.naming.Context;
-import javax.naming.NamingException;
 import java.io.IOException;
 
 public class HBaseAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
@@ -35,8 +32,7 @@ public class HBaseAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
     private HBaseAnalyticsRecordStore store;
 
     @BeforeClass
-    public void setup() throws NamingException, AnalyticsException, IOException {
-        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, InMemoryICFactory.class.getName());
+    public void setup() throws AnalyticsException, IOException {
         this.store = new HBaseAnalyticsRecordStore(this.init(), this.createConfig());
         super.init("HBaseAnalyticsRecordStore", store);
     }

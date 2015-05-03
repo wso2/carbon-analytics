@@ -19,12 +19,14 @@ package org.wso2.carbon.analytics.io.commons;
 
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 
 public class RemoteRecordGroup implements RecordGroup {
+
+    private static final long serialVersionUID = 7445677312837053383L;
+    
     private String[] locations;
     private byte[] binaryRecordGroup;
 
@@ -45,12 +47,8 @@ public class RemoteRecordGroup implements RecordGroup {
         return this.locations;
     }
 
-    public RecordGroup getRecordGroupFromBinary() throws IOException, ClassNotFoundException {
-        ByteArrayInputStream in = new ByteArrayInputStream(binaryRecordGroup);
-        ObjectInputStream is = new ObjectInputStream(in);
-        RecordGroup recordGroup = (RecordGroup) is.readObject();
-        is.close();
-        in.close();
-        return recordGroup;
+    public RecordGroup getRecordGroupFromBinary() throws IOException {
+        return (RecordGroup) GenericUtils.deserializeObject(this.binaryRecordGroup);
     }
+    
 }

@@ -20,16 +20,18 @@ package org.wso2.carbon.analytics.api;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.util.Iterator;
 
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+
 public class RemoteRecordIterator<T> implements Iterator<T> {
-    private ObjectInputStream objectInputStream;
+    
+    private InputStream inputStream;
     private T nextObject;
     private boolean completed;
 
     public RemoteRecordIterator(InputStream inputStream) throws IOException {
-        objectInputStream = new ObjectInputStream(inputStream);
+        this.inputStream = inputStream;
         this.completed = false;
     }
 
@@ -42,17 +44,17 @@ public class RemoteRecordIterator<T> implements Iterator<T> {
             } else {
                 if (!completed) {
                     try {
-                        this.nextObject = (T) objectInputStream.readObject();
+                        this.nextObject = (T) GenericUtils.deserializeObject(this.inputStream);
                     } catch (EOFException ex) {
                         this.nextObject = null;
                         completed = true;
-                        this.objectInputStream.close();
+                        this.inputStream.close();
                     }
                 }
                 return nextObject != null;
             }
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("Error while streaming the results ." + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new RuntimeException("Error while streaming the results: " + e.getMessage(), e);
         }
     }
 

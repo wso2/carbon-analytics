@@ -45,11 +45,13 @@ import javax.xml.bind.JAXBContext;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -391,6 +393,8 @@ public class GenericUtils {
         return builder.toString();
     }
 
+    /* do not touch if you do not know what you're doing, critical for serialize/deserialize
+     * implementation to be stable to retain backward compatibility */
     public static byte[] serializeObject(Object obj) {
 //        Kryo kryo = kryoTL.get();
 //        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
@@ -398,7 +402,11 @@ public class GenericUtils {
 //        try {
 //            kryo.writeClassAndObject(out, obj);
 //            out.flush();
-//            return byteOut.toByteArray();
+//            byte[] data = byteOut.toByteArray();
+//            ByteBuffer result = ByteBuffer.allocate(data.length + Integer.SIZE / 8);
+//            result.putInt(data.length);
+//            result.put(data);
+//            return result.array();
 //        } finally {
 //            out.close();
 //        }
@@ -412,12 +420,20 @@ public class GenericUtils {
             throw new RuntimeException(e);
         }
     }
+    
+    /* do not touch, @see serializeObject(Object) */
+    public static void serializeObject(Object obj, OutputStream out) throws IOException {
+        byte[] data = serializeObject(obj);
+        out.write(data, 0, data.length);
+    }
 
+    /* do not touch, @see serializeObject(Object) */
     public static Object deserializeObject(byte[] source) {
         if (source == null) {
             return null;
         }
-//        Input input = new Input(source);
+//        /* skip the object size integer */
+//        Input input = new Input(Arrays.copyOfRange(source, Integer.SIZE / 8, source.length));
 //        try {
 //            Kryo kryo = kryoTL.get();
 //            return kryo.readClassAndObject(input);
@@ -433,13 +449,21 @@ public class GenericUtils {
         }
     }
     
-    public static Object deserializeObject(InputStream in) {
+    /* do not touch, @see serializeObject(Object) */
+    public static Object deserializeObject(InputStream in) throws IOException, EOFException {
         if (in == null) {
             return null;
         }
-//        Input input = new Input(in);
+        if (in.available() == 0) {
+            throw new EOFException();
+        }
+//        DataInputStream dataIn = new DataInputStream(in);
+//        int size = dataIn.readInt();
+//        byte[] buff = new byte[size];
+//        dataIn.readFully(buff);
+//        Input input = new Input(buff);
+//        Kryo kryo = kryoTL.get();
 //        try {
-//            Kryo kryo = kryoTL.get();
 //            return kryo.readClassAndObject(input);
 //        } finally {
 //            input.close();

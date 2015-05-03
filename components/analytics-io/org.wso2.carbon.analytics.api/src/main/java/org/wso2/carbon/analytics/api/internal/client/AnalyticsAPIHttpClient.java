@@ -19,6 +19,7 @@ package org.wso2.carbon.analytics.api.internal.client;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
 import org.apache.axiom.om.util.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -56,6 +57,7 @@ import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
 import org.wso2.carbon.analytics.io.commons.RemoteRecordGroup;
 
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -65,8 +67,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
+@SuppressWarnings("deprecation")
 public class AnalyticsAPIHttpClient {
     private static final Log log = LogFactory.getLog(AnalyticsAPIHttpClient.class);
     private static AnalyticsAPIHttpClient instance;

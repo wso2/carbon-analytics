@@ -19,9 +19,9 @@ package org.wso2.carbon.analytics.servlet;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
-import org.wso2.carbon.analytics.io.commons.RemoteRecordGroup;
 import org.wso2.carbon.analytics.servlet.exception.AnalyticsAPIAuthenticationException;
 import org.wso2.carbon.analytics.servlet.internal.ServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -29,13 +29,11 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -45,6 +43,8 @@ import java.util.List;
  * Servlet to process records related operations such as add/delete/update the records.
  */
 public class AnalyticsRecordProcessor extends HttpServlet {
+
+    private static final long serialVersionUID = -6519267839269075681L;
 
     /**
      * Get record count
@@ -105,6 +105,7 @@ public class AnalyticsRecordProcessor extends HttpServlet {
      * @throws ServletException
      * @throws IOException
      */
+    @SuppressWarnings("unchecked")
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String sessionId = req.getHeader(AnalyticsAPIConstants.SESSION_ID);
         if (sessionId == null || sessionId.trim().isEmpty()) {

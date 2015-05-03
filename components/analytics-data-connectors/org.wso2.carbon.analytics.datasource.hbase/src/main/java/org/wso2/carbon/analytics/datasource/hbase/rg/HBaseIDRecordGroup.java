@@ -35,6 +35,8 @@ public class HBaseIDRecordGroup implements RecordGroup {
         return new String[] { "localhost" };
     }
 
+    public HBaseIDRecordGroup() { }
+    
     public HBaseIDRecordGroup(int tenantId, String tableName, List<String> columns, List<String> ids) {
         this.tenantId = tenantId;
         this.tableName = tableName;
