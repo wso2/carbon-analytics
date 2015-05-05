@@ -564,11 +564,11 @@
                 <version>${jackson.version}</version>
             </dependency>
 
-            <!--dependency>
+            <dependency>
                 <groupId>org.wso2.orbit.com.esotericsoftware.kryo</groupId>
                 <artifactId>kryo</artifactId>
-                <version>${kryo.version}</version>
-            </dependency-->
+                <version>${kryo.orbit.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.esotericsoftware.kryo</groupId>
@@ -1168,7 +1168,7 @@
         <codahale.metrics.version>3.1.0</codahale.metrics.version>
         <jackson.version>2.4.4</jackson.version>
         <json4s.orbit.version>3.2.10.wso2v1</json4s.orbit.version>
-        <!--kryo.version>2.24.0.wso2v1</kryo.version-->
+        <kryo.orbit.version>2.24.0.wso2v1</kryo.orbit.version>
         <kryo.version>2.21</kryo.version>
         <antlr.version>3.2.0.wso2v1</antlr.version>
         <snappy.version>1.1.1.6</snappy.version>
