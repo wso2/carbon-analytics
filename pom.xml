@@ -854,6 +854,14 @@
                 <version>${carbon.analytics.version}</version>
             </dependency>
             <!-- END Analytics Dashboard UI -->
+
+            <!--START Log Monitor UIs-->
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.dashboard.logmonitor.ui</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <!--END Log Monitor UIs-->
         </dependencies>
     </dependencyManagement>
 
