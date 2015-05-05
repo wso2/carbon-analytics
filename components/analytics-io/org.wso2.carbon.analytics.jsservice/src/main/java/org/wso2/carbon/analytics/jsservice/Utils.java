@@ -104,8 +104,8 @@ public class Utils {
                     break;
                 case "FACET":
                     AnalyticsCategoryPathBean categoryPathBean = valueEntryBean.getAnalyticsCategoryPathBeanValue();
-                    Map<String, Object> facet = new LinkedHashMap<>();
-                    facet.put("path", categoryPathBean.getPath());
+                    List<String> facet = new ArrayList<>();
+                    facet.addAll(Arrays.asList(categoryPathBean.getPath()));
                     columnValues.put(valueEntryBean.getFieldName(), facet);
                     break;
                 default:
@@ -161,7 +161,7 @@ public class Utils {
             } else if (value instanceof String) {
                 recordValueEntryBean.setType("STRING");
                 recordValueEntryBean.setStringValue(value.toString());
-            } else if (value instanceof LinkedHashMap) {
+            } else if (value instanceof ArrayList) {
                 recordValueEntryBean.setType("FACET");
                 recordValueEntryBean.setAnalyticsCategoryPathBeanValue(validateAndReturn(value));
             }
@@ -256,6 +256,9 @@ public class Utils {
                 break;
             case "BINARY":
                 bean.setType(ColumnTypeBean.BINARY);
+                break;
+            case "FACET":
+                bean.setType(ColumnTypeBean.FACET);
                 break;
             default:
                 bean.setType(ColumnTypeBean.STRING);

@@ -102,6 +102,16 @@ public class AnalyticsWebServiceConnector {
         }
     }
 
+    /**
+     * This constructor will be used for Jaggery based stub invocation
+     * @param analyticsStub Stub created by jaggery
+     */
+
+    public AnalyticsWebServiceConnector(AnalyticsWebServiceStub analyticsStub) {
+        gson = new Gson();
+        analyticsWebServiceStub = analyticsStub;
+    }
+
     public String createTable(String tableName) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking createTable tableName : " +
