@@ -59,6 +59,7 @@
                         </goals>
                         <configuration>
                             <id>org.wso2.carbon.analytics.messageconsole</id>
+                            <propertiesFile>../../etc/feature.properties</propertiesFile>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}</importFeatureDef>
                             </importFeatures>
