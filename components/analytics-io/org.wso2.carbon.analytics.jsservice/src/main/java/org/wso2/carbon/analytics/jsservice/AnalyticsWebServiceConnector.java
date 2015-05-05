@@ -56,21 +56,21 @@ public class AnalyticsWebServiceConnector {
     public static final int TYPE_DELETE_BY_ID = 3;
     public static final int TYPE_DELETE_BY_RANGE = 4;
     public static final int TYPE_DELETE_TABLE = 5;
-    public static final int TYPE_GET_RECORD_COUNT = 7;
-    public static final int TYPE_GET_BY_ID = 8;
-    public static final int TYPE_GET_BY_RANGE = 9;
-    public static final int TYPE_LIST_TABLES = 10;
-    public static final int TYPE_GET_SCHEMA = 11;
-    public static final int TYPE_PUT_RECORDS = 12;
-    public static final int TYPE_SEARCH = 13;
-    public static final int TYPE_SEARCH_COUNT = 14;
-    public static final int TYPE_SET_SCHEMA = 16;
-    public static final int TYPE_TABLE_EXISTS = 17;
-    public static final int TYPE_WAIT_FOR_INDEXING = 18;
-    public static final int TYPE_PAGINATION_SUPPORTED = 19;
-    public static final int TYPE_DRILLDOWN_CATEGORIES = 20;
-    public static final int TYPE_DRILLDOWN_SEARCH = 21;
-    public static final int TYPE_DRILLDOWN_SEARCH_COUNT = 22;
+    public static final int TYPE_GET_RECORD_COUNT = 6;
+    public static final int TYPE_GET_BY_ID = 7;
+    public static final int TYPE_GET_BY_RANGE = 8;
+    public static final int TYPE_LIST_TABLES = 9;
+    public static final int TYPE_GET_SCHEMA = 10;
+    public static final int TYPE_PUT_RECORDS = 11;
+    public static final int TYPE_SEARCH = 12;
+    public static final int TYPE_SEARCH_COUNT = 13;
+    public static final int TYPE_SET_SCHEMA = 14;
+    public static final int TYPE_TABLE_EXISTS = 15;
+    public static final int TYPE_WAIT_FOR_INDEXING = 16;
+    public static final int TYPE_PAGINATION_SUPPORTED = 17;
+    public static final int TYPE_DRILLDOWN_CATEGORIES = 28;
+    public static final int TYPE_DRILLDOWN_SEARCH = 19;
+    public static final int TYPE_DRILLDOWN_SEARCH_COUNT = 20;
 
     public AnalyticsWebServiceConnector(ConfigurationContext configCtx, String backendServerURL, String cookie) {
         try {
