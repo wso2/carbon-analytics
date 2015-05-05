@@ -38,6 +38,8 @@ public class RDBMSIDsRecordGroup implements RecordGroup {
     
     private List<String> ids;
     
+    public RDBMSIDsRecordGroup() { }
+    
     public RDBMSIDsRecordGroup(int tenantId, String tableName, List<String> columns, List<String> ids) {
         this.tenantId = tenantId;
         this.tableName = tableName;

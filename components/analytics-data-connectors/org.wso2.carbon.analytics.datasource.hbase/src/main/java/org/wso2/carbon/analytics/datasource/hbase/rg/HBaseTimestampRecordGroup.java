@@ -30,6 +30,8 @@ public class HBaseTimestampRecordGroup implements RecordGroup {
     private List<String> columns;
     private long startTime, endTime;
 
+    public HBaseTimestampRecordGroup() { }
+    
     public HBaseTimestampRecordGroup(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo) {
         this.tenantId = tenantId;
         this.tableName = tableName;

@@ -18,6 +18,11 @@
  */
 package org.wso2.carbon.analytics.datasource.core;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -152,6 +157,52 @@ public class GenericUtilsTest {
         }
         end = System.currentTimeMillis();
         System.out.println("Record Decode TPS: " + (count) / (double) (end - start) * 1000.0);
+    }
+    
+    @Test
+    public void testObjectSerializeDeserializeOne() throws IOException {
+        BigDecimal obj = new BigDecimal(54522.6420);
+        byte[] data = GenericUtils.serializeObject(obj);
+        BigDecimal objIn = (BigDecimal) GenericUtils.deserializeObject(data);
+        Assert.assertEquals(obj, objIn);
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        GenericUtils.serializeObject(obj, byteOut);
+        ByteArrayInputStream byteIn = new ByteArrayInputStream(byteOut.toByteArray());
+        objIn = (BigDecimal) GenericUtils.deserializeObject(byteIn);
+        Assert.assertEquals(obj, objIn);
+    }
+    
+    @Test
+    public void testObjectSerializeDeserializeMultiple() throws IOException {
+        BigDecimal obj1 = new BigDecimal(Math.E);
+        BigDecimal obj2 = new BigDecimal(Math.PI);
+        BigDecimal obj3 = new BigDecimal(4491.99014);
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        GenericUtils.serializeObject(obj1, byteOut);
+        GenericUtils.serializeObject(obj2, byteOut);
+        GenericUtils.serializeObject(obj3, byteOut);
+        ByteArrayInputStream byteIn = new ByteArrayInputStream(byteOut.toByteArray());
+        BigDecimal objIn1 = (BigDecimal) GenericUtils.deserializeObject(byteIn);
+        BigDecimal objIn2 = (BigDecimal) GenericUtils.deserializeObject(byteIn);
+        BigDecimal objIn3 = (BigDecimal) GenericUtils.deserializeObject(byteIn);
+        Assert.assertEquals(obj1, objIn1);
+        Assert.assertEquals(obj2, objIn2);
+        Assert.assertEquals(obj3, objIn3);
+    }
+    
+    @Test (expectedExceptions = EOFException.class)
+    public void testObjectSerializeDeserializeMultipleWithEOF() throws IOException, EOFException {
+        BigDecimal obj1 = new BigDecimal(Math.E);
+        BigDecimal obj2 = new BigDecimal(Math.PI);
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        GenericUtils.serializeObject(obj1, byteOut);
+        GenericUtils.serializeObject(obj2, byteOut);
+        ByteArrayInputStream byteIn = new ByteArrayInputStream(byteOut.toByteArray());
+        BigDecimal objIn1 = (BigDecimal) GenericUtils.deserializeObject(byteIn);
+        BigDecimal objIn2 = (BigDecimal) GenericUtils.deserializeObject(byteIn);
+        Assert.assertEquals(obj1, objIn1);
+        Assert.assertEquals(obj2, objIn2);
+        GenericUtils.deserializeObject(byteIn);
     }
     
 }

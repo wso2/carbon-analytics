@@ -30,7 +30,6 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotA
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
-import javax.naming.Context;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -46,10 +45,6 @@ public class AnalyticsRecordStoreTest {
     private AnalyticsRecordStore analyticsRS;
 
     private String implementationName;
-
-    public AnalyticsRecordStoreTest() {
-        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, InMemoryICFactory.class.getName());
-    }
 
     protected void init(String implementationName, AnalyticsRecordStore analyticsRS) throws AnalyticsException {
         this.implementationName = implementationName;

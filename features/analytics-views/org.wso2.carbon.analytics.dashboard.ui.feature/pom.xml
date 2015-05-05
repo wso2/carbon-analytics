@@ -52,7 +52,7 @@
                         </goals>
                         <configuration>
                             <id>org.wso2.carbon.analytics.dashboard.ui</id>
-                            <propertiesFile>../feature.properties</propertiesFile>
+                            <propertiesFile>../../etc/feature.properties</propertiesFile>
                             <adviceFile>
                                 <properties>
                                     <propertyDef>org.wso2.carbon.p2.fieldName.type:console</propertyDef>

@@ -45,6 +45,8 @@ public class RDBMSRangeRecordGroup implements RecordGroup {
     
     private int recordsCount;
     
+    public RDBMSRangeRecordGroup() { }
+    
     public RDBMSRangeRecordGroup(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo, 
             int recordsFrom, int recordsCount) {
         this.tenantId = tenantId;

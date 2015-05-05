@@ -33,6 +33,8 @@ public class HBaseRegionSplitRecordGroup implements RecordGroup {
 
     private List<String> columns;
 
+    public HBaseRegionSplitRecordGroup() { }
+    
     public HBaseRegionSplitRecordGroup(int tenantId, String tableName, List<String> columns, byte[] startRow, byte[] endRow, String location) {
         this.tenantId = tenantId;
         this.tableName = tableName;

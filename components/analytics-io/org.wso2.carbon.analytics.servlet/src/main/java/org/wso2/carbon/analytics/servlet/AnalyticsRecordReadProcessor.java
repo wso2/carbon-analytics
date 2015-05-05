@@ -19,6 +19,7 @@ package org.wso2.carbon.analytics.servlet;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
 import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
 import org.wso2.carbon.analytics.io.commons.RemoteRecordGroup;
 import org.wso2.carbon.analytics.servlet.exception.AnalyticsAPIAuthenticationException;
@@ -26,6 +27,7 @@ import org.wso2.carbon.analytics.servlet.internal.ServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.servlet.ServletException;
@@ -33,6 +35,7 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.*;
 import java.lang.reflect.Type;
 import java.util.Iterator;
@@ -43,6 +46,8 @@ import java.util.List;
  *
  */
 public class AnalyticsRecordReadProcessor extends HttpServlet {
+
+    private static final long serialVersionUID = -3656252576106717848L;
 
     /**
      * Read the record record count
@@ -90,13 +95,11 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
                     RemoteRecordGroup[] remoteRecordGroup = new RemoteRecordGroup[recordGroups.length];
                     for (int i = 0; i < recordGroups.length; i++) {
                         remoteRecordGroup[i] = new RemoteRecordGroup();
-                        remoteRecordGroup[i].setBinaryRecordGroup(getBinaryRecordGroup(recordGroups[i]));
+                        remoteRecordGroup[i].setBinaryRecordGroup(GenericUtils.serializeObject(recordGroups[i]));
                         remoteRecordGroup[i].setLocations(recordGroups[i].getLocations());
                     }
                     resp.setStatus(HttpServletResponse.SC_OK);
-                    ObjectOutputStream objectOutputStream = new ObjectOutputStream(resp.getOutputStream());
-                    objectOutputStream.writeObject(remoteRecordGroup);
-                    objectOutputStream.close();
+                    GenericUtils.serializeObject(remoteRecordGroup, resp.getOutputStream());
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
                 }
@@ -111,7 +114,6 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
                 }.getType();
                 List<String> columns = gson.fromJson(req.getParameter(AnalyticsAPIConstants.COLUMNS_PARAM), columnsList);
                 List<String> ids = gson.fromJson(req.getParameter(AnalyticsAPIConstants.RECORD_IDS_PARAM), columnsList);
-                ObjectOutputStream objectOutputStream = null;
                 try {
                     RecordGroup[] recordGroups;
                     if (!securityEnabled)
@@ -122,49 +124,27 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
                     RemoteRecordGroup[] remoteRecordGroup = new RemoteRecordGroup[recordGroups.length];
                     for (int i = 0; i < recordGroups.length; i++) {
                         remoteRecordGroup[i] = new RemoteRecordGroup();
-                        remoteRecordGroup[i].setBinaryRecordGroup(getBinaryRecordGroup(recordGroups[i]));
+                        remoteRecordGroup[i].setBinaryRecordGroup(GenericUtils.serializeObject(recordGroups[i]));
                         remoteRecordGroup[i].setLocations(recordGroups[i].getLocations());
                     }
                     resp.setStatus(HttpServletResponse.SC_OK);
-                    objectOutputStream = new ObjectOutputStream(resp.getOutputStream());
-                    objectOutputStream.writeObject(remoteRecordGroup);
+                    GenericUtils.serializeObject(remoteRecordGroup, resp.getOutputStream());
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-                } finally {
-                    if (objectOutputStream != null) {
-                        objectOutputStream.close();
-                    }
                 }
             } else if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.READ_RECORD_OPERATION)) {
                 ServletInputStream servletInputStream = req.getInputStream();
-                ObjectInputStream inputStream = null;
-                ObjectOutputStream outputStream = null;
                 try {
-                    inputStream = new ObjectInputStream(servletInputStream);
-                    RemoteRecordGroup remoteRecordGroupObj = (RemoteRecordGroup) inputStream.readObject();
+                    RemoteRecordGroup remoteRecordGroupObj = (RemoteRecordGroup) GenericUtils.deserializeObject(servletInputStream);
                     Iterator<Record> records = ServiceHolder.getAnalyticsDataService().readRecords(remoteRecordGroupObj.
                             getRecordGroupFromBinary());
                     resp.setStatus(HttpServletResponse.SC_OK);
-                    outputStream = new ObjectOutputStream(resp.getOutputStream());
                     while (records.hasNext()) {
                         Record record = records.next();
-                        outputStream.writeObject(record);
+                        GenericUtils.serializeObject(record, resp.getOutputStream());
                     }
-                } catch (ClassNotFoundException e) {
-                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No class found for the " +
-                            "record group implementation : " + ". " + e.getMessage());
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-                } finally {
-                    if (inputStream != null) {
-                        inputStream.close();
-                    }
-                    if (servletInputStream != null) {
-                        servletInputStream.close();
-                    }
-                    if (outputStream != null) {
-                        outputStream.close();
-                    }
                 }
             } else {
                 resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : " + operation
@@ -193,20 +173,14 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.READ_RECORD_OPERATION)) {
                 ServletInputStream servletInputStream = req.getInputStream();
-                ObjectInputStream inputStream = new ObjectInputStream(servletInputStream);
                 try {
-                    RemoteRecordGroup remoteRecordGroupObj = (RemoteRecordGroup) inputStream.readObject();
+                    RemoteRecordGroup remoteRecordGroupObj = (RemoteRecordGroup) GenericUtils.deserializeObject(servletInputStream);
                     Iterator<Record> records = ServiceHolder.getAnalyticsDataService().readRecords(remoteRecordGroupObj.getRecordGroupFromBinary());
                     resp.setStatus(HttpServletResponse.SC_OK);
-                    ObjectOutputStream outputStream = new ObjectOutputStream(resp.getOutputStream());
                     while (records.hasNext()) {
                         Record record = records.next();
-                        outputStream.writeObject(record);
+                        GenericUtils.serializeObject(record, resp.getOutputStream());
                     }
-                    outputStream.close();
-                } catch (ClassNotFoundException e) {
-                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No class found for the " +
-                            "record group implementation : " + ". " + e.getMessage());
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
                 }
@@ -217,10 +191,4 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
         }
     }
 
-    private byte[] getBinaryRecordGroup(RecordGroup recordGroup) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ObjectOutputStream os = new ObjectOutputStream(out);
-        os.writeObject(recordGroup);
-        return out.toByteArray();
-    }
 }

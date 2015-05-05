@@ -14,36 +14,36 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.wso2.carbon</groupId>
-			<artifactId>org.wso2.carbon.core</artifactId>
-			<exclusions>
-                <exclusion>
-                    <groupId>org.compass-project.wso2</groupId>
-                    <artifactId>compass</artifactId>
-                </exclusion>
-            </exclusions>
+		    <groupId>org.wso2.carbon</groupId>
+		    <artifactId>org.wso2.carbon.core</artifactId>
+		    <exclusions>
+		        <exclusion>
+		            <groupId>org.compass-project.wso2</groupId>
+		            <artifactId>compass</artifactId>
+		        </exclusion>
+		    </exclusions>
 		</dependency>
 		<dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.ndatasource.core</artifactId>
-        </dependency>
-		<dependency>
-			<groupId>org.testng</groupId>
-			<artifactId>testng</artifactId>
-			<scope>test</scope>
+		    <groupId>org.wso2.carbon</groupId>
+		    <artifactId>org.wso2.carbon.ndatasource.core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast</artifactId>
+		    <groupId>org.testng</groupId>
+		    <artifactId>testng</artifactId>
+		    <scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.wso2.carbon.analytics</groupId>
-			<artifactId>org.wso2.carbon.analytics.datasource.commons</artifactId>
+		    <groupId>com.hazelcast</groupId>
+		    <artifactId>hazelcast</artifactId>
 		</dependency>
 		<dependency>
-            <groupId>com.esotericsoftware.kryo</groupId>
-            <artifactId>kryo</artifactId>
-        </dependency>
+		    <groupId>org.wso2.carbon.analytics</groupId>
+		    <artifactId>org.wso2.carbon.analytics.datasource.commons</artifactId>
+		</dependency>
+		<!--dependency>
+		    <groupId>org.wso2.orbit.com.esotericsoftware.kryo</groupId>
+		    <artifactId>kryo</artifactId>
+		</dependency-->
 	</dependencies>
 
 	<build>

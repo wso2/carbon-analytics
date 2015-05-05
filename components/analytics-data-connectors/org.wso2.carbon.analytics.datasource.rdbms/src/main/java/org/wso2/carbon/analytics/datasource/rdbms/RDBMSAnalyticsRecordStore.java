@@ -385,7 +385,12 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     }
     
     private AnalyticsSchema streamToSchema(InputStream in) throws AnalyticsException {
-        AnalyticsSchema schema = (AnalyticsSchema) GenericUtils.deserializeObject(in);
+        AnalyticsSchema schema;
+        try {
+            schema = (AnalyticsSchema) GenericUtils.deserializeObject(in);
+        } catch (IOException e) {
+            throw new AnalyticsException("Error in reading RDBMS analytics schema from stream: " + e.getMessage(), e);
+        }
         if (schema == null) {
             schema = new AnalyticsSchema();
         }
@@ -422,6 +427,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
+        InputStream binaryStream = null;
         try {
             conn = this.getConnection();
             stmt = conn.prepareStatement(this.getRecordMetaTableSelectQuery());
@@ -429,7 +435,8 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             stmt.setString(2, tableName);
             rs = stmt.executeQuery();
             if (rs.next()) {
-                return this.streamToSchema(rs.getBinaryStream(1));
+                binaryStream = rs.getBinaryStream(1);
+                return this.streamToSchema(binaryStream);
             } else {
                 if (!this.tableExists(tenantId, tableName)) {
                     throw new AnalyticsTableNotAvailableException(tenantId, tableName);
@@ -440,6 +447,11 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         } catch (SQLException e) {
             throw new AnalyticsException("Error in setting table schema: " + e.getMessage(), e);
         } finally {
+            if (binaryStream != null) {
+                try {
+                    binaryStream.close();
+                } catch (IOException ignore) { /* ignore */ }
+            }
             RDBMSUtils.cleanupConnection(rs, stmt, conn);
         }
     }
