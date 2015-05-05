@@ -118,8 +118,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private void initClient(String masterUrl) {
         this.sparkConf.setMaster(masterUrl).setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
         this.sparkConf.set("spark.scheduler.mode", "FAIR");
-        this.sparkConf.set("spark.deploy.recoveryMode", "FILESYSTEM");
-        this.sparkConf.set("spark.deploy.recoveryDirectory", "/home/niranda/wso2/bamm5/recovery/");
 
         this.javaSparkCtx = new JavaSparkContext(this.sparkConf);
         this.sqlCtx = new SQLContext(this.javaSparkCtx);
@@ -134,6 +132,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         this.sparkConf.setMaster("spark://" + masterHost + ":" + masterPort)
                 .setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
         this.sparkConf.set("spark.scheduler.mode", "FAIR");
+        this.sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
 
         this.workerActorSystem = Worker.startSystemAndActor(workerHost, p1, p2, 2, 1000000, new String[]{"spark://" + masterHost + ":" + masterPort},
                                                             null, (Option) None$.MODULE$, sparkConf)._1();
