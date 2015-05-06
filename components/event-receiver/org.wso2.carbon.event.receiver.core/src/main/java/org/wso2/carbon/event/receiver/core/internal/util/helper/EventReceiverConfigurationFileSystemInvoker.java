@@ -177,8 +177,7 @@ public class EventReceiverConfigurationFileSystemInvoker {
      * @return the full path
      */
     private static String getFilePathFromFilename(String filename) {
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        String repositoryPath = MultitenantUtils.getAxis2RepositoryPath(tenantId);
-        return new File(repositoryPath).getAbsolutePath() + File.separator + EventReceiverConstants.ER_CONFIG_DIRECTORY + File.separator + filename;
+        return new File(EventAdapterUtil.getAxisConfiguration().getRepository().getPath()).getAbsolutePath()
+                + File.separator + EventReceiverConstants.ER_CONFIG_DIRECTORY + File.separator + filename;
     }
 }
