@@ -53,6 +53,9 @@ public class AnalyticsConstants {
     public static final String TERM_PRIMARY = "primary";
     public static final String TERM_KEY = "key";
     public static final String TERM_AS = "as";
+    public static final String TERM_FROM = "from";
+    public static final String TERM_JOIN = "join";
+
     public static final String TABLE_INFO_TABLE_NAME = "__TABLE_INFO__";
     public static final int TABLE_INFO_TENANT_ID = -1000;
     public static final String OBJECT = "OBJECT";
