@@ -576,11 +576,11 @@
                 <version>${kryo.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.wso2.orbit.org.objenesis</groupId>
-                <artifactId>objenesis</artifactId>
-                <version>${objenesis.orbit.version}</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>org.wso2.orbit.org.objenesis</groupId>-->
+                <!--<artifactId>objenesis</artifactId>-->
+                <!--<version>${objenesis.orbit.version}</version>-->
+            <!--</dependency>-->
 
             <dependency>
                 <groupId>org.antlr.wso2</groupId>
