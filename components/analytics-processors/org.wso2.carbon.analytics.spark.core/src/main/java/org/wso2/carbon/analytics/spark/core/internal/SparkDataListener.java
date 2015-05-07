@@ -45,8 +45,8 @@ import java.util.concurrent.Executors;
  */
 public class SparkDataListener implements Runnable {
 
-    private static final String DIR_RELATIVE_PATH = "repository/data/spark-data";
-    
+    private static final String IN_DIR_RELATIVE_PATH = "repository/data/spark-data/in";
+
     private static final Log log = LogFactory.getLog(SparkDataListener.class);
     
     private ExecutorService executor = Executors.newCachedThreadPool();
@@ -55,7 +55,7 @@ public class SparkDataListener implements Runnable {
 
     @Override
     public void run() {
-        String destFolderPath = CarbonUtils.getCarbonHome() + "/" + DIR_RELATIVE_PATH;
+        String destFolderPath = CarbonUtils.getCarbonHome() + File.separator + IN_DIR_RELATIVE_PATH;
         if (! new File(destFolderPath).exists()) new File(destFolderPath).mkdirs();
         Path dir = Paths.get(destFolderPath);
         try {
@@ -85,7 +85,7 @@ public class SparkDataListener implements Runnable {
                         }
                         new File(destFolderPath + File.separator + fileName).delete();
                         log.info("Starting a Spark executor: " + Arrays.toString(argArray));
-                        this.executor.execute(new SparkBackendExecutor(argArray));
+                        this.executor.execute(new SparkBackendExecutor(argArray, fileName));
                     }
                 }
                 boolean valid = watckKey.reset();
