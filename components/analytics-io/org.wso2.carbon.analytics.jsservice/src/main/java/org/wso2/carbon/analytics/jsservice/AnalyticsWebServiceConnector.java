@@ -61,16 +61,17 @@ public class AnalyticsWebServiceConnector {
     public static final int TYPE_GET_BY_RANGE = 8;
     public static final int TYPE_LIST_TABLES = 9;
     public static final int TYPE_GET_SCHEMA = 10;
-    public static final int TYPE_PUT_RECORDS = 11;
-    public static final int TYPE_SEARCH = 12;
-    public static final int TYPE_SEARCH_COUNT = 13;
-    public static final int TYPE_SET_SCHEMA = 14;
-    public static final int TYPE_TABLE_EXISTS = 15;
-    public static final int TYPE_WAIT_FOR_INDEXING = 16;
-    public static final int TYPE_PAGINATION_SUPPORTED = 17;
-    public static final int TYPE_DRILLDOWN_CATEGORIES = 28;
-    public static final int TYPE_DRILLDOWN_SEARCH = 19;
-    public static final int TYPE_DRILLDOWN_SEARCH_COUNT = 20;
+    public static final int TYPE_PUT_RECORDS_TO_TABLE = 11;
+    public static final int TYPE_PUT_RECORDS = 12;
+    public static final int TYPE_SEARCH = 13;
+    public static final int TYPE_SEARCH_COUNT = 14;
+    public static final int TYPE_SET_SCHEMA = 15;
+    public static final int TYPE_TABLE_EXISTS = 16;
+    public static final int TYPE_WAIT_FOR_INDEXING = 17;
+    public static final int TYPE_PAGINATION_SUPPORTED = 18;
+    public static final int TYPE_DRILLDOWN_CATEGORIES = 19;
+    public static final int TYPE_DRILLDOWN_SEARCH = 20;
+    public static final int TYPE_DRILLDOWN_SEARCH_COUNT = 21;
 
     public AnalyticsWebServiceConnector(ConfigurationContext configCtx, String backendServerURL, String cookie) {
         try {

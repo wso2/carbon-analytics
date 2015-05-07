@@ -138,6 +138,17 @@
                 out.print(connector.insertRecords(recordsAsString));
                 break;
             }
+            case AnalyticsWebServiceConnector.TYPE_PUT_RECORDS_TO_TABLE: {
+                StringBuilder buffer = new StringBuilder();
+                BufferedReader reader = request.getReader();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                String recordsAsString = buffer.toString();
+                out.print(connector.insertRecordsToTable(tableName, recordsAsString));
+                break;
+            }
             case AnalyticsWebServiceConnector.TYPE_SEARCH_COUNT: {
                 StringBuilder buffer = new StringBuilder();
                 BufferedReader reader = request.getReader();
