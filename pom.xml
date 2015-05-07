@@ -564,16 +564,22 @@
                 <version>${jackson.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.wso2.orbit.com.esotericsoftware.kryo</groupId>
-                <artifactId>kryo</artifactId>
-                <version>${kryo.orbit.version}</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>org.wso2.orbit.com.esotericsoftware.kryo</groupId>-->
+                <!--<artifactId>kryo</artifactId>-->
+                <!--<version>${kryo.orbit.version}</version>-->
+            <!--</dependency>-->
 
             <dependency>
                 <groupId>com.esotericsoftware.kryo</groupId>
                 <artifactId>kryo</artifactId>
                 <version>${kryo.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.wso2.orbit.org.objenesis</groupId>
+                <artifactId>objenesis</artifactId>
+                <version>${objenesis.orbit.version}</version>
             </dependency>
 
             <dependency>
@@ -1223,6 +1229,7 @@
         <google.protobuf.version>2.5.0</google.protobuf.version>
         <roaringbitmap.version>0.4.5</roaringbitmap.version>
         <roaringbitmap.import.version>[0.4.5, 0.5.0)</roaringbitmap.import.version>
+        <objenesis.orbit.version>2.1.wso2v1</objenesis.orbit.version>
 
 
     </properties>
