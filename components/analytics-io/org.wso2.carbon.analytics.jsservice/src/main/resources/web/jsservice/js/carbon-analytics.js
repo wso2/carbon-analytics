@@ -141,7 +141,7 @@ function AnalyticsClient() {
      */
     this.clearIndexData = function (tableName, callback) {
         $.ajax({
-                   url: this.url + "?type=" + TYPE_CLEAR_INDICES + "&tableName=" + tableName,
+                   url: this.url + "?type=" + TYPE_CLEAR_INDEX_DATA + "&tableName=" + tableName,
                    dataType: DATA_TYPE_JSON,
                    contentType: CONTENT_TYPE_JSON,
                    type: HTTP_GET,
