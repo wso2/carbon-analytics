@@ -19,26 +19,33 @@
 package org.wso2.carbon.analytics.spark.core.util;
 
 import org.apache.spark.rdd.RDD;
+import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
-import org.apache.spark.sql.api.java.JavaSQLContext;
-import org.apache.spark.sql.catalyst.expressions.Row;
-import org.apache.spark.sql.catalyst.types.StructType;
+import org.apache.spark.sql.sources.BaseRelation;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.types.StructType;
 import org.apache.spark.sql.sources.TableScan;
+import org.apache.spark.sql.types.DataType;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.Metadata;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
 import scala.reflect.ClassTag$;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static scala.collection.JavaConversions.asJavaCollection;
 
 /**
  * This class represents a Spark SQL relation.
  */
-public class AnalyticsRelation extends TableScan implements Serializable {
+public class AnalyticsRelation extends BaseRelation implements TableScan, Serializable {
 
     private static final long serialVersionUID = -7773419083178608517L;
 
-    private JavaSQLContext sqlContext;
+    private SQLContext sqlContext;
     
     private StructType schema;
         
@@ -49,30 +56,66 @@ public class AnalyticsRelation extends TableScan implements Serializable {
     public AnalyticsRelation() { }
     
     public AnalyticsRelation(int tenantId, String tableName, 
-            JavaSQLContext sqlContext, String schemaString) {
+            SQLContext sqlContext, String schemaString) {
         this.tenantId = tenantId;
         this.tableName = tableName;
         this.sqlContext = sqlContext;
-        this.schema = new AnalyticsSchema(schemaString);
+        this.schema = new StructType(extractFields(schemaString));
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public RDD<Row> buildScan() {
         return new AnalyticsRDD(this.tenantId, this.tableName,
-                new ArrayList<String>(asJavaCollection(this.schema.fieldNames().toList())), 
-                sqlContext.sqlContext().sparkContext(), scala.collection.Seq$.MODULE$.empty(), 
+                new ArrayList<>(Arrays.asList(this.schema.fieldNames())),
+                this.sqlContext.sparkContext(), scala.collection.Seq$.MODULE$.empty(),
                 ClassTag$.MODULE$.<Row>apply(Row.class));
     }
 
     @Override
     public SQLContext sqlContext() {
-        return this.sqlContext.sqlContext();
+        return this.sqlContext;
     }
 
     @Override
     public StructType schema() {
         return schema;
+    }
+
+    private StructField[] extractFields(String schemaString) {
+        String[] strFields = schemaString.split(",");
+        StructField[] resFields = new StructField[(strFields.length)];
+        String name, type;
+        String[] strFieldTokens;
+        for (int i = 0; i < strFields.length; i++) {
+            strFieldTokens = strFields[i].trim().split(" ");
+            name = strFieldTokens[0].trim();
+            type = strFieldTokens[1].trim().toLowerCase();
+            StructField field = new StructField(name, parseDataType(type), true, Metadata.empty());
+            resFields[i] = field;
+        }
+        return resFields;
+    }
+
+    private DataType parseDataType(String strType) {
+        switch (strType) {
+            case AnalyticsConstants.INTEGER_TYPE:
+                return DataTypes.IntegerType;
+            case AnalyticsConstants.INT_TYPE:
+                return DataTypes.IntegerType;
+            case AnalyticsConstants.FLOAT_TYPE:
+                return DataTypes.FloatType;
+            case AnalyticsConstants.DOUBLE_TYPE:
+                return DataTypes.DoubleType;
+            case AnalyticsConstants.LONG_TYPE:
+                return DataTypes.LongType;
+            case AnalyticsConstants.BOOLEAN_TYPE:
+                return DataTypes.BooleanType;
+            case AnalyticsConstants.STRING_TYPE:
+                return DataTypes.StringType;
+            default:
+                throw new RuntimeException("Invalid data type: " + strType);
+        }
     }
     
 }
