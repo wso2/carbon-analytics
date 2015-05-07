@@ -126,6 +126,17 @@ public class Utils {
         }
         return records.toArray(new  RecordBean[records.size()]);
     }
+    public static RecordBean[] getRecords(String tableName, List<Record> recordBeans) {
+        List<RecordBean> records = new ArrayList<>();
+        for (Record recordBean : recordBeans) {
+            RecordBean record = new RecordBean();
+            record.setId(recordBean.getId());
+            record.setTableName(tableName);
+            record.setValues(getRecordValueEntryBeans(recordBean.getValues()));
+            records.add(record);
+        }
+        return records.toArray(new  RecordBean[records.size()]);
+    }
 
     private static AnalyticsCategoryPathBean validateAndReturn(Object value) {
         List<String> pathList = (List<String>) value;

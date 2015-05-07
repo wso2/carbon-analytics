@@ -343,6 +343,40 @@ public class AnalyticsWebServiceConnector {
         }
     }
 
+    public String insertRecordsToTable(String tableName, String recordsAsString) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Invoking insertRecordsToTable");
+        }
+
+        if (recordsAsString != null && tableName != null) {
+            try {
+                Type recordListType = new TypeToken<List<Record>>(){}.getType();
+                List<Record> records = gson.fromJson(recordsAsString, recordListType);
+                if (logger.isDebugEnabled()) {
+                    for (Record record : records) {
+                        logger.debug(" inserting -- Record Id: " + record.getId() + " values :" +
+                                     record.toString() + "to table: " + tableName);
+                    }
+                }
+                RecordBean[] recordBeans = Utils.getRecords(tableName, records);
+                RecordBean[] beansWithIds = analyticsWebServiceStub.put(recordBeans);
+                List<String> ids = Utils.getIds(beansWithIds);
+                return gson.toJson(ids);
+            } catch (Exception e) {
+                logger.error("Failed to put records: " + e.getMessage(), e);
+                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to put records: " + e.getMessage()));
+            }
+        } else {
+            String errorMsg = "";
+            if (recordsAsString == null){
+                errorMsg = gson.toJson(handleResponse(ResponseStatus.FAILED, "Record list is empty"));
+            } else if (tableName == null) {
+                errorMsg =  gson.toJson(handleResponse(ResponseStatus.FAILED, "tableName is not provided"));
+            }
+            return errorMsg;
+        }
+    }
+
     public String clearIndexData(String tableName) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking clearIndexData for tableName : " +
