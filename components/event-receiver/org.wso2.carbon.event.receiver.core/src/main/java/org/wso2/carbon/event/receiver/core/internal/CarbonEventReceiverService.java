@@ -657,7 +657,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
                     eventReceiver.getInputAdapterRuntime().startPolling();
                 }
             } catch (Exception e) {
-                log.error("Unable to start event adpaters for tenant :" + tenantId, e);
+                log.error("Unable to start event adapters for tenant :" + tenantId, e);
             } finally {
                 PrivilegedCarbonContext.endTenantFlow();
             }
