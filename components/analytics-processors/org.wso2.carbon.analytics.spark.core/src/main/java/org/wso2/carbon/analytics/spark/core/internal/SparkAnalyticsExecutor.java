@@ -116,27 +116,31 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
     
     private void initClient(String masterUrl) {
-        this.sparkConf.setMaster(masterUrl).setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
-        this.sparkConf.set("spark.scheduler.mode", "FAIR");
-
+        this.sparkConf = initSparkConf(masterUrl, CARBON_ANALYTICS_SPARK_APP_NAME);
         this.javaSparkCtx = new JavaSparkContext(this.sparkConf);
         this.sqlCtx = new SQLContext(this.javaSparkCtx);
     }
 
     private void startMaster(String host, int port, int webUIport) {
-        this.masterActorSystem = Master.startSystemAndActor(host, port, webUIport, this.sparkConf)._1();
+        this.masterActorSystem = Master.startSystemAndActor(host, port, webUIport,
+                                                            this.sparkConf)._1();
     }
 
     private void startWorker(String workerHost, String masterHost, int masterPort, int p1, int p2) {
-        this.sparkConf = new SparkConf();
-        this.sparkConf.setMaster("spark://" + masterHost + ":" + masterPort)
-                .setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
-        this.sparkConf.set("spark.scheduler.mode", "FAIR");
-        this.sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-
-        this.workerActorSystem = Worker.startSystemAndActor(workerHost, p1, p2, 2, 1000000, new String[]{"spark://" + masterHost + ":" + masterPort},
-                                                            null, (Option) None$.MODULE$, sparkConf)._1();
+        this.sparkConf = initSparkConf("spark://" + masterHost + ":" + masterPort,
+                                       CARBON_ANALYTICS_SPARK_APP_NAME);
+        this.workerActorSystem = Worker.startSystemAndActor(workerHost, p1, p2, 2, 1000000,
+                                       new String[]{"spark://" + masterHost + ":" + masterPort},
+                                       null, (Option) None$.MODULE$, sparkConf)._1();
           }
+
+    private SparkConf initSparkConf(String masterUrl, String appName){
+        SparkConf sc = new SparkConf();
+        sc.setMaster(masterUrl).setAppName(appName);
+        sc.set("spark.scheduler.mode", "FAIR");
+//        sc.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+        return sc;
+    }
 
     private void initSparkDataListener() {
         this.validateSparkScriptPathPermission();
