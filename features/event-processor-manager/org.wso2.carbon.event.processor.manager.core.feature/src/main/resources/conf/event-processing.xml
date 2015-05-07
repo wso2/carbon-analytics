@@ -45,7 +45,7 @@
             <receiver enable="true"/>
             <publisher enable="true"/>
             <manager enable="true">
-                <hostName>192.168.1.5</hostName>
+                <hostName>localhost</hostName>
                 <port>8904</port>
             </manager>
         </nodeType>
@@ -54,11 +54,11 @@
         <management>
             <managers>
                 <manager>
-                    <hostName>192.168.1.5</hostName>
+                    <hostName>localhost</hostName>
                     <port>8904</port>
                 </manager>
                 <manager>
-                    <hostName>192.168.1.5</hostName>
+                    <hostName>localhost</hostName>
                     <port>8905</port>
                 </manager>
             </managers>
