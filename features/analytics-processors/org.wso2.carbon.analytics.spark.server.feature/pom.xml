@@ -249,10 +249,10 @@
             <artifactId>commons-configuration</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.wso2.orbit.org.objenesis</groupId>
-            <artifactId>objenesis</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.wso2.orbit.org.objenesis</groupId>-->
+            <!--<artifactId>objenesis</artifactId>-->
+        <!--</dependency>-->
 
     </dependencies>
 
@@ -339,7 +339,7 @@
                                 <bundleDef>org.spark-project.protobuf:protobuf-java</bundleDef>
                                 <bundleDef>commons-configuration.wso2:commons-configuration</bundleDef>
                                 <bundleDef>org.roaringbitmap:RoaringBitmap</bundleDef>
-                                <bundleDef>org.wso2.orbit.org.objenesis:objenesis</bundleDef>
+                                <!--<bundleDef>org.wso2.orbit.org.objenesis:objenesis</bundleDef>-->
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}
