@@ -46,6 +46,7 @@ public class HttpHeaderOutInterceptor extends AbstractPhaseInterceptor<Message> 
             headers.put("Cache-Control", Collections.singletonList("proxy-revalidate"));
             headers.put("pragma", Collections.singletonList("no-cache"));
             headers.put("Expires", Collections.singletonList(0));
+            message.put(Message.PROTOCOL_HEADERS, headers);
         } catch (Exception ce) {
             logger.error("Error while adding headers to Response: " + ce.getMessage(), ce);
         }
