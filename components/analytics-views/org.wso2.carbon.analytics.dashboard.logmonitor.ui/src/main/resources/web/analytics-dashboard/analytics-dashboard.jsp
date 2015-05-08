@@ -23,8 +23,8 @@
 
 <%
 
-    /*ConfigurationContext configContext =
-            (ConfigurationContext) config.getServletContext().getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);*/
+    ConfigurationContext configContext =
+            (ConfigurationContext) config.getServletContext().getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
     String mgtConsoleUrl = CarbonUIUtil.getAdminConsoleURL(request);
     String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
     String appName = (String) CarbonContext.getThreadLocalCarbonContext().getApplicationName();
@@ -40,7 +40,7 @@
         var contextRoot = "<%=appName%>";
         if(tenentId == SUPER_TENENT_ID){
             if((contextRoot === null) || (contextRoot == "") || (contextRoot == 'null')){
-                dashboardUrl = "../../BamLog/index.jag";
+                dashboardUrl = "../../log-analyzer/index.jag";
             }
             /* else{
                 dashboardUrl = "../../../bamdashboards/index.jag?appName="+contextRoot;
@@ -55,7 +55,7 @@
                 dashboardUrl = "../../../../../"+url;
             }
         } */
-        location.href = "http://localhost:9763/log-analyzer/index.jag"; //hard coded for now
+        location.href = "https://localhost:9443/log-analyzer/index.jag"; //hard coded for now
     });
 
 </script>
