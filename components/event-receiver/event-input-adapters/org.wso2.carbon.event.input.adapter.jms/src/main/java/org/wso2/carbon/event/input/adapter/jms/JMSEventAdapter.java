@@ -185,6 +185,7 @@ public class JMSEventAdapter implements InputEventAdapter {
 
 
         adaptorProperties.putAll(eventAdapterConfiguration.getProperties());
+        adaptorProperties.remove(JMSConstants.PARAM_DESTINATION);
 
         JMSConnectionFactory jmsConnectionFactory = new JMSConnectionFactory(convertMapToHashTable(adaptorProperties),
                 eventAdapterConfiguration.getName());
