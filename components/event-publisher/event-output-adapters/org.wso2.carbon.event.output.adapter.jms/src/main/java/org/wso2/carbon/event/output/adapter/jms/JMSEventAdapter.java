@@ -59,7 +59,7 @@ public class JMSEventAdapter implements OutputEventAdapter {
         try {
             Hashtable<String, String> adaptorProperties = new Hashtable<String, String>();
             adaptorProperties.putAll(eventAdapterConfiguration.getStaticProperties());
-
+            adaptorProperties.remove(JMSEventAdapterConstants.ADAPTER_JMS_DESTINATION);
             JMSConnectionFactory jmsConnectionFactory = new JMSConnectionFactory(adaptorProperties,
                     eventAdapterConfiguration.getName());
             Connection connection = jmsConnectionFactory.getConnection();

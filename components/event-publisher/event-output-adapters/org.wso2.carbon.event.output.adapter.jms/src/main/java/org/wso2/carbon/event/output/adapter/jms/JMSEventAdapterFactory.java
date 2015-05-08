@@ -36,6 +36,7 @@ public class JMSEventAdapterFactory extends OutputEventAdapterFactory {
     public List<String> getSupportedMessageFormats() {
         List<String> supportedMessageFormats = new ArrayList<String>();
         supportedMessageFormats.add(MessageType.TEXT);
+        supportedMessageFormats.add(MessageType.MAP);
         supportedMessageFormats.add(MessageType.XML);
         supportedMessageFormats.add(MessageType.JSON);
         return supportedMessageFormats;
