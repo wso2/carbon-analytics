@@ -41,7 +41,6 @@ import org.wso2.carbon.analytics.restapi.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.restapi.beans.QueryBean;
 import org.wso2.carbon.analytics.restapi.beans.RecordBean;
 import org.wso2.carbon.analytics.restapi.beans.SubCategoriesBean;
-import org.wso2.carbon.analytics.restapi.beans.TableBean;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.user.api.UserRealm;
@@ -98,7 +97,7 @@ public class AnalyticsResource extends AbstractResource {
 	 * @return the response
 	 * @throws AnalyticsException
 	 */
-	@POST
+	/*@POST
 	@Path(Constants.ResourcePath.TABLES)
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON })
@@ -121,7 +120,7 @@ public class AnalyticsResource extends AbstractResource {
         } else {
             throw new AnalyticsException("Table name is not defined");
         }
-    }
+    }*/
 
 	/**
 	 * Check if the table Exists
@@ -179,7 +178,7 @@ public class AnalyticsResource extends AbstractResource {
 	 * @return the response
 	 * @throws AnalyticsException the analytics exception
 	 */
-	@DELETE
+	/*@DELETE
 	@Path(Constants.ResourcePath.TABLES)
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON })
@@ -202,7 +201,7 @@ public class AnalyticsResource extends AbstractResource {
         } else {
             throw new AnalyticsException("The table name is empty");
         }
-    }
+    }*/
 
 	/**
 	 * Inserts or update a list of records to a table. updating happens only if there are matching record ids
@@ -210,7 +209,7 @@ public class AnalyticsResource extends AbstractResource {
 	 * @return the response
 	 * @throws AnalyticsException
 	 */
-	@POST
+	/*@POST
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}")
@@ -251,7 +250,7 @@ public class AnalyticsResource extends AbstractResource {
         } else {
             throw new AnalyticsException("List of records is empty");
         }
-    }
+    }*/
 
 	/**
 	 * Delete records either the time range, but not both
@@ -261,7 +260,7 @@ public class AnalyticsResource extends AbstractResource {
 	 * @return the response
 	 * @throws AnalyticsException
 	 */
-	@DELETE
+	/*@DELETE
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}/{timeFrom}/{timeTo}")
 	public Response deleteRecords(@PathParam("tableName") String tableName,
@@ -282,7 +281,7 @@ public class AnalyticsResource extends AbstractResource {
         return handleResponse(ResponseStatus.SUCCESS, "Successfully deleted records in table: " +
                                                           tableName);
 	}
-
+*/
 	/**
 	 * Delete records either by ids
 	 * @param tableName the table name
@@ -290,7 +289,7 @@ public class AnalyticsResource extends AbstractResource {
 	 * @return the response
 	 * @throws AnalyticsException
 	 */
-	@DELETE
+	/*@DELETE
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}")
@@ -313,7 +312,7 @@ public class AnalyticsResource extends AbstractResource {
         } else {
             throw new AnalyticsException("list of ids is empty");
         }
-    }
+    }*/
 
 	/**
 	 * Gets the record count.
@@ -470,7 +469,7 @@ public class AnalyticsResource extends AbstractResource {
 	 * @return the response
 	 * @throws AnalyticsException
 	 */
-	@POST
+	/*@POST
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path(Constants.ResourcePath.RECORDS)
@@ -511,7 +510,7 @@ public class AnalyticsResource extends AbstractResource {
         } else {
             throw new AnalyticsException("List of records are empty");
         }
-    }
+    }*/
 
 	/**
 	 * Clear indices.
@@ -750,7 +749,7 @@ public class AnalyticsResource extends AbstractResource {
      * @return the {@link Response} response
      * @throws AnalyticsException
      */
-    @POST
+    /*@POST
     @Consumes({MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_JSON})
     @Path("tables/{tableName}/schema")
@@ -771,7 +770,7 @@ public class AnalyticsResource extends AbstractResource {
         } else {
             throw new AnalyticsException("Table schema is not provided");
         }
-    }
+    }*/
 
     /**
      * Gets the analytics schema of a table

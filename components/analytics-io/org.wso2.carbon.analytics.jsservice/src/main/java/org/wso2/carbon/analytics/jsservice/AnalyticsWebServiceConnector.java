@@ -55,19 +55,19 @@ public class AnalyticsWebServiceConnector {
 
     public static final int TYPE_CLEAR_INDEX_DATA = 1;
     public static final int TYPE_CREATE_TABLE = 2;
-    public static final int TYPE_DELETE_BY_ID = 3;
-    public static final int TYPE_DELETE_BY_RANGE = 4;
+//    public static final int TYPE_DELETE_BY_ID = 3;
+//    public static final int TYPE_DELETE_BY_RANGE = 4;
     public static final int TYPE_DELETE_TABLE = 5;
     public static final int TYPE_GET_RECORD_COUNT = 6;
     public static final int TYPE_GET_BY_ID = 7;
     public static final int TYPE_GET_BY_RANGE = 8;
     public static final int TYPE_LIST_TABLES = 9;
     public static final int TYPE_GET_SCHEMA = 10;
-    public static final int TYPE_PUT_RECORDS_TO_TABLE = 11;
+//    public static final int TYPE_PUT_RECORDS_TO_TABLE = 11;
     public static final int TYPE_PUT_RECORDS = 12;
     public static final int TYPE_SEARCH = 13;
     public static final int TYPE_SEARCH_COUNT = 14;
-    public static final int TYPE_SET_SCHEMA = 15;
+//    public static final int TYPE_SET_SCHEMA = 15;
     public static final int TYPE_TABLE_EXISTS = 16;
     public static final int TYPE_WAIT_FOR_INDEXING = 17;
     public static final int TYPE_PAGINATION_SUPPORTED = 18;
@@ -115,7 +115,7 @@ public class AnalyticsWebServiceConnector {
         analyticsWebServiceStub = analyticsStub;
     }
 
-    public String createTable(String tableName) {
+    /*public String createTable(String tableName) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking createTable tableName : " +
                          tableName);
@@ -141,7 +141,7 @@ public class AnalyticsWebServiceConnector {
         } else {
             return gson.toJson(handleResponse(ResponseStatus.NON_EXISTENT, "table is not defined"));
         }
-    }
+    }*/
 
     public String tableExists(String tableName) {
         if (logger.isDebugEnabled()) {
@@ -189,7 +189,7 @@ public class AnalyticsWebServiceConnector {
         return gson.toJson(tableList);
     }
 
-    public String deleteTable(String tableName) {
+    /*public String deleteTable(String tableName) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking deleteTable for tableName : " +
                          tableName);
@@ -216,9 +216,9 @@ public class AnalyticsWebServiceConnector {
             return gson.toJson(handleResponse(ResponseStatus.NON_EXISTENT, "Table: " + tableName +
                                                                            " does not exist"));
         }
-    }
+    }*/
 
-    public String deleteRecordsByRange(String tableName, long timeFrom, long timeTo) {
+    /*public String deleteRecordsByRange(String tableName, long timeFrom, long timeTo) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking deleteRecords for tableName : " +
                          tableName);
@@ -239,9 +239,9 @@ public class AnalyticsWebServiceConnector {
             return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to delete records by range for table: " +
                                                                      tableName + ": " + e.getFaultMessage()));
         }
-    }
+    }*/
 
-    public String deleteRecordsByIds(String tableName, String idsAsString) {
+    /*public String deleteRecordsByIds(String tableName, String idsAsString) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking deleteRecords for tableName : " +
                          tableName);
@@ -269,7 +269,7 @@ public class AnalyticsWebServiceConnector {
         } else {
             return gson.toJson(handleResponse(ResponseStatus.FAILED, "Id list is empty"));
         }
-    }
+    }*/
 
     public String getRecordCount(String tableName) {
         if (logger.isDebugEnabled()) {
@@ -366,7 +366,7 @@ public class AnalyticsWebServiceConnector {
         }
     }
 
-    public String insertRecords(String recordsAsString) {
+    /*public String insertRecords(String recordsAsString) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking insertRecords");
         }
@@ -395,9 +395,9 @@ public class AnalyticsWebServiceConnector {
         } else {
             return gson.toJson(handleResponse(ResponseStatus.FAILED, "Record list is empty"));
         }
-    }
+    }*/
 
-    public String insertRecordsToTable(String tableName, String recordsAsString) {
+    /*public String insertRecordsToTable(String tableName, String recordsAsString) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking insertRecordsToTable");
         }
@@ -432,7 +432,7 @@ public class AnalyticsWebServiceConnector {
             }
             return errorMsg;
         }
-    }
+    }*/
 
     public String clearIndexData(String tableName) {
         if (logger.isDebugEnabled()) {
@@ -535,7 +535,7 @@ public class AnalyticsWebServiceConnector {
         }
     }
 
-    public String setTableSchema(String tableName, String schemaAsString) {
+    /*public String setTableSchema(String tableName, String schemaAsString) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking setTableSchema for tableName : " + tableName);
         }
@@ -559,7 +559,7 @@ public class AnalyticsWebServiceConnector {
         } else {
             return gson.toJson(handleResponse(ResponseStatus.FAILED,"Table schema is not provided"));
         }
-    }
+    }*/
 
     public String getTableSchema(String tableName) {
         if (logger.isDebugEnabled()) {

@@ -68,7 +68,7 @@ function AnalyticsClient() {
                        callback(data);
                    }
                });
-    }
+    };
 
     /**
      * Creates a table with a given name.
@@ -90,7 +90,7 @@ function AnalyticsClient() {
                        callback(data);
                    }
                });
-    }
+    };
 
     /**
      * Check if the given table exists
@@ -111,7 +111,7 @@ function AnalyticsClient() {
                        callback(data);
                    }
                });
-    }
+    };
 
     /**
      * Delete a table with a given name.
@@ -133,7 +133,7 @@ function AnalyticsClient() {
                        callback(data);
                    }
                });
-    }
+    };
 
     /**
      * Clears  all the indexed data for a specific table.
@@ -155,7 +155,7 @@ function AnalyticsClient() {
                        callback(data);
                    }
                });
-    }
+    };
 
     /**
      * Gets the records given the table name and the timestamp range and pagination information.
@@ -186,7 +186,7 @@ function AnalyticsClient() {
                        callback(data);
                    }
                });
-    }
+    };
     /**
      * Gets the records given the record Ids.
      * @param recordsInfo The object which contains the record ids.
@@ -212,7 +212,7 @@ function AnalyticsClient() {
                        callback(data);
                    }
                });
-    }
+    };
 
     /**
      * Returns the total record count.
@@ -234,7 +234,7 @@ function AnalyticsClient() {
                        callback(data);
                    }
                });
-    }
+    };
 
     /**
      * Delete records by records ids.
@@ -261,7 +261,7 @@ function AnalyticsClient() {
                        callback(data);
                    }
                });
-    }
+    };
 
     /**
      * Deletes the records given the time ranges.
@@ -289,7 +289,7 @@ function AnalyticsClient() {
                        callback(data);
                    }
                });
-    }
+    };
 
     /**
      * Insert records ( tableName should be given for each record.
@@ -330,7 +330,7 @@ function AnalyticsClient() {
                        callback(data);
                    }
                });
-    }
+    };
 
     /**
      * Insert records to a specific table.
@@ -370,7 +370,7 @@ function AnalyticsClient() {
                        callback(data);
                    }
                });
-    }
+    };
 
     /**
      * Search records in a given table using lucene queries.
@@ -402,7 +402,7 @@ function AnalyticsClient() {
                        callback(data);
                    }
                });
-    }
+    };
 
     /**
      * Returns the search count of records in a given table using lucene queries.
@@ -434,7 +434,7 @@ function AnalyticsClient() {
                        callback(data);
                    }
                });
-    }
+    };
 
     /**
      * Sets the schema for a table.
@@ -469,7 +469,7 @@ function AnalyticsClient() {
                        callback(data);
                    }
                });
-    }
+    };
 
     /**
      * Gets the schema of a table.
@@ -491,7 +491,7 @@ function AnalyticsClient() {
                        callback(data);
                    }
                });
-    }
+    };
 
     /**
      * Returns if the underlying AnalyticsService supports pagination.
@@ -512,7 +512,7 @@ function AnalyticsClient() {
                        callback(data);
                    }
                });
-    }
+    };
 
     /**
      * Waits till the indexing completes.
@@ -533,7 +533,7 @@ function AnalyticsClient() {
                        callback(data);
                    }
                });
-    }
+    };
 
     /**
      * Returns the immediate sub categories of a facet field.
@@ -565,7 +565,7 @@ function AnalyticsClient() {
                        callback(data);
                    }
                });
-    }
+    };
 
     /**
      * Returns the records which match the drill-down query given the table.
@@ -605,7 +605,7 @@ function AnalyticsClient() {
                        callback(data);
                    }
                });
-    }
+    };
 
     /**
      * Returns number of the records which match the drill-down query given the table.
@@ -665,7 +665,7 @@ AnalyticsClient.prototype.init = function (username, password, svrUrl) {
         return null;
     }
     return this;
-}
+};
 
 /**
  * Construct an AnalyticsClient object given the serverUrl.
@@ -676,7 +676,7 @@ AnalyticsClient.prototype.init = function (svrUrl) {
     this.url = svrUrl;
     this.authHeader = null;
     return this;
-}
+};
 
 /**
  * Create an AnalyticsClient object with default server url.
@@ -687,4 +687,4 @@ AnalyticsClient.prototype.init = function () {
     this.url = "https://localhost:9443/designer/controllers/analytics.jag";
     this.authHeader = null;
     return this;
-}
+};

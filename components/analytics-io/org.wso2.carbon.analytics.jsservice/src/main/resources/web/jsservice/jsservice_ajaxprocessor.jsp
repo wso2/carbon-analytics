@@ -71,14 +71,14 @@
                 out.print(connector.getTableList());
                 break;
             }
-            case AnalyticsWebServiceConnector.TYPE_CREATE_TABLE: {
+            /*case AnalyticsWebServiceConnector.TYPE_CREATE_TABLE: {
                 out.print(connector.createTable(tableName));
                 break;
             }
             case AnalyticsWebServiceConnector.TYPE_DELETE_TABLE: {
                 out.print(connector.deleteTable(tableName));
                 break;
-            }
+            }*/
             case AnalyticsWebServiceConnector.TYPE_TABLE_EXISTS: {
                 out.print(connector.tableExists(tableName));
                 break;
@@ -113,7 +113,7 @@
                 out.print(connector.getRecordCount(tableName));
                 break;
             }
-            case AnalyticsWebServiceConnector.TYPE_DELETE_BY_RANGE: {
+            /*case AnalyticsWebServiceConnector.TYPE_DELETE_BY_RANGE: {
                 long timeFrom = Long.parseLong(request.getParameter(Constants.TIME_FROM));
                 long timeTo = Long.parseLong(request.getParameter(Constants.TIME_TO));
                 out.print(connector.deleteRecordsByRange(tableName, timeFrom, timeTo));
@@ -129,12 +129,12 @@
                 String recordIdsAsString = buffer.toString();
                 out.print(connector.deleteRecordsByIds(tableName, recordIdsAsString));
                 break;
-            }
+            }*/
             case AnalyticsWebServiceConnector.TYPE_CLEAR_INDEX_DATA: {
                 out.print(connector.clearIndexData(tableName));
                 break;
             }
-            case AnalyticsWebServiceConnector.TYPE_PUT_RECORDS: {
+            /*case AnalyticsWebServiceConnector.TYPE_PUT_RECORDS: {
                 StringBuilder buffer = new StringBuilder();
                 BufferedReader reader = request.getReader();
                 String line;
@@ -155,7 +155,7 @@
                 String recordsAsString = buffer.toString();
                 out.print(connector.insertRecordsToTable(tableName, recordsAsString));
                 break;
-            }
+            }*/
             case AnalyticsWebServiceConnector.TYPE_SEARCH_COUNT: {
                 StringBuilder buffer = new StringBuilder();
                 BufferedReader reader = request.getReader();
@@ -178,7 +178,7 @@
                 out.print(connector.search(tableName, queryAsString));
                 break;
             }
-            case AnalyticsWebServiceConnector.TYPE_SET_SCHEMA: {
+            /*case AnalyticsWebServiceConnector.TYPE_SET_SCHEMA: {
                 StringBuilder buffer = new StringBuilder();
                 BufferedReader reader = request.getReader();
                 String line;
@@ -188,7 +188,7 @@
                 String schemaAsString = buffer.toString();
                 out.print(connector.setTableSchema(tableName, schemaAsString));
                 break;
-            }
+            }*/
             case AnalyticsWebServiceConnector.TYPE_GET_SCHEMA: {
                 out.print(connector.getTableSchema(tableName));
                 break;
