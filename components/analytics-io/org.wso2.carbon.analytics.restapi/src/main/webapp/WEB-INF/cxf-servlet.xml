@@ -10,6 +10,9 @@
 		<jaxrs:serviceBeans>
 			<ref bean="analyticsBean"/>
 		</jaxrs:serviceBeans>
+        <jaxrs:outInterceptors>
+            <ref bean="httpHeadersOutInterceptor"/>
+        </jaxrs:outInterceptors>
 		<jaxrs:providers>
 			<ref bean="jacksonJsonProvider"/>
 			<ref bean="analyticsExceptionMapper"/>
@@ -29,4 +32,5 @@
 	<bean id="analyticsTimeoutExceptionMapper" 
 			class="org.wso2.carbon.analytics.restapi.providers.AnalyticsTimeoutExceptionMapper"/>
 	<bean id="jacksonJsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider"/>
+    <bean id="httpHeadersOutInterceptor" class="org.wso2.carbon.analytics.restapi.interceptors.HttpHeaderOutInterceptor"/>
 </beans>

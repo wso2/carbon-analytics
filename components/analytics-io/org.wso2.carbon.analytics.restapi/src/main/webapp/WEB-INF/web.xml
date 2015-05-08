@@ -29,13 +29,23 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
 
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>SecureConnection</web-resource-name>
+            <url-pattern>/*</url-pattern>
+        </web-resource-collection>
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+
     <servlet-mapping>
         <servlet-name>cxf</servlet-name>
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
 
     <session-config>
-        <session-timeout>60</session-timeout>
+        <session-timeout>15</session-timeout>
     </session-config>
 
 </web-app>
