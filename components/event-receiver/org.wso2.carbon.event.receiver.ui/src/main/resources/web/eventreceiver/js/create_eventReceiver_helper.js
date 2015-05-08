@@ -456,8 +456,7 @@ function getTextDataValues(dataTable) {
     return textData;
 }
 
-function getMapDataValues(dataTable) {
-
+function getMapDataMappingValues(dataTable) {
     var mapEventData = "";
     for (var i = 0; i < dataTable.rows.length; i++) {
 
@@ -707,7 +706,7 @@ function addEventReceiverViaPopup(form, toStreamId, redirectPage) {
 
         var mapDataTable = document.getElementById("addMapDataTable");
         if (mapDataTable.rows.length > 0 && customMappingValue == "enable") {
-            mapData = getMapDataValues(mapDataTable);
+            mapData = getMapDataMappingValues(mapDataTable);
         }
 
         if ((mapData == "" && customMappingValue == "enable") || mapData == "invalid") {

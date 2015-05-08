@@ -111,6 +111,7 @@ public class JMSEventAdapter implements OutputEventAdapter {
         PublisherDetails publisherDetails;
         Hashtable<String, String> adaptorProperties =
                 convertMapToHashTable(outputEventAdaptorConfiguration.getStaticProperties());
+        adaptorProperties.remove(JMSConstants.PARAM_DESTINATION);
         JMSConnectionFactory jmsConnectionFactory = new JMSConnectionFactory(adaptorProperties,
                 outputEventAdaptorConfiguration.getName());
         JMSMessageSender jmsMessageSender = new JMSMessageSender(jmsConnectionFactory, messageConfig);
