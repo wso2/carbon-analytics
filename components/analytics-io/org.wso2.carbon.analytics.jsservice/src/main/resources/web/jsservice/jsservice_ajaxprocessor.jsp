@@ -88,7 +88,14 @@
                 String to = request.getParameter(Constants.TIME_TO);
                 String start = request.getParameter(Constants.START);
                 String count = request.getParameter(Constants.COUNT);
-                out.print(connector.getRecordsByRange(tableName, from, to, start, count));
+                StringBuilder buffer = new StringBuilder();
+                BufferedReader reader = request.getReader();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                String columnsAsString = buffer.toString();
+                out.print(connector.getRecordsByRange(tableName, from, to, start, count, columnsAsString));
                 break;
             }
             case AnalyticsWebServiceConnector.TYPE_GET_BY_ID: {

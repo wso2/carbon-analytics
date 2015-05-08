@@ -32,7 +32,9 @@ public class ResponseBean {
 	/** The status. */
 	@XmlElement(required = true)
 	private String status;
-
+     /**The status code **/
+    @XmlElement(required = true)
+    private int statusCode;
 	/** The message. */
 	@XmlElement(required = false)
 	private String message;
@@ -50,6 +52,16 @@ public class ResponseBean {
 	public ResponseBean(String status) {
 		this.status = status;
 	}
+
+    /**
+     * Instantiates a new response bean.
+     * @param status the status
+     * @param statusCode the http status code
+     */
+    public ResponseBean(String status, int statusCode) {
+        this.status = status;
+        this.statusCode = statusCode;
+    }
 
 	/**
 	 * Sets the status.
