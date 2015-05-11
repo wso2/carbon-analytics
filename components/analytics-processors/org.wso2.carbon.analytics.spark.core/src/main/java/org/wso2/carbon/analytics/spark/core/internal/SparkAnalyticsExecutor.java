@@ -23,10 +23,13 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.deploy.master.Master;
+import org.apache.spark.deploy.master.MasterArguments;
 import org.apache.spark.deploy.worker.Worker;
+import org.apache.spark.deploy.worker.WorkerArguments;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
+import org.apache.spark.util.Utils;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterException;
@@ -67,9 +70,9 @@ import java.util.concurrent.Executors;
  */
 public class SparkAnalyticsExecutor implements GroupEventListener {
 
-    private static final int P2_BASE_PORT = 8090;
+    private static final int BASE_WORKER_UI_PORT = 8090;
 
-    private static final int P1_BASE_PORT = 4501;
+    private static final int BASE_WORKER_PORT = 4501;
 
     private static final String MASTER_PORT_GROUP_PROP = "MASTER_PORT";
 
@@ -85,8 +88,12 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private static final String CARBON_ANALYTICS_SPARK_APP_NAME = "CarbonAnalytics";
 
+    private static final String WORKER_CORES = "1";
+
+    private static final String WORKER_MEMORY = "1g";
+
     private static final Log log = LogFactory.getLog(SparkAnalyticsExecutor.class);
-    
+
     private SparkConf sparkConf;
 
     private JavaSparkContext javaSparkCtx;
@@ -110,37 +117,60 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             this.initSparkDataListener();
             acm.joinGroup(CLUSTER_GROUP_NAME, this);
         } else {
-            this.sparkConf = new SparkConf();
-            this.initClient(LOCAL_MASTER_URL);
+            this.initLocalClient();
         }
     }
-    
-    private void initClient(String masterUrl) {
-        this.sparkConf = initSparkConf(masterUrl, CARBON_ANALYTICS_SPARK_APP_NAME);
+
+    private void initClient(String masterUrl, String appName) {
+        this.sparkConf = initSparkConf(masterUrl, appName);
         this.javaSparkCtx = new JavaSparkContext(this.sparkConf);
         this.sqlCtx = new SQLContext(this.javaSparkCtx);
     }
 
-    private void startMaster(String host, int port, int webUIport) {
-        this.masterActorSystem = Master.startSystemAndActor(host, port, webUIport,
-                                                            this.sparkConf)._1();
+    private void initLocalClient() {
+        this.sparkConf = new SparkConf();
+        this.sparkConf.setMaster(LOCAL_MASTER_URL).setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
+        this.javaSparkCtx = new JavaSparkContext(this.sparkConf);
+        this.sqlCtx = new SQLContext(this.javaSparkCtx);
     }
 
-    private void startWorker(String workerHost, String masterHost, int masterPort, int p1, int p2) {
-        this.sparkConf = initSparkConf("spark://" + masterHost + ":" + masterPort,
-                                       CARBON_ANALYTICS_SPARK_APP_NAME);
-        this.workerActorSystem = Worker.startSystemAndActor(workerHost, p1, p2, 2, 1000000,
-                                       new String[]{"spark://" + masterHost + ":" + masterPort},
-                                       null, (Option) None$.MODULE$, sparkConf)._1();
-          }
+    private void startMaster(String host, String port, String webUIport, String propsFile,
+                             SparkConf sc) {
+        String[] argsArray = new String[]{"-h", host,
+                                          "-p", port,
+                                          "--webui-port", webUIport,
+                                          "--properties-file", propsFile //CarbonUtils.getCarbonHome() + File.separator + AnalyticsConstants.SPARK_DEFAULTS_PATH
+        };
+        MasterArguments args = new MasterArguments(argsArray, sc);
+        this.masterActorSystem = Master.startSystemAndActor(args.host(), args.port(), args.webUiPort(), sc)._1();
+    }
 
-    private SparkConf initSparkConf(String masterUrl, String appName){
-        SparkConf sc = new SparkConf();
-        sc.setMaster(masterUrl).setAppName(appName);
-        sc.set("spark.scheduler.mode", "FAIR");
-        sc.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-        sc.set("spark.kryoserializer.buffer.mb","512");
-        return sc;
+    private void startWorker(String workerHost, String masterHost, String masterPort,
+                             String workerPort,
+                             String workerUiPort, String workerCores, String workerMemory,
+                             String workerDir,
+                             String propFile, SparkConf sc) {
+        String master = "spark://" + masterHost + ":" + masterPort;
+        String[] argsArray = new String[]{master,
+                                          "-h", workerHost,
+                                          "-p", workerPort,
+                                          "--webui-port", workerUiPort,
+                                          "-c", workerCores, //WORKER_CORES,
+                                          "-m", workerMemory, //WORKER_MEMORY,
+                                          "-d", workerDir, //CarbonUtils.getCarbonHome() + File.separator + AnalyticsConstants.SPARK_WORK_DIR,
+                                          "--properties-file", propFile //CarbonUtils.getCarbonHome() + File.separator + AnalyticsConstants.SPARK_DEFAULTS_PATH
+        };
+        WorkerArguments args = new WorkerArguments(argsArray, this.sparkConf);
+        this.workerActorSystem = Worker.startSystemAndActor(args.host(), args.port(), args.webUiPort(),
+                                                            args.cores(), args.memory(), args.masters(),
+                                                            args.workDir(), (Option) None$.MODULE$, sc)._1();
+    }
+
+    private SparkConf initSparkConf(String masterUrl, String appName) {
+        SparkConf conf = new SparkConf();
+        conf.setIfMissing("spark.master", masterUrl);
+        conf.setIfMissing("spark.app.name", appName);
+        return conf;
     }
 
     private void initSparkDataListener() {
@@ -162,10 +192,10 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         perms.add(PosixFilePermission.GROUP_EXECUTE);
         try {
             Files.setPosixFilePermissions(Paths.get(CarbonUtils.getCarbonHome() + File.separator +
-                    AnalyticsConstants.SPARK_COMPUTE_CLASSPATH_SCRIPT_PATH), perms);
+                                                    AnalyticsConstants.SPARK_COMPUTE_CLASSPATH_SCRIPT_PATH), perms);
         } catch (IOException e) {
             log.warn("Error while checking the permission for " + AnalyticsConstants.SPARK_COMPUTE_CLASSPATH_SCRIPT_PATH
-                    + ". " + e.getMessage());
+                     + ". " + e.getMessage());
         }
     }
 
@@ -175,7 +205,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             this.javaSparkCtx.close();
         }
     }
-    
+
     private void shutdownWorker() {
         if (this.workerActorSystem == null) {
             return;
@@ -188,7 +218,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
     }
 
-    private void shutdownMaster(){
+    private void shutdownMaster() {
         if (this.masterActorSystem == null) {
             return;
         }
@@ -490,43 +520,80 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     @Override
     public void onBecomingLeader() {
-        this.sparkConf = new SparkConf();
-        int masterPort = BASE_MASTER_PORT + this.portOffset;
-        int webuiPort = BASE_WEBUI_PORT + this.portOffset;
-        this.stop();
+        String propsFile = CarbonUtils.getCarbonHome() + File.separator
+                           + AnalyticsConstants.SPARK_DEFAULTS_PATH;
+        Utils.loadDefaultSparkProperties(new SparkConf(), propsFile);
+        log.info("Spark defaults loaded from " + propsFile);
 
-        this.shutdownMaster();
-        this.shutdownWorker();
-        this.startMaster(this.myHost, masterPort, webuiPort);
+        String masterPort = System.getProperty(AnalyticsConstants.SPARK_MASTER_PORT);
+        if (masterPort == null) {
+            masterPort = Integer.toString(BASE_MASTER_PORT + this.portOffset);
+        }
+        String webuiPort = System.getProperty(AnalyticsConstants.SPARK_MASTER_WEBUI_PORT);
+        if (webuiPort == null) {
+            webuiPort = Integer.toString(BASE_WEBUI_PORT + this.portOffset);
+        }
+
+        String master = System.getProperty(AnalyticsConstants.SPARK_MASTER);
+        if (master == null) {
+            master = "spark://" + this.myHost + ":" + masterPort;
+        }
+        String appName = System.getProperty(AnalyticsConstants.SPARK_APP_NAME);
+        if (appName == null) {
+            appName = CARBON_ANALYTICS_SPARK_APP_NAME;
+        }
+        this.sparkConf = initSparkConf(master, appName);
+
+        this.startMaster(this.myHost, masterPort, webuiPort, propsFile, this.sparkConf);
+
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         acm.setProperty(CLUSTER_GROUP_NAME, MASTER_HOST_GROUP_PROP, this.myHost);
         acm.setProperty(CLUSTER_GROUP_NAME, MASTER_PORT_GROUP_PROP, masterPort);
-        log.info("Analytics master started: [" + this.myHost + ":" + masterPort + "]");
+        log.info("Analytics master started: [" + master + "]");
     }
 
     @Override
     public void onLeaderUpdate() {
-        this.shutdownWorker();
-        this.stop();
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
+        //take master information from the cluster
         String masterHost = (String) acm.getProperty(CLUSTER_GROUP_NAME, MASTER_HOST_GROUP_PROP);
-        int masterPort = (Integer) acm.getProperty(CLUSTER_GROUP_NAME, MASTER_PORT_GROUP_PROP);
-        int p1 = P1_BASE_PORT + this.portOffset;
-        int p2 = P2_BASE_PORT + this.portOffset;
-        this.startWorker(this.myHost, masterHost, masterPort, p1, p2);
+        String masterPort = (String) acm.getProperty(CLUSTER_GROUP_NAME, MASTER_PORT_GROUP_PROP);
 
-        if (acm.isLeader(CLUSTER_GROUP_NAME)) {
-            this.initClient("spark://" + this.myHost + ":" + masterPort);
+        String workerPort = System.getProperty(AnalyticsConstants.SPARK_WORKER_PORT);
+        if (workerPort == null) {
+            workerPort = Integer.toString(BASE_WORKER_PORT + this.portOffset);
         }
 
-        log.info("Analytics worker started: [" + this.myHost + ":" + p1 + ":" + p2 + "] "
+        String workerUiPort = System.getProperty(AnalyticsConstants.SPARK_WORKER_WEBUI_PORT);
+        if (workerUiPort == null) {
+            workerUiPort = Integer.toString(BASE_WORKER_UI_PORT + this.portOffset);
+        }
+
+        String workerCores = System.getProperty(AnalyticsConstants.SPARK_WORKER_CORES);
+        if (workerCores ==null){
+            workerCores = WORKER_CORES;
+        }
+
+        String workerMem =  System.getProperty(AnalyticsConstants.SPARK_WORKER_MEMORY);
+        if (workerMem ==null){
+            workerMem = WORKER_MEMORY;
+        }
+        memeory dir prop
+
+        this.startWorker(this.myHost, masterHost, masterPort, workerPort, workerUiPort);
+
+        if (acm.isLeader(CLUSTER_GROUP_NAME)) {
+            this.initClient("spark://" + this.myHost + ":" + masterPort, CARBON_ANALYTICS_SPARK_APP_NAME);
+        }
+
+        log.info("Analytics worker started: [" + this.myHost + ":" + workerPort + ":" + workerUiPort + "] "
                  + "Master [" + masterHost + ":" + masterPort + "]");
     }
 
     public int getWorkerCount() {
         return workerCount;
     }
-    
+
     @Override
     public void onMembersChangeForLeader() {
         try {
@@ -536,5 +603,5 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             log.error("Error in extracting the worker count: " + e.getMessage(), e);
         }
     }
-    
+
 }
