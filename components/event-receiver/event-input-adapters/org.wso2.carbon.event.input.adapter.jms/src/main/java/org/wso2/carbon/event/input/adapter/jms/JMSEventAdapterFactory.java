@@ -118,6 +118,14 @@ public class JMSEventAdapterFactory extends InputEventAdapterFactory {
                 JMSEventAdapterConstants.ADAPTER_JMS_DURABLE_SUBSCRIBER_NAME_HINT));
         propertyList.add(subscriberNameProperty);
 
+        Property isDuplicatedInCluster = new Property(JMSEventAdapterConstants.ADAPTER_JMS_IS_EVENT_DUPLICATED_IN_CLUSTER);
+        isDuplicatedInCluster.setDisplayName(
+                resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_JMS_IS_EVENT_DUPLICATED_IN_CLUSTER));
+        isDuplicatedInCluster.setRequired(false);
+        isDuplicatedInCluster.setOptions(new String[]{"true", "false"});
+        isDuplicatedInCluster.setDefaultValue("false");
+        propertyList.add(isDuplicatedInCluster);
+
         return propertyList;
     }
 
