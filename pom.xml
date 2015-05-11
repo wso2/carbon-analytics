@@ -340,6 +340,11 @@
                 <artifactId>json-smart</artifactId>
                 <version>${jsonsmart.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.cassandra.wso2</groupId>
+                <artifactId>cassandra-thrift</artifactId>
+                <version>${cassandra.thrift.wso2.version}</version>
+            </dependency>
             <!--third party dependencies stop-->
 
             <!--carbon analytics common dependencies start-->
@@ -964,6 +969,7 @@
         <google.guava.version>13.0.1</google.guava.version>
         <orbit.version.distruptor>2.10.4-wso2v2</orbit.version.distruptor>
         <commons.pool.version>1.5.0.wso2v1</commons.pool.version>
+        <cassandra.thrift.wso2.version>1.2.13.wso2v4</cassandra.thrift.wso2.version>
 
         <httpclient.httpcomponents.wso2.version>4.2.5.wso2v1</httpclient.httpcomponents.wso2.version>
         <httpcore.httpcomponents.wso2.version>4.3.3.wso2v1</httpcore.httpcomponents.wso2.version>
