@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+//TODO : Handle secured and non-secured endpoints
 public class HTTPMessageServlet extends HttpServlet {
 
     private static final String AUTHORIZATION_HEADER = "Authorization";

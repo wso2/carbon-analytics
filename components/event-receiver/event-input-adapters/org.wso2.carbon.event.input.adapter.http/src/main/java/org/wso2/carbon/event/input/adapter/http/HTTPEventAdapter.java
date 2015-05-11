@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005 - 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy
@@ -25,10 +25,7 @@ import org.wso2.carbon.event.input.adapter.http.internal.util.HTTPEventAdapterCo
 
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public final class HTTPEventAdapter implements InputEventAdapter {
 
@@ -48,6 +45,7 @@ public final class HTTPEventAdapter implements InputEventAdapter {
     public void init(InputEventAdapterListener eventAdaptorListener) throws InputEventAdapterException {
         this.eventAdaptorListener = eventAdaptorListener;
 
+        //TODO min thread , max thread, default keep alive timeIN Millis, queue size
         //ThreadPoolExecutor will be assigned  if it is null
         if (executorService == null) {
             int minThread;
@@ -86,6 +84,23 @@ public final class HTTPEventAdapter implements InputEventAdapter {
 
             executorService = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime,
                     TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(jobQueueSize));
+
+
+//            private RejectedExecutionHandler rejectedExecutionHandler = new RejectedExecutionHandler() {
+//                @Override
+//                public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+//                    try {
+//                        executor.getQueue().put(r);
+//                    } catch (InterruptedException e) {
+//                        log.error(e.getMessage(), e);
+//                    }
+//                }
+//
+//            };
+//            private ExecutorService executorService = new ThreadPoolExecutor(HTTPEventAdaptorConstants.ADAPTER_MIN_THREAD_POOL_SIZE,
+//                    HTTPEventAdaptorConstants.ADAPTER_MAX_THREAD_POOL_SIZE, HTTPEventAdaptorConstants.DEFAULT_KEEP_ALIVE_TIME, TimeUnit.SECONDS,
+//                    new LinkedBlockingQueue<Runnable>(HTTPEventAdaptorConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE), rejectedExecutionHandler);
+
         }
     }
 

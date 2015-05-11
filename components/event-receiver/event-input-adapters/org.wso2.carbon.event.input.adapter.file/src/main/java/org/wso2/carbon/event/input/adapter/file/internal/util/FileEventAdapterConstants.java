@@ -23,7 +23,7 @@ public final class FileEventAdapterConstants {
     private FileEventAdapterConstants() {
     }
 
-    public static final String EVENT_ADAPTER_TYPE_FILE = "file";
+    public static final String EVENT_ADAPTER_TYPE_FILE = "file-tail";
     public static final String EVENT_ADAPTER_CONF_FILEPATH = "filepath";
     public static final String EVENT_ADAPTER_CONF_FILEPATH_HINT = "filepathHint";
     public static final int MIN_THREAD = 8;

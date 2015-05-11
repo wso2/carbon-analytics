@@ -36,6 +36,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+//TODO If remote polling not avaialble then move to global properties
 public class FileEventAdapter implements InputEventAdapter {
 
     private final InputEventAdapterConfiguration eventAdapterConfiguration;
@@ -45,7 +46,7 @@ public class FileEventAdapter implements InputEventAdapter {
     private static final Log log = LogFactory.getLog(FileEventAdapter.class);
     private ConcurrentHashMap<String, ConcurrentHashMap<String, FileTailerManager>> tailerMap =
             new ConcurrentHashMap<String, ConcurrentHashMap<String, FileTailerManager>>();
-    private ThreadPoolExecutor threadPoolExecutor;
+    private static ThreadPoolExecutor threadPoolExecutor;
 
     public FileEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration,
                             Map<String, String> globalProperties) {
@@ -53,7 +54,7 @@ public class FileEventAdapter implements InputEventAdapter {
         this.globalProperties = globalProperties;
     }
 
-
+     //TODO check the use of executoe and use single threaded executer
     @Override
     public void init(InputEventAdapterListener eventAdapterListener) throws InputEventAdapterException {
         this.eventAdapterListener = eventAdapterListener;
@@ -108,6 +109,7 @@ public class FileEventAdapter implements InputEventAdapter {
         createFileAdapterListener();
     }
 
+    //TODO : remove the map
     @Override
     public void disconnect() {
 

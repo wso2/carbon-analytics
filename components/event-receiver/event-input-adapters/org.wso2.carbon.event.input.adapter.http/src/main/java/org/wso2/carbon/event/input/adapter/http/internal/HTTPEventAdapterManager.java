@@ -33,6 +33,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public final class HTTPEventAdapterManager {
+
+    //TODO - Move the impl to the adapter code
     public static Map<String, List<HTTPEventAdapter>> ADAPTER_MAP = new ConcurrentHashMap<String, List<HTTPEventAdapter>>();
 
     private HTTPEventAdapterManager() {

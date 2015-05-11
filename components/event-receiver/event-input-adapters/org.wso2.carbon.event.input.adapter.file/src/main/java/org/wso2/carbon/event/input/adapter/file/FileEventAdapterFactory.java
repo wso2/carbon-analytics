@@ -22,6 +22,7 @@ import org.wso2.carbon.event.input.adapter.file.internal.util.FileEventAdapterCo
 
 import java.util.*;
 
+//TODO : Change from file to file-tail
 public class FileEventAdapterFactory extends InputEventAdapterFactory {
 
     private ResourceBundle resourceBundle = ResourceBundle.getBundle
@@ -62,7 +63,7 @@ public class FileEventAdapterFactory extends InputEventAdapterFactory {
         startFromEndProperty.setDisplayName(
                 resourceBundle.getString(FileEventAdapterConstants.EVENT_ADAPTER_START_FROM_END));
         startFromEndProperty.setOptions(new String[]{"true", "false"});
-        startFromEndProperty.setDefaultValue("false");
+        startFromEndProperty.setDefaultValue("true");
         startFromEndProperty.setHint(resourceBundle.getString(
                 FileEventAdapterConstants.EVENT_ADAPTER_START_FROM_END_HINT));
         propertyList.add(startFromEndProperty);

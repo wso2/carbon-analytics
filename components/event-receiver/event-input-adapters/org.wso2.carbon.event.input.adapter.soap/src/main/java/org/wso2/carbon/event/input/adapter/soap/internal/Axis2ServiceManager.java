@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+//TODO : change receiver to receive  , allow user to decide about the transports
 public final class Axis2ServiceManager {
     public static Map<String, List<SOAPEventAdapter>> ADAPTER_MAP = new ConcurrentHashMap<String, List<SOAPEventAdapter>>();
 
@@ -49,7 +50,7 @@ public final class Axis2ServiceManager {
 
     public static synchronized void registerService(String serviceName, SOAPEventAdapter soapEventAdapter,
                                                     AxisConfiguration axisConfiguration) throws AxisFault {
-
+    //TODO - Remove adapter map
 
 //        TenantManager.getTenantAxisConfiguration()
 //        TenantAxisUtils.getTenantAxisConfiguration()
@@ -128,6 +129,7 @@ public final class Axis2ServiceManager {
     }
 
 
+    //TODO : Move to another class and create instance and use when creating an endpoint
     static class SubscriptionMessageReceiver extends AbstractInMessageReceiver {
         private final String serviceName;
         private final String operationName;

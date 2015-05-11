@@ -34,6 +34,7 @@ import org.wso2.carbon.event.input.adapter.soap.internal.Axis2ServiceManager;
 import java.util.Map;
 import java.util.UUID;
 
+//TODO : change the distributed clustered to <- false
 public final class SOAPEventAdapter implements InputEventAdapter {
 
     private static final Log log = LogFactory.getLog(SOAPEventAdapter.class);
@@ -80,7 +81,7 @@ public final class SOAPEventAdapter implements InputEventAdapter {
             Axis2ServiceManager.unregisterService(eventAdapterConfiguration.getName(), this,
                     EventAdapterUtil.getAxisConfiguration());
         } catch (AxisFault axisFault) {
-            throw new InputEventAdapterRuntimeException("Cannot unregister Input Adapter " +
+            throw new InputEventAdapterRuntimeException("Cannot un-register Input Adapter " +
                     eventAdapterConfiguration.getName() + " on tenant " + tenantId, axisFault);
         }
     }
