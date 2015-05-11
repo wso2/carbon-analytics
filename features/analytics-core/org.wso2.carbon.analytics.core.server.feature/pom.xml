@@ -67,10 +67,10 @@
             <groupId>com.esotericsoftware.kryo</groupId>
             <artifactId>kryo</artifactId>
         </dependency>
-        <!--dependency>
+        <dependency>
             <groupId>org.wso2.orbit.com.esotericsoftware.kryo</groupId>
             <artifactId>kryo</artifactId>
-        </dependency-->
+        </dependency>
         <dependency>
             <groupId>org.antlr.wso2</groupId>
             <artifactId>antlr-runtime</artifactId>
@@ -106,8 +106,8 @@
                             <bundles>
                                 <bundleDef>org.wso2.orbit.org.apache.lucene:lucene</bundleDef>
                                 <bundleDef>org.wso2.orbit.asm4:asm4-all</bundleDef>
-                                <!--bundleDef>org.wso2.orbit.com.esotericsoftware.kryo:kryo</bundleDef-->
-                                <bundleDef>com.esotericsoftware.kryo:kryo</bundleDef>
+                                <bundleDef>org.wso2.orbit.com.esotericsoftware.kryo:kryo</bundleDef>
+                                <!--<bundleDef>com.esotericsoftware.kryo:kryo</bundleDef>-->
                                 <bundleDef>org.antlr.wso2:antlr-runtime</bundleDef>
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasource.core
                                 </bundleDef>

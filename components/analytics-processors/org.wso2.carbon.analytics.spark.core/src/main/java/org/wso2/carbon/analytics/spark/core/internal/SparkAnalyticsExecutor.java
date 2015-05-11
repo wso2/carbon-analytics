@@ -138,7 +138,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         SparkConf sc = new SparkConf();
         sc.setMaster(masterUrl).setAppName(appName);
         sc.set("spark.scheduler.mode", "FAIR");
-//        sc.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+        sc.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
         return sc;
     }
 
