@@ -40,10 +40,14 @@
 		    <groupId>org.wso2.carbon.analytics</groupId>
 		    <artifactId>org.wso2.carbon.analytics.datasource.commons</artifactId>
 		</dependency>
-		<!--dependency>
+		<dependency>
 		    <groupId>org.wso2.orbit.com.esotericsoftware.kryo</groupId>
 		    <artifactId>kryo</artifactId>
-		</dependency-->
+		</dependency>
+        <dependency>
+            <groupId>com.esotericsoftware.kryo</groupId>
+            <artifactId>kryo</artifactId>
+        </dependency>
 	</dependencies>
 
 	<build>

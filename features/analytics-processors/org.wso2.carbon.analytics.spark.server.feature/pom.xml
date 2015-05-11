@@ -98,10 +98,10 @@
             <artifactId>kryo</artifactId>
         </dependency>
 
-        <!--<dependency>-->
-            <!--<groupId>org.wso2.orbit.com.esotericsoftware.kryo</groupId>-->
-            <!--<artifactId>kryo</artifactId>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>org.wso2.orbit.com.esotericsoftware.kryo</groupId>
+            <artifactId>kryo</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.xerial.snappy</groupId>
@@ -249,10 +249,10 @@
             <artifactId>commons-configuration</artifactId>
         </dependency>
 
-        <!--<dependency>-->
-            <!--<groupId>org.wso2.orbit.org.objenesis</groupId>-->
-            <!--<artifactId>objenesis</artifactId>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>org.wso2.orbit.org.objenesis</groupId>
+            <artifactId>objenesis</artifactId>
+        </dependency>
 
     </dependencies>
 
@@ -308,8 +308,8 @@
                                 <bundleDef>com.fasterxml.jackson.core:jackson-databind</bundleDef>
                                 <bundleDef>com.fasterxml.jackson.core:jackson-core</bundleDef>
                                 <bundleDef>com.fasterxml.jackson.core:jackson-annotations</bundleDef>
-                                <bundleDef>com.esotericsoftware.kryo:kryo</bundleDef>
-                                <!--<bundleDef>org.wso2.orbit.com.esotericsoftware.kryo:kryo</bundleDef>-->
+                                <!--<bundleDef>com.esotericsoftware.kryo:kryo</bundleDef>-->
+                                <bundleDef>org.wso2.orbit.com.esotericsoftware.kryo:kryo</bundleDef>
                                 <bundleDef>org.xerial.snappy:snappy-java</bundleDef>
                                 <bundleDef>io.netty.wso2:netty-all</bundleDef>
                                 <bundleDef>javax.servlet.jsp:javax.servlet.jsp-api</bundleDef>
@@ -339,7 +339,7 @@
                                 <bundleDef>org.spark-project.protobuf:protobuf-java</bundleDef>
                                 <bundleDef>commons-configuration.wso2:commons-configuration</bundleDef>
                                 <bundleDef>org.roaringbitmap:RoaringBitmap</bundleDef>
-                                <!--<bundleDef>org.wso2.orbit.org.objenesis:objenesis</bundleDef>-->
+                                <bundleDef>org.wso2.orbit.org.objenesis:objenesis</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}

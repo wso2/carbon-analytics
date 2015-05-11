@@ -564,11 +564,11 @@
                 <version>${jackson.version}</version>
             </dependency>
 
-            <!--<dependency>-->
-                <!--<groupId>org.wso2.orbit.com.esotericsoftware.kryo</groupId>-->
-                <!--<artifactId>kryo</artifactId>-->
-                <!--<version>${kryo.orbit.version}</version>-->
-            <!--</dependency>-->
+            <dependency>
+                <groupId>org.wso2.orbit.com.esotericsoftware.kryo</groupId>
+                <artifactId>kryo</artifactId>
+                <version>${kryo.orbit.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.esotericsoftware.kryo</groupId>
@@ -576,11 +576,11 @@
                 <version>${kryo.version}</version>
             </dependency>
 
-            <!--<dependency>-->
-                <!--<groupId>org.wso2.orbit.org.objenesis</groupId>-->
-                <!--<artifactId>objenesis</artifactId>-->
-                <!--<version>${objenesis.orbit.version}</version>-->
-            <!--</dependency>-->
+            <dependency>
+                <groupId>org.wso2.orbit.org.objenesis</groupId>
+                <artifactId>objenesis</artifactId>
+                <version>${objenesis.orbit.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.antlr.wso2</groupId>
@@ -1204,8 +1204,8 @@
         <codahale.metrics.import.version>[3.1.0, 4.0.0)</codahale.metrics.import.version>
         <jackson.import.version>[2.4.4, 2.5.0)</jackson.import.version>
         <json4s.import.version>[3.2.10, 3.2.11)</json4s.import.version>
-        <!--kryo.import.version>[2.24.0,3.0)</kryo.import.version-->
-        <kryo.import.version>[2.21,3.0)</kryo.import.version>
+        <kryo.import.version>[2.24.0,3.0)</kryo.import.version>
+        <!--<kryo.import.version>[2.21,3.0)</kryo.import.version>-->
         <snappy.import.version>[1.1.1.6, 1.1.1.7)</snappy.import.version>
         <netty-all.import.version>[4.0.23, 4.0.24.Final)</netty-all.import.version>
         <scala.import.version>[2.10.4, 2.11.0)</scala.import.version>
