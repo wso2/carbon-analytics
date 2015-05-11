@@ -51,7 +51,6 @@ import scala.Option;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
@@ -91,6 +90,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private static final String WORKER_CORES = "1";
 
     private static final String WORKER_MEMORY = "1g";
+
+    private static final String WORK_DIR = "work";
 
     private static final Log log = LogFactory.getLog(SparkAnalyticsExecutor.class);
 
@@ -155,9 +156,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                                           "-h", workerHost,
                                           "-p", workerPort,
                                           "--webui-port", workerUiPort,
-                                          "-c", workerCores, //WORKER_CORES,
-                                          "-m", workerMemory, //WORKER_MEMORY,
-                                          "-d", workerDir, //CarbonUtils.getCarbonHome() + File.separator + AnalyticsConstants.SPARK_WORK_DIR,
+                                          "-c", workerCores,
+                                          "-m", workerMemory,
+                                          "-d", workerDir,
                                           "--properties-file", propFile //CarbonUtils.getCarbonHome() + File.separator + AnalyticsConstants.SPARK_DEFAULTS_PATH
         };
         WorkerArguments args = new WorkerArguments(argsArray, this.sparkConf);
@@ -203,31 +204,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         if (this.sqlCtx != null) {
             this.sqlCtx.sparkContext().stop();
             this.javaSparkCtx.close();
-        }
-    }
-
-    private void shutdownWorker() {
-        if (this.workerActorSystem == null) {
-            return;
-        }
-        try {
-            Method method = this.workerActorSystem.getClass().getMethod("shutdown");
-            method.invoke(this.workerActorSystem);
-        } catch (Exception e) {
-            throw new RuntimeException("Error in shutting down worker: " + e.getMessage(), e);
-        }
-    }
-
-    private void shutdownMaster() {
-        if (this.masterActorSystem == null) {
-            return;
-        }
-        try {
-            Method method = this.masterActorSystem.getClass().getMethod("shutdown");
-            method.invoke(this.masterActorSystem);
-            this.masterActorSystem = null;
-        } catch (Exception e) {
-            throw new RuntimeException("Error in shutting down master: " + e.getMessage(), e);
         }
     }
 
@@ -554,6 +530,11 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     @Override
     public void onLeaderUpdate() {
+        String propsFile = CarbonUtils.getCarbonHome() + File.separator
+                           + AnalyticsConstants.SPARK_DEFAULTS_PATH;
+        Utils.loadDefaultSparkProperties(new SparkConf(), propsFile);
+        log.info("Spark defaults loaded from " + propsFile);
+
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         //take master information from the cluster
         String masterHost = (String) acm.getProperty(CLUSTER_GROUP_NAME, MASTER_HOST_GROUP_PROP);
@@ -570,20 +551,30 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
 
         String workerCores = System.getProperty(AnalyticsConstants.SPARK_WORKER_CORES);
-        if (workerCores ==null){
+        if (workerCores == null) {
             workerCores = WORKER_CORES;
         }
 
-        String workerMem =  System.getProperty(AnalyticsConstants.SPARK_WORKER_MEMORY);
-        if (workerMem ==null){
+        String workerMem = System.getProperty(AnalyticsConstants.SPARK_WORKER_MEMORY);
+        if (workerMem == null) {
             workerMem = WORKER_MEMORY;
         }
-        memeory dir prop
 
-        this.startWorker(this.myHost, masterHost, masterPort, workerPort, workerUiPort);
+        String workerDir = System.getProperty(AnalyticsConstants.SPARK_WORKER_DIR);
+        if (workerDir == null) {
+            workerDir = CarbonUtils.getCarbonHome() + File.separator + WORK_DIR;
+        }
+
+        String appName = System.getProperty(AnalyticsConstants.SPARK_APP_NAME);
+        if (appName == null) {
+            appName = CARBON_ANALYTICS_SPARK_APP_NAME;
+        }
+
+        this.startWorker(this.myHost, masterHost, masterPort, workerPort, workerUiPort, workerCores,
+                         workerMem, workerDir, propsFile, this.sparkConf);
 
         if (acm.isLeader(CLUSTER_GROUP_NAME)) {
-            this.initClient("spark://" + this.myHost + ":" + masterPort, CARBON_ANALYTICS_SPARK_APP_NAME);
+            this.initClient("spark://" + masterHost + ":" + masterPort, appName);
         }
 
         log.info("Analytics worker started: [" + this.myHost + ":" + workerPort + ":" + workerUiPort + "] "

@@ -63,7 +63,6 @@ public class AnalyticsConstants {
     public static final String DEFAULT_CHARSET = "UTF8";
     public static final String SCRIPT_DEPLOYMENT_DIR = "spark-scripts";
     public static final String SPARK_DEFAULTS_PATH = "repository/conf/spark/spark-defaults.conf";
-    public static final String SPARK_WORK_DIR = "work";
 
     //Spark default properties strings
     public static final String SPARK_MASTER_IP = "spark.master.ip";
@@ -90,7 +89,9 @@ public class AnalyticsConstants {
     public static final String SPARK_LOCAL_DIR = "spark.local.dir";
     public static final String SPARK_LOGCONF = "spark.logConf";
     public static final String SPARK_MASTER = "spark.master";
-    public static final String SPARK_DRIVER_EXTRACLASSPATH = "spark.driver.extraClassPath";
+
+    //Extra constants available for Spark
+/*  public static final String SPARK_DRIVER_EXTRACLASSPATH = "spark.driver.extraClassPath";
     public static final String SPARK_DRIVER_EXTRAJAVAOPTIONS = "spark.driver.extraJavaOptions";
     public static final String SPARK_DRIVER_EXTRALIBRARYPATH = "spark.driver.extraLibraryPath";
     public static final String SPARK_DRIVER_USERCLASSPATHFIRST = "spark.driver.userClassPathFirst";
@@ -206,7 +207,7 @@ public class AnalyticsConstants {
     public static final String SPARK_SSL_KEYSTOREPASSWORD = "spark.ssl.keyStorePassword";
     public static final String SPARK_SSL_PROTOCOL = "spark.ssl.protocol";
     public static final String SPARK_SSL_TRUSTSTORE = "spark.ssl.trustStore";
-    public static final String SPARK_SSL_TRUSTSTOREPASSWORD = "spark.ssl.trustStorePassword";
+    public static final String SPARK_SSL_TRUSTSTOREPASSWORD = "spark.ssl.trustStorePassword";*/
 
 
 }
