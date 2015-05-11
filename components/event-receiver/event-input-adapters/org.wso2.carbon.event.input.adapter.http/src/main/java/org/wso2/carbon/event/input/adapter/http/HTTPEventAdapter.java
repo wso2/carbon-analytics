@@ -15,14 +15,23 @@
 
 package org.wso2.carbon.event.input.adapter.http;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.osgi.service.http.HttpService;
+import org.osgi.service.http.NamespaceException;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapter;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterConfiguration;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterException;
+import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterRuntimeException;
 import org.wso2.carbon.event.input.adapter.core.exception.TestConnectionNotSupportedException;
-import org.wso2.carbon.event.input.adapter.http.internal.HTTPEventAdapterManager;
+import org.wso2.carbon.event.input.adapter.http.internal.ds.HTTPEventAdapterServiceValueHolder;
 import org.wso2.carbon.event.input.adapter.http.internal.util.HTTPEventAdapterConstants;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
+import javax.servlet.ServletException;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.*;
@@ -33,8 +42,9 @@ public final class HTTPEventAdapter implements InputEventAdapter {
     private final Map<String, String> globalProperties;
     private InputEventAdapterListener eventAdaptorListener;
     private final String id = UUID.randomUUID().toString();
-
     public static ExecutorService executorService;
+    private static final Log log = LogFactory.getLog(HTTPEventAdapter.class);
+
     public HTTPEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration,
                             Map<String, String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
@@ -45,7 +55,6 @@ public final class HTTPEventAdapter implements InputEventAdapter {
     public void init(InputEventAdapterListener eventAdaptorListener) throws InputEventAdapterException {
         this.eventAdaptorListener = eventAdaptorListener;
 
-        //TODO min thread , max thread, default keep alive timeIN Millis, queue size
         //ThreadPoolExecutor will be assigned  if it is null
         if (executorService == null) {
             int minThread;
@@ -72,7 +81,7 @@ public final class HTTPEventAdapter implements InputEventAdapter {
                 defaultKeepAliveTime = Integer.parseInt(globalProperties.get(
                         HTTPEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_NAME));
             } else {
-                defaultKeepAliveTime = HTTPEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME;
+                defaultKeepAliveTime = HTTPEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_IN_MILLS;
             }
 
             if (globalProperties.get(HTTPEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME) != null) {
@@ -82,24 +91,20 @@ public final class HTTPEventAdapter implements InputEventAdapter {
                 jobQueueSize = HTTPEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE;
             }
 
+            RejectedExecutionHandler rejectedExecutionHandler = new RejectedExecutionHandler() {
+                @Override
+                public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+                    try {
+                        executor.getQueue().put(r);
+                    } catch (InterruptedException e) {
+                        log.error("Exception while adding event to executor queue : " + e.getMessage(), e);
+                    }
+                }
+
+            };
+
             executorService = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime,
-                    TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(jobQueueSize));
-
-
-//            private RejectedExecutionHandler rejectedExecutionHandler = new RejectedExecutionHandler() {
-//                @Override
-//                public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-//                    try {
-//                        executor.getQueue().put(r);
-//                    } catch (InterruptedException e) {
-//                        log.error(e.getMessage(), e);
-//                    }
-//                }
-//
-//            };
-//            private ExecutorService executorService = new ThreadPoolExecutor(HTTPEventAdaptorConstants.ADAPTER_MIN_THREAD_POOL_SIZE,
-//                    HTTPEventAdaptorConstants.ADAPTER_MAX_THREAD_POOL_SIZE, HTTPEventAdaptorConstants.DEFAULT_KEEP_ALIVE_TIME, TimeUnit.SECONDS,
-//                    new LinkedBlockingQueue<Runnable>(HTTPEventAdaptorConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE), rejectedExecutionHandler);
+                    TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(jobQueueSize), rejectedExecutionHandler);
 
         }
     }
@@ -111,12 +116,12 @@ public final class HTTPEventAdapter implements InputEventAdapter {
 
     @Override
     public void connect() {
-        HTTPEventAdapterManager.registerDynamicEndpoint(eventAdapterConfiguration.getName(), this);
+        registerDynamicEndpoint(eventAdapterConfiguration.getName(), this);
     }
 
     @Override
     public void disconnect() {
-        HTTPEventAdapterManager.unregisterDynamicEndpoint(eventAdapterConfiguration.getName(), this);
+        unregisterDynamicEndpoint(eventAdapterConfiguration.getName(), this);
     }
 
     @Override
@@ -134,9 +139,8 @@ public final class HTTPEventAdapter implements InputEventAdapter {
 
         HTTPEventAdapter that = (HTTPEventAdapter) o;
 
-        if (!id.equals(that.id)) return false;
+        return id.equals(that.id);
 
-        return true;
     }
 
     @Override
@@ -152,5 +156,48 @@ public final class HTTPEventAdapter implements InputEventAdapter {
     @Override
     public boolean isPolling() {
         return false;
+    }
+
+    private void registerDynamicEndpoint(String adapterName, HTTPEventAdapter httpEventAdapter) {
+
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+
+        String endpoint;
+        if (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+            endpoint = HTTPEventAdapterConstants.ENDPOINT_PREFIX + adapterName;
+        } else {
+            endpoint = HTTPEventAdapterConstants.ENDPOINT_PREFIX + HTTPEventAdapterConstants.ENDPOINT_TENANT_KEY
+                    + HTTPEventAdapterConstants.ENDPOINT_URL_SEPARATOR + tenantDomain
+                    + HTTPEventAdapterConstants.ENDPOINT_URL_SEPARATOR + adapterName;
+        }
+
+        try {
+            HttpService httpService = HTTPEventAdapterServiceValueHolder.getHTTPService();
+            httpService.registerServlet(endpoint,
+                    new HTTPMessageServlet(eventAdaptorListener, tenantId),
+                    new Hashtable(),
+                    httpService.createDefaultHttpContext());
+        } catch (ServletException | NamespaceException e) {
+            throw new InputEventAdapterRuntimeException("Error in registering endpoint " + endpoint, e);
+        }
+
+    }
+
+    private void unregisterDynamicEndpoint(String adapterName, HTTPEventAdapter httpEventAdapter) {
+        HttpService httpService = HTTPEventAdapterServiceValueHolder.getHTTPService();
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        String endpoint;
+        if (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+            endpoint = HTTPEventAdapterConstants.ENDPOINT_PREFIX + adapterName;
+        } else {
+            endpoint = HTTPEventAdapterConstants.ENDPOINT_PREFIX + HTTPEventAdapterConstants.ENDPOINT_TENANT_KEY
+                    + HTTPEventAdapterConstants.ENDPOINT_URL_SEPARATOR
+                    + tenantDomain + HTTPEventAdapterConstants.ENDPOINT_URL_SEPARATOR + adapterName;
+        }
+        if (httpService != null) {
+            httpService.unregister(endpoint);
+        }
+
     }
 }
