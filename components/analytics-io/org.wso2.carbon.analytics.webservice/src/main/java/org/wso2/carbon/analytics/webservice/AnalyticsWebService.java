@@ -78,14 +78,14 @@ public class AnalyticsWebService extends AbstractAdmin {
      * @param tableName The name of the table to be created
      * @throws AnalyticsWebServiceException
      */
-    public void createTable(String tableName) throws AnalyticsWebServiceException {
+    /*public void createTable(String tableName) throws AnalyticsWebServiceException {
         try {
             analyticsDataAPI.createTable(getUsername(), tableName);
         } catch (Exception e) {
             logger.error("Unable to create table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to create table due to " + e.getMessage(), e);
         }
-    }
+    }*/
 
     /**
      * Sets the schema for the target analytics table, if there is already one assigned, it will be
@@ -95,14 +95,14 @@ public class AnalyticsWebService extends AbstractAdmin {
      * @param schema    The schema to be applied to the table
      * @throws AnalyticsWebServiceException
      */
-    public void setTableSchema(String tableName, AnalyticsSchemaBean schema) throws AnalyticsWebServiceException {
+    /*public void setTableSchema(String tableName, AnalyticsSchemaBean schema) throws AnalyticsWebServiceException {
         try {
             analyticsDataAPI.setTableSchema(getUsername(), tableName, Utils.createAnalyticsSchema(schema));
         } catch (Exception e) {
             logger.error("Unable to set table schema[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to set table schema due to " + e.getMessage(), e);
         }
-    }
+    }*/
 
     /**
      * Retrieves the table schema for the given table.
@@ -146,14 +146,14 @@ public class AnalyticsWebService extends AbstractAdmin {
      * @param tableName The name of the table to be dropped
      * @throws AnalyticsWebServiceException
      */
-    public void deleteTable(String tableName) throws AnalyticsWebServiceException {
+    /*public void deleteTable(String tableName) throws AnalyticsWebServiceException {
         try {
             analyticsDataAPI.deleteTable(getUsername(), tableName);
         } catch (Exception e) {
             logger.error("Unable to delete table[" + tableName + "] due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to delete table[" + tableName + "] due to " + e.getMessage(), e);
         }
-    }
+    }*/
 
     /**
      * Lists all the current tables with the given category.
@@ -211,7 +211,7 @@ public class AnalyticsWebService extends AbstractAdmin {
      * @return Arrays of updated RecordBean with ids
      * @throws AnalyticsWebServiceException
      */
-    public RecordBean[] put(RecordBean[] recordBeans) throws AnalyticsWebServiceException {
+    /*public RecordBean[] put(RecordBean[] recordBeans) throws AnalyticsWebServiceException {
         try {
             List<RecordBean> recordBeanList = Arrays.asList(recordBeans);
             String username = getUsername();
@@ -223,7 +223,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             throw new AnalyticsWebServiceException("Unable to add record due to " + e.getMessage(), e);
         }
         return recordBeans;
-    }
+    }*/
 
     /**
      * Retrieves data from a table, with a given range.
@@ -303,7 +303,7 @@ public class AnalyticsWebService extends AbstractAdmin {
      * @param timeTo    The ending time to get records to for deletion
      * @throws AnalyticsWebServiceException
      */
-    public void deleteByRange(String tableName, long timeFrom, long timeTo) throws AnalyticsWebServiceException {
+    /*public void deleteByRange(String tableName, long timeFrom, long timeTo) throws AnalyticsWebServiceException {
         try {
             analyticsDataAPI.delete(getUsername(), tableName, timeFrom, timeTo);
         } catch (Exception e) {
@@ -311,7 +311,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             throw new AnalyticsWebServiceException("Unable to delete record from table[" + tableName + "] due to " + e
                     .getMessage(), e);
         }
-    }
+    }*/
 
     /**
      * Delete data in a table with given ids.
