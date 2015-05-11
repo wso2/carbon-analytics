@@ -25,20 +25,20 @@ var AUTHORIZATION_HEADER = "Authorization";
 
 function AnalyticsClient() {
     var TYPE_CLEAR_INDEX_DATA = 1;
-    var TYPE_CREATE_TABLE = 2;
-    var TYPE_DELETE_BY_ID = 3;
-    var TYPE_DELETE_BY_RANGE = 4;
-    var TYPE_DELETE_TABLE = 5;
+    //var TYPE_CREATE_TABLE = 2;
+    //var TYPE_DELETE_BY_ID = 3;
+    //var TYPE_DELETE_BY_RANGE = 4;
+    //var TYPE_DELETE_TABLE = 5;
     var TYPE_GET_RECORD_COUNT = 6;
     var TYPE_GET_BY_ID = 7;
     var TYPE_GET_BY_RANGE = 8;
     var TYPE_LIST_TABLES = 9;
     var TYPE_GET_SCHEMA = 10;
-    var TYPE_PUT_RECORDS = 11;
-    var TYPE_PUT_RECORDS_TO_TABLE = 12;
+    //var TYPE_PUT_RECORDS = 11;
+    //var TYPE_PUT_RECORDS_TO_TABLE = 12;
     var TYPE_SEARCH = 13;
     var TYPE_SEARCH_COUNT = 14;
-    var TYPE_SET_SCHEMA = 15;
+    //var TYPE_SET_SCHEMA = 15;
     var TYPE_TABLE_EXISTS = 16;
     var TYPE_WAIT_FOR_INDEXING = 17;
     var TYPE_PAGINATION_SUPPORTED = 18;
@@ -47,7 +47,7 @@ function AnalyticsClient() {
     var TYPE_DRILLDOWN_SEARCH_COUNT = 21;
     var HTTP_GET = "GET";
     var HTTP_POST = "POST";
-    this.serverUrl;
+    this.serverUrl = "";
 
     /**
      * Lists all the tables.
@@ -182,7 +182,7 @@ function AnalyticsClient() {
      * @param callback The callback function which has one argument containing the response message.
      * @param error The callback function which has one argument which contains the error if any
      */
-    this.getRecordByIds = function (recordsInfo, callback, error) {
+    this.getRecordsByIds = function (recordsInfo, callback, error) {
         jQuery.ajax({
                         url: this.serverUrl + "?type=" + TYPE_GET_BY_ID + "&tableName=" + recordsInfo["tableName"],
                         data: JSON.stringify(recordsInfo["ids"]),
@@ -454,7 +454,7 @@ function AnalyticsClient() {
      * @param callback The callback function which has one argument containing true/false.
      * @param error The callback function which has one argument which contains the error if any
      */
-    this.PaginationSupported = function (callback, error) {
+    this.isPaginationSupported = function (callback, error) {
         jQuery.ajax({
                         url: this.serverUrl + "?type=" + TYPE_PAGINATION_SUPPORTED,
                         type: HTTP_GET,
@@ -630,12 +630,12 @@ AnalyticsClient.prototype.init = function (svrUrl) {
  */
 
 AnalyticsClient.prototype.init = function () {
-    this.url = "https://localhost:9443/designer/controllers/analytics.jag";
+    this.serverUrl = "https://localhost:9443/portal/controllers/analytics.jag";
     return this;
 };
 
 AnalyticsClient.prototype.init = function (username, password) {
-    this.serverUrl = "https://localhost:9443/designer/controllers/analytics.jag";
+    this.serverUrl = "https://localhost:9443/portal/controllers/analytics.jag";
     var authHeader = generateBasicAuthHeader(username, password);
     jQuery.ajaxSetup({
                          dataType: DATA_TYPE_JSON,
