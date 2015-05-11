@@ -1,21 +1,4 @@
-
-<!--
-  ~ Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~ http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
-<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ax29="http://exception.webservice.analytics.carbon.wso2.org/xsd" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://webservice.analytics.carbon.wso2.org" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:ax211="http://beans.webservice.analytics.carbon.wso2.org/xsd" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://webservice.analytics.carbon.wso2.org">
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://webservice.analytics.carbon.wso2.org" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ax217="http://exception.webservice.analytics.carbon.wso2.org/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ax219="http://beans.webservice.analytics.carbon.wso2.org/xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://webservice.analytics.carbon.wso2.org">
     <wsdl:documentation>AnalyticsWebService</wsdl:documentation>
     <wsdl:types>
         <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://exception.webservice.analytics.carbon.wso2.org/xsd">
@@ -29,12 +12,12 @@
                     <xs:element minOccurs="0" name="id" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="timestamp" type="xs:long"/>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="values" nillable="true" type="ax211:RecordValueEntryBean"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="values" nillable="true" type="ax219:RecordValueEntryBean"/>
                 </xs:sequence>
             </xs:complexType>
             <xs:complexType name="RecordValueEntryBean">
                 <xs:sequence>
-                    <xs:element minOccurs="0" name="analyticsCategoryPathBeanValue" nillable="true" type="ax211:AnalyticsCategoryPathBean"/>
+                    <xs:element minOccurs="0" name="analyticsCategoryPathBeanValue" nillable="true" type="ax219:AnalyticsCategoryPathBean"/>
                     <xs:element minOccurs="0" name="booleanValue" type="xs:boolean"/>
                     <xs:element minOccurs="0" name="doubleValue" type="xs:double"/>
                     <xs:element minOccurs="0" name="fieldName" nillable="true" type="xs:string"/>
@@ -52,7 +35,7 @@
             </xs:complexType>
             <xs:complexType name="AnalyticsSchemaBean">
                 <xs:sequence>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="ax211:SchemaColumnBean"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="ax219:SchemaColumnBean"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="primaryKeys" nillable="true" type="xs:string"/>
                 </xs:sequence>
             </xs:complexType>
@@ -66,10 +49,10 @@
             </xs:complexType>
             <xs:complexType name="AnalyticsDrillDownRequestBean">
                 <xs:sequence>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="categoryPaths" nillable="true" type="ax211:CategoryPathBean"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="categoryPaths" nillable="true" type="ax219:CategoryPathBean"/>
                     <xs:element minOccurs="0" name="query" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="rangeField" nillable="true" type="xs:string"/>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="ranges" nillable="true" type="ax211:AnalyticsDrillDownRangeBean"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="ranges" nillable="true" type="ax219:AnalyticsDrillDownRangeBean"/>
                     <xs:element minOccurs="0" name="recordCount" type="xs:int"/>
                     <xs:element minOccurs="0" name="recordStart" type="xs:int"/>
                     <xs:element minOccurs="0" name="scoreFunction" nillable="true" type="xs:string"/>
@@ -101,7 +84,7 @@
             </xs:complexType>
             <xs:complexType name="SubCategoriesBean">
                 <xs:sequence>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="categories" nillable="true" type="ax211:CategorySearchResultEntryBean"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="categories" nillable="true" type="ax219:CategorySearchResultEntryBean"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="path" nillable="true" type="xs:string"/>
                 </xs:sequence>
             </xs:complexType>
@@ -112,47 +95,13 @@
                 </xs:sequence>
             </xs:complexType>
         </xs:schema>
-        <xs:schema xmlns:ax212="http://beans.webservice.analytics.carbon.wso2.org/xsd" xmlns:ax210="http://exception.webservice.analytics.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://webservice.analytics.carbon.wso2.org">
+        <xs:schema xmlns:ax220="http://beans.webservice.analytics.carbon.wso2.org/xsd" xmlns:ax218="http://exception.webservice.analytics.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://webservice.analytics.carbon.wso2.org">
             <xs:import namespace="http://exception.webservice.analytics.carbon.wso2.org/xsd"/>
             <xs:import namespace="http://beans.webservice.analytics.carbon.wso2.org/xsd"/>
             <xs:element name="AnalyticsWebServiceAnalyticsWebServiceException">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="AnalyticsWebServiceException" nillable="true" type="ax29:AnalyticsWebServiceException"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getById">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="numPartitionsHint" type="xs:int"/>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="xs:string"/>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="ids" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getByIdResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax212:RecordBean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deleteByIds">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="ids" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deleteByRange">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="timeFrom" type="xs:long"/>
-                        <xs:element minOccurs="0" name="timeTo" type="xs:long"/>
+                        <xs:element minOccurs="0" name="AnalyticsWebServiceException" nillable="true" type="ax217:AnalyticsWebServiceException"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -172,29 +121,32 @@
             <xs:element name="getByRangeResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax212:RecordBean"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax220:RecordBean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="createTable">
+            <xs:element name="deleteByIds">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="ids" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="clearIndices">
+            <xs:element name="getById">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="numPartitionsHint" type="xs:int"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="ids" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="setTableSchema">
+            <xs:element name="getByIdResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="schema" nillable="true" type="ax212:AnalyticsSchemaBean"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax220:RecordBean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -208,7 +160,7 @@
             <xs:element name="getTableSchemaResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax212:AnalyticsSchemaBean"/>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax220:AnalyticsSchemaBean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -223,13 +175,6 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deleteTable">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -273,6 +218,20 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="waitForIndexing">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="maxWait" type="xs:long"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="clearIndices">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="searchCount">
                 <xs:complexType>
                     <xs:sequence>
@@ -288,31 +247,24 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="waitForIndexing">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="maxWait" type="xs:long"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
             <xs:element name="drillDownSearch">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="drillDownRequest" nillable="true" type="ax212:AnalyticsDrillDownRequestBean"/>
+                        <xs:element minOccurs="0" name="drillDownRequest" nillable="true" type="ax220:AnalyticsDrillDownRequestBean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
             <xs:element name="drillDownSearchResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax212:RecordBean"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax220:RecordBean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
             <xs:element name="drillDownSearchCount">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="drillDownRequest" nillable="true" type="ax212:AnalyticsDrillDownRequestBean"/>
+                        <xs:element minOccurs="0" name="drillDownRequest" nillable="true" type="ax220:AnalyticsDrillDownRequestBean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -326,28 +278,14 @@
             <xs:element name="drillDownCategories">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="drillDownRequest" nillable="true" type="ax212:CategoryDrillDownRequestBean"/>
+                        <xs:element minOccurs="0" name="drillDownRequest" nillable="true" type="ax220:CategoryDrillDownRequestBean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
             <xs:element name="drillDownCategoriesResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax212:SubCategoriesBean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="put">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="recordBeans" nillable="true" type="ax212:RecordBean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="putResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax212:RecordBean"/>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax220:SubCategoriesBean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -364,29 +302,20 @@
             <xs:element name="searchResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax212:RecordBean"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax220:RecordBean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
         </xs:schema>
     </wsdl:types>
-    <wsdl:message name="putRequest">
-        <wsdl:part name="parameters" element="ns:put"/>
-    </wsdl:message>
-    <wsdl:message name="putResponse">
-        <wsdl:part name="parameters" element="ns:putResponse"/>
-    </wsdl:message>
-    <wsdl:message name="AnalyticsWebServiceAnalyticsWebServiceException">
-        <wsdl:part name="parameters" element="ns:AnalyticsWebServiceAnalyticsWebServiceException"/>
-    </wsdl:message>
-    <wsdl:message name="createTableRequest">
-        <wsdl:part name="parameters" element="ns:createTable"/>
-    </wsdl:message>
     <wsdl:message name="searchCountRequest">
         <wsdl:part name="parameters" element="ns:searchCount"/>
     </wsdl:message>
     <wsdl:message name="searchCountResponse">
         <wsdl:part name="parameters" element="ns:searchCountResponse"/>
+    </wsdl:message>
+    <wsdl:message name="AnalyticsWebServiceAnalyticsWebServiceException">
+        <wsdl:part name="parameters" element="ns:AnalyticsWebServiceAnalyticsWebServiceException"/>
     </wsdl:message>
     <wsdl:message name="listTablesRequest">
         <wsdl:part name="parameters" element="ns:listTables"/>
@@ -421,17 +350,11 @@
     <wsdl:message name="getRecordCountResponse">
         <wsdl:part name="parameters" element="ns:getRecordCountResponse"/>
     </wsdl:message>
-    <wsdl:message name="setTableSchemaRequest">
-        <wsdl:part name="parameters" element="ns:setTableSchema"/>
-    </wsdl:message>
     <wsdl:message name="getByIdRequest">
         <wsdl:part name="parameters" element="ns:getById"/>
     </wsdl:message>
     <wsdl:message name="getByIdResponse">
         <wsdl:part name="parameters" element="ns:getByIdResponse"/>
-    </wsdl:message>
-    <wsdl:message name="deleteByRangeRequest">
-        <wsdl:part name="parameters" element="ns:deleteByRange"/>
     </wsdl:message>
     <wsdl:message name="drillDownSearchRequest">
         <wsdl:part name="parameters" element="ns:drillDownSearch"/>
@@ -444,9 +367,6 @@
     </wsdl:message>
     <wsdl:message name="searchResponse">
         <wsdl:part name="parameters" element="ns:searchResponse"/>
-    </wsdl:message>
-    <wsdl:message name="deleteTableRequest">
-        <wsdl:part name="parameters" element="ns:deleteTable"/>
     </wsdl:message>
     <wsdl:message name="isPaginationSupportedRequest">
         <wsdl:part name="parameters" element="ns:isPaginationSupported"/>
@@ -473,15 +393,6 @@
         <wsdl:part name="parameters" element="ns:clearIndices"/>
     </wsdl:message>
     <wsdl:portType name="AnalyticsWebServicePortType">
-        <wsdl:operation name="put">
-            <wsdl:input message="ns:putRequest" wsaw:Action="urn:put"/>
-            <wsdl:output message="ns:putResponse" wsaw:Action="urn:putResponse"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:putAnalyticsWebServiceAnalyticsWebServiceException"/>
-        </wsdl:operation>
-        <wsdl:operation name="createTable">
-            <wsdl:input message="ns:createTableRequest" wsaw:Action="urn:createTable"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:createTableAnalyticsWebServiceAnalyticsWebServiceException"/>
-        </wsdl:operation>
         <wsdl:operation name="searchCount">
             <wsdl:input message="ns:searchCountRequest" wsaw:Action="urn:searchCount"/>
             <wsdl:output message="ns:searchCountResponse" wsaw:Action="urn:searchCountResponse"/>
@@ -516,18 +427,10 @@
             <wsdl:output message="ns:getRecordCountResponse" wsaw:Action="urn:getRecordCountResponse"/>
             <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getRecordCountAnalyticsWebServiceAnalyticsWebServiceException"/>
         </wsdl:operation>
-        <wsdl:operation name="setTableSchema">
-            <wsdl:input message="ns:setTableSchemaRequest" wsaw:Action="urn:setTableSchema"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:setTableSchemaAnalyticsWebServiceAnalyticsWebServiceException"/>
-        </wsdl:operation>
         <wsdl:operation name="getById">
             <wsdl:input message="ns:getByIdRequest" wsaw:Action="urn:getById"/>
             <wsdl:output message="ns:getByIdResponse" wsaw:Action="urn:getByIdResponse"/>
             <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getByIdAnalyticsWebServiceAnalyticsWebServiceException"/>
-        </wsdl:operation>
-        <wsdl:operation name="deleteByRange">
-            <wsdl:input message="ns:deleteByRangeRequest" wsaw:Action="urn:deleteByRange"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:deleteByRangeAnalyticsWebServiceAnalyticsWebServiceException"/>
         </wsdl:operation>
         <wsdl:operation name="drillDownSearch">
             <wsdl:input message="ns:drillDownSearchRequest" wsaw:Action="urn:drillDownSearch"/>
@@ -538,10 +441,6 @@
             <wsdl:input message="ns:searchRequest" wsaw:Action="urn:search"/>
             <wsdl:output message="ns:searchResponse" wsaw:Action="urn:searchResponse"/>
             <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:searchAnalyticsWebServiceAnalyticsWebServiceException"/>
-        </wsdl:operation>
-        <wsdl:operation name="deleteTable">
-            <wsdl:input message="ns:deleteTableRequest" wsaw:Action="urn:deleteTable"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:deleteTableAnalyticsWebServiceAnalyticsWebServiceException"/>
         </wsdl:operation>
         <wsdl:operation name="isPaginationSupported">
             <wsdl:input message="ns:isPaginationSupportedRequest" wsaw:Action="urn:isPaginationSupported"/>
@@ -568,27 +467,6 @@
     </wsdl:portType>
     <wsdl:binding name="AnalyticsWebServiceSoap11Binding" type="ns:AnalyticsWebServicePortType">
         <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
-        <wsdl:operation name="put">
-            <soap:operation soapAction="urn:put" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap:body use="literal"/>
-            </wsdl:output>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="createTable">
-            <soap:operation soapAction="urn:createTable" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
         <wsdl:operation name="listTables">
             <soap:operation soapAction="urn:listTables" style="document"/>
             <wsdl:input>
@@ -658,15 +536,6 @@
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="setTableSchema">
-            <soap:operation soapAction="urn:setTableSchema" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
         <wsdl:operation name="getRecordCount">
             <soap:operation soapAction="urn:getRecordCount" style="document"/>
             <wsdl:input>
@@ -691,15 +560,6 @@
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="deleteByRange">
-            <soap:operation soapAction="urn:deleteByRange" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
         <wsdl:operation name="drillDownSearch">
             <soap:operation soapAction="urn:drillDownSearch" style="document"/>
             <wsdl:input>
@@ -708,15 +568,6 @@
             <wsdl:output>
                 <soap:body use="literal"/>
             </wsdl:output>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="deleteTable">
-            <soap:operation soapAction="urn:deleteTable" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
             <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
@@ -787,27 +638,6 @@
     </wsdl:binding>
     <wsdl:binding name="AnalyticsWebServiceSoap12Binding" type="ns:AnalyticsWebServicePortType">
         <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
-        <wsdl:operation name="put">
-            <soap12:operation soapAction="urn:put" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap12:body use="literal"/>
-            </wsdl:output>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="createTable">
-            <soap12:operation soapAction="urn:createTable" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
         <wsdl:operation name="listTables">
             <soap12:operation soapAction="urn:listTables" style="document"/>
             <wsdl:input>
@@ -877,15 +707,6 @@
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="setTableSchema">
-            <soap12:operation soapAction="urn:setTableSchema" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
         <wsdl:operation name="getRecordCount">
             <soap12:operation soapAction="urn:getRecordCount" style="document"/>
             <wsdl:input>
@@ -910,15 +731,6 @@
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="deleteByRange">
-            <soap12:operation soapAction="urn:deleteByRange" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
         <wsdl:operation name="drillDownSearch">
             <soap12:operation soapAction="urn:drillDownSearch" style="document"/>
             <wsdl:input>
@@ -927,15 +739,6 @@
             <wsdl:output>
                 <soap12:body use="literal"/>
             </wsdl:output>
-            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
-                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="deleteTable">
-            <soap12:operation soapAction="urn:deleteTable" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
             <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
@@ -1006,21 +809,6 @@
     </wsdl:binding>
     <wsdl:binding name="AnalyticsWebServiceHttpBinding" type="ns:AnalyticsWebServicePortType">
         <http:binding verb="POST"/>
-        <wsdl:operation name="put">
-            <http:operation location="put"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="createTable">
-            <http:operation location="createTable"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-        </wsdl:operation>
         <wsdl:operation name="listTables">
             <http:operation location="listTables"/>
             <wsdl:input>
@@ -1072,12 +860,6 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="setTableSchema">
-            <http:operation location="setTableSchema"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-        </wsdl:operation>
         <wsdl:operation name="getRecordCount">
             <http:operation location="getRecordCount"/>
             <wsdl:input>
@@ -1096,12 +878,6 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="deleteByRange">
-            <http:operation location="deleteByRange"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-        </wsdl:operation>
         <wsdl:operation name="drillDownSearch">
             <http:operation location="drillDownSearch"/>
             <wsdl:input>
@@ -1110,12 +886,6 @@
             <wsdl:output>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="deleteTable">
-            <http:operation location="deleteTable"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
         </wsdl:operation>
         <wsdl:operation name="search">
             <http:operation location="search"/>

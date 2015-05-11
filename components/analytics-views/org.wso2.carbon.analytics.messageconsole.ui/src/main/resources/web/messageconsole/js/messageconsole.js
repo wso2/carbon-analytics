@@ -20,7 +20,7 @@ function getArbitraryFields(rowData) {
                             postData['tableName'] = $("#tableSelect").val();
                             postData['_unique_rec_id'] = rowData.record._unique_rec_id;
                             return arbitraryFieldListActionMethod(postData, jtParams);
-                        },
+                        }/*,
                         createAction: function (postData) {
                             return arbitraryFieldCreateActionMethod(postData);
                         },
@@ -31,7 +31,7 @@ function getArbitraryFields(rowData) {
                             postData['tableName'] = $("#tableSelect").val();
                             postData['_unique_rec_id'] = rowData.record._unique_rec_id;
                             return arbitraryFieldDeleteActionMethod(postData);
-                        }
+                        }*/
                     },
                     deleteConfirmation: function (data) {
                         arbitraryColumnName = data.record.Name;
@@ -97,7 +97,7 @@ function arbitraryFieldListActionMethod(postData, jtParams) {
     });
 }
 
-function arbitraryFieldCreateActionMethod(postData) {
+/*function arbitraryFieldCreateActionMethod(postData) {
     var recordId;
     var $selectedRows = $('#AnalyticsTableContainer').jtable('selectedRows');
     if ($selectedRows.length > 0) {
@@ -121,9 +121,9 @@ function arbitraryFieldCreateActionMethod(postData) {
                 }
         );
     });
-}
+}*/
 
-function arbitraryFieldUpdateActionMethod(postData) {
+/*function arbitraryFieldUpdateActionMethod(postData) {
     var recordId;
     var $selectedRows = $('#AnalyticsTableContainer').jtable('selectedRows');
     if ($selectedRows.length > 0) {
@@ -147,9 +147,9 @@ function arbitraryFieldUpdateActionMethod(postData) {
                 }
         );
     });
-}
+}*/
 
-function arbitraryFieldDeleteActionMethod(postData) {
+/*function arbitraryFieldDeleteActionMethod(postData) {
     postData["Name"] = arbitraryColumnName;
     return $.Deferred(function ($dfd) {
         $.ajax({
@@ -166,7 +166,7 @@ function arbitraryFieldDeleteActionMethod(postData) {
                 }
         );
     });
-}
+}*/
 
 function createJTable() {
     var table = $("#tableSelect").val();
@@ -268,7 +268,7 @@ function listActionMethod(jtParams) {
     });
 }
 
-function createActionMethod(postData) {
+/*function createActionMethod(postData) {
     return $.Deferred(function ($dfd) {
         $.ajax({
             url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeCreateRecord + '&tableName=' + $("#tableSelect").val(),
@@ -283,9 +283,9 @@ function createActionMethod(postData) {
             }
         });
     });
-}
+}*/
 
-function updateActionMethod(postData) {
+/*function updateActionMethod(postData) {
     return $.Deferred(function ($dfd) {
         $.ajax({
             url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?' +
@@ -301,9 +301,9 @@ function updateActionMethod(postData) {
             }
         });
     });
-}
+}*/
 
-function deleteRecords(postData) {
+/*function deleteRecords(postData) {
     console.log(postData);
     postData["tableName"] = $("#tableSelect").val();
     return $.Deferred(function ($dfd) {
@@ -325,7 +325,7 @@ function deleteRecords(postData) {
 
 function deleteActionMethod(postData) {
     return deleteRecords(postData);
-}
+}*/
 
 function tableSelectChange() {
     var table = $("#tableSelect").val();

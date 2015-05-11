@@ -3,7 +3,6 @@
 <%@ page import="org.wso2.carbon.messageconsole.ui.MessageConsoleConnector" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
-<%@ page import="java.util.Map" %>
 
 <%
     String serverURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);
@@ -54,7 +53,7 @@
             out.print(connector.getRecords(tableName, from, to, startIndex, pageSize, query, facets));
             break;
         }
-        case MessageConsoleConnector.TYPE_UPDATE_RECORD: {
+        /*case MessageConsoleConnector.TYPE_UPDATE_RECORD: {
             Map<String, String[]> parameters = request.getParameterMap();
             Properties properties = new Properties(parameters).invoke(UPDATE_RECORD_ACTION);
             String[] columns = properties.getColumns();
@@ -63,8 +62,8 @@
             String recordID = request.getParameter(MessageConsoleConnector.RECORD_ID);
             out.print(connector.updateRecord(tableName, columns, values, recordID));
             break;
-        }
-        case MessageConsoleConnector.TYPE_CREATE_RECORD: {
+        }*/
+        /*case MessageConsoleConnector.TYPE_CREATE_RECORD: {
             Map<String, String[]> parameters = request.getParameterMap();
             Properties properties = new Properties(parameters).invoke(CREATE_RECORD_ACTION);
             String[] columns = properties.getColumns();
@@ -72,13 +71,13 @@
 
             out.print(connector.addRecord(tableName, columns, values));
             break;
-        }
-        case MessageConsoleConnector.TYPE_DELETE_RECORD: {
+        }*/
+        /*case MessageConsoleConnector.TYPE_DELETE_RECORD: {
             String recordsIdString = request.getParameter(MessageConsoleConnector.RECORD_ID);
             String[] recordsIds = new String[]{recordsIdString};
             out.print(connector.deleteRecords(tableName, recordsIds));
             break;
-        }
+        }*/
         case MessageConsoleConnector.TYPE_TABLE_INFO: {
             out.print(connector.getTableInfo(tableName));
             break;
@@ -88,29 +87,29 @@
             out.print(connector.getArbitraryFields(tableName, recordId));
             break;
         }
-        case MessageConsoleConnector.TYPE_CRATE_ARBITRARY_RECORD: {
+        /*case MessageConsoleConnector.TYPE_CRATE_ARBITRARY_RECORD: {
             String recordId = request.getParameter("_unique_rec_id");
             String fieldName = request.getParameter("Name");
             String fieldValue = request.getParameter("Value");
             String fieldType = request.getParameter("Type");
             out.print(connector.putArbitraryField(tableName, recordId, fieldName, fieldValue, fieldType));
             break;
-        }
-        case MessageConsoleConnector.TYPE_UPDATE_ARBITRARY_RECORD: {
+        }*/
+        /*case MessageConsoleConnector.TYPE_UPDATE_ARBITRARY_RECORD: {
             String recordId = request.getParameter("_unique_rec_id");
             String fieldName = request.getParameter("Name");
             String fieldValue = request.getParameter("Value");
             String fieldType = request.getParameter("Type");
             out.print(connector.putArbitraryField(tableName, recordId, fieldName, fieldValue, fieldType));
             break;
-        }
-        case MessageConsoleConnector.TYPE_DELETE_ARBITRARY_RECORD: {
+        }*/
+        /*case MessageConsoleConnector.TYPE_DELETE_ARBITRARY_RECORD: {
             String recordId = request.getParameter("_unique_rec_id");
             String fieldName = request.getParameter("Name");
             out.print(connector.deleteArbitraryField(tableName, recordId, fieldName));
             break;
-        }
-        case MessageConsoleConnector.TYPE_CREATE_TABLE: {
+        }*/
+        /*case MessageConsoleConnector.TYPE_CREATE_TABLE: {
             String tableInfo = request.getParameter("tableInfo");
             String action = request.getParameter("action");
             if ("add".equals(action)) {
@@ -119,15 +118,15 @@
                 out.print(connector.putTable(tableName, tableInfo, false));
             }
             break;
-        }
-        case MessageConsoleConnector.TYPE_DELETE_TABLE: {
+        }*/
+        /*case MessageConsoleConnector.TYPE_DELETE_TABLE: {
             out.print(connector.deleteTable(tableName));
             break;
-        }
-        case MessageConsoleConnector.TYPE_GET_TABLE_INFO: {
+        }*/
+        /*case MessageConsoleConnector.TYPE_GET_TABLE_INFO: {
             out.print(connector.getTableInfoWithIndexInfo(tableName));
             break;
-        }
+        }*/
         case MessageConsoleConnector.TYPE_GET_PURGING_TASK_INFO: {
             out.print(connector.getDataPurgingDetails(tableName));
             break;
@@ -159,7 +158,9 @@
     response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
     response.setDateHeader("Expires", 0); // Proxies.
 
-%><%! public static final int UPDATE_RECORD_ACTION = 2;
+%>
+<%--
+<%! public static final int UPDATE_RECORD_ACTION = 2;
     public static final int CREATE_RECORD_ACTION = 1;
 
     private class Properties {
@@ -204,4 +205,4 @@
                    !MessageConsoleConnector.RECORD_ID.equals(columnName) && !MessageConsoleConnector.TIMESTAMP.equals(columnName);
         }
     }
-%>
+%>--%>

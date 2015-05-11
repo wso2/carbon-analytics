@@ -16,10 +16,8 @@
 
 package org.wso2.carbon.analytics.webservice;
 
-import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
-import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema.ColumnType;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -28,12 +26,8 @@ import org.wso2.carbon.analytics.webservice.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.webservice.beans.RecordBean;
 import org.wso2.carbon.analytics.webservice.beans.RecordValueEntryBean;
 import org.wso2.carbon.analytics.webservice.beans.SchemaColumnBean;
-import org.wso2.carbon.user.api.UserStoreException;
-import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,7 +42,7 @@ public class Utils {
      * @param recordBeans the record beans
      * @return the records from record beans
      * @throws AnalyticsException if the tableName is not specified
-     */
+     *//*
     public static List<Record> getRecords(String username, List<RecordBean> recordBeans) throws AnalyticsException {
         List<Record> records = new ArrayList<>();
         int tenantId = getTenantId(username);
@@ -63,9 +57,9 @@ public class Utils {
             }
         }
         return records;
-    }
+    }*/
 
-    private static Map<String, Object> validateAndReturn(RecordValueEntryBean[] values) {
+    /*private static Map<String, Object> validateAndReturn(RecordValueEntryBean[] values) {
         Map<String, Object> valueMap = new LinkedHashMap<>();
         if (values != null) {
             for (RecordValueEntryBean recordEntry : values) {
@@ -73,7 +67,7 @@ public class Utils {
             }
         }
         return valueMap;
-    }
+    }*/
 
     /**
      * Creates the record beans from records.
@@ -150,7 +144,7 @@ public class Utils {
      *
      * @param analyticsSchemaBean bean table schema to be converted to Analytics Schema.
      * @return Analytics schema
-     */
+     *//*
     public static AnalyticsSchema createAnalyticsSchema(AnalyticsSchemaBean analyticsSchemaBean) {
         List<ColumnDefinition> columnTypes = new ArrayList<>();
         if (analyticsSchemaBean == null) {
@@ -167,7 +161,7 @@ public class Utils {
             primaryKeys = Arrays.asList(analyticsSchemaBean.getPrimaryKeys());
         }
         return new AnalyticsSchema(columnTypes, primaryKeys);
-    }
+    }*/
 
     /**
      * Create table schema bean from a analytics schema
@@ -200,7 +194,7 @@ public class Utils {
 
     /**
      * Converts a column type bean to ColumnType.
-     */
+     *//*
     private static ColumnDefinition getColumnDefinition(String name, String type, boolean isIndex,
                                                         boolean isScoreParam) {
         ColumnDefinition columnDefinition = new ColumnDefinition();
@@ -236,7 +230,7 @@ public class Utils {
         columnDefinition.setIndexed(isIndex);
         columnDefinition.setScoreParam(isScoreParam);
         return columnDefinition;
-    }
+    }*/
 
     /**
      * convert a column type to bean type
@@ -267,16 +261,16 @@ public class Utils {
         }
     }
 
-    private static int getTenantId(String username) throws AnalyticsException {
+    /*private static int getTenantId(String username) throws AnalyticsException {
         try {
             String tenantDomain = MultitenantUtils.getTenantDomain(username);
             return AnalyticsServiceHolder.getRealmService().getTenantManager().getTenantId(tenantDomain);
         } catch (UserStoreException e) {
             throw new AnalyticsException("Unable to get tenantId for user: " + username, e);
         }
-    }
+    }*/
 
-    private static Object getValue(RecordValueEntryBean recordValueEntryBean) {
+    /*private static Object getValue(RecordValueEntryBean recordValueEntryBean) {
         Object resultObj;
         switch (recordValueEntryBean.getType()) {
             case RecordValueEntryBean.STRING: {
@@ -316,7 +310,7 @@ public class Utils {
             }
         }
         return resultObj;
-    }
+    }*/
 
     private static RecordValueEntryBean getRecordValueEntryBean(String fieldName, Object value) {
         RecordValueEntryBean recordValueEntryBean = new RecordValueEntryBean();
