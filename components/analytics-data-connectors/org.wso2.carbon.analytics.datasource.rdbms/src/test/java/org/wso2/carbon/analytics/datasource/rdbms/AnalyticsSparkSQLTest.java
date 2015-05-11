@@ -28,11 +28,6 @@ import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerI
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
-import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
-import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
-import org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsFileSystemTest;
-import org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsRecordStoreTest;
-import org.wso2.carbon.analytics.datasource.core.*;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 import org.wso2.carbon.analytics.spark.core.internal.SparkAnalyticsExecutor;
@@ -196,6 +191,8 @@ public class AnalyticsSparkSQLTest {
         this.service.deleteTable(-1234, "log");
         this.service.deleteTable(-1234, "log2");
         this.service.deleteTable(-1234, "t");
+        this.service.deleteTable(-1234, "t1");
+        this.service.deleteTable(-1234, "t2");
         this.service.deleteTable(2, "log");
     }
     
