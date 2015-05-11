@@ -15,8 +15,6 @@
 package org.wso2.carbon.event.input.adapter.kafka;
 
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.event.input.adapter.core.*;
 import org.wso2.carbon.event.input.adapter.kafka.internal.util.KafkaEventAdapterConstants;
 
@@ -77,6 +75,13 @@ public class KafkaEventAdapterFactory extends InputEventAdapterFactory {
         webTopic.setDisplayName(resourceBundle.getString(KafkaEventAdapterConstants.ADAPTOR_SUSCRIBER_TOPIC));
         webTopic.setRequired(true);
         propertyList.add(webTopic);
+
+        Property isDuplicatedInCluster = new Property(KafkaEventAdapterConstants.ADAPTOR_IS_EVENT_DUPLICATED_IN_CLUSTER);
+        isDuplicatedInCluster.setDisplayName(resourceBundle.getString(KafkaEventAdapterConstants.ADAPTOR_IS_EVENT_DUPLICATED_IN_CLUSTER));
+        isDuplicatedInCluster.setRequired(false);
+        isDuplicatedInCluster.setOptions(new String[]{"true", "false"});
+        isDuplicatedInCluster.setDefaultValue("false");
+        propertyList.add(isDuplicatedInCluster);
 
         return propertyList;
 

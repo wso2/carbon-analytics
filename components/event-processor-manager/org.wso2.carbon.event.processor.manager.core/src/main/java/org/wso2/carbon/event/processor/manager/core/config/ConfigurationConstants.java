@@ -22,6 +22,9 @@ package org.wso2.carbon.event.processor.manager.core.config;
  */
 public final class ConfigurationConstants {
 
+    private ConfigurationConstants() {
+    }
+
     public static final String CEP_MANAGEMENT_XML = "event-processing.xml";
 
     public static final int CARBON_DEFAULT_PORT_OFFSET = 0;

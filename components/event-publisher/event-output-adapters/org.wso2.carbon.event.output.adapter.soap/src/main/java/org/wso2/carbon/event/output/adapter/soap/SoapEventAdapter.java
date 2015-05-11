@@ -35,7 +35,6 @@ import org.apache.neethi.PolicyEngine;
 import org.apache.rampart.RampartMessageData;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
-import org.wso2.carbon.event.output.adapter.core.exception.ConnectionUnavailableException;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterRuntimeException;
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
@@ -214,22 +213,20 @@ public class SoapEventAdapter implements OutputEventAdapter {
                 serviceClient.fireAndForget(AXIOMUtil.stringToOM(payload.toString()));
 
             } catch (AxisFault e) {
-                throw new ConnectionUnavailableException("Exception in adapter "
-                        + eventAdapterConfiguration.getName() + " while sending events to soap endpoint "
-                        + this.url, e);
+                log.error("Exception in adapter " + eventAdapterConfiguration.getName()
+                        + " while sending events to soap endpoint " + this.url + ": " + e.getMessage(), e);
             } catch (XMLStreamException e) {
-                throw new OutputEventAdapterRuntimeException(
-                        "Exception occurred in adapter " + eventAdapterConfiguration.getName()
-                                + " while converting the event to xml object ", e);
+                log.error("Exception occurred in adapter " + eventAdapterConfiguration.getName()
+                        + " while converting the event to xml object :" + e.getMessage(), e);
             } catch (Exception e) {
-                throw new OutputEventAdapterRuntimeException("Exception occurred in adapter "
-                        + eventAdapterConfiguration.getName(), e);
+                log.error("Exception occurred in adapter "
+                        + eventAdapterConfiguration.getName() + ": " + e.getMessage(), e);
             } finally {
                 if (serviceClient != null) {
                     try {
                         serviceClient.cleanup();
                     } catch (AxisFault axisFault) {
-                        log.error("Error while cleaning-up service client resources ", axisFault);
+                        log.error("Error while cleaning-up service client resources : " + axisFault.getMessage(), axisFault);
                     }
                 }
             }

@@ -22,17 +22,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.SystemDefaultHttpClient;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
-import org.wso2.carbon.event.output.adapter.core.exception.ConnectionUnavailableException;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
-import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterRuntimeException;
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.params.ConnRoutePNames;
 
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -251,12 +249,12 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                 this.processHeaders(method);
                 httpClient.execute(method).getEntity().getContent().close();
             } catch (UnknownHostException e) {
-                throw new ConnectionUnavailableException("Exception while connecting adapter "
-                        + eventAdapterConfiguration.getName() + " HTTP endpoint to " + this.getUrl(),
+                log.error("Exception while connecting adapter "
+                                + eventAdapterConfiguration.getName() + " HTTP endpoint to " + this.getUrl(),
                         e);
-            } catch (Exception e) {
-                throw new OutputEventAdapterRuntimeException("Error executing HTTP output event adapter "
-                        + eventAdapterConfiguration.getName() +" sender: ", e);
+            } catch (Throwable e) {
+                log.error("Error executing HTTP output event adapter "
+                        + eventAdapterConfiguration.getName() + " sender: ", e);
             }
         }
 

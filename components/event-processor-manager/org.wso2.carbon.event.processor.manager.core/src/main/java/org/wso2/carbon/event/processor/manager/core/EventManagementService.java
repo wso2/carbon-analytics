@@ -23,8 +23,6 @@ import org.wso2.carbon.utils.ConfigurationContextService;
 
 public interface EventManagementService {
 
-
-
     public void init(HazelcastInstance hazelcastInstance);
 
     public void init(ConfigurationContextService configurationContextService);
@@ -32,7 +30,6 @@ public interface EventManagementService {
     public void shutdown() ;
 
     public byte[] getState();
-
 
     public void subscribe(Manager manager);
 
@@ -42,15 +39,4 @@ public interface EventManagementService {
 
     public EventPublisherManagementService getEventPublisherManagementService();
 
-//    public EventProcessorManagementService getEventProcessorManagementService() {
-//        return EventManagementServiceValueHolder.getEventProcessorManagementService();
-//    }
-
-//    public EventReceiverManagementService getEventReceiverManagementService() {
-//        return EventManagementServiceValueHolder.getEventReceiverManagementService();
-//    }
-
-//    public EventPublisherManagementService getEventPublisherManagementService() {
-//        return EventManagementServiceValueHolder.getEventPublisherManagementService();
-//    }
 }
