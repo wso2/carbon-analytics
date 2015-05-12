@@ -19,10 +19,10 @@
 package org.wso2.carbon.event.input.adapter.soap;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.InOnlyAxisOperation;
+import org.apache.axis2.Constants;
+import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.CarbonConstants;
@@ -39,6 +39,7 @@ import org.wso2.carbon.event.input.adapter.soap.internal.SubscriptionMessageRece
 import org.wso2.carbon.event.input.adapter.soap.internal.util.SOAPEventAdapterConstants;
 
 import javax.xml.namespace.QName;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -130,40 +131,37 @@ public final class SOAPEventAdapter implements InputEventAdapter {
     private void registerService(InputEventAdapterListener eventAdaptorListener, String serviceName,
                                  AxisConfiguration axisConfiguration) throws AxisFault {
 
+
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         AxisService axisService = axisConfiguration.getService(serviceName);
-        if (axisService == null) {
-            // create a new axis service
-            axisService = new AxisService(serviceName);
-
-            List<String> transports = axisService.getExposedTransports();
-            transports.clear();
-            String exposedTransports = eventAdapterConfiguration.getProperties().get(SOAPEventAdapterConstants.EXPOSED_TRANSPORTS);
-            if (exposedTransports.equalsIgnoreCase(SOAPEventAdapterConstants.ALL)) {
-                transports.add("http");
-                transports.add("https");
-                transports.add("local");
-            } else {
-                transports.add(SOAPEventAdapterConstants.EXPOSED_TRANSPORTS);
-            }
-            axisService.setExposedTransports(transports);
-
-            axisConfiguration.addService(axisService);
-            axisService.getAxisServiceGroup().addParameter(CarbonConstants.DYNAMIC_SERVICE_PARAM_NAME, "true");
-
+        if (axisService != null) {
+            axisConfiguration.removeService(serviceName);
         }
 
-        AxisOperation axisOperation = axisService.getOperation(new QName("",
-                SOAPEventAdapterConstants.OPERATION_NAME));
-        if (axisOperation == null) {
-            axisOperation = new InOnlyAxisOperation(new QName("", SOAPEventAdapterConstants.OPERATION_NAME));
-            axisOperation.setMessageReceiver(new SubscriptionMessageReceiver(eventAdaptorListener, serviceName,
-                    SOAPEventAdapterConstants.OPERATION_NAME, tenantId));
-            axisOperation.setSoapAction("urn:" + SOAPEventAdapterConstants.OPERATION_NAME);
-            axisConfiguration.getPhasesInfo().setOperationPhases(axisOperation);
-            axisService.addOperation(axisOperation);
+        // create a new axis service
+        axisService = new AxisService(serviceName);
+        AxisOperation axisOperation = new InOnlyAxisOperation(new QName(SOAPEventAdapterConstants.OPERATION_NAME));
+        axisOperation.setMessageReceiver(new SubscriptionMessageReceiver(eventAdaptorListener, serviceName,
+                SOAPEventAdapterConstants.OPERATION_NAME, tenantId));
+        axisService.addOperation(axisOperation);
+
+        List<String> transports = axisService.getExposedTransports();
+        transports.clear();
+        String exposedTransports = eventAdapterConfiguration.getProperties().get(SOAPEventAdapterConstants.EXPOSED_TRANSPORTS);
+        if (exposedTransports.equalsIgnoreCase(SOAPEventAdapterConstants.ALL)) {
+            transports.add("http");
+            transports.add("https");
+            transports.add("local");
+        } else {
+            transports.add(SOAPEventAdapterConstants.EXPOSED_TRANSPORTS);
         }
+        axisService.setExposedTransports(transports);
+        axisConfiguration.addService(axisService);
+
+        axisOperation.setSoapAction("urn:" + SOAPEventAdapterConstants.OPERATION_NAME);
+        axisConfiguration.getPhasesInfo().setOperationPhases(axisOperation);
+        axisOperation.getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE).setName("in");
 
     }
 
