@@ -19,8 +19,14 @@
 package org.wso2.carbon.event.input.adapter.soap;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.InOnlyAxisOperation;
+import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.CarbonConstants;
+import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.input.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapter;
@@ -29,12 +35,14 @@ import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterException;
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterRuntimeException;
 import org.wso2.carbon.event.input.adapter.core.exception.TestConnectionNotSupportedException;
-import org.wso2.carbon.event.input.adapter.soap.internal.Axis2ServiceManager;
+import org.wso2.carbon.event.input.adapter.soap.internal.SubscriptionMessageReceiver;
+import org.wso2.carbon.event.input.adapter.soap.internal.util.SOAPEventAdapterConstants;
 
+import javax.xml.namespace.QName;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-//TODO : change the distributed clustered to <- false
 public final class SOAPEventAdapter implements InputEventAdapter {
 
     private static final Log log = LogFactory.getLog(SOAPEventAdapter.class);
@@ -64,8 +72,7 @@ public final class SOAPEventAdapter implements InputEventAdapter {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         try {
-
-            Axis2ServiceManager.registerService(eventAdapterConfiguration.getName(), this,
+            registerService(eventAdaptorListener, eventAdapterConfiguration.getName(),
                     EventAdapterUtil.getAxisConfiguration());
         } catch (AxisFault axisFault) {
             throw new InputEventAdapterRuntimeException("Cannot register Input Adapter " +
@@ -78,7 +85,7 @@ public final class SOAPEventAdapter implements InputEventAdapter {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         try {
-            Axis2ServiceManager.unregisterService(eventAdapterConfiguration.getName(), this,
+            unregisterService(eventAdapterConfiguration.getName(),
                     EventAdapterUtil.getAxisConfiguration());
         } catch (AxisFault axisFault) {
             throw new InputEventAdapterRuntimeException("Cannot un-register Input Adapter " +
@@ -101,9 +108,8 @@ public final class SOAPEventAdapter implements InputEventAdapter {
 
         SOAPEventAdapter that = (SOAPEventAdapter) o;
 
-        if (!id.equals(that.id)) return false;
+        return id.equals(that.id);
 
-        return true;
     }
 
     @Override
@@ -120,4 +126,70 @@ public final class SOAPEventAdapter implements InputEventAdapter {
     public boolean isPolling() {
         return false;
     }
+
+    private void registerService(InputEventAdapterListener eventAdaptorListener, String serviceName,
+                                 AxisConfiguration axisConfiguration) throws AxisFault {
+
+        int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+
+        AxisService axisService = axisConfiguration.getService(serviceName);
+        if (axisService == null) {
+            // create a new axis service
+            axisService = new AxisService(serviceName);
+
+            List<String> transports = axisService.getExposedTransports();
+            transports.clear();
+            String exposedTransports = eventAdapterConfiguration.getProperties().get(SOAPEventAdapterConstants.EXPOSED_TRANSPORTS);
+            if (exposedTransports.equalsIgnoreCase(SOAPEventAdapterConstants.ALL)) {
+                transports.add("http");
+                transports.add("https");
+                transports.add("local");
+            } else {
+                transports.add(SOAPEventAdapterConstants.EXPOSED_TRANSPORTS);
+            }
+            axisService.setExposedTransports(transports);
+
+            axisConfiguration.addService(axisService);
+            axisService.getAxisServiceGroup().addParameter(CarbonConstants.DYNAMIC_SERVICE_PARAM_NAME, "true");
+
+        }
+
+        AxisOperation axisOperation = axisService.getOperation(new QName("",
+                SOAPEventAdapterConstants.OPERATION_NAME));
+        if (axisOperation == null) {
+            axisOperation = new InOnlyAxisOperation(new QName("", SOAPEventAdapterConstants.OPERATION_NAME));
+            axisOperation.setMessageReceiver(new SubscriptionMessageReceiver(eventAdaptorListener, serviceName,
+                    SOAPEventAdapterConstants.OPERATION_NAME, tenantId));
+            axisOperation.setSoapAction("urn:" + SOAPEventAdapterConstants.OPERATION_NAME);
+            axisConfiguration.getPhasesInfo().setOperationPhases(axisOperation);
+            axisService.addOperation(axisOperation);
+        }
+
+    }
+
+    private void unregisterService(String serviceName,
+                                   AxisConfiguration axisConfiguration) throws AxisFault {
+
+        AxisService axisService = axisConfiguration.getService(serviceName);
+
+        if (axisService == null) {
+            throw new AxisFault("There is no service with the name " + serviceName);
+        }
+
+        AxisOperation axisOperation = axisService.getOperation(new QName("",
+                SOAPEventAdapterConstants.OPERATION_NAME));
+        if (axisOperation == null) {
+            throw new AxisFault("There is no operation with the name " + SOAPEventAdapterConstants.OPERATION_NAME);
+        }
+        SubscriptionMessageReceiver messageReceiver =
+                (SubscriptionMessageReceiver) axisOperation.getMessageReceiver();
+        if (messageReceiver == null) {
+            throw new AxisFault("There is no message receiver for operation with name "
+                    + SOAPEventAdapterConstants.OPERATION_NAME);
+        }
+
+        axisService.removeOperation(new QName("", SOAPEventAdapterConstants.OPERATION_NAME));
+
+    }
+
 }

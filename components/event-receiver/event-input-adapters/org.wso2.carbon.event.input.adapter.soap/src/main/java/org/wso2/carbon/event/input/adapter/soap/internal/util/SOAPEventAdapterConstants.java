@@ -24,14 +24,12 @@ public final class SOAPEventAdapterConstants {
     }
 
     public static final String ADAPTER_TYPE_SOAP = "soap";
-    public static final int ADAPTER_MIN_THREAD_POOL_SIZE = 8;
-    public static final int ADAPTER_MAX_THREAD_POOL_SIZE = 100;
-    public static final int ADAPTER_EXECUTOR_JOB_QUEUE_SIZE = 10000;
-    public static final long DEFAULT_KEEP_ALIVE_TIME = 20;
-    public static final String ENDPOINT_PREFIX = "/endpoints/";
-    public static final String SEPARATOR = "/";
-    public static final String ENDPOINT_TENANT_KEY = "t";
-    public static final String OPERATION_NAME = "receiver";
+    public static final String OPERATION_NAME = "receive";
+    public static final String EXPOSED_TRANSPORTS = "transports";
+    public static final String HTTPS = "https";
+    public static final String HTTP = "http";
+    public static final String LOCAL = "local";
+    public static final String ALL = "all";
 
 
 }
