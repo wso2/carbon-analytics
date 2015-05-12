@@ -503,7 +503,7 @@ function AnalyticsClient() {
     this.drillDownCategories = function (drilldownReq, callback, error) {
         jQuery.ajax({
                         url: this.serverUrl + "?type=" + TYPE_DRILLDOWN_CATEGORIES + "&tableName=" +
-                                                                               drilldownReq["tableName"],
+                             drilldownReq["tableName"],
                         data: JSON.stringify(drilldownReq["drillDownInfo"]),
                         type: HTTP_POST,
                         success: function (data) {
@@ -541,7 +541,7 @@ function AnalyticsClient() {
     this.drillDownSearch = function (drillDownReq, callback, error) {
         jQuery.ajax({
                         url: this.serverUrl + "?type=" + TYPE_DRILLDOWN_SEARCH + "&tableName=" +
-                                                                               drillDownReq["tableName"],
+                             drillDownReq["tableName"],
                         data: JSON.stringify(drillDownReq["drillDownInfo"]),
                         type: HTTP_POST,
                         success: function (data) {
@@ -579,7 +579,7 @@ function AnalyticsClient() {
     this.drillDownSearchCount = function (drillDownReq, callback, error) {
         jQuery.ajax({
                         url: this.serverUrl + "?type=" + TYPE_DRILLDOWN_SEARCH_COUNT + "&tableName="+
-                                                                                  drillDownReq["tableName"],
+                             drillDownReq["tableName"],
                         data: JSON.stringify(drillDownReq["drillDownInfo"]),
                         type: HTTP_POST,
                         success: function (data) {
