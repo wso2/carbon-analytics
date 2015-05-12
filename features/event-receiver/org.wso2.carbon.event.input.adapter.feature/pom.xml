@@ -68,7 +68,7 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics-common</groupId>
-            <artifactId>org.wso2.carbon.event.input.adapter.file.server.feature</artifactId>
+            <artifactId>org.wso2.carbon.event.input.adapter.filetail.server.feature</artifactId>
             <type>zip</type>
             <version>${carbon.analytics.common.version}</version>
         </dependency>
@@ -140,7 +140,7 @@
                                     org.wso2.carbon.analytics-common:org.wso2.carbon.event.input.adapter.websocket.local.server.feature:${carbon.analytics.common.version}
                                 </includedFeatureDef>
                                 <includedFeatureDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.input.adapter.file.server.feature:${carbon.analytics.common.version}
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.event.input.adapter.filetail.server.feature:${carbon.analytics.common.version}
                                 </includedFeatureDef>
                                 <includedFeatureDef>
                                     org.wso2.carbon.analytics-common:org.wso2.carbon.event.input.adapter.email.server.feature:${carbon.analytics.common.version}
