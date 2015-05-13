@@ -20,7 +20,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
-import org.wso2.carbon.event.input.adapter.http.internal.HTTPEventAdapterManager;
 import org.wso2.carbon.event.input.adapter.http.internal.ds.HTTPEventAdapterServiceValueHolder;
 import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
@@ -32,7 +31,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 public class HTTPMessageServlet extends HttpServlet {
 
@@ -44,11 +42,11 @@ public class HTTPMessageServlet extends HttpServlet {
 
     private static Log log = LogFactory.getLog(HTTPMessageServlet.class);
 
-    private String endpoint = "";
+    private InputEventAdapterListener eventAdaptorListener;
     private int tenantId;
 
-    public HTTPMessageServlet(String endpoint, int tenantId) {
-        this.endpoint = endpoint;
+    public HTTPMessageServlet(InputEventAdapterListener eventAdaptorListener, int tenantId) {
+        this.eventAdaptorListener = eventAdaptorListener;
         this.tenantId = tenantId;
     }
 
@@ -139,15 +137,12 @@ public class HTTPMessageServlet extends HttpServlet {
             }
         }
 
-        List<HTTPEventAdapter> eventAdapters = HTTPEventAdapterManager.ADAPTER_MAP.get(endpoint);
-        if (eventAdapters != null) {
-            for (HTTPEventAdapter eventAdapter : eventAdapters) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Message : " + data);
-                }
-                HTTPEventAdapter.executorService.submit(new HTTPRequestProcessor(eventAdapter.getEventAdaptorListener(), data, tenantId));
-            }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Message : " + data);
         }
+        HTTPEventAdapter.executorService.submit(new HTTPRequestProcessor(eventAdaptorListener, data, tenantId));
+
     }
 
     @Override
@@ -168,15 +163,11 @@ public class HTTPMessageServlet extends HttpServlet {
             }
         }
 
-        List<HTTPEventAdapter> eventAdapters = HTTPEventAdapterManager.ADAPTER_MAP.get(endpoint);
-        if (eventAdapters != null) {
-            for (HTTPEventAdapter eventAdapter : eventAdapters) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Message : " + data);
-                }
-                HTTPEventAdapter.executorService.submit(new HTTPRequestProcessor(eventAdapter.getEventAdaptorListener(), data, tenantId));
-            }
+        if (log.isDebugEnabled()) {
+            log.debug("Message : " + data);
         }
+        HTTPEventAdapter.executorService.submit(new HTTPRequestProcessor(eventAdaptorListener, data, tenantId));
+
     }
 
     public class HTTPRequestProcessor implements Runnable {

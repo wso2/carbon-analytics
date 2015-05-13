@@ -42,7 +42,7 @@
         <module>org.wso2.carbon.event.input.adapter.soap.server.feature</module>
         <module>org.wso2.carbon.event.input.adapter.websocket.server.feature</module>
         <module>org.wso2.carbon.event.input.adapter.websocket.local.server.feature</module>
-        <module>org.wso2.carbon.event.input.adapter.file.server.feature</module>
+        <module>org.wso2.carbon.event.input.adapter.filetail.server.feature</module>
         <module>org.wso2.carbon.event.input.adapter.email.server.feature</module>
         <module>org.wso2.carbon.event.input.adapter.jms.server.feature</module>
         <module>org.wso2.carbon.event.input.adapter.kafka.server.feature</module>

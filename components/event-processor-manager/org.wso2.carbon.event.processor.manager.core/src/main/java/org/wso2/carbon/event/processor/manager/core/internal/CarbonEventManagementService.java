@@ -64,10 +64,7 @@ public class CarbonEventManagementService implements EventManagementService {
             haManager = new HAManager(hazelcastInstance, haConfiguration, readWriteLock.writeLock(), this);
         } else if (mode == Mode.SingleNode) {
             log.warn("CEP started with clustering enabled, but SingleNode configuration given.");
-        } else {
-            log.warn("CEP started with HA enabled, but distributed configuration given.");
         }
-
         if (haManager != null) {
             haManager.init();
         }
