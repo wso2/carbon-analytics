@@ -67,7 +67,7 @@ public class JMSEventAdapter implements InputEventAdapter {
     public void connect() {
 
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        createJMSAdaptorListener(eventAdapterListener, "1", tenantId);
+        createJMSAdaptorListener(eventAdapterListener, id, tenantId);
 
     }
 
