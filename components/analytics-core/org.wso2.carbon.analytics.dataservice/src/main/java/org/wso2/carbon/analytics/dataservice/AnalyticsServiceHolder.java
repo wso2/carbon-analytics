@@ -26,6 +26,7 @@ import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 import com.hazelcast.core.HazelcastInstance;
 
+import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.user.core.service.RealmService;
 
 /**
@@ -42,6 +43,8 @@ public class AnalyticsServiceHolder {
     private static AnalyticsDataService analyticsDataService;
 
     private static RealmService realmService;
+
+    private static TaskService taskService;
 
     public static void setHazelcastInstance(HazelcastInstance hazelcastInstance) {
         AnalyticsServiceHolder.hazelcastInstance = hazelcastInstance;
@@ -91,5 +94,12 @@ public class AnalyticsServiceHolder {
     public static RealmService getRealmService() {
         return AnalyticsServiceHolder.realmService;
     }
-    
+
+    public static TaskService getTaskService() {
+        return taskService;
+    }
+
+    public static void setTaskService(TaskService taskService) {
+        AnalyticsServiceHolder.taskService = taskService;
+    }
 }

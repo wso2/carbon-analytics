@@ -18,6 +18,8 @@
  */
 package org.wso2.carbon.analytics.dataservice;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
@@ -26,9 +28,12 @@ import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
+import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataPurgingConfiguration;
+import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataPurgingIncludeTable;
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfigProperty;
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfiguration;
 import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsDataIndexer;
+import org.wso2.carbon.analytics.dataservice.tasks.AnalyticsGlobalDataPurgingTask;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -40,6 +45,10 @@ import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
 import org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.ntask.common.TaskException;
+import org.wso2.carbon.ntask.core.TaskInfo;
+import org.wso2.carbon.ntask.core.TaskManager;
+import org.wso2.carbon.ntask.core.service.TaskService;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -63,6 +72,8 @@ import java.util.concurrent.Callable;
  */
 public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
+    private static final Log logger = LogFactory.getLog(AnalyticsDataServiceImpl.class);
+
     private static final String ANALYTICS_DATASERVICE_GROUP = "__ANALYTICS_DATASERVICE_GROUP__";
     
     private static final String ANALYTICS_DS_CONFIG_FILE = "analytics-dataservice-config.xml";
@@ -74,7 +85,11 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private static final String INDEX_INTERNAL_SCORE_FIELD = "_score";
 
     private static final String INDEX_INTERNAL_WEIGHT_FIELD = "_weight";
-    
+
+    private static final String ANALYTICS_DATA_PURGING_GLOBAL = "ANALYTICS_DATA_PURGING_GLOBAL";
+
+    private static final String GLOBAL_DATA_PURGING = "GLOBAL_DATA_PURGING";
+
     private AnalyticsRecordStore analyticsRecordStore;
     
     private AnalyticsFileSystem analyticsFileSystem;
@@ -107,8 +122,65 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             acm.joinGroup(ANALYTICS_DATASERVICE_GROUP, null);
         } 
         this.indexer.init();
+        if (config.getAnalyticsDataPurgingConfiguration() != null) {
+            final AnalyticsDataPurgingConfiguration analyticsDataPurgingConfiguration = config.getAnalyticsDataPurgingConfiguration();
+            TaskService taskService = AnalyticsServiceHolder.getTaskService();
+            if (analyticsDataPurgingConfiguration.isEnable()) {
+                try {
+                    if (analyticsDataPurgingConfiguration.isPurgeNode()) {
+                        taskService.registerTaskType(ANALYTICS_DATA_PURGING_GLOBAL);
+                    }
+                    TaskManager dataPurgingTaskManager = taskService.getTaskManager(ANALYTICS_DATA_PURGING_GLOBAL);
+                    if (dataPurgingTaskManager.isTaskScheduled(GLOBAL_DATA_PURGING)) {
+                        dataPurgingTaskManager.deleteTask(GLOBAL_DATA_PURGING);
+                    }
+                    dataPurgingTaskManager.registerTask(createDataPurgingTask(analyticsDataPurgingConfiguration));
+                    dataPurgingTaskManager.scheduleTask(GLOBAL_DATA_PURGING);
+
+                } catch (TaskException e) {
+                    logger.error("Unable to schedule global data puring task: " + e.getMessage(), e);
+                }
+            } else {
+                Set<String> registeredTaskTypes = taskService.getRegisteredTaskTypes();
+                if (registeredTaskTypes != null && registeredTaskTypes.contains(ANALYTICS_DATA_PURGING_GLOBAL)) {
+                    try {
+                        TaskManager dataPurgingTaskManager = taskService.getTaskManager(ANALYTICS_DATA_PURGING_GLOBAL);
+                        if (dataPurgingTaskManager.isTaskScheduled(GLOBAL_DATA_PURGING)) {
+                            dataPurgingTaskManager.deleteTask(GLOBAL_DATA_PURGING);
+                            logger.info("Global data purging task removed.");
+                        }
+                    } catch (TaskException e) {
+                        logger.error("Unable to get purging task related information: " + e.getMessage(), e);
+                    }
+                }
+            }
+        }
     }
-    
+
+    private TaskInfo createDataPurgingTask(AnalyticsDataPurgingConfiguration analyticsDataPurgingConfiguration) {
+        String taskName = GLOBAL_DATA_PURGING;
+        TaskInfo.TriggerInfo triggerInfo = new TaskInfo.TriggerInfo(analyticsDataPurgingConfiguration.getCronExpression());
+        Map<String, String> taskProperties = new HashMap<>(2);
+        taskProperties.put(Constants.RETENTION_PERIOD, String.valueOf(analyticsDataPurgingConfiguration.getRetentionDays()));
+        taskProperties.put(Constants.INCLUDE_TABLES, getIncludeTables(analyticsDataPurgingConfiguration
+                                                                              .getPurgingIncludeTables()));
+        return new TaskInfo(taskName, AnalyticsGlobalDataPurgingTask.class.getName(), taskProperties, triggerInfo);
+    }
+
+    private String getIncludeTables(AnalyticsDataPurgingIncludeTable[] purgingIncludeTables) {
+        StringBuilder stringBuffer = new StringBuilder();
+        if (purgingIncludeTables != null) {
+            for (AnalyticsDataPurgingIncludeTable purgingIncludeTable : purgingIncludeTables) {
+                if (purgingIncludeTable != null && purgingIncludeTable.getValue() != null &&
+                    !purgingIncludeTable.getValue().isEmpty()) {
+                    stringBuffer.append(purgingIncludeTable.getValue());
+                    stringBuffer.append(Constants.INCLUDE_CLASS_SPLITTER);
+                }
+            }
+        }
+        return stringBuffer.toString();
+    }
+
     private AnalyticsDataServiceConfiguration loadAnalyticsDataServiceConfig() throws AnalyticsException {
         try {
             File confFile = new File(GenericUtils.getAnalyticsConfDirectory() +

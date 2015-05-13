@@ -31,4 +31,7 @@ public class Constants {
     public static final String PERMISSION_SEARCH_RECORD = "/permission/admin/manage/analytics/records/search";
     public static final String DEFAULT_CHARSET = "UTF8";
     public static final String ANALYTICS_SCHEMA_FILE_EXTENSION = "xml";
+    public static final String RETENTION_PERIOD = "retentionPeriod";
+    public static final String INCLUDE_TABLES = "excludeTables";
+    public static final String INCLUDE_CLASS_SPLITTER = "###";
 }

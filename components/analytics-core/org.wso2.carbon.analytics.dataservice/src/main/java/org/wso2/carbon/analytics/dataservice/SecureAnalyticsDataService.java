@@ -248,7 +248,7 @@ public interface SecureAnalyticsDataService extends AnalyticsRecordReader {
      * @throws org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutException
      * @throws AnalyticsException
      */
-    public void waitForIndexing(long maxWait) throws AnalyticsTimeoutException, AnalyticsException;
+    void waitForIndexing(long maxWait) throws AnalyticsTimeoutException, AnalyticsException;
 
     /**
      * Returns the drill down results of a search query, given
@@ -258,7 +258,7 @@ public interface SecureAnalyticsDataService extends AnalyticsRecordReader {
      * @return the results containing the ids which match the drilldown query.
      * @throws AnalyticsIndexException
      */
-    public List<SearchResultEntry> drillDownSearch(String username, AnalyticsDrillDownRequest drillDownRequest)
+    List<SearchResultEntry> drillDownSearch(String username, AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException;
 
     /**
@@ -269,7 +269,7 @@ public interface SecureAnalyticsDataService extends AnalyticsRecordReader {
      * @return the count of the records which match the drilldown query
      * @throws AnalyticsIndexException
      */
-    public int drillDownSearchCount(String username, AnalyticsDrillDownRequest drillDownRequest)
+    int drillDownSearchCount(String username, AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException;
 
     /**
@@ -280,7 +280,7 @@ public interface SecureAnalyticsDataService extends AnalyticsRecordReader {
      * @return
      * @throws AnalyticsIndexException
      */
-    public SubCategories drillDownCategories(String username, CategoryDrillDownRequest drillDownRequest)
+    SubCategories drillDownCategories(String username, CategoryDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException;
 
     /**
@@ -291,7 +291,7 @@ public interface SecureAnalyticsDataService extends AnalyticsRecordReader {
      * with score property not-null
      * @throws AnalyticsIndexException
      */
-    public List<AnalyticsDrillDownRange> drillDownRangeCount(String username, AnalyticsDrillDownRequest drillDownRequest)
+    List<AnalyticsDrillDownRange> drillDownRangeCount(String username, AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException;
     /**
      * Destroys and frees any resources taken up by the analytics data service implementation.

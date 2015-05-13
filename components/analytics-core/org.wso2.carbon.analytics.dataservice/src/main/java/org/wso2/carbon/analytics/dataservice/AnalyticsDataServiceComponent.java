@@ -19,7 +19,6 @@
 package org.wso2.carbon.analytics.dataservice;
 
 import com.hazelcast.core.HazelcastInstance;
-
 import org.apache.axis2.engine.ListenerManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,6 +31,7 @@ import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerI
 import org.wso2.carbon.analytics.dataservice.deployment.AnalyticsTableSchemaCAppDeployer;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceService;
 import org.wso2.carbon.application.deployer.handler.AppDeploymentHandler;
+import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.user.core.service.RealmService;
 
 /**
@@ -44,6 +44,8 @@ import org.wso2.carbon.user.core.service.RealmService;
  * cardinality="1..1" policy="dynamic" bind="setRealmService" unbind="unsetRealmService"
  * @scr.reference name="analytics.datasource.service" interface="org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceService"
  * cardinality="1..1" policy="dynamic" bind="setAnalyticsDataSourceService" unbind="unsetAnalyticsDataSourceService"
+ * @scr.reference name="ntask.component" interface="org.wso2.carbon.ntask.core.service.TaskService"
+ * cardinality="1..1" policy="dynamic" bind="setTaskService" unbind="unsetTaskService"
  */
 public class AnalyticsDataServiceComponent {
 
@@ -122,6 +124,19 @@ public class AnalyticsDataServiceComponent {
     protected void unsetRealmService(RealmService realmService) {
         if (log.isDebugEnabled()) {
             log.info("Unsetting the Realm Service");
+        }
+    }
+
+    protected void setTaskService(TaskService taskService) {
+        if (log.isDebugEnabled()) {
+            log.debug("Setting the Task Service");
+        }
+        AnalyticsServiceHolder.setTaskService(taskService);
+    }
+
+    protected void unsetTaskService(TaskService taskService) {
+        if (log.isDebugEnabled()) {
+            log.debug("Unsetting the Task Service");
         }
     }
 }

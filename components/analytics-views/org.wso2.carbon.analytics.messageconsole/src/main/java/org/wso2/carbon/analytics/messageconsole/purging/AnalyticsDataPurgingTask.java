@@ -23,14 +23,13 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.messageconsole.Constants;
 import org.wso2.carbon.analytics.messageconsole.internal.ServiceHolder;
-import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.ntask.core.AbstractTask;
 
 import java.util.Calendar;
 import java.util.Map;
 
 /**
- * This class responsible to execute purging task operation
+ * This class is responsible to execute purging task operation
  */
 public class AnalyticsDataPurgingTask extends AbstractTask {
     private static final Log logger = LogFactory.getLog(AnalyticsDataPurgingTask.class);

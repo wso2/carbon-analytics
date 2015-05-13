@@ -32,6 +32,8 @@ public class AnalyticsDataServiceConfiguration {
     private AnalyticsFileSystemConfiguration analyticsFileSystem;
     
     private AnalyticsLuceneAnalyzerConfiguration luceneAnalyzerConfiguration;
+
+    private AnalyticsDataPurgingConfiguration analyticsDataPurgingConfiguration;
     
     private int shardCount;
     
@@ -80,5 +82,14 @@ public class AnalyticsDataServiceConfiguration {
     public void setShardCount(int shardCount) {
         this.shardCount = shardCount;
     }
-    
+
+    @XmlElement(name = "analytics-data-purging")
+    public AnalyticsDataPurgingConfiguration getAnalyticsDataPurgingConfiguration() {
+        return analyticsDataPurgingConfiguration;
+    }
+
+    public void setAnalyticsDataPurgingConfiguration(
+            AnalyticsDataPurgingConfiguration analyticsDataPurgingConfiguration) {
+        this.analyticsDataPurgingConfiguration = analyticsDataPurgingConfiguration;
+    }
 }
