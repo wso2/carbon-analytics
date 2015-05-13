@@ -98,38 +98,31 @@ public class MapInputMapper implements InputMapper {
         if (obj instanceof Map) {
             Map<Object, Object> eventMap = (Map<Object, Object>) obj;
 
-            for (Map.Entry<Object, Object> eventAttribute : eventMap.entrySet()) {
-                boolean setFlag = false;
-
-                if (noMetaData > 0) {
-                    for (Attribute metaData : streamDefinition.getMetaData()) {
-                        if (eventAttribute.getKey().equals(EventReceiverConstants.META_DATA_PREFIX + metaData.getName())) {
-                            attributeArray[attributeCount++] = eventAttribute.getValue();
-                            setFlag = true;
-                            break;
-                        }
+            if (noMetaData > 0) {
+                for (Attribute metaData : streamDefinition.getMetaData()) {
+                    Object mapAttribute = eventMap.get(EventReceiverConstants.META_DATA_PREFIX + metaData.getName());
+                    if(mapAttribute != null){
+                        attributeArray[attributeCount++] = mapAttribute;
                     }
                 }
+            }
 
-                if (noCorrelationData > 0 && !setFlag) {
-                    for (Attribute correlationData : streamDefinition.getCorrelationData()) {
-                        if (eventAttribute.getKey().equals(EventReceiverConstants.CORRELATION_DATA_PREFIX + correlationData.getName())) {
-                            attributeArray[attributeCount++] = eventAttribute.getValue();
-                            setFlag = true;
-                            break;
-                        }
+            if (noCorrelationData > 0) {
+                for (Attribute correlationData : streamDefinition.getCorrelationData()) {
+                    Object mapAttribute = eventMap.get(EventReceiverConstants.CORRELATION_DATA_PREFIX + correlationData.getName());
+                    if(mapAttribute != null){
+                        attributeArray[attributeCount++] = mapAttribute;
                     }
                 }
+            }
 
-                if (noPayloadData > 0 && !setFlag) {
-                    for (Attribute payloadData : streamDefinition.getPayloadData()) {
-                        if (eventAttribute.getKey().equals(payloadData.getName())) {
-                            attributeArray[attributeCount++] = eventAttribute.getValue();
-                            break;
-                        }
+            if (noPayloadData > 0) {
+                for (Attribute payloadData : streamDefinition.getPayloadData()) {
+                    Object mapAttribute = eventMap.get(payloadData.getName());
+                    if(mapAttribute != null){
+                        attributeArray[attributeCount++] = mapAttribute;
                     }
                 }
-
             }
 
             if (noMetaData + noCorrelationData + noPayloadData != attributeCount) {
