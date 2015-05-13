@@ -33,7 +33,6 @@ import java.io.File;
 import java.util.*;
 import java.util.concurrent.*;
 
-//TODO If remote polling not avaialble then move to global properties
 public class FileTailEventAdapter implements InputEventAdapter {
 
     private final InputEventAdapterConfiguration eventAdapterConfiguration;
@@ -78,10 +77,6 @@ public class FileTailEventAdapter implements InputEventAdapter {
     public void destroy() {
     }
 
-    public InputEventAdapterListener getEventAdapterListener() {
-        return eventAdapterListener;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -99,8 +94,9 @@ public class FileTailEventAdapter implements InputEventAdapter {
     }
 
     private void createFileAdapterListener() {
-        log.info("New subscriber added for " + eventAdapterConfiguration.getName());
-
+        if(log.isDebugEnabled()){
+            log.debug("New subscriber added for " + eventAdapterConfiguration.getName());
+        }
 
         String delayInMillisProperty = eventAdapterConfiguration.getProperties().get(FileTailEventAdapterConstants.EVENT_ADAPTER_DELAY_MILLIS);
         int delayInMillis = FileTailEventAdapterConstants.DEFAULT_DELAY_MILLIS;
@@ -114,18 +110,19 @@ public class FileTailEventAdapter implements InputEventAdapter {
             startFromEnd = Boolean.parseBoolean(startFromEndProperty);
         }
 
-        String filepath = eventAdapterConfiguration.getProperties().get(
+        String filePath = eventAdapterConfiguration.getProperties().get(
                 FileTailEventAdapterConstants.EVENT_ADAPTER_CONF_FILEPATH);
 
-        FileTailerListener listener = new FileTailerListener(new File(filepath).getName(), eventAdapterListener);
-        Tailer tailer = new Tailer(new File(filepath), listener, delayInMillis, startFromEnd);
+        FileTailerListener listener = new FileTailerListener(new File(filePath).getName(), eventAdapterListener);
+        Tailer tailer = new Tailer(new File(filePath), listener, delayInMillis, startFromEnd);
         fileTailerManager = new FileTailerManager(tailer, listener);
         singleThreadedExecutor.execute(tailer);
     }
 
     @Override
     public boolean isEventDuplicatedInCluster() {
-        return Boolean.parseBoolean(eventAdapterConfiguration.getProperties().get("receiving.events.duplicated.in.cluster"));
+        //TODO : events.duplicated.in.cluster , move to adapter core constants
+        return Boolean.parseBoolean(globalProperties.get("events.duplicated.in.cluster"));
     }
 
     @Override

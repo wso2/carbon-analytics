@@ -116,20 +116,16 @@ public final class HTTPEventAdapter implements InputEventAdapter {
 
     @Override
     public void connect() {
-        registerDynamicEndpoint(eventAdapterConfiguration.getName(), this);
+        registerDynamicEndpoint(eventAdapterConfiguration.getName());
     }
 
     @Override
     public void disconnect() {
-        unregisterDynamicEndpoint(eventAdapterConfiguration.getName(), this);
+        unregisterDynamicEndpoint(eventAdapterConfiguration.getName());
     }
 
     @Override
     public void destroy() {
-    }
-
-    public InputEventAdapterListener getEventAdaptorListener() {
-        return eventAdaptorListener;
     }
 
     @Override
@@ -158,7 +154,7 @@ public final class HTTPEventAdapter implements InputEventAdapter {
         return false;
     }
 
-    private void registerDynamicEndpoint(String adapterName, HTTPEventAdapter httpEventAdapter) {
+    private void registerDynamicEndpoint(String adapterName) {
 
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
@@ -184,7 +180,7 @@ public final class HTTPEventAdapter implements InputEventAdapter {
 
     }
 
-    private void unregisterDynamicEndpoint(String adapterName, HTTPEventAdapter httpEventAdapter) {
+    private void unregisterDynamicEndpoint(String adapterName) {
         HttpService httpService = HTTPEventAdapterServiceValueHolder.getHTTPService();
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         String endpoint;

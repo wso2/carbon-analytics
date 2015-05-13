@@ -80,15 +80,15 @@ public class WebsocketEventAdapter implements InputEventAdapter {
     @Override
     public void disconnect() {
         client.shutdown();
+        client = null;
     }
 
     @Override
     public void destroy() {
-        if(client != null){
-            client.shutdown();
-        }
+
     }
 
+    //TODO : Check the usage of the duplicated events property
     @Override
     public boolean isEventDuplicatedInCluster() {
         return Boolean.parseBoolean(eventAdapterConfiguration.getProperties().get("receiving.events.duplicated.in.cluster"));
@@ -96,6 +96,6 @@ public class WebsocketEventAdapter implements InputEventAdapter {
 
     @Override
     public boolean isPolling() {
-        return false;
+        return true;
     }
 }

@@ -33,6 +33,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class JMSEventAdapter implements InputEventAdapter {
 
+    //TODO : remove the map, late start loader remove,     Check the ESB JMS Listener Operation
+    // transport.jms.ReceiveTimeout - global property , concurrentConsumers - adapter properties
+
     private final InputEventAdapterConfiguration eventAdapterConfiguration;
     private final Map<String, String> globalProperties;
     private InputEventAdapterListener eventAdapterListener;
@@ -117,10 +120,6 @@ public class JMSEventAdapter implements InputEventAdapter {
 
     @Override
     public void destroy() {
-    }
-
-    public InputEventAdapterListener getEventAdaptorListener() {
-        return eventAdapterListener;
     }
 
     @Override
@@ -223,12 +222,13 @@ public class JMSEventAdapter implements InputEventAdapter {
 
     @Override
     public boolean isEventDuplicatedInCluster() {
+        //TODO : only based on detination type. Remove from adapter properties
         return Boolean.parseBoolean(eventAdapterConfiguration.getProperties().get("receiving.events.duplicated.in.cluster"));
     }
 
     @Override
     public boolean isPolling() {
-        return false;
+        return true;
     }
 
     class SubscriptionDetails {

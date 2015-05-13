@@ -26,15 +26,6 @@ public final class FileTailEventAdapterConstants {
     public static final String EVENT_ADAPTER_TYPE_FILE = "file-tail";
     public static final String EVENT_ADAPTER_CONF_FILEPATH = "filepath";
     public static final String EVENT_ADAPTER_CONF_FILEPATH_HINT = "filepathHint";
-    public static final int MIN_THREAD = 8;
-    public static final int MAX_THREAD = 100;
-    public static final long DEFAULT_KEEP_ALIVE_TIME_IN_MILLIS = 20000;
-    public static final int JOB_QUEUE_SIZE = 1000;
-    public static final int AXIS_TIME_INTERVAL_IN_MILLISECONDS = 10000;
-    public static final String MIN_THREAD_NAME = "minThread";
-    public static final String MAX_THREAD_NAME = "maxThread";
-    public static final String DEFAULT_KEEP_ALIVE_TIME_NAME = "defaultKeepAliveTimeInMillis";
-    public static final String JOB_QUEUE_SIZE_NAME = "jobQueueSize";
     public static final String EVENT_ADAPTER_DELAY_MILLIS = "delayInMillis";
     public static final String EVENT_ADAPTER_DELAY_MILLIS_HINT = "delayInMillis.hint";
     public static final String EVENT_ADAPTER_START_FROM_END = "startFromEnd";

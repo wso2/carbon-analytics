@@ -47,6 +47,15 @@ public class MQTTEventAdapterFactory extends InputEventAdapterFactory {
     public List<Property> getPropertyList() {
         List<Property> propertyList = new ArrayList<Property>();
 
+        // set topic
+        Property topicProperty = new Property(MQTTEventAdapterConstants.ADAPTER_MESSAGE_TOPIC);
+        topicProperty.setDisplayName(
+                resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_MESSAGE_TOPIC));
+        topicProperty.setRequired(true);
+        topicProperty.setHint(
+                resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_MESSAGE_TOPIC_HINT));
+        propertyList.add(topicProperty);
+
         //Broker Url
         Property brokerUrl = new Property(MQTTEventAdapterConstants.ADAPTER_CONF_URL);
         brokerUrl.setDisplayName(
@@ -55,14 +64,6 @@ public class MQTTEventAdapterFactory extends InputEventAdapterFactory {
         brokerUrl.setHint(resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_URL_HINT));
         propertyList.add(brokerUrl);
 
-        //Broker Password
-        Property password = new Property(MQTTEventAdapterConstants.ADAPTER_CONF_PASSWORD);
-        password.setDisplayName(
-                resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_PASSWORD));
-        password.setRequired(false);
-        password.setHint(
-                resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_PASSWORD_HINT));
-        propertyList.add(password);
 
         //Broker Username
         Property userName = new Property(MQTTEventAdapterConstants.ADAPTER_CONF_USERNAME);
@@ -72,6 +73,15 @@ public class MQTTEventAdapterFactory extends InputEventAdapterFactory {
         userName.setHint(
                 resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_USERNAME_HINT));
         propertyList.add(userName);
+
+        //Broker Password
+        Property password = new Property(MQTTEventAdapterConstants.ADAPTER_CONF_PASSWORD);
+        password.setDisplayName(
+                resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_PASSWORD));
+        password.setRequired(false);
+        password.setHint(
+                resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_PASSWORD_HINT));
+        propertyList.add(password);
 
         //Broker clear session
         Property clearSession = new Property(MQTTEventAdapterConstants.ADAPTER_CONF_CLEAN_SESSION);
@@ -84,6 +94,8 @@ public class MQTTEventAdapterFactory extends InputEventAdapterFactory {
                 resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_CLEAN_SESSION_HINT));
         propertyList.add(clearSession);
 
+
+        //TODO : KEEP alive, move to global properties
         //Broker clear session
         Property keepAlive = new Property(MQTTEventAdapterConstants.ADAPTER_CONF_KEEP_ALIVE);
         keepAlive.setDisplayName(
@@ -91,14 +103,6 @@ public class MQTTEventAdapterFactory extends InputEventAdapterFactory {
         keepAlive.setRequired(false);
         propertyList.add(keepAlive);
 
-        // set topic
-        Property topicProperty = new Property(MQTTEventAdapterConstants.ADAPTER_MESSAGE_TOPIC);
-        topicProperty.setDisplayName(
-                resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_MESSAGE_TOPIC));
-        topicProperty.setRequired(true);
-        topicProperty.setHint(
-                resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_MESSAGE_TOPIC_HINT));
-        propertyList.add(topicProperty);
 
         // set clientId
         Property clientId = new Property(MQTTEventAdapterConstants.ADAPTER_MESSAGE_CLIENTID);
@@ -109,6 +113,7 @@ public class MQTTEventAdapterFactory extends InputEventAdapterFactory {
                 resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_MESSAGE_CLIENTID_HINT));
         propertyList.add(clientId);
 
+        //TODO : Always true
         Property isDuplicatedInCluster = new Property(MQTTEventAdapterConstants.ADAPTOR_IS_EVENT_DUPLICATED_IN_CLUSTER);
         isDuplicatedInCluster.setDisplayName(resourceBundle.getString(MQTTEventAdapterConstants.ADAPTOR_IS_EVENT_DUPLICATED_IN_CLUSTER));
         isDuplicatedInCluster.setRequired(false);
