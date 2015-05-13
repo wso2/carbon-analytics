@@ -64,6 +64,11 @@ public class AnalyticsConstants {
     public static final String SCRIPT_DEPLOYMENT_DIR = "spark-scripts";
     public static final String SPARK_DEFAULTS_PATH = "repository/conf/spark/spark-defaults.conf";
 
+    //Analytics relation strings
+    public static final String TENANT_ID = "tenantId";
+    public static final String TABLE_NAME = "tableName";
+    public static final String SCHEMA_STRING = "schema";
+
     //Spark default properties strings
     public static final String SPARK_MASTER_IP = "spark.master.ip";
     public static final String SPARK_MASTER_PORT = "spark.master.port";

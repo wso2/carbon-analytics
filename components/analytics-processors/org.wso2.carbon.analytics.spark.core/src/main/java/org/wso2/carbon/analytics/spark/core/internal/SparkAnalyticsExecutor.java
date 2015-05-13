@@ -44,9 +44,11 @@ import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionExceptio
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsRelation;
+import org.wso2.carbon.analytics.spark.core.util.AnalyticsRelationProvider;
 import org.wso2.carbon.utils.CarbonUtils;
 import scala.None$;
 import scala.Option;
+import scala.Tuple2;
 
 import java.io.File;
 import java.io.IOException;
@@ -478,7 +480,14 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         if (!ads.tableExists(tenantId, tableName)) {
             ads.createTable(tenantId, tableName);
         }
-        AnalyticsRelation table = new AnalyticsRelation(tenantId, tableName, this.sqlCtx, schemaString);
+//        AnalyticsRelation table = new AnalyticsRelation(tenantId, tableName, this.sqlCtx, schemaString);
+        AnalyticsRelationProvider relationProvider = new AnalyticsRelationProvider();
+        scala.collection.immutable.HashMap<String, String> params = new  scala.collection.immutable.HashMap<>();
+        params = params.$plus(new Tuple2<>(AnalyticsConstants.TENANT_ID, Integer.toString(tenantId)));
+        params = params.$plus(new Tuple2<>(AnalyticsConstants.TABLE_NAME, tableName));
+        params = params.$plus(new Tuple2<>(AnalyticsConstants.SCHEMA_STRING, schemaString));
+
+        AnalyticsRelation table = relationProvider.createRelation(this.sqlCtx, params);
         DataFrame dataFrame = this.sqlCtx.baseRelationToDataFrame(table);
         dataFrame.registerTempTable(encodeTableName(tenantId, alias));
     }

@@ -105,12 +105,15 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
     public Partition[] getPartitions() {
         RecordGroup[] rgs;
         try {
-            rgs = ServiceHolder.getAnalyticsDataService().get(this.tenantId, this.tableName, 
+            System.out.println("########### DS = " + ServiceHolder.getAnalyticsDataService().toString());
+            System.out.println("########### excu = " + ServiceHolder.getAnalyticskExecutor().toString());
+            System.out.println("########### parts = " + ServiceHolder.getAnalyticskExecutor().getNumPartitionsHint());
+            rgs = ServiceHolder.getAnalyticsDataService().get(this.tenantId, this.tableName,
                     ServiceHolder.getAnalyticskExecutor().getNumPartitionsHint(),
                     this.columns, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
         } catch (AnalyticsException e) {
             throw new RuntimeException(e.getMessage(), e);
-        } 
+        }
         Partition[] result = new Partition[rgs.length];
         for (int i = 0; i < result.length; i++) {
             result[i] = new AnalyticsPartition(rgs[i], i);
