@@ -38,6 +38,10 @@
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.analytics.activitydashboard.ui</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.activitydashboard.stub</artifactId>
         </dependency>
         <dependency>
@@ -69,6 +73,9 @@
                                 </properties>
                             </adviceFile>
                             <bundles>
+                                <bundleDef>
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.activitydashboard.ui:${carbon.analytics.version}
+                                </bundleDef>
                                 <bundleDef>
                                     org.wso2.carbon.analytics:org.wso2.carbon.analytics.activitydashboard.stub:${carbon.analytics.version}
                                 </bundleDef>
