@@ -41,10 +41,10 @@ public class EventProcessingAppDeployer implements AppDeploymentHandler {
 
     private Map<String, Boolean> acceptanceList = null;
 
-    List<Artifact> executionPlans = new ArrayList<Artifact>();
-    List<Artifact> eventStreams = new ArrayList<Artifact>();
-    List<Artifact> eventReceivers = new ArrayList<Artifact>();
-    List<Artifact> eventPublishers = new ArrayList<Artifact>();
+    private List<Artifact> executionPlans = new ArrayList<Artifact>();
+    private List<Artifact> eventStreams = new ArrayList<Artifact>();
+    private List<Artifact> eventReceivers = new ArrayList<Artifact>();
+    private List<Artifact> eventPublishers = new ArrayList<Artifact>();
 
     /**
      * @param carbonApp  - CarbonApplication instance to check for Event Processing artifacts
@@ -73,6 +73,13 @@ public class EventProcessingAppDeployer implements AppDeploymentHandler {
                     EventProcessingAppDeployerConstants.FILE_TYPE_XML);
             deployTypeSpecifiedArtifacts(executionPlans, axisConfig, EventProcessingAppDeployerConstants.CEP_EXECUTION_PLAN_DIR,
                     EventProcessingAppDeployerConstants.FILE_TYPE_SIDDHIQL);
+        } catch (Exception e) {
+            try {
+                undeployArtifacts(carbonApp,axisConfig);
+            }catch (Exception _e) {
+                throw new DeploymentException(_e.getMessage(),_e);
+            }
+            throw new DeploymentException(e.getMessage(),e);
         } finally {
             executionPlans.clear();
             eventStreams.clear();
@@ -119,42 +126,62 @@ public class EventProcessingAppDeployer implements AppDeploymentHandler {
         }
     }
 
-    public void undeployArtifacts(CarbonApplication carbonApp, AxisConfiguration axisConfig) {
-        List<Artifact.Dependency> artifacts = carbonApp.getAppConfig().getApplicationArtifact()
-                .getDependencies();
+    public void undeployArtifacts(CarbonApplication carbonApp, AxisConfiguration axisConfig) throws DeploymentException {
+        List<Artifact.Dependency> artifacts =
+                carbonApp.getAppConfig().getApplicationArtifact().getDependencies();
+
+        executionPlans.clear();
+        eventStreams.clear();
+        eventReceivers.clear();
+        eventPublishers.clear();
 
         for (Artifact.Dependency dep : artifacts) {
-            EventProcessingDeployer deployer;
             Artifact artifact = dep.getArtifact();
-            if (artifact == null) {
+            if (!validateArtifact(artifact)) {
                 continue;
             }
+            addArtifact(artifact);
+        }
 
-            deployer = getDeployer(artifact,axisConfig);
+        try {
+            undeployTypeSpecifiedArtifacts(eventStreams, axisConfig, EventProcessingAppDeployerConstants.CEP_EVENT_STREAM_DIR,
+                    EventProcessingAppDeployerConstants.FILE_TYPE_JSON);
+            undeployTypeSpecifiedArtifacts(eventReceivers, axisConfig, EventProcessingAppDeployerConstants.CEP_EVENT_RECEIVER_DIR,
+                    EventProcessingAppDeployerConstants.FILE_TYPE_XML);
+            undeployTypeSpecifiedArtifacts(eventPublishers, axisConfig, EventProcessingAppDeployerConstants.CEP_EVENT_PUBLISHER_DIR,
+                    EventProcessingAppDeployerConstants.FILE_TYPE_XML);
+            undeployTypeSpecifiedArtifacts(executionPlans, axisConfig, EventProcessingAppDeployerConstants.CEP_EXECUTION_PLAN_DIR,
+                    EventProcessingAppDeployerConstants.FILE_TYPE_SIDDHIQL);
+        } finally {
+            executionPlans.clear();
+            eventStreams.clear();
+            eventReceivers.clear();
+            eventPublishers.clear();
+        }
+    }
 
-            List<CappFile> files = artifact.getFiles();
-            if (files.size() != 1) {
-                log.error("Artifact must have only a single file. But " +
-                        files.size() + " files found.");
-                continue;
+    private void undeployTypeSpecifiedArtifacts(List<Artifact> artifacts, AxisConfiguration axisConfig, String directory, String fileType) throws DeploymentException {
+        for(Artifact artifact: artifacts) {
+            EventProcessingDeployer deployer;
+            deployer = (EventProcessingDeployer)AppDeployerUtils.getArtifactDeployer(axisConfig,
+                    directory, fileType);
+            if(deployer!=null) {
+                undeploy(deployer, artifact);
             }
+        }
+    }
 
-            if (deployer != null && AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED.
-                    equals(artifact.getDeploymentStatus())) {
-                String fileName = artifact.getFiles().get(0).getName();
-                String artifactPath = artifact.getExtractedPath() + File.separator + fileName;
-                try {
-                    deployer.processUndeployment(artifactPath);
-                    artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_PENDING);
-                    File artifactFile = new File(artifactPath);
-                    if (artifactFile.exists() && !artifactFile.delete()) {
-                        log.warn("Couldn't delete App artifact file : " + artifactPath);
-                    }
-                } catch (Exception e) {
-                    artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_FAILED);
-                    log.error("Error occured while trying to undeploy : " + artifact.getName() + " due to " + e.getMessage(), e);
-                }
-            }
+    private void undeploy(EventProcessingDeployer deployer, Artifact artifact) throws DeploymentException {
+        List<CappFile> files = artifact.getFiles();
+        String fileName = artifact.getFiles().get(0).getName();
+        String artifactPath = artifact.getExtractedPath() + File.separator + fileName;
+        try {
+            deployer.processUndeployment(new DeploymentFileData(new File(artifactPath), deployer).getAbsolutePath());
+            artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED);
+        } catch (Exception e) {
+            artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_FAILED);
+            log.error("Undeployment is failed due to " + e.getMessage(), e);
+            throw new DeploymentException(e.getMessage(), e);
         }
     }
 
