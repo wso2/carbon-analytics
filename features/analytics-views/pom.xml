@@ -38,5 +38,8 @@
         <module>org.wso2.carbon.analytics.messageconsole.feature</module>
         <module>org.wso2.carbon.analytics.dashboard.ui.feature</module>
         <module>org.wso2.carbon.analytics.dashboard.logmonitor.ui.feature</module>
+        <module>org.wso2.carbon.analytics.activitydashboard.server.feature</module>
+        <module>org.wso2.carbon.analytics.activitydashboard.ui.feature</module>
+        <module>org.wso2.carbon.analytics.activitydashboard.feature</module>
     </modules>
 </project>
