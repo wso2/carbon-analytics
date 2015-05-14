@@ -35,11 +35,18 @@ import org.wso2.carbon.analytics.webservice.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.webservice.beans.CategoryDrillDownRequestBean;
 import org.wso2.carbon.analytics.webservice.beans.CategoryPathBean;
 import org.wso2.carbon.analytics.webservice.beans.CategorySearchResultEntryBean;
+import org.wso2.carbon.analytics.webservice.beans.EventBean;
 import org.wso2.carbon.analytics.webservice.beans.RecordBean;
+import org.wso2.carbon.analytics.webservice.beans.StreamDefinitionBean;
 import org.wso2.carbon.analytics.webservice.beans.SubCategoriesBean;
 import org.wso2.carbon.analytics.webservice.exception.AnalyticsWebServiceException;
 import org.wso2.carbon.analytics.webservice.internal.ServiceHolder;
 import org.wso2.carbon.core.AbstractAdmin;
+import org.wso2.carbon.databridge.commons.Event;
+import org.wso2.carbon.databridge.commons.StreamDefinition;
+import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
+import org.wso2.carbon.event.stream.core.EventStreamService;
+import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,10 +62,12 @@ public class AnalyticsWebService extends AbstractAdmin {
     private static final Log logger = LogFactory.getLog(AnalyticsWebService.class);
     private static final int DEFAULT_NUM_PARTITIONS_HINT = 1;
     private AnalyticsDataAPI analyticsDataAPI;
+    private EventStreamService eventStreamService;
     private static final String AT_SIGN = "@";
 
     public AnalyticsWebService() {
         analyticsDataAPI = ServiceHolder.getAnalyticsDataAPI();
+        eventStreamService = ServiceHolder.getEventStreamService();
     }
 
     /**
@@ -103,6 +112,35 @@ public class AnalyticsWebService extends AbstractAdmin {
             throw new AnalyticsWebServiceException("Unable to set table schema due to " + e.getMessage(), e);
         }
     }*/
+
+    /**
+     * Add a stream definition using the Event stream publisher.
+     * @param streamDefinitionBean The stream definition bean class.
+     */
+    public String addStreamDefinition(StreamDefinitionBean streamDefinitionBean)
+            throws AnalyticsWebServiceException, MalformedStreamDefinitionException {
+        StreamDefinition streamDefinition = Utils.getStreamDefinition(streamDefinitionBean);
+        try {
+            eventStreamService.addEventStreamDefinition(streamDefinition);
+            return streamDefinition.getStreamId();
+        } catch (EventStreamConfigurationException e) {
+            logger.error("Unable to set the stream definition: [" + streamDefinition.getName() + ":" +
+                         streamDefinition.getVersion()+ "]" + e.getMessage(), e);
+            throw new AnalyticsWebServiceException("Unable to set the stream definition: [" +
+                         streamDefinition.getName() + ":" + streamDefinition.getVersion()+ "], " +
+                         e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Publishes events to a given stream represented by stream id.
+     * @param eventBean The event bean representing the event data.
+     * @throws AnalyticsWebServiceException
+     */
+    public void publishEvent(EventBean eventBean) throws AnalyticsWebServiceException {
+        Event event = Utils.getEvent(eventBean);
+        eventStreamService.publish(event);
+    }
 
     /**
      * Retrieves the table schema for the given table.

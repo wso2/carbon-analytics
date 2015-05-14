@@ -19,12 +19,14 @@
 package org.wso2.carbon.analytics.webservice.internal;
 
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
+import org.wso2.carbon.event.stream.core.EventStreamService;
 
 /**
  * This class represents the service holder for data service web service
  */
 public class ServiceHolder {
     private static AnalyticsDataAPI analyticsDataAPI;
+    private static EventStreamService eventStreamService;
 
     public static void setAnalyticsDataAPIService(AnalyticsDataAPI analyticsDataAPI) {
         ServiceHolder.analyticsDataAPI = analyticsDataAPI;
@@ -32,5 +34,13 @@ public class ServiceHolder {
 
     public static AnalyticsDataAPI getAnalyticsDataAPI() {
         return analyticsDataAPI;
+    }
+
+    public static EventStreamService getEventStreamService() {
+        return eventStreamService;
+    }
+
+    public static void setEventStreamService(EventStreamService eventStreamService) {
+        ServiceHolder.eventStreamService = eventStreamService;
     }
 }

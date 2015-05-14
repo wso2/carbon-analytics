@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
+import org.wso2.carbon.event.stream.core.EventStreamService;
 
 /**
  * This class represents the analytics data service web service declarative services component.
@@ -29,6 +30,9 @@ import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
  * @scr.component name="analytics.webservice.component" immediate="true"
  * @scr.reference name="analytics.api.component" interface="org.wso2.carbon.analytics.api.AnalyticsDataAPI"
  * cardinality="1..1" policy="dynamic" bind="setAnalyticsDataAPIService" unbind="unsetAnalyticsDataAPIService"
+ * @scr.reference name="org.wso2.carbon.event.stream.core.EventStreamService"
+ * interface="org.wso2.carbon.event.stream.core.EventStreamService"
+ * cardinality="1..1" policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
  */
 public class AnalyticsWebServiceComponent {
     private static final Log logger = LogFactory.getLog(AnalyticsWebServiceComponent.class);
@@ -44,5 +48,13 @@ public class AnalyticsWebServiceComponent {
     }
 
     protected void unsetAnalyticsDataAPIService(AnalyticsDataAPI analyticsDataAPI) {
+    }
+
+    protected void setEventStreamService(EventStreamService eventStreamService) {
+        ServiceHolder.setEventStreamService(eventStreamService);
+    }
+
+    protected void unsetEventStreamService(EventStreamService eventStreamService) {
+
     }
 }

@@ -30,17 +30,21 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.jsservice.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.jsservice.beans.CategoryDrillDownRequestBean;
 import org.wso2.carbon.analytics.jsservice.beans.DrillDownRequestBean;
+import org.wso2.carbon.analytics.jsservice.beans.EventBean;
 import org.wso2.carbon.analytics.jsservice.beans.QueryBean;
 import org.wso2.carbon.analytics.jsservice.beans.Record;
 import org.wso2.carbon.analytics.jsservice.beans.ResponseBean;
+import org.wso2.carbon.analytics.jsservice.beans.StreamDefinitionBean;
 import org.wso2.carbon.analytics.jsservice.beans.SubCategoriesBean;
 import org.wso2.carbon.analytics.jsservice.exception.JSServiceException;
 import org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceAnalyticsWebServiceExceptionException;
+import org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceMalformedStreamDefinitionExceptionException;
 import org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceStub;
 import org.wso2.carbon.analytics.webservice.stub.beans.RecordBean;
 
 import java.lang.reflect.Type;
 import java.rmi.RemoteException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -54,10 +58,10 @@ public class AnalyticsWebServiceConnector {
     private Gson gson;
 
     public static final int TYPE_CLEAR_INDEX_DATA = 1;
-    public static final int TYPE_CREATE_TABLE = 2;
+//    public static final int TYPE_CREATE_TABLE = 2;
 //    public static final int TYPE_DELETE_BY_ID = 3;
 //    public static final int TYPE_DELETE_BY_RANGE = 4;
-    public static final int TYPE_DELETE_TABLE = 5;
+//    public static final int TYPE_DELETE_TABLE = 5;
     public static final int TYPE_GET_RECORD_COUNT = 6;
     public static final int TYPE_GET_BY_ID = 7;
     public static final int TYPE_GET_BY_RANGE = 8;
@@ -74,6 +78,8 @@ public class AnalyticsWebServiceConnector {
     public static final int TYPE_DRILLDOWN_CATEGORIES = 19;
     public static final int TYPE_DRILLDOWN_SEARCH = 20;
     public static final int TYPE_DRILLDOWN_SEARCH_COUNT = 21;
+    public static final int TYPE_ADD_STREAM_DEFINITION = 22;
+    public static final int TYPE_PUBLISH_EVENT = 23;
 
     public AnalyticsWebServiceConnector(ConfigurationContext configCtx, String backendServerURL, String cookie) {
         try {
@@ -167,6 +173,60 @@ public class AnalyticsWebServiceConnector {
         }
         return gson.toJson(handleResponse(ResponseStatus.SUCCESS,
                                           "Table : " + tableName + " exists."));
+    }
+
+    public String addStreamDefinition(String streamDefAsString) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("invoking addStreamDefinition");
+        }
+        try {
+            if (streamDefAsString != null) {
+                StreamDefinitionBean streamDefinitionBean = gson.fromJson(streamDefAsString, StreamDefinitionBean.class);
+                analyticsWebServiceStub.addStreamDefinition(Utils.getStreamDefinition(streamDefinitionBean));
+                return gson.toJson(handleResponse(ResponseStatus.SUCCESS, "StreamDefinition added successfully"));
+            } else {
+                return gson.toJson(handleResponse(ResponseStatus.NON_EXISTENT, "StreamDefinition is not given"));
+            }
+        } catch (RemoteException e) {
+            logger.error("Failed to add the stream definition: " + e.getMessage(), e);
+            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to add the stream definition: " +
+                                                                     ": " + e.getMessage()));
+        } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
+            logger.error("Failed to add the stream definition: " + e.getFaultMessage(), e);
+            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to add the stream definition: " +
+                                                                     ": " + e.getFaultMessage()));
+        } catch (AnalyticsWebServiceMalformedStreamDefinitionExceptionException e) {
+            logger.error("Failed to add the stream definition: " + e.getFaultMessage(), e);
+            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to add the stream definition: " +
+                                                                     ": " + e.getFaultMessage()));
+        }
+    }
+
+    public String publishEvent(String eventAsString) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("invoking publishEvent");
+        }
+        try {
+            if (eventAsString != null) {
+                EventBean eventBean = gson.fromJson(eventAsString, EventBean.class);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("publishing event: stream id: " + eventBean.getStreamId());
+                }
+                analyticsWebServiceStub.publishEvent(Utils.getStreamEvent(eventBean));
+                return gson.toJson(handleResponse(ResponseStatus.SUCCESS, "Event published successfully"));
+
+            } else {
+                return gson.toJson(handleResponse(ResponseStatus.NON_EXISTENT, "Stream event is not provided"));
+            }
+        } catch (RemoteException e) {
+            logger.error("Failed to publish event: " + e.getMessage(), e);
+            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to publish event: " +
+                                                                     ": " + e.getMessage()));
+        } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
+            logger.error("Failed to publish event: " + e.getFaultMessage(), e);
+            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to publish event: " +
+                                                                     ": " + e.getFaultMessage()));
+        }
     }
 
     public String getTableList() {
@@ -298,11 +358,11 @@ public class AnalyticsWebServiceConnector {
             logger.debug("Invoking getRecordByRange for tableName: " + tableName);
         }
         try {
-            long from = validateNumericValue("timeFrom", timeFrom).longValue();
-            long to = validateNumericValue("timeTo", timeTo).longValue();
+            long from = validateNumericValue("timeFrom", timeFrom);
+            long to = validateNumericValue("timeTo", timeTo);
             int start = validateNumericValue("start", recordsFrom).intValue();
             int recordCount = validateNumericValue("count", count).intValue();
-            RecordBean[] recordBeans = null;
+            RecordBean[] recordBeans;
             if (columns == null) {
                 recordBeans = analyticsWebServiceStub.getByRange(tableName, 1, null,
                                                                               from, to, start, recordCount);
@@ -608,7 +668,7 @@ public class AnalyticsWebServiceConnector {
                         analyticsWebServiceStub.drillDownCategories(requestBean);
                 SubCategoriesBean subCategories = Utils.getSubCategories(searchResults);
                 if (logger.isDebugEnabled()) {
-                    logger.debug("DrilldownCategory Result -- path: " + subCategories.getCategoryPath() +
+                    logger.debug("DrilldownCategory Result -- path: " + Arrays.toString(subCategories.getCategoryPath()) +
                                  " values :" + subCategories.getCategories());
 
                 }

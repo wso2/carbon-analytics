@@ -1,4 +1,4 @@
-<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://webservice.analytics.carbon.wso2.org" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ax217="http://exception.webservice.analytics.carbon.wso2.org/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ax219="http://beans.webservice.analytics.carbon.wso2.org/xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://webservice.analytics.carbon.wso2.org">
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://webservice.analytics.carbon.wso2.org" xmlns:ax221="http://exception.commons.databridge.carbon.wso2.org/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ax217="http://exception.webservice.analytics.carbon.wso2.org/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ax219="http://beans.webservice.analytics.carbon.wso2.org/xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://webservice.analytics.carbon.wso2.org">
     <wsdl:documentation>AnalyticsWebService</wsdl:documentation>
     <wsdl:types>
         <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://exception.webservice.analytics.carbon.wso2.org/xsd">
@@ -94,10 +94,46 @@
                     <xs:element minOccurs="0" name="score" type="xs:float"/>
                 </xs:sequence>
             </xs:complexType>
+            <xs:complexType name="EventBean">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="arbitraryData" nillable="true" type="ax219:RecordValueEntryBean"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="correlationData" nillable="true" type="ax219:RecordValueEntryBean"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="metaData" nillable="true" type="ax219:RecordValueEntryBean"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="payloadData" nillable="true" type="ax219:RecordValueEntryBean"/>
+                    <xs:element minOccurs="0" name="streamId" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="timeStamp" type="xs:long"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="StreamDefinitionBean">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="correlationData" nillable="true" type="ax219:StreamDefAttributeBean"/>
+                    <xs:element minOccurs="0" name="description" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="metaData" nillable="true" type="ax219:StreamDefAttributeBean"/>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="nickName" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="payloadData" nillable="true" type="ax219:StreamDefAttributeBean"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="tags" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="version" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="StreamDefAttributeBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
         </xs:schema>
-        <xs:schema xmlns:ax220="http://beans.webservice.analytics.carbon.wso2.org/xsd" xmlns:ax218="http://exception.webservice.analytics.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://webservice.analytics.carbon.wso2.org">
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://exception.commons.databridge.carbon.wso2.org/xsd">
+            <xs:complexType name="MalformedStreamDefinitionException">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="errorMessage" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema xmlns:ax220="http://beans.webservice.analytics.carbon.wso2.org/xsd" xmlns:ax218="http://exception.webservice.analytics.carbon.wso2.org/xsd" xmlns:ax222="http://exception.commons.databridge.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://webservice.analytics.carbon.wso2.org">
             <xs:import namespace="http://exception.webservice.analytics.carbon.wso2.org/xsd"/>
             <xs:import namespace="http://beans.webservice.analytics.carbon.wso2.org/xsd"/>
+            <xs:import namespace="http://exception.commons.databridge.carbon.wso2.org/xsd"/>
             <xs:element name="AnalyticsWebServiceAnalyticsWebServiceException">
                 <xs:complexType>
                     <xs:sequence>
@@ -125,14 +161,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="deleteByIds">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="ids" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
             <xs:element name="getById">
                 <xs:complexType>
                     <xs:sequence>
@@ -150,17 +178,11 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getTableSchema">
+            <xs:element name="deleteByIds">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getTableSchemaResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax220:AnalyticsSchemaBean"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="ids" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -175,6 +197,27 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="clearIndices">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTableSchema">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getTableSchemaResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax220:AnalyticsSchemaBean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -215,20 +258,6 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="waitForIndexing">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="maxWait" type="xs:long"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="clearIndices">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -286,6 +315,41 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" nillable="true" type="ax220:SubCategoriesBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="waitForIndexing">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="maxWait" type="xs:long"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="publishEvent">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventBean" nillable="true" type="ax220:EventBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="AnalyticsWebServiceMalformedStreamDefinitionException">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="MalformedStreamDefinitionException" nillable="true" type="ax221:MalformedStreamDefinitionException"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addStreamDefinition">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="streamDefinitionBean" nillable="true" type="ax220:StreamDefinitionBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addStreamDefinitionResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -380,17 +444,29 @@
     <wsdl:message name="tableExistsResponse">
         <wsdl:part name="parameters" element="ns:tableExistsResponse"/>
     </wsdl:message>
-    <wsdl:message name="drillDownSearchCountRequest">
-        <wsdl:part name="parameters" element="ns:drillDownSearchCount"/>
+    <wsdl:message name="addStreamDefinitionRequest">
+        <wsdl:part name="parameters" element="ns:addStreamDefinition"/>
     </wsdl:message>
-    <wsdl:message name="drillDownSearchCountResponse">
-        <wsdl:part name="parameters" element="ns:drillDownSearchCountResponse"/>
+    <wsdl:message name="addStreamDefinitionResponse">
+        <wsdl:part name="parameters" element="ns:addStreamDefinitionResponse"/>
+    </wsdl:message>
+    <wsdl:message name="AnalyticsWebServiceMalformedStreamDefinitionException">
+        <wsdl:part name="parameters" element="ns:AnalyticsWebServiceMalformedStreamDefinitionException"/>
     </wsdl:message>
     <wsdl:message name="waitForIndexingRequest">
         <wsdl:part name="parameters" element="ns:waitForIndexing"/>
     </wsdl:message>
     <wsdl:message name="clearIndicesRequest">
         <wsdl:part name="parameters" element="ns:clearIndices"/>
+    </wsdl:message>
+    <wsdl:message name="publishEventRequest">
+        <wsdl:part name="parameters" element="ns:publishEvent"/>
+    </wsdl:message>
+    <wsdl:message name="drillDownSearchCountRequest">
+        <wsdl:part name="parameters" element="ns:drillDownSearchCount"/>
+    </wsdl:message>
+    <wsdl:message name="drillDownSearchCountResponse">
+        <wsdl:part name="parameters" element="ns:drillDownSearchCountResponse"/>
     </wsdl:message>
     <wsdl:portType name="AnalyticsWebServicePortType">
         <wsdl:operation name="searchCount">
@@ -451,10 +527,11 @@
             <wsdl:output message="ns:tableExistsResponse" wsaw:Action="urn:tableExistsResponse"/>
             <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:tableExistsAnalyticsWebServiceAnalyticsWebServiceException"/>
         </wsdl:operation>
-        <wsdl:operation name="drillDownSearchCount">
-            <wsdl:input message="ns:drillDownSearchCountRequest" wsaw:Action="urn:drillDownSearchCount"/>
-            <wsdl:output message="ns:drillDownSearchCountResponse" wsaw:Action="urn:drillDownSearchCountResponse"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:drillDownSearchCountAnalyticsWebServiceAnalyticsWebServiceException"/>
+        <wsdl:operation name="addStreamDefinition">
+            <wsdl:input message="ns:addStreamDefinitionRequest" wsaw:Action="urn:addStreamDefinition"/>
+            <wsdl:output message="ns:addStreamDefinitionResponse" wsaw:Action="urn:addStreamDefinitionResponse"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:addStreamDefinitionAnalyticsWebServiceAnalyticsWebServiceException"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceMalformedStreamDefinitionException" name="AnalyticsWebServiceMalformedStreamDefinitionException" wsaw:Action="urn:addStreamDefinitionAnalyticsWebServiceMalformedStreamDefinitionException"/>
         </wsdl:operation>
         <wsdl:operation name="waitForIndexing">
             <wsdl:input message="ns:waitForIndexingRequest" wsaw:Action="urn:waitForIndexing"/>
@@ -463,6 +540,15 @@
         <wsdl:operation name="clearIndices">
             <wsdl:input message="ns:clearIndicesRequest" wsaw:Action="urn:clearIndices"/>
             <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:clearIndicesAnalyticsWebServiceAnalyticsWebServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="publishEvent">
+            <wsdl:input message="ns:publishEventRequest" wsaw:Action="urn:publishEvent"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:publishEventAnalyticsWebServiceAnalyticsWebServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="drillDownSearchCount">
+            <wsdl:input message="ns:drillDownSearchCountRequest" wsaw:Action="urn:drillDownSearchCount"/>
+            <wsdl:output message="ns:drillDownSearchCountResponse" wsaw:Action="urn:drillDownSearchCountResponse"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:drillDownSearchCountAnalyticsWebServiceAnalyticsWebServiceException"/>
         </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="AnalyticsWebServiceSoap11Binding" type="ns:AnalyticsWebServicePortType">
@@ -605,8 +691,32 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="addStreamDefinition">
+            <soap:operation soapAction="urn:addStreamDefinition" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+            <wsdl:fault name="AnalyticsWebServiceMalformedStreamDefinitionException">
+                <soap:fault use="literal" name="AnalyticsWebServiceMalformedStreamDefinitionException"/>
+            </wsdl:fault>
+        </wsdl:operation>
         <wsdl:operation name="waitForIndexing">
             <soap:operation soapAction="urn:waitForIndexing" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="clearIndices">
+            <soap:operation soapAction="urn:clearIndices" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -626,8 +736,8 @@
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="clearIndices">
-            <soap:operation soapAction="urn:clearIndices" style="document"/>
+        <wsdl:operation name="publishEvent">
+            <soap:operation soapAction="urn:publishEvent" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -776,8 +886,32 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="addStreamDefinition">
+            <soap12:operation soapAction="urn:addStreamDefinition" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+            <wsdl:fault name="AnalyticsWebServiceMalformedStreamDefinitionException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceMalformedStreamDefinitionException"/>
+            </wsdl:fault>
+        </wsdl:operation>
         <wsdl:operation name="waitForIndexing">
             <soap12:operation soapAction="urn:waitForIndexing" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="clearIndices">
+            <soap12:operation soapAction="urn:clearIndices" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -797,8 +931,8 @@
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="clearIndices">
-            <soap12:operation soapAction="urn:clearIndices" style="document"/>
+        <wsdl:operation name="publishEvent">
+            <soap12:operation soapAction="urn:publishEvent" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -914,8 +1048,23 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="addStreamDefinition">
+            <http:operation location="addStreamDefinition"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="waitForIndexing">
             <http:operation location="waitForIndexing"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="clearIndices">
+            <http:operation location="clearIndices"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -929,8 +1078,8 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="clearIndices">
-            <http:operation location="clearIndices"/>
+        <wsdl:operation name="publishEvent">
+            <http:operation location="publishEvent"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -938,13 +1087,13 @@
     </wsdl:binding>
     <wsdl:service name="AnalyticsWebService">
         <wsdl:port name="AnalyticsWebServiceHttpsSoap11Endpoint" binding="ns:AnalyticsWebServiceSoap11Binding">
-            <soap:address location="https://10.100.0.46:9443/services/AnalyticsWebService.AnalyticsWebServiceHttpsSoap11Endpoint/"/>
+            <soap:address location="https://10.100.5.97:9443/services/AnalyticsWebService.AnalyticsWebServiceHttpsSoap11Endpoint/"/>
         </wsdl:port>
         <wsdl:port name="AnalyticsWebServiceHttpsSoap12Endpoint" binding="ns:AnalyticsWebServiceSoap12Binding">
-            <soap12:address location="https://10.100.0.46:9443/services/AnalyticsWebService.AnalyticsWebServiceHttpsSoap12Endpoint/"/>
+            <soap12:address location="https://10.100.5.97:9443/services/AnalyticsWebService.AnalyticsWebServiceHttpsSoap12Endpoint/"/>
         </wsdl:port>
         <wsdl:port name="AnalyticsWebServiceHttpsEndpoint" binding="ns:AnalyticsWebServiceHttpBinding">
-            <http:address location="https://10.100.0.46:9443/services/AnalyticsWebService.AnalyticsWebServiceHttpsEndpoint/"/>
+            <http:address location="https://10.100.5.97:9443/services/AnalyticsWebService.AnalyticsWebServiceHttpsEndpoint/"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

@@ -24,7 +24,9 @@ import org.wso2.carbon.analytics.jsservice.beans.ColumnTypeBean;
 import org.wso2.carbon.analytics.jsservice.beans.DrillDownPathBean;
 import org.wso2.carbon.analytics.jsservice.beans.DrillDownRangeBean;
 import org.wso2.carbon.analytics.jsservice.beans.DrillDownRequestBean;
+import org.wso2.carbon.analytics.jsservice.beans.EventBean;
 import org.wso2.carbon.analytics.jsservice.beans.Record;
+import org.wso2.carbon.analytics.jsservice.beans.StreamDefinitionBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsCategoryPathBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsDrillDownRangeBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsDrillDownRequestBean;
@@ -33,6 +35,7 @@ import org.wso2.carbon.analytics.webservice.stub.beans.CategorySearchResultEntry
 import org.wso2.carbon.analytics.webservice.stub.beans.RecordBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.RecordValueEntryBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.SchemaColumnBean;
+import org.wso2.carbon.analytics.webservice.stub.beans.StreamDefAttributeBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.SubCategoriesBean;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -399,5 +402,56 @@ public class Utils {
             throw new UnauthenticatedUserException("Invalid authentication header");
         }
         return credentials;
+    }
+
+    public static org.wso2.carbon.analytics.webservice.stub.beans.StreamDefinitionBean getStreamDefinition(
+            StreamDefinitionBean streamDefinitionBean) {
+        org.wso2.carbon.analytics.webservice.stub.beans.StreamDefinitionBean streamDef =
+                new org.wso2.carbon.analytics.webservice.stub.beans.StreamDefinitionBean();
+        streamDef.setDescription(streamDefinitionBean.getDescription());
+        streamDef.setNickName(streamDefinitionBean.getNickName());
+        streamDef.setName(streamDefinitionBean.getName());
+        streamDef.setVersion(streamDefinitionBean.getVersion());
+        List<String> tags = streamDefinitionBean.getTags();
+        Map<String, String> metaData = streamDefinitionBean.getMetaData();
+        Map<String, String> correlationData = streamDefinitionBean.getCorrelationData();
+        Map<String, String> payloadData = streamDefinitionBean.getPayloadData();
+        if (tags != null) {
+            streamDef.setTags(tags.toArray(new String[tags.size()]));
+        }
+        if (metaData != null) {
+            streamDef.setMetaData(getStreamDefAttributes(metaData));
+        }
+        if (correlationData != null) {
+            streamDef.setCorrelationData(getStreamDefAttributes(correlationData));
+        }
+        if (payloadData != null) {
+            streamDef.setPayloadData(getStreamDefAttributes(payloadData));
+        }
+        return streamDef;
+    }
+
+    private static StreamDefAttributeBean[] getStreamDefAttributes(Map<String, String> metaData) {
+        List<StreamDefAttributeBean> attributeBeans = new ArrayList<>();
+        for (Map.Entry<String, String> entry : metaData.entrySet()) {
+            StreamDefAttributeBean bean = new StreamDefAttributeBean();
+            bean.setName(entry.getKey());
+            bean.setType(entry.getValue());
+            attributeBeans.add(bean);
+        }
+        return attributeBeans.toArray(new StreamDefAttributeBean[metaData.size()]);
+    }
+
+    public static org.wso2.carbon.analytics.webservice.stub.beans.EventBean getStreamEvent(
+            EventBean eventBean) {
+        org.wso2.carbon.analytics.webservice.stub.beans.EventBean bean =
+                new org.wso2.carbon.analytics.webservice.stub.beans.EventBean();
+        bean.setTimeStamp(eventBean.getTimeStamp());
+        bean.setStreamId(eventBean.getStreamId());
+        bean.setMetaData(getRecordValueEntryBeans(eventBean.getMetaData()));
+        bean.setCorrelationData(getRecordValueEntryBeans(eventBean.getCorrelationData()));
+        bean.setPayloadData(getRecordValueEntryBeans(eventBean.getPayloadData()));
+        bean.setArbitraryData(getRecordValueEntryBeans(eventBean.getArbitraryDataMap()));
+        return bean;
     }
 }

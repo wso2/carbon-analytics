@@ -23,11 +23,22 @@ import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsCategoryPathBean;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsSchemaBean;
+import org.wso2.carbon.analytics.webservice.beans.EventBean;
 import org.wso2.carbon.analytics.webservice.beans.RecordBean;
 import org.wso2.carbon.analytics.webservice.beans.RecordValueEntryBean;
 import org.wso2.carbon.analytics.webservice.beans.SchemaColumnBean;
+import org.wso2.carbon.analytics.webservice.beans.StreamDefAttributeBean;
+import org.wso2.carbon.analytics.webservice.beans.StreamDefinitionBean;
+import org.wso2.carbon.analytics.webservice.exception.AnalyticsWebServiceException;
+import org.wso2.carbon.databridge.commons.Attribute;
+import org.wso2.carbon.databridge.commons.AttributeType;
+import org.wso2.carbon.databridge.commons.Event;
+import org.wso2.carbon.databridge.commons.StreamDefinition;
+import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +46,6 @@ import java.util.Map;
  * This class represents a set of utility functionalities for the analytics REST API.
  */
 public class Utils {
-
     /**
      * Gets the records from record beans.
      *
@@ -354,5 +364,137 @@ public class Utils {
             }
         }
         return recordValueEntryBean;
+    }
+
+    /**
+     * Gets the streamDefinition object from stream definition bean class
+     * @param streamDefinitionBean The streamDefinition bean class
+     * @return The converted StreamDefinition object.
+     * @throws MalformedStreamDefinitionException
+     * @throws AnalyticsWebServiceException
+     */
+    public static StreamDefinition getStreamDefinition(StreamDefinitionBean streamDefinitionBean)
+            throws MalformedStreamDefinitionException, AnalyticsWebServiceException {
+        String name = streamDefinitionBean.getName();
+        String version = streamDefinitionBean.getVersion();
+        StreamDefinition streamDefinition;
+        if (name != null && version != null) {
+            streamDefinition = new StreamDefinition(name, version);
+        } else if (name != null) {
+            streamDefinition = new StreamDefinition(name);
+        } else {
+            throw new AnalyticsWebServiceException("Stream name cannot be empty!");
+        }
+        streamDefinition.setNickName(streamDefinitionBean.getNickName());
+        streamDefinition.setDescription(streamDefinitionBean.getDescription());
+        streamDefinition.setCorrelationData(getAttributeData(streamDefinitionBean.getCorrelationData()));
+        streamDefinition.setMetaData(getAttributeData(streamDefinitionBean.getMetaData()));
+        streamDefinition.setPayloadData(getAttributeData(streamDefinitionBean.getPayloadData()));
+        if (streamDefinitionBean.getTags() != null) {
+            streamDefinition.setTags(Arrays.asList(streamDefinitionBean.getTags()));
+        }
+        return  streamDefinition;
+    }
+
+    private static List<Attribute> getAttributeData(StreamDefAttributeBean[] attributeBeans) throws AnalyticsWebServiceException{
+        List<Attribute> attributes = new ArrayList<>();
+        if (attributeBeans != null) {
+            for (StreamDefAttributeBean bean : attributeBeans) {
+                Attribute attribute = new Attribute(bean.getName(), getAttributeType(bean.getType()));
+                attributes.add(attribute);
+            }
+        }
+        return attributes;
+    }
+
+    private static AttributeType getAttributeType(String type) throws AnalyticsWebServiceException {
+        if (type != null) {
+            switch (type) {
+                case "STRING" : {
+                    return AttributeType.STRING;
+                }
+                case "BOOLEAN" : {
+                    return AttributeType.BOOL;
+                }
+                case "FLOAT" : {
+                    return AttributeType.FLOAT;
+                }
+                case "DOUBLE" : {
+                    return AttributeType.DOUBLE;
+                }
+                case "INTEGER" : {
+                    return AttributeType.INT;
+                }
+                case "LONG" : {
+                    return AttributeType.LONG;
+                }
+                default: {
+                    throw new AnalyticsWebServiceException("Unkown type found while reading stream definition bean.");
+                }
+            }
+        } else {
+            throw new AnalyticsWebServiceException("Type is not defined.");
+        }
+    }
+
+    public static Event getEvent(EventBean eventBean)
+            throws AnalyticsWebServiceException {
+        Event event = new Event();
+        event.setStreamId(eventBean.getStreamId());
+        event.setTimeStamp(eventBean.getTimeStamp());
+        event.setMetaData(getEventData(eventBean.getMetaData()));
+        event.setCorrelationData(getEventData(eventBean.getCorrelationData()));
+        event.setPayloadData(getEventData(eventBean.getPayloadData()));
+        event.setArbitraryDataMap(getArbitraryValues(eventBean.getArbitraryData()));
+        return  event;
+    }
+
+    private static Map<String, String> getArbitraryValues(RecordValueEntryBean[] arbitraryData) {
+        Map<String, String> arbitraryDataMap = new HashMap<>();
+        if (arbitraryData != null) {
+            for (RecordValueEntryBean bean : arbitraryData) {
+                arbitraryDataMap.put(bean.getFieldName(), bean.getStringValue());
+            }
+        }
+        if (arbitraryDataMap.isEmpty()) {
+            return null;
+        }
+        return arbitraryDataMap;
+    }
+
+    private static Object[] getEventData(RecordValueEntryBean[] valueEntryBeans)
+            throws AnalyticsWebServiceException {
+        List<Object> values = new ArrayList<>();
+        if (valueEntryBeans != null) {
+            for (RecordValueEntryBean bean : valueEntryBeans) {
+                if (bean == null) {
+                    values.add(Constants.STR_NULL);
+                } else {
+                    switch (bean.getType()) {
+                        case RecordValueEntryBean.INTEGER:
+                            values.add(bean.getIntValue());
+                            break;
+                        case RecordValueEntryBean.DOUBLE:
+                            values.add(bean.getDoubleValue());
+                            break;
+                        case RecordValueEntryBean.FLOAT:
+                            values.add(bean.getFloatValue());
+                            break;
+                        case RecordValueEntryBean.BOOLEAN:
+                            values.add(bean.getBooleanValue());
+                            break;
+                        case RecordValueEntryBean.LONG:
+                            values.add(bean.getLongValue());
+                            break;
+                        case RecordValueEntryBean.STRING:
+                            values.add(bean.getStringValue());
+                            break;
+                        default:
+                            throw new AnalyticsWebServiceException("Unkown data type found while reading event bean");
+                    }
+                }
+            }
+        }
+        return values.toArray(new Object[values.size()]);
     }
 }
