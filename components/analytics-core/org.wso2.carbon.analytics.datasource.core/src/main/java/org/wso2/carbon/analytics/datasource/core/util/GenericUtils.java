@@ -171,12 +171,12 @@ public class GenericUtils {
         boolean boolVal;
         byte[] binData;
         try {
-            buffer.putInt(name.length());
+            buffer.putInt(name.getBytes(DEFAULT_CHARSET).length);
             buffer.put(name.getBytes(DEFAULT_CHARSET));
             if (value instanceof String) {
                 buffer.put(DATA_TYPE_STRING);
                 strVal = (String) value;
-                buffer.putInt(strVal.length());
+                buffer.putInt(strVal.getBytes(DEFAULT_CHARSET).length);
                 buffer.put(strVal.getBytes(DEFAULT_CHARSET));
             } else if (value instanceof Long) {
                 buffer.put(DATA_TYPE_LONG);
