@@ -172,8 +172,10 @@
                                                     <%
                                                     } else {
                                                     %>
-                                                    CARBON.showErrorDialog("No Tables exists in the analytics data
-                                                    store.");
+                                                    <script type="text/javascript">
+                                                        CARBON.showErrorDialog("No Tables exists in the analytics data store.",customCarbonWindowClose,
+                                                                customCarbonWindowClose );
+                                                    </script>
                                                     <%
                                                         }
                                                     %>
