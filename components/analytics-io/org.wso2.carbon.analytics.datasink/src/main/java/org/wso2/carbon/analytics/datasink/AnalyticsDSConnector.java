@@ -17,12 +17,14 @@
 */
 package org.wso2.carbon.analytics.datasink;
 
+import com.google.gson.Gson;
 import org.wso2.carbon.analytics.datasink.internal.util.AnalyticsDatasinkConstants;
 import org.wso2.carbon.analytics.datasink.internal.util.ServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
@@ -34,6 +36,11 @@ import java.util.*;
  * Analytics data service connector which actually makes the interacts with DS.
  */
 public class AnalyticsDSConnector {
+    private Gson gson;
+
+    public AnalyticsDSConnector() {
+        gson = new Gson();
+    }
 
     public void addStream(int tenantId, StreamDefinition streamDefinition) throws AnalyticsException {
         String tableName = generateTableName(streamDefinition);
@@ -88,27 +95,31 @@ public class AnalyticsDSConnector {
     }
 
     private List<Record> convertEventsToRecord(int tenantId, List<Event> events)
-            throws StreamDefinitionStoreException {
+            throws StreamDefinitionStoreException, AnalyticsException {
         List<Record> records = new ArrayList<>();
         for (Event event : events) {
             long timestamp;
             StreamDefinition streamDefinition = ServiceHolder.getStreamDefinitionStoreService().
                     getStreamDefinition(event.getStreamId(), tenantId);
+            String tableName = generateTableName(streamDefinition);
+            AnalyticsSchema analyticsSchema = ServiceHolder.getAnalyticsDataService().getTableSchema(tenantId, tableName);
             Map<String, Object> eventAttributes = new HashMap<>();
-            populateCommonAttributes(streamDefinition, eventAttributes);
-            populateTypedAttributes(AnalyticsDatasinkConstants.EVENT_META_DATA_TYPE,
+            populateCommonAttributes(streamDefinition, analyticsSchema, eventAttributes);
+            populateTypedAttributes(analyticsSchema, AnalyticsDatasinkConstants.EVENT_META_DATA_TYPE,
                     streamDefinition.getMetaData(),
                     event.getMetaData(), eventAttributes);
-            populateTypedAttributes(AnalyticsDatasinkConstants.EVENT_CORRELATION_DATA_TYPE,
+            populateTypedAttributes(analyticsSchema, AnalyticsDatasinkConstants.EVENT_CORRELATION_DATA_TYPE,
                     streamDefinition.getCorrelationData(),
                     event.getCorrelationData(), eventAttributes);
-            populateTypedAttributes(null,
+            populateTypedAttributes(analyticsSchema, null,
                     streamDefinition.getPayloadData(),
                     event.getPayloadData(), eventAttributes);
 
             if (event.getArbitraryDataMap() != null && !event.getArbitraryDataMap().isEmpty()) {
                 for (String attributeName : event.getArbitraryDataMap().keySet()) {
-                    eventAttributes.put("_" + attributeName, event.getArbitraryDataMap().get(attributeName));
+                    String attributeKey = "_" + attributeName;
+                    eventAttributes.put(attributeKey, getRecordValue(analyticsSchema, attributeKey,
+                            event.getArbitraryDataMap().get(attributeName)));
                 }
             }
             if (event.getTimeStamp() != 0L) {
@@ -117,13 +128,13 @@ public class AnalyticsDSConnector {
                 timestamp = System.currentTimeMillis();
             }
 
-            Record record = new Record(tenantId, generateTableName(streamDefinition), eventAttributes, timestamp);
+            Record record = new Record(tenantId, tableName, eventAttributes, timestamp);
             records.add(record);
         }
         return records;
     }
 
-    private void populateTypedAttributes(String type, List<Attribute> attributes, Object[] values,
+    private void populateTypedAttributes(AnalyticsSchema schema, String type, List<Attribute> attributes, Object[] values,
                                          Map<String, Object> eventAttribute) {
         if (attributes == null) {
             return;
@@ -131,7 +142,7 @@ public class AnalyticsDSConnector {
         int iteration = 0;
         for (Attribute attribute : attributes) {
             String attributeKey = getAttributeKey(type, attribute.getName());
-            eventAttribute.put(attributeKey, values[iteration]);
+            eventAttribute.put(attributeKey, getRecordValue(schema, attributeKey, values[iteration]));
             iteration++;
         }
     }
@@ -178,11 +189,41 @@ public class AnalyticsDSConnector {
         }
     }
 
-    private void populateCommonAttributes(StreamDefinition streamDefinition, Map<String, Object> eventAttributes) {
-        eventAttributes.put(AnalyticsDatasinkConstants.STREAM_VERSION_KEY, streamDefinition.getVersion());
+    private void populateCommonAttributes(StreamDefinition streamDefinition, AnalyticsSchema schema,
+                                          Map<String, Object> eventAttributes) {
+        eventAttributes.put(AnalyticsDatasinkConstants.STREAM_VERSION_KEY, getRecordValue(schema,
+                AnalyticsDatasinkConstants.STREAM_VERSION_KEY, streamDefinition.getVersion()));
     }
 
     public void deleteStream(int tenantId, StreamDefinition streamDefinition) throws AnalyticsException {
         ServiceHolder.getAnalyticsDataService().deleteTable(tenantId, generateTableName(streamDefinition));
+    }
+
+    private Object getRecordValue(AnalyticsSchema schema, String fieldName, Object fieldValue) {
+        if (fieldValue instanceof String) {
+            String fieldStrValue = (String) fieldValue;
+            ColumnDefinition columnDefinition = schema.getColumns().get(fieldName);
+            if (columnDefinition != null) {
+                switch (columnDefinition.getType()) {
+                    case FACET:
+                        return gson.fromJson(fieldStrValue, List.class);
+                    case STRING:
+                        return fieldStrValue;
+                    case BINARY:
+                        return GenericUtils.serializeObject(fieldStrValue);
+                    case BOOLEAN:
+                        return Boolean.parseBoolean(fieldStrValue);
+                    case DOUBLE:
+                        return Double.parseDouble(fieldStrValue);
+                    case FLOAT:
+                        return Float.parseFloat(fieldStrValue);
+                    case INTEGER:
+                        return Integer.parseInt(fieldStrValue);
+                    case LONG:
+                        return Long.parseLong(fieldStrValue);
+                }
+            }
+        }
+        return fieldValue;
     }
 }
