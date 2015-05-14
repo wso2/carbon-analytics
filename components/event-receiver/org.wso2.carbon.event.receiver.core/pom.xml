@@ -47,7 +47,7 @@
             <artifactId>org.wso2.carbon.event.input.adapter.core</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.google.guava.wso2</groupId>
+            <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
         <dependency>
