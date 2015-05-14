@@ -1,0 +1,308 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://admin.activitydashboard.analytics.carbon.wso2.org" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:ax25="http://bean.admin.activitydashboard.analytics.carbon.wso2.org/xsd" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ax23="http://admin.activitydashboard.analytics.carbon.wso2.org/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://admin.activitydashboard.analytics.carbon.wso2.org">
+    <wsdl:documentation>ActivityDashboardAdminService</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://admin.activitydashboard.analytics.carbon.wso2.org/xsd">
+            <xs:complexType name="ActivityDashboardException">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="errorMessage" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://bean.admin.activitydashboard.analytics.carbon.wso2.org/xsd">
+            <xs:complexType name="ActivitySearchRequest">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="fromTime" type="xs:long"/>
+                    <xs:element minOccurs="0" name="searchTreeExpression" nillable="true" type="xs:base64Binary"/>
+                    <xs:element minOccurs="0" name="toTime" type="xs:long"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="RecordId">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="fullQualifiedId" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="recordId" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="RecordBean">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="columnEntries" nillable="true" type="ax25:ColumnEntry"/>
+                    <xs:element minOccurs="0" name="id" nillable="true" type="ax25:RecordId"/>
+                    <xs:element minOccurs="0" name="timeStamp" type="xs:long"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ColumnEntry">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="value" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema xmlns:ax26="http://bean.admin.activitydashboard.analytics.carbon.wso2.org/xsd" xmlns:ax24="http://admin.activitydashboard.analytics.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://admin.activitydashboard.analytics.carbon.wso2.org">
+            <xs:import namespace="http://admin.activitydashboard.analytics.carbon.wso2.org/xsd"/>
+            <xs:import namespace="http://bean.admin.activitydashboard.analytics.carbon.wso2.org/xsd"/>
+            <xs:element name="ActivityDashboardAdminServiceActivityDashboardException">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="ActivityDashboardException" nillable="true" type="ax23:ActivityDashboardException"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getActivities">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="activitySearchRequest" nillable="true" type="ax25:ActivitySearchRequest"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getActivitiesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getRecord">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="id" nillable="true" type="ax25:RecordId"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getRecordResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax25:RecordBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getRecordIds">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="activityId" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="searchTableNames" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getRecordIdsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax25:RecordId"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllTables">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllTablesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="getRecordIdsRequest">
+        <wsdl:part name="parameters" element="ns:getRecordIds"/>
+    </wsdl:message>
+    <wsdl:message name="getRecordIdsResponse">
+        <wsdl:part name="parameters" element="ns:getRecordIdsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="ActivityDashboardAdminServiceActivityDashboardException">
+        <wsdl:part name="parameters" element="ns:ActivityDashboardAdminServiceActivityDashboardException"/>
+    </wsdl:message>
+    <wsdl:message name="getActivitiesRequest">
+        <wsdl:part name="parameters" element="ns:getActivities"/>
+    </wsdl:message>
+    <wsdl:message name="getActivitiesResponse">
+        <wsdl:part name="parameters" element="ns:getActivitiesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getAllTablesRequest">
+        <wsdl:part name="parameters" element="ns:getAllTables"/>
+    </wsdl:message>
+    <wsdl:message name="getAllTablesResponse">
+        <wsdl:part name="parameters" element="ns:getAllTablesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getRecordRequest">
+        <wsdl:part name="parameters" element="ns:getRecord"/>
+    </wsdl:message>
+    <wsdl:message name="getRecordResponse">
+        <wsdl:part name="parameters" element="ns:getRecordResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="ActivityDashboardAdminServicePortType">
+        <wsdl:operation name="getRecordIds">
+            <wsdl:input message="ns:getRecordIdsRequest" wsaw:Action="urn:getRecordIds"/>
+            <wsdl:output message="ns:getRecordIdsResponse" wsaw:Action="urn:getRecordIdsResponse"/>
+            <wsdl:fault message="ns:ActivityDashboardAdminServiceActivityDashboardException" name="ActivityDashboardAdminServiceActivityDashboardException" wsaw:Action="urn:getRecordIdsActivityDashboardAdminServiceActivityDashboardException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getActivities">
+            <wsdl:input message="ns:getActivitiesRequest" wsaw:Action="urn:getActivities"/>
+            <wsdl:output message="ns:getActivitiesResponse" wsaw:Action="urn:getActivitiesResponse"/>
+            <wsdl:fault message="ns:ActivityDashboardAdminServiceActivityDashboardException" name="ActivityDashboardAdminServiceActivityDashboardException" wsaw:Action="urn:getActivitiesActivityDashboardAdminServiceActivityDashboardException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getAllTables">
+            <wsdl:input message="ns:getAllTablesRequest" wsaw:Action="urn:getAllTables"/>
+            <wsdl:output message="ns:getAllTablesResponse" wsaw:Action="urn:getAllTablesResponse"/>
+            <wsdl:fault message="ns:ActivityDashboardAdminServiceActivityDashboardException" name="ActivityDashboardAdminServiceActivityDashboardException" wsaw:Action="urn:getAllTablesActivityDashboardAdminServiceActivityDashboardException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getRecord">
+            <wsdl:input message="ns:getRecordRequest" wsaw:Action="urn:getRecord"/>
+            <wsdl:output message="ns:getRecordResponse" wsaw:Action="urn:getRecordResponse"/>
+            <wsdl:fault message="ns:ActivityDashboardAdminServiceActivityDashboardException" name="ActivityDashboardAdminServiceActivityDashboardException" wsaw:Action="urn:getRecordActivityDashboardAdminServiceActivityDashboardException"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="ActivityDashboardAdminServiceSoap11Binding" type="ns:ActivityDashboardAdminServicePortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="getRecordIds">
+            <soap:operation soapAction="urn:getRecordIds" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ActivityDashboardAdminServiceActivityDashboardException">
+                <soap:fault use="literal" name="ActivityDashboardAdminServiceActivityDashboardException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getActivities">
+            <soap:operation soapAction="urn:getActivities" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ActivityDashboardAdminServiceActivityDashboardException">
+                <soap:fault use="literal" name="ActivityDashboardAdminServiceActivityDashboardException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getAllTables">
+            <soap:operation soapAction="urn:getAllTables" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ActivityDashboardAdminServiceActivityDashboardException">
+                <soap:fault use="literal" name="ActivityDashboardAdminServiceActivityDashboardException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getRecord">
+            <soap:operation soapAction="urn:getRecord" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ActivityDashboardAdminServiceActivityDashboardException">
+                <soap:fault use="literal" name="ActivityDashboardAdminServiceActivityDashboardException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="ActivityDashboardAdminServiceSoap12Binding" type="ns:ActivityDashboardAdminServicePortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="getRecordIds">
+            <soap12:operation soapAction="urn:getRecordIds" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ActivityDashboardAdminServiceActivityDashboardException">
+                <soap12:fault use="literal" name="ActivityDashboardAdminServiceActivityDashboardException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getActivities">
+            <soap12:operation soapAction="urn:getActivities" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ActivityDashboardAdminServiceActivityDashboardException">
+                <soap12:fault use="literal" name="ActivityDashboardAdminServiceActivityDashboardException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getAllTables">
+            <soap12:operation soapAction="urn:getAllTables" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ActivityDashboardAdminServiceActivityDashboardException">
+                <soap12:fault use="literal" name="ActivityDashboardAdminServiceActivityDashboardException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getRecord">
+            <soap12:operation soapAction="urn:getRecord" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ActivityDashboardAdminServiceActivityDashboardException">
+                <soap12:fault use="literal" name="ActivityDashboardAdminServiceActivityDashboardException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="ActivityDashboardAdminServiceHttpBinding" type="ns:ActivityDashboardAdminServicePortType">
+        <http:binding verb="POST"/>
+        <wsdl:operation name="getRecordIds">
+            <http:operation location="getRecordIds"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActivities">
+            <http:operation location="getActivities"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllTables">
+            <http:operation location="getAllTables"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getRecord">
+            <http:operation location="getRecord"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="ActivityDashboardAdminService">
+        <wsdl:port name="ActivityDashboardAdminServiceHttpsSoap11Endpoint" binding="ns:ActivityDashboardAdminServiceSoap11Binding">
+            <soap:address location="https://10.100.1.138:9443/services/ActivityDashboardAdminService.ActivityDashboardAdminServiceHttpsSoap11Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="ActivityDashboardAdminServiceHttpsSoap12Endpoint" binding="ns:ActivityDashboardAdminServiceSoap12Binding">
+            <soap12:address location="https://10.100.1.138:9443/services/ActivityDashboardAdminService.ActivityDashboardAdminServiceHttpsSoap12Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="ActivityDashboardAdminServiceHttpsEndpoint" binding="ns:ActivityDashboardAdminServiceHttpBinding">
+            <http:address location="https://10.100.1.138:9443/services/ActivityDashboardAdminService.ActivityDashboardAdminServiceHttpsEndpoint/"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
