@@ -16,7 +16,7 @@
 <eventProcessingConfig>
 
     <processing mode="SingleNode">
-        <persistence enable="true">
+        <persistence enable="false">
             <persistenceIntervalInMillis>10000</persistenceIntervalInMillis>
             <persisterSchedulerPoolSize>10</persisterSchedulerPoolSize>
             <persister class="org.wso2.carbon.event.processor.core.internal.persistence.FileSystemPersistenceStore">
