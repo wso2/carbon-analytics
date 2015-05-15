@@ -54,6 +54,15 @@ public class JMSEventAdapterFactory extends OutputEventAdapterFactory {
         initialContextProperty.setHint(resourceBundle.getString(
                 JMSEventAdapterConstants.JNDI_INITIAL_CONTEXT_FACTORY_CLASS_HINT));
 
+        // Connection Factory JNDI Name
+        Property connectionFactoryNameProperty = new Property(
+                JMSEventAdapterConstants.ADAPTER_JMS_CONNECTION_FACTORY_JNDINAME);
+        connectionFactoryNameProperty.setRequired(true);
+        connectionFactoryNameProperty.setDisplayName(
+                resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_JMS_CONNECTION_FACTORY_JNDINAME));
+        connectionFactoryNameProperty.setHint(resourceBundle.getString(
+                JMSEventAdapterConstants.ADAPTER_JMS_CONNECTION_FACTORY_JNDINAME_HINT));
+
         // JNDI Provider URL
         Property javaNamingProviderUrlProperty = new Property(JMSEventAdapterConstants.JAVA_NAMING_PROVIDER_URL);
         javaNamingProviderUrlProperty.setDisplayName(
@@ -73,14 +82,6 @@ public class JMSEventAdapterFactory extends OutputEventAdapterFactory {
         passwordProperty.setDisplayName(
                 resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_JMS_PASSWORD));
 
-        // Connection Factory JNDI Name
-        Property connectionFactoryNameProperty = new Property(
-                JMSEventAdapterConstants.ADAPTER_JMS_CONNECTION_FACTORY_JNDINAME);
-        connectionFactoryNameProperty.setRequired(true);
-        connectionFactoryNameProperty.setDisplayName(
-                resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_JMS_CONNECTION_FACTORY_JNDINAME));
-        connectionFactoryNameProperty.setHint(resourceBundle.getString(
-                JMSEventAdapterConstants.ADAPTER_JMS_CONNECTION_FACTORY_JNDINAME_HINT));
 
         // Destination Type
         Property destinationTypeProperty = new Property(JMSEventAdapterConstants.ADAPTER_JMS_DESTINATION_TYPE);
@@ -91,6 +92,8 @@ public class JMSEventAdapterFactory extends OutputEventAdapterFactory {
         destinationTypeProperty.setDefaultValue("topic");
         destinationTypeProperty.setHint(resourceBundle.getString(
                 JMSEventAdapterConstants.ADAPTER_JMS_DESTINATION_TYPE_HINT));
+
+        //TODO, Move the topic to message property
 
         // Topic
         Property topicProperty = new Property(JMSEventAdapterConstants.ADAPTER_JMS_DESTINATION);

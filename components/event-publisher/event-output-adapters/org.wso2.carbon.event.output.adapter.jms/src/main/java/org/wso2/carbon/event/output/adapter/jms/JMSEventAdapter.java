@@ -42,6 +42,8 @@ public class JMSEventAdapter implements OutputEventAdapter {
 
     private PublisherDetails publisherDetails = null;
 
+    //TODO, Have a threadpool to publish events
+
     public JMSEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
                            Map<String, String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;

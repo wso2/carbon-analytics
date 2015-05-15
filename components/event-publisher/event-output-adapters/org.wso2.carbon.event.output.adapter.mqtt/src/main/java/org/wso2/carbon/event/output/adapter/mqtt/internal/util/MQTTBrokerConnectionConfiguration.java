@@ -62,6 +62,7 @@ public class MQTTBrokerConnectionConfiguration {
         return keepAlive;
     }
 
+    //TODO, move the keepalive to global
     public void setKeepAlive(int keepAlive) {
         this.keepAlive = keepAlive;
     }

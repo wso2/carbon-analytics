@@ -109,9 +109,9 @@ public class KafkaEventAdapter implements OutputEventAdapter {
             if (optionalProperties != null && optionalProperties.length > 0) {
                 for (String header : optionalProperties) {
                     String[] configPropertyWithValue = header.split(":");
-                    if(configPropertyWithValue.length == 2){
+                    if (configPropertyWithValue.length == 2) {
                         props.put(configPropertyWithValue[0], configPropertyWithValue[1]);
-                    }else {
+                    } else {
                         log.warn("Optional configuration property not defined in the correct format");
                     }
                 }
@@ -120,21 +120,24 @@ public class KafkaEventAdapter implements OutputEventAdapter {
 
         config = new ProducerConfig(props);
         producer = new Producer<String, Object>(config);
-       try {
-           String testTopic = "org.wso2.carbon.event.output.adapter.kafka.test";
+        try {
+            String testTopic = "org.wso2.carbon.event.output.adapter.kafka.test";
 
-           ZkClient zkClient = new ZkClient("localhost:2181", 10000, 10000, ZKStringSerializer$.MODULE$);
-           AdminUtils.createTopic(zkClient, testTopic, 10, 1, new Properties());
+            //TODO, move session timeout and others to global properties
+            //move zkclient host to adapter properties localhost:2181
 
-           KeyedMessage<String, Object> data = new KeyedMessage<String, Object>(testTopic,"Successfully connected to kafka server");
-           producer.send(data);
+            ZkClient zkClient = new ZkClient("localhost:2181", 10000, 10000, ZKStringSerializer$.MODULE$);
+            AdminUtils.createTopic(zkClient, testTopic, 10, 1, new Properties());
 
-        }catch(kafka.common.TopicExistsException e){
-           log.info("test topic already created.");
-        }catch (Exception e){
-           throw new OutputEventAdapterRuntimeException("The adaptor "+eventAdapterConfiguration.getName()+" failed to connect to the kafka server "
-                   ,e);
-       }
+            KeyedMessage<String, Object> data = new KeyedMessage<String, Object>(testTopic, "Successfully connected to kafka server");
+            producer.send(data);
+
+        } catch (kafka.common.TopicExistsException e) {
+            log.info("test topic already created.", e);
+        } catch (Exception e) {
+            throw new OutputEventAdapterRuntimeException("The adaptor " + eventAdapterConfiguration.getName() + " failed to connect to the kafka server "
+                    , e);
+        }
 
 
     }
@@ -144,14 +147,14 @@ public class KafkaEventAdapter implements OutputEventAdapter {
 
         String topic = dynamicProperties.get(KafkaEventAdapterConstants.ADAPTOR_PUBLISH_TOPIC);
 
-        KeyedMessage<String, Object> data = new KeyedMessage<String, Object>(topic,message.toString());
+        KeyedMessage<String, Object> data = new KeyedMessage<String, Object>(topic, message.toString());
         producer.send(data);
     }
 
     @Override
     public void disconnect() {
         //close producer
-        if(producer != null){
+        if (producer != null) {
             producer.close();
         }
     }

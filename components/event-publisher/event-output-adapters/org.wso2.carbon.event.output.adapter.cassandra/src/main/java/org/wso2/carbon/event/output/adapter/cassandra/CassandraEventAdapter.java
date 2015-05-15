@@ -46,6 +46,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 
+//TODO : Check property lists
 public class CassandraEventAdapter implements OutputEventAdapter {
 
     private static final Log log = LogFactory.getLog(CassandraEventAdapter.class);
@@ -62,7 +63,9 @@ public class CassandraEventAdapter implements OutputEventAdapter {
     private EventAdapterInfo eventAdapterInfo;
     private MessageInfo messageInfo;
 
-
+    //TODO remove the map
+    //TODO add the properties to global configuration
+    //TODO Create a handler or check possiblity of handling rejected exception  and manage the drop
     public CassandraEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
                                  Map<String, String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
@@ -206,6 +209,7 @@ public class CassandraEventAdapter implements OutputEventAdapter {
                     ColumnFamilyDefinition cfDef = new ThriftCfDef(
                             columnFamilyDefinition);
 
+                    // TODO, move org.apache.cassandra.locator.SimpleStrategy, replication factor to global properties
                     KeyspaceDefinition keyspaceDefinition = HFactory
                             .createKeyspaceDefinition(keySpaceName,
                                     "org.apache.cassandra.locator.SimpleStrategy", 1,

@@ -40,6 +40,5 @@ public class JMSEventAdapterConstants {
     public static final String ADAPTER_JMS_DESTINATION_HINT = "transport.jms.Destination.hint";
     public static final int AXIS_TIME_INTERVAL_IN_MILLISECONDS = 10000;
 
-    public static final String ADAPTER_JMS_IS_EVENT_DUPLICATED_IN_CLUSTER = "receiving.events.duplicated.in.cluster";
 
 }

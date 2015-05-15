@@ -19,6 +19,7 @@ package org.wso2.carbon.event.input.adapter.jms;
 
 import org.apache.axis2.transport.base.threads.NativeWorkerPool;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.event.input.adapter.core.EventAdapterConstants;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapter;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterConfiguration;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
@@ -223,7 +224,7 @@ public class JMSEventAdapter implements InputEventAdapter {
     @Override
     public boolean isEventDuplicatedInCluster() {
         //TODO : only based on detination type. Remove from adapter properties
-        return Boolean.parseBoolean(eventAdapterConfiguration.getProperties().get("receiving.events.duplicated.in.cluster"));
+        return Boolean.parseBoolean(eventAdapterConfiguration.getProperties().get(EventAdapterConstants.EVENTS_DUPLICATED_IN_CLUSTER));
     }
 
     @Override

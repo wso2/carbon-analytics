@@ -40,9 +40,9 @@ public class WSO2EventEventAdapterFactory extends InputEventAdapterFactory {
     public List<Property> getPropertyList() {
         List<Property> propertyList = new ArrayList<Property>();
 
-        Property isDuplicatedInCluster = new Property(WSO2EventAdapterConstants.ADAPTER_IS_EVENTS_DUPLICATED_IN_CLUSTER);
+        Property isDuplicatedInCluster = new Property(EventAdapterConstants.EVENTS_DUPLICATED_IN_CLUSTER);
         isDuplicatedInCluster.setDisplayName(
-                resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_IS_EVENTS_DUPLICATED_IN_CLUSTER));
+                resourceBundle.getString(EventAdapterConstants.EVENTS_DUPLICATED_IN_CLUSTER));
         isDuplicatedInCluster.setRequired(false);
         isDuplicatedInCluster.setHint(resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_IS_EVENTS_DUPLICATED_IN_CLUSTER_HINT));
         isDuplicatedInCluster.setOptions(new String[]{"true", "false"});

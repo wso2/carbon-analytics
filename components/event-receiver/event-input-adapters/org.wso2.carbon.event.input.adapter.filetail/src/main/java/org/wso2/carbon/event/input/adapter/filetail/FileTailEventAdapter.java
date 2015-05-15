@@ -20,6 +20,7 @@ package org.wso2.carbon.event.input.adapter.filetail;
 import org.apache.commons.io.input.Tailer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.event.input.adapter.core.EventAdapterConstants;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapter;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterConfiguration;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
@@ -121,8 +122,7 @@ public class FileTailEventAdapter implements InputEventAdapter {
 
     @Override
     public boolean isEventDuplicatedInCluster() {
-        //TODO : events.duplicated.in.cluster , move to adapter core constants
-        return Boolean.parseBoolean(globalProperties.get("events.duplicated.in.cluster"));
+        return Boolean.parseBoolean(globalProperties.get(EventAdapterConstants.EVENTS_DUPLICATED_IN_CLUSTER));
     }
 
     @Override
