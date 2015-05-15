@@ -76,8 +76,8 @@ public class EventProcessingAppDeployer implements AppDeploymentHandler {
         } catch (Exception e) {
             try {
                 undeployArtifacts(carbonApp,axisConfig);
-            }catch (Exception _e) {
-                throw new DeploymentException(_e.getMessage(),_e);
+            } catch (Exception _e) {
+                //ignore
             }
             throw new DeploymentException(e.getMessage(),e);
         } finally {
@@ -165,7 +165,8 @@ public class EventProcessingAppDeployer implements AppDeploymentHandler {
             EventProcessingDeployer deployer;
             deployer = (EventProcessingDeployer)AppDeployerUtils.getArtifactDeployer(axisConfig,
                     directory, fileType);
-            if(deployer!=null) {
+            if(deployer!=null && AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED.
+                    equals(artifact.getDeploymentStatus())) {
                 undeploy(deployer, artifact);
             }
         }
@@ -177,7 +178,7 @@ public class EventProcessingAppDeployer implements AppDeploymentHandler {
         String artifactPath = artifact.getExtractedPath() + File.separator + fileName;
         try {
             deployer.processUndeployment(new DeploymentFileData(new File(artifactPath), deployer).getAbsolutePath());
-            artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED);
+            artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_PENDING);
         } catch (Exception e) {
             artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_FAILED);
             log.error("Undeployment is failed due to " + e.getMessage(), e);
