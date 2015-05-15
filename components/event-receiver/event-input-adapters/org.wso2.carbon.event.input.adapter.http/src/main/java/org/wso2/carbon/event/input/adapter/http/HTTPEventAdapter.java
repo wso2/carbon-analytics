@@ -31,6 +31,7 @@ import org.wso2.carbon.event.input.adapter.http.internal.util.HTTPEventAdapterCo
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.servlet.ServletException;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.UUID;
@@ -171,7 +172,7 @@ public final class HTTPEventAdapter implements InputEventAdapter {
         try {
             HttpService httpService = HTTPEventAdapterServiceValueHolder.getHTTPService();
             httpService.registerServlet(endpoint,
-                    new HTTPMessageServlet(eventAdaptorListener, tenantId),
+                    new HTTPMessageServlet(eventAdaptorListener, tenantId, eventAdapterConfiguration.getProperties().get(HTTPEventAdapterConstants.EXPOSED_TRANSPORTS)),
                     new Hashtable(),
                     httpService.createDefaultHttpContext());
         } catch (ServletException | NamespaceException e) {

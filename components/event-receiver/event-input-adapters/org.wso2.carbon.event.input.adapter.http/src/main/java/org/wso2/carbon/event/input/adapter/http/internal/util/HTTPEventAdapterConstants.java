@@ -32,6 +32,11 @@ public final class HTTPEventAdapterConstants {
     public static final String ADAPTER_MAX_THREAD_POOL_SIZE_NAME = "maxThread";
     public static final String DEFAULT_KEEP_ALIVE_TIME_NAME = "defaultKeepAliveTimeInMillis";
     public static final String ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME = "jobQueueSize";
+    public static final String EXPOSED_TRANSPORTS = "transports";
+    public static final String HTTPS = "https";
+    public static final String HTTP = "http";
+    public static final String LOCAL = "local";
+    public static final String ALL = "all";
 
 
 }
