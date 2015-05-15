@@ -41,6 +41,8 @@ public class HTTPEventAdapterFactory extends InputEventAdapterFactory {
 
     @Override
     public List<Property> getPropertyList() {
+
+        //TODO : Check for possibility of adding http, https
         return null;
     }
 

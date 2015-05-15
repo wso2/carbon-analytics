@@ -43,8 +43,7 @@ public class WebsocketClient extends Endpoint {
     }
 
     @Override
-    public void onOpen(Session session, EndpointConfig EndpointConfig) {
-        final EndpointConfig endpointConfig = EndpointConfig;
+    public void onOpen(Session session, EndpointConfig endpointConfig) {
         session.addMessageHandler(new MessageHandler.Whole<String>() {
             @Override
             public void onMessage(String message) {

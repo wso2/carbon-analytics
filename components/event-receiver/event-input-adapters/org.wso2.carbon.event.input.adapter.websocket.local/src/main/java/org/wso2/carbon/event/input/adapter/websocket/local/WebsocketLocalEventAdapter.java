@@ -44,7 +44,7 @@ public class WebsocketLocalEventAdapter implements InputEventAdapter {
     @Override
     public void init(InputEventAdapterListener eventAdapterListener) throws InputEventAdapterException {
         this.eventAdapterListener = eventAdapterListener;
-        websocketLocalInputCallbackRegisterService.updateAdapterListenerMap(eventAdapterConfiguration.getName(), this.eventAdapterListener);
+        websocketLocalInputCallbackRegisterService.subscribeAdapterListener(eventAdapterConfiguration.getName(), this.eventAdapterListener);
     }
 
     @Override

@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class WebsocketLocalInputCallbackRegisterServiceImpl implements WebsocketLocalInputCallbackRegisterService {
 
+    //TODO : need a method to un-subscribe
     private ConcurrentHashMap<Integer, ConcurrentHashMap<String, InputEventAdapterListener>> inputEventAdaptorListenerMap;
 
     public WebsocketLocalInputCallbackRegisterServiceImpl(){
@@ -33,7 +34,7 @@ public class WebsocketLocalInputCallbackRegisterServiceImpl implements Websocket
     }
 
     @Override
-    public void updateAdapterListenerMap(String adaptorName, InputEventAdapterListener eventAdapterListener) {
+    public void subscribeAdapterListener(String adaptorName, InputEventAdapterListener eventAdapterListener) {
         int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         ConcurrentHashMap<String,InputEventAdapterListener> tenantSpecificAdaptorMap = inputEventAdaptorListenerMap
                 .get(tenantID);
