@@ -106,10 +106,10 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
         RecordGroup[] rgs;
         try {
             System.out.println("########### DS = " + ServiceHolder.getAnalyticsDataService().toString());
-            System.out.println("########### excu = " + ServiceHolder.getAnalyticskExecutor().toString());
-            System.out.println("########### parts = " + ServiceHolder.getAnalyticskExecutor().getNumPartitionsHint());
+//            System.out.println("########### excu = " + ServiceHolder.getAnalyticskExecutor().toString());
+//            System.out.println("########### parts = " + ServiceHolder.getAnalyticskExecutor().getNumPartitionsHint());
             rgs = ServiceHolder.getAnalyticsDataService().get(this.tenantId, this.tableName,
-                    ServiceHolder.getAnalyticskExecutor().getNumPartitionsHint(),
+                    6,//ServiceHolder.getAnalyticskExecutor().getNumPartitionsHint(),
                     this.columns, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
         } catch (AnalyticsException e) {
             throw new RuntimeException(e.getMessage(), e);
