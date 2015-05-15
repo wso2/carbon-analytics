@@ -22,6 +22,7 @@ public class KafkaEventAdapterConstants {
     private KafkaEventAdapterConstants() {
     }
 
+    //TODO Move to global properties
     public static final String MIN_THREAD_NAME = "minThread";
     public static final String MAX_THREAD_NAME = "maxThread";
     public static final String DEFAULT_KEEP_ALIVE_TIME_NAME = "defaultKeepAliveTime";
@@ -31,6 +32,8 @@ public class KafkaEventAdapterConstants {
 
     public final static String ADAPTOR_TYPE_KAFKA = "kafka";
     public final static String ADAPTOR_PUBLISH_TOPIC = "topic";
+
+    //TODO Put hints for both broker and optional properties
     public final static String ADAPTOR_META_BROKER_LIST = "meta.broker.list";
     public final static String ADAPTOR_OPTIONAL_CONFIGURATION_PROPERTIES="optional.configuration";
     public final static String ADAPTOR_OPTIONAL_CONFIGURATION_PROPERTIES_HINT="optional.configuration.hint";

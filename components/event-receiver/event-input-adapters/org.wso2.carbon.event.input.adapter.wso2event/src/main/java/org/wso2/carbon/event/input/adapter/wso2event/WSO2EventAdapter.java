@@ -17,6 +17,7 @@ package org.wso2.carbon.event.input.adapter.wso2event;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.event.input.adapter.core.EventAdapterConstants;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapter;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterConfiguration;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
@@ -69,7 +70,7 @@ public final class WSO2EventAdapter implements InputEventAdapter {
 
     @Override
     public boolean isEventDuplicatedInCluster() {
-        return Boolean.parseBoolean(eventAdapterConfiguration.getProperties().get("receiving.events.duplicated.in.cluster"));
+        return Boolean.parseBoolean(eventAdapterConfiguration.getProperties().get(EventAdapterConstants.EVENTS_DUPLICATED_IN_CLUSTER));
     }
 
     @Override

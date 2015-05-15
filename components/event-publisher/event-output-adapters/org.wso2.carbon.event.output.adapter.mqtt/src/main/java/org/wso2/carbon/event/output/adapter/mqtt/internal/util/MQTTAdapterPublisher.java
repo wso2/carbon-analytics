@@ -69,6 +69,7 @@ public class MQTTAdapterPublisher {
                 connectionOptions.setUserName(this.mqttBrokerConnectionConfiguration.getBrokerUsername());
             }
 
+            //TODO, check the client Id usage and redefine it if needed
             // Construct an MQTT blocking mode client
             mqttClient = new MqttClient(this.mqttBrokerConnectionConfiguration.getBrokerUrl(), this.mqttClientId,
                     dataStore);

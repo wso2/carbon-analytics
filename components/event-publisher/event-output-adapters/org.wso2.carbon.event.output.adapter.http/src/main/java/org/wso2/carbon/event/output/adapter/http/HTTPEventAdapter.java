@@ -44,7 +44,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
     private static final Log log = LogFactory.getLog(OutputEventAdapter.class);
     private OutputEventAdapterConfiguration eventAdapterConfiguration;
     private Map<String, String> globalProperties;
-    private ExecutorService executorService;
+    private static ExecutorService executorService;
     private HttpClient httpClient;
 
     public HTTPEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String,
@@ -53,12 +53,11 @@ public class HTTPEventAdapter implements OutputEventAdapter {
         this.globalProperties = globalProperties;
     }
 
-
     @Override
     public void init() throws OutputEventAdapterException {
 
         //ExecutorService will be assigned  if it is null
-        if (this.executorService == null) {
+        if (executorService == null) {
             int minThread;
             int maxThread;
             long defaultKeepAliveTime;
@@ -83,7 +82,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                 defaultKeepAliveTime = Integer.parseInt(globalProperties.get(
                         HTTPEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_NAME));
             } else {
-                defaultKeepAliveTime = HTTPEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME;
+                defaultKeepAliveTime = HTTPEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_IN_MILLIS;
             }
 
             if (globalProperties.get(HTTPEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME) != null) {
@@ -93,7 +92,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                 jobQueSize = HTTPEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE;
             }
 
-            this.executorService = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime, TimeUnit.SECONDS,
+            executorService = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime, TimeUnit.MILLISECONDS,
                     new LinkedBlockingQueue<Runnable>(jobQueSize));
         }
 
@@ -106,14 +105,14 @@ public class HTTPEventAdapter implements OutputEventAdapter {
 
     @Override
     public void connect() {
-        //not required
+        this.checkHTTPClientInit(eventAdapterConfiguration.getStaticProperties());
     }
 
     @Override
     public void publish(Object message, Map<String, String> dynamicProperties) {
 
+
         //Load dynamic properties
-        this.checkHTTPClientInit(dynamicProperties);
         String url = dynamicProperties.get(HTTPEventAdapterConstants.ADAPTER_MESSAGE_URL);
         String username = dynamicProperties.get(HTTPEventAdapterConstants.ADAPTER_USERNAME);
         String password = dynamicProperties.get(HTTPEventAdapterConstants.ADAPTER_PASSWORD);
@@ -135,7 +134,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
     }
 
     private void checkHTTPClientInit(
-            Map<String, String> dynamicProperties) {
+            Map<String, String> staticProperties) {
         if (this.httpClient != null) {
             return;
         }
@@ -146,8 +145,8 @@ public class HTTPEventAdapter implements OutputEventAdapter {
             /* this needs to be created as late as possible, for the SSL trust store properties
              * to be set by Carbon in Java system properties */
             this.httpClient = new SystemDefaultHttpClient();
-            String proxyHost = dynamicProperties.get(HTTPEventAdapterConstants.ADAPTER_PROXY_HOST);
-            String proxyPort = dynamicProperties.get(HTTPEventAdapterConstants.ADAPTER_PROXY_PORT);
+            String proxyHost = staticProperties.get(HTTPEventAdapterConstants.ADAPTER_PROXY_HOST);
+            String proxyPort = staticProperties.get(HTTPEventAdapterConstants.ADAPTER_PROXY_PORT);
             if (proxyHost != null && proxyHost.trim().length() > 0) {
                 try {
                     HttpHost host = new HttpHost(proxyHost, Integer.parseInt(proxyPort));
@@ -160,23 +159,25 @@ public class HTTPEventAdapter implements OutputEventAdapter {
         }
     }
 
+    //TODO, drop only the invalid headers
     private Map<String, String> extractHeaders(String headers) {
         if (headers == null || headers.trim().length() == 0) {
             return null;
         }
-        try {
-            String[] entries = headers.split(HTTPEventAdapterConstants.HEADER_SEPARATOR);
-            String[] keyValue;
-            Map<String, String> result = new HashMap<String, String>();
-            for (String entry : entries) {
+
+        String[] entries = headers.split(HTTPEventAdapterConstants.HEADER_SEPARATOR);
+        String[] keyValue;
+        Map<String, String> result = new HashMap<String, String>();
+        for (String entry : entries) {
+            try {
                 keyValue = entry.split(HTTPEventAdapterConstants.ENTRY_SEPARATOR);
                 result.put(keyValue[0].trim(), keyValue[1].trim());
+            } catch (Exception e) {
+                log.error("Invalid headers format: \"" + headers + "\", ignoring HTTP headers...", e);
             }
-            return result;
-        } catch (Exception e) {
-            log.error("Invalid headers format: \"" + headers + "\", ignoring HTTP headers...");
-            return null;
         }
+        return result;
+
     }
 
     /**
@@ -239,6 +240,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
             }
         }
 
+        //TODO, allow other operations. POST, UPDATE & etc..
         public void run() {
             HttpPost method = new HttpPost(this.getUrl());
             StringEntity entity;
@@ -250,7 +252,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                 httpClient.execute(method).getEntity().getContent().close();
             } catch (UnknownHostException e) {
                 log.error("Exception while connecting adapter "
-                                + eventAdapterConfiguration.getName() + " HTTP endpoint to " + this.getUrl(),
+                        + eventAdapterConfiguration.getName() + " HTTP endpoint to " + this.getUrl(),
                         e);
             } catch (Throwable e) {
                 log.error("Error executing HTTP output event adapter "

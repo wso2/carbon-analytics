@@ -42,7 +42,24 @@ public class HTTPEventAdapterFactory extends OutputEventAdapterFactory {
 
     @Override
     public List<Property> getStaticPropertyList() {
-        return null;
+
+        List<Property> staticPropertyList = new ArrayList<Property>();
+
+        Property proxyHostProp = new Property(HTTPEventAdapterConstants.ADAPTER_PROXY_HOST);
+        proxyHostProp.setDisplayName(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_PROXY_HOST));
+        proxyHostProp.setHint(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_PROXY_HOST_HINT));
+        proxyHostProp.setRequired(false);
+
+        Property proxyPortProp = new Property(HTTPEventAdapterConstants.ADAPTER_PROXY_PORT);
+        proxyPortProp.setDisplayName(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_PROXY_PORT));
+        proxyPortProp.setHint(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_PROXY_PORT_HINT));
+        proxyPortProp.setRequired(false);
+
+        staticPropertyList.add(proxyHostProp);
+        staticPropertyList.add(proxyPortProp);
+
+        return staticPropertyList;
+
     }
 
     @Override
@@ -70,22 +87,10 @@ public class HTTPEventAdapterFactory extends OutputEventAdapterFactory {
         headersProp.setHint(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_HEADERS_HINT));
         headersProp.setRequired(false);
 
-        Property proxyHostProp = new Property(HTTPEventAdapterConstants.ADAPTER_PROXY_HOST);
-        proxyHostProp.setDisplayName(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_PROXY_HOST));
-        proxyHostProp.setHint(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_PROXY_HOST_HINT));
-        proxyHostProp.setRequired(false);
-
-        Property proxyPortProp = new Property(HTTPEventAdapterConstants.ADAPTER_PROXY_PORT);
-        proxyPortProp.setDisplayName(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_PROXY_PORT));
-        proxyPortProp.setHint(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_PROXY_PORT_HINT));
-        proxyPortProp.setRequired(false);
-
         dynamicPropertyList.add(urlProp);
         dynamicPropertyList.add(usernameProp);
         dynamicPropertyList.add(passwordProp);
         dynamicPropertyList.add(headersProp);
-        dynamicPropertyList.add(proxyHostProp);
-        dynamicPropertyList.add(proxyPortProp);
 
         return dynamicPropertyList;
     }

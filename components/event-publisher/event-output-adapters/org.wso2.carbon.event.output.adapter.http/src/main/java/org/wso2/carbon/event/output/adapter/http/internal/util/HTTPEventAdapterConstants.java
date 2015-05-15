@@ -51,16 +51,17 @@ public class HTTPEventAdapterConstants {
 
     public static final String ADAPTER_HEADERS_HINT = "http.headers.hint";
 
-    public static final long DEFAULT_KEEP_ALIVE_TIME = 20;
+    public static final long DEFAULT_KEEP_ALIVE_TIME_IN_MILLIS = 20;
 
     public static final String ADAPTER_MIN_THREAD_POOL_SIZE_NAME = "minThread";
 
     public static final String ADAPTER_MAX_THREAD_POOL_SIZE_NAME = "maxThread";
 
-    public static final String DEFAULT_KEEP_ALIVE_TIME_NAME = "defaultKeepAliveTime";
+    public static final String DEFAULT_KEEP_ALIVE_TIME_NAME = "defaultKeepAliveTimeInMillis";
 
     public static final String ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME = "jobQueueSize";
 
+    //TODO, try to find unique header and entry separator
     public static final String HEADER_SEPARATOR = ",";
 
     public static final String ENTRY_SEPARATOR = ":";

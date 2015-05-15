@@ -40,6 +40,7 @@ public class MQTTEventAdapter implements OutputEventAdapter {
 
     private ConcurrentHashMap<String, ConcurrentHashMap<String, MQTTAdapterPublisher>> clientIdSpecificEventSenderMap;
 
+    //TODO Introduce a thread pool, & remove the map
     public MQTTEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
                             Map<String, String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
