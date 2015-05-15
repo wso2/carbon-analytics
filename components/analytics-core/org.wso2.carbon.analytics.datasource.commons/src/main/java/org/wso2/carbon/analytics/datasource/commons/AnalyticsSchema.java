@@ -19,6 +19,7 @@
 package org.wso2.carbon.analytics.datasource.commons;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,8 @@ public class AnalyticsSchema implements Serializable {
     private static final long serialVersionUID = -4696693702436657326L;
 
     private Map<String, ColumnDefinition> columns;
+
+    private transient Map<String, ColumnDefinition> indexedColumns = null;
     
     /** primary keys are set separately rather than having in {@link ColumnDefinition} 
      * to optimize the lookup of just the primary keys when required */
@@ -54,6 +57,24 @@ public class AnalyticsSchema implements Serializable {
     
     public List<String> getPrimaryKeys() {
         return primaryKeys;
+    }
+
+    public Map<String, ColumnDefinition> getIndexedColumns() {
+        if (indexedColumns == null) {
+            indexedColumns = new HashMap<>();
+            if (columns != null) {
+                for (Map.Entry<String, ColumnDefinition> entry : columns.entrySet()) {
+                    if (entry.getValue().isIndexed()) {
+                        indexedColumns.put(entry.getKey(), entry.getValue());
+                    }
+                }
+            }
+        }
+        return indexedColumns;
+    }
+
+    public void setIndexedColumns(Map<String, ColumnDefinition> indexedColumns) {
+        this.indexedColumns = indexedColumns;
     }
 
     public static enum ColumnType {
