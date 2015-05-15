@@ -29,7 +29,7 @@ public class EventBean {
     private Map<String, Object> metaData;
     private Map<String, Object> correlationData;
     private Map<String, Object> payloadData;
-    private Map<String, Object> arbitraryDataMap = null;
+    private Map<String, Object> arbitraryDataMap;
 
     public EventBean() {
 

@@ -60,6 +60,7 @@
         type != AnalyticsWebServiceConnector.TYPE_PUT_RECORDS &&
             type != AnalyticsWebServiceConnector.TYPE_PAGINATION_SUPPORTED &&
             type != AnalyticsWebServiceConnector.TYPE_ADD_STREAM_DEFINITION &&
+            type != AnalyticsWebServiceConnector.TYPE_GET_STREAM_DEFINITION &&
             type != AnalyticsWebServiceConnector.TYPE_PUBLISH_EVENT ) {
         if (tableName == null || tableName.isEmpty()) {
             out.print("{ \"status\": \"Failed\", \"message\": \"Table name param is empty\" }");
@@ -257,6 +258,17 @@
                 }
                 String requestAsString = buffer.toString();
                 out.print(connector.publishEvent(requestAsString));
+                break;
+            }
+            case AnalyticsWebServiceConnector.TYPE_GET_STREAM_DEFINITION: {
+                StringBuilder buffer = new StringBuilder();
+                BufferedReader reader = request.getReader();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                String requestAsString = buffer.toString();
+                out.print(connector.getStreamDefinition(requestAsString));
                 break;
             }
             default:

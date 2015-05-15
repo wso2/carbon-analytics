@@ -35,6 +35,7 @@ import org.wso2.carbon.analytics.jsservice.beans.QueryBean;
 import org.wso2.carbon.analytics.jsservice.beans.Record;
 import org.wso2.carbon.analytics.jsservice.beans.ResponseBean;
 import org.wso2.carbon.analytics.jsservice.beans.StreamDefinitionBean;
+import org.wso2.carbon.analytics.jsservice.beans.StreamDefinitionQueryBean;
 import org.wso2.carbon.analytics.jsservice.beans.SubCategoriesBean;
 import org.wso2.carbon.analytics.jsservice.exception.JSServiceException;
 import org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceAnalyticsWebServiceExceptionException;
@@ -80,6 +81,7 @@ public class AnalyticsWebServiceConnector {
     public static final int TYPE_DRILLDOWN_SEARCH_COUNT = 21;
     public static final int TYPE_ADD_STREAM_DEFINITION = 22;
     public static final int TYPE_PUBLISH_EVENT = 23;
+    public static final int TYPE_GET_STREAM_DEFINITION = 24;
 
     public AnalyticsWebServiceConnector(ConfigurationContext configCtx, String backendServerURL, String cookie) {
         try {
@@ -180,10 +182,10 @@ public class AnalyticsWebServiceConnector {
             logger.debug("invoking addStreamDefinition");
         }
         try {
-            if (streamDefAsString != null) {
+            if (streamDefAsString != null && !streamDefAsString.isEmpty()) {
                 StreamDefinitionBean streamDefinitionBean = gson.fromJson(streamDefAsString, StreamDefinitionBean.class);
-                analyticsWebServiceStub.addStreamDefinition(Utils.getStreamDefinition(streamDefinitionBean));
-                return gson.toJson(handleResponse(ResponseStatus.SUCCESS, "StreamDefinition added successfully"));
+                String streamId = analyticsWebServiceStub.addStreamDefinition(Utils.getStreamDefinition(streamDefinitionBean));
+                return gson.toJson(streamId);
             } else {
                 return gson.toJson(handleResponse(ResponseStatus.NON_EXISTENT, "StreamDefinition is not given"));
             }
@@ -202,12 +204,42 @@ public class AnalyticsWebServiceConnector {
         }
     }
 
+    public String getStreamDefinition(String requestAsString) {
+        try {
+            if (requestAsString != null && !requestAsString.isEmpty()) {
+                StreamDefinitionQueryBean queryBean = gson.fromJson(requestAsString, StreamDefinitionQueryBean.class);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("invoking getStreamDefinition for name: " + queryBean.getName() + " version: " +
+                                 queryBean.getVersion());
+                }
+                org.wso2.carbon.analytics.webservice.stub.beans.StreamDefinitionBean streamDefinitionBean =
+                        analyticsWebServiceStub.getStreamDefinition(queryBean.getName(), queryBean.getVersion());
+                StreamDefinitionBean streamDefinition = Utils.getStreamDefinitionBean(streamDefinitionBean);
+                return gson.toJson(streamDefinition);
+            } else {
+                return gson.toJson(handleResponse(ResponseStatus.NON_EXISTENT, "Name of the Stream is not given"));
+            }
+        } catch (RemoteException e) {
+            logger.error("Failed to get the stream definition: " + e.getMessage(), e);
+            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get the stream definition: " +
+                                                                     ": " + e.getMessage()));
+        } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
+            logger.error("Failed to get the stream definition: " + e.getFaultMessage(), e);
+            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get the stream definition: " +
+                                                                     ": " + e.getFaultMessage()));
+        } catch (AnalyticsWebServiceMalformedStreamDefinitionExceptionException e) {
+            logger.error("Failed to get the stream definition: " + e.getFaultMessage(), e);
+            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get the stream definition: " +
+                                                                     ": " + e.getFaultMessage()));
+        }
+    }
+
     public String publishEvent(String eventAsString) {
         if (logger.isDebugEnabled()) {
             logger.debug("invoking publishEvent");
         }
         try {
-            if (eventAsString != null) {
+            if (eventAsString != null && !eventAsString.isEmpty()) {
                 EventBean eventBean = gson.fromJson(eventAsString, EventBean.class);
                 if (logger.isDebugEnabled()) {
                     logger.debug("publishing event: stream id: " + eventBean.getStreamId());
@@ -400,7 +432,7 @@ public class AnalyticsWebServiceConnector {
     }
 
     public String getRecordsByIds(String tableName, String idsAsString) {
-        if (idsAsString != null) {
+        if (idsAsString != null && !idsAsString.isEmpty()) {
             try {
                 Type idsType = new TypeToken<List<String>>() {
                 }.getType();
@@ -518,7 +550,7 @@ public class AnalyticsWebServiceConnector {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking search for tableName : " + tableName);
         }
-        if (queryAsString != null) {
+        if (queryAsString != null && !queryAsString.isEmpty()) {
             try {
                 QueryBean queryBean = gson.fromJson(queryAsString, QueryBean.class);
                 RecordBean[] searchResults = analyticsWebServiceStub.search(tableName, queryBean.getQuery(),
@@ -553,7 +585,7 @@ public class AnalyticsWebServiceConnector {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking search count for tableName : " + tableName);
         }
-        if (queryAsString != null) {
+        if (queryAsString != null && !queryAsString.isEmpty()) {
             try {
                 QueryBean queryBean = gson.fromJson(queryAsString, QueryBean.class);
                 int result = analyticsWebServiceStub.searchCount(tableName, queryBean.getQuery());
@@ -658,7 +690,7 @@ public class AnalyticsWebServiceConnector {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking drillDownCategories for tableName : " + tableName);
         }
-        if (queryAsString != null) {
+        if (queryAsString != null && !queryAsString.isEmpty()) {
             try {
                 CategoryDrillDownRequestBean queryBean =
                          gson.fromJson(queryAsString,CategoryDrillDownRequestBean.class);
@@ -696,7 +728,7 @@ public class AnalyticsWebServiceConnector {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking drillDownCategories for tableName : " + tableName);
         }
-        if (queryAsString != null) {
+        if (queryAsString != null && !queryAsString.isEmpty()) {
             try {
                 DrillDownRequestBean queryBean =
                         gson.fromJson(queryAsString,DrillDownRequestBean.class);
@@ -735,7 +767,7 @@ public class AnalyticsWebServiceConnector {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking drillDownCategories for tableName : " + tableName);
         }
-        if (queryAsString != null) {
+        if (queryAsString != null && !queryAsString.isEmpty()) {
             try {
                 DrillDownRequestBean queryBean =
                         gson.fromJson(queryAsString,DrillDownRequestBean.class);

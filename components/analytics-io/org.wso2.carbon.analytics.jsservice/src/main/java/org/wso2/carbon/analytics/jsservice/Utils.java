@@ -416,18 +416,10 @@ public class Utils {
         Map<String, String> metaData = streamDefinitionBean.getMetaData();
         Map<String, String> correlationData = streamDefinitionBean.getCorrelationData();
         Map<String, String> payloadData = streamDefinitionBean.getPayloadData();
-        if (tags != null) {
-            streamDef.setTags(tags.toArray(new String[tags.size()]));
-        }
-        if (metaData != null) {
-            streamDef.setMetaData(getStreamDefAttributes(metaData));
-        }
-        if (correlationData != null) {
-            streamDef.setCorrelationData(getStreamDefAttributes(correlationData));
-        }
-        if (payloadData != null) {
-            streamDef.setPayloadData(getStreamDefAttributes(payloadData));
-        }
+        if (tags != null) streamDef.setTags(tags.toArray(new String[tags.size()]));
+        if (metaData != null) streamDef.setMetaData(getStreamDefAttributes(metaData));
+        if (correlationData != null) streamDef.setCorrelationData(getStreamDefAttributes(correlationData));
+        if (payloadData != null) streamDef.setPayloadData(getStreamDefAttributes(payloadData));
         return streamDef;
     }
 
@@ -448,10 +440,40 @@ public class Utils {
                 new org.wso2.carbon.analytics.webservice.stub.beans.EventBean();
         bean.setTimeStamp(eventBean.getTimeStamp());
         bean.setStreamId(eventBean.getStreamId());
-        bean.setMetaData(getRecordValueEntryBeans(eventBean.getMetaData()));
-        bean.setCorrelationData(getRecordValueEntryBeans(eventBean.getCorrelationData()));
-        bean.setPayloadData(getRecordValueEntryBeans(eventBean.getPayloadData()));
-        bean.setArbitraryData(getRecordValueEntryBeans(eventBean.getArbitraryDataMap()));
+        Map<String, Object> metaData = eventBean.getMetaData();
+        Map<String, Object> correlationData = eventBean.getCorrelationData();
+        Map<String, Object> payloadData = eventBean.getPayloadData();
+        Map<String, Object> arbitraryValues = eventBean.getArbitraryDataMap();
+        if (metaData != null) bean.setMetaData(getRecordValueEntryBeans(metaData));
+        if (correlationData != null) bean.setCorrelationData(getRecordValueEntryBeans(correlationData));
+        if (payloadData != null) bean.setPayloadData(getRecordValueEntryBeans(payloadData));
+        if (arbitraryValues != null) bean.setArbitraryData(getRecordValueEntryBeans(arbitraryValues));
         return bean;
+    }
+
+    public static StreamDefinitionBean getStreamDefinitionBean(
+            org.wso2.carbon.analytics.webservice.stub.beans.StreamDefinitionBean streamDefinitionBean) {
+        StreamDefinitionBean bean = new StreamDefinitionBean();
+        bean.setName(streamDefinitionBean.getName());
+        bean.setVersion(streamDefinitionBean.getVersion());
+        bean.setDescription(streamDefinitionBean.getDescription());
+        bean.setNickName(streamDefinitionBean.getNickName());
+        String[] tags = streamDefinitionBean.getTags();
+        StreamDefAttributeBean[] metaData = streamDefinitionBean.getMetaData();
+        StreamDefAttributeBean[] correlationData = streamDefinitionBean.getCorrelationData();
+        StreamDefAttributeBean[] payloadData = streamDefinitionBean.getPayloadData();
+        if (tags != null) bean.setTags(Arrays.asList(tags));
+        if (metaData != null) bean.setMetaData(getStreamAttributesAsMap(metaData));
+        if (correlationData != null) bean.setCorrelationData(getStreamAttributesAsMap(correlationData));
+        if (payloadData != null) bean.setPayloadData(getStreamAttributesAsMap(payloadData));
+        return bean;
+    }
+
+    private static Map<String, String> getStreamAttributesAsMap(StreamDefAttributeBean[] attributeBeans) {
+        Map<String, String> attributeMap= new LinkedHashMap<>();
+        for (StreamDefAttributeBean bean : attributeBeans) {
+            attributeMap.put(bean.getName(), bean.getType());
+        }
+        return attributeMap;
     }
 }

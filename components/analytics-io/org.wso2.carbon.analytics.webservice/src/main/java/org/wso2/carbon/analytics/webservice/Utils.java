@@ -410,22 +410,22 @@ public class Utils {
     private static AttributeType getAttributeType(String type) throws AnalyticsWebServiceException {
         if (type != null) {
             switch (type) {
-                case "STRING" : {
+                case RecordValueEntryBean.STRING : {
                     return AttributeType.STRING;
                 }
-                case "BOOLEAN" : {
+                case RecordValueEntryBean.BOOLEAN : {
                     return AttributeType.BOOL;
                 }
-                case "FLOAT" : {
+                case RecordValueEntryBean.FLOAT : {
                     return AttributeType.FLOAT;
                 }
-                case "DOUBLE" : {
+                case RecordValueEntryBean.DOUBLE : {
                     return AttributeType.DOUBLE;
                 }
-                case "INTEGER" : {
+                case RecordValueEntryBean.INTEGER : {
                     return AttributeType.INT;
                 }
-                case "LONG" : {
+                case RecordValueEntryBean.LONG : {
                     return AttributeType.LONG;
                 }
                 default: {
@@ -496,5 +496,56 @@ public class Utils {
             }
         }
         return values.toArray(new Object[values.size()]);
+    }
+
+    public static StreamDefinitionBean getStreamDefinitionBean(StreamDefinition streamDefinition)
+            throws AnalyticsWebServiceException {
+        StreamDefinitionBean bean = new StreamDefinitionBean();
+        bean.setName(streamDefinition.getName());
+        bean.setDescription(streamDefinition.getDescription());
+        bean.setNickName(streamDefinition.getNickName());
+        bean.setVersion(streamDefinition.getVersion());
+        List<String> tags = streamDefinition.getTags();
+        List<Attribute> metaData = streamDefinition.getMetaData();
+        List<Attribute> correlationData = streamDefinition.getCorrelationData();
+        List<Attribute> payloadData = streamDefinition.getPayloadData();
+        if (tags != null) bean.setTags(tags.toArray(new String[tags.size()]));
+        if (metaData != null) bean.setMetaData(createStreamDefAttributes(metaData));
+        if (correlationData != null) bean.setCorrelationData(createStreamDefAttributes(correlationData));
+        if (payloadData != null) bean.setPayloadData(createStreamDefAttributes(payloadData));
+        return bean;
+    }
+
+    private static StreamDefAttributeBean[] createStreamDefAttributes(List<Attribute> attributes)
+            throws AnalyticsWebServiceException {
+        List<StreamDefAttributeBean> beans = new ArrayList<>();
+        for (Attribute attribute : attributes) {
+            StreamDefAttributeBean bean = new StreamDefAttributeBean();
+            bean.setName(attribute.getName());
+            switch (attribute.getType()) {
+                case LONG:
+                    bean.setType(RecordValueEntryBean.LONG);
+                    break;
+                case STRING:
+                    bean.setType(RecordValueEntryBean.STRING);
+                    break;
+                case BOOL:
+                    bean.setType(RecordValueEntryBean.BOOLEAN);
+                    break;
+                case FLOAT:
+                    bean.setType(RecordValueEntryBean.FLOAT);
+                    break;
+                case DOUBLE:
+                    bean.setType(RecordValueEntryBean.DOUBLE);
+                    break;
+                case INT:
+                    bean.setType(RecordValueEntryBean.INTEGER);
+                    break;
+                default:
+                    throw new AnalyticsWebServiceException("Unknown Datatype found in Stream Definition");
+            }
+            beans.add(bean);
+        }
+        return beans.toArray(new StreamDefAttributeBean[beans.size()]);
     }
 }

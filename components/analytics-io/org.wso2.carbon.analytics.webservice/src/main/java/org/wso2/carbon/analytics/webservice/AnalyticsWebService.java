@@ -133,6 +133,33 @@ public class AnalyticsWebService extends AbstractAdmin {
     }
 
     /**
+     * get the stream definition using the Event stream publisher.
+     * @param name  The name of the stream.
+     * @param version The version of the stream
+     * @return The stream definition bean
+     * @throws AnalyticsWebServiceException
+     * @throws MalformedStreamDefinitionException
+     */
+    public StreamDefinitionBean getStreamDefinition(String name, String version)
+            throws AnalyticsWebServiceException, MalformedStreamDefinitionException {
+        StreamDefinition streamDefinition;
+        try {
+            if (name != null && version != null ) {
+                streamDefinition = eventStreamService.getStreamDefinition(name, version);
+            } else if (name != null) {
+                streamDefinition = eventStreamService.getStreamDefinition(name);
+            } else {
+                throw new AnalyticsWebServiceException("The stream name is not provided");
+            }
+            return Utils.getStreamDefinitionBean(streamDefinition);
+        } catch (EventStreamConfigurationException e) {
+            logger.error("Unable to get the stream definition: " + e.getMessage(), e);
+            throw new AnalyticsWebServiceException("Unable to get the stream definition: " +
+                         e.getMessage(), e);
+        }
+    }
+
+    /**
      * Publishes events to a given stream represented by stream id.
      * @param eventBean The event bean representing the event data.
      * @throws AnalyticsWebServiceException
