@@ -490,7 +490,7 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
      */
     private void populateDbMappings() throws OutputEventAdapterException {
 
-        String dbName;
+        String dbName = null;
         dbTypeMappings = new HashMap<String, String>();
         Connection con;
 
@@ -499,10 +499,16 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
                     .getDataSource(
                             eventAdapterConfiguration.getStaticProperties().get(RDBMSEventAdapterConstants
                                     .ADAPTER_GENERIC_RDBMS_DATASOURCE_NAME));
-            con = ((DataSource) carbonDataSource.getDSObject()).getConnection();
-            DatabaseMetaData databaseMetaData = con.getMetaData();
-            dbName = databaseMetaData.getDatabaseProductName();
-            dbName = dbName.toLowerCase();
+            if(carbonDataSource != null){
+                con = ((DataSource) carbonDataSource.getDSObject()).getConnection();
+                DatabaseMetaData databaseMetaData = con.getMetaData();
+                dbName = databaseMetaData.getDatabaseProductName();
+                dbName = dbName.toLowerCase();
+            } else{
+                throw new OutputEventAdapterException("There is no data-source called "+eventAdapterConfiguration
+                        .getStaticProperties().get(RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_DATASOURCE_NAME));
+            }
+
         } catch (DataSourceException e) {
             log.error(
                     "There is no any data-source found called : " + eventAdapterConfiguration.getStaticProperties().get(
