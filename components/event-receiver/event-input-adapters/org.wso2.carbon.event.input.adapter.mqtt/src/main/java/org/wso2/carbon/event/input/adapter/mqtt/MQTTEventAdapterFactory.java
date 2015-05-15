@@ -113,14 +113,6 @@ public class MQTTEventAdapterFactory extends InputEventAdapterFactory {
                 resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_MESSAGE_CLIENTID_HINT));
         propertyList.add(clientId);
 
-        //TODO : Always true
-        Property isDuplicatedInCluster = new Property(MQTTEventAdapterConstants.ADAPTOR_IS_EVENT_DUPLICATED_IN_CLUSTER);
-        isDuplicatedInCluster.setDisplayName(resourceBundle.getString(MQTTEventAdapterConstants.ADAPTOR_IS_EVENT_DUPLICATED_IN_CLUSTER));
-        isDuplicatedInCluster.setRequired(false);
-        isDuplicatedInCluster.setOptions(new String[]{"true", "false"});
-        isDuplicatedInCluster.setDefaultValue("false");
-        propertyList.add(isDuplicatedInCluster);
-
         return propertyList;
     }
 

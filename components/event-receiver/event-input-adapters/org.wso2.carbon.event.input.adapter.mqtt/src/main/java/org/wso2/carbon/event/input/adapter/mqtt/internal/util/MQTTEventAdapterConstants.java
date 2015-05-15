@@ -34,7 +34,6 @@ public class MQTTEventAdapterConstants {
     public static final String ADAPTER_CONF_CLEAN_SESSION = "cleanSession";
     public static final String ADAPTER_CONF_CLEAN_SESSION_HINT = "cleanSession.hint";
     public static final String ADAPTER_CONF_KEEP_ALIVE = "keepAlive";
-    public static final String ADAPTOR_IS_EVENT_DUPLICATED_IN_CLUSTER = "receiving.events.duplicated.in.cluster";
 
     public static int initialReconnectDuration = 10000;
     public static final int reconnectionProgressionFactor = 2;

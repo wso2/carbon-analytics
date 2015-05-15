@@ -173,7 +173,7 @@ public class MQTTEventAdapter implements InputEventAdapter {
 
     @Override
     public boolean isEventDuplicatedInCluster() {
-        return Boolean.parseBoolean(eventAdapterConfiguration.getProperties().get("receiving.events.duplicated.in.cluster"));
+        return true;
     }
 
     @Override
