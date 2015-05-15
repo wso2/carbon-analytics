@@ -1027,6 +1027,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
      * @throws AnalyticsException
      */
     public void put(List<Record> records) throws AnalyticsException {
+
         this.scheduleIndexUpdate(records);
     }
     
@@ -1201,7 +1202,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         Map<String, ColumnDefinition> indices;
         try {
             AnalyticsSchema schema = this.analyticsDataService.getTableSchema(tenantId, tableName);
-            indices = schema.getColumns();
+            indices = schema.getIndexedColumns();
             if (indices == null) {
                 indices = new HashMap<>();
             }

@@ -323,8 +323,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
      * schema's primary keys.
      * @param records
      */
-    private void preprocessRecords(List<Record> records) throws AnalyticsException {
-        Collection<List<Record>> recordBatches = GenericUtils.generateRecordBatches(records);
+    private void preprocessRecords(Collection<List<Record>> recordBatches) throws AnalyticsException {
         for (List<Record> recordBatch : recordBatches) {
             this.preprocessRecordBatch(recordBatch);
         }
@@ -391,9 +390,17 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     @Override
     public void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
-        this.preprocessRecords(records);
+        Collection<List<Record>> recordBatches = GenericUtils.generateRecordBatches(records);
+        this.preprocessRecords(recordBatches);
         this.getAnalyticsRecordStore().put(records);
-        this.getIndexer().put(records);
+        for (List<Record> recordsBatch : recordBatches) {
+            Record record = recordsBatch.get(0);
+            AnalyticsSchema schema = this.lookupSchema(record.getTenantId(), record.getTableName());
+            Map<String, ColumnDefinition> indexedColumns = schema.getIndexedColumns();
+            if (indexedColumns.size() > 0) {
+                this.getIndexer().put(records);
+            }
+        }
     }
     
     @Override
