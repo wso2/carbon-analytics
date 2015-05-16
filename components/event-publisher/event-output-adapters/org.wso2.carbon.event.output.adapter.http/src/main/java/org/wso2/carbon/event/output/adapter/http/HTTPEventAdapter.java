@@ -35,10 +35,7 @@ import org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterC
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class HTTPEventAdapter implements OutputEventAdapter {
     private static final Log log = LogFactory.getLog(OutputEventAdapter.class);
@@ -78,9 +75,9 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                 maxThread = HTTPEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE;
             }
 
-            if (globalProperties.get(HTTPEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_NAME) != null) {
+            if (globalProperties.get(HTTPEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME) != null) {
                 defaultKeepAliveTime = Integer.parseInt(globalProperties.get(
-                        HTTPEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_NAME));
+                        HTTPEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME));
             } else {
                 defaultKeepAliveTime = HTTPEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_IN_MILLIS;
             }
@@ -120,7 +117,11 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                 HTTPEventAdapterConstants.ADAPTER_HEADERS));
         String payload = message.toString();
 
-        this.executorService.submit(new HTTPSender(url, payload, username, password, headers));
+        try {
+            executorService.submit(new HTTPSender(url, payload, username, password, headers));
+        } catch (RejectedExecutionException e) {
+            log.error("There is no thread left to publish event : " + payload, e);
+        }
     }
 
     @Override
@@ -159,7 +160,6 @@ public class HTTPEventAdapter implements OutputEventAdapter {
         }
     }
 
-    //TODO, drop only the invalid headers
     private Map<String, String> extractHeaders(String headers) {
         if (headers == null || headers.trim().length() == 0) {
             return null;
@@ -168,12 +168,12 @@ public class HTTPEventAdapter implements OutputEventAdapter {
         String[] entries = headers.split(HTTPEventAdapterConstants.HEADER_SEPARATOR);
         String[] keyValue;
         Map<String, String> result = new HashMap<String, String>();
-        for (String entry : entries) {
+        for (String header : entries) {
             try {
-                keyValue = entry.split(HTTPEventAdapterConstants.ENTRY_SEPARATOR);
+                keyValue = header.split(HTTPEventAdapterConstants.ENTRY_SEPARATOR, 2);
                 result.put(keyValue[0].trim(), keyValue[1].trim());
             } catch (Exception e) {
-                log.error("Invalid headers format: \"" + headers + "\", ignoring HTTP headers...", e);
+                log.warn("Header property \"" + header + "\" is not defined in the correct format.", e);
             }
         }
         return result;
@@ -183,7 +183,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
     /**
      * This class represents a job to send an HTTP request to a target URL.
      */
-    public class HTTPSender implements Runnable {
+    class HTTPSender implements Runnable {
 
         private String url;
 
@@ -240,7 +240,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
             }
         }
 
-        //TODO, allow other operations. POST, UPDATE & etc..
+        //TODO, Check for possibility of other operations. POST, UPDATE & etc..
         public void run() {
             HttpPost method = new HttpPost(this.getUrl());
             StringEntity entity;

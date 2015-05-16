@@ -93,8 +93,6 @@ public class JMSEventAdapterFactory extends OutputEventAdapterFactory {
         destinationTypeProperty.setHint(resourceBundle.getString(
                 JMSEventAdapterConstants.ADAPTER_JMS_DESTINATION_TYPE_HINT));
 
-        //TODO, Move the topic to message property
-
         // Topic
         Property topicProperty = new Property(JMSEventAdapterConstants.ADAPTER_JMS_DESTINATION);
         topicProperty.setDisplayName(

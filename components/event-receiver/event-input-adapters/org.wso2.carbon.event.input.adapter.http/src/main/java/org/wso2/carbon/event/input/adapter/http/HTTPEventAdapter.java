@@ -31,7 +31,6 @@ import org.wso2.carbon.event.input.adapter.http.internal.util.HTTPEventAdapterCo
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.servlet.ServletException;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.UUID;
@@ -78,9 +77,9 @@ public final class HTTPEventAdapter implements InputEventAdapter {
                 maxThread = HTTPEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE;
             }
 
-            if (globalProperties.get(HTTPEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_NAME) != null) {
+            if (globalProperties.get(HTTPEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME) != null) {
                 defaultKeepAliveTime = Integer.parseInt(globalProperties.get(
-                        HTTPEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_NAME));
+                        HTTPEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME));
             } else {
                 defaultKeepAliveTime = HTTPEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_IN_MILLS;
             }

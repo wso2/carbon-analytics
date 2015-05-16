@@ -32,8 +32,18 @@ public class JMSEventAdapterConstants {
             "transport.jms.ConnectionFactoryJNDIName.hint";
     public static final String ADAPTER_JMS_DESTINATION_TYPE = "transport.jms.DestinationType";
     public static final String ADAPTER_JMS_DESTINATION_TYPE_HINT = "transport.jms.DestinationType.hint";
-
     public static final String ADAPTER_JMS_DESTINATION = "transport.jms.Destination";
     public static final String ADAPTER_JMS_HEADER = "transport.jms.Header";
     public static final String ADAPTER_JMS_HEADER_HINT = "transport.jms.Header.Hint";
+    public static final long DEFAULT_KEEP_ALIVE_TIME_IN_MILLIS = 20000;
+    public static final String ADAPTER_MIN_THREAD_POOL_SIZE_NAME = "minThread";
+    public static final String ADAPTER_MAX_THREAD_POOL_SIZE_NAME = "maxThread";
+    public static final String ADAPTER_KEEP_ALIVE_TIME_NAME = "keepAliveTimeInMillis";
+    public static final String ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME = "jobQueueSize";
+    public static final int ADAPTER_MIN_THREAD_POOL_SIZE = 8;
+    public static final int ADAPTER_MAX_THREAD_POOL_SIZE = 100;
+    public static final int ADAPTER_EXECUTOR_JOB_QUEUE_SIZE = 2000;
+    public static final String HEADER_SEPARATOR = ",";
+    public static final String ENTRY_SEPARATOR = ":";
+
 }

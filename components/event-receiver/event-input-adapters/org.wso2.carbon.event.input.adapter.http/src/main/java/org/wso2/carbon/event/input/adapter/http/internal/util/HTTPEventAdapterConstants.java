@@ -30,7 +30,7 @@ public final class HTTPEventAdapterConstants {
     public static final String ENDPOINT_TENANT_KEY = "t";
     public static final String ADAPTER_MIN_THREAD_POOL_SIZE_NAME = "minThread";
     public static final String ADAPTER_MAX_THREAD_POOL_SIZE_NAME = "maxThread";
-    public static final String DEFAULT_KEEP_ALIVE_TIME_NAME = "defaultKeepAliveTimeInMillis";
+    public static final String ADAPTER_KEEP_ALIVE_TIME_NAME = "keepAliveTimeInMillis";
     public static final String ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME = "jobQueueSize";
     public static final String EXPOSED_TRANSPORTS = "transports";
     public static final String HTTPS = "https";

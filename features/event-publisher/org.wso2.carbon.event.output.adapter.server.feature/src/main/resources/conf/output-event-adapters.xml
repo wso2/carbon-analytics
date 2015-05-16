@@ -48,7 +48,25 @@
     <adapterConfig type="http">
         <property key="minThread">8</property>
         <property key="maxThread">100</property>
-        <property key="defaultKeepAliveTimeInMillis">20000</property>
+        <property key="keepAliveTimeInMillis">20000</property>
+        <property key="jobQueueSize">10000</property>
+    </adapterConfig>
+
+    <adapterConfig type="jms">
+        <property key="minThread">8</property>
+        <property key="maxThread">100</property>
+        <property key="keepAliveTimeInMillis">20000</property>
+        <property key="jobQueueSize">10000</property>
+    </adapterConfig>
+
+    <adapterConfig type="mqtt">
+        <property key="keepAlive">true</property>
+    </adapterConfig>
+
+    <adapterConfig type="kafka">
+        <property key="minThread">8</property>
+        <property key="maxThread">100</property>
+        <property key="keepAliveTimeInMillis">20000</property>
         <property key="jobQueueSize">10000</property>
     </adapterConfig>
 

@@ -20,49 +20,27 @@ package org.wso2.carbon.event.output.adapter.http.internal.util;
 public class HTTPEventAdapterConstants {
 
     public static final String ADAPTER_TYPE_HTTP = "http";
-
     public static final String ADAPTER_MESSAGE_URL = "http.url";
-
     public static final String ADAPTER_MESSAGE_URL_HINT = "http.url.hint";
-
     public static final int ADAPTER_MIN_THREAD_POOL_SIZE = 8;
-
     public static final int ADAPTER_MAX_THREAD_POOL_SIZE = 100;
-
     public static final int ADAPTER_EXECUTOR_JOB_QUEUE_SIZE = 2000;
-
-    public static final String ADAPTER_PROXY_HOST = "http.proxy.host";
-
-    public static final String ADAPTER_PROXY_HOST_HINT = "http.proxy.host.hint";
-
-    public static final String ADAPTER_PROXY_PORT = "http.proxy.port";
-
-    public static final String ADAPTER_PROXY_PORT_HINT = "http.proxy.port.hint";
-
-    public static final String ADAPTER_USERNAME = "http.username";
-
-    public static final String ADAPTER_USERNAME_HINT = "http.username.hint";
-
-    public static final String ADAPTER_PASSWORD = "http.password";
-
-    public static final String ADAPTER_PASSWORD_HINT = "http.password.hint";
-
-    public static final String ADAPTER_HEADERS = "http.headers";
-
-    public static final String ADAPTER_HEADERS_HINT = "http.headers.hint";
-
-    public static final long DEFAULT_KEEP_ALIVE_TIME_IN_MILLIS = 20;
-
+    public static final long DEFAULT_KEEP_ALIVE_TIME_IN_MILLIS = 20000;
     public static final String ADAPTER_MIN_THREAD_POOL_SIZE_NAME = "minThread";
-
     public static final String ADAPTER_MAX_THREAD_POOL_SIZE_NAME = "maxThread";
-
-    public static final String DEFAULT_KEEP_ALIVE_TIME_NAME = "defaultKeepAliveTimeInMillis";
-
+    public static final String ADAPTER_KEEP_ALIVE_TIME_NAME = "keepAliveTimeInMillis";
     public static final String ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME = "jobQueueSize";
-
+    public static final String ADAPTER_PROXY_HOST = "http.proxy.host";
+    public static final String ADAPTER_PROXY_HOST_HINT = "http.proxy.host.hint";
+    public static final String ADAPTER_PROXY_PORT = "http.proxy.port";
+    public static final String ADAPTER_PROXY_PORT_HINT = "http.proxy.port.hint";
+    public static final String ADAPTER_USERNAME = "http.username";
+    public static final String ADAPTER_USERNAME_HINT = "http.username.hint";
+    public static final String ADAPTER_PASSWORD = "http.password";
+    public static final String ADAPTER_PASSWORD_HINT = "http.password.hint";
+    public static final String ADAPTER_HEADERS = "http.headers";
+    public static final String ADAPTER_HEADERS_HINT = "http.headers.hint";
     //TODO, try to find unique header and entry separator
     public static final String HEADER_SEPARATOR = ",";
-
     public static final String ENTRY_SEPARATOR = ":";
 }

@@ -77,18 +77,10 @@ public class MQTTEventAdapterFactory extends OutputEventAdapterFactory {
         clearSession.setHint(
                 resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_CLEAN_SESSION_HINT));
 
-
-        //TODO, move to global properties
-        Property keepAlive = new Property(MQTTEventAdapterConstants.ADAPTER_CONF_KEEP_ALIVE);
-        keepAlive.setDisplayName(
-                resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_KEEP_ALIVE));
-        keepAlive.setRequired(false);
-
         staticPropertyList.add(brokerUrl);
         staticPropertyList.add(userName);
         staticPropertyList.add(password);
         staticPropertyList.add(clearSession);
-        staticPropertyList.add(keepAlive);
 
         return staticPropertyList;
 

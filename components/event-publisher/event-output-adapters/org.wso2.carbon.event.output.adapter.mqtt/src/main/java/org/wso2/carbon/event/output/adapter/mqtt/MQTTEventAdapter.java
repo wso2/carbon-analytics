@@ -94,8 +94,7 @@ public class MQTTEventAdapter implements OutputEventAdapter {
                                     .get(MQTTEventAdapterConstants.ADAPTER_CONF_PASSWORD),
                             eventAdapterConfiguration.getStaticProperties()
                                     .get(MQTTEventAdapterConstants.ADAPTER_CONF_CLEAN_SESSION),
-                            eventAdapterConfiguration.getStaticProperties()
-                                    .get(MQTTEventAdapterConstants.ADAPTER_CONF_KEEP_ALIVE));
+                            globalProperties.get(MQTTEventAdapterConstants.ADAPTER_CONF_KEEP_ALIVE));
 
             mqttAdapterPublisher = new MQTTAdapterPublisher(mqttBrokerConnectionConfiguration,
                     dynamicProperties.get(MQTTEventAdapterConstants.ADAPTER_MESSAGE_TOPIC),

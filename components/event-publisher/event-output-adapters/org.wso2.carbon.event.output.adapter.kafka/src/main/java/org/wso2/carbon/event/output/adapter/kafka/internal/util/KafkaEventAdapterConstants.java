@@ -22,21 +22,22 @@ public class KafkaEventAdapterConstants {
     private KafkaEventAdapterConstants() {
     }
 
-    //TODO Move to global properties
-    public static final String MIN_THREAD_NAME = "minThread";
-    public static final String MAX_THREAD_NAME = "maxThread";
-    public static final String DEFAULT_KEEP_ALIVE_TIME_NAME = "defaultKeepAliveTime";
-    public static final int MIN_THREAD = 8;
-    public static final int MAX_THREAD = 100;
-    public static final long DEFAULT_KEEP_ALIVE_TIME = 20;
-
+    public static final int ADAPTER_MIN_THREAD_POOL_SIZE = 8;
+    public static final int ADAPTER_MAX_THREAD_POOL_SIZE = 100;
+    public static final int ADAPTER_EXECUTOR_JOB_QUEUE_SIZE = 2000;
+    public static final long DEFAULT_KEEP_ALIVE_TIME_IN_MILLIS = 20000;
+    public static final String ADAPTER_MIN_THREAD_POOL_SIZE_NAME = "minThread";
+    public static final String ADAPTER_MAX_THREAD_POOL_SIZE_NAME = "maxThread";
+    public static final String ADAPTER_KEEP_ALIVE_TIME_NAME = "keepAliveTimeInMillis";
+    public static final String ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME = "jobQueueSize";
     public final static String ADAPTOR_TYPE_KAFKA = "kafka";
     public final static String ADAPTOR_PUBLISH_TOPIC = "topic";
-
-    //TODO Put hints for both broker and optional properties
     public final static String ADAPTOR_META_BROKER_LIST = "meta.broker.list";
-    public final static String ADAPTOR_OPTIONAL_CONFIGURATION_PROPERTIES="optional.configuration";
-    public final static String ADAPTOR_OPTIONAL_CONFIGURATION_PROPERTIES_HINT="optional.configuration.hint";
+    public final static String ADAPTOR_META_BROKER_LIST_HINT = "meta.broker.list.hint";
+    public final static String ADAPTOR_OPTIONAL_CONFIGURATION_PROPERTIES = "optional.configuration";
+    public final static String ADAPTOR_OPTIONAL_CONFIGURATION_PROPERTIES_HINT = "optional.configuration.hint";
+    public static final String HEADER_SEPARATOR = ",";
+    public static final String ENTRY_SEPARATOR = ":";
 
 
 }
