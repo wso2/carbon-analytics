@@ -40,7 +40,9 @@ public class HTTPEventAdapterConstants {
     public static final String ADAPTER_PASSWORD_HINT = "http.password.hint";
     public static final String ADAPTER_HEADERS = "http.headers";
     public static final String ADAPTER_HEADERS_HINT = "http.headers.hint";
-    //TODO, try to find unique header and entry separator
     public static final String HEADER_SEPARATOR = ",";
     public static final String ENTRY_SEPARATOR = ":";
+    public static final String ADAPTER_HTTP_CLIENT_METHOD = "http.client.method";
+    public static final String CONSTANT_HTTP_POST = "HttpPost";
+    public static final String CONSTANT_HTTP_PUT = "HttpPut";
 }

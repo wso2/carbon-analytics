@@ -55,8 +55,16 @@ public class HTTPEventAdapterFactory extends OutputEventAdapterFactory {
         proxyPortProp.setHint(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_PROXY_PORT_HINT));
         proxyPortProp.setRequired(false);
 
+        Property clientMethod = new Property(HTTPEventAdapterConstants.ADAPTER_HTTP_CLIENT_METHOD);
+        clientMethod.setDisplayName(
+                resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_HTTP_CLIENT_METHOD));
+        clientMethod.setRequired(true);
+        clientMethod.setOptions(new String[]{HTTPEventAdapterConstants.CONSTANT_HTTP_POST, HTTPEventAdapterConstants.CONSTANT_HTTP_PUT});
+        clientMethod.setDefaultValue(HTTPEventAdapterConstants.CONSTANT_HTTP_POST);
+
         staticPropertyList.add(proxyHostProp);
         staticPropertyList.add(proxyPortProp);
+        staticPropertyList.add(clientMethod);
 
         return staticPropertyList;
 

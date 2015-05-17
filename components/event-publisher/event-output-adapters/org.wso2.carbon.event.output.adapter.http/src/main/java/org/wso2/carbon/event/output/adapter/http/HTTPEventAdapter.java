@@ -22,7 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.*;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.SystemDefaultHttpClient;
@@ -43,11 +43,13 @@ public class HTTPEventAdapter implements OutputEventAdapter {
     private Map<String, String> globalProperties;
     private static ExecutorService executorService;
     private HttpClient httpClient;
+    private String clientMethod;
 
     public HTTPEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String,
             String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
         this.globalProperties = globalProperties;
+        this.clientMethod = eventAdapterConfiguration.getStaticProperties().get(HTTPEventAdapterConstants.ADAPTER_HTTP_CLIENT_METHOD);
     }
 
     @Override
@@ -224,31 +226,32 @@ public class HTTPEventAdapter implements OutputEventAdapter {
             return headers;
         }
 
-        private void processAuthentication(HttpPost method) {
-            if (this.getUsername() != null && this.getUsername().trim().length() > 0) {
-                method.setHeader("Authorization", "Basic " + Base64.encode(
-                        (this.getUsername() + HTTPEventAdapterConstants.ENTRY_SEPARATOR
-                                + this.getPassword()).getBytes()));
-            }
-        }
-
-        private void processHeaders(HttpPost method) {
-            if (this.getHeaders() != null) {
-                for (Map.Entry<String, String> header : this.getHeaders().entrySet()) {
-                    method.setHeader(header.getKey(), header.getValue());
-                }
-            }
-        }
-
-        //TODO, Check for possibility of other operations. POST, UPDATE & etc..
         public void run() {
-            HttpPost method = new HttpPost(this.getUrl());
+
+            HttpEntityEnclosingRequestBase method;
+
+            if (clientMethod.equalsIgnoreCase(HTTPEventAdapterConstants.CONSTANT_HTTP_PUT)) {
+                method = new HttpPut(this.getUrl());
+            } else {
+                method = new HttpPost(this.getUrl());
+            }
+
             StringEntity entity;
             try {
                 entity = new StringEntity(this.getPayload());
                 method.setEntity(entity);
-                this.processAuthentication(method);
-                this.processHeaders(method);
+                if (this.getUsername() != null && this.getUsername().trim().length() > 0) {
+                    method.setHeader("Authorization", "Basic " + Base64.encode(
+                            (this.getUsername() + HTTPEventAdapterConstants.ENTRY_SEPARATOR
+                                    + this.getPassword()).getBytes()));
+                }
+
+                if (this.getHeaders() != null) {
+                    for (Map.Entry<String, String> header : this.getHeaders().entrySet()) {
+                        method.setHeader(header.getKey(), header.getValue());
+                    }
+                }
+
                 httpClient.execute(method).getEntity().getContent().close();
             } catch (UnknownHostException e) {
                 log.error("Exception while connecting adapter "
