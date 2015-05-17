@@ -93,7 +93,7 @@ public class OutputAdapterRuntime {
                                 log.error("Connection unavailable on " + name + " reconnecting.", e);
                                 publish(message, dynamicProperties);
                             } else {
-                                log.error("Connection unavailable on " + name + " reconnection will be retried in" + (timer.returnTimeToWait()) + " milliseconds.", e);
+                                log.error("Connection unavailable on " + name + " reconnection will be retried in " + (timer.returnTimeToWait()) + " milliseconds.", e);
                             }
                         } else {
                             logAndDrop();
