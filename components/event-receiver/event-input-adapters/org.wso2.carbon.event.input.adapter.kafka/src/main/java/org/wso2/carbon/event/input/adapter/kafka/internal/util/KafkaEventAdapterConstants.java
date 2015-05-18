@@ -37,7 +37,6 @@ public final class KafkaEventAdapterConstants {
     public final static String ADAPTOR_SUSCRIBER_THREADS_HINT = "threads.hint";
     public final static String ADAPTOR_OPTIONAL_CONFIGURATION_PROPERTIES="optional.configuration";
     public final static String ADAPTOR_OPTIONAL_CONFIGURATION_PROPERTIES_HINT="optional.configuration.hint";
-    public static final String ADAPTOR_IS_EVENT_DUPLICATED_IN_CLUSTER = "receiving.events.duplicated.in.cluster";
     public static final int AXIS_TIME_INTERVAL_IN_MILLISECONDS = 10000;
 
 

@@ -21,30 +21,17 @@ public class MQTTBrokerConnectionConfiguration {
 
     private String brokerUsername;
     private String brokerPassword;
-    private boolean cleanSession = true;
-    private int keepAlive = 60000;
     private String brokerUrl;
+    private boolean cleanSession = true;
+    private int keepAlive;
 
     public String getBrokerPassword() {
         return brokerPassword;
     }
 
-    public void setBrokerPassword(String brokerPassword) {
-        this.brokerPassword = brokerPassword;
-    }
-
     public String getBrokerUsername() {
         return brokerUsername;
     }
-
-    public void setBrokerUsername(String brokerUsername) {
-        this.brokerUsername = brokerUsername;
-    }
-
-    public void setCleanSession(boolean cleanSession) {
-        this.cleanSession = cleanSession;
-    }
-
 
     public boolean isCleanSession() {
         return cleanSession;
@@ -52,31 +39,22 @@ public class MQTTBrokerConnectionConfiguration {
 
     public String getBrokerUrl() {
         return brokerUrl;
-    }
 
-    public void setBrokerUrl(String brokerUrl) {
-        this.brokerUrl = brokerUrl;
     }
-
     public int getKeepAlive() {
         return keepAlive;
     }
 
-    public void setKeepAlive(int keepAlive) {
-        this.keepAlive = keepAlive;
-    }
-
     public MQTTBrokerConnectionConfiguration(String brokerUrl, String brokerUsername,
-                                             String brokerPassword, String cleanSession,
-                                             String keepAlive) {
+                                             String brokerPassword, int keepAlive, String cleanSession) {
         this.brokerUsername = brokerUsername;
         this.brokerPassword = brokerPassword;
         this.brokerUrl = brokerUrl;
+        this.keepAlive = keepAlive;
+
         if (cleanSession != null) {
             this.cleanSession = Boolean.parseBoolean(cleanSession);
         }
-        if (keepAlive != null) {
-            this.keepAlive = Integer.parseInt(keepAlive);
-        }
+
     }
 }

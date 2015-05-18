@@ -77,9 +77,9 @@ public final class HTTPEventAdapter implements InputEventAdapter {
                 maxThread = HTTPEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE;
             }
 
-            if (globalProperties.get(HTTPEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_NAME) != null) {
+            if (globalProperties.get(HTTPEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME) != null) {
                 defaultKeepAliveTime = Integer.parseInt(globalProperties.get(
-                        HTTPEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_NAME));
+                        HTTPEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME));
             } else {
                 defaultKeepAliveTime = HTTPEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_IN_MILLS;
             }
@@ -171,7 +171,7 @@ public final class HTTPEventAdapter implements InputEventAdapter {
         try {
             HttpService httpService = HTTPEventAdapterServiceValueHolder.getHTTPService();
             httpService.registerServlet(endpoint,
-                    new HTTPMessageServlet(eventAdaptorListener, tenantId),
+                    new HTTPMessageServlet(eventAdaptorListener, tenantId, eventAdapterConfiguration.getProperties().get(HTTPEventAdapterConstants.EXPOSED_TRANSPORTS)),
                     new Hashtable(),
                     httpService.createDefaultHttpContext());
         } catch (ServletException | NamespaceException e) {

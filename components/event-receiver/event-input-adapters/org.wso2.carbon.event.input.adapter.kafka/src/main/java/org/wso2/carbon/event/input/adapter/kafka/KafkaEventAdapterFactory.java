@@ -76,8 +76,8 @@ public class KafkaEventAdapterFactory extends InputEventAdapterFactory {
         webTopic.setRequired(true);
         propertyList.add(webTopic);
 
-        Property isDuplicatedInCluster = new Property(KafkaEventAdapterConstants.ADAPTOR_IS_EVENT_DUPLICATED_IN_CLUSTER);
-        isDuplicatedInCluster.setDisplayName(resourceBundle.getString(KafkaEventAdapterConstants.ADAPTOR_IS_EVENT_DUPLICATED_IN_CLUSTER));
+        Property isDuplicatedInCluster = new Property(EventAdapterConstants.EVENTS_DUPLICATED_IN_CLUSTER);
+        isDuplicatedInCluster.setDisplayName(resourceBundle.getString(EventAdapterConstants.EVENTS_DUPLICATED_IN_CLUSTER));
         isDuplicatedInCluster.setRequired(false);
         isDuplicatedInCluster.setOptions(new String[]{"true", "false"});
         isDuplicatedInCluster.setDefaultValue("false");

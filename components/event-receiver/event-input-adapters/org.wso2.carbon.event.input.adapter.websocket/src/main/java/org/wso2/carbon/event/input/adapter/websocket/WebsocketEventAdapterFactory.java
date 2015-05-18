@@ -49,9 +49,9 @@ public class WebsocketEventAdapterFactory extends InputEventAdapterFactory {
         urlProperty.setRequired(true);
         propertyList.add(urlProperty);
 
-        Property isDuplicatedInCluster = new Property(WebsocketEventAdapterConstants.ADAPTER_IS_EVENT_DUPLICATED_IN_CLUSTER);
+        Property isDuplicatedInCluster = new Property(EventAdapterConstants.EVENTS_DUPLICATED_IN_CLUSTER);
         isDuplicatedInCluster.setDisplayName(
-                resourceBundle.getString(WebsocketEventAdapterConstants.ADAPTER_IS_EVENT_DUPLICATED_IN_CLUSTER));
+                resourceBundle.getString(EventAdapterConstants.EVENTS_DUPLICATED_IN_CLUSTER));
         isDuplicatedInCluster.setRequired(false);
         isDuplicatedInCluster.setOptions(new String[]{"true", "false"});
         isDuplicatedInCluster.setDefaultValue("false");

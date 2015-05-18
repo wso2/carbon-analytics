@@ -12,7 +12,7 @@
  * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.wso2.carbon.event.input.adapter.core.internal;
+package org.wso2.carbon.event.input.adapter.core;
 
 
 public final class EventAdapterConstants {
@@ -21,5 +21,6 @@ public final class EventAdapterConstants {
     }
 
     public static final String GLOBAL_CONFIG_FILE_NAME = "input-event-adapters.xml";
+    public static final String EVENTS_DUPLICATED_IN_CLUSTER = "events.duplicated.in.cluster";
 
 }

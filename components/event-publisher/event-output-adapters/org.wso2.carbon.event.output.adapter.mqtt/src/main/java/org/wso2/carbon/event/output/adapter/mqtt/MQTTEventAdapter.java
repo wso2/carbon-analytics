@@ -17,8 +17,7 @@
 */
 package org.wso2.carbon.event.output.adapter.mqtt;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
@@ -28,28 +27,75 @@ import org.wso2.carbon.event.output.adapter.mqtt.internal.util.MQTTBrokerConnect
 import org.wso2.carbon.event.output.adapter.mqtt.internal.util.MQTTEventAdapterConstants;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 public class MQTTEventAdapter implements OutputEventAdapter {
 
     private OutputEventAdapterConfiguration eventAdapterConfiguration;
     private Map<String, String> globalProperties;
-    private ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentHashMap<String, MQTTAdapterPublisher>>>
-            publisherMap = new ConcurrentHashMap<String,
-            ConcurrentHashMap<String, ConcurrentHashMap<String, MQTTAdapterPublisher>>>();
-
-    private ConcurrentHashMap<String, ConcurrentHashMap<String, MQTTAdapterPublisher>> clientIdSpecificEventSenderMap;
+    private MQTTAdapterPublisher mqttAdapterPublisher;
+    private int connectionKeepAliveInterval;
+    private String qos;
+    private static ThreadPoolExecutor threadPoolExecutor;
+    private static final Logger log = Logger.getLogger(MQTTEventAdapter.class);
 
     public MQTTEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
                             Map<String, String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
         this.globalProperties = globalProperties;
-    }
 
+        Object keeAliveInternal = globalProperties.get(MQTTEventAdapterConstants.CONNECTION_KEEP_ALIVE_INTERVAL);
+        if (keeAliveInternal != null) {
+            try {
+                connectionKeepAliveInterval = Integer.parseInt(keeAliveInternal.toString());
+            } catch (NumberFormatException e) {
+                log.error("Error when configuring user specified connection keep alive time, using default value", e);
+                connectionKeepAliveInterval = MQTTEventAdapterConstants.DEFAULT_CONNECTION_KEEP_ALIVE_INTERVAL;
+            }
+        } else {
+            connectionKeepAliveInterval = MQTTEventAdapterConstants.DEFAULT_CONNECTION_KEEP_ALIVE_INTERVAL;
+        }
+    }
 
     @Override
     public void init() throws OutputEventAdapterException {
-        //not required
+        //ThreadPoolExecutor will be assigned  if it is null
+        if (threadPoolExecutor == null) {
+            int minThread;
+            int maxThread;
+            int jobQueSize;
+            long defaultKeepAliveTime;
+
+            //If global properties are available those will be assigned else constant values will be assigned
+            if (globalProperties.get(MQTTEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE_NAME) != null) {
+                minThread = Integer.parseInt(globalProperties.get(MQTTEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE_NAME));
+            } else {
+                minThread = MQTTEventAdapterConstants.DEFAULT_MIN_THREAD_POOL_SIZE;
+            }
+
+            if (globalProperties.get(MQTTEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME) != null) {
+                maxThread = Integer.parseInt(globalProperties.get(MQTTEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME));
+            } else {
+                maxThread = MQTTEventAdapterConstants.DEFAULT_MAX_THREAD_POOL_SIZE;
+            }
+
+            if (globalProperties.get(MQTTEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME) != null) {
+                defaultKeepAliveTime = Integer.parseInt(globalProperties.get(
+                        MQTTEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME));
+            } else {
+                defaultKeepAliveTime = MQTTEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_IN_MILLIS;
+            }
+
+            if (globalProperties.get(MQTTEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME) != null) {
+                jobQueSize = Integer.parseInt(globalProperties.get(
+                        MQTTEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME));
+            } else {
+                jobQueSize = MQTTEventAdapterConstants.DEFAULT_EXECUTOR_JOB_QUEUE_SIZE;
+            }
+
+            threadPoolExecutor = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime,
+                    TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(jobQueSize));
+        }
     }
 
     @Override
@@ -59,65 +105,64 @@ public class MQTTEventAdapter implements OutputEventAdapter {
 
     @Override
     public void connect() {
-        clientIdSpecificEventSenderMap = publisherMap.get(eventAdapterConfiguration.getName());
-        if (null == clientIdSpecificEventSenderMap) {
-            clientIdSpecificEventSenderMap =
-                    new ConcurrentHashMap<String, ConcurrentHashMap<String, MQTTAdapterPublisher>>();
-            if (null != publisherMap.putIfAbsent(eventAdapterConfiguration.getName(), clientIdSpecificEventSenderMap)) {
-                clientIdSpecificEventSenderMap = publisherMap.get(eventAdapterConfiguration.getName());
-            }
-        }
+        MQTTBrokerConnectionConfiguration mqttBrokerConnectionConfiguration =
+                new MQTTBrokerConnectionConfiguration(eventAdapterConfiguration.getStaticProperties()
+                        .get(MQTTEventAdapterConstants.ADAPTER_CONF_URL),
+                        eventAdapterConfiguration.getStaticProperties()
+                                .get(MQTTEventAdapterConstants.ADAPTER_CONF_USERNAME),
+                        eventAdapterConfiguration.getStaticProperties()
+                                .get(MQTTEventAdapterConstants.ADAPTER_CONF_PASSWORD),
+                        connectionKeepAliveInterval,
+                        eventAdapterConfiguration.getStaticProperties()
+                                .get(MQTTEventAdapterConstants.ADAPTER_CONF_CLEAN_SESSION)
+                );
+
+        qos = eventAdapterConfiguration.getStaticProperties().get(MQTTEventAdapterConstants.ADAPTER_MESSAGE_QOS);
+        mqttAdapterPublisher = new MQTTAdapterPublisher(mqttBrokerConnectionConfiguration);
     }
 
     @Override
     public void publish(Object message, Map<String, String> dynamicProperties) {
-        String clientId = dynamicProperties.get(MQTTEventAdapterConstants.ADAPTER_MESSAGE_CLIENTID);
-        ConcurrentHashMap<String, MQTTAdapterPublisher> topicSpecificEventPublisherMap =
-                clientIdSpecificEventSenderMap.get(clientId);
-        if (null == topicSpecificEventPublisherMap) {
-            topicSpecificEventPublisherMap = new ConcurrentHashMap<String, MQTTAdapterPublisher>();
-            if (null != clientIdSpecificEventSenderMap.putIfAbsent(clientId, topicSpecificEventPublisherMap)) {
-                topicSpecificEventPublisherMap = clientIdSpecificEventSenderMap.get(clientId);
-            }
-        }
 
         String topic = dynamicProperties.get(MQTTEventAdapterConstants.ADAPTER_MESSAGE_TOPIC);
-        MQTTAdapterPublisher mqttAdapterPublisher = topicSpecificEventPublisherMap.get(topic);
-        if (mqttAdapterPublisher == null) {
-            MQTTBrokerConnectionConfiguration mqttBrokerConnectionConfiguration =
-                    new MQTTBrokerConnectionConfiguration(eventAdapterConfiguration.getStaticProperties()
-                            .get(MQTTEventAdapterConstants.ADAPTER_CONF_URL),
-                            eventAdapterConfiguration.getStaticProperties()
-                                    .get(MQTTEventAdapterConstants.ADAPTER_CONF_USERNAME),
-                            eventAdapterConfiguration.getStaticProperties()
-                                    .get(MQTTEventAdapterConstants.ADAPTER_CONF_PASSWORD),
-                            eventAdapterConfiguration.getStaticProperties()
-                                    .get(MQTTEventAdapterConstants.ADAPTER_CONF_CLEAN_SESSION),
-                            eventAdapterConfiguration.getStaticProperties()
-                                    .get(MQTTEventAdapterConstants.ADAPTER_CONF_KEEP_ALIVE));
-
-            mqttAdapterPublisher = new MQTTAdapterPublisher(mqttBrokerConnectionConfiguration,
-                    dynamicProperties.get(MQTTEventAdapterConstants.ADAPTER_MESSAGE_TOPIC),
-                    dynamicProperties.get(MQTTEventAdapterConstants.ADAPTER_MESSAGE_CLIENTID));
-            topicSpecificEventPublisherMap.put(topic, mqttAdapterPublisher);
+        try {
+            threadPoolExecutor.submit(new MQTTSender(topic, message));
+        } catch (RejectedExecutionException e) {
+            log.error("There is no thread left to publish event : " + message, e);
         }
-        String qos = eventAdapterConfiguration.getStaticProperties().get(MQTTEventAdapterConstants.ADAPTER_MESSAGE_QOS);
-
-        if (qos == null) {
-            mqttAdapterPublisher.publish(message.toString());
-        } else {
-            mqttAdapterPublisher.publish(Integer.parseInt(qos), message.toString());
-        }
-
     }
 
     @Override
     public void disconnect() {
-        publisherMap.clear();
+        try {
+            mqttAdapterPublisher.close();
+        } catch (OutputEventAdapterException e) {
+            log.error("Exception when closing the mqtt publisher connection", e);
+        }
     }
 
     @Override
     public void destroy() {
         //not required
+    }
+
+    class MQTTSender implements Runnable {
+
+        String topic;
+        Object message;
+
+        MQTTSender(String topic, Object message) {
+            this.topic = topic;
+            this.message = message;
+        }
+
+        @Override
+        public void run() {
+            if (qos == null) {
+                mqttAdapterPublisher.publish(message.toString(), topic);
+            } else {
+                mqttAdapterPublisher.publish(Integer.parseInt(qos), message.toString(), topic);
+            }
+        }
     }
 }

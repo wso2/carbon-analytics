@@ -42,8 +42,18 @@ public class HTTPEventAdapterFactory extends InputEventAdapterFactory {
     @Override
     public List<Property> getPropertyList() {
 
-        //TODO : Check for possibility of adding http, https
-        return null;
+        List<Property> propertyList = new ArrayList<Property>();
+
+        // Transport Exposed
+        Property exposedTransportsProperty = new Property(HTTPEventAdapterConstants.EXPOSED_TRANSPORTS);
+        exposedTransportsProperty.setRequired(true);
+        exposedTransportsProperty.setDisplayName(
+                resourceBundle.getString(HTTPEventAdapterConstants.EXPOSED_TRANSPORTS));
+        exposedTransportsProperty.setOptions(new String[]{HTTPEventAdapterConstants.HTTPS, HTTPEventAdapterConstants.HTTP, HTTPEventAdapterConstants.LOCAL, HTTPEventAdapterConstants.ALL});
+        exposedTransportsProperty.setDefaultValue(HTTPEventAdapterConstants.ALL);
+        propertyList.add(exposedTransportsProperty);
+
+        return propertyList;
     }
 
     @Override

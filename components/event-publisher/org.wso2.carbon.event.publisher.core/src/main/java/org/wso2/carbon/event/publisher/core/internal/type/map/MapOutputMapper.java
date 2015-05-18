@@ -18,6 +18,7 @@ import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.publisher.core.config.EventOutputProperty;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConfiguration;
+import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
 import org.wso2.carbon.event.publisher.core.config.mapping.MapOutputMapping;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherStreamValidationException;
@@ -40,7 +41,7 @@ public class MapOutputMapper implements OutputMapper {
     public MapOutputMapper(EventPublisherConfiguration eventPublisherConfiguration,
                            Map<String, Integer> propertyPositionMap,
                            int tenantId, StreamDefinition streamDefinition) throws
-                                                                                  EventPublisherConfigurationException {
+            EventPublisherConfigurationException {
         this.eventPublisherConfiguration = eventPublisherConfiguration;
         this.propertyPositionMap = propertyPositionMap;
         if (eventPublisherConfiguration.getOutputMapping().isCustomMappingEnabled()) {
@@ -64,7 +65,7 @@ public class MapOutputMapper implements OutputMapper {
         for (; outputPropertyConfigurationIterator.hasNext(); ) {
             EventOutputProperty outputProperty = outputPropertyConfigurationIterator.next();
             if (!propertyPositionMap.containsKey(outputProperty.getValueOf())) {
-                throw new EventPublisherStreamValidationException("Property " + outputProperty.getValueOf() + " is not in the input stream definition. ",streamDefinition.getStreamId());
+                throw new EventPublisherStreamValidationException("Property " + outputProperty.getValueOf() + " is not in the input stream definition. ", streamDefinition.getStreamId());
             }
         }
     }
@@ -93,14 +94,14 @@ public class MapOutputMapper implements OutputMapper {
 
         if (noOfMetaData > 0) {
             for (Attribute metaData : streamDefinition.getMetaData()) {
-                eventMapObject.put(metaData.getName(), eventData[counter]);
+                eventMapObject.put(EventPublisherConstants.PROPERTY_META_PREFIX + metaData.getName(), eventData[counter]);
                 counter++;
             }
         }
 
         if (noOfCorrelationData > 0) {
             for (Attribute correlationData : streamDefinition.getCorrelationData()) {
-                eventMapObject.put(correlationData.getName(), eventData[counter]);
+                eventMapObject.put(EventPublisherConstants.PROPERTY_CORRELATION_PREFIX + correlationData.getName(), eventData[counter]);
                 counter++;
             }
         }

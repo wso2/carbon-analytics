@@ -29,7 +29,6 @@ import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration
 import org.wso2.carbon.event.output.adapter.core.exception.ConnectionUnavailableException;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterRuntimeException;
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
-import org.wso2.carbon.event.output.adapter.wso2event.internal.util.WSO2EventAdapterConstants;
 
 import java.util.Map;
 

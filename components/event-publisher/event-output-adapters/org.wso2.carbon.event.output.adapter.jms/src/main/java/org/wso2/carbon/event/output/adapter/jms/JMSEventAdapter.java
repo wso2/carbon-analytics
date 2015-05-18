@@ -33,14 +33,15 @@ import java.util.Map;
 import javax.jms.JMSException;
 import javax.jms.Session;
 import java.util.*;
+import java.util.concurrent.*;
 
 public class JMSEventAdapter implements OutputEventAdapter {
 
     private static final Log log = LogFactory.getLog(JMSEventAdapter.class);
     private OutputEventAdapterConfiguration eventAdapterConfiguration;
     private Map<String, String> globalProperties;
-
     private PublisherDetails publisherDetails = null;
+    private static ExecutorService executorService;
 
     public JMSEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
                            Map<String, String> globalProperties) {
@@ -51,6 +52,46 @@ public class JMSEventAdapter implements OutputEventAdapter {
     @Override
     public void init() throws OutputEventAdapterException {
 
+        //ExecutorService will be assigned  if it is null
+        if (executorService == null) {
+            int minThread;
+            int maxThread;
+            long defaultKeepAliveTime;
+            int jobQueSize;
+
+            //If global properties are available those will be assigned else constant values will be assigned
+            if (globalProperties.get(JMSEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE_NAME) != null) {
+                minThread = Integer.parseInt(globalProperties.get(
+                        JMSEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE_NAME));
+            } else {
+                minThread = JMSEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE;
+            }
+
+            if (globalProperties.get(JMSEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME) != null) {
+                maxThread = Integer.parseInt(globalProperties.get(
+                        JMSEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME));
+            } else {
+                maxThread = JMSEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE;
+            }
+
+            if (globalProperties.get(JMSEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME) != null) {
+                defaultKeepAliveTime = Integer.parseInt(globalProperties.get(
+                        JMSEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME));
+            } else {
+                defaultKeepAliveTime = JMSEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_IN_MILLIS;
+            }
+
+            if (globalProperties.get(JMSEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME) != null) {
+                jobQueSize = Integer.parseInt(globalProperties.get(
+                        JMSEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME));
+            } else {
+                jobQueSize = JMSEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE;
+            }
+
+            executorService = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime, TimeUnit.MILLISECONDS,
+                    new LinkedBlockingQueue<Runnable>(jobQueSize));
+        }
+
     }
 
     @Override
@@ -59,9 +100,7 @@ public class JMSEventAdapter implements OutputEventAdapter {
         try {
             Hashtable<String, String> adaptorProperties = new Hashtable<String, String>();
             adaptorProperties.putAll(eventAdapterConfiguration.getStaticProperties());
-            adaptorProperties.remove(JMSEventAdapterConstants.ADAPTER_JMS_DESTINATION);
-            JMSConnectionFactory jmsConnectionFactory = new JMSConnectionFactory(adaptorProperties,
-                    eventAdapterConfiguration.getName());
+            JMSConnectionFactory jmsConnectionFactory = new JMSConnectionFactory(adaptorProperties, eventAdapterConfiguration.getName());
             Connection connection = jmsConnectionFactory.getConnection();
             connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             connection.close();
@@ -88,7 +127,11 @@ public class JMSEventAdapter implements OutputEventAdapter {
         Message jmsMessage = publisherDetails.getJmsMessageSender().convertToJMSMessage(message,
                 publisherDetails.getMessageConfig());
         setJMSTransportHeaders(jmsMessage, dynamicProperties.get(JMSEventAdapterConstants.ADAPTER_JMS_HEADER));
-        publisherDetails.getJmsMessageSender().send(jmsMessage, publisherDetails.getMessageConfig());
+        try {
+            executorService.submit(new JMSSender(jmsMessage));
+        } catch (RejectedExecutionException e) {
+            log.error("There is no thread connection left to publish event : " + message, e);
+        }
     }
 
     @Override
@@ -111,9 +154,7 @@ public class JMSEventAdapter implements OutputEventAdapter {
         PublisherDetails publisherDetails;
         Hashtable<String, String> adaptorProperties =
                 convertMapToHashTable(outputEventAdaptorConfiguration.getStaticProperties());
-        adaptorProperties.remove(JMSConstants.PARAM_DESTINATION);
-        JMSConnectionFactory jmsConnectionFactory = new JMSConnectionFactory(adaptorProperties,
-                outputEventAdaptorConfiguration.getName());
+        JMSConnectionFactory jmsConnectionFactory = new JMSConnectionFactory(adaptorProperties, outputEventAdaptorConfiguration.getName());
         JMSMessageSender jmsMessageSender = new JMSMessageSender(jmsConnectionFactory, messageConfig);
         publisherDetails = new PublisherDetails(jmsConnectionFactory, jmsMessageSender, messageConfig);
 
@@ -125,15 +166,15 @@ public class JMSEventAdapter implements OutputEventAdapter {
         Map<String, String> messageConfiguration = new HashMap<String, String>();
 
         if (headerProperty != null && message != null) {
-            String[] headers = headerProperty.split(",");
+            String[] headers = headerProperty.split(JMSEventAdapterConstants.HEADER_SEPARATOR);
 
             if (headers != null && headers.length > 0) {
                 for (String header : headers) {
-                    String[] headerPropertyWithValue = header.split(":");
-                    if (headerPropertyWithValue.length == 2) {
+                    try {
+                        String[] headerPropertyWithValue = header.split(JMSEventAdapterConstants.ENTRY_SEPARATOR, 2);
                         messageConfiguration.put(headerPropertyWithValue[0], headerPropertyWithValue[1]);
-                    } else {
-                        log.warn("Header property \" " + header + " \" is not defined in the correct format");
+                    } catch (Exception e) {
+                        log.warn("Header property \" " + header + " \" is not defined in the correct format", e);
                     }
                 }
             }
@@ -188,6 +229,21 @@ public class JMSEventAdapter implements OutputEventAdapter {
         }
 
         return table;
+    }
+
+    public class JMSSender implements Runnable {
+
+        private Message jmsMessage;
+
+        public JMSSender(Message jmsMessage) {
+            this.jmsMessage = jmsMessage;
+
+        }
+
+        @Override
+        public void run() {
+            publisherDetails.getJmsMessageSender().send(jmsMessage, publisherDetails.getMessageConfig());
+        }
     }
 
 }

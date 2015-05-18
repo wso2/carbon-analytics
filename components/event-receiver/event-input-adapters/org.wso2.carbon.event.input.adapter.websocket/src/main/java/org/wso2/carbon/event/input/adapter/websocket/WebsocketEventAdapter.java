@@ -19,6 +19,7 @@
 package org.wso2.carbon.event.input.adapter.websocket;
 
 import org.glassfish.tyrus.client.ClientManager;
+import org.wso2.carbon.event.input.adapter.core.EventAdapterConstants;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapter;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterConfiguration;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
@@ -91,7 +92,7 @@ public class WebsocketEventAdapter implements InputEventAdapter {
     //TODO : Check the usage of the duplicated events property
     @Override
     public boolean isEventDuplicatedInCluster() {
-        return Boolean.parseBoolean(eventAdapterConfiguration.getProperties().get("receiving.events.duplicated.in.cluster"));
+        return Boolean.parseBoolean(eventAdapterConfiguration.getProperties().get(EventAdapterConstants.EVENTS_DUPLICATED_IN_CLUSTER));
     }
 
     @Override

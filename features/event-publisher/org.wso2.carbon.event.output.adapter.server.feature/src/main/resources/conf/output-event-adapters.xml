@@ -45,4 +45,33 @@
         <property key="h2.selectAllColumnsDataTypeInTable">SHOW COLUMNS FROM $TABLE_NAME</property>
     </adapterConfig>
 
+    <adapterConfig type="http">
+        <property key="minThread">8</property>
+        <property key="maxThread">100</property>
+        <property key="keepAliveTimeInMillis">20000</property>
+        <property key="jobQueueSize">10000</property>
+    </adapterConfig>
+
+    <adapterConfig type="jms">
+        <property key="minThread">8</property>
+        <property key="maxThread">100</property>
+        <property key="keepAliveTimeInMillis">20000</property>
+        <property key="jobQueueSize">10000</property>
+    </adapterConfig>
+
+    <adapterConfig type="mqtt">
+        <property key="minThread">8</property>
+        <property key="maxThread">100</property>
+        <property key="keepAliveTimeInMillis">20000</property>
+        <property key="jobQueueSize">10000</property>
+        <property key="connectionKeepAliveInterval">60</property>
+    </adapterConfig>
+
+    <adapterConfig type="kafka">
+        <property key="minThread">8</property>
+        <property key="maxThread">100</property>
+        <property key="keepAliveTimeInMillis">20000</property>
+        <property key="jobQueueSize">10000</property>
+    </adapterConfig>
+
 </outputEventAdaptersConfig>

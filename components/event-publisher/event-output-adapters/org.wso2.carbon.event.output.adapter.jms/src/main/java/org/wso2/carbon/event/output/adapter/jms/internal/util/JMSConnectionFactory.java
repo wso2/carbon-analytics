@@ -89,10 +89,6 @@ public class JMSConnectionFactory {
             context = new InitialContext(parameters);
             conFactory = JMSUtils.lookup(context, ConnectionFactory.class,
                     parameters.get(JMSConstants.PARAM_CONFAC_JNDI_NAME));
-            if (parameters.get(JMSConstants.PARAM_DESTINATION) != null) {
-                sharedDestination = JMSUtils.lookup(context, Destination.class,
-                        parameters.get(JMSConstants.PARAM_DESTINATION));
-            }
             log.info("JMS ConnectionFactory : " + name + " initialized");
 
         } catch (NamingException e) {
