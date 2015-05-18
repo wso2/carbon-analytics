@@ -239,8 +239,8 @@ public class UIEventAdapter implements OutputEventAdapter {
         } catch (RejectedExecutionException e) {
             log.error("Event Dropped by Output UI Adapter '" + eventAdapterConfiguration.getName() + "'");
             if (log.isDebugEnabled()) {
-                log.debug("Dropping the message: '" + message + "', since no clients have being registered to receive " +
-                        "events from ui adapter: '" + eventAdapterConfiguration.getName() + "', " +
+                log.debug("Dropping the message: '" + message + "', since since buffer queue is full for" +
+                        "ui adapter: '" + eventAdapterConfiguration.getName() + "', " +
                         "for tenant ID: " + tenantId);
             }
         }
@@ -298,7 +298,11 @@ public class UIEventAdapter implements OutputEventAdapter {
                         try {
                             session.getBasicRemote().sendText(message);
                         } catch (IOException e) {
-                            throw new ConnectionUnavailableException(e);
+                            log.error("Event Dropped by Output UI Adapter '" + eventAdapterConfiguration.getName() + "'");
+                            if (log.isDebugEnabled()) {
+                                log.debug("Dropping the message: '" + message + "' from ui adapter: '" + eventAdapterConfiguration.getName() + "' " +
+                                        "for tenant ID: " + tenantId + ", as " + e.getMessage(), e);
+                            }
                         }
                     }
                 }

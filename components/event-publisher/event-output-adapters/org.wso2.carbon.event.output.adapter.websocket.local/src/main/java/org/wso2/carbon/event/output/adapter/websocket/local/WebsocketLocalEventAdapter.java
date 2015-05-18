@@ -27,16 +27,19 @@ import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterExc
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.output.adapter.websocket.local.internal.WebsocketLocalOutputCallbackRegisterServiceImpl;
 import org.wso2.carbon.event.output.adapter.websocket.local.internal.ds.WebsocketLocalEventAdaptorServiceInternalValueHolder;
+import org.wso2.carbon.event.output.adapter.websocket.local.internal.util.WebsocketLocalEventAdapterConstants;
 
 import javax.websocket.Session;
+import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.*;
 
 public final class WebsocketLocalEventAdapter implements OutputEventAdapter {
 
     private static final Log log = LogFactory.getLog(WebsocketLocalEventAdapter.class);
     private OutputEventAdapterConfiguration eventAdapterConfiguration;
     private Map<String, String> globalProperties;
+    private static ThreadPoolExecutor executorService;
 
     private int tenantID;
 
@@ -49,7 +52,45 @@ public final class WebsocketLocalEventAdapter implements OutputEventAdapter {
 
     @Override
     public void init() throws OutputEventAdapterException {
-        //Nothing to initialize.
+        //ExecutorService will be assigned  if it is null
+        if (executorService == null) {
+            int minThread;
+            int maxThread;
+            long defaultKeepAliveTime;
+            int jobQueSize;
+
+            //If global properties are available those will be assigned else constant values will be assigned
+            if (globalProperties.get(WebsocketLocalEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE_NAME) != null) {
+                minThread = Integer.parseInt(globalProperties.get(
+                        WebsocketLocalEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE_NAME));
+            } else {
+                minThread = WebsocketLocalEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE;
+            }
+
+            if (globalProperties.get(WebsocketLocalEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME) != null) {
+                maxThread = Integer.parseInt(globalProperties.get(
+                        WebsocketLocalEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME));
+            } else {
+                maxThread = WebsocketLocalEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE;
+            }
+
+            if (globalProperties.get(WebsocketLocalEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME) != null) {
+                defaultKeepAliveTime = Integer.parseInt(globalProperties.get(
+                        WebsocketLocalEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME));
+            } else {
+                defaultKeepAliveTime = WebsocketLocalEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_IN_MILLIS;
+            }
+
+            if (globalProperties.get(WebsocketLocalEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME) != null) {
+                jobQueSize = Integer.parseInt(globalProperties.get(
+                        WebsocketLocalEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME));
+            } else {
+                jobQueSize = WebsocketLocalEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE;
+            }
+
+            executorService = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime, TimeUnit.MILLISECONDS,
+                    new LinkedBlockingQueue<Runnable>(jobQueSize));
+        }
     }
 
     @Override
@@ -64,29 +105,14 @@ public final class WebsocketLocalEventAdapter implements OutputEventAdapter {
 
     @Override
     public void publish(Object message, Map<String, String> dynamicProperties) {
-        WebsocketLocalOutputCallbackRegisterServiceImpl websocketLocalOutputCallbackRegisterServiceImpl = WebsocketLocalEventAdaptorServiceInternalValueHolder.getWebsocketLocalOutputCallbackRegisterServiceImpl();
-        CopyOnWriteArrayList<Session> sessions = websocketLocalOutputCallbackRegisterServiceImpl.getSessions(tenantID, eventAdapterConfiguration.getName());
-        if (sessions != null){
-            if (message instanceof Object[]) {
-                //TODO: send message in one send() operation by defining a new events-schema.
-                for (Object object : (Object[])message){
-                    for (Session session : sessions){
-                        synchronized (session){
-                            session.getAsyncRemote().sendText(object.toString());  //this method call was synchronized to fix CEP-996
-                        }
-                    }
-                }
-            } else {
-                for (Session session : sessions){
-                    synchronized (session){
-                        session.getAsyncRemote().sendText(message.toString());  //this method call was synchronized to fix CEP-996
-                    }
-                }
-            }
-        } else {
+        try {
+            executorService.execute(new WebSocketSender(message.toString()));
+        } catch (RejectedExecutionException e) {
+            log.error("Event Dropped by Output UI Adapter '" + eventAdapterConfiguration.getName() + "'");
             if (log.isDebugEnabled()) {
-                log.debug("Dropping the message: '"+message+"', since no clients have being registered to receive events from websocket-local adapter: '"
-                        +eventAdapterConfiguration.getName()+"', for tenant ID: "+tenantID);
+                log.debug("Dropping the message: '" + message + "', since buffer queue is full for " +
+                        "websocket-local adapter: '" + eventAdapterConfiguration.getName() + "', " +
+                        "for tenant ID: " + tenantID);
             }
         }
     }
@@ -99,5 +125,55 @@ public final class WebsocketLocalEventAdapter implements OutputEventAdapter {
     @Override
     public void destroy() {
         //Nothing to be destroyed.
+    }
+
+    private class WebSocketSender implements Runnable {
+
+        private String message;
+
+        public WebSocketSender(String message) {
+            this.message = message;
+        }
+
+        /**
+         * When an object implementing interface <code>Runnable</code> is used
+         * to create a thread, starting the thread causes the object's
+         * <code>run</code> method to be called in that separately executing
+         * thread.
+         * <p/>
+         * The general contract of the method <code>run</code> is that it may
+         * take any action whatsoever.
+         *
+         * @see Thread#run()
+         */
+        @Override
+        public void run() {
+
+            WebsocketLocalOutputCallbackRegisterServiceImpl websocketLocalOutputCallbackRegisterServiceImpl = WebsocketLocalEventAdaptorServiceInternalValueHolder.getWebsocketLocalOutputCallbackRegisterServiceImpl();
+            CopyOnWriteArrayList<Session> sessions = websocketLocalOutputCallbackRegisterServiceImpl.getSessions(tenantID, eventAdapterConfiguration.getName());
+            if (sessions != null) {
+                for (Session session : sessions) {
+                    synchronized (session) {
+                        try {
+                            session.getBasicRemote().sendText(message);
+                        } catch (IOException e) {
+                            log.error("Event Dropped by Output Websocket-Local Adapter '" + eventAdapterConfiguration.getName() + "'");
+                            if (log.isDebugEnabled()) {
+                                log.debug("Dropping the message: '" + message + "' from websocket-local adapter: '" + eventAdapterConfiguration.getName() + "' " +
+                                        "for tenant ID: " + tenantID + ", as " + e.getMessage(), e);
+                            }
+                        }
+                    }
+                }
+            } else {
+                log.error("Event Dropped by Output Websocket-Local Adapter '" + eventAdapterConfiguration.getName() + "'");
+                if (log.isDebugEnabled()) {
+                    log.debug("Dropping the message: '" + message + "', since no clients have being registered to receive " +
+                            "events from websocket-local adapter: '" + eventAdapterConfiguration.getName() + "', " +
+                            "for tenant ID: " + tenantID);
+                }
+            }
+
+        }
     }
 }
