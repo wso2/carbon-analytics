@@ -14,41 +14,52 @@
 * KIND, either express or implied.  See the License for the
 * specific language governing permissions and limitations
 * under the License.
+*
 */
 package org.wso2.carbon.event.output.adapter.email;
 
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.Constants;
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.client.Options;
-import org.apache.axis2.client.ServiceClient;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.axis2.transport.mail.MailConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
+import org.wso2.carbon.event.output.adapter.core.exception.ConnectionUnavailableException;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants;
-import org.wso2.carbon.event.output.adapter.email.internal.ds.EmailEventAdapterServiceValueHolder;
 
-import java.util.HashMap;
+import javax.mail.*;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import java.util.Date;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+
+/**
+ * The Email event adapter sends mail using an SMTP server configuration defined
+ * in output-event-adapters.xml email adapter sender definition.
+ */
 
 public class EmailEventAdapter implements OutputEventAdapter {
 
     private static final Log log = LogFactory.getLog(EmailEventAdapter.class);
     private static ThreadPoolExecutor threadPoolExecutor;
+    private static Session session;
     private OutputEventAdapterConfiguration eventAdapterConfiguration;
     private Map<String, String> globalProperties;
+
+
+    /**
+     * Default from address for outgoing messages.
+     */
+    private InternetAddress smtpFromAddress = null;
+
 
     public EmailEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
                              Map<String, String> globalProperties) {
@@ -56,14 +67,22 @@ public class EmailEventAdapter implements OutputEventAdapter {
         this.globalProperties = globalProperties;
     }
 
+    /**
+     * Initialize the thread pool to send emails.
+     *
+     * @throws OutputEventAdapterException on error.
+     */
+
     @Override
     public void init() throws OutputEventAdapterException {
 
-        //ThreadPoolExecutor will be assigned  if it is null
+        //ThreadPoolExecutor will be assigned  if it is null.
         if (threadPoolExecutor == null) {
             int minThread;
             int maxThread;
             long defaultKeepAliveTime;
+            int jobQueSize;
+
 
             //If global properties are available those will be assigned else constant values will be assigned
             if (globalProperties.get(EmailEventAdapterConstants.MIN_THREAD_NAME) != null) {
@@ -78,16 +97,24 @@ public class EmailEventAdapter implements OutputEventAdapter {
                 maxThread = EmailEventAdapterConstants.MAX_THREAD;
             }
 
-            if (globalProperties.get(EmailEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_NAME) != null) {
+            if (globalProperties.get(EmailEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME) != null) {
                 defaultKeepAliveTime = Integer.parseInt(globalProperties.get(
-                        EmailEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_NAME));
+                        EmailEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME));
             } else {
-                defaultKeepAliveTime = EmailEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME;
+                defaultKeepAliveTime = EmailEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_IN_MILLS;
+            }
+
+            if (globalProperties.get(EmailEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME) != null) {
+                jobQueSize = Integer.parseInt(globalProperties.get(
+                        EmailEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME));
+            } else {
+                jobQueSize = EmailEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE;
             }
 
             threadPoolExecutor = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime,
-                    TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(1000));
+                    TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(jobQueSize));
         }
+
     }
 
     @Override
@@ -95,22 +122,122 @@ public class EmailEventAdapter implements OutputEventAdapter {
         throw new TestConnectionNotSupportedException("not-available");
     }
 
+    /**
+     * Initialize the Email SMTP session and be ready to send emails.
+     *
+     * @throws ConnectionUnavailableException on error.
+     */
+
+
     @Override
-    public void connect() {
-        //not required
+    public void connect() throws ConnectionUnavailableException {
+
+        if (session == null) {
+
+            /**
+             * Default SMTP properties for outgoing messages.
+             */
+            String smtpFrom;
+            String smtpHost;
+            String smtpPort;
+
+
+            /**
+             *  Default from username and password for outgoing messages.
+             */
+            final String smtpUsername;
+            final String smtpPassword;
+
+
+            // initialize SMTP session.
+            Properties props = new Properties();
+            props.putAll(globalProperties);
+
+            //Verifying default SMTP properties of the SMTP server.
+
+            smtpFrom = props.getProperty(MailConstants.MAIL_SMTP_FROM);
+            smtpHost = props.getProperty(EmailEventAdapterConstants.MAIL_SMTP_HOST);
+            smtpPort = props.getProperty(EmailEventAdapterConstants.MAIL_SMTP_PORT);
+
+            if (smtpFrom == null) {
+                String msg = "failed to connect to the mail server due to null smtpFrom value";
+                throw new ConnectionUnavailableException("The adapter " +
+                        eventAdapterConfiguration.getName() + " " + msg);
+
+            }
+
+            if (smtpHost == null) {
+                String msg = "failed to connect to the mail server due to null smtpHost value";
+                throw new ConnectionUnavailableException
+                        ("The adapter " + eventAdapterConfiguration.getName() + " " + msg);
+            }
+
+            if (smtpPort == null) {
+                String msg = "failed to connect to the mail server due to null smtpPort value";
+                throw new ConnectionUnavailableException
+                        ("The adapter " + eventAdapterConfiguration.getName() + " " + msg);
+            }
+
+
+            try {
+                smtpFromAddress = new InternetAddress(smtpFrom);
+            } catch (AddressException e) {
+                log.error("Error in retrieving smtp address : " +
+                        smtpFrom, e);
+                String msg = "failed to connect to the mail server due to error in retrieving " +
+                        "smtp from address";
+                throw new ConnectionUnavailableException
+                        ("The adapter " + eventAdapterConfiguration.getName() + " " + msg, e);
+            }
+
+            //Retrieving username and password of SMTP server.
+            smtpUsername = props.getProperty(MailConstants.MAIL_SMTP_USERNAME);
+            smtpPassword = props.getProperty(MailConstants.MAIL_SMTP_PASSWORD);
+
+
+            //initializing SMTP server to create session object.
+            if (smtpUsername != null && smtpPassword != null) {
+                session = Session.getInstance(props, new Authenticator() {
+                    public PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(smtpUsername, smtpPassword);
+                    }
+                });
+            } else {
+                log.error("Error in smtp username & password verification");
+                String msg = "failed to connect to the mail server due to failed " +
+                        "user password authorization";
+                throw new ConnectionUnavailableException("The adapter " +
+                        eventAdapterConfiguration.getName() + " " + msg);
+            }
+        }
+
+
     }
+
+    /**
+     * This will be invoked upon a successful trigger of
+     * a data stream.
+     *
+     * @param message           the event stream data.
+     * @param dynamicProperties the dynamic attributes of the email.
+     */
+
 
     @Override
     public void publish(Object message, Map<String, String> dynamicProperties) {
-
         //Get subject and emailIds from dynamic properties
         String subject = dynamicProperties.get(EmailEventAdapterConstants.ADAPTER_MESSAGE_EMAIL_SUBJECT);
         String[] emailIds = dynamicProperties.get(EmailEventAdapterConstants.ADAPTER_MESSAGE_EMAIL_ADDRESS)
                 .replaceAll(" ", "").split(EmailEventAdapterConstants.EMAIL_SEPARATOR);
+        String emailType = dynamicProperties.get(EmailEventAdapterConstants.APAPTER_MESSAGE_EMAIL_TYPE);
 
         //Send email for each emailId
         for (String email : emailIds) {
-            threadPoolExecutor.submit(new EmailSender(email, subject, message.toString()));
+            try {
+                threadPoolExecutor.submit(new EmailSender(email, subject, message.toString(), emailType));
+            } catch (RejectedExecutionException e) {
+                log.error("There is no thread connection left to publish event : " + message, e);
+            }
         }
     }
 
@@ -129,61 +256,54 @@ public class EmailEventAdapter implements OutputEventAdapter {
         String to;
         String subject;
         String body;
+        String type;
 
-        EmailSender(String to, String subject, String body) {
+        EmailSender(String to, String subject, String body, String type) {
             this.to = to;
             this.subject = subject;
             this.body = body;
+            this.type = type;
         }
 
+        /**
+         * Sending emails to the corresponding Email IDs'.
+         */
         @Override
         public void run() {
-            Map<String, String> headerMap = new HashMap<String, String>();
-            headerMap.put(MailConstants.MAIL_HEADER_SUBJECT, subject);
-            OMElement payload = OMAbstractFactory.getOMFactory().createOMElement(
-                    BaseConstants.DEFAULT_TEXT_WRAPPER, null);
-            payload.setText(body);
 
-            ServiceClient serviceClient = null;
+            if (log.isDebugEnabled()) {
+                log.debug("Format of the email:" + " " + to + "->" + type);
+            }
+
+            //Creating MIME object using initiated session.
+            MimeMessage message = new MimeMessage(session);
+
+            //Setting up the Email attributes and Email payload.
             try {
-                ConfigurationContext configContext = EmailEventAdapterServiceValueHolder
-                        .getConfigurationContextService().getClientConfigContext();
+                message.setFrom(smtpFromAddress);
+                message.addRecipient(Message.RecipientType.TO,
+                        new InternetAddress(to));
 
-                //Set configuration service client if available, else create new service client
-                if (configContext != null) {
-                    serviceClient = new ServiceClient(configContext, null);
-                } else {
-                    serviceClient = new ServiceClient();
-                }
-                Options options = new Options();
-                options.setProperty(Constants.Configuration.ENABLE_REST, Constants.VALUE_TRUE);
-                options.setProperty(MessageContext.TRANSPORT_HEADERS, headerMap);
-                options.setProperty(MailConstants.TRANSPORT_MAIL_FORMAT,
-                        MailConstants.TRANSPORT_FORMAT_TEXT);
-                options.setTo(new EndpointReference(EmailEventAdapterConstants.EMAIL_URI_SCHEME + to));
+                message.setSubject(subject);
+                message.setSentDate(new Date());
+                message.setContent(body, type);
 
-                serviceClient.setOptions(options);
-                serviceClient.fireAndForget(payload);
-                log.debug("Sending confirmation mail to " + to);
-            } catch (AxisFault e) {
-                String msg = "Error in delivering the message, " +
-                        "subject: " + subject + ", to: " + to + ".";
-                log.error(msg);
-            } catch (Throwable t) {
-                String msg = "Error in delivering the message, " +
-                        "subject: " + subject + ", to: " + to + ".";
-                log.error(msg);
-                log.error(t);
-            } finally {
-                if (serviceClient != null) {
-                    try {
-                        serviceClient.cleanup();
-                    } catch (AxisFault axisFault) {
-                        log.error("Error while cleaning-up service client resources ", axisFault);
-                    }
+                if (log.isDebugEnabled()) {
+                    log.debug("Meta data of the email configured successfully");
                 }
+
+                Transport.send(message);
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Mail sent to the EmailID" + " " + to + " " + "Successfully");
+                }
+            } catch (MessagingException e) {
+                log.error("Message format error in sending the Email from : " + smtpFromAddress, e);
+            } catch (Exception e) {
+                log.error("Error in sending the Email : " + to, e);
             }
         }
+
     }
 
 }
