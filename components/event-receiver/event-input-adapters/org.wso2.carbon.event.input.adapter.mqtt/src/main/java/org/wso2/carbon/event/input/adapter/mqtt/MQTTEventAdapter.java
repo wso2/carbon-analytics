@@ -22,7 +22,6 @@ import org.wso2.carbon.event.input.adapter.core.InputEventAdapter;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterConfiguration;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterException;
-import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterRuntimeException;
 import org.wso2.carbon.event.input.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.input.adapter.mqtt.internal.util.MQTTAdapterListener;
 import org.wso2.carbon.event.input.adapter.mqtt.internal.util.MQTTBrokerConnectionConfiguration;
@@ -30,7 +29,6 @@ import org.wso2.carbon.event.input.adapter.mqtt.internal.util.MQTTEventAdapterCo
 
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class MQTTEventAdapter implements InputEventAdapter {
 
@@ -38,11 +36,9 @@ public class MQTTEventAdapter implements InputEventAdapter {
     private InputEventAdapterListener eventAdapterListener;
     private final Map<String, String> globalProperties;
     private final String id = UUID.randomUUID().toString();
+    private MQTTAdapterListener mqttAdapterListener;
+    private MQTTBrokerConnectionConfiguration mqttBrokerConnectionConfiguration;
 
-    public static ConcurrentHashMap<Integer, Map<String, ConcurrentHashMap<String, ConcurrentHashMap<String,
-            MQTTAdapterListener>>>> inputEventAdapterListenerMap =
-            new ConcurrentHashMap<Integer, Map<String, ConcurrentHashMap<String, ConcurrentHashMap<String,
-                    MQTTAdapterListener>>>>();
 
     public MQTTEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration,
                             Map<String, String> globalProperties) {
@@ -62,49 +58,41 @@ public class MQTTEventAdapter implements InputEventAdapter {
 
     @Override
     public void connect() {
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        createMQTTAdapterListener(tenantId);
+
+        int keepAlive;
+
+        //If global properties are available those will be assigned else constant values will be assigned
+        if (globalProperties.get(MQTTEventAdapterConstants.ADAPTER_CONF_KEEP_ALIVE) != null) {
+            keepAlive = Integer.parseInt((globalProperties.get(MQTTEventAdapterConstants.ADAPTER_CONF_KEEP_ALIVE)));
+        } else {
+            keepAlive = MQTTEventAdapterConstants.ADAPTER_CONF_DEFAULT_KEEP_ALIVE;
+        }
+
+        mqttBrokerConnectionConfiguration = new MQTTBrokerConnectionConfiguration(
+                eventAdapterConfiguration.getProperties().get(MQTTEventAdapterConstants.ADAPTER_CONF_URL),
+                eventAdapterConfiguration.getProperties().get(MQTTEventAdapterConstants.ADAPTER_CONF_USERNAME),
+                eventAdapterConfiguration.getProperties().get(MQTTEventAdapterConstants.ADAPTER_CONF_PASSWORD),
+                eventAdapterConfiguration.getProperties().get(MQTTEventAdapterConstants.ADAPTER_CONF_CLEAN_SESSION),
+                String.valueOf(keepAlive));
+
+        mqttAdapterListener = new MQTTAdapterListener(mqttBrokerConnectionConfiguration,
+                eventAdapterConfiguration.getProperties().get(MQTTEventAdapterConstants.ADAPTER_MESSAGE_TOPIC),
+                eventAdapterConfiguration.getProperties().get(MQTTEventAdapterConstants.ADAPTER_MESSAGE_CLIENTID),
+                eventAdapterListener, PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
+
+        mqttAdapterListener.createConnection();
     }
 
     @Override
     public void disconnect() {
-
-        String topic = eventAdapterConfiguration.getProperties().get(MQTTEventAdapterConstants.ADAPTER_MESSAGE_TOPIC);
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-
-        Map<String, ConcurrentHashMap<String, ConcurrentHashMap<String, MQTTAdapterListener>>>
-                adapterDestinationSubscriptionsMap = inputEventAdapterListenerMap.get(tenantId);
-        if (adapterDestinationSubscriptionsMap == null) {
-            throw new InputEventAdapterRuntimeException("There is no subscription for " + topic + " for tenant "
-                    + PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true));
-        }
-
-        ConcurrentHashMap<String, ConcurrentHashMap<String, MQTTAdapterListener>> destinationSubscriptionsMap =
-                adapterDestinationSubscriptionsMap.get(eventAdapterConfiguration.getName());
-        if (destinationSubscriptionsMap == null) {
-            throw new InputEventAdapterRuntimeException("There is no subscription for " + topic
-                    + " for event adapter " + eventAdapterConfiguration.getName());
-        }
-
-        ConcurrentHashMap<String, MQTTAdapterListener> subscriptionsMap = destinationSubscriptionsMap.get(topic);
-        if (subscriptionsMap == null) {
-            throw new InputEventAdapterRuntimeException("There is no subscription for " + topic);
-        }
-
-        MQTTAdapterListener mqttAdapterListener = subscriptionsMap.get(id);
         if (mqttAdapterListener != null) {
             mqttAdapterListener.stopListener(eventAdapterConfiguration.getName());
-            subscriptionsMap.remove(id);
+            mqttAdapterListener = null;
         }
-
     }
 
     @Override
     public void destroy() {
-    }
-
-    public InputEventAdapterListener getEventAdapterListener() {
-        return eventAdapterListener;
     }
 
     @Override
@@ -124,52 +112,6 @@ public class MQTTEventAdapter implements InputEventAdapter {
         return id.hashCode();
     }
 
-    private void createMQTTAdapterListener(int tenantId) {
-
-        String topic = eventAdapterConfiguration.getProperties().get(MQTTEventAdapterConstants.ADAPTER_MESSAGE_TOPIC);
-        Map<String, ConcurrentHashMap<String, ConcurrentHashMap<String, MQTTAdapterListener>>> tenantSpecificListenerMap
-                = inputEventAdapterListenerMap.get(tenantId);
-        if (tenantSpecificListenerMap == null) {
-            tenantSpecificListenerMap = new ConcurrentHashMap<String, ConcurrentHashMap<String,
-                    ConcurrentHashMap<String, MQTTAdapterListener>>>();
-            inputEventAdapterListenerMap.put(tenantId, tenantSpecificListenerMap);
-        }
-
-        ConcurrentHashMap<String, ConcurrentHashMap<String, MQTTAdapterListener>> adapterSpecificListenerMap =
-                tenantSpecificListenerMap.get(eventAdapterConfiguration.getName());
-
-        if (adapterSpecificListenerMap == null) {
-            adapterSpecificListenerMap = new ConcurrentHashMap<String, ConcurrentHashMap<String, MQTTAdapterListener>>();
-            if (null != tenantSpecificListenerMap.put(eventAdapterConfiguration.getName(),
-                    adapterSpecificListenerMap)) {
-                adapterSpecificListenerMap = tenantSpecificListenerMap.get(eventAdapterConfiguration.getName());
-            }
-        }
-
-        ConcurrentHashMap<String, MQTTAdapterListener> topicSpecificListenMap = adapterSpecificListenerMap.get(topic);
-        if (topicSpecificListenMap == null) {
-            topicSpecificListenMap = new ConcurrentHashMap<String, MQTTAdapterListener>();
-            if (null != adapterSpecificListenerMap.putIfAbsent(topic, topicSpecificListenMap)) {
-                topicSpecificListenMap = adapterSpecificListenerMap.get(topic);
-            }
-        }
-
-        MQTTBrokerConnectionConfiguration mqttBrokerConnectionConfiguration = new MQTTBrokerConnectionConfiguration(
-                eventAdapterConfiguration.getProperties().get(MQTTEventAdapterConstants.ADAPTER_CONF_URL),
-                eventAdapterConfiguration.getProperties().get(MQTTEventAdapterConstants.ADAPTER_CONF_USERNAME),
-                eventAdapterConfiguration.getProperties().get(MQTTEventAdapterConstants.ADAPTER_CONF_PASSWORD),
-                eventAdapterConfiguration.getProperties().get(MQTTEventAdapterConstants.ADAPTER_CONF_CLEAN_SESSION),
-                eventAdapterConfiguration.getProperties().get(MQTTEventAdapterConstants.ADAPTER_CONF_KEEP_ALIVE));
-
-        MQTTAdapterListener mqttAdapterListener = new MQTTAdapterListener(mqttBrokerConnectionConfiguration,
-                eventAdapterConfiguration.getProperties().get(MQTTEventAdapterConstants.ADAPTER_MESSAGE_TOPIC),
-                eventAdapterConfiguration.getProperties().get(MQTTEventAdapterConstants.ADAPTER_MESSAGE_CLIENTID),
-                eventAdapterListener, tenantId);
-        topicSpecificListenMap.put(id, mqttAdapterListener);
-
-        mqttAdapterListener.createConnection();
-
-    }
 
     @Override
     public boolean isEventDuplicatedInCluster() {

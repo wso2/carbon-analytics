@@ -94,16 +94,6 @@ public class MQTTEventAdapterFactory extends InputEventAdapterFactory {
                 resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_CLEAN_SESSION_HINT));
         propertyList.add(clearSession);
 
-
-        //TODO : KEEP alive, move to global properties
-        //Broker clear session
-        Property keepAlive = new Property(MQTTEventAdapterConstants.ADAPTER_CONF_KEEP_ALIVE);
-        keepAlive.setDisplayName(
-                resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_KEEP_ALIVE));
-        keepAlive.setRequired(false);
-        propertyList.add(keepAlive);
-
-
         // set clientId
         Property clientId = new Property(MQTTEventAdapterConstants.ADAPTER_MESSAGE_CLIENTID);
         clientId.setDisplayName(

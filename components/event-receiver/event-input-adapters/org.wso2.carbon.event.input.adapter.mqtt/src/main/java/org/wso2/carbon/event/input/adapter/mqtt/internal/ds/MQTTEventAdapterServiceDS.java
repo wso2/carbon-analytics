@@ -26,9 +26,6 @@ import org.wso2.carbon.utils.ConfigurationContextService;
 
 /**
  * @scr.component component.name="input.Mqtt.AdapterService.component" immediate="true"
- * @scr.reference name="configurationcontext.service"
- * interface="org.wso2.carbon.utils.ConfigurationContextService" cardinality="1..1"
- * policy="dynamic" bind="setConfigurationContextService" unbind="unsetConfigurationContextService"
  */
 
 public class MQTTEventAdapterServiceDS {
@@ -51,13 +48,4 @@ public class MQTTEventAdapterServiceDS {
         }
     }
 
-    protected void setConfigurationContextService(
-            ConfigurationContextService configurationContextService) {
-        MQTTEventAdapterValueHolder.registerConfigurationContextService(configurationContextService);
-    }
-
-    protected void unsetConfigurationContextService(
-            ConfigurationContextService configurationContextService) {
-        MQTTEventAdapterValueHolder.unregisterConfigurationContextService(configurationContextService);
-    }
 }
