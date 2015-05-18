@@ -27,20 +27,19 @@ import org.apache.spark.SparkContext;
 import org.apache.spark.TaskContext;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.catalyst.expressions.GenericRow;
+import org.apache.spark.sql.RowFactory;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
-
 import scala.collection.JavaConversions;
 import scala.collection.Seq;
 import scala.reflect.ClassTag;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import static scala.collection.JavaConversions.asScalaIterator;
@@ -105,12 +104,8 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
     public Partition[] getPartitions() {
         RecordGroup[] rgs;
         try {
-            System.out.println("########### DS = " + ServiceHolder.getAnalyticsDataService().toString());
-//            System.out.println("########### excu = " + ServiceHolder.getAnalyticskExecutor().toString());
-//            System.out.println("########### parts = " + ServiceHolder.getAnalyticskExecutor().getNumPartitionsHint());
             rgs = ServiceHolder.getAnalyticsDataService().get(this.tenantId, this.tableName,
-                    6,//ServiceHolder.getAnalyticskExecutor().getNumPartitionsHint(),
-                    this.columns, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
+                    computePartitions(), this.columns, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
         } catch (AnalyticsException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -121,10 +116,17 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
         return result;
     }
 
+    private int computePartitions(){
+        if (ServiceHolder.getAnalyticskExecutor() != null){
+           return ServiceHolder.getAnalyticskExecutor().getNumPartitionsHint();
+        }
+        return AnalyticsConstants.SPARK_DEFAULT_PARTITION_COUNT;
+    }
+
     /**
      * Row iterator implementation to act as an adaptor for a record iterator.
      */
-    private class RowRecordIteratorAdaptor implements Iterator<GenericRow>, Serializable {
+    private class RowRecordIteratorAdaptor implements Iterator<Row>, Serializable {
 
         private static final long serialVersionUID = -8866801517386445810L;
         
@@ -140,11 +142,11 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
         }
 
         @Override
-        public GenericRow next() {
+        public Row next() {
             return this.recordToRow(this.recordItr.next());           
         }
         
-        private GenericRow recordToRow(Record record) {
+        private Row recordToRow(Record record) {
             if (record == null) {
                 return null;
             }
@@ -153,8 +155,8 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
             for (int i = 0; i < columns.size(); i++) {
                 rowVals[i] = recordVals.get(columns.get(i));
             }
-//            return org.apache.spark.sql.api.java.Row.create(rowVals).row();
-            return new GenericRow(rowVals);
+//            return new GenericRow(rowVals);
+            return RowFactory.create(rowVals);
         }
 
         @Override

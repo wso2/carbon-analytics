@@ -63,6 +63,7 @@ public class AnalyticsConstants {
     public static final String DEFAULT_CHARSET = "UTF8";
     public static final String SCRIPT_DEPLOYMENT_DIR = "spark-scripts";
     public static final String SPARK_DEFAULTS_PATH = "repository/conf/spark/spark-defaults.conf";
+    public static final int SPARK_DEFAULT_PARTITION_COUNT = 6;
 
     //Analytics relation strings
     public static final String TENANT_ID = "tenantId";
