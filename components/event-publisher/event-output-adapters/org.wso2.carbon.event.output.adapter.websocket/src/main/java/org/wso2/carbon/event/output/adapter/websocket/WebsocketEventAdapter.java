@@ -53,7 +53,7 @@ public final class WebsocketEventAdapter implements OutputEventAdapter {
 
     @Override
     public void init() throws OutputEventAdapterException {
-        WebsocketEventAdapterFactory.validateOutputEventAdapterConfigurations(eventAdapterConfiguration);
+        validateOutputEventAdapterConfigurations(eventAdapterConfiguration);
     }
 
     @Override
@@ -110,5 +110,13 @@ public final class WebsocketEventAdapter implements OutputEventAdapter {
     @Override
     public void destroy() {
         //Nothing to be destroyed.
+    }
+
+    private void validateOutputEventAdapterConfigurations(OutputEventAdapterConfiguration eventAdapterConfiguration) throws OutputEventAdapterException {
+        String socketServerUrl = eventAdapterConfiguration.getStaticProperties().get(WebsocketEventAdapterConstants.ADAPTER_SERVER_URL);
+        if (!socketServerUrl.startsWith("ws://")){
+            throw new OutputEventAdapterException("Provided websocket URL - "+socketServerUrl+" is invalid for websocket output adaptor with name"+
+                    eventAdapterConfiguration.getName()+". The websocket URL should start with 'ws://' prefix.");
+        }
     }
 }

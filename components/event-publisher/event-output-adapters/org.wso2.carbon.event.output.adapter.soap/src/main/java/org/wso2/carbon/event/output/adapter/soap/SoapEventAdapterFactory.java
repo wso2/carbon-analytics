@@ -68,6 +68,7 @@ public class SoapEventAdapterFactory extends OutputEventAdapterFactory {
         passwordProperty.setDisplayName(
                 resourceBundle.getString(SoapEventAdapterConstants.ADAPTER_CONF_SOAP_PASSWORD));
 
+        //TODO put a hint for headers
         // header name
         Property headerProperty = new Property(SoapEventAdapterConstants.ADAPTER_CONF_SOAP_HEADERS);
         headerProperty.setDisplayName(

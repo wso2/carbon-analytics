@@ -275,6 +275,8 @@ public class SoapEventAdapter implements OutputEventAdapter {
 
         private void setSoapHeaders(Map<String, String> headers, Options options) {
 
+            //TODO Add, SOAP HEADERS, HTTP HEADERS
+
             for (Map.Entry<String, String> headerValue : headers.entrySet()) {
                 try {
                     if (headerValue.getKey().equalsIgnoreCase("SOAPAction")) {
