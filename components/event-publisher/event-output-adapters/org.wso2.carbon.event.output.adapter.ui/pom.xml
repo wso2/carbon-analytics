@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.event.output.adapter.ui</artifactId>
     <packaging>bundle</packaging>
-    <name>WSO2 Carbon - Event Output ui Adapter Module</name>
+    <name>WSO2 Carbon - Event Output UI Adapter Module</name>
     <description>org.wso2.carbon.event.output.adapter.ui provides the back-end functionality of
         ui event adapter
     </description>

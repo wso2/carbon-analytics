@@ -121,7 +121,7 @@ public class EventPublisher implements RawEventConsumer {
     }
 
     public void sendEventData(Object[] eventData) {
-        if ( EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()) {
+        if (EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()) {
             return;
         }
 
@@ -146,11 +146,7 @@ public class EventPublisher implements RawEventConsumer {
         }
 
         if (traceEnabled) {
-            if (outObject instanceof Object[]) {
-                trace.info(afterTracerPrefix + Arrays.deepToString((Object[]) outObject));
-            } else {
-                trace.info(afterTracerPrefix + outObject);
-            }
+            trace.info(afterTracerPrefix + outObject);
         }
 
         if (dynamicMessagePropertyEnabled) {

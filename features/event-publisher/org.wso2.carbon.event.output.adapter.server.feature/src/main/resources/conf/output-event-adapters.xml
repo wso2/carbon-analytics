@@ -89,4 +89,13 @@
         <property key="jobQueueSize">10000</property>
     </adapterConfig>
 
+    <adapterConfig type="ui">
+        <property key="eventQueueSize">30</property>
+        <!-- Thread Pool Related Properties -->
+        <property key="minThread">8</property>
+        <property key="maxThread">100</property>
+        <property key="keepAliveTimeInMillis">20000</property>
+        <property key="jobQueueSize">10000</property>
+    </adapterConfig>
+
 </outputEventAdaptersConfig>
