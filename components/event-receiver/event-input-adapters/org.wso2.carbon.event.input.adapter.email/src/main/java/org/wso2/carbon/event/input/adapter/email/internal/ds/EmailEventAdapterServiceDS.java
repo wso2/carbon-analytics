@@ -22,14 +22,10 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterFactory;
 import org.wso2.carbon.event.input.adapter.email.EmailEventAdapterFactory;
-import org.wso2.carbon.utils.ConfigurationContextService;
 
 
 /**
  * @scr.component component.name="input.Email.AdapterService.component" immediate="true"
- * @scr.reference name="configurationcontext.service"
- * interface="org.wso2.carbon.utils.ConfigurationContextService" cardinality="1..1"
- * policy="dynamic" bind="setConfigurationContextService" unbind="unsetConfigurationContextService"
  */
 
 public class EmailEventAdapterServiceDS {
@@ -54,16 +50,5 @@ public class EmailEventAdapterServiceDS {
             log.error("Can not create  the input email event service ", e);
         }
     }
-
-    protected void setConfigurationContextService(
-            ConfigurationContextService configurationContextService) {
-        EmailEventAdapterServiceValueHolder.registerConfigurationContextService(configurationContextService);
-    }
-
-    protected void unsetConfigurationContextService(
-            ConfigurationContextService configurationContextService) {
-        EmailEventAdapterServiceValueHolder.unregisterConfigurationContextService(configurationContextService);
-    }
-
 
 }

@@ -29,4 +29,8 @@
         <property key="events.duplicated.in.cluster">false</property>
     </adapterConfig>
 
+    <adapterConfig type="email">
+        <property key="moveToFolderName">readMails</property>
+    </adapterConfig>
+
 </inputEventAdaptersConfig>
