@@ -40,7 +40,7 @@ public class EventStreamAdminService extends AbstractAdmin {
 
     private static Log log = LogFactory.getLog(EventStreamAdminService.class);
 
-    public void addEventStreamDefinitionAsDto (EventStreamDefinitionDto eventStreamDefinitionDto)throws AxisFault {
+    public boolean addEventStreamDefinitionAsDto (EventStreamDefinitionDto eventStreamDefinitionDto)throws AxisFault {
         if ((eventStreamDefinitionDto.getName() != null) && (!eventStreamDefinitionDto.getName().isEmpty())) {
             if ((eventStreamDefinitionDto.getVersion() != null) && (!eventStreamDefinitionDto.getVersion().isEmpty())) {
                 try {
@@ -66,8 +66,6 @@ public class EventStreamAdminService extends AbstractAdmin {
                             streamDefinition.addPayloadData(eventStreamAttributeDto.getAttributeName(), EventAttributeTypeConstants.STRING_ATTRIBUTE_TYPE_MAP.get(eventStreamAttributeDto.getAttributeType()));
                         }
                     }
-                    int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-
                     EventStreamService eventStreamService = EventStreamAdminServiceValueHolder.getEventStreamService();
                     eventStreamService.addEventStreamDefinition(streamDefinition);
                 } catch (MalformedStreamDefinitionException e) {
@@ -83,11 +81,12 @@ public class EventStreamAdminService extends AbstractAdmin {
         } else {
             throw new AxisFault("Not a valid event stream name");
         }
+        return true;
     }
 
 
 
-    public void addEventStreamDefinitionAsString(String streamStringDefinition)throws AxisFault {
+    public boolean addEventStreamDefinitionAsString(String streamStringDefinition)throws AxisFault {
 
         StreamDefinition streamDefinition = null;
         try {
@@ -97,7 +96,6 @@ public class EventStreamAdminService extends AbstractAdmin {
             }else if(streamDefinition.getCorrelationData() == null && streamDefinition.getMetaData() == null && streamDefinition.getPayloadData() == null){
                 throw new AxisFault("Mapping parameters cannot be empty.");
             }else{
-                int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
                 EventStreamService eventStreamService = EventStreamAdminServiceValueHolder.getEventStreamService();
                 eventStreamService.addEventStreamDefinition(streamDefinition);
             }
@@ -108,10 +106,10 @@ public class EventStreamAdminService extends AbstractAdmin {
         } catch (EventStreamConfigurationException e) {
             throw new AxisFault(e.getMessage(), e);
         }
-
+        return true;
     }
 
-    public void editEventStreamDefinitionAsString(String streamStringDefinition, String oldStreamId)throws AxisFault {
+    public boolean editEventStreamDefinitionAsString(String streamStringDefinition, String oldStreamId)throws AxisFault {
 
         StreamDefinition streamDefinition = null;
         try {
@@ -123,8 +121,6 @@ public class EventStreamAdminService extends AbstractAdmin {
                 throw new AxisFault("Mapping parameters cannot be empty.");
             } else {
                 String[] oldStreamProperties = oldStreamId.split(":");
-                int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-
                 EventStreamService eventStreamService = EventStreamAdminServiceValueHolder.getEventStreamService();
                 eventStreamService.removeEventStreamDefinition(oldStreamProperties[0], oldStreamProperties[1]);
                 eventStreamService.addEventStreamDefinition(streamDefinition);
@@ -134,10 +130,10 @@ public class EventStreamAdminService extends AbstractAdmin {
         } catch (EventStreamConfigurationException e) {
             throw new AxisFault(e.getMessage(), e);
         }
-
+        return true;
     }
 
-    public void editEventStreamDefinitionAsDto(EventStreamDefinitionDto eventStreamDefinitionDto, String oldStreamId)throws AxisFault {
+    public boolean editEventStreamDefinitionAsDto(EventStreamDefinitionDto eventStreamDefinitionDto, String oldStreamId)throws AxisFault {
 
         if ((eventStreamDefinitionDto.getName() != null) && (!eventStreamDefinitionDto.getName().isEmpty())) {
             if ((eventStreamDefinitionDto.getVersion() != null) && (!eventStreamDefinitionDto.getVersion().isEmpty())) {
@@ -167,8 +163,6 @@ public class EventStreamAdminService extends AbstractAdmin {
                             streamDefinition.addPayloadData(eventStreamAttributeDto.getAttributeName(),EventAttributeTypeConstants.STRING_ATTRIBUTE_TYPE_MAP.get(eventStreamAttributeDto.getAttributeType()));
                         }
                     }
-                    int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-
                     EventStreamService eventStreamService = EventStreamAdminServiceValueHolder.getEventStreamService();
                     eventStreamService.removeEventStreamDefinition(oldStreamProperties[0], oldStreamProperties[1]);
                     eventStreamService.addEventStreamDefinition(streamDefinition);
@@ -186,10 +180,10 @@ public class EventStreamAdminService extends AbstractAdmin {
         } else {
             throw new AxisFault("Not a valid event stream name");
         }
+        return true;
     }
 
-    public void removeEventStreamDefinition(String eventStreamName, String eventStreamVersion) throws AxisFault {
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+    public boolean removeEventStreamDefinition(String eventStreamName, String eventStreamVersion) throws AxisFault {
 
         if ((eventStreamName != null) && (!eventStreamName.isEmpty())) {
             if ((eventStreamVersion != null) && (!eventStreamVersion.isEmpty())) {
@@ -206,13 +200,13 @@ public class EventStreamAdminService extends AbstractAdmin {
         } else {
             throw new AxisFault("Not a valid event stream name");
         }
+        return true;
     }
 
 
     public EventStreamInfoDto[] getAllEventStreamDefinitionDto() throws AxisFault {
 
         EventStreamService eventStreamService = EventStreamAdminServiceValueHolder.getEventStreamService();
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         try {
             Collection<EventStreamConfiguration> eventStreamDefinitionList = eventStreamService.getAllEventStreamConfigurations();
             if (eventStreamDefinitionList != null) {
@@ -250,7 +244,6 @@ public class EventStreamAdminService extends AbstractAdmin {
     public String[] getStreamNames() throws AxisFault {
         EventStreamService eventStreamService = EventStreamAdminServiceValueHolder.getEventStreamService();
         if (eventStreamService != null) {
-            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             try {
                 List<String> streamIdList = eventStreamService.getStreamIds();
                 if (streamIdList != null) {
@@ -271,7 +264,6 @@ public class EventStreamAdminService extends AbstractAdmin {
             throws AxisFault {
         EventStreamService eventStreamService = EventStreamAdminServiceValueHolder.getEventStreamService();
         if (eventStreamService != null) {
-            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             EventStreamConfiguration streamDefinition = null;
             streamDefinition = eventStreamService.getEventStreamConfiguration(streamId);
             String[] streamDetails = new String[2];
@@ -286,7 +278,6 @@ public class EventStreamAdminService extends AbstractAdmin {
 
         EventStreamService eventStreamService = EventStreamAdminServiceValueHolder.getEventStreamService();
         if (eventStreamService != null) {
-            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             try {
                 return eventStreamService.generateSampleEvent(streamId, eventType);
             } catch (EventStreamConfigurationException e) {
@@ -300,7 +291,6 @@ public class EventStreamAdminService extends AbstractAdmin {
     public String getStreamDefinitionAsString(String streamId) throws AxisFault {
         EventStreamService eventStreamService = EventStreamAdminServiceValueHolder.getEventStreamService();
         if (eventStreamService != null) {
-            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             EventStreamConfiguration streamDefinition = eventStreamService.getEventStreamConfiguration(streamId);
 
             String definitionString = "";
@@ -354,7 +344,6 @@ public class EventStreamAdminService extends AbstractAdmin {
 
         EventStreamService eventStreamService = EventStreamAdminServiceValueHolder.getEventStreamService();
         if (eventStreamService != null) {
-            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             EventStreamConfiguration eventStreamConfiguration = eventStreamService.getEventStreamConfiguration(streamId);
             EventStreamDefinitionDto dto = new EventStreamDefinitionDto();
             dto.setName(eventStreamConfiguration.getStreamDefinition().getName());
@@ -400,7 +389,6 @@ public class EventStreamAdminService extends AbstractAdmin {
             log.error(e.getMessage(), e);
             throw new AxisFault(e.getMessage(), e);
         }
-
 
         EventStreamDefinitionDto eventStreamDefinitionDto = new EventStreamDefinitionDto();
 

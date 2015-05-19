@@ -288,7 +288,7 @@ public class EventReceiverAdminService extends AbstractAdmin {
         }
     }
 
-    public void undeployActiveEventReceiverConfiguration(String eventReceiverName)
+    public boolean undeployActiveEventReceiverConfiguration(String eventReceiverName)
             throws AxisFault {
         EventReceiverService eventReceiverService = EventReceiverAdminServiceValueHolder.getEventReceiverService();
         AxisConfiguration axisConfiguration = getAxisConfig();
@@ -298,9 +298,10 @@ public class EventReceiverAdminService extends AbstractAdmin {
             log.error(e.getMessage(), e);
             throw new AxisFault(e.getMessage());
         }
+        return true;
     }
 
-    public void undeployInactiveEventReceiverConfiguration(String fileName)
+    public boolean undeployInactiveEventReceiverConfiguration(String fileName)
             throws AxisFault {
         EventReceiverService eventReceiverService = EventReceiverAdminServiceValueHolder.getEventReceiverService();
         try {
@@ -310,9 +311,10 @@ public class EventReceiverAdminService extends AbstractAdmin {
             log.error(e.getMessage(), e);
             throw new AxisFault(e.getMessage());
         }
+        return true;
     }
 
-    public void editActiveEventReceiverConfiguration(String eventReceiverConfiguration,
+    public boolean editActiveEventReceiverConfiguration(String eventReceiverConfiguration,
                                                      String eventReceiverName)
             throws AxisFault {
         EventReceiverService eventReceiverService = EventReceiverAdminServiceValueHolder.getEventReceiverService();
@@ -323,9 +325,10 @@ public class EventReceiverAdminService extends AbstractAdmin {
             log.error(e.getMessage(), e);
             throw new AxisFault(e.getMessage());
         }
+        return true;
     }
 
-    public void editInactiveEventReceiverConfiguration(
+    public boolean editInactiveEventReceiverConfiguration(
             String eventReceiverConfiguration,
             String fileName)
             throws AxisFault {
@@ -338,9 +341,10 @@ public class EventReceiverAdminService extends AbstractAdmin {
             log.error(e.getMessage(), e);
             throw new AxisFault(e.getMessage());
         }
+        return true;
     }
 
-    public void deployEventReceiverConfiguration(String eventReceiverConfigXml)
+    public boolean deployEventReceiverConfiguration(String eventReceiverConfigXml)
             throws AxisFault {
         try {
             EventReceiverService eventReceiverService = EventReceiverAdminServiceValueHolder.getEventReceiverService();
@@ -349,9 +353,10 @@ public class EventReceiverAdminService extends AbstractAdmin {
             log.error(e.getMessage(), e);
             throw new AxisFault(e.getMessage());
         }
+        return true;
     }
 
-    public void deployWso2EventReceiverConfiguration(String eventReceiverName,
+    public boolean deployWso2EventReceiverConfiguration(String eventReceiverName,
                                                      String streamNameWithVersion,
                                                      String eventAdapterType,
                                                      EventMappingPropertyDto[] metaData,
@@ -415,10 +420,10 @@ public class EventReceiverAdminService extends AbstractAdmin {
         } else {
             throw new AxisFault(eventReceiverName + " is already registered for this tenant");
         }
-
+        return true;
     }
 
-    public void deployTextEventReceiverConfiguration(String eventReceiverName,
+    public boolean deployTextEventReceiverConfiguration(String eventReceiverName,
                                                      String streamNameWithVersion,
                                                      String eventAdapterType,
                                                      EventMappingPropertyDto[] inputMappings,
@@ -462,10 +467,10 @@ public class EventReceiverAdminService extends AbstractAdmin {
         } else {
             throw new AxisFault(eventReceiverName + " is already registered for this tenant");
         }
-
+        return true;
     }
 
-    public void deployXmlEventReceiverConfiguration(String eventReceiverName,
+    public boolean deployXmlEventReceiverConfiguration(String eventReceiverName,
                                                     String streamNameWithVersion,
                                                     String eventAdapterType,
                                                     String parentXpath,
@@ -520,10 +525,10 @@ public class EventReceiverAdminService extends AbstractAdmin {
         } else {
             throw new AxisFault(eventReceiverName + " is already registered for this tenant");
         }
-
+        return true;
     }
 
-    public void deployMapEventReceiverConfiguration(String eventReceiverName,
+    public boolean deployMapEventReceiverConfiguration(String eventReceiverName,
                                                     String streamNameWithVersion,
                                                     String eventAdapterType,
                                                     EventMappingPropertyDto[] inputMappings,
@@ -569,10 +574,10 @@ public class EventReceiverAdminService extends AbstractAdmin {
         } else {
             throw new AxisFault(eventReceiverName + " is already registered for this tenant");
         }
-
+        return true;
     }
 
-    public void deployJsonEventReceiverConfiguration(String eventReceiverName,
+    public boolean deployJsonEventReceiverConfiguration(String eventReceiverName,
                                                      String streamNameWithVersion,
                                                      String eventAdapterType,
                                                      EventMappingPropertyDto[] inputMappings,
@@ -616,10 +621,10 @@ public class EventReceiverAdminService extends AbstractAdmin {
         } else {
             throw new AxisFault(eventReceiverName + " is already registered for this tenant");
         }
-
+        return true;
     }
 
-    public void setStatisticsEnabled(String eventReceiverName, boolean flag) throws AxisFault {
+    public boolean setStatisticsEnabled(String eventReceiverName, boolean flag) throws AxisFault {
 
         EventReceiverService eventReceiverService = EventReceiverAdminServiceValueHolder.getEventReceiverService();
         AxisConfiguration axisConfiguration = getAxisConfig();
@@ -629,9 +634,10 @@ public class EventReceiverAdminService extends AbstractAdmin {
             log.error(e.getMessage(), e);
             throw new AxisFault(e.getMessage());
         }
+        return true;
     }
 
-    public void setTracingEnabled(String eventReceiverName, boolean flag) throws AxisFault {
+    public boolean setTracingEnabled(String eventReceiverName, boolean flag) throws AxisFault {
         EventReceiverService eventReceiverService = EventReceiverAdminServiceValueHolder.getEventReceiverService();
         AxisConfiguration axisConfiguration = getAxisConfig();
         try {
@@ -640,7 +646,7 @@ public class EventReceiverAdminService extends AbstractAdmin {
             log.error(e.getMessage(), e);
             throw new AxisFault(e.getMessage());
         }
-
+        return true;
     }
 
     public InputAdapterConfigurationDto getInputAdapterConfigurationSchema(String adopterType) {
