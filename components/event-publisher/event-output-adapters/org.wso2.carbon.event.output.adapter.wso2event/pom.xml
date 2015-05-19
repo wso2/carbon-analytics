@@ -74,7 +74,7 @@
                 <artifactId>maven-scr-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>generate-scr-scrdescriptor</id>
+                        <id>generate-scr-descriptor</id>
                         <goals>
                             <goal>scr</goal>
                         </goals>
