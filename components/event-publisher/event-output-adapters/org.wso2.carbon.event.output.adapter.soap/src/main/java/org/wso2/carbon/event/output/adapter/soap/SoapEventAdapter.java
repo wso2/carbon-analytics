@@ -38,6 +38,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.rampart.RampartMessageData;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
@@ -51,10 +53,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class SoapEventAdapter implements OutputEventAdapter {
 
@@ -63,6 +62,7 @@ public class SoapEventAdapter implements OutputEventAdapter {
     private Map<String, String> globalProperties;
     private ExecutorService executorService;
     private ConfigurationContext configContext;
+    private int tenantId;
 
     public SoapEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
                             Map<String, String> globalProperties) {
@@ -72,6 +72,8 @@ public class SoapEventAdapter implements OutputEventAdapter {
 
     @Override
     public void init() throws OutputEventAdapterException {
+
+        tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         //executorService will be assigned  if it is null
         if (executorService == null) {
@@ -190,7 +192,11 @@ public class SoapEventAdapter implements OutputEventAdapter {
         Map<String, String> httpHeaders = this.extractHeaders(dynamicProperties.get(
                 SoapEventAdapterConstants.ADAPTER_CONF_HTTP_HEADERS));
 
-        this.executorService.submit(new SoapSender(url, message, userName, password, soapHeaders, httpHeaders));
+        try {
+            this.executorService.submit(new SoapSender(url, message, userName, password, soapHeaders, httpHeaders));
+        } catch (RejectedExecutionException e) {
+            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
+        }
     }
 
     @Override
@@ -270,20 +276,17 @@ public class SoapEventAdapter implements OutputEventAdapter {
                 serviceClient.fireAndForget(AXIOMUtil.stringToOM(payload.toString()));
 
             } catch (AxisFault e) {
-                log.error("Exception in adapter " + eventAdapterConfiguration.getName()
-                        + " while sending events to soap endpoint " + this.url + ": " + e.getMessage(), e);
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), payload, "Cannot send to endpoint '" + url + "'", e, log, tenantId);
             } catch (XMLStreamException e) {
-                log.error("Exception occurred in adapter " + eventAdapterConfiguration.getName()
-                        + " while converting the event to xml object :" + e.getMessage(), e);
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), payload, "Cannot convert event to XML", e, log, tenantId);
             } catch (Exception e) {
-                log.error("Exception occurred in adapter "
-                        + eventAdapterConfiguration.getName() + ": " + e.getMessage(), e);
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), payload, null, e, log, tenantId);
             } finally {
                 if (serviceClient != null) {
                     try {
                         serviceClient.cleanup();
                     } catch (AxisFault axisFault) {
-                        log.error("Error while cleaning-up service client resources : " + axisFault.getMessage(), axisFault);
+                        log.error("Error while cleaning-up service client resources of Output SOAP Event Adapter '" + eventAdapterConfiguration.getName() + "' : " + axisFault.getMessage(), axisFault);
                     }
                 }
             }
@@ -385,7 +388,7 @@ public class SoapEventAdapter implements OutputEventAdapter {
                     list.add(header);
                 } catch (Throwable e) {
                     //Catching the exception because there can be several exception thrown from axis2 level and we cannot drop the message because of a header issue
-                    log.warn("Invalid http header : \"" + headerValue + "\", ignoring corresponding header..." + e.getMessage());
+                    log.warn("Invalid HTTP header : \"" + headerValue + "\", ignoring corresponding header..." + e.getMessage());
                 }
             }
             options.setProperty(org.apache.axis2.transport.http.HTTPConstants.HTTP_HEADERS, list);

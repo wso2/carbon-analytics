@@ -19,6 +19,8 @@ package org.wso2.carbon.event.output.adapter.jms;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
@@ -43,6 +45,7 @@ public class JMSEventAdapter implements OutputEventAdapter {
     private Map<String, String> globalProperties;
     private PublisherDetails publisherDetails = null;
     private static ExecutorService executorService;
+    private int tenantId;
 
     public JMSEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
                            Map<String, String> globalProperties) {
@@ -52,6 +55,8 @@ public class JMSEventAdapter implements OutputEventAdapter {
 
     @Override
     public void init() throws OutputEventAdapterException {
+
+        tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         //ExecutorService will be assigned  if it is null
         if (executorService == null) {
@@ -131,7 +136,7 @@ public class JMSEventAdapter implements OutputEventAdapter {
         try {
             executorService.submit(new JMSSender(jmsMessage));
         } catch (RejectedExecutionException e) {
-            log.error("There is no thread connection left to publish event : " + message, e);
+            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
         }
     }
 
@@ -217,7 +222,7 @@ public class JMSEventAdapter implements OutputEventAdapter {
     }
 
     private Hashtable<String, String> convertMapToHashTable(Map<String, String> map) {
-        Hashtable<String, String> table = new Hashtable();
+        Hashtable<String, String> table = new Hashtable<String, String>();
         Iterator it = map.entrySet().iterator();
 
         //Iterate through the hash map

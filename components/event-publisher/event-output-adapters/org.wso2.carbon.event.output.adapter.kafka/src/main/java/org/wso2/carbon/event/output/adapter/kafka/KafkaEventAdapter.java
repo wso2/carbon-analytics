@@ -22,6 +22,8 @@ import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
@@ -42,6 +44,7 @@ public class KafkaEventAdapter implements OutputEventAdapter {
     private Map<String, String> globalProperties;
     private ProducerConfig config;
     private Producer<String, Object> producer;
+    private int tenantId;
 
     public KafkaEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
                              Map<String, String> globalProperties) {
@@ -51,6 +54,8 @@ public class KafkaEventAdapter implements OutputEventAdapter {
 
     @Override
     public void init() throws OutputEventAdapterException {
+
+        tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         //ThreadPoolExecutor will be assigned  if it is null
         if (threadPoolExecutor == null) {
@@ -116,7 +121,7 @@ public class KafkaEventAdapter implements OutputEventAdapter {
                         String[] configPropertyWithValue = header.split(KafkaEventAdapterConstants.ENTRY_SEPARATOR, 2);
                         props.put(configPropertyWithValue[0], configPropertyWithValue[1]);
                     } catch (Exception e) {
-                        log.warn("Optional property \"" + header + "\" is not defined in the correct format.", e);
+                        log.warn("Optional property '" + header + "' is not defined in the correct format.", e);
                     }
                 }
             }
@@ -135,7 +140,7 @@ public class KafkaEventAdapter implements OutputEventAdapter {
         try {
             threadPoolExecutor.submit(new KafkaSender(topic, message));
         } catch (RejectedExecutionException e) {
-            log.error("There is no thread left to publish event : " + message, e);
+            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
         }
     }
 

@@ -17,7 +17,10 @@
 */
 package org.wso2.carbon.event.output.adapter.mqtt;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
@@ -27,7 +30,10 @@ import org.wso2.carbon.event.output.adapter.mqtt.internal.util.MQTTBrokerConnect
 import org.wso2.carbon.event.output.adapter.mqtt.internal.util.MQTTEventAdapterConstants;
 
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class MQTTEventAdapter implements OutputEventAdapter {
 
@@ -37,7 +43,8 @@ public class MQTTEventAdapter implements OutputEventAdapter {
     private int connectionKeepAliveInterval;
     private String qos;
     private static ThreadPoolExecutor threadPoolExecutor;
-    private static final Logger log = Logger.getLogger(MQTTEventAdapter.class);
+    private static final Log log = LogFactory.getLog(MQTTEventAdapter.class);
+    private int tenantId;
 
     public MQTTEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
                             Map<String, String> globalProperties) {
@@ -59,6 +66,9 @@ public class MQTTEventAdapter implements OutputEventAdapter {
 
     @Override
     public void init() throws OutputEventAdapterException {
+
+        tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+
         //ThreadPoolExecutor will be assigned  if it is null
         if (threadPoolExecutor == null) {
             int minThread;
@@ -128,7 +138,7 @@ public class MQTTEventAdapter implements OutputEventAdapter {
         try {
             threadPoolExecutor.submit(new MQTTSender(topic, message));
         } catch (RejectedExecutionException e) {
-            log.error("There is no thread left to publish event : " + message, e);
+            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
         }
     }
 
@@ -137,7 +147,7 @@ public class MQTTEventAdapter implements OutputEventAdapter {
         try {
             mqttAdapterPublisher.close();
         } catch (OutputEventAdapterException e) {
-            log.error("Exception when closing the mqtt publisher connection", e);
+            log.error("Exception when closing the mqtt publisher connection on Output MQTT Adapter '" + eventAdapterConfiguration.getName() + "'", e);
         }
     }
 
@@ -158,10 +168,15 @@ public class MQTTEventAdapter implements OutputEventAdapter {
 
         @Override
         public void run() {
-            if (qos == null) {
-                mqttAdapterPublisher.publish(message.toString(), topic);
-            } else {
-                mqttAdapterPublisher.publish(Integer.parseInt(qos), message.toString(), topic);
+            try {
+                if (qos == null) {
+                    mqttAdapterPublisher.publish(message.toString(), topic);
+                } else {
+                    mqttAdapterPublisher.publish(Integer.parseInt(qos), message.toString(), topic);
+                }
+            } catch (Throwable t) {
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, null, t, log, tenantId);
+
             }
         }
     }

@@ -16,6 +16,7 @@ package org.wso2.carbon.event.output.adapter.wso2event;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.agent.AgentHolder;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
@@ -24,6 +25,7 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationExcep
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
+import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.ConnectionUnavailableException;
@@ -42,9 +44,10 @@ public final class WSO2EventAdapter implements OutputEventAdapter {
     private DataPublisher dataPublisher = null;
     private boolean isBlockingMode = false;
     private long timeout = 0;
+    private int tenantId;
 
     public WSO2EventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
-            Map<String, String> globalProperties) {
+                            Map<String, String> globalProperties) {
 
         this.eventAdapterConfiguration = eventAdapterConfiguration;
         this.globalProperties = globalProperties;
@@ -55,6 +58,8 @@ public final class WSO2EventAdapter implements OutputEventAdapter {
      */
     @Override
     public void init() {
+        tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+
         String configPath = globalProperties.get(ADAPTOR_CONF_PATH);
         if (configPath != null) {
             AgentHolder.setConfigPath(configPath);
@@ -118,7 +123,9 @@ public final class WSO2EventAdapter implements OutputEventAdapter {
         if (isBlockingMode) {
             dataPublisher.publish(event);
         } else {
-            dataPublisher.tryPublish(event, timeout);
+            if (!dataPublisher.tryPublish(event, timeout)) {
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send event", log, tenantId);
+            }
         }
     }
 
@@ -147,7 +154,7 @@ public final class WSO2EventAdapter implements OutputEventAdapter {
     }
 
     private void throwRuntimeException(String receiverUrl, String authUrl, String protocol, String userName,
-            Exception e) {
+                                       Exception e) {
         throw new OutputEventAdapterRuntimeException(
                 "Error in data-bridge config for adaptor " + eventAdapterConfiguration.getName()
                         + " with the receiverUrl:" + receiverUrl + " authUrl:" + authUrl + " protocol:" + protocol
@@ -155,14 +162,14 @@ public final class WSO2EventAdapter implements OutputEventAdapter {
     }
 
     private void logException(String message, String receiverUrl, String authUrl, String protocol, String userName,
-            Exception e) {
+                              Exception e) {
         log.error(message + " for adaptor " + eventAdapterConfiguration.getName()
                 + " with the receiverUrl:" + receiverUrl + " authUrl:" + authUrl + " protocol:" + protocol
                 + " and userName:" + userName + "," + e.getMessage(), e);
     }
 
     private void throwConnectionException(String receiverUrl, String authUrl, String protocol, String userName,
-            Exception e) {
+                                          Exception e) {
         throw new ConnectionUnavailableException(
                 "Connection not available for adaptor " + eventAdapterConfiguration.getName()
                         + " with the receiverUrl:" + receiverUrl + " authUrl:" + authUrl + " protocol:" + protocol
