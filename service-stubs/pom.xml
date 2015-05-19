@@ -35,6 +35,7 @@
 
     <modules>
         <module>org.wso2.carbon.event.stream.stub</module>
+        <module>org.wso2.carbon.event.stream.persistence.stub</module>
         <module>org.wso2.carbon.event.publisher.stub</module>
         <module>org.wso2.carbon.event.receiver.stub</module>
         <module>org.wso2.carbon.event.statistics.stub</module>

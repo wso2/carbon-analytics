@@ -17,8 +17,8 @@
 <component xmlns="http://products.wso2.org/carbon">
     <menus>
         <menu>
-            <id>event_processor_menu</id>
-            <i18n-key>event.processor</i18n-key>
+            <id>event_menu</id>
+            <i18n-key>event</i18n-key>
             <i18n-bundle>org.wso2.carbon.event.publisher.ui.i18n.Resources</i18n-bundle>
             <parent-menu>manage_menu</parent-menu>
             <link>#</link>
@@ -30,9 +30,9 @@
         </menu>
         <menu>
             <id>eventpublisher_menu</id>
-            <i18n-key>event.publishers</i18n-key>
+            <i18n-key>publishers</i18n-key>
             <i18n-bundle>org.wso2.carbon.event.publisher.ui.i18n.Resources</i18n-bundle>
-            <parent-menu>event_processor_menu</parent-menu>
+            <parent-menu>event_menu</parent-menu>
             <link>../eventpublisher/index.jsp</link>
             <region>region1</region>
             <order>30</order>

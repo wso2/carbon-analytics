@@ -20,7 +20,6 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.exception.ConnectionUnavailableException;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
-import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterRuntimeException;
 
 import java.util.Map;
 
@@ -103,7 +102,7 @@ public class OutputAdapterRuntime {
                     logAndDrop();
                 }
             }
-        } catch (OutputEventAdapterRuntimeException e) {
+        } catch (Throwable e) {
             log.error("Error in sending message " + e.getMessage(), e);
         }
 
