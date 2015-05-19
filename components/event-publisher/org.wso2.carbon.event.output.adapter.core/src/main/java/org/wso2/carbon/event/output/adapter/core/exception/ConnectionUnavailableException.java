@@ -15,7 +15,7 @@
 
 package org.wso2.carbon.event.output.adapter.core.exception;
 
-public class ConnectionUnavailableException extends OutputEventAdapterRuntimeException {
+public class ConnectionUnavailableException extends RuntimeException {
     public ConnectionUnavailableException() {
     }
 

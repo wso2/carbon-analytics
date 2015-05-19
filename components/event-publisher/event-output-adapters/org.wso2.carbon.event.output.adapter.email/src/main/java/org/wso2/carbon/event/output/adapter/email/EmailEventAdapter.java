@@ -21,6 +21,8 @@ package org.wso2.carbon.event.output.adapter.email;
 import org.apache.axis2.transport.mail.MailConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.ConnectionUnavailableException;
@@ -53,6 +55,7 @@ public class EmailEventAdapter implements OutputEventAdapter {
     private static Session session;
     private OutputEventAdapterConfiguration eventAdapterConfiguration;
     private Map<String, String> globalProperties;
+    private int tenantId;
 
 
     /**
@@ -75,6 +78,8 @@ public class EmailEventAdapter implements OutputEventAdapter {
 
     @Override
     public void init() throws OutputEventAdapterException {
+
+        tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         //ThreadPoolExecutor will be assigned  if it is null.
         if (threadPoolExecutor == null) {
@@ -236,7 +241,7 @@ public class EmailEventAdapter implements OutputEventAdapter {
             try {
                 threadPoolExecutor.submit(new EmailSender(email, subject, message.toString(), emailType));
             } catch (RejectedExecutionException e) {
-                log.error("There is no thread connection left to publish event : " + message, e);
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
             }
         }
     }
@@ -298,9 +303,9 @@ public class EmailEventAdapter implements OutputEventAdapter {
                     log.debug("Mail sent to the EmailID" + " " + to + " " + "Successfully");
                 }
             } catch (MessagingException e) {
-                log.error("Message format error in sending the Email from : " + smtpFromAddress, e);
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Error in message format", e, log, tenantId);
             } catch (Exception e) {
-                log.error("Error in sending the Email : " + to, e);
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Error sending email to '" + to + "'", e, log, tenantId);
             }
         }
 

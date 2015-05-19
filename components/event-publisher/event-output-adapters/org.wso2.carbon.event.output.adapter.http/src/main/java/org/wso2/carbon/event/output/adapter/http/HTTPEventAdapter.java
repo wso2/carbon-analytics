@@ -28,6 +28,8 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.SystemDefaultHttpClient;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
@@ -46,6 +48,8 @@ public class HTTPEventAdapter implements OutputEventAdapter {
     private static ExecutorService executorService;
     private HttpClient httpClient;
     private String clientMethod;
+    private int tenantId;
+
 
     public HTTPEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String,
             String> globalProperties) {
@@ -56,6 +60,8 @@ public class HTTPEventAdapter implements OutputEventAdapter {
 
     @Override
     public void init() throws OutputEventAdapterException {
+
+        tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         //ExecutorService will be assigned  if it is null
         if (executorService == null) {
@@ -124,7 +130,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
         try {
             executorService.submit(new HTTPSender(url, payload, username, password, headers));
         } catch (RejectedExecutionException e) {
-            log.error("There is no thread left to publish event : " + payload, e);
+            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
         }
     }
 
@@ -177,7 +183,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                 keyValue = header.split(HTTPEventAdapterConstants.ENTRY_SEPARATOR, 2);
                 result.put(keyValue[0].trim(), keyValue[1].trim());
             } catch (Exception e) {
-                log.warn("Header property \"" + header + "\" is not defined in the correct format.", e);
+                log.warn("Header property '" + header + "' is not defined in the correct format.", e);
             }
         }
         return result;
@@ -256,10 +262,9 @@ public class HTTPEventAdapter implements OutputEventAdapter {
 
                 httpClient.execute(method).getEntity().getContent().close();
             } catch (UnknownHostException e) {
-                log.error("Exception while connecting adapter " + eventAdapterConfiguration.getName() + " HTTP endpoint to " + this.getUrl(), e);
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), this.getPayload(), "Cannot connect to " + this.getUrl(), e, log, tenantId);
             } catch (Throwable e) {
-                log.error("Error executing HTTP output event adapter "
-                        + eventAdapterConfiguration.getName() + " sender: ", e);
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), this.getPayload(), null, e, log, tenantId);
             }
         }
 

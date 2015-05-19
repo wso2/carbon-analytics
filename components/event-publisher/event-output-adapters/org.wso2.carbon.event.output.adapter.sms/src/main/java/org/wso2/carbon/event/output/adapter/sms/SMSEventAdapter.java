@@ -29,6 +29,8 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
@@ -38,6 +40,7 @@ import org.wso2.carbon.event.output.adapter.sms.internal.util.SMSEventAdapterCon
 
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -47,6 +50,7 @@ public final class SMSEventAdapter implements OutputEventAdapter {
     private OutputEventAdapterConfiguration eventAdapterConfiguration;
     private static ThreadPoolExecutor threadPoolExecutor;
     private Map<String, String> globalProperties;
+    private int tenantId;
 
     public SMSEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String, String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
@@ -55,6 +59,8 @@ public final class SMSEventAdapter implements OutputEventAdapter {
 
     @Override
     public void init() throws OutputEventAdapterException {
+        tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+
         //ThreadPoolExecutor will be assigned  if it is null
         if (threadPoolExecutor == null) {
             int minThread;
@@ -105,7 +111,11 @@ public final class SMSEventAdapter implements OutputEventAdapter {
 
             //Send sms for each sms no
             for (String smsNo : smsNoArray) {
-                threadPoolExecutor.submit(new SMSSender(smsNo, message.toString()));
+                try {
+                    threadPoolExecutor.submit(new SMSSender(smsNo, message.toString()));
+                } catch (RejectedExecutionException e) {
+                    EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
+                }
             }
         }
     }
@@ -147,22 +157,17 @@ public final class SMSEventAdapter implements OutputEventAdapter {
                 options.setTo(new EndpointReference("sms://" + smsNo));
                 serviceClient.setOptions(options);
                 serviceClient.fireAndForget(payload);
-                log.debug("Sending SMS to "+smsNo +" , message : "+message);
-
-            } catch (AxisFault axisFault) {
-                String msg = "Error in delivering the message, " +
-                        "message: " + message + ", to: " + smsNo + ".";
-                log.error(msg, axisFault);
+                if (log.isDebugEnabled()) {
+                    log.debug("Sending SMS to " + smsNo + " , message : " + message);
+                }
             } catch (Exception ex) {
-                String msg = "Error in delivering the message, " +
-                        "message: " + message + ", to: " + smsNo + ".";
-                log.error(msg, ex);
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send to '" + smsNo + "'", ex, log, tenantId);
             } finally {
                 if (serviceClient != null) {
                     try {
                         serviceClient.cleanup();
                     } catch (AxisFault axisFault) {
-                        log.error("Error while cleaning-up service client resources ", axisFault);
+                        log.error("Error while cleaning-up service client resources at Output SMS Adapter '" + eventAdapterConfiguration.getName() + "'", axisFault);
                     }
                 }
             }

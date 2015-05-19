@@ -21,6 +21,7 @@ package org.wso2.carbon.event.output.adapter.websocket.local;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
@@ -41,17 +42,19 @@ public final class WebsocketLocalEventAdapter implements OutputEventAdapter {
     private Map<String, String> globalProperties;
     private static ThreadPoolExecutor executorService;
 
-    private int tenantID;
+    private int tenantId;
 
     public WebsocketLocalEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String, String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
         this.globalProperties = globalProperties;
-        this.tenantID = CarbonContext.getThreadLocalCarbonContext().getTenantId();
     }
 
 
     @Override
     public void init() throws OutputEventAdapterException {
+
+        tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+
         //ExecutorService will be assigned  if it is null
         if (executorService == null) {
             int minThread;
@@ -108,12 +111,7 @@ public final class WebsocketLocalEventAdapter implements OutputEventAdapter {
         try {
             executorService.execute(new WebSocketSender(message.toString()));
         } catch (RejectedExecutionException e) {
-            log.error("Event Dropped by Output UI Adapter '" + eventAdapterConfiguration.getName() + "'");
-            if (log.isDebugEnabled()) {
-                log.debug("Dropping the message: '" + message + "', since buffer queue is full for " +
-                        "websocket-local adapter: '" + eventAdapterConfiguration.getName() + "', " +
-                        "for tenant ID: " + tenantID);
-            }
+            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
         }
     }
 
@@ -150,28 +148,19 @@ public final class WebsocketLocalEventAdapter implements OutputEventAdapter {
         public void run() {
 
             WebsocketLocalOutputCallbackRegisterServiceImpl websocketLocalOutputCallbackRegisterServiceImpl = WebsocketLocalEventAdaptorServiceInternalValueHolder.getWebsocketLocalOutputCallbackRegisterServiceImpl();
-            CopyOnWriteArrayList<Session> sessions = websocketLocalOutputCallbackRegisterServiceImpl.getSessions(tenantID, eventAdapterConfiguration.getName());
+            CopyOnWriteArrayList<Session> sessions = websocketLocalOutputCallbackRegisterServiceImpl.getSessions(tenantId, eventAdapterConfiguration.getName());
             if (sessions != null) {
                 for (Session session : sessions) {
                     synchronized (session) {
                         try {
                             session.getBasicRemote().sendText(message);
                         } catch (IOException e) {
-                            log.error("Event Dropped by Output Websocket-Local Adapter '" + eventAdapterConfiguration.getName() + "'");
-                            if (log.isDebugEnabled()) {
-                                log.debug("Dropping the message: '" + message + "' from websocket-local adapter: '" + eventAdapterConfiguration.getName() + "' " +
-                                        "for tenant ID: " + tenantID + ", as " + e.getMessage(), e);
-                            }
+                            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send to endpoint", e, log, tenantId);
                         }
                     }
                 }
             } else {
-                log.error("Event Dropped by Output Websocket-Local Adapter '" + eventAdapterConfiguration.getName() + "'");
-                if (log.isDebugEnabled()) {
-                    log.debug("Dropping the message: '" + message + "', since no clients have being registered to receive " +
-                            "events from websocket-local adapter: '" + eventAdapterConfiguration.getName() + "', " +
-                            "for tenant ID: " + tenantID);
-                }
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send as session not available", log, tenantId);
             }
 
         }

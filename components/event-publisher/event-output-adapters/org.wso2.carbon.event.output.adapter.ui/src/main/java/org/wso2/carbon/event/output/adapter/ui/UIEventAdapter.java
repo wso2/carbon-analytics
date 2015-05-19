@@ -22,17 +22,17 @@ package org.wso2.carbon.event.output.adapter.ui;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.Event;
+import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
-import org.wso2.carbon.event.output.adapter.core.exception.ConnectionUnavailableException;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterRuntimeException;
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.output.adapter.ui.internal.UIOutputCallbackControllerServiceImpl;
 import org.wso2.carbon.event.output.adapter.ui.internal.ds.UIEventAdaptorServiceInternalValueHolder;
 import org.wso2.carbon.event.output.adapter.ui.internal.util.UIEventAdapterConstants;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.websocket.Session;
 import java.io.IOException;
@@ -52,6 +52,7 @@ public class UIEventAdapter implements OutputEventAdapter {
     private int queueSize;
     private LinkedBlockingDeque<Object> streamSpecificEvents;
     private static ThreadPoolExecutor executorService;
+    private int tenantId;
 
     public UIEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String,
             String> globalProperties) {
@@ -61,6 +62,8 @@ public class UIEventAdapter implements OutputEventAdapter {
 
     @Override
     public void init() throws OutputEventAdapterException {
+
+        tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         //ExecutorService will be assigned  if it is null
         if (executorService == null) {
@@ -233,16 +236,10 @@ public class UIEventAdapter implements OutputEventAdapter {
         eventValues[UIEventAdapterConstants.INDEX_ONE] = System.currentTimeMillis();
         streamSpecificEvents.add(eventValues);
 
-        int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
         try {
-            executorService.execute(new WebSocketSender(eventString, tenantId));
+            executorService.execute(new WebSocketSender(eventString));
         } catch (RejectedExecutionException e) {
-            log.error("Event Dropped by Output UI Adapter '" + eventAdapterConfiguration.getName() + "'");
-            if (log.isDebugEnabled()) {
-                log.debug("Dropping the message: '" + message + "', since since buffer queue is full for" +
-                        "ui adapter: '" + eventAdapterConfiguration.getName() + "', " +
-                        "for tenant ID: " + tenantId);
-            }
+            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
         }
 
     }
@@ -269,11 +266,9 @@ public class UIEventAdapter implements OutputEventAdapter {
     private class WebSocketSender implements Runnable {
 
         private String message;
-        private int tenantId = MultitenantConstants.INVALID_TENANT_ID;
 
-        public WebSocketSender(String message, int tenantId) {
+        public WebSocketSender(String message) {
             this.message = message;
-            this.tenantId = tenantId;
         }
 
         /**
@@ -298,21 +293,12 @@ public class UIEventAdapter implements OutputEventAdapter {
                         try {
                             session.getBasicRemote().sendText(message);
                         } catch (IOException e) {
-                            log.error("Event Dropped by Output UI Adapter '" + eventAdapterConfiguration.getName() + "'");
-                            if (log.isDebugEnabled()) {
-                                log.debug("Dropping the message: '" + message + "' from ui adapter: '" + eventAdapterConfiguration.getName() + "' " +
-                                        "for tenant ID: " + tenantId + ", as " + e.getMessage(), e);
-                            }
+                            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send to endpoint", e, log, tenantId);
                         }
                     }
                 }
             } else {
-                log.error("Event Dropped by Output UI Adapter '" + eventAdapterConfiguration.getName() + "'");
-                if (log.isDebugEnabled()) {
-                    log.debug("Dropping the message: '" + message + "', since no clients have being registered to receive " +
-                            "events from ui adapter: '" + eventAdapterConfiguration.getName() + "', " +
-                            "for tenant ID: " + tenantId);
-                }
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "No clients registered", log, tenantId);
             }
         }
     }

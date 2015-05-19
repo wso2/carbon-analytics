@@ -15,6 +15,7 @@
 package org.wso2.carbon.event.output.adapter.core;
 
 import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.commons.logging.Log;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.event.output.adapter.core.internal.ds.OutputEventAdapterServiceValueHolder;
@@ -34,5 +35,24 @@ public class EventAdapterUtil {
                             getServerConfigContext());
         }
         return axisConfiguration;
+    }
+
+    public static void logAndDrop(String adapterName, Object event, String message, Throwable e, Log log, int tenantId) {
+        if (message != null) {
+            message = message + ", ";
+        } else {
+            message = "";
+        }
+        log.error("Event dropped at Output Adapter '" + adapterName + "' for tenant id '" + tenantId + "', " + message + e.getMessage(), e);
+        if (log.isDebugEnabled()) {
+            log.debug("Error at Output Adapter '" + adapterName + "' for tenant id '" + tenantId + "', dropping event: /n" + event, e);
+        }
+    }
+
+    public static void logAndDrop(String adapterName, Object event, String message, Log log, int tenantId) {
+        log.error("Event dropped at Output Adapter '" + adapterName + "' for tenant id '" + tenantId + "', " + message);
+        if (log.isDebugEnabled()) {
+            log.debug("Error at Output Adapter '" + adapterName + "' for tenant id '" + tenantId + "', dropping event: /n" + event);
+        }
     }
 }

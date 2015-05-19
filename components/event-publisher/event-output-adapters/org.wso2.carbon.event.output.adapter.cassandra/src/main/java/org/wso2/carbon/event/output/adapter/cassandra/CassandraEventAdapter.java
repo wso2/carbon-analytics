@@ -32,7 +32,9 @@ import me.prettyprint.hector.api.factory.HFactory;
 import me.prettyprint.hector.api.mutation.Mutator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.output.adapter.cassandra.internal.util.CassandraEventAdapterConstants;
+import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.ConnectionUnavailableException;
@@ -50,6 +52,7 @@ public class CassandraEventAdapter implements OutputEventAdapter {
     private String columnFamilyName;
     private Mutator<String> mutator;
     private Cluster cluster;
+    private int tenantId;
 
     public CassandraEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
                                  Map<String, String> globalProperties) {
@@ -59,6 +62,8 @@ public class CassandraEventAdapter implements OutputEventAdapter {
 
     @Override
     public void init() throws OutputEventAdapterException {
+
+        tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         Map<String, String> staticProperties = eventAdapterConfiguration.getStaticProperties();
 
@@ -186,10 +191,10 @@ public class CassandraEventAdapter implements OutputEventAdapter {
                 }
                 mutator.execute();
             } catch (Throwable t) {
-                log.error("Cannot publish message to Cassandra: " + t.getMessage(), t);
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, null, t, log, tenantId);
             }
         } else {
-            log.error("Event cannot be published as it's not type of Map, hence dropping the Event: " + message);
+            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Event is not type of Map.", log, tenantId);
         }
 
     }

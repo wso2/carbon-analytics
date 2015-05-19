@@ -22,8 +22,10 @@ package org.wso2.carbon.event.output.adapter.rdbms;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.AttributeType;
+import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.ConnectionUnavailableException;
@@ -37,17 +39,8 @@ import org.wso2.carbon.ndatasource.common.DataSourceException;
 import org.wso2.carbon.ndatasource.core.CarbonDataSource;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.sql.*;
+import java.util.*;
 
 /**
  * Class will Insert or Update/Insert values to selected RDBMS
@@ -61,6 +54,7 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
     private Map<String, String> dbTypeMappings;
     private ExecutionInfo executionInfo = null;
     private DataSource dataSource;
+    private int tenantId;
 
     public RDBMSEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
                              Map<String, String> globalProperties) {
@@ -70,6 +64,8 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
 
     @Override
     public void init() throws OutputEventAdapterException {
+
+        tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         resourceBundle = ResourceBundle
                 .getBundle("org.wso2.carbon.event.output.adapter.rdbms.i18n.Resources", Locale.getDefault());
@@ -143,11 +139,10 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
                 }
                 executeProcessActions(message, tableName);
             } else {
-                throw new OutputEventAdapterRuntimeException(
-                        message.getClass().toString() + "is not a compatible type. Hence Event is dropped.");
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Event is not type of Map", log, tenantId);
             }
         } catch (OutputEventAdapterException e) {
-            log.error(e.getMessage() + " Hence Event is dropped.", e);
+            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, null, e, log, tenantId);
         }
     }
 
