@@ -18,6 +18,7 @@
 package org.wso2.carbon.event.input.adapter.email;
 
 import org.apache.log4j.Logger;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapter;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterConfiguration;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
@@ -40,6 +41,7 @@ public class EmailEventAdapter implements InputEventAdapter {
     private String moveToFolderName;
     private Timer timer;
     private boolean isThreadOccupied;
+    private int tenantId;
 
     public EmailEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration,
                              Map<String, String> globalProperties) {
@@ -47,6 +49,7 @@ public class EmailEventAdapter implements InputEventAdapter {
         this.globalProperties = globalProperties;
         timer = new Timer("PollTimer");
         moveToFolderName = globalProperties.get(EmailEventAdapterConstants.ADAPTER_CONF_MOVE_TO_FOLDER_NAME);
+        tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
     }
 
 
@@ -369,7 +372,7 @@ public class EmailEventAdapter implements InputEventAdapter {
             if (mailSubject.equalsIgnoreCase(expectedSubject)) {
                 Object content = msg.getContent();
                 if (content instanceof String) {
-                    eventAdaptorListener.onEvent(content);
+                    pushEvent(msg);
                 } else {
                     if (log.isDebugEnabled()) {
                         log.debug("Skipping message because content type is not accepted " + msg);
@@ -381,13 +384,26 @@ public class EmailEventAdapter implements InputEventAdapter {
                 }
             }
 
-
         } catch (MessagingException e) {
             log.error("Exception when trying to identify the content type", e);
         } catch (IOException e) {
             log.error("Exception when trying to read the mail content", e);
-
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
         }
+    }
+
+    private void pushEvent(Object obj) {
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
+            eventAdaptorListener.onEvent(obj);
+        } catch (Throwable e) {
+            log.error("Exception when pushing event to CEP ", e);
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
+
     }
 
 }
