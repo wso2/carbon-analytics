@@ -22,7 +22,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.*;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.SystemDefaultHttpClient;
@@ -254,9 +256,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
 
                 httpClient.execute(method).getEntity().getContent().close();
             } catch (UnknownHostException e) {
-                log.error("Exception while connecting adapter "
-                        + eventAdapterConfiguration.getName() + " HTTP endpoint to " + this.getUrl(),
-                        e);
+                log.error("Exception while connecting adapter " + eventAdapterConfiguration.getName() + " HTTP endpoint to " + this.getUrl(), e);
             } catch (Throwable e) {
                 log.error("Error executing HTTP output event adapter "
                         + eventAdapterConfiguration.getName() + " sender: ", e);

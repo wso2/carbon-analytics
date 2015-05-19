@@ -27,12 +27,13 @@ import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupp
 import org.wso2.carbon.event.output.adapter.jms.internal.util.*;
 
 import javax.jms.Connection;
-import javax.jms.Message;
-import java.util.HashMap;
-import java.util.Map;
 import javax.jms.JMSException;
+import javax.jms.Message;
 import javax.jms.Session;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.*;
 
 public class JMSEventAdapter implements OutputEventAdapter {
