@@ -227,6 +227,12 @@
 
             <% } %>
 
+            <% if(eventPublisherPropertyDto[index].getHint()!=null) { %>
+            <div class="sectionHelp">
+                <%=eventPublisherPropertyDto[index].getHint()%>
+            </div>
+            <% } %>
+
 
         </div>
     </td>
@@ -301,6 +307,11 @@
 
             <% } %>
 
+            <% if(eventPublisherPropertyDto[index].getHint()!=null) { %>
+            <div class="sectionHelp">
+                <%=eventPublisherPropertyDto[index].getHint()%>
+            </div>
+            <% } %>
 
         </div>
     </td>

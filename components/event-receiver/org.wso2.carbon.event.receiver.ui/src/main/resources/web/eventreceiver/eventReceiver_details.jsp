@@ -193,6 +193,11 @@
 
             <% } %>
 
+            <% if(eventReceiverPropertyDto[index].getHint()!=null) { %>
+            <div class="sectionHelp">
+                <%=eventReceiverPropertyDto[index].getHint()%>
+            </div>
+            <% } %>
 
         </div>
     </td>
