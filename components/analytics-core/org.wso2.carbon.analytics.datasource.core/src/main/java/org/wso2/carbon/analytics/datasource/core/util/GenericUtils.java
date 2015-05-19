@@ -551,7 +551,6 @@ public class GenericUtils {
         String path = System.getProperty(WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP);
         if (path == null) {
             path = Paths.get("").toAbsolutePath().toString() + File.separator + CUSTOM_WSO2_CONF_DIR_NAME;
-            System.out.println("&&&&&&&&&&&&&&&&&&&&&&& " + path + "&&&&&&&&&&&&&&&&&");
         }
         File confDir = new File(path);
         if (!confDir.exists()) {
