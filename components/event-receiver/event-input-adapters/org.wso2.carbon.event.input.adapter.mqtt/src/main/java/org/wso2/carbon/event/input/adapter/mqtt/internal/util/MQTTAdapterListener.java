@@ -48,8 +48,12 @@ public class MQTTAdapterListener implements MqttCallback, Runnable {
                                String topic, String mqttClientId,
                                InputEventAdapterListener inputEventAdapterListener, int tenantId) {
 
-        this.mqttBrokerConnectionConfiguration = mqttBrokerConnectionConfiguration;
+        if(mqttClientId == null || mqttClientId.trim().isEmpty()){
+            mqttClientId = MqttClient.generateClientId();
+        }
+
         this.mqttClientId = mqttClientId;
+        this.mqttBrokerConnectionConfiguration = mqttBrokerConnectionConfiguration;
         this.cleanSession = mqttBrokerConnectionConfiguration.isCleanSession();
         this.keepAlive = mqttBrokerConnectionConfiguration.getKeepAlive();
         this.topic = topic;

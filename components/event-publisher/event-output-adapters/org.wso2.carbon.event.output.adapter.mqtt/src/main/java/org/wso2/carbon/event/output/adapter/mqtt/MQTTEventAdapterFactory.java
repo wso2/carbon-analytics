@@ -67,6 +67,15 @@ public class MQTTEventAdapterFactory extends OutputEventAdapterFactory {
         password.setHint(
                 resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_PASSWORD_HINT));
 
+        // set clientId
+        Property clientId = new Property(MQTTEventAdapterConstants.ADAPTER_CONF_CLIENTID);
+        clientId.setDisplayName(
+                resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_CLIENTID));
+        clientId.setRequired(false);
+        clientId.setHint(
+                resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_CLIENTID_HINT));
+        staticPropertyList.add(clientId);
+
         //Broker clear session
         Property clearSession = new Property(MQTTEventAdapterConstants.ADAPTER_CONF_CLEAN_SESSION);
         clearSession.setDisplayName(
@@ -98,6 +107,8 @@ public class MQTTEventAdapterFactory extends OutputEventAdapterFactory {
     @Override
     public List<Property> getDynamicPropertyList() {
         List<Property> dynamicPropertyList = new ArrayList<Property>();
+
+
 
         // set topic
         Property topicProperty = new Property(MQTTEventAdapterConstants.ADAPTER_MESSAGE_TOPIC);

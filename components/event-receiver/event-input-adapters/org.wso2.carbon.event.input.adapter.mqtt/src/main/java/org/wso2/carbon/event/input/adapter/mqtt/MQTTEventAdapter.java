@@ -77,7 +77,7 @@ public class MQTTEventAdapter implements InputEventAdapter {
 
         mqttAdapterListener = new MQTTAdapterListener(mqttBrokerConnectionConfiguration,
                 eventAdapterConfiguration.getProperties().get(MQTTEventAdapterConstants.ADAPTER_MESSAGE_TOPIC),
-                eventAdapterConfiguration.getProperties().get(MQTTEventAdapterConstants.ADAPTER_MESSAGE_CLIENTID),
+                eventAdapterConfiguration.getProperties().get(MQTTEventAdapterConstants.ADAPTER_CONF_CLIENTID),
                 eventAdapterListener, PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
 
         mqttAdapterListener.createConnection();

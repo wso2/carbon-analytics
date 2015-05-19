@@ -67,7 +67,7 @@ public class MQTTEventAdapter implements OutputEventAdapter {
     @Override
     public void init() throws OutputEventAdapterException {
 
-        tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         //ThreadPoolExecutor will be assigned  if it is null
         if (threadPoolExecutor == null) {
@@ -127,8 +127,10 @@ public class MQTTEventAdapter implements OutputEventAdapter {
                                 .get(MQTTEventAdapterConstants.ADAPTER_CONF_CLEAN_SESSION)
                 );
 
+        String clientId = eventAdapterConfiguration.getStaticProperties().get(MQTTEventAdapterConstants.ADAPTER_CONF_CLIENTID);
+
         qos = eventAdapterConfiguration.getStaticProperties().get(MQTTEventAdapterConstants.ADAPTER_MESSAGE_QOS);
-        mqttAdapterPublisher = new MQTTAdapterPublisher(mqttBrokerConnectionConfiguration);
+        mqttAdapterPublisher = new MQTTAdapterPublisher(mqttBrokerConnectionConfiguration, clientId);
     }
 
     @Override

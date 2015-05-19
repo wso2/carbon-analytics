@@ -34,7 +34,11 @@ public class MQTTAdapterPublisher {
     private static final Log log = LogFactory.getLog(MQTTAdapterPublisher.class);
     private MqttClient mqttClient;
 
-    public MQTTAdapterPublisher(MQTTBrokerConnectionConfiguration mqttBrokerConnectionConfiguration) {
+    public MQTTAdapterPublisher(MQTTBrokerConnectionConfiguration mqttBrokerConnectionConfiguration, String clientId) {
+
+        if (clientId == null || clientId.trim().isEmpty()) {
+            clientId = MqttClient.generateClientId();
+        }
 
         boolean cleanSession = mqttBrokerConnectionConfiguration.isCleanSession();
         int keepAlive = mqttBrokerConnectionConfiguration.getKeepAlive();
@@ -58,7 +62,7 @@ public class MQTTAdapterPublisher {
             }
 
             // Construct an MQTT blocking mode client
-            mqttClient = new MqttClient(mqttBrokerConnectionConfiguration.getBrokerUrl(), MqttClient.generateClientId(),
+            mqttClient = new MqttClient(mqttBrokerConnectionConfiguration.getBrokerUrl(), clientId,
                     dataStore);
             mqttClient.connect(connectionOptions);
 

@@ -28,8 +28,8 @@ public class MQTTEventAdapterConstants {
     public static final String ADAPTER_CONF_URL_HINT = "url.hint";
     public static final String ADAPTER_MESSAGE_TOPIC = "topic";
     public static final String ADAPTER_MESSAGE_TOPIC_HINT = "topic.hint";
-    public static final String ADAPTER_MESSAGE_CLIENTID = "clientId";
-    public static final String ADAPTER_MESSAGE_CLIENTID_HINT = "clientId.hint";
+    public static final String ADAPTER_CONF_CLIENTID = "clientId";
+    public static final String ADAPTER_CONF_CLIENTID_HINT = "clientId.hint";
     public static final String ADAPTER_CONF_CLEAN_SESSION = "cleanSession";
     public static final String ADAPTER_CONF_CLEAN_SESSION_HINT = "cleanSession.hint";
     public static final String ADAPTER_CONF_KEEP_ALIVE = "keepAlive";

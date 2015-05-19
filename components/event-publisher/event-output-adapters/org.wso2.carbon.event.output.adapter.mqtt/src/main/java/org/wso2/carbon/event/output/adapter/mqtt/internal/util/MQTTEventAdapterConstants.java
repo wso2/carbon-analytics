@@ -37,6 +37,8 @@ public final class MQTTEventAdapterConstants {
     public static final String CONNECTION_KEEP_ALIVE_INTERVAL = "connectionKeepAliveInterval";
     public static final int DEFAULT_CONNECTION_KEEP_ALIVE_INTERVAL = 60;
     public static final String ADAPTER_TEMP_DIRECTORY_NAME = "java.io.tmpdir";
+    public static final String ADAPTER_CONF_CLIENTID = "clientId";
+    public static final String ADAPTER_CONF_CLIENTID_HINT = "clientId.hint";
 
     public static final int DEFAULT_MIN_THREAD_POOL_SIZE = 8;
     public static final int DEFAULT_MAX_THREAD_POOL_SIZE = 100;
