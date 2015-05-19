@@ -1,0 +1,179 @@
+
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://persistence.stream.analytics.carbon.wso2.org" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ax217="http://dto.persistence.stream.analytics.carbon.wso2.org/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://persistence.stream.analytics.carbon.wso2.org">
+    <wsdl:documentation>EventStreamPersistenceAdminService</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema xmlns:ax218="http://dto.persistence.stream.analytics.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://persistence.stream.analytics.carbon.wso2.org">
+            <xs:import namespace="http://dto.persistence.stream.analytics.carbon.wso2.org/xsd"/>
+            <xs:element name="isBackendServicePresent">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isBackendServicePresentResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAnalyticsTable">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="streamName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAnalyticsTableResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax217:AnalyticsTable"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addAnalyticsTable">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="analyticsTable" nillable="true" type="ax217:AnalyticsTable"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://dto.persistence.stream.analytics.carbon.wso2.org/xsd">
+            <xs:complexType name="AnalyticsTable">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="analyticsTableColumns" nillable="true" type="ax217:AnalyticsTableColumn"/>
+                    <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="AnalyticsTableColumn">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="columnName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="columnType" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="indexed" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="primaryKey" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="scoreParam" type="xs:boolean"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="isBackendServicePresentRequest">
+        <wsdl:part name="parameters" element="ns:isBackendServicePresent"/>
+    </wsdl:message>
+    <wsdl:message name="isBackendServicePresentResponse">
+        <wsdl:part name="parameters" element="ns:isBackendServicePresentResponse"/>
+    </wsdl:message>
+    <wsdl:message name="addAnalyticsTableRequest">
+        <wsdl:part name="parameters" element="ns:addAnalyticsTable"/>
+    </wsdl:message>
+    <wsdl:message name="getAnalyticsTableRequest">
+        <wsdl:part name="parameters" element="ns:getAnalyticsTable"/>
+    </wsdl:message>
+    <wsdl:message name="getAnalyticsTableResponse">
+        <wsdl:part name="parameters" element="ns:getAnalyticsTableResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="EventStreamPersistenceAdminServicePortType">
+        <wsdl:operation name="isBackendServicePresent">
+            <wsdl:input message="ns:isBackendServicePresentRequest" wsaw:Action="urn:isBackendServicePresent"/>
+            <wsdl:output message="ns:isBackendServicePresentResponse" wsaw:Action="urn:isBackendServicePresentResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="addAnalyticsTable">
+            <wsdl:input message="ns:addAnalyticsTableRequest" wsaw:Action="urn:addAnalyticsTable"/>
+        </wsdl:operation>
+        <wsdl:operation name="getAnalyticsTable">
+            <wsdl:input message="ns:getAnalyticsTableRequest" wsaw:Action="urn:getAnalyticsTable"/>
+            <wsdl:output message="ns:getAnalyticsTableResponse" wsaw:Action="urn:getAnalyticsTableResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="EventStreamPersistenceAdminServiceSoap11Binding" type="ns:EventStreamPersistenceAdminServicePortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="isBackendServicePresent">
+            <soap:operation soapAction="urn:isBackendServicePresent" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addAnalyticsTable">
+            <soap:operation soapAction="urn:addAnalyticsTable" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getAnalyticsTable">
+            <soap:operation soapAction="urn:getAnalyticsTable" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="EventStreamPersistenceAdminServiceSoap12Binding" type="ns:EventStreamPersistenceAdminServicePortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="isBackendServicePresent">
+            <soap12:operation soapAction="urn:isBackendServicePresent" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addAnalyticsTable">
+            <soap12:operation soapAction="urn:addAnalyticsTable" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getAnalyticsTable">
+            <soap12:operation soapAction="urn:getAnalyticsTable" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="EventStreamPersistenceAdminServiceHttpBinding" type="ns:EventStreamPersistenceAdminServicePortType">
+        <http:binding verb="POST"/>
+        <wsdl:operation name="isBackendServicePresent">
+            <http:operation location="isBackendServicePresent"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addAnalyticsTable">
+            <http:operation location="addAnalyticsTable"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getAnalyticsTable">
+            <http:operation location="getAnalyticsTable"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="EventStreamPersistenceAdminService">
+        <wsdl:port name="EventStreamPersistenceAdminServiceHttpsSoap11Endpoint" binding="ns:EventStreamPersistenceAdminServiceSoap11Binding">
+            <soap:address location="https://10.100.0.46:9443/services/EventStreamPersistenceAdminService.EventStreamPersistenceAdminServiceHttpsSoap11Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="EventStreamPersistenceAdminServiceHttpsSoap12Endpoint" binding="ns:EventStreamPersistenceAdminServiceSoap12Binding">
+            <soap12:address location="https://10.100.0.46:9443/services/EventStreamPersistenceAdminService.EventStreamPersistenceAdminServiceHttpsSoap12Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="EventStreamPersistenceAdminServiceHttpsEndpoint" binding="ns:EventStreamPersistenceAdminServiceHttpBinding">
+            <http:address location="https://10.100.0.46:9443/services/EventStreamPersistenceAdminService.EventStreamPersistenceAdminServiceHttpsEndpoint/"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
