@@ -46,6 +46,7 @@
     </adapterConfig>
 
     <adapterConfig type="http">
+        <!-- Thread Pool Related Properties -->
         <property key="minThread">8</property>
         <property key="maxThread">100</property>
         <property key="keepAliveTimeInMillis">20000</property>
@@ -53,6 +54,7 @@
     </adapterConfig>
 
     <adapterConfig type="jms">
+        <!-- Thread Pool Related Properties -->
         <property key="minThread">8</property>
         <property key="maxThread">100</property>
         <property key="keepAliveTimeInMillis">20000</property>
@@ -60,6 +62,7 @@
     </adapterConfig>
 
     <adapterConfig type="mqtt">
+        <!-- Thread Pool Related Properties -->
         <property key="minThread">8</property>
         <property key="maxThread">100</property>
         <property key="keepAliveTimeInMillis">20000</property>
@@ -68,6 +71,7 @@
     </adapterConfig>
 
     <adapterConfig type="kafka">
+        <!-- Thread Pool Related Properties -->
         <property key="minThread">8</property>
         <property key="maxThread">100</property>
         <property key="keepAliveTimeInMillis">20000</property>
@@ -99,10 +103,24 @@
     </adapterConfig>
 
     <adapterConfig type="websocket-local">
+        <!-- Thread Pool Related Properties -->
         <property key="minThread">8</property>
         <property key="maxThread">100</property>
         <property key="keepAliveTimeInMillis">20000</property>
         <property key="jobQueueSize">10000</property>
+    </adapterConfig>
+
+    <adapterConfig type="soap">
+        <!-- Thread Pool Related Properties -->
+        <property key="minThread">8</property>
+        <property key="maxThread">100</property>
+        <property key="keepAliveTimeInMillis">20000</property>
+        <property key="jobQueueSize">10000</property>
+        <!-- Axis2 Client Connection Related Properties -->
+        <property key="axis2ClientConnectionTimeout">10000</property>
+        <property key="reuseHTTPClient">true</property>
+        <property key="autoReleaseConnection">true</property>
+        <property key="maxConnectionsPerHost">50</property>
     </adapterConfig>
 
 </outputEventAdaptersConfig>
