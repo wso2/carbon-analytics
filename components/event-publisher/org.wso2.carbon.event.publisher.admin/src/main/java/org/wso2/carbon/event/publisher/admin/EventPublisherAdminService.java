@@ -262,6 +262,8 @@ public class EventPublisherAdminService extends AbstractAdmin {
                     wso2EventOutputMappingDto.setMetaWSO2EventMappingProperties(getEventPropertyDtoArray(metaOutputPropertyList));
                     wso2EventOutputMappingDto.setCorrelationWSO2EventMappingProperties(getEventPropertyDtoArray(correlationOutputPropertyList));
                     wso2EventOutputMappingDto.setPayloadWSO2EventMappingProperties(getEventPropertyDtoArray(payloadOutputPropertyList));
+                    wso2EventOutputMappingDto.setOutputStreamName(wso2EventOutputMapping.getToEventName());
+                    wso2EventOutputMappingDto.setOutputStreamVersion(wso2EventOutputMapping.getToEventVersion());
 
                     eventPublisherConfigurationDto.setCustomMappingEnabled(wso2EventOutputMapping.isCustomMappingEnabled());
                     eventPublisherConfigurationDto.setWso2EventOutputMappingDto(wso2EventOutputMappingDto);
