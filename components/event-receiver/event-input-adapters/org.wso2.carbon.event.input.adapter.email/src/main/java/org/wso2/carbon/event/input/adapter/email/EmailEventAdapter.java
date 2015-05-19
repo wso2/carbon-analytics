@@ -91,8 +91,10 @@ public class EmailEventAdapter implements InputEventAdapter {
 
     @Override
     public void disconnect() {
-        timer.cancel();
-        timer.purge();
+        if (timer != null) {
+            timer.cancel();
+            timer.purge();
+        }
     }
 
     @Override
