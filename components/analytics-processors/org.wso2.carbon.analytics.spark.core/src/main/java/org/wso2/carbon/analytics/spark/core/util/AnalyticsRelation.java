@@ -19,29 +19,30 @@
 package org.wso2.carbon.analytics.spark.core.util;
 
 import org.apache.spark.rdd.RDD;
+import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.sources.BaseRelation;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.types.StructType;
+import org.apache.spark.sql.sources.InsertableRelation;
 import org.apache.spark.sql.sources.TableScan;
 import org.apache.spark.sql.types.DataType;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 import scala.reflect.ClassTag$;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static scala.collection.JavaConversions.asJavaCollection;
-
 /**
  * This class represents a Spark SQL relation.
  */
-public class AnalyticsRelation extends BaseRelation implements TableScan, Serializable {
+public class AnalyticsRelation extends BaseRelation implements TableScan,
+                                                               InsertableRelation, Serializable {
 
     private static final long serialVersionUID = -7773419083178608517L;
 
@@ -117,5 +118,9 @@ public class AnalyticsRelation extends BaseRelation implements TableScan, Serial
                 throw new RuntimeException("Invalid data type: " + strType);
         }
     }
-    
+
+    @Override
+    public void insert(DataFrame data, boolean overwrite) {
+        AnalyticsDataService dataService =  ServiceHolder.getAnalyticsDataService();
+    }
 }
