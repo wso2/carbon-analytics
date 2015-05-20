@@ -22,10 +22,8 @@ package org.wso2.carbon.event.output.adapter.rdbms;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.AttributeType;
-import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.ConnectionUnavailableException;
@@ -39,8 +37,17 @@ import org.wso2.carbon.ndatasource.common.DataSourceException;
 import org.wso2.carbon.ndatasource.core.CarbonDataSource;
 
 import javax.sql.DataSource;
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 /**
  * Class will Insert or Update/Insert values to selected RDBMS
@@ -54,18 +61,17 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
     private Map<String, String> dbTypeMappings;
     private ExecutionInfo executionInfo = null;
     private DataSource dataSource;
-    private int tenantId;
+    private float count;
 
     public RDBMSEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
-                             Map<String, String> globalProperties) {
+            Map<String, String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
         this.globalProperties = globalProperties;
+        this.count = 0;
     }
 
     @Override
     public void init() throws OutputEventAdapterException {
-
-        tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         resourceBundle = ResourceBundle
                 .getBundle("org.wso2.carbon.event.output.adapter.rdbms.i18n.Resources", Locale.getDefault());
@@ -122,7 +128,6 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
     public void publish(Object message, Map<String, String> dynamicProperties) {
 
         String tableName;
-
         try {
             if (message instanceof Map) {
 
@@ -139,10 +144,11 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
                 }
                 executeProcessActions(message, tableName);
             } else {
-                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Event is not type of Map", log, tenantId);
+                throw new OutputEventAdapterRuntimeException(
+                        message.getClass().toString() + "is not a compatible type. Hence Event is dropped.");
             }
         } catch (OutputEventAdapterException e) {
-            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, null, e, log, tenantId);
+            log.error(e.getMessage() + " Hence Event is dropped.", e);
         }
     }
 
@@ -150,7 +156,7 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
      * Construct all the queries and assign to executionInfo instance
      */
     private void initializeDatabaseExecutionInfo(String tableName, String executionMode, String updateColumnKeys,
-                                                 Object message) {
+            Object message) {
 
         if (resourceBundle.getString(RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_EXECUTION_MODE_UPDATE)
                 .equalsIgnoreCase(executionMode)) {
@@ -300,43 +306,39 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
             throws OutputEventAdapterException {
 
         PreparedStatement stmt = null;
-        Connection con;
-
-        try {
-            con = dataSource.getConnection();
-            con.setAutoCommit(false);
-        } catch (SQLException e) {
-            throw new ConnectionUnavailableException(e);
-        }
+        Connection con = null;
 
         Map<String, Object> map = (Map<String, Object>) message;
-
         boolean executeInsert = true;
 
         try {
-            synchronized (this) {
-                if (executionInfo.isUpdateMode()) {
-
-                    stmt = con.prepareStatement(executionInfo.getPreparedUpdateStatement());
-                    populateStatement(map, stmt, executionInfo.getUpdateQueryColumnOrder());
-                    int updatedRows = stmt.executeUpdate();
-                    con.commit();
-
-                    stmt.close();
-
-                    if (updatedRows > 0) {
-                        executeInsert = false;
-                    }
-                }
-
-                if (executeInsert) {
-                    stmt = con.prepareStatement(executionInfo.getPreparedInsertStatement());
-                    populateStatement(map, stmt, executionInfo.getInsertQueryColumnOrder());
-                    stmt.executeUpdate();
-                    con.commit();
-                }
-
+            try {
+                con = dataSource.getConnection();
+                con.setAutoCommit(false);
+            } catch (SQLException e) {
+                throw new ConnectionUnavailableException(e);
             }
+
+            if (executionInfo.isUpdateMode()) {
+                stmt = con.prepareStatement(executionInfo.getPreparedUpdateStatement());
+                populateStatement(map, stmt, executionInfo.getUpdateQueryColumnOrder());
+                int updatedRows = stmt.executeUpdate();
+                con.commit();
+
+                stmt.close();
+
+                if (updatedRows > 0) {
+                    executeInsert = false;
+                }
+            }
+
+            if (executeInsert) {
+                stmt = con.prepareStatement(executionInfo.getPreparedInsertStatement());
+                populateStatement(map, stmt, executionInfo.getInsertQueryColumnOrder());
+                stmt.executeUpdate();
+                con.commit();
+            }
+
         } catch (SQLException e) {
             throw new OutputEventAdapterException(
                     "Cannot Execute Insert/Update Query for event " + message.toString() + " " + e.getMessage(), e);
@@ -358,24 +360,24 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
                 Object value = map.get(attribute.getName());
                 if (value != null) {
                     switch (attribute.getType()) {
-                        case INT:
-                            stmt.setInt(i + 1, (Integer) value);
-                            break;
-                        case LONG:
-                            stmt.setLong(i + 1, (Long) value);
-                            break;
-                        case FLOAT:
-                            stmt.setFloat(i + 1, (Float) value);
-                            break;
-                        case DOUBLE:
-                            stmt.setDouble(i + 1, (Double) value);
-                            break;
-                        case STRING:
-                            stmt.setString(i + 1, (String) value);
-                            break;
-                        case BOOL:
-                            stmt.setBoolean(i + 1, (Boolean) value);
-                            break;
+                    case INT:
+                        stmt.setInt(i + 1, (Integer) value);
+                        break;
+                    case LONG:
+                        stmt.setLong(i + 1, (Long) value);
+                        break;
+                    case FLOAT:
+                        stmt.setFloat(i + 1, (Float) value);
+                        break;
+                    case DOUBLE:
+                        stmt.setDouble(i + 1, (Double) value);
+                        break;
+                    case STRING:
+                        stmt.setString(i + 1, (String) value);
+                        break;
+                    case BOOL:
+                        stmt.setBoolean(i + 1, (Boolean) value);
+                        break;
                     }
                 } else {
                     throw new OutputEventAdapterException("Cannot Execute Insert/Update. Null value detected for " +
@@ -392,19 +394,17 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
     public void createTableIfNotExist(String tableName)
             throws OutputEventAdapterException {
 
-        Statement stmt = null;
-        Boolean tableExists = true;
-        Connection con;
-
-        try {
-            con = dataSource.getConnection();
-            con.setAutoCommit(false);
-        } catch (SQLException e) {
-            throw new ConnectionUnavailableException(e);
-        }
-
         if (!executionInfo.isTableExist()) {
+            Statement stmt = null;
+            Boolean tableExists = true;
+            Connection con = null;
             try {
+                try {
+                    con = dataSource.getConnection();
+                    con.setAutoCommit(false);
+                } catch (SQLException e) {
+                    throw new ConnectionUnavailableException(e);
+                }
                 stmt = con.createStatement();
                 try {
                     stmt.executeQuery(executionInfo.getPreparedTableExistenceCheckStatement());
@@ -425,13 +425,12 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
                     }
                 } catch (SQLException e) {
                     throw new OutputEventAdapterException("Cannot Execute Create Table Query. " + e.getMessage(), e);
-                } finally {
-                    cleanupConnections(stmt, con);
                 }
             } catch (SQLException e) {
                 throw new ConnectionUnavailableException(e);
+            } finally {
+                cleanupConnections(stmt, con);
             }
-
         }
     }
 
@@ -456,7 +455,7 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
      * Replace attribute values with target build queries
      */
     public String constructQuery(String tableName, String query, StringBuilder columnTypes, StringBuilder columns,
-                                 StringBuilder values, StringBuilder columnValues, StringBuilder condition) {
+            StringBuilder values, StringBuilder columnValues, StringBuilder condition) {
 
         if (query.contains(RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_ATTRIBUTE_TABLE_NAME)) {
             query = query.replace(RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_ATTRIBUTE_TABLE_NAME, tableName);
@@ -490,7 +489,7 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
 
         String dbName = null;
         dbTypeMappings = new HashMap<String, String>();
-        Connection con;
+        Connection con = null;
 
         try {
             CarbonDataSource carbonDataSource = RDBMSEventAdapterServiceValueHolder.getDataSourceService()
@@ -514,10 +513,12 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
             throw new ConnectionUnavailableException(e.getMessage(), e);
         } catch (SQLException e) {
             throw new ConnectionUnavailableException(e);
+        } finally {
+            cleanupConnections(null, con);
         }
 
         // Map<String, String> defaultMappings = new HashMap<String, String>();
-        String[] staticAttributes = {RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_STRING,
+        String[] staticAttributes = { RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_STRING,
                 RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_DOUBLE,
                 RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_INTEGER,
                 RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_LONG,
@@ -532,12 +533,11 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
                 RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_COMMA,
                 RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_QUESTION_MARK,
                 RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_EQUAL,
-                RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_AND};
+                RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_AND };
 
         Boolean staticAttributeExist;
         String attribute = null;
         Map<String, String> defaultMappings = new HashMap<String, String>();
-
 
         for (String staticAttribute : staticAttributes) {
             staticAttributeExist = false;

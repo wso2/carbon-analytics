@@ -63,9 +63,9 @@ public final class LoggerEventAdapter implements OutputEventAdapter {
         }
 
         if (message instanceof Object[]) {
-            log.info("Unique ID: " + uniqueIdentification + "\n, Event: " + Arrays.deepToString((Object[]) message));
+            log.info("Unique ID: " + uniqueIdentification + ",\n Event: " + Arrays.deepToString((Object[]) message));
         } else {
-            log.info("Unique ID: " + uniqueIdentification + "\n, Event: " + message);
+            log.info("Unique ID: " + uniqueIdentification + ",\n Event: " + message);
         }
     }
 

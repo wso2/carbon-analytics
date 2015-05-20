@@ -18,6 +18,7 @@
 <%@ page import="org.wso2.carbon.event.stream.ui.EventStreamUIUtils" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <fmt:bundle basename="org.wso2.carbon.event.stream.ui.i18n.Resources">
 
@@ -37,6 +38,7 @@
 <script type="text/javascript" src="../yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
 <script type="text/javascript" src="../yui/build/connection/connection-min.js"></script>
 <script type="text/javascript" src="js/event_stream.js"></script>
+    <script type="text/javascript" src="js/event_stream_persistence.js"></script>
 <script type="text/javascript"
         src="js/create_eventStream_helper.js"></script>
 <script type="text/javascript" src="../ajax/js/prototype.js"></script>
@@ -54,6 +56,23 @@
             convertStringToEventStreamInfoDto();
         }
     }
+    function nextPersistView() {
+        var eventStreamName = document.getElementById("eventStreamNameId").value.trim();
+        var eventStreamVersion = document.getElementById("eventStreamVersionId").value.trim();
+        if ((eventStreamName == "") || (eventStreamVersion == "")) {
+            // empty fields are encountered.
+            CARBON.showErrorDialog("Empty inputs fields are not allowed.");
+        } else {
+            document.getElementById("stream").style.display = 'none';
+            document.getElementById("persist").style.display = 'block';
+            populateAnalyticsIndexTable(eventStreamName);
+        }
+    }
+
+    function back() {
+        document.getElementById("stream").style.display = 'block';
+        document.getElementById("persist").style.display = 'none';
+    }
 </script>
 
 <% String eventStreamWithVersion = request.getParameter("eventStreamWithVersion");
@@ -67,7 +86,7 @@
     <h2><fmt:message key="title.event.stream.edit"/></h2>
     <div id="designWorkArea">
         <div id="workArea">
-
+            <div id="stream">
             <form name="inputForm" action="index.jsp?ordinal=1" method="post" id="editEventStream">
                 <table style="width:100%" id="eventStreamEdit" class="styledLeft">
                     <thead>
@@ -392,11 +411,43 @@
                         <tr>
                             <td class="buttonRow">
                                 <input type="button" value="<fmt:message key="edit.event.stream"/>"  onclick="addEventStream(document.getElementById('editEventStream'),'edit', '<%=eventStreamWithVersion%>')"/>
+                                <c:if test="${isAnalyticsPersistenceBackendAvailable}">
+                                    <input type="button" value="<fmt:message key="next.persist.stream"/>"
+                                           onclick="nextPersistView()"/>
+                                </c:if>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </form>
+            </div>
+            <div id="persist" style="display: none;">
+                <table style="width:100%" id="eventStreamPersistEdit" class="styledLeft">
+                    <thead>
+                    <tr>
+                        <th colspan="2" class="middle-header">
+                            <span style="float: left; position: relative; margin-top: 2px;">
+                                <fmt:message key="title.event.stream.details"/>
+                            </span>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="formRaw">
+                            <%@include file="inner_event_stream_persistence_ui.jsp" %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="buttonRow">
+                            <input type="button" value="<fmt:message key="back"/>" onclick="back()"/>
+                            <input type="button" value="<fmt:message key="edit.event.stream"/>"
+                                   onclick="addEventStream(document.getElementById('editEventStream'),'edit', '<%=eventStreamWithVersion%>')"/>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
     <div id="sourceWorkArea">

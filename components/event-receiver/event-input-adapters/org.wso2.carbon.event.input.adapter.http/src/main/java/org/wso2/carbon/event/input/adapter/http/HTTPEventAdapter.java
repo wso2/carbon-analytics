@@ -170,6 +170,9 @@ public final class HTTPEventAdapter implements InputEventAdapter {
 
         try {
             HttpService httpService = HTTPEventAdapterServiceValueHolder.getHTTPService();
+            if (httpService == null) {
+                throw new InputEventAdapterRuntimeException("HttpService not available, Error in registering endpoint " + endpoint);
+            }
             httpService.registerServlet(endpoint,
                     new HTTPMessageServlet(eventAdaptorListener, tenantId, eventAdapterConfiguration.getProperties().get(HTTPEventAdapterConstants.EXPOSED_TRANSPORTS)),
                     new Hashtable(),
