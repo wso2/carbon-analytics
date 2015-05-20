@@ -27,6 +27,7 @@ import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
+import java.io.IOException;
 
 /**
  * An instance of this class is used, when we connect to a user-given socket-server, as a client - to send events.
@@ -68,7 +69,12 @@ public class WebsocketClient extends Endpoint {
 
     @Override
     public void onError(Session session, Throwable thr) {
-        log.error("Error occured during session ID:"+session.getId()+", for request URI - "+session.getRequestURI()+", Reason: "+thr);
+        log.error("Error occurred during session ID:"+session.getId()+", for request URI - "+session.getRequestURI()+", Reason: "+thr, thr);
+        try {
+            session.close();
+        } catch (IOException e) {
+            log.error("Error occurred during closing session. Session ID:"+session.getId()+", for request URI - "+session.getRequestURI()+", Reason: "+e.getMessage(), e);
+        }
     }
 
 }
