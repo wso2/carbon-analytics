@@ -103,11 +103,21 @@ public class JMSEventAdapterFactory extends InputEventAdapterFactory {
         destinationTypeProperty.setRequired(true);
         destinationTypeProperty.setDisplayName(
                 resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_JMS_DESTINATION_TYPE));
-        destinationTypeProperty.setOptions(new String[]{"queue", "topic"});
-        destinationTypeProperty.setDefaultValue("topic");
+        destinationTypeProperty.setOptions(new String[]{JMSEventAdapterConstants.DESTINATION_TOPIC, JMSEventAdapterConstants.DESTINATION_QUEUE});
+        destinationTypeProperty.setDefaultValue(JMSEventAdapterConstants.DESTINATION_TOPIC);
         destinationTypeProperty.setHint(resourceBundle.getString(
                 JMSEventAdapterConstants.ADAPTER_JMS_DESTINATION_TYPE_HINT));
         propertyList.add(destinationTypeProperty);
+
+
+        Property isDurableSubscriptionProperty = new Property(JMSEventAdapterConstants.ADAPTER_JMS_SUBSCRIPTION_DURABLE);
+        isDurableSubscriptionProperty.setRequired(false);
+        isDurableSubscriptionProperty.setDisplayName(
+                resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_JMS_SUBSCRIPTION_DURABLE));
+        isDurableSubscriptionProperty.setHint(resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_JMS_SUBSCRIPTION_DURABLE_HINT));
+        isDurableSubscriptionProperty.setOptions(new String[]{"true", "false"});
+        isDurableSubscriptionProperty.setDefaultValue("false");
+        propertyList.add(isDurableSubscriptionProperty);
 
         // Connection Factory JNDI Name
         Property subscriberNameProperty = new Property(JMSEventAdapterConstants.ADAPTER_JMS_DURABLE_SUBSCRIBER_NAME);
@@ -118,13 +128,11 @@ public class JMSEventAdapterFactory extends InputEventAdapterFactory {
                 JMSEventAdapterConstants.ADAPTER_JMS_DURABLE_SUBSCRIBER_NAME_HINT));
         propertyList.add(subscriberNameProperty);
 
-        Property isDuplicatedInCluster = new Property(EventAdapterConstants.EVENTS_DUPLICATED_IN_CLUSTER);
-        isDuplicatedInCluster.setDisplayName(
-                resourceBundle.getString(EventAdapterConstants.EVENTS_DUPLICATED_IN_CLUSTER));
-        isDuplicatedInCluster.setRequired(false);
-        isDuplicatedInCluster.setOptions(new String[]{"true", "false"});
-        isDuplicatedInCluster.setDefaultValue("false");
-        propertyList.add(isDuplicatedInCluster);
+        Property jmsProperties = new Property(JMSEventAdapterConstants.ADAPTER_PROPERTIES);
+        jmsProperties.setDisplayName(resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_PROPERTIES));
+        jmsProperties.setHint(resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_PROPERTIES_HINT));
+        jmsProperties.setRequired(false);
+        propertyList.add(jmsProperties);
 
         return propertyList;
     }

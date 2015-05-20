@@ -33,12 +33,28 @@ public class JMSEventAdapterConstants {
     public static final String ADAPTER_JMS_DURABLE_SUBSCRIBER_NAME = "transport.jms.DurableSubscriberName";
     public static final String ADAPTER_JMS_DURABLE_SUBSCRIBER_NAME_HINT = "transport.jms.DurableSubscriberName.hint";
     public static final String ADAPTER_JMS_SUBSCRIPTION_DURABLE = "transport.jms.SubscriptionDurable";
+    public static final String ADAPTER_JMS_SUBSCRIPTION_DURABLE_HINT = "transport.jms.SubscriptionDurable.hint";
     public static final String ADAPTER_JMS_DESTINATION_TYPE = "transport.jms.DestinationType";
     public static final String ADAPTER_JMS_DESTINATION_TYPE_HINT = "transport.jms.DestinationType.hint";
 
     public static final String ADAPTER_JMS_DESTINATION = "transport.jms.Destination";
     public static final String ADAPTER_JMS_DESTINATION_HINT = "transport.jms.Destination.hint";
-    public static final int AXIS_TIME_INTERVAL_IN_MILLISECONDS = 10000;
+    public static final String DESTINATION_TOPIC = "topic";
+    public static final String DESTINATION_QUEUE = "queue";
+
+    public static final int DEFAULT_MIN_THREAD_POOL_SIZE = 4;
+    public static final int DEFAULT_MAX__THREAD_POOL_SIZE = 4;
+    public static final int DEFAULT_KEEP_ALIVE_TIME_IN_INTERVAL = 1000;
+    public static final int DEFAULT_JOB_IN_QUEUE_SIZE = 1000;
+    public static final String ADAPTER_KEEP_ALIVE_TIME_NAME = "keepAliveTimeInMillis";
+    public static final String ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME = "jobQueueSize";
+    public static final String ADAPTER_PROPERTIES = "jms.properties";
+    public static final String ADAPTER_PROPERTIES_HINT = "jms.properties.hint";
+    public static final String PROPERTY_SEPARATOR = ",";
+    public static final String ENTRY_SEPARATOR = ":";
+    public static final String ADAPTER_JMS_CONCURRENT_CONSUMERS = "transport.jms.ConcurrentConsumers";
+    public static final String ADAPTER_JMS_MAX_CONCURRENT_CONSUMERS = "transport.jms.MaxConcurrentConsumers";
+
 
 
 }

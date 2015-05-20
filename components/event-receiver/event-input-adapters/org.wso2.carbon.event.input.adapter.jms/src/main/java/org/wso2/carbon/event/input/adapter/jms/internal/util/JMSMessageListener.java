@@ -17,7 +17,6 @@
 */
 package org.wso2.carbon.event.input.adapter.jms.internal.util;
 
-import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;

@@ -44,7 +44,6 @@ public class JMSTaskManagerFactory {
                                                              String name, WorkerPool workerPool,
                                                              Map<String, String> svc) {
 
-//        Map<String, String> svc = getServiceStringParameters(service.getParameters());
         Map<String, String> cf = jcf.getParameters();
 
         JMSTaskManager stm = new JMSTaskManager();
