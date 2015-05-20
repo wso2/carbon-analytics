@@ -66,7 +66,7 @@ function populateAnalyticsTable(analyticsTable, columnInformation) {
         var scoreParamCell = row.insertCell(cellNo++);
         var scoreParamCheckElement = document.createElement('input');
         scoreParamCheckElement.type = "checkbox";
-        if (column1 == 'string') {
+        if (column1 == 'string' || column1 == 'bool') {
             scoreParamCheckElement.disabled = true;
         }
         scoreParamCell.appendChild(scoreParamCheckElement);

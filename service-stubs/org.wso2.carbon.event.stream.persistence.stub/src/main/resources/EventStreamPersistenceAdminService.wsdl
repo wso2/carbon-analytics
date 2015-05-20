@@ -5,22 +5,17 @@
         <xs:schema xmlns:ax220="http://dto.persistence.stream.analytics.carbon.wso2.org/xsd" xmlns:ax218="http://exception.persistence.stream.analytics.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://persistence.stream.analytics.carbon.wso2.org">
             <xs:import namespace="http://exception.persistence.stream.analytics.carbon.wso2.org/xsd"/>
             <xs:import namespace="http://dto.persistence.stream.analytics.carbon.wso2.org/xsd"/>
-            <xs:element name="isBackendServicePresent">
-                <xs:complexType>
-                    <xs:sequence/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="isBackendServicePresentResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
             <xs:element name="EventStreamPersistenceAdminServiceEventStreamPersistenceAdminServiceException">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="EventStreamPersistenceAdminServiceException" nillable="true" type="ax217:EventStreamPersistenceAdminServiceException"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addAnalyticsTable">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="analyticsTable" nillable="true" type="ax220:AnalyticsTable"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -38,10 +33,15 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="addAnalyticsTable">
+            <xs:element name="isBackendServicePresent">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isBackendServicePresentResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="analyticsTable" nillable="true" type="ax220:AnalyticsTable"/>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -65,7 +65,9 @@
         </xs:schema>
         <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://exception.persistence.stream.analytics.carbon.wso2.org/xsd">
             <xs:complexType name="EventStreamPersistenceAdminServiceException">
-                <xs:sequence/>
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="message" nillable="true" type="xs:string"/>
+                </xs:sequence>
             </xs:complexType>
         </xs:schema>
     </wsdl:types>

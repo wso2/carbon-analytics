@@ -109,7 +109,6 @@
 
         if (EventStreamUIUtils.isEventStreamPersistenceAdminServiceAvailable(streamPersistenceAdminServiceStub)) {
             String indexDataString = request.getParameter("indexData");
-            System.out.println("indexDataString = " + indexDataString);
             if (indexDataString != null && !indexDataString.isEmpty()) {
                 String[] properties = indexDataString.split("\\$=");
                 List<AnalyticsTableRecord> analyticsTableColumns = new ArrayList<AnalyticsTableRecord>();
