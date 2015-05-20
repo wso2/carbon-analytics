@@ -23,7 +23,7 @@ import java.io.Serializable;
 /**
  * This class represent single analytics table column
  */
-public class AnalyticsTableColumn implements Serializable {
+public class AnalyticsTableRecord implements Serializable {
     private static final long serialVersionUID = 3291248719712541000L;
 
     private String columnName;
@@ -32,7 +32,7 @@ public class AnalyticsTableColumn implements Serializable {
     private boolean indexed;
     private boolean primaryKey;
 
-    public AnalyticsTableColumn() {
+    public AnalyticsTableRecord() {
     }
 
     public String getColumnName() {

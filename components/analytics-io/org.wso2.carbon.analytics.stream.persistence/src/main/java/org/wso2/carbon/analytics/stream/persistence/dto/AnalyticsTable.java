@@ -27,7 +27,7 @@ public class AnalyticsTable implements Serializable {
     private static final long serialVersionUID = 2451467215330903630L;
 
     private String tableName;
-    private AnalyticsTableColumn[] analyticsTableColumns;
+    private AnalyticsTableRecord[] analyticsTableRecords;
 
     public AnalyticsTable() {
     }
@@ -40,11 +40,11 @@ public class AnalyticsTable implements Serializable {
         this.tableName = tableName;
     }
 
-    public AnalyticsTableColumn[] getAnalyticsTableColumns() {
-        return analyticsTableColumns;
+    public AnalyticsTableRecord[] getAnalyticsTableRecords() {
+        return analyticsTableRecords;
     }
 
-    public void setAnalyticsTableColumns(AnalyticsTableColumn[] analyticsTableColumns) {
-        this.analyticsTableColumns = analyticsTableColumns;
+    public void setAnalyticsTableRecords(AnalyticsTableRecord[] analyticsTableRecords) {
+        this.analyticsTableRecords = analyticsTableRecords;
     }
 }

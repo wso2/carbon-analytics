@@ -62,7 +62,7 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Export-Package>
-                            org.wso2.carbon.event.analytics.persistence.*,
+                            org.wso2.carbon.analytics.stream.persistence.*,
                         </Export-Package>
                         <Import-Package>
                             org.wso2.carbon.utils,

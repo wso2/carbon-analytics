@@ -23,15 +23,16 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
-import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.stream.persistence.dto.AnalyticsTable;
-import org.wso2.carbon.analytics.stream.persistence.dto.AnalyticsTableColumn;
+import org.wso2.carbon.analytics.stream.persistence.dto.AnalyticsTableRecord;
+import org.wso2.carbon.analytics.stream.persistence.exception.EventStreamPersistenceAdminServiceException;
 import org.wso2.carbon.analytics.stream.persistence.internal.ServiceHolder;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.core.AbstractAdmin;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class represent Event Stream Persistence admin operations
@@ -55,8 +56,32 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
      * @param streamName
      * @return AnalyticsTable instance with column details
      */
-    public AnalyticsTable getAnalyticsTable(String streamName) {
-        return new AnalyticsTable();
+    public AnalyticsTable getAnalyticsTable(String streamName) throws EventStreamPersistenceAdminServiceException {
+        AnalyticsDataService analyticsDataService = ServiceHolder.getAnalyticsDataService();
+        AnalyticsTable analyticsTable = new AnalyticsTable();
+        try {
+            AnalyticsSchema tableSchema = analyticsDataService.getTableSchema(getTenantId(), getTableName(streamName));
+            analyticsTable.setTableName(streamName);
+            if (tableSchema != null) {
+                AnalyticsTableRecord[] tableColumns = new AnalyticsTableRecord[tableSchema.getColumns().size()];
+                List<String> primaryKeys = tableSchema.getPrimaryKeys();
+                int i = 0;
+                for (Map.Entry<String, ColumnDefinition> columnDefinitionEntry : tableSchema.getColumns().entrySet()) {
+                    AnalyticsTableRecord analyticsTableRecord = new AnalyticsTableRecord();
+                    analyticsTableRecord.setColumnName(columnDefinitionEntry.getValue().getName());
+                    analyticsTableRecord.setColumnType(columnDefinitionEntry.getValue().getType().name());
+                    analyticsTableRecord.setIndexed(columnDefinitionEntry.getValue().isIndexed());
+                    analyticsTableRecord.setPrimaryKey(primaryKeys.contains(columnDefinitionEntry.getKey()));
+                    analyticsTableRecord.setScoreParam(columnDefinitionEntry.getValue().isScoreParam());
+                    tableColumns[i++] = analyticsTableRecord;
+                }
+                analyticsTable.setAnalyticsTableRecords(tableColumns);
+            }
+        } catch (Exception e) {
+            log.error("Unable to get analytics schema[" + streamName + "]: " + e.getMessage(), e);
+            throw new EventStreamPersistenceAdminServiceException("Unable to get analytics schema", e);
+        }
+        return analyticsTable;
     }
 
     /**
@@ -64,28 +89,30 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
      *
      * @param analyticsTable
      */
-    public void addAnalyticsTable(AnalyticsTable analyticsTable) {
+    public void addAnalyticsTable(AnalyticsTable analyticsTable) throws EventStreamPersistenceAdminServiceException {
         if (analyticsTable != null) {
-            if (analyticsTable.getAnalyticsTableColumns() != null) {
-                List<ColumnDefinition> columnDefinitions = new ArrayList<>(analyticsTable.getAnalyticsTableColumns().length);
+            if (analyticsTable.getAnalyticsTableRecords() != null) {
+                List<ColumnDefinition> columnDefinitions = new ArrayList<>(analyticsTable.getAnalyticsTableRecords().length);
                 List<String> primaryKeys = new ArrayList<>();
-                for (AnalyticsTableColumn analyticsTableColumn : analyticsTable.getAnalyticsTableColumns()) {
+                for (AnalyticsTableRecord analyticsTableRecord : analyticsTable.getAnalyticsTableRecords()) {
                     ColumnDefinition columnDefinition = new ColumnDefinition();
-                    columnDefinition.setName(analyticsTableColumn.getColumnName());
-                    columnDefinition.setType(getColumnType(analyticsTableColumn.getColumnType()));
-                    columnDefinition.setIndexed(analyticsTableColumn.isIndexed());
-                    columnDefinition.setScoreParam(analyticsTableColumn.isScoreParam());
+                    columnDefinition.setName(analyticsTableRecord.getColumnName());
+                    columnDefinition.setType(getColumnType(analyticsTableRecord.getColumnType()));
+                    columnDefinition.setIndexed(analyticsTableRecord.isIndexed());
+                    columnDefinition.setScoreParam(analyticsTableRecord.isScoreParam());
                     columnDefinitions.add(columnDefinition);
-                    if (analyticsTableColumn.isPrimaryKey()) {
-                        primaryKeys.add(analyticsTableColumn.getColumnName());
+                    if (analyticsTableRecord.isPrimaryKey()) {
+                        primaryKeys.add(analyticsTableRecord.getColumnName());
                     }
                 }
                 AnalyticsDataService analyticsDataService = ServiceHolder.getAnalyticsDataService();
                 try {
                     AnalyticsSchema schema = new AnalyticsSchema(columnDefinitions, primaryKeys);
-                    analyticsDataService.setTableSchema(getTenantId(), analyticsTable.getTableName(), schema);
-                } catch (AnalyticsException e) {
-                    e.printStackTrace();
+                    analyticsDataService.setTableSchema(getTenantId(), getTableName(analyticsTable.getTableName()),
+                                                        schema);
+                } catch (Exception e) {
+                    log.error("Unable to save analytics schema[" + analyticsTable.getTableName() + "]: " + e.getMessage(), e);
+                    throw new EventStreamPersistenceAdminServiceException("Unable to save analytics schema", e);
                 }
             }
         }
@@ -114,5 +141,13 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
             default:
                 return AnalyticsSchema.ColumnType.STRING;
         }
+    }
+
+    private String getTableName(String streamName) {
+        String tableName = streamName;
+        if (tableName != null && !tableName.isEmpty()) {
+            tableName = tableName.replace('.', '_');
+        }
+        return tableName;
     }
 }
