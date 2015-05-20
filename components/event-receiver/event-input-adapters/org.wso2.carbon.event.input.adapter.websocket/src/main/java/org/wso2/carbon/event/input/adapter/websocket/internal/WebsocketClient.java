@@ -64,6 +64,11 @@ public class WebsocketClient extends Endpoint {
         if (log.isDebugEnabled()){
             log.debug("Input ws-adaptor: WebsocketClient Endpoint closed: "+closeReason.toString()+"for request URI - "+session.getRequestURI());
         }
+        try {
+            session.close();
+        } catch (IOException e) {
+            log.error("Error occurred during closing session. Session ID:"+session.getId()+", for request URI - "+session.getRequestURI()+", Reason: "+e.getMessage(), e);
+        }
     }
 
 
