@@ -52,7 +52,7 @@
                                 </path>
                                 <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
                                     <arg
-                                            line="-uri src/main/resources/EventStreamPersistenceAdminService.wsdl -u -uw -o target/generated-code -p org.wso2.carbon.analytics.stream.persistence.stub -ns2p http://persistence.stream.analytics.carbon.wso2.org=org.wso2.carbon.analytics.stream.persistence.stub,http://dto.persistence.stream.analytics.carbon.wso2.org/xsd=org.wso2.carbon.analytics.stream.persistence.stub.dto" />
+                                            line="-uri src/main/resources/EventStreamPersistenceAdminService.wsdl -u -uw -o target/generated-code -p org.wso2.carbon.analytics.stream.persistence.stub -ns2p http://persistence.stream.analytics.carbon.wso2.org=org.wso2.carbon.analytics.stream.persistence.stub,http://dto.persistence.stream.analytics.carbon.wso2.org/xsd=org.wso2.carbon.analytics.stream.persistence.stub.dto,http://exception.persistence.stream.analytics.carbon.wso2.org/xsd=org.wso2.carbon.analytics.stream.persistence.stub.exception" />
                                     <classpath refid="wsdl2java.classpath" />
                                     <classpath refid="wsdl2java.classpath" />
                                 </java>

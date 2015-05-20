@@ -95,6 +95,7 @@ function addEventStream(form, option, eventStreamId) {
                             metaData: metaData,
                             correlationData: correlationData,
                             payloadData: payloadData,
+                            indexData: indexData,
                             eventStreamDescription: eventStreamDescription,
                             eventStreamNickName: eventStreamNickName
                         },onSuccess: function (event) {

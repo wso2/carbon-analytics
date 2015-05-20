@@ -14,13 +14,14 @@
   --%>
 <%@ page import="org.wso2.carbon.analytics.stream.persistence.stub.EventStreamPersistenceAdminServiceStub" %>
 <%@ page import="org.wso2.carbon.analytics.stream.persistence.stub.dto.AnalyticsTable" %>
-<%@ page import="org.wso2.carbon.analytics.stream.persistence.stub.dto.AnalyticsTableColumn" %>
+<%@ page import="org.wso2.carbon.analytics.stream.persistence.stub.dto.AnalyticsTableRecord" %>
 <%@ page import="org.wso2.carbon.event.stream.stub.EventStreamAdminServiceStub" %>
 <%@ page import="org.wso2.carbon.event.stream.stub.types.EventStreamAttributeDto" %>
 <%@ page import="org.wso2.carbon.event.stream.stub.types.EventStreamDefinitionDto" %>
 <%@ page import="org.wso2.carbon.event.stream.ui.EventStreamUIUtils" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.wso2.carbon.analytics.stream.persistence.stub.dto.AnalyticsTableRecord" %>
 
 <%
 
@@ -111,11 +112,11 @@
             String indexDataString = request.getParameter("indexData");
             if (indexDataString != null && !indexDataString.isEmpty()) {
                 String[] properties = indexDataString.split("\\$=");
-                List<AnalyticsTableColumn> analyticsTableColumns = new ArrayList<AnalyticsTableColumn>();
+                List<AnalyticsTableRecord> analyticsTableColumns = new ArrayList<AnalyticsTableRecord>();
                 for (String property : properties) {
                     String[] propertyConfiguration = property.split("\\^=");
                     if (propertyConfiguration[0].equalsIgnoreCase("true")) {
-                        AnalyticsTableColumn analyticsTableColumn = new AnalyticsTableColumn();
+                        AnalyticsTableRecord analyticsTableColumn = new AnalyticsTableRecord();
                         analyticsTableColumn.setColumnName(propertyConfiguration[1]);
                         analyticsTableColumn.setColumnType(propertyConfiguration[2]);
                         analyticsTableColumn.setPrimaryKey(Boolean.parseBoolean(propertyConfiguration[3]));
@@ -126,8 +127,8 @@
                 }
                 AnalyticsTable analyticsTable = new AnalyticsTable();
                 analyticsTable.setTableName(request.getParameter("eventStreamName"));
-                analyticsTable.setAnalyticsTableColumns(
-                        analyticsTableColumns.toArray(new AnalyticsTableColumn[analyticsTableColumns.size()]));
+                analyticsTable.setAnalyticsTableRecords(
+                        analyticsTableColumns.toArray(new AnalyticsTableRecord[analyticsTableColumns.size()]));
                 streamPersistenceAdminServiceStub.addAnalyticsTable(analyticsTable);
             }
         }
