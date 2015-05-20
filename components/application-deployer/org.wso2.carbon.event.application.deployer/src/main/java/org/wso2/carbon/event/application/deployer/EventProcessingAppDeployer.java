@@ -75,11 +75,11 @@ public class EventProcessingAppDeployer implements AppDeploymentHandler {
                     EventProcessingAppDeployerConstants.FILE_TYPE_SIDDHIQL);
         } catch (Exception e) {
             try {
-                undeployArtifacts(carbonApp,axisConfig);
+                undeployArtifacts(carbonApp, axisConfig);
             } catch (Exception _e) {
                 //ignore
             }
-            throw new DeploymentException(e.getMessage(),e);
+            throw new DeploymentException(e.getMessage(), e);
         } finally {
             executionPlans.clear();
             eventStreams.clear();
@@ -90,18 +90,17 @@ public class EventProcessingAppDeployer implements AppDeploymentHandler {
 
     private void deployTypeSpecifiedArtifacts(List<Artifact> artifacts, AxisConfiguration axisConfig, String directory,
                                               String fileType) throws DeploymentException {
-        for(Artifact artifact: artifacts) {
+        for (Artifact artifact : artifacts) {
             EventProcessingDeployer deployer;
-            deployer = (EventProcessingDeployer)AppDeployerUtils.getArtifactDeployer(axisConfig,
+            deployer = (EventProcessingDeployer) AppDeployerUtils.getArtifactDeployer(axisConfig,
                     directory, fileType);
-            if(deployer!=null) {
-                deploy(deployer,artifact);
+            if (deployer != null) {
+                deploy(deployer, artifact);
             }
         }
     }
 
     void deploy(EventProcessingDeployer deployer, Artifact artifact) throws DeploymentException {
-        List<CappFile> files = artifact.getFiles();
         String fileName = artifact.getFiles().get(0).getName();
         String artifactPath = artifact.getExtractedPath() + File.separator + fileName;
         try {
@@ -121,7 +120,7 @@ public class EventProcessingAppDeployer implements AppDeploymentHandler {
             eventPublishers.add(artifact);
         } else if (EventProcessingAppDeployerConstants.CEP_EXECUTION_PLAN_TYPE.equals(artifact.getType())) {
             executionPlans.add(artifact);
-        }  else if (EventProcessingAppDeployerConstants.CEP_EVENT_STREAM_TYPE.equals(artifact.getType())) {
+        } else if (EventProcessingAppDeployerConstants.CEP_EVENT_STREAM_TYPE.equals(artifact.getType())) {
             eventStreams.add(artifact);
         }
     }
@@ -161,19 +160,21 @@ public class EventProcessingAppDeployer implements AppDeploymentHandler {
     }
 
     private void undeployTypeSpecifiedArtifacts(List<Artifact> artifacts, AxisConfiguration axisConfig, String directory, String fileType) throws DeploymentException {
-        for(Artifact artifact: artifacts) {
+        for (Artifact artifact : artifacts) {
             EventProcessingDeployer deployer;
-            deployer = (EventProcessingDeployer)AppDeployerUtils.getArtifactDeployer(axisConfig,
+            deployer = (EventProcessingDeployer) AppDeployerUtils.getArtifactDeployer(axisConfig,
                     directory, fileType);
-            if(deployer!=null && AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED.
-                    equals(artifact.getDeploymentStatus())) {
+            if (deployer != null &&
+                    (AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED.equals(artifact.getDeploymentStatus()) ||
+                            AppDeployerConstants.DEPLOYMENT_STATUS_FAILED.equals(artifact.getDeploymentStatus()))) {
                 undeploy(deployer, artifact);
             }
+
         }
+
     }
 
     private void undeploy(EventProcessingDeployer deployer, Artifact artifact) throws DeploymentException {
-        List<CappFile> files = artifact.getFiles();
         String fileName = artifact.getFiles().get(0).getName();
         String artifactPath = artifact.getExtractedPath() + File.separator + fileName;
         try {
@@ -189,17 +190,17 @@ public class EventProcessingAppDeployer implements AppDeploymentHandler {
     private EventProcessingDeployer getDeployer(Artifact artifact, AxisConfiguration axisConfig) {
         Deployer deployer;
         if (EventProcessingAppDeployerConstants.CEP_EVENT_RECEIVER_TYPE.equals(artifact.getType())) {
-            deployer =  AppDeployerUtils.getArtifactDeployer(axisConfig, EventProcessingAppDeployerConstants.CEP_EVENT_RECEIVER_DIR, "xml");
-        } else if(EventProcessingAppDeployerConstants.CEP_EVENT_PUBLISHER_TYPE.equals(artifact.getType())) {
-            deployer =  AppDeployerUtils.getArtifactDeployer(axisConfig, EventProcessingAppDeployerConstants.CEP_EVENT_PUBLISHER_DIR, "xml");
-        } else if(EventProcessingAppDeployerConstants.CEP_EXECUTION_PLAN_TYPE.equals(artifact.getType())) {
+            deployer = AppDeployerUtils.getArtifactDeployer(axisConfig, EventProcessingAppDeployerConstants.CEP_EVENT_RECEIVER_DIR, "xml");
+        } else if (EventProcessingAppDeployerConstants.CEP_EVENT_PUBLISHER_TYPE.equals(artifact.getType())) {
+            deployer = AppDeployerUtils.getArtifactDeployer(axisConfig, EventProcessingAppDeployerConstants.CEP_EVENT_PUBLISHER_DIR, "xml");
+        } else if (EventProcessingAppDeployerConstants.CEP_EXECUTION_PLAN_TYPE.equals(artifact.getType())) {
             deployer = AppDeployerUtils.getArtifactDeployer(axisConfig, EventProcessingAppDeployerConstants.CEP_EXECUTION_PLAN_DIR, "xml");
         } else if (EventProcessingAppDeployerConstants.CEP_EVENT_STREAM_TYPE.equals(artifact.getType())) {
-            deployer =  AppDeployerUtils.getArtifactDeployer(axisConfig, EventProcessingAppDeployerConstants.CEP_EVENT_STREAM_DIR, "json");
+            deployer = AppDeployerUtils.getArtifactDeployer(axisConfig, EventProcessingAppDeployerConstants.CEP_EVENT_STREAM_DIR, "json");
         } else {
             deployer = null;
         }
-        return (EventProcessingDeployer)deployer;
+        return (EventProcessingDeployer) deployer;
     }
 
     private boolean isAccepted(String serviceType) {
