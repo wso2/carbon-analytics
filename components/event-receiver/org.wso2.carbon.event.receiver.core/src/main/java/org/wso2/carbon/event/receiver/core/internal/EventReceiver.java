@@ -275,7 +275,6 @@ public class EventReceiver implements EventProducer {
     }
 
     public void destroy() {
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         EventReceiverServiceValueHolder.getInputEventAdapterService().destroy(eventReceiverConfiguration.getFromAdapterConfiguration().getName());
 
     }

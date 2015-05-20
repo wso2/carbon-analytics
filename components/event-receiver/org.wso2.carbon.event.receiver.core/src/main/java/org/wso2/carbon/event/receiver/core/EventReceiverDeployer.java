@@ -242,7 +242,6 @@ public class EventReceiverDeployer extends AbstractDeployer implements EventProc
     public void processUndeployment(String filePath) throws EventReceiverConfigurationException {
         String fileName = new File(filePath).getName();
         log.info("Event Receiver undeployed successfully : " + fileName);
-        int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         CarbonEventReceiverService carbonEventReceiverService = EventReceiverServiceValueHolder.getCarbonEventReceiverService();
         carbonEventReceiverService.removeEventReceiverConfigurationFile(fileName);
     }
