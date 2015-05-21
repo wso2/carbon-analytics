@@ -51,8 +51,7 @@ public class UIEventAdapterFactory extends OutputEventAdapterFactory{
 
     @Override
     public List<Property> getStaticPropertyList() {
-        List<Property> staticPropertyList = new ArrayList<Property>();
-        return staticPropertyList;
+        return null;
     }
 
     @Override

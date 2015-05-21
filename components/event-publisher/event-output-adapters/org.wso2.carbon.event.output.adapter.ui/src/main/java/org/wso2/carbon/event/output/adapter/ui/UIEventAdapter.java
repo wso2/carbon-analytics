@@ -105,9 +105,6 @@ public class UIEventAdapter implements OutputEventAdapter {
                     new LinkedBlockingQueue<Runnable>(jobQueSize));
         }
 
-
-        int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
-
         streamId = eventAdapterConfiguration.getOutputStreamIdOfWso2eventMessageFormat();
         if (streamId == null || streamId.isEmpty()) {
             throw new OutputEventAdapterRuntimeException("UI event adapter needs a output stream id");
@@ -154,7 +151,12 @@ public class UIEventAdapter implements OutputEventAdapter {
         }
 
         if (globalProperties.get(UIEventAdapterConstants.ADAPTER_EVENT_QUEUE_SIZE_NAME) != null) {
-            queueSize = Integer.parseInt(globalProperties.get(UIEventAdapterConstants.ADAPTER_EVENT_QUEUE_SIZE_NAME));
+            try{
+                queueSize = Integer.parseInt(globalProperties.get(UIEventAdapterConstants.ADAPTER_EVENT_QUEUE_SIZE_NAME));
+            } catch (NumberFormatException e){
+                log.error("String does not have the appropriate format for conversion."+e.getMessage());
+                queueSize = UIEventAdapterConstants.EVENTS_QUEUE_SIZE;
+            }
         } else {
             queueSize = UIEventAdapterConstants.EVENTS_QUEUE_SIZE;
         }

@@ -21,6 +21,7 @@ package org.wso2.carbon.event.output.adapter.ui.internal;
 
 import com.google.gson.JsonObject;
 import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.output.adapter.ui.UIOutputCallbackControllerService;
 import org.wso2.carbon.event.output.adapter.ui.internal.ds.UIEventAdaptorServiceInternalValueHolder;
 import org.wso2.carbon.event.output.adapter.ui.internal.util.UIEventAdapterConstants;
@@ -55,7 +56,7 @@ public class UIOutputCallbackControllerServiceImpl implements UIOutputCallbackCo
      */
     public void subscribeWebsocket(String streamName, String version, Session session) {
 
-        int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         if (version == null || " ".equals(version)) {
             version = UIEventAdapterConstants.ADAPTER_UI_DEFAULT_OUTPUT_STREAM_VERSION;
@@ -124,7 +125,7 @@ public class UIOutputCallbackControllerServiceImpl implements UIOutputCallbackCo
      */
     public void unsubscribeWebsocket(String streamName, String version, Session session) {
 
-        int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         if (version == null || " ".equals(version)) {
             version = UIEventAdapterConstants.ADAPTER_UI_DEFAULT_OUTPUT_STREAM_VERSION;
@@ -160,7 +161,7 @@ public class UIOutputCallbackControllerServiceImpl implements UIOutputCallbackCo
     @Override
     public JsonObject retrieveEvents(String streamName, String version, String lastUpdatedTime) {
 
-        int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         LinkedBlockingDeque<Object> allEvents = getEvents(tenantId, streamName, version);
         //List<Object> eventsListToBeSent;
         Object lastEventTime = null;
