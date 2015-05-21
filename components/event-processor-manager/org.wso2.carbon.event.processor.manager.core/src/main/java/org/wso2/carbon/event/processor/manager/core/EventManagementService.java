@@ -19,6 +19,7 @@
 package org.wso2.carbon.event.processor.manager.core;
 
 import com.hazelcast.core.HazelcastInstance;
+import org.wso2.carbon.event.processor.manager.core.config.ManagementModeInfo;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
 public interface EventManagementService {
@@ -38,5 +39,7 @@ public interface EventManagementService {
     public EventReceiverManagementService getEventReceiverManagementService();
 
     public EventPublisherManagementService getEventPublisherManagementService();
+
+    public ManagementModeInfo getManagementModeInfo();
 
 }

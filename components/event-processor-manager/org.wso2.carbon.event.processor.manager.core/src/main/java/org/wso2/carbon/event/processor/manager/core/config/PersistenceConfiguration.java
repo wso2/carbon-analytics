@@ -19,16 +19,20 @@ package org.wso2.carbon.event.processor.manager.core.config;
 
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PersistenceConfiguration implements Serializable {
     private String persistenceClass;
     private int threadPoolSize;
     private long persistenceTimeInterval;
+    private Map propertiesMap = new HashMap();
 
-    public PersistenceConfiguration(String persistenceClass, long persistenceTimeInterval, int threadPoolSize) {
+    public PersistenceConfiguration(String persistenceClass, long persistenceTimeInterval, int threadPoolSize, Map propertiesMap) {
         this.persistenceClass = persistenceClass;
         this.persistenceTimeInterval = persistenceTimeInterval;
         this.threadPoolSize = threadPoolSize;
+        this.propertiesMap = propertiesMap;
     }
 
     public String getPersistenceClass() {
@@ -42,4 +46,9 @@ public class PersistenceConfiguration implements Serializable {
     public int getThreadPoolSize() {
         return threadPoolSize;
     }
+
+    public Map getPropertiesMap(){
+        return propertiesMap;
+    }
+
 }

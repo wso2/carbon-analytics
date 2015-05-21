@@ -81,7 +81,7 @@ public class EventReceiverServiceDS {
 
             activateInactiveEventReceiverConfigurations(carbonEventReceiverService);
             context.getBundleContext().registerService(EventStreamListener.class.getName(), new EventStreamListenerImpl(), null);
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             log.error("Could not create EventReceiverService or EventReceiver : " + e.getMessage(), e);
         }
     }

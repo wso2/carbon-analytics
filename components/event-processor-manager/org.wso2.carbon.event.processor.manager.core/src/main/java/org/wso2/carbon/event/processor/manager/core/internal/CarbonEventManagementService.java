@@ -21,24 +21,23 @@ import com.hazelcast.core.HazelcastInstance;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.event.processor.manager.core.*;
 import org.wso2.carbon.event.processor.manager.core.config.HAConfiguration;
-import org.wso2.carbon.event.processor.manager.core.config.ManagementConfigurationException;
 import org.wso2.carbon.event.processor.manager.core.config.ManagementModeInfo;
 import org.wso2.carbon.event.processor.manager.core.config.Mode;
-import org.wso2.carbon.event.processor.manager.core.internal.util.Constants;
+import org.wso2.carbon.event.processor.manager.core.exception.EventManagementException;
+import org.wso2.carbon.event.processor.manager.core.exception.ManagementConfigurationException;
+import org.wso2.carbon.event.processor.manager.core.internal.util.ConfigurationConstants;
+import org.wso2.carbon.event.processor.manager.core.internal.util.ManagementModeConfigurationLoader;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
 public class CarbonEventManagementService implements EventManagementService {
 
     private static Logger log = Logger.getLogger(CarbonEventManagementService.class);
 
-    public ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private Mode mode = Mode.SingleNode;
     private ManagementModeInfo managementModeInfo;
     private HAManager haManager = null;
@@ -51,17 +50,17 @@ public class CarbonEventManagementService implements EventManagementService {
 
     public CarbonEventManagementService() {
         try {
-            managementModeInfo = ManagementModeInfo.getInstance();
+            managementModeInfo = ManagementModeConfigurationLoader.loadManagementModeInfo();
             mode = managementModeInfo.getMode();
         } catch (ManagementConfigurationException e) {
-            e.printStackTrace();
+            throw new EventManagementException("Error getting management mode information", e);
         }
     }
 
     public void init(HazelcastInstance hazelcastInstance) {
         if (mode == Mode.HA) {
             HAConfiguration haConfiguration = managementModeInfo.getHaConfiguration();
-            haManager = new HAManager(hazelcastInstance, haConfiguration, readWriteLock.writeLock(), this);
+            haManager = new HAManager(hazelcastInstance, haConfiguration, this);
         } else if (mode == Mode.SingleNode) {
             log.warn("CEP started with clustering enabled, but SingleNode configuration given.");
         }
@@ -70,6 +69,7 @@ public class CarbonEventManagementService implements EventManagementService {
         }
     }
 
+    //todo: check   startPolling on single node
     public void init(ConfigurationContextService configurationContextService) {
         executorService = new ScheduledThreadPoolExecutor(1);
         executorService.schedule(new Runnable() {
@@ -78,7 +78,7 @@ public class CarbonEventManagementService implements EventManagementService {
                 log.info("Starting polling event adapters");
                 getEventReceiverManagementService().startPolling();
             }
-        }, Constants.AXIS_TIME_INTERVAL_IN_MILLISECONDS * 4, TimeUnit.MILLISECONDS);
+        }, ConfigurationConstants.AXIS_TIME_INTERVAL_IN_MILLISECONDS * 4, TimeUnit.MILLISECONDS);
     }
 
     public void shutdown() {
@@ -97,6 +97,9 @@ public class CarbonEventManagementService implements EventManagementService {
         return null;
     }
 
+    public ManagementModeInfo getManagementModeInfo() {
+        return managementModeInfo;
+    }
 
     public void subscribe(Manager manager){
         if (manager.getType() == Manager.ManagerType.Processor) {

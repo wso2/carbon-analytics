@@ -31,8 +31,10 @@ import org.wso2.carbon.event.processor.manager.core.internal.thrift.service.Mana
 
 import java.net.InetSocketAddress;
 
-public class ManagementServer {
-    private static final Log log = LogFactory.getLog(ManagementServer.class);
+
+public class SnapshotServer {
+    private static final Log log = LogFactory.getLog(SnapshotServer.class);
+    private static TServer dataReceiverServer;
 
     public static void start(HAConfiguration config) {
         try {
@@ -52,7 +54,7 @@ public class ManagementServer {
             ManagementService.Processor<ManagementServiceImpl> processor =
                     new ManagementService.Processor<ManagementServiceImpl>(
                             new ManagementServiceImpl());
-            TThreadPoolServer dataReceiverServer = new TThreadPoolServer(
+            dataReceiverServer = new TThreadPoolServer(
                     new TThreadPoolServer.Args(serverTransport).processor(processor));
             Thread thread = new Thread(new ServerThread(dataReceiverServer));
             log.info("CEP Management Thrift Server started on " + hostAndPort.getHostName() + ":" + hostAndPort.getPort());
@@ -61,6 +63,10 @@ public class ManagementServer {
             throw new Exception("Cannot start CEP Management Thrift server on port " + hostAndPort.getPort() +
                     " on host " + hostAndPort.getHostName(), e);
         }
+    }
+
+    public static void shutDown(){
+         dataReceiverServer.stop();
     }
 
     static class ServerThread implements Runnable {

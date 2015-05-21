@@ -29,12 +29,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class QueueInputEventDispatcher extends AbstractInputEventDispatcher {
 
     private Logger log = Logger.getLogger(AbstractInputEventDispatcher.class);
     private final BlockingQueue<Object[]> eventQueue = new LinkedBlockingQueue<Object[]>();
     private Lock readLock;
+    private ReentrantLock lock = new ReentrantLock();
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
     private String eventReceiverName;
     private int tenantId;
@@ -53,7 +55,10 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher {
     @Override
     public void onEvent(Object[] event) {
         try {
+            //todo:check lock
+            lock.lock();
             eventQueue.put(event);
+            lock.unlock();
         } catch (InterruptedException e) {
             log.error("Interrupted while waiting to put the event to queue.", e);
         }
@@ -66,12 +71,16 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher {
 
     @Override
     public byte[] getState() {
-        return ByteSerializer.OToB(eventQueue);
+        //todo:check lock
+        lock.lock();
+        byte[] state = ByteSerializer.OToB(eventQueue);
+        lock.unlock();
+        return state;
     }
 
     @Override
     public void syncState(byte[] bytes) {
-        Object[] events = (Object[]) ByteSerializer.BToO(bytes);
+        BlockingQueue<Object[]> events = (BlockingQueue<Object[]>) ByteSerializer.BToO(bytes);
         for(Object object: events) {
             if(Arrays.deepEquals((Object[]) object, eventQueue.peek())) {
                 eventQueue.poll();

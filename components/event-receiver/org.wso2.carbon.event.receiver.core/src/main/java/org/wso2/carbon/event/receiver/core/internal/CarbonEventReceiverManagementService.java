@@ -29,8 +29,7 @@ import org.wso2.carbon.event.processor.manager.commons.transport.server.TCPEvent
 import org.wso2.carbon.event.processor.manager.commons.transport.server.TCPEventServerConfig;
 import org.wso2.carbon.event.processor.manager.commons.utils.HostAndPort;
 import org.wso2.carbon.event.processor.manager.core.EventReceiverManagementService;
-import org.wso2.carbon.event.processor.manager.core.config.ManagementConfigurationException;
-import org.wso2.carbon.event.processor.manager.core.config.ManagementModeInfo;
+import org.wso2.carbon.event.receiver.core.exception.EventReceiverConfigurationException;
 import org.wso2.carbon.event.receiver.core.internal.ds.EventReceiverServiceValueHolder;
 import org.wso2.siddhi.core.util.snapshot.ByteSerializer;
 
@@ -50,15 +49,11 @@ public class CarbonEventReceiverManagementService extends EventReceiverManagemen
     private TCPEventPublisher tcpEventPublisher;
     private TCPEventServer tcpEventServer;
 
-    public CarbonEventReceiverManagementService() {
-            tcpEventServer = null;
-            tcpEventPublisher = null;
-        try {
-            EventReceiverServiceValueHolder.getCarbonEventReceiverService().setManagementModeInfo(ManagementModeInfo.getInstance());
-        } catch (ManagementConfigurationException e) {
-            log.error("Error while reading CEP configuration XML", e);
-        }
+    public CarbonEventReceiverManagementService() throws EventReceiverConfigurationException {
+        tcpEventServer = null;
+        tcpEventPublisher = null;
         EventReceiverServiceValueHolder.getEventManagementService().subscribe(this);
+        EventReceiverServiceValueHolder.getCarbonEventReceiverService().setManagementModeInfo(EventReceiverServiceValueHolder.getEventManagementService().getManagementModeInfo());
     }
 
     @Override
@@ -117,6 +112,10 @@ public class CarbonEventReceiverManagementService extends EventReceiverManagemen
 
     @Override
     public void setOtherMember(HostAndPort otherMember) {
+        if((this.otherMember != null && !this.otherMember.equals(otherMember))){
+            tcpEventPublisher.shutdown();
+            tcpEventPublisher = null;
+        }
         if ((this.otherMember == null || !this.otherMember.equals(otherMember)) &&
                 tcpEventPublisher == null) {
             try {

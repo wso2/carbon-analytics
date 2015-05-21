@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.event.processor.manager.core.config;
+package org.wso2.carbon.event.processor.manager.core.exception;
 
 
 public class ManagementConfigurationException extends Exception {
