@@ -13,7 +13,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-function populateAnalyticsTable(analyticsTable, columnInformation, action, type) {
+function populateAnalyticsTable(analyticsTable, columnInformation, type) {
     var tbody = analyticsTable.getElementsByTagName('tbody')[0];
     for (var i = 1; i < columnInformation.rows.length; i++) {
         var cellNo = 0;
@@ -26,9 +26,6 @@ function populateAnalyticsTable(analyticsTable, columnInformation, action, type)
         var persistCheckElement = document.createElement('input');
         persistCheckElement.type = "checkbox";
         persistCheckElement.name = "persist";
-        if (action == 'add') {
-            persistCheckElement.checked = true;
-        }
         persistCell.appendChild(persistCheckElement);
 
         var columnCell = row.insertCell(cellNo++);
@@ -76,27 +73,27 @@ function populateAnalyticsTable(analyticsTable, columnInformation, action, type)
     }
 }
 
-function createAnalyticsIndexTable(action) {
+function createAnalyticsIndexTable() {
     var table = document.getElementById('analyticsIndexTable');
     for (var i = table.rows.length; i > 1; i--) {
         table.deleteRow(i - 1);
     }
     var metaDataTable = document.getElementById("outputMetaDataTable");
     if (metaDataTable.rows.length > 1) {
-        populateAnalyticsTable(table, metaDataTable, action, 'meta_');
+        populateAnalyticsTable(table, metaDataTable, 'meta_');
     }
     var correlationDataTable = document.getElementById("outputCorrelationDataTable");
     if (correlationDataTable.rows.length > 1) {
-        populateAnalyticsTable(table, correlationDataTable, action, 'correlation_');
+        populateAnalyticsTable(table, correlationDataTable, 'correlation_');
     }
     var payloadDataTable = document.getElementById("outputPayloadDataTable");
     if (payloadDataTable.rows.length > 1) {
-        populateAnalyticsTable(table, payloadDataTable, action, '');
+        populateAnalyticsTable(table, payloadDataTable, '');
     }
 }
 
 function populateAnalyticsIndexTable(eventStreamName) {
-    createAnalyticsIndexTable('edit');
+    createAnalyticsIndexTable();
     jQuery.ajax({
         type: "GET",
         url: "../eventstream/get_analytics_index_definitions_ajaxprocessor.jsp?eventStreamName=" + eventStreamName,
@@ -118,13 +115,12 @@ function populateAnalyticsIndexTable(eventStreamName) {
                         var columnName = row.cells[1].textContent;
                         if (columnName.trim() == resultJson[i].columnName) {
                             row.cells[0].childNodes[0].checked = true;
-                            if (row.cells[2].childNodes[0].options[row.cells[2].childNodes[0].selectedIndex].text == 'STRING') {
-                                var select = row.cells[2].childNodes[0];
-                                for (var k = 0; k < select.options.length; k++) {
-                                    if (select.options[k].text === resultJson[i].columnType) {
-                                        select.selectedIndex = k;
-                                        break;
-                                    }
+                            var select = row.cells[2].childNodes[0];
+                            if (select.value == 'string') {
+                                if (resultJson[i].columnType == 'STRING') {
+                                    select.selectedIndex = 0;
+                                } else {
+                                    select.selectedIndex = 1;
                                 }
                             }
                             row.cells[3].childNodes[0].checked = resultJson[i].primaryKey;

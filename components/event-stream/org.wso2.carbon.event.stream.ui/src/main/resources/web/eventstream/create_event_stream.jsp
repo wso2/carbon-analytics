@@ -52,7 +52,6 @@
 				convertStringToEventStreamInfoDto();
 			}
 		}
-
 		function nextPersistView() {
 			var eventStreamName = document.getElementById("eventStreamNameId").value.trim();
 			var eventStreamVersion = document.getElementById("eventStreamVersionId").value.trim();
@@ -62,11 +61,9 @@
 			} else {
 				document.getElementById("stream").style.display = 'none';
 				document.getElementById("persist").style.display = 'block';
-
-				createAnalyticsIndexTable('add');
+				populateAnalyticsIndexTable(eventStreamName);
 			}
 		}
-
 		function back() {
 			document.getElementById("stream").style.display = 'block';
 			document.getElementById("persist").style.display = 'none';
