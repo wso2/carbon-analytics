@@ -31,12 +31,23 @@ public final class MQTTEventAdapterConstants {
     public static final String ADAPTER_CONF_PASSWORD_HINT = "password.hint";
     public static final String ADAPTER_CONF_URL_HINT = "url.hint";
     public static final String ADAPTER_MESSAGE_TOPIC = "topic";
-    public static final String ADAPTER_MESSAGE_CLIENTID = "clientId";
     public static final String ADAPTER_MESSAGE_QOS = "qos";
     public static final String ADAPTER_CONF_CLEAN_SESSION = "cleanSession";
     public static final String ADAPTER_CONF_CLEAN_SESSION_HINT = "cleanSession.hint";
-    public static final String ADAPTER_CONF_KEEP_ALIVE = "keepAlive";
+    public static final String CONNECTION_KEEP_ALIVE_INTERVAL = "connectionKeepAliveInterval";
+    public static final int DEFAULT_CONNECTION_KEEP_ALIVE_INTERVAL = 60;
     public static final String ADAPTER_TEMP_DIRECTORY_NAME = "java.io.tmpdir";
+    public static final String ADAPTER_CONF_CLIENTID = "clientId";
+    public static final String ADAPTER_CONF_CLIENTID_HINT = "clientId.hint";
+
+    public static final int DEFAULT_MIN_THREAD_POOL_SIZE = 8;
+    public static final int DEFAULT_MAX_THREAD_POOL_SIZE = 100;
+    public static final int DEFAULT_EXECUTOR_JOB_QUEUE_SIZE = 2000;
+    public static final long DEFAULT_KEEP_ALIVE_TIME_IN_MILLIS = 20000;
+    public static final String ADAPTER_MIN_THREAD_POOL_SIZE_NAME = "minThread";
+    public static final String ADAPTER_MAX_THREAD_POOL_SIZE_NAME = "maxThread";
+    public static final String ADAPTER_KEEP_ALIVE_TIME_NAME = "keepAliveTimeInMillis";
+    public static final String ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME = "jobQueueSize";
 
 
 }

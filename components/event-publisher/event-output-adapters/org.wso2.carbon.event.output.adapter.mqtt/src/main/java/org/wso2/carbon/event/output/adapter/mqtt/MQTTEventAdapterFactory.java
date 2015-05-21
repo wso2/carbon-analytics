@@ -67,6 +67,15 @@ public class MQTTEventAdapterFactory extends OutputEventAdapterFactory {
         password.setHint(
                 resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_PASSWORD_HINT));
 
+        // set clientId
+        Property clientId = new Property(MQTTEventAdapterConstants.ADAPTER_CONF_CLIENTID);
+        clientId.setDisplayName(
+                resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_CLIENTID));
+        clientId.setRequired(false);
+        clientId.setHint(
+                resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_CLIENTID_HINT));
+        staticPropertyList.add(clientId);
+
         //Broker clear session
         Property clearSession = new Property(MQTTEventAdapterConstants.ADAPTER_CONF_CLEAN_SESSION);
         clearSession.setDisplayName(
@@ -77,17 +86,19 @@ public class MQTTEventAdapterFactory extends OutputEventAdapterFactory {
         clearSession.setHint(
                 resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_CLEAN_SESSION_HINT));
 
-        //Broker clear session
-        Property keepAlive = new Property(MQTTEventAdapterConstants.ADAPTER_CONF_KEEP_ALIVE);
-        keepAlive.setDisplayName(
-                resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_KEEP_ALIVE));
-        keepAlive.setRequired(false);
+        // set Quality of Service
+        Property qos = new Property(MQTTEventAdapterConstants.ADAPTER_MESSAGE_QOS);
+        qos.setDisplayName(
+                resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_MESSAGE_QOS));
+        qos.setRequired(true);
+        qos.setOptions(new String[]{"0", "1", "2"});
+        qos.setDefaultValue("1");
 
         staticPropertyList.add(brokerUrl);
         staticPropertyList.add(userName);
         staticPropertyList.add(password);
         staticPropertyList.add(clearSession);
-        staticPropertyList.add(keepAlive);
+        staticPropertyList.add(qos);
 
         return staticPropertyList;
 
@@ -97,29 +108,15 @@ public class MQTTEventAdapterFactory extends OutputEventAdapterFactory {
     public List<Property> getDynamicPropertyList() {
         List<Property> dynamicPropertyList = new ArrayList<Property>();
 
+
+
         // set topic
         Property topicProperty = new Property(MQTTEventAdapterConstants.ADAPTER_MESSAGE_TOPIC);
         topicProperty.setDisplayName(
                 resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_MESSAGE_TOPIC));
         topicProperty.setRequired(true);
 
-        // set clientId
-        Property clientId = new Property(MQTTEventAdapterConstants.ADAPTER_MESSAGE_CLIENTID);
-        clientId.setDisplayName(
-                resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_MESSAGE_CLIENTID));
-        clientId.setRequired(true);
-
-        // set Quality of Service
-        Property qos = new Property(MQTTEventAdapterConstants.ADAPTER_MESSAGE_QOS);
-        qos.setDisplayName(
-                resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_MESSAGE_QOS));
-        qos.setRequired(false);
-        qos.setOptions(new String[]{"0", "1", "2"});
-        qos.setDefaultValue("1");
-
         dynamicPropertyList.add(topicProperty);
-        dynamicPropertyList.add(clientId);
-        dynamicPropertyList.add(qos);
 
         return dynamicPropertyList;
     }

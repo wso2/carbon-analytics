@@ -44,14 +44,14 @@ public class SOAPEventAdapterFactory extends InputEventAdapterFactory {
 
         List<Property> propertyList = new ArrayList<Property>();
 
-        // Destination Type
-        Property destinationTypeProperty = new Property(SOAPEventAdapterConstants.EXPOSED_TRANSPORTS);
-        destinationTypeProperty.setRequired(true);
-        destinationTypeProperty.setDisplayName(
+        // Transport Exposed
+        Property exposedTransportsProperty = new Property(SOAPEventAdapterConstants.EXPOSED_TRANSPORTS);
+        exposedTransportsProperty.setRequired(true);
+        exposedTransportsProperty.setDisplayName(
                 resourceBundle.getString(SOAPEventAdapterConstants.EXPOSED_TRANSPORTS));
-        destinationTypeProperty.setOptions(new String[]{SOAPEventAdapterConstants.HTTPS, SOAPEventAdapterConstants.HTTP, SOAPEventAdapterConstants.LOCAL, SOAPEventAdapterConstants.ALL});
-        destinationTypeProperty.setDefaultValue(SOAPEventAdapterConstants.ALL);
-        propertyList.add(destinationTypeProperty);
+        exposedTransportsProperty.setOptions(new String[]{SOAPEventAdapterConstants.HTTPS, SOAPEventAdapterConstants.HTTP, SOAPEventAdapterConstants.LOCAL, SOAPEventAdapterConstants.ALL});
+        exposedTransportsProperty.setDefaultValue(SOAPEventAdapterConstants.ALL);
+        propertyList.add(exposedTransportsProperty);
 
         return propertyList;
     }

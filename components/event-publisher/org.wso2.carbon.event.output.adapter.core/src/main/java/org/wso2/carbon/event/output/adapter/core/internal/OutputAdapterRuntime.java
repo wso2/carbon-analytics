@@ -17,10 +17,11 @@ package org.wso2.carbon.event.output.adapter.core.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.exception.ConnectionUnavailableException;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
-import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterRuntimeException;
 
 import java.util.Map;
 
@@ -71,14 +72,14 @@ public class OutputAdapterRuntime {
                                     connected = true;
                                     timer.reset();
                                 } else {
-                                    logAndDrop();
+                                    logAndDrop(message);
                                 }
                             } else {
                                 outputEventAdapter.publish(message, dynamicProperties);
                             }
                         }
                     } else {
-                        logAndDrop();
+                        logAndDrop(message);
                     }
                 }
             } catch (ConnectionUnavailableException e) {
@@ -93,35 +94,33 @@ public class OutputAdapterRuntime {
                                 log.error("Connection unavailable on " + name + " reconnecting.", e);
                                 publish(message, dynamicProperties);
                             } else {
-                                log.error("Connection unavailable on " + name + " reconnection will be retried in" + (timer.returnTimeToWait()) + " milliseconds.", e);
+                                log.error("Connection unavailable on " + name + " reconnection will be retried in " + (timer.returnTimeToWait()) + " milliseconds.", e);
                             }
                         } else {
-                            logAndDrop();
+                            logAndDrop(message);
                         }
                     }
                 } else {
-                    logAndDrop();
+                    logAndDrop(message);
                 }
             }
-        } catch (OutputEventAdapterRuntimeException e) {
-            log.error("Error in sending message " + e.getMessage(), e);
+        } catch (Throwable e) {
+            EventAdapterUtil.logAndDrop(name, message, null, e, log, PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
         }
-
     }
 
-    private void logAndDrop() {
+    private void logAndDrop(Object message) {
+        log.error("Event dropped, Output Adapter '" + name + "' suspended, Adapter will be active after " + (nextConnectionTime - System.currentTimeMillis()) + " milliseconds.");
         if (log.isDebugEnabled()) {
-            log.debug("Output Adapter '" + name + "' suspended hence dropping event. Adapter will be active after " + (nextConnectionTime - System.currentTimeMillis()) + " milliseconds.");
+            log.debug("Output Adapter '" + name + "' suspended, dropping event: /n" + message + "/n");
         }
     }
 
     public void destroy() {
-        if (outputEventAdapter != null) {
-            try {
-                outputEventAdapter.disconnect();
-            } finally {
-                outputEventAdapter.destroy();
-            }
+        try {
+            outputEventAdapter.disconnect();
+        } finally {
+            outputEventAdapter.destroy();
         }
     }
 }

@@ -20,7 +20,7 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterFactory;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterService;
 import org.wso2.carbon.event.input.adapter.core.internal.CarbonInputEventAdapterService;
-import org.wso2.carbon.event.input.adapter.core.internal.EventAdapterConstants;
+import org.wso2.carbon.event.input.adapter.core.EventAdapterConstants;
 import org.wso2.carbon.event.input.adapter.core.internal.config.AdapterConfigs;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.ConfigurationContextService;

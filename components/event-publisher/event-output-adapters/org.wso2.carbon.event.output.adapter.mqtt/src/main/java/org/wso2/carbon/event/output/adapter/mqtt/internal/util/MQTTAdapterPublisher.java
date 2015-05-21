@@ -32,45 +32,37 @@ import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterRun
 public class MQTTAdapterPublisher {
 
     private static final Log log = LogFactory.getLog(MQTTAdapterPublisher.class);
-
     private MqttClient mqttClient;
-    private MqttConnectOptions connectionOptions;
-    private boolean cleanSession;
-    private int keepAlive;
-    private MQTTBrokerConnectionConfiguration mqttBrokerConnectionConfiguration;
-    private String mqttClientId;
-    private String topic;
 
-    public MQTTAdapterPublisher(MQTTBrokerConnectionConfiguration mqttBrokerConnectionConfiguration,
-                                String topic, String mqttClientId) {
+    public MQTTAdapterPublisher(MQTTBrokerConnectionConfiguration mqttBrokerConnectionConfiguration, String clientId) {
 
-        this.mqttBrokerConnectionConfiguration = mqttBrokerConnectionConfiguration;
-        this.mqttClientId = mqttClientId;
-        this.cleanSession = mqttBrokerConnectionConfiguration.isCleanSession();
-        this.keepAlive = mqttBrokerConnectionConfiguration.getKeepAlive();
-        this.topic = topic;
+        if (clientId == null || clientId.trim().isEmpty()) {
+            clientId = MqttClient.generateClientId();
+        }
+
+        boolean cleanSession = mqttBrokerConnectionConfiguration.isCleanSession();
+        int keepAlive = mqttBrokerConnectionConfiguration.getKeepAlive();
 
         //SORTING messages until the server fetches them
         String temp_directory = System.getProperty(MQTTEventAdapterConstants.ADAPTER_TEMP_DIRECTORY_NAME);
         MqttDefaultFilePersistence dataStore = new MqttDefaultFilePersistence(temp_directory);
 
-
         try {
             // Construct the connection options object that contains connection parameters
             // such as cleanSession and LWT
-            connectionOptions = new MqttConnectOptions();
+            MqttConnectOptions connectionOptions = new MqttConnectOptions();
             connectionOptions.setCleanSession(cleanSession);
             connectionOptions.setKeepAliveInterval(keepAlive);
-            if (this.mqttBrokerConnectionConfiguration.getBrokerPassword() != null) {
+            if (mqttBrokerConnectionConfiguration.getBrokerPassword() != null) {
                 connectionOptions
-                        .setPassword(this.mqttBrokerConnectionConfiguration.getBrokerPassword().toCharArray());
+                        .setPassword(mqttBrokerConnectionConfiguration.getBrokerPassword().toCharArray());
             }
-            if (this.mqttBrokerConnectionConfiguration.getBrokerUsername() != null) {
-                connectionOptions.setUserName(this.mqttBrokerConnectionConfiguration.getBrokerUsername());
+            if (mqttBrokerConnectionConfiguration.getBrokerUsername() != null) {
+                connectionOptions.setUserName(mqttBrokerConnectionConfiguration.getBrokerUsername());
             }
 
             // Construct an MQTT blocking mode client
-            mqttClient = new MqttClient(this.mqttBrokerConnectionConfiguration.getBrokerUrl(), this.mqttClientId,
+            mqttClient = new MqttClient(mqttBrokerConnectionConfiguration.getBrokerUrl(), clientId,
                     dataStore);
             mqttClient.connect(connectionOptions);
 
@@ -82,7 +74,7 @@ public class MQTTAdapterPublisher {
 
     }
 
-    public void publish(int qos, String payload) {
+    public void publish(int qos, String payload, String topic) {
         try {
             // Create and configure a message
             MqttMessage message = new MqttMessage(payload.getBytes());
@@ -92,6 +84,7 @@ public class MQTTAdapterPublisher {
             // it has been delivered to the server meeting the specified
             // quality of service.
             mqttClient.publish(topic, message);
+
         } catch (MqttException e) {
             log.error("Error occurred when publishing message for MQTT server : "
                     + mqttClient.getServerURI());
@@ -99,7 +92,7 @@ public class MQTTAdapterPublisher {
         }
     }
 
-    public void publish(String payload) {
+    public void publish(String payload, String topic) {
         try {
             // Create and configure a message
             MqttMessage message = new MqttMessage(payload.getBytes());

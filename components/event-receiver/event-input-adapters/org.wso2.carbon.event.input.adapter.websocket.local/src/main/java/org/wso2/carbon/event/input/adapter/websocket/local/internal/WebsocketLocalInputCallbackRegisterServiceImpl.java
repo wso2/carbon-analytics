@@ -26,21 +26,20 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class WebsocketLocalInputCallbackRegisterServiceImpl implements WebsocketLocalInputCallbackRegisterService {
 
-    //TODO : need a method to un-subscribe
     private ConcurrentHashMap<Integer, ConcurrentHashMap<String, InputEventAdapterListener>> inputEventAdaptorListenerMap;
 
-    public WebsocketLocalInputCallbackRegisterServiceImpl(){
+    public WebsocketLocalInputCallbackRegisterServiceImpl() {
         inputEventAdaptorListenerMap = new ConcurrentHashMap<Integer, ConcurrentHashMap<String, InputEventAdapterListener>>();
     }
 
     @Override
     public void subscribeAdapterListener(String adaptorName, InputEventAdapterListener eventAdapterListener) {
         int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        ConcurrentHashMap<String,InputEventAdapterListener> tenantSpecificAdaptorMap = inputEventAdaptorListenerMap
+        ConcurrentHashMap<String, InputEventAdapterListener> tenantSpecificAdaptorMap = inputEventAdaptorListenerMap
                 .get(tenantID);
-        if(tenantSpecificAdaptorMap == null){
+        if (tenantSpecificAdaptorMap == null) {
             tenantSpecificAdaptorMap = new ConcurrentHashMap<String, InputEventAdapterListener>();
-            if(null != inputEventAdaptorListenerMap.putIfAbsent(tenantID, tenantSpecificAdaptorMap)){
+            if (null != inputEventAdaptorListenerMap.putIfAbsent(tenantID, tenantSpecificAdaptorMap)) {
                 tenantSpecificAdaptorMap = inputEventAdaptorListenerMap.get(tenantID);
             }
         }
@@ -48,11 +47,23 @@ public class WebsocketLocalInputCallbackRegisterServiceImpl implements Websocket
     }
 
     @Override
+    public void unsubscribeAdapterListener(String adaptorName) {
+        int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        ConcurrentHashMap<String, InputEventAdapterListener> tenantSpecificAdaptorMap = inputEventAdaptorListenerMap
+                .get(tenantID);
+        tenantSpecificAdaptorMap.remove(adaptorName);
+        if (tenantSpecificAdaptorMap.size() == 0) {
+            inputEventAdaptorListenerMap.remove(tenantID);
+        }
+
+    }
+
+    @Override
     public InputEventAdapterListener getAdapterListener(String adaptorName) {
         int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        ConcurrentHashMap<String,InputEventAdapterListener> tenantSpecificAdaptorMap = inputEventAdaptorListenerMap
+        ConcurrentHashMap<String, InputEventAdapterListener> tenantSpecificAdaptorMap = inputEventAdaptorListenerMap
                 .get(tenantID);
-        if(tenantSpecificAdaptorMap != null) {
+        if (tenantSpecificAdaptorMap != null) {
             return tenantSpecificAdaptorMap.get(adaptorName);
         } else {
             return null;

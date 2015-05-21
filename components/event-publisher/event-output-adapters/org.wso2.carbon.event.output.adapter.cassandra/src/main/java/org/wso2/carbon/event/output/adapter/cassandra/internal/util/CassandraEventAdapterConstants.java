@@ -22,33 +22,35 @@ public class CassandraEventAdapterConstants {
     private CassandraEventAdapterConstants() {
     }
 
-    public static final String MIN_THREAD_NAME = "minThread";
-    public static final String MAX_THREAD_NAME = "maxThread";
-    public static final String DEFAULT_KEEP_ALIVE_TIME_NAME = "defaultKeepAliveTime";
-    public static final int MIN_THREAD = 8;
-    public static final int MAX_THREAD = 100;
-    public static final long DEFAULT_KEEP_ALIVE_TIME = 20;
+    public static final String ADAPTER_TYPE_CASSANDRA = "cassandra";
 
+    public static final String ADAPTER_CASSANDRA_HOSTS = "hosts";
+    public static final String ADAPTER_CASSANDRA_HOSTS_HINT = "hosts.hint";
+
+    public static final String ADAPTER_CASSANDRA_PORT = "port";
+    public static final String ADAPTER_CASSANDRA_PORT_HINT = "port.hint";
 
     public static final String ADAPTER_CASSANDRA_USER_NAME = "user.name";
 
     public static final String ADAPTER_CASSANDRA_PASSWORD = "password";
 
-    public static final String ADAPTER_CASSANDRA_CLUSTER_NAME = "cluster.name";
-    public static final String ADAPTER_CASSANDRA_CLUSTER_NAME_HINT = "cluster.name.hint";
+    public static final String ADAPTER_CASSANDRA_STRATEGY_CLASS = "strategy.class";
+    public static final String ADAPTER_CASSANDRA_STRATEGY_CLASS_HINT = "strategy.class.hint";
+    public static final String ADAPTER_CASSANDRA_DEFAULT_STRATEGY_CLASS = "org.apache.cassandra.locator.SimpleStrategy";
 
-    public static final String ADAPTER_CASSANDRA_HOSTNAME = "hostname";
+    public static final String ADAPTER_CASSANDRA_REPLICATION_FACTOR = "replication.factor";
+    public static final String ADAPTER_CASSANDRA_REPLICATION_FACTOR_HINT = "replication.factor.hint";
+    public static final int ADAPTER_CASSANDRA_DEFAULT_REPLICATION_FACTOR = 1;
 
-    public static final String ADAPTER_CASSANDRA_PORT = "port";
-
-    public static final String ADAPTER_CASSANDRA_INDEX_ALL_COLUMNS = "index.all.columns";
-    public static final String ADAPTER_CASSANDRA_INDEX_ALL_COLUMNS_HINT = "index.all.columns.hint";
-
-    public static final String ADAPTER_TYPE_CASSANDRA = "cassandra";
+    public static final String ADAPTER_CASSANDRA_INDEXED_COLUMNS = "indexed.columns";
+    public static final String ADAPTER_CASSANDRA_INDEXED_COLUMNS_HINT = "indexed.columns.hint";
 
     public static final String ADAPTER_CASSANDRA_KEY_SPACE_NAME = "key.space.name";
 
     public static final String ADAPTER_CASSANDRA_COLUMN_FAMILY_NAME = "column.family.name";
+
+    public static final String CASSANDRA_CLUSTER_NAME_PREFIX = "EventPublisher_";
+
 
 
 }

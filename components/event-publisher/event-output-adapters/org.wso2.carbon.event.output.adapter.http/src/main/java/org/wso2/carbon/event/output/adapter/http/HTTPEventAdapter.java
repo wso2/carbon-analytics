@@ -22,10 +22,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.SystemDefaultHttpClient;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
@@ -35,30 +39,32 @@ import org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterC
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class HTTPEventAdapter implements OutputEventAdapter {
     private static final Log log = LogFactory.getLog(OutputEventAdapter.class);
     private OutputEventAdapterConfiguration eventAdapterConfiguration;
     private Map<String, String> globalProperties;
-    private ExecutorService executorService;
+    private static ExecutorService executorService;
     private HttpClient httpClient;
+    private String clientMethod;
+    private int tenantId;
+
 
     public HTTPEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String,
             String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
         this.globalProperties = globalProperties;
+        this.clientMethod = eventAdapterConfiguration.getStaticProperties().get(HTTPEventAdapterConstants.ADAPTER_HTTP_CLIENT_METHOD);
     }
-
 
     @Override
     public void init() throws OutputEventAdapterException {
 
+        tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+
         //ExecutorService will be assigned  if it is null
-        if (this.executorService == null) {
+        if (executorService == null) {
             int minThread;
             int maxThread;
             long defaultKeepAliveTime;
@@ -79,11 +85,11 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                 maxThread = HTTPEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE;
             }
 
-            if (globalProperties.get(HTTPEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_NAME) != null) {
+            if (globalProperties.get(HTTPEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME) != null) {
                 defaultKeepAliveTime = Integer.parseInt(globalProperties.get(
-                        HTTPEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_NAME));
+                        HTTPEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME));
             } else {
-                defaultKeepAliveTime = HTTPEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME;
+                defaultKeepAliveTime = HTTPEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_IN_MILLIS;
             }
 
             if (globalProperties.get(HTTPEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME) != null) {
@@ -93,7 +99,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                 jobQueSize = HTTPEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE;
             }
 
-            this.executorService = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime, TimeUnit.SECONDS,
+            executorService = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime, TimeUnit.MILLISECONDS,
                     new LinkedBlockingQueue<Runnable>(jobQueSize));
         }
 
@@ -106,14 +112,14 @@ public class HTTPEventAdapter implements OutputEventAdapter {
 
     @Override
     public void connect() {
-        //not required
+        this.checkHTTPClientInit(eventAdapterConfiguration.getStaticProperties());
     }
 
     @Override
     public void publish(Object message, Map<String, String> dynamicProperties) {
 
+
         //Load dynamic properties
-        this.checkHTTPClientInit(dynamicProperties);
         String url = dynamicProperties.get(HTTPEventAdapterConstants.ADAPTER_MESSAGE_URL);
         String username = dynamicProperties.get(HTTPEventAdapterConstants.ADAPTER_USERNAME);
         String password = dynamicProperties.get(HTTPEventAdapterConstants.ADAPTER_PASSWORD);
@@ -121,7 +127,11 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                 HTTPEventAdapterConstants.ADAPTER_HEADERS));
         String payload = message.toString();
 
-        this.executorService.submit(new HTTPSender(url, payload, username, password, headers));
+        try {
+            executorService.submit(new HTTPSender(url, payload, username, password, headers));
+        } catch (RejectedExecutionException e) {
+            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
+        }
     }
 
     @Override
@@ -135,7 +145,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
     }
 
     private void checkHTTPClientInit(
-            Map<String, String> dynamicProperties) {
+            Map<String, String> staticProperties) {
         if (this.httpClient != null) {
             return;
         }
@@ -146,8 +156,8 @@ public class HTTPEventAdapter implements OutputEventAdapter {
             /* this needs to be created as late as possible, for the SSL trust store properties
              * to be set by Carbon in Java system properties */
             this.httpClient = new SystemDefaultHttpClient();
-            String proxyHost = dynamicProperties.get(HTTPEventAdapterConstants.ADAPTER_PROXY_HOST);
-            String proxyPort = dynamicProperties.get(HTTPEventAdapterConstants.ADAPTER_PROXY_PORT);
+            String proxyHost = staticProperties.get(HTTPEventAdapterConstants.ADAPTER_PROXY_HOST);
+            String proxyPort = staticProperties.get(HTTPEventAdapterConstants.ADAPTER_PROXY_PORT);
             if (proxyHost != null && proxyHost.trim().length() > 0) {
                 try {
                     HttpHost host = new HttpHost(proxyHost, Integer.parseInt(proxyPort));
@@ -164,25 +174,26 @@ public class HTTPEventAdapter implements OutputEventAdapter {
         if (headers == null || headers.trim().length() == 0) {
             return null;
         }
-        try {
-            String[] entries = headers.split(HTTPEventAdapterConstants.HEADER_SEPARATOR);
-            String[] keyValue;
-            Map<String, String> result = new HashMap<String, String>();
-            for (String entry : entries) {
-                keyValue = entry.split(HTTPEventAdapterConstants.ENTRY_SEPARATOR);
+
+        String[] entries = headers.split(HTTPEventAdapterConstants.HEADER_SEPARATOR);
+        String[] keyValue;
+        Map<String, String> result = new HashMap<String, String>();
+        for (String header : entries) {
+            try {
+                keyValue = header.split(HTTPEventAdapterConstants.ENTRY_SEPARATOR, 2);
                 result.put(keyValue[0].trim(), keyValue[1].trim());
+            } catch (Exception e) {
+                log.warn("Header property '" + header + "' is not defined in the correct format.", e);
             }
-            return result;
-        } catch (Exception e) {
-            log.error("Invalid headers format: \"" + headers + "\", ignoring HTTP headers...");
-            return null;
         }
+        return result;
+
     }
 
     /**
      * This class represents a job to send an HTTP request to a target URL.
      */
-    public class HTTPSender implements Runnable {
+    class HTTPSender implements Runnable {
 
         private String url;
 
@@ -223,38 +234,37 @@ public class HTTPEventAdapter implements OutputEventAdapter {
             return headers;
         }
 
-        private void processAuthentication(HttpPost method) {
-            if (this.getUsername() != null && this.getUsername().trim().length() > 0) {
-                method.setHeader("Authorization", "Basic " + Base64.encode(
-                        (this.getUsername() + HTTPEventAdapterConstants.ENTRY_SEPARATOR
-                                + this.getPassword()).getBytes()));
-            }
-        }
-
-        private void processHeaders(HttpPost method) {
-            if (this.getHeaders() != null) {
-                for (Map.Entry<String, String> header : this.getHeaders().entrySet()) {
-                    method.setHeader(header.getKey(), header.getValue());
-                }
-            }
-        }
-
         public void run() {
-            HttpPost method = new HttpPost(this.getUrl());
+
+            HttpEntityEnclosingRequestBase method;
+
+            if (clientMethod.equalsIgnoreCase(HTTPEventAdapterConstants.CONSTANT_HTTP_PUT)) {
+                method = new HttpPut(this.getUrl());
+            } else {
+                method = new HttpPost(this.getUrl());
+            }
+
             StringEntity entity;
             try {
                 entity = new StringEntity(this.getPayload());
                 method.setEntity(entity);
-                this.processAuthentication(method);
-                this.processHeaders(method);
+                if (this.getUsername() != null && this.getUsername().trim().length() > 0) {
+                    method.setHeader("Authorization", "Basic " + Base64.encode(
+                            (this.getUsername() + HTTPEventAdapterConstants.ENTRY_SEPARATOR
+                                    + this.getPassword()).getBytes()));
+                }
+
+                if (this.getHeaders() != null) {
+                    for (Map.Entry<String, String> header : this.getHeaders().entrySet()) {
+                        method.setHeader(header.getKey(), header.getValue());
+                    }
+                }
+
                 httpClient.execute(method).getEntity().getContent().close();
             } catch (UnknownHostException e) {
-                log.error("Exception while connecting adapter "
-                                + eventAdapterConfiguration.getName() + " HTTP endpoint to " + this.getUrl(),
-                        e);
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), this.getPayload(), "Cannot connect to " + this.getUrl(), e, log, tenantId);
             } catch (Throwable e) {
-                log.error("Error executing HTTP output event adapter "
-                        + eventAdapterConfiguration.getName() + " sender: ", e);
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), this.getPayload(), null, e, log, tenantId);
             }
         }
 

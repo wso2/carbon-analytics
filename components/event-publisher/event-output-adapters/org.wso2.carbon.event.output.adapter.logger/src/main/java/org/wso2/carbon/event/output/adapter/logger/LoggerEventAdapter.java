@@ -57,10 +57,15 @@ public final class LoggerEventAdapter implements OutputEventAdapter {
 
     @Override
     public void publish(Object message, Map<String, String> dynamicProperties) {
+        String uniqueIdentification = dynamicProperties.get(LoggerEventAdapterConstants.ADAPTER_MESSAGE_UNIQUE_ID);
+        if (uniqueIdentification == null || uniqueIdentification.trim().isEmpty()) {
+            uniqueIdentification = eventAdapterConfiguration.getName();
+        }
+
         if (message instanceof Object[]) {
-            log.info("Unique ID: " + dynamicProperties.get(LoggerEventAdapterConstants.ADAPTER_MESSAGE_UNIQUE_ID) + ", Event: " + Arrays.deepToString((Object[]) message));
+            log.info("Unique ID: " + uniqueIdentification + ",\n Event: " + Arrays.deepToString((Object[]) message));
         } else {
-            log.info("Unique ID: " + dynamicProperties.get(LoggerEventAdapterConstants.ADAPTER_MESSAGE_UNIQUE_ID) + ", Event: " + message);
+            log.info("Unique ID: " + uniqueIdentification + ",\n Event: " + message);
         }
     }
 

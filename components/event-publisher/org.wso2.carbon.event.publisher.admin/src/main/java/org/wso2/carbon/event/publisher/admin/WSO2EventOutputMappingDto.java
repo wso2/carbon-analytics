@@ -23,6 +23,9 @@ public class WSO2EventOutputMappingDto {
 
     EventMappingPropertyDto[] payloadWSO2EventMappingProperties;
 
+    private String outputStreamName;
+    private String outputStreamVersion;
+
 
     public WSO2EventOutputMappingDto() {
     }
@@ -55,4 +58,19 @@ public class WSO2EventOutputMappingDto {
         this.payloadWSO2EventMappingProperties = payloadWSO2EventMappingProperties;
     }
 
+    public String getOutputStreamName() {
+        return outputStreamName;
+    }
+
+    public void setOutputStreamName(String outputStreamName) {
+        this.outputStreamName = outputStreamName;
+    }
+
+    public String getOutputStreamVersion() {
+        return outputStreamVersion;
+    }
+
+    public void setOutputStreamVersion(String outputStreamVersion) {
+        this.outputStreamVersion = outputStreamVersion;
+    }
 }

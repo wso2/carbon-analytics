@@ -46,52 +46,33 @@ public class CassandraEventAdapterFactory extends OutputEventAdapterFactory {
     public List<Property> getStaticPropertyList() {
         List<Property> propertyList = new ArrayList<Property>();
 
+        // set host name
+        Property hosts = new Property(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_HOSTS);
+        hosts.setDisplayName(
+                resourceBundle.getString(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_HOSTS));
+        hosts.setRequired(true);
+        hosts.setHint(resourceBundle.getString(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_HOSTS_HINT));
+        propertyList.add(hosts);
 
-        // set cluster name
-        Property clusterName = new Property(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_CLUSTER_NAME);
-        clusterName.setDisplayName(
-                resourceBundle.getString(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_CLUSTER_NAME));
-        clusterName.setRequired(true);
-        clusterName.setHint(resourceBundle.getString(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_CLUSTER_NAME_HINT));
-        propertyList.add(clusterName);
+        // set port
+        Property port = new Property(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_PORT);
+        port.setDisplayName(
+                resourceBundle.getString(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_PORT));
+        port.setHint(resourceBundle.getString(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_PORT_HINT));
+        propertyList.add(port);
 
         // set user name
         Property userName = new Property(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_USER_NAME);
         userName.setDisplayName(
                 resourceBundle.getString(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_USER_NAME));
-        userName.setRequired(true);
         propertyList.add(userName);
 
         // set password
         Property password = new Property(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_PASSWORD);
         password.setDisplayName(
                 resourceBundle.getString(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_PASSWORD));
-        password.setRequired(true);
         password.setSecured(true);
         propertyList.add(password);
-
-        // set host name
-        Property hostName = new Property(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_HOSTNAME);
-        hostName.setDisplayName(
-                resourceBundle.getString(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_HOSTNAME));
-        hostName.setRequired(true);
-        propertyList.add(hostName);
-
-        // set index all columns
-        Property indexAllColumns = new Property(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_INDEX_ALL_COLUMNS);
-        indexAllColumns.setDisplayName(
-                resourceBundle.getString(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_INDEX_ALL_COLUMNS));
-        indexAllColumns.setOptions(new String[]{"true", "false"});
-        indexAllColumns.setDefaultValue("false");
-        indexAllColumns.setHint(resourceBundle.getString(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_INDEX_ALL_COLUMNS_HINT));
-        propertyList.add(indexAllColumns);
-
-        // set port
-        Property port = new Property(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_PORT);
-        port.setDisplayName(
-                resourceBundle.getString(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_PORT));
-        port.setRequired(true);
-        propertyList.add(port);
 
         // key space
         Property keySpace = new Property(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_KEY_SPACE_NAME);
@@ -106,6 +87,27 @@ public class CassandraEventAdapterFactory extends OutputEventAdapterFactory {
                 resourceBundle.getString(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_COLUMN_FAMILY_NAME));
         columnFamily.setRequired(true);
         propertyList.add(columnFamily);
+
+        // strategy class
+        Property strategyClass = new Property(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_STRATEGY_CLASS);
+        strategyClass.setDisplayName(
+                resourceBundle.getString(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_STRATEGY_CLASS));
+        strategyClass.setHint(resourceBundle.getString(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_STRATEGY_CLASS_HINT));
+        propertyList.add(strategyClass);
+
+        // replication factor
+        Property replicationFactor = new Property(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_REPLICATION_FACTOR);
+        replicationFactor.setDisplayName(
+                resourceBundle.getString(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_REPLICATION_FACTOR));
+        replicationFactor.setHint(resourceBundle.getString(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_REPLICATION_FACTOR_HINT));
+        propertyList.add(replicationFactor);
+
+        // indexed columns
+        Property indexedColumns = new Property(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_INDEXED_COLUMNS);
+        indexedColumns.setDisplayName(
+                resourceBundle.getString(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_INDEXED_COLUMNS));
+        indexedColumns.setHint(resourceBundle.getString(CassandraEventAdapterConstants.ADAPTER_CASSANDRA_INDEXED_COLUMNS_HINT));
+        propertyList.add(indexedColumns);
 
         return propertyList;
     }

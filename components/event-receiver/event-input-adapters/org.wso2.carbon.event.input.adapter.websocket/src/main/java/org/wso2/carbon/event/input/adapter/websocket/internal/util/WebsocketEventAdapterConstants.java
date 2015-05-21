@@ -27,6 +27,5 @@ public final class WebsocketEventAdapterConstants {
     public static final String ADAPTER_TYPE_WEBSOCKET = "websocket";
     public static final String ADAPTER_SERVER_URL = "websocket.server.url";
     public static final String ADAPTER_SERVER_URL_HINT = "websocket.server.url.hint";
-    public static final String ADAPTER_IS_EVENT_DUPLICATED_IN_CLUSTER = "receiving.events.duplicated.in.cluster";
 
 }

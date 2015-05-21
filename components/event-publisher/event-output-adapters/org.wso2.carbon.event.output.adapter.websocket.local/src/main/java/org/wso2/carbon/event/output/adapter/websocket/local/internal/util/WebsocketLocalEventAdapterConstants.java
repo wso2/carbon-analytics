@@ -26,4 +26,14 @@ public final class WebsocketLocalEventAdapterConstants {
     }
 
     public static final String ADAPTER_TYPE_WEBSOCKET_LOCAL = "websocket-local";
+
+    public static final int ADAPTER_MIN_THREAD_POOL_SIZE = 8;
+    public static final int ADAPTER_MAX_THREAD_POOL_SIZE = 100;
+    public static final int ADAPTER_EXECUTOR_JOB_QUEUE_SIZE = 2000;
+    public static final long DEFAULT_KEEP_ALIVE_TIME_IN_MILLIS = 20000;
+    public static final String ADAPTER_MIN_THREAD_POOL_SIZE_NAME = "minThread";
+    public static final String ADAPTER_MAX_THREAD_POOL_SIZE_NAME = "maxThread";
+    public static final String ADAPTER_KEEP_ALIVE_TIME_NAME = "keepAliveTimeInMillis";
+    public static final String ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME = "jobQueueSize";
+
 }

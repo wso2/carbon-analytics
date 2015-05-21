@@ -69,15 +69,25 @@ public class SoapEventAdapterFactory extends OutputEventAdapterFactory {
                 resourceBundle.getString(SoapEventAdapterConstants.ADAPTER_CONF_SOAP_PASSWORD));
 
         // header name
-        Property headerProperty = new Property(SoapEventAdapterConstants.ADAPTER_CONF_SOAP_HEADERS);
-        headerProperty.setDisplayName(
+        Property soapHeaderProperty = new Property(SoapEventAdapterConstants.ADAPTER_CONF_SOAP_HEADERS);
+        soapHeaderProperty.setDisplayName(
                 resourceBundle.getString(SoapEventAdapterConstants.ADAPTER_CONF_SOAP_HEADERS));
-        headerProperty.setRequired(false);
+        soapHeaderProperty.setHint(resourceBundle.getString(SoapEventAdapterConstants.ADAPTER_CONF_SOAP_HEADERS_HINT));
+        soapHeaderProperty.setRequired(false);
+
+        // header name
+        Property httpHeaderProperty = new Property(SoapEventAdapterConstants.ADAPTER_CONF_HTTP_HEADERS);
+        httpHeaderProperty.setDisplayName(
+                resourceBundle.getString(SoapEventAdapterConstants.ADAPTER_CONF_HTTP_HEADERS));
+        httpHeaderProperty.setHint(resourceBundle.getString(SoapEventAdapterConstants.ADAPTER_CONF_HTTP_HEADERS_HINT));
+        httpHeaderProperty.setRequired(false);
+
 
         dynamicPropertyList.add(host);
         dynamicPropertyList.add(userNameProperty);
         dynamicPropertyList.add(passwordProperty);
-        dynamicPropertyList.add(headerProperty);
+        dynamicPropertyList.add(soapHeaderProperty);
+        dynamicPropertyList.add(httpHeaderProperty);
 
         return dynamicPropertyList;
     }

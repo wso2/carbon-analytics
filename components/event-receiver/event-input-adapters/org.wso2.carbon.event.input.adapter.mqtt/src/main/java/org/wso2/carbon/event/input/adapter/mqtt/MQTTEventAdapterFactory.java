@@ -94,32 +94,14 @@ public class MQTTEventAdapterFactory extends InputEventAdapterFactory {
                 resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_CLEAN_SESSION_HINT));
         propertyList.add(clearSession);
 
-
-        //TODO : KEEP alive, move to global properties
-        //Broker clear session
-        Property keepAlive = new Property(MQTTEventAdapterConstants.ADAPTER_CONF_KEEP_ALIVE);
-        keepAlive.setDisplayName(
-                resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_KEEP_ALIVE));
-        keepAlive.setRequired(false);
-        propertyList.add(keepAlive);
-
-
         // set clientId
-        Property clientId = new Property(MQTTEventAdapterConstants.ADAPTER_MESSAGE_CLIENTID);
+        Property clientId = new Property(MQTTEventAdapterConstants.ADAPTER_CONF_CLIENTID);
         clientId.setDisplayName(
-                resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_MESSAGE_CLIENTID));
-        clientId.setRequired(true);
+                resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_CLIENTID));
+        clientId.setRequired(false);
         clientId.setHint(
-                resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_MESSAGE_CLIENTID_HINT));
+                resourceBundle.getString(MQTTEventAdapterConstants.ADAPTER_CONF_CLIENTID_HINT));
         propertyList.add(clientId);
-
-        //TODO : Always true
-        Property isDuplicatedInCluster = new Property(MQTTEventAdapterConstants.ADAPTOR_IS_EVENT_DUPLICATED_IN_CLUSTER);
-        isDuplicatedInCluster.setDisplayName(resourceBundle.getString(MQTTEventAdapterConstants.ADAPTOR_IS_EVENT_DUPLICATED_IN_CLUSTER));
-        isDuplicatedInCluster.setRequired(false);
-        isDuplicatedInCluster.setOptions(new String[]{"true", "false"});
-        isDuplicatedInCluster.setDefaultValue("false");
-        propertyList.add(isDuplicatedInCluster);
 
         return propertyList;
     }

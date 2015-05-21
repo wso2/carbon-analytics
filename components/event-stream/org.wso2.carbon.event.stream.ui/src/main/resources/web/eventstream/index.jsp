@@ -14,7 +14,9 @@
   --%>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<%@ page import="org.wso2.carbon.analytics.stream.persistence.stub.EventStreamPersistenceAdminServiceStub" %>
 <%@ page import="org.wso2.carbon.event.stream.stub.EventStreamAdminServiceStub" %>
 <%@ page import="org.wso2.carbon.event.stream.stub.types.EventStreamInfoDto" %>
 <%@ page import="org.wso2.carbon.event.stream.ui.EventStreamUIUtils" %>
@@ -65,6 +67,12 @@
         if (eventStreamDetailsArray != null) {
             totalEventStreams = eventStreamDetailsArray.length;
         }
+
+        EventStreamPersistenceAdminServiceStub persistenceAdminServiceStub =
+                EventStreamUIUtils.getEventStreamPersistenceAdminService(config, session, request);
+        pageContext.setAttribute("isAnalyticsPersistenceBackendAvailable",
+                                 EventStreamUIUtils.isEventStreamPersistenceAdminServiceAvailable(persistenceAdminServiceStub),
+                                 PageContext.APPLICATION_SCOPE);
 
     %>
 

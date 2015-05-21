@@ -30,6 +30,7 @@ function addEventStream(form, option, eventStreamId) {
         var metaData = "";
         var correlationData = "";
         var payloadData = "";
+        var indexData = "";
         var newEventStreamId = eventStreamName + ":" + eventStreamVersion;
 
         var metaDataTable = document.getElementById("outputMetaDataTable");
@@ -44,6 +45,11 @@ function addEventStream(form, option, eventStreamId) {
         var payloadDataTable = document.getElementById("outputPayloadDataTable");
         if (payloadDataTable != null && payloadDataTable.rows.length > 1) {
             payloadData = getWSO2EventDataValues(payloadDataTable);
+        }
+
+        var indexDataTable = document.getElementById("analyticsIndexTable");
+        if (indexDataTable != null && indexDataTable.rows.length > 1) {
+            indexData = getAnalyticsIndexDataValues(indexDataTable);
         }
 
         if (metaData == "" && correlationData == "" && payloadData == "") {
@@ -61,6 +67,7 @@ function addEventStream(form, option, eventStreamId) {
                         metaData: metaData,
                         correlationData: correlationData,
                         payloadData: payloadData,
+                        indexData: indexData,
                         eventStreamDescription: eventStreamDescription,
                         eventStreamNickName: eventStreamNickName
                     },
@@ -88,6 +95,7 @@ function addEventStream(form, option, eventStreamId) {
                             metaData: metaData,
                             correlationData: correlationData,
                             payloadData: payloadData,
+                            indexData: indexData,
                             eventStreamDescription: eventStreamDescription,
                             eventStreamNickName: eventStreamNickName
                         },onSuccess: function (event) {

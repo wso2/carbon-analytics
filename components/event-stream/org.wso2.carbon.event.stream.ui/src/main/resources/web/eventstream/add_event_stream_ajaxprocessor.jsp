@@ -12,10 +12,16 @@
   ~ CONDITIONS OF ANY KIND, either express or implied.  See the License for the
   ~ specific language governing permissions and limitations under the License.
   --%>
+<%@ page import="org.wso2.carbon.analytics.stream.persistence.stub.EventStreamPersistenceAdminServiceStub" %>
+<%@ page import="org.wso2.carbon.analytics.stream.persistence.stub.dto.AnalyticsTable" %>
+<%@ page import="org.wso2.carbon.analytics.stream.persistence.stub.dto.AnalyticsTableRecord" %>
 <%@ page import="org.wso2.carbon.event.stream.stub.EventStreamAdminServiceStub" %>
 <%@ page import="org.wso2.carbon.event.stream.stub.types.EventStreamAttributeDto" %>
 <%@ page import="org.wso2.carbon.event.stream.stub.types.EventStreamDefinitionDto" %>
 <%@ page import="org.wso2.carbon.event.stream.ui.EventStreamUIUtils" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.List" %>
+<%@ page import="org.wso2.carbon.analytics.stream.persistence.stub.dto.AnalyticsTableRecord" %>
 
 <%
 
@@ -98,6 +104,34 @@
         eventStreamDefinitionDto.setPayloadData(payloadWSO2EventAttributeDtos);
 
         stub.addEventStreamDefinitionAsDto(eventStreamDefinitionDto);
+
+        EventStreamPersistenceAdminServiceStub
+                streamPersistenceAdminServiceStub = EventStreamUIUtils.getEventStreamPersistenceAdminService(config, session, request);
+
+        if (EventStreamUIUtils.isEventStreamPersistenceAdminServiceAvailable(streamPersistenceAdminServiceStub)) {
+            String indexDataString = request.getParameter("indexData");
+            if (indexDataString != null && !indexDataString.isEmpty()) {
+                String[] properties = indexDataString.split("\\$=");
+                List<AnalyticsTableRecord> analyticsTableColumns = new ArrayList<AnalyticsTableRecord>();
+                for (String property : properties) {
+                    String[] propertyConfiguration = property.split("\\^=");
+                    if (propertyConfiguration[0].equalsIgnoreCase("true")) {
+                        AnalyticsTableRecord analyticsTableColumn = new AnalyticsTableRecord();
+                        analyticsTableColumn.setColumnName(propertyConfiguration[1]);
+                        analyticsTableColumn.setColumnType(propertyConfiguration[2]);
+                        analyticsTableColumn.setPrimaryKey(Boolean.parseBoolean(propertyConfiguration[3]));
+                        analyticsTableColumn.setIndexed(Boolean.parseBoolean(propertyConfiguration[4]));
+                        analyticsTableColumn.setScoreParam(Boolean.parseBoolean(propertyConfiguration[5]));
+                        analyticsTableColumns.add(analyticsTableColumn);
+                    }
+                }
+                AnalyticsTable analyticsTable = new AnalyticsTable();
+                analyticsTable.setTableName(request.getParameter("eventStreamName"));
+                analyticsTable.setAnalyticsTableRecords(
+                        analyticsTableColumns.toArray(new AnalyticsTableRecord[analyticsTableColumns.size()]));
+                streamPersistenceAdminServiceStub.addAnalyticsTable(analyticsTable);
+            }
+        }
 
         msg = "true";
 

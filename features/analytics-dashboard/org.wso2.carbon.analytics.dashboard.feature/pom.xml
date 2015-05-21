@@ -14,11 +14,12 @@
   ~ specific language governing permissions and limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>analytics-dashboard-feature</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -28,20 +29,14 @@
     <name>WSO2 Carbon - Analytics Dashboard Feature</name>
     <url>http://wso2.org</url>
     <description>
-        This feature contains the bundles required for Analytics Dashboard features.
+        This feature contains Analytics Dashboard menu.
     </description>
 
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon.analytics-common</groupId>
-            <artifactId>org.wso2.carbon.analytics.dashboard.server.feature</artifactId>
-            <type>zip</type>
+            <artifactId>org.wso2.carbon.analytics.dashboard.ui</artifactId>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon.analytics-common</groupId>-->
-            <!--<artifactId>org.wso2.carbon.analytics.dashboard.ui.feature</artifactId>-->
-            <!--<type>zip</type>-->
-        <!--</dependency>-->
     </dependencies>
 
     <build>
@@ -60,18 +55,20 @@
                         <configuration>
                             <id>org.wso2.carbon.analytics.dashboard</id>
                             <propertiesFile>../../etc/feature.properties</propertiesFile>
+                            <adviceFile>
+                                <properties>
+                                    <propertyDef>org.wso2.carbon.p2.category.type:console</propertyDef>
+                                    <propertyDef>org.eclipse.equinox.p2.type.group:true</propertyDef>
+                                </properties>
+                            </adviceFile>
+                            <bundles>
+                                <bundleDef>
+                                    org.wso2.carbon.analytics-common:org.wso2.carbon.analytics.dashboard.ui:${carbon.analytics.common.version}
+                                </bundleDef>
+                            </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}
-                                </importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}</importFeatureDef>
                             </importFeatures>
-                            <includedFeatures>
-                                <includedFeatureDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.analytics.dashboard.server.feature:${carbon.analytics.common.version}
-                                </includedFeatureDef>
-                                <!--<includedFeatureDef>-->
-                                    <!--org.wso2.carbon.analytics-common:org.wso2.carbon.analytics.dashboard.ui.feature:${carbon.analytics.common.version}-->
-                                <!--</includedFeatureDef>-->
-                            </includedFeatures>
                         </configuration>
                     </execution>
                 </executions>

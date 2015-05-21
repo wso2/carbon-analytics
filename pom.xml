@@ -15,7 +15,8 @@
  ~ specific language governing permissions and limitations
  ~ under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>org.wso2</groupId>
@@ -33,7 +34,7 @@
 
     <modules>
         <module>service-stubs</module>
-        <!-- <module>components/analytics-dashboard</module> -->
+        <module>components/analytics-dashboard</module>
         <module>components/data-bridge</module>
         <module>components/event-stream</module>
         <module>components/application-deployer</module>
@@ -43,7 +44,7 @@
         <module>components/event-publisher</module>
         <module>features/event-stream</module>
         <module>features/data-bridge</module>
-        <!-- <module>features/analytics-dashboard</module> -->
+        <module>features/analytics-dashboard</module>
         <module>features/application-deployer</module>
         <module>features/event-monitor</module>
         <module>features/event-receiver</module>
@@ -360,6 +361,11 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.stream.persistence.stub</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.event.stream.ui</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
@@ -415,26 +421,6 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.analytics.dashboard.stub</artifactId>
-                <version>${carbon.analytics.common.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.analytics.dashboard.batch.stub</artifactId>
-                <version>${carbon.analytics.common.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.analytics.dashboard.admin</artifactId>
-                <version>${carbon.analytics.common.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.analytics.dashboard.batch.admin</artifactId>
-                <version>${carbon.analytics.common.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.event.processor.manager.core</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
@@ -443,16 +429,11 @@
                 <artifactId>org.wso2.carbon.event.processor.manager.commons</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
-            <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon.analytics-common</groupId>-->
-            <!--<artifactId>org.wso2.carbon.analytics.dashboard.ui</artifactId>-->
-            <!--<version>${carbon.analytics.common.version}</version>-->
-            <!--</dependency>-->
-            <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon.analytics-common</groupId>-->
-            <!--<artifactId>org.wso2.carbon.event.publisher.stub</artifactId>-->
-            <!--<version>${carbon.analytics.common.version}</version>-->
-            <!--</dependency>-->
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.dashboard.ui</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
@@ -628,12 +609,6 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.analytics.dashboard.server.feature</artifactId>
-                <version>${carbon.analytics.common.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.event.statistics.server.feature</artifactId>
                 <version>${carbon.analytics.common.version}</version>
                 <type>zip</type>
@@ -712,10 +687,10 @@
 
             <!--carbon-deployment features start-->
             <!--<dependency>-->
-                <!--<groupId>org.wso2.carbon.deployment</groupId>-->
-                <!--<artifactId>org.wso2.carbon.as.runtimes.cxf.feature</artifactId>-->
-                <!--<version>${carbon.deployment.version}</version>-->
-                <!--<type>zip</type>-->
+            <!--<groupId>org.wso2.carbon.deployment</groupId>-->
+            <!--<artifactId>org.wso2.carbon.as.runtimes.cxf.feature</artifactId>-->
+            <!--<version>${carbon.deployment.version}</version>-->
+            <!--<type>zip</type>-->
             <!--</dependency>-->
             <!--carbon-deployment features stop-->
 
@@ -760,7 +735,7 @@
                     <version>1.7.2</version>
                     <executions>
                         <execution>
-                            <id>generate-scr-scrdescriptor</id>
+                            <id>generate-scr-descriptor</id>
                             <goals>
                                 <goal>scr</goal>
                             </goals>
@@ -919,7 +894,8 @@
         <carbon.kernel.version>4.4.0</carbon.kernel.version>
         <!--<carbon.kernel.imp.pkg.version>[4.3.0, 4.4.0)</carbon.kernel.imp.pkg.version>-->
 
-        <carbon.commons.version>4.4.0</carbon.commons.version> <!--<carbon.deployment.version>4.3.1</carbon.deployment.version>-->
+        <carbon.commons.version>4.4.0</carbon.commons.version>
+        <!--<carbon.deployment.version>4.3.1</carbon.deployment.version>-->
         <!--<carbon.commons.imp.pkg.version>[4.3.0, 4.4.0)</carbon.commons.imp.pkg.version>-->
 
         <!--CEP versions-->
