@@ -168,20 +168,23 @@ function addEventStreamViaPopup(form, callback) {
                     eventStreamNickName: eventStreamNickName
                 },onSuccess: function (event) {
                     if ("true" == event.responseText.trim()) {
-                        CARBON.showInfoDialog("Stream definition added successfully!!",
-                            function () {
-                                if (callback == "inflow") {
-                                    onSuccessCreateInflowStreamDefinition(streamId);
-                                } else if (callback == "outflow") {
-                                    onSuccessCreateOutflowStreamDefinition(streamId);
-                                }
-                            },function () {
-                                if (callback == "inflow") {
-                                    onSuccessCreateInflowStreamDefinition(streamId);
-                                } else if (callback == "outflow") {
-                                    onSuccessCreateOutflowStreamDefinition(streamId);
-                                }
-                            });customCarbonWindowClose();
+                        CARBON.showInfoDialog("Stream definition added successfully!!",function () {
+                            form.submit();
+                        });
+                        //CARBON.showInfoDialog("Stream definition added successfully!!",
+                        //    function () {
+                        //        if (callback == "inflow") {
+                        //            onSuccessCreateInflowStreamDefinition(streamId);
+                        //        } else if (callback == "outflow") {
+                        //            onSuccessCreateOutflowStreamDefinition(streamId);
+                        //        }
+                        //    },function () {
+                        //        if (callback == "inflow") {
+                        //            onSuccessCreateInflowStreamDefinition(streamId);
+                        //        } else if (callback == "outflow") {
+                        //            onSuccessCreateOutflowStreamDefinition(streamId);
+                        //        }
+                        //    });customCarbonWindowClose();
                     } else {
                         CARBON.showErrorDialog("Failed to add event stream, Exception: " + event.responseText.trim());
                     }

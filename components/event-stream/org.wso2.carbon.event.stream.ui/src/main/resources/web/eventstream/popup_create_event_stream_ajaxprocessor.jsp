@@ -123,7 +123,7 @@
                                             } else {
                                             %>
                                             <input type="text" name="eventStreamVersion" id="eventStreamVersionId"
-                                                   class="initE" value=""
+                                                   class="initE" value="1.0.0"
                                                    style="width:75%"/>
                                             <%
                                                 }

@@ -53,7 +53,7 @@
     <td><input type="text" name="eventStreamVersion" id="eventStreamVersionId"
                class="initE"
 
-               value=""
+               value="1.0.0"
                style="width:75%"/>
 
         <div class="sectionHelp">
