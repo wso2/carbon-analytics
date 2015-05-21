@@ -39,7 +39,7 @@ var CONSTANTS = {
     processModeHTTP : 'HTTP',
     processModeWebSocket : 'WEBSOCKET',
     processModeAuto : 'AUTO',
-    superTenantId : 'carbon.super',
+    domain : 'carbon.super',
     numThousand : 1000,
     websocketTimeAppender : 400,
     secureMode : 'SECURED'
@@ -67,13 +67,13 @@ var transportToBeUsedHttp;
 var transportToBeUsedWebsocket;
 
 function subscribe(streamName,version,intervalTime,domain,
-                   listningFuncSuccessData,listningFuncErrorData,cepHost,cepPort,mode,secureMode){
+                   listeningFuncSuccessData,listeningFuncErrorData,cepHost,cepPort,mode,secureMode){
 
-    killPollingProcesses();
+    stopPollingProcesses();
     stream = streamName;
     streamVersion = version;
-    onSuccessFunction = listningFuncSuccessData;
-    onErrorFunction = listningFuncErrorData;
+    onSuccessFunction = listeningFuncSuccessData;
+    onErrorFunction = listeningFuncErrorData;
 
     if(secureMode == CONSTANTS.secureMode){
         transportToBeUsedHttp = CONSTANTS.urlSecureTransportHttp;
@@ -115,7 +115,7 @@ function subscribe(streamName,version,intervalTime,domain,
         processMode = mode;
     }
 
-    if(domain != CONSTANTS.superTenantId){
+    if(domain != CONSTANTS.domain){
         userDomainUrl = CONSTANTS.tenantUrlAttribute + CONSTANTS.urlSeperator + domain + CONSTANTS.urlSeperator;
 
     }
@@ -149,6 +149,7 @@ function initializeWebSocket(webSocketUrl){
  */
 
 var webSocketOnOpen = function () {
+    alert("Successfully connected to "+webSocketUrl);
     //onErrorFunction("Successfully connected to URL:" + webSocketUrl + "\n");
 };
 
@@ -158,7 +159,8 @@ var webSocketOnOpen = function () {
  */
 var webSocketOnMessage = function (evt) {
     var event = evt.data;
-    constructPayload(event);
+    var array = JSON.parse(event);
+    constructPayload(array);
 };
 
 /**
@@ -236,7 +238,10 @@ function startPoll(){
                 var eventList = $.parseJSON(responseText.events);
                 if(eventList.length != 0){
                     lastUpdatedtime = responseText.lastEventTime;
-                    constructPayload(eventList);
+                    for(var i=0;i<eventList.length;i++){
+                        var arr = eventList[i];
+                        constructPayload(arr);
+                    }
                 }
                 if(pollingContinue){
                     startPoll();
@@ -250,7 +255,7 @@ function startPoll(){
     })()
 }
 
-function killPollingProcesses(){
+function stopPollingProcesses(){
 
     //stopping the Websocket
     if(websocket != null){
@@ -265,13 +270,7 @@ function killPollingProcesses(){
 function constructPayload(eventsArray){
 
     var streamId = stream + CONSTANTS.colon + streamVersion;
-    var eventsData = {};
-    var jsonData = [];
-
-    eventsData ["source"] = streamId;
-    eventsData ["data"] = eventsArray;
-    jsonData.push(eventsData);
-    console.log(jsonData);
-    onSuccessFunction(jsonData);
+    var twoDimentionalArray = [eventsArray];
+    onSuccessFunction(streamId,twoDimentionalArray);
 
 }

@@ -13,34 +13,40 @@
   ~ specific language governing permissions and limitations under the License.
   -->
 
-<eventProcessingConfig>
+<eventProcessorConfiguration>
 
-    <processing mode="SingleNode">
+    <mode name="SingleNode">
         <persistence enable="false">
-            <persistenceIntervalInMillis>10000</persistenceIntervalInMillis>
+            <persistenceIntervalInMinutes>15</persistenceIntervalInMinutes>
             <persisterSchedulerPoolSize>10</persisterSchedulerPoolSize>
             <persister class="org.wso2.carbon.event.processor.core.internal.persistence.FileSystemPersistenceStore">
-                <property key="">value</property>
+                <property key="persistenceLocation">cep_persistence</property>
             </persister>
         </persistence>
-    </processing>
+    </mode>
 
-    <processing mode="HA">
+
+    <!-- HA Mode Config -->
+
+    <!--<mode name="HA">
+
 
         <transport>
-            <!--<hostName>localhost</hostName>-->
+            <hostName>localhost</hostName>
             <port>11224</port>
             <reconnectionInterval>20000</reconnectionInterval>
         </transport>
         <management>
-            <!--<hostName>localhost</hostName>-->
+            <hostName>localhost</hostName>
             <port>10005</port>
         </management>
-    </processing>
+    </mode>  -->
 
-    <processing mode="Distributed" class="">
 
-        <!-- CEP Node Config -->
+    <!-- Distributed Mode Config -->
+
+   <!-- <mode name="Distributed" class="">
+
         <nodeType>
             <receiver enable="true"/>
             <publisher enable="true"/>
@@ -50,7 +56,6 @@
             </manager>
         </nodeType>
 
-        <!-- CEP Storm Manager Information -->
         <management>
             <managers>
                 <manager>
@@ -67,7 +72,6 @@
             <topologyResubmitInterval>10000</topologyResubmitInterval>
         </management>
 
-        <!-- CEP Storm transport config -->
         <transport>
             <portRange>
                 <min>15000</min>
@@ -76,7 +80,6 @@
             <reconnectionInterval>20000</reconnectionInterval>
         </transport>
 
-        <!-- Siddhi-Storm Jar that will be deployed in Storm -->
         <stormJar>org.wso2.carbon.event.processor.storm.jar</stormJar>
 
         <defaultParalalisum>
@@ -86,6 +89,6 @@
 
         <distributedUIUrl></distributedUIUrl>
 
-    </processing>
-</eventProcessingConfig>
+    </mode>-->
+</eventProcessorConfiguration>
 

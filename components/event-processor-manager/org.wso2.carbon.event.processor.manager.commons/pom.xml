@@ -73,8 +73,7 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Export-Package>
-                            org.wso2.carbon.event.processor.manager.commons,
-                            org.wso2.carbon.event.processor.manager.commons.*
+                            org.wso2.carbon.event.processor.manager.commons.*,
                         </Export-Package>
                         <Import-Package>
                             !javax.xml.namespace,

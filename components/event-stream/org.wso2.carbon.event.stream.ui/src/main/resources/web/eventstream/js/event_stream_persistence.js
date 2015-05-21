@@ -13,25 +13,25 @@
  * specific language governing permissions and limitations under the License.
  */
 
-function populateAnalyticsTable(analyticsTable, columnInformation) {
+function populateAnalyticsTable(analyticsTable, columnInformation, type) {
     var tbody = analyticsTable.getElementsByTagName('tbody')[0];
     for (var i = 1; i < columnInformation.rows.length; i++) {
         var cellNo = 0;
         var meta = columnInformation.rows[i];
-        var column0 = meta.cells[0].textContent;
+        var column0 = meta.cells[0].textContent.trim();
         var column1 = meta.cells[1].textContent.trim();
         var row = tbody.insertRow(analyticsTable.rows.length - 1);
 
         var persistCell = row.insertCell(cellNo++);
         var persistCheckElement = document.createElement('input');
         persistCheckElement.type = "checkbox";
-        persistCheckElement.checked = true;
+        persistCheckElement.name = "persist";
         persistCell.appendChild(persistCheckElement);
 
         var columnCell = row.insertCell(cellNo++);
         var columnInputElement = document.createElement('label');
         columnInputElement.name = "column";
-        columnInputElement.innerHTML = column0;
+        columnInputElement.innerHTML = type + column0;
         columnCell.appendChild(columnInputElement);
 
         var typeCell = row.insertCell(cellNo++);
@@ -80,15 +80,15 @@ function createAnalyticsIndexTable() {
     }
     var metaDataTable = document.getElementById("outputMetaDataTable");
     if (metaDataTable.rows.length > 1) {
-        populateAnalyticsTable(table, metaDataTable);
+        populateAnalyticsTable(table, metaDataTable, 'meta_');
     }
     var correlationDataTable = document.getElementById("outputCorrelationDataTable");
     if (correlationDataTable.rows.length > 1) {
-        populateAnalyticsTable(table, correlationDataTable);
+        populateAnalyticsTable(table, correlationDataTable, 'correlation_');
     }
     var payloadDataTable = document.getElementById("outputPayloadDataTable");
     if (payloadDataTable.rows.length > 1) {
-        populateAnalyticsTable(table, payloadDataTable);
+        populateAnalyticsTable(table, payloadDataTable, '');
     }
 }
 
@@ -115,13 +115,12 @@ function populateAnalyticsIndexTable(eventStreamName) {
                         var columnName = row.cells[1].textContent;
                         if (columnName.trim() == resultJson[i].columnName) {
                             row.cells[0].childNodes[0].checked = true;
-                            if (row.cells[2].childNodes[0].options[row.cells[2].childNodes[0].selectedIndex].text == 'STRING') {
-                                var select = row.cells[2].childNodes[0];
-                                for (var k = 0; k < select.options.length; k++) {
-                                    if (select.options[k].text === resultJson[i].columnType) {
-                                        select.selectedIndex = k;
-                                        break;
-                                    }
+                            var select = row.cells[2].childNodes[0];
+                            if (select.value == 'string') {
+                                if (resultJson[i].columnType == 'STRING') {
+                                    select.selectedIndex = 0;
+                                } else {
+                                    select.selectedIndex = 1;
                                 }
                             }
                             row.cells[3].childNodes[0].checked = resultJson[i].primaryKey;

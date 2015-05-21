@@ -21,17 +21,16 @@ import com.hazelcast.core.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.event.processor.manager.commons.utils.ByteSerializer;
-import org.wso2.carbon.event.processor.manager.core.EventManagementService;
+import org.wso2.carbon.event.processor.manager.core.*;
 import org.wso2.carbon.event.processor.manager.core.config.HAConfiguration;
 import org.wso2.carbon.event.processor.manager.core.internal.ds.EventManagementServiceValueHolder;
 import org.wso2.carbon.event.processor.manager.core.internal.thrift.ManagementServiceClientThriftImpl;
-import org.wso2.carbon.event.processor.manager.core.internal.util.Constants;
+import org.wso2.carbon.event.processor.manager.core.internal.util.ConfigurationConstants;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
 
 
 public class HAManager {
@@ -47,27 +46,25 @@ public class HAManager {
     private IMap<String, HAConfiguration> roleToMembershipMap;
 
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
-    private Lock writeLock;
     private Future stateChanger = null;
     private String activeId;
     private String passiveId;
     private EventManagementService eventManagementService;
 
-    public HAManager(HazelcastInstance hazelcastInstance, HAConfiguration haConfiguration,
-                     Lock writeLock, EventManagementService eventManagementService) {
+
+    public HAManager(HazelcastInstance hazelcastInstance, HAConfiguration haConfiguration,EventManagementService eventManagementService) {
         this.hazelcastInstance = hazelcastInstance;
-        this.writeLock = writeLock;
         this.haConfiguration = haConfiguration;
-        activeId = Constants.ACTIVEID;
-        passiveId = Constants.PASSIVEID;
+        activeId = ConfigurationConstants.ACTIVEID;
+        passiveId = ConfigurationConstants.PASSIVEID;
         activeLock = hazelcastInstance.getLock(activeId);
         passiveLock = hazelcastInstance.getLock(passiveId);
 
-        members = hazelcastInstance.getMap(Constants.MEMBERS);
+        members = hazelcastInstance.getMap(ConfigurationConstants.MEMBERS);
         members.set(haConfiguration, true);
 
         this.eventManagementService = eventManagementService;
-        ManagementServer.start(haConfiguration);
+        SnapshotServer.start(haConfiguration);
         hazelcastInstance.getCluster().addMembershipListener(new MembershipListener() {
             @Override
             public void memberAdded(MembershipEvent membershipEvent) {
@@ -88,7 +85,7 @@ public class HAManager {
         });
 
         try {
-            roleToMembershipMap = hazelcastInstance.getMap(Constants.ROLE_MEMBERSHIP_MAP);
+            roleToMembershipMap = hazelcastInstance.getMap(ConfigurationConstants.ROLE_MEMBERSHIP_MAP);
         } catch (Exception e) {
             log.error(e);
         }
@@ -147,15 +144,23 @@ public class HAManager {
         } catch (Exception e) {
             log.error(e);
         }
-
         HAConfiguration passiveMember = roleToMembershipMap.get(passiveId);
         // Send non-duplicate events to active member
-        eventManagementService.getEventReceiverManagementService().startServer(passiveMember.getTransport());
-        eventManagementService.getEventReceiverManagementService().setOtherMember(activeMember.getTransport());
-        eventManagementService.getEventReceiverManagementService().start();
-        eventManagementService.getEventReceiverManagementService().pause();
-        eventManagementService.getEventProcessorManagementService().pause();
-        eventManagementService.getEventPublisherManagementService().setDrop(true);
+        EventReceiverManagementService eventReceiverManagementService = eventManagementService.getEventReceiverManagementService();
+        EventProcessorManagementService eventProcessorManagementService = eventManagementService.getEventProcessorManagementService();
+        EventPublisherManagementService eventPublisherManagementService =  eventManagementService.getEventPublisherManagementService();
+        if(eventReceiverManagementService != null) {
+            eventReceiverManagementService.startServer(passiveMember.getTransport());
+            eventReceiverManagementService.setOtherMember(activeMember.getTransport());
+            eventReceiverManagementService.start();
+            eventReceiverManagementService.pause();
+        }
+        if(eventProcessorManagementService!= null) {
+            eventProcessorManagementService.pause();
+        }
+        if(eventPublisherManagementService != null) {
+            eventPublisherManagementService.setDrop(true);
+        }
         ManagementServiceClient client = new ManagementServiceClientThriftImpl();
         byte[] state = null;
         try {
@@ -163,44 +168,65 @@ public class HAManager {
         } catch(Throwable e) {
             log.error(e);
         }
-        ArrayList<byte[]> stateList = (ArrayList<byte[]>) ByteSerializer.BToO(state);
+        HashMap<Manager.ManagerType,byte[]> stateMap = (HashMap<Manager.ManagerType,byte[]>) ByteSerializer.BToO(state);
         // Synchronize the duplicate events with active member
-        eventManagementService.getEventReceiverManagementService().syncState(stateList.get(1));
-        eventManagementService.getEventProcessorManagementService().restoreState(stateList.get(0));
-        eventManagementService.getEventProcessorManagementService().resume();
-        eventManagementService.getEventReceiverManagementService().resume();
-        //        writeLock.unlock();
-
+        if(eventProcessorManagementService!= null) {
+            eventProcessorManagementService.restoreState(stateMap.get(Manager.ManagerType.Processor));
+            eventProcessorManagementService.resume();
+        }
+        if(eventReceiverManagementService != null) {
+            eventReceiverManagementService.syncState(stateMap.get(Manager.ManagerType.Receiver));
+            eventReceiverManagementService.resume();
+        }
 
     }
 
     private void becomeActive() {
         EventManagementService eventManagementService = EventManagementServiceValueHolder.getEventManagementService();
+        EventReceiverManagementService eventReceiverManagementService = eventManagementService.getEventReceiverManagementService();
+        EventPublisherManagementService eventPublisherManagementService = eventManagementService.getEventPublisherManagementService();
 
         roleToMembershipMap.set(activeId, haConfiguration);
-        eventManagementService.getEventReceiverManagementService().startServer(haConfiguration.getTransport());
-        eventManagementService.getEventPublisherManagementService().setDrop(false);
-        eventManagementService.getEventReceiverManagementService().start();
+        if(eventPublisherManagementService!= null) {
+            eventPublisherManagementService.setDrop(false);
+        }
+        if(eventReceiverManagementService != null) {
+            eventReceiverManagementService.startServer(haConfiguration.getTransport());
+            eventReceiverManagementService.start();
+        }
     }
 
     public byte[] getState() {
-        eventManagementService.getEventReceiverManagementService().pause();
-        eventManagementService.getEventProcessorManagementService().pause();
-
+        EventReceiverManagementService eventReceiverManagementService = eventManagementService.getEventReceiverManagementService();
+        EventProcessorManagementService eventProcessorManagementService = eventManagementService.getEventProcessorManagementService();
         HAConfiguration passiveMember = roleToMembershipMap.get(passiveId);
-        eventManagementService.getEventReceiverManagementService().setOtherMember(passiveMember.getTransport());
+        HashMap<Manager.ManagerType,byte[]> stateMap = new HashMap<Manager.ManagerType,byte[]> ();
 
-        byte[] processorState = eventManagementService.getEventProcessorManagementService().getState();
-        byte[] receiverState = eventManagementService.getEventReceiverManagementService().getState();
 
-        ArrayList<byte[]> stateList = new ArrayList<byte[]>(2);
-        stateList.add(processorState);
-        stateList.add(receiverState);
+        if(eventProcessorManagementService != null) {
+            eventProcessorManagementService.pause();
+        }
 
-        byte[] state = ByteSerializer.OToB(stateList);
+        if(eventReceiverManagementService != null) {
+            eventReceiverManagementService.pause();
+            eventReceiverManagementService.setOtherMember(passiveMember.getTransport());
+            byte[] receiverState = eventReceiverManagementService.getState();
+            stateMap.put(Manager.ManagerType.Receiver,receiverState);
+        }
 
-        eventManagementService.getEventProcessorManagementService().resume();
-        eventManagementService.getEventReceiverManagementService().resume();
+        if(eventProcessorManagementService  != null) {
+            byte[] processorState = eventProcessorManagementService.getState();
+            stateMap.put(Manager.ManagerType.Processor,processorState);
+        }
+
+        byte[] state = ByteSerializer.OToB(stateMap);
+
+        if(eventProcessorManagementService != null) {
+            eventProcessorManagementService.resume();
+        }
+        if(eventReceiverManagementService != null) {
+            eventReceiverManagementService.resume();
+        }
 
         return state;
     }
@@ -216,6 +242,7 @@ public class HAManager {
 
         }
         stateChanger.cancel(false);
+        SnapshotServer.shutDown();
     }
 
     class PeriodicStateChanger implements Runnable {
