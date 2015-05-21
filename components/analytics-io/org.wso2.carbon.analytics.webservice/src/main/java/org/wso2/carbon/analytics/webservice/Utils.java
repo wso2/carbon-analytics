@@ -326,7 +326,7 @@ public class Utils {
         RecordValueEntryBean recordValueEntryBean = new RecordValueEntryBean();
         recordValueEntryBean.setFieldName(fieldName);
         if (value != null) {
-            switch (value.getClass().toString().toUpperCase()) {
+            switch (value.getClass().getSimpleName().toUpperCase()) {
                 case RecordValueEntryBean.STRING: {
                     recordValueEntryBean.setStringValue(String.valueOf(value));
                     recordValueEntryBean.setType(RecordValueEntryBean.STRING);
@@ -437,14 +437,14 @@ public class Utils {
         }
     }
 
-    public static Event getEvent(EventBean eventBean)
+    public static Event getEvent(EventBean eventBean, StreamDefinition streamDefinition)
             throws AnalyticsWebServiceException {
         Event event = new Event();
-        event.setStreamId(eventBean.getStreamId());
+        event.setStreamId(streamDefinition.getStreamId());
         event.setTimeStamp(eventBean.getTimeStamp());
-        event.setMetaData(getEventData(eventBean.getMetaData()));
-        event.setCorrelationData(getEventData(eventBean.getCorrelationData()));
-        event.setPayloadData(getEventData(eventBean.getPayloadData()));
+        event.setMetaData(getEventData(eventBean.getMetaData(), streamDefinition.getMetaData()));
+        event.setCorrelationData(getEventData(eventBean.getCorrelationData(), streamDefinition.getCorrelationData()));
+        event.setPayloadData(getEventData(eventBean.getPayloadData(), streamDefinition.getPayloadData()));
         event.setArbitraryDataMap(getArbitraryValues(eventBean.getArbitraryData()));
         return  event;
     }
@@ -462,36 +462,45 @@ public class Utils {
         return arbitraryDataMap;
     }
 
-    private static Object[] getEventData(RecordValueEntryBean[] valueEntryBeans)
-            throws AnalyticsWebServiceException {
+    private static Object[] getEventData(RecordValueEntryBean[] valueEntryBeans, List<Attribute> columns)
+            throws AnalyticsWebServiceException, NumberFormatException {
         List<Object> values = new ArrayList<>();
+        Map<String, AttributeType> columnMap = new HashMap<>();
+        if (columns != null) {
+            for (Attribute attribute : columns) {
+                columnMap.put(attribute.getName(), attribute.getType());
+            }
+        }
         if (valueEntryBeans != null) {
             for (RecordValueEntryBean bean : valueEntryBeans) {
-                if (bean == null) {
-                    values.add(Constants.STR_NULL);
-                } else {
-                    switch (bean.getType()) {
-                        case RecordValueEntryBean.INTEGER:
-                            values.add(bean.getIntValue());
-                            break;
-                        case RecordValueEntryBean.DOUBLE:
-                            values.add(bean.getDoubleValue());
-                            break;
-                        case RecordValueEntryBean.FLOAT:
-                            values.add(bean.getFloatValue());
-                            break;
-                        case RecordValueEntryBean.BOOLEAN:
-                            values.add(bean.getBooleanValue());
-                            break;
-                        case RecordValueEntryBean.LONG:
-                            values.add(bean.getLongValue());
-                            break;
-                        case RecordValueEntryBean.STRING:
-                            values.add(bean.getStringValue());
-                            break;
-                        default:
-                            throw new AnalyticsWebServiceException("Unkown data type found while reading event bean");
+                if (bean != null) {
+                    AttributeType type = columnMap.get(bean.getFieldName());
+                    if (type != null) {
+                        switch (type) {
+                            case DOUBLE:
+                                values.add(bean.getDoubleValue());
+                                break;
+                            case INT:
+                                values.add(new Double(bean.getDoubleValue()).intValue());
+                                break;
+                            case BOOL:
+                                values.add(bean.getBooleanValue());
+                                break;
+                            case LONG:
+                                values.add(new Double(bean.getDoubleValue()).longValue());
+                                break;
+                            case FLOAT:
+                                values.add(new Double(bean.getDoubleValue()).floatValue());
+                                break;
+                            case STRING:
+                                values.add(bean.getStringValue());
+                                break;
+                            default:
+                                throw new AnalyticsWebServiceException("DataType is not valid for [" + bean.getFieldName());
+                        }
                     }
+                } else {
+                    throw new AnalyticsWebServiceException("Type is not defined for field: " + bean.getFieldName());
                 }
             }
         }

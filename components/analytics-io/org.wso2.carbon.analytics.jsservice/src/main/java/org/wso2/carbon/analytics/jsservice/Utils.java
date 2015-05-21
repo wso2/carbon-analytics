@@ -157,18 +157,9 @@ public class Utils {
             RecordValueEntryBean recordValueEntryBean = new RecordValueEntryBean();
             recordValueEntryBean.setFieldName(entry.getKey());
             Object value = entry.getValue();
-            if (value instanceof Integer) {
-                recordValueEntryBean.setType("INTEGER");
-                recordValueEntryBean.setIntValue(((Integer) value));
-            } else if (value instanceof Long) {
-                recordValueEntryBean.setType("LONG");
-                recordValueEntryBean.setLongValue(((Long) value));
-            } else if (value instanceof Double) {
+            if (value instanceof Number) {
                 recordValueEntryBean.setType("DOUBLE");
                 recordValueEntryBean.setDoubleValue(((Double) value));
-            } else if (value instanceof Float) {
-                recordValueEntryBean.setType("FLOAT");
-                recordValueEntryBean.setFloatValue(((Float) value));
             } else if (value instanceof Boolean) {
                 recordValueEntryBean.setType("BOOLEAN");
                 recordValueEntryBean.setBooleanValue(((Boolean) value));
@@ -439,7 +430,8 @@ public class Utils {
         org.wso2.carbon.analytics.webservice.stub.beans.EventBean bean =
                 new org.wso2.carbon.analytics.webservice.stub.beans.EventBean();
         bean.setTimeStamp(eventBean.getTimeStamp());
-        bean.setStreamId(eventBean.getStreamId());
+        bean.setStreamName(eventBean.getStreamName());
+        bean.setStreamVersion(eventBean.getStreamVersion());
         Map<String, Object> metaData = eventBean.getMetaData();
         Map<String, Object> correlationData = eventBean.getCorrelationData();
         Map<String, Object> payloadData = eventBean.getPayloadData();
@@ -472,7 +464,9 @@ public class Utils {
     private static Map<String, String> getStreamAttributesAsMap(StreamDefAttributeBean[] attributeBeans) {
         Map<String, String> attributeMap= new LinkedHashMap<>();
         for (StreamDefAttributeBean bean : attributeBeans) {
-            attributeMap.put(bean.getName(), bean.getType());
+            if (bean != null) {
+                attributeMap.put(bean.getName(), bean.getType());
+            }
         }
         return attributeMap;
     }

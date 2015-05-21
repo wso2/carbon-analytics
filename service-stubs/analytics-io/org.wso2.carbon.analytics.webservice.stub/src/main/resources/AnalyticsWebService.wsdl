@@ -118,7 +118,8 @@
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="correlationData" nillable="true" type="ax223:RecordValueEntryBean"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="metaData" nillable="true" type="ax223:RecordValueEntryBean"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="payloadData" nillable="true" type="ax223:RecordValueEntryBean"/>
-                    <xs:element minOccurs="0" name="streamId" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="streamName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="streamVersion" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="timeStamp" type="xs:long"/>
                 </xs:sequence>
             </xs:complexType>
@@ -200,20 +201,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="tableExists">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="tableExistsResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
             <xs:element name="listTables">
                 <xs:complexType>
                     <xs:sequence/>
@@ -290,6 +277,20 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="tableExists">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="tableExistsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="drillDownSearchCount">
                 <xs:complexType>
                     <xs:sequence>
@@ -325,13 +326,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="AnalyticsWebServiceMalformedStreamDefinitionException">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="MalformedStreamDefinitionException" nillable="true" type="ax225:MalformedStreamDefinitionException"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
             <xs:element name="getStreamDefinition">
                 <xs:complexType>
                     <xs:sequence>
@@ -351,6 +345,13 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="eventBean" nillable="true" type="ax223:EventBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="AnalyticsWebServiceMalformedStreamDefinitionException">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="MalformedStreamDefinitionException" nillable="true" type="ax225:MalformedStreamDefinitionException"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -447,17 +448,17 @@
     <wsdl:message name="searchResponse">
         <wsdl:part name="parameters" element="ns:searchResponse"/>
     </wsdl:message>
-    <wsdl:message name="isPaginationSupportedRequest">
-        <wsdl:part name="parameters" element="ns:isPaginationSupported"/>
-    </wsdl:message>
-    <wsdl:message name="isPaginationSupportedResponse">
-        <wsdl:part name="parameters" element="ns:isPaginationSupportedResponse"/>
-    </wsdl:message>
     <wsdl:message name="tableExistsRequest">
         <wsdl:part name="parameters" element="ns:tableExists"/>
     </wsdl:message>
     <wsdl:message name="tableExistsResponse">
         <wsdl:part name="parameters" element="ns:tableExistsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="isPaginationSupportedRequest">
+        <wsdl:part name="parameters" element="ns:isPaginationSupported"/>
+    </wsdl:message>
+    <wsdl:message name="isPaginationSupportedResponse">
+        <wsdl:part name="parameters" element="ns:isPaginationSupportedResponse"/>
     </wsdl:message>
     <wsdl:message name="addStreamDefinitionRequest">
         <wsdl:part name="parameters" element="ns:addStreamDefinition"/>
@@ -539,14 +540,14 @@
             <wsdl:output message="ns:searchResponse" wsaw:Action="urn:searchResponse"/>
             <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:searchAnalyticsWebServiceAnalyticsWebServiceException"/>
         </wsdl:operation>
-        <wsdl:operation name="isPaginationSupported">
-            <wsdl:input message="ns:isPaginationSupportedRequest" wsaw:Action="urn:isPaginationSupported"/>
-            <wsdl:output message="ns:isPaginationSupportedResponse" wsaw:Action="urn:isPaginationSupportedResponse"/>
-        </wsdl:operation>
         <wsdl:operation name="tableExists">
             <wsdl:input message="ns:tableExistsRequest" wsaw:Action="urn:tableExists"/>
             <wsdl:output message="ns:tableExistsResponse" wsaw:Action="urn:tableExistsResponse"/>
             <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:tableExistsAnalyticsWebServiceAnalyticsWebServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="isPaginationSupported">
+            <wsdl:input message="ns:isPaginationSupportedRequest" wsaw:Action="urn:isPaginationSupported"/>
+            <wsdl:output message="ns:isPaginationSupportedResponse" wsaw:Action="urn:isPaginationSupportedResponse"/>
         </wsdl:operation>
         <wsdl:operation name="addStreamDefinition">
             <wsdl:input message="ns:addStreamDefinitionRequest" wsaw:Action="urn:addStreamDefinition"/>
@@ -575,7 +576,6 @@
             <wsdl:input message="ns:getStreamDefinitionRequest" wsaw:Action="urn:getStreamDefinition"/>
             <wsdl:output message="ns:getStreamDefinitionResponse" wsaw:Action="urn:getStreamDefinitionResponse"/>
             <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getStreamDefinitionAnalyticsWebServiceAnalyticsWebServiceException"/>
-            <wsdl:fault message="ns:AnalyticsWebServiceMalformedStreamDefinitionException" name="AnalyticsWebServiceMalformedStreamDefinitionException" wsaw:Action="urn:getStreamDefinitionAnalyticsWebServiceMalformedStreamDefinitionException"/>
         </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="AnalyticsWebServiceSoap11Binding" type="ns:AnalyticsWebServicePortType">
@@ -697,6 +697,15 @@
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
+        <wsdl:operation name="isPaginationSupported">
+            <soap:operation soapAction="urn:isPaginationSupported" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="tableExists">
             <soap:operation soapAction="urn:tableExists" style="document"/>
             <wsdl:input>
@@ -708,15 +717,6 @@
             <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="isPaginationSupported">
-            <soap:operation soapAction="urn:isPaginationSupported" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap:body use="literal"/>
-            </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="addStreamDefinition">
             <soap:operation soapAction="urn:addStreamDefinition" style="document"/>
@@ -782,9 +782,6 @@
             </wsdl:output>
             <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
                 <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-            <wsdl:fault name="AnalyticsWebServiceMalformedStreamDefinitionException">
-                <soap:fault use="literal" name="AnalyticsWebServiceMalformedStreamDefinitionException"/>
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -907,6 +904,15 @@
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
+        <wsdl:operation name="isPaginationSupported">
+            <soap12:operation soapAction="urn:isPaginationSupported" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="tableExists">
             <soap12:operation soapAction="urn:tableExists" style="document"/>
             <wsdl:input>
@@ -918,15 +924,6 @@
             <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="isPaginationSupported">
-            <soap12:operation soapAction="urn:isPaginationSupported" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap12:body use="literal"/>
-            </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="addStreamDefinition">
             <soap12:operation soapAction="urn:addStreamDefinition" style="document"/>
@@ -992,9 +989,6 @@
             </wsdl:output>
             <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
-            </wsdl:fault>
-            <wsdl:fault name="AnalyticsWebServiceMalformedStreamDefinitionException">
-                <soap12:fault use="literal" name="AnalyticsWebServiceMalformedStreamDefinitionException"/>
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -1087,8 +1081,8 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="tableExists">
-            <http:operation location="tableExists"/>
+        <wsdl:operation name="isPaginationSupported">
+            <http:operation location="isPaginationSupported"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -1096,8 +1090,8 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="isPaginationSupported">
-            <http:operation location="isPaginationSupported"/>
+        <wsdl:operation name="tableExists">
+            <http:operation location="tableExists"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -1153,13 +1147,13 @@
     </wsdl:binding>
     <wsdl:service name="AnalyticsWebService">
         <wsdl:port name="AnalyticsWebServiceHttpsSoap11Endpoint" binding="ns:AnalyticsWebServiceSoap11Binding">
-            <soap:address location="https://10.100.5.97:9443/services/AnalyticsWebService.AnalyticsWebServiceHttpsSoap11Endpoint/"/>
+            <soap:address location="https://192.168.200.1:9443/services/AnalyticsWebService.AnalyticsWebServiceHttpsSoap11Endpoint/"/>
         </wsdl:port>
         <wsdl:port name="AnalyticsWebServiceHttpsSoap12Endpoint" binding="ns:AnalyticsWebServiceSoap12Binding">
-            <soap12:address location="https://10.100.5.97:9443/services/AnalyticsWebService.AnalyticsWebServiceHttpsSoap12Endpoint/"/>
+            <soap12:address location="https://192.168.200.1:9443/services/AnalyticsWebService.AnalyticsWebServiceHttpsSoap12Endpoint/"/>
         </wsdl:port>
         <wsdl:port name="AnalyticsWebServiceHttpsEndpoint" binding="ns:AnalyticsWebServiceHttpBinding">
-            <http:address location="https://10.100.5.97:9443/services/AnalyticsWebService.AnalyticsWebServiceHttpsEndpoint/"/>
+            <http:address location="https://192.168.200.1:9443/services/AnalyticsWebService.AnalyticsWebServiceHttpsEndpoint/"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

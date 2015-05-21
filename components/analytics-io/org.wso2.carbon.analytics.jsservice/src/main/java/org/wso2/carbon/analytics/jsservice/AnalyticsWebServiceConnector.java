@@ -151,7 +151,7 @@ public class AnalyticsWebServiceConnector {
         }
     }*/
 
-    public String tableExists(String tableName) {
+    public ResponseBean tableExists(String tableName) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking tableExists for table: " + tableName);
         }
@@ -161,23 +161,23 @@ public class AnalyticsWebServiceConnector {
                 logger.debug("Table's Existance : " + tableExists);
             }
             if (!tableExists) {
-                return gson.toJson(handleResponse(ResponseStatus.NON_EXISTENT,
-                                                  "Table : " + tableName + " does not exist."));
+                return handleResponse(ResponseStatus.NON_EXISTENT,
+                                      "Table : " + tableName + " does not exist.");
             }
         } catch (RemoteException e) {
             logger.error("Failed to check the existance of the table: " + e.getMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to check the existance of table: " +
-                                                              tableName + ": " + e.getMessage()));
+            return handleResponse(ResponseStatus.FAILED, "Failed to check the existance of table: " +
+                                                         tableName + ": " + e.getMessage());
         } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
             logger.error("Failed to check the existance of the table: " + e.getFaultMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to check the existance of table: " +
-                                                                     tableName + ": " + e.getFaultMessage()));
+            return handleResponse(ResponseStatus.FAILED, "Failed to check the existance of table: " +
+                                                         tableName + ": " + e.getFaultMessage());
         }
-        return gson.toJson(handleResponse(ResponseStatus.SUCCESS,
-                                          "Table : " + tableName + " exists."));
+        return handleResponse(ResponseStatus.SUCCESS,
+                              "Table : " + tableName + " exists.");
     }
 
-    public String addStreamDefinition(String streamDefAsString) {
+    public ResponseBean addStreamDefinition(String streamDefAsString) {
         if (logger.isDebugEnabled()) {
             logger.debug("invoking addStreamDefinition");
         }
@@ -185,26 +185,26 @@ public class AnalyticsWebServiceConnector {
             if (streamDefAsString != null && !streamDefAsString.isEmpty()) {
                 StreamDefinitionBean streamDefinitionBean = gson.fromJson(streamDefAsString, StreamDefinitionBean.class);
                 String streamId = analyticsWebServiceStub.addStreamDefinition(Utils.getStreamDefinition(streamDefinitionBean));
-                return gson.toJson(streamId);
+                return handleResponse(ResponseStatus.CREATED, streamId);
             } else {
-                return gson.toJson(handleResponse(ResponseStatus.NON_EXISTENT, "StreamDefinition is not given"));
+                return handleResponse(ResponseStatus.NON_EXISTENT, "StreamDefinition is not given");
             }
         } catch (RemoteException e) {
             logger.error("Failed to add the stream definition: " + e.getMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to add the stream definition: " +
-                                                                     ": " + e.getMessage()));
+            return handleResponse(ResponseStatus.FAILED, "Failed to add the stream definition: " +
+                                                                     ": " + e.getMessage());
         } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
             logger.error("Failed to add the stream definition: " + e.getFaultMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to add the stream definition: " +
-                                                                     ": " + e.getFaultMessage()));
+            return handleResponse(ResponseStatus.FAILED, "Failed to add the stream definition: " +
+                                                                     ": " + e.getFaultMessage());
         } catch (AnalyticsWebServiceMalformedStreamDefinitionExceptionException e) {
             logger.error("Failed to add the stream definition: " + e.getFaultMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to add the stream definition: " +
-                                                                     ": " + e.getFaultMessage()));
+            return handleResponse(ResponseStatus.FAILED, "Failed to add the stream definition: " +
+                                                                     ": " + e.getFaultMessage());
         }
     }
 
-    public String getStreamDefinition(String requestAsString) {
+    public ResponseBean getStreamDefinition(String requestAsString) {
         try {
             if (requestAsString != null && !requestAsString.isEmpty()) {
                 StreamDefinitionQueryBean queryBean = gson.fromJson(requestAsString, StreamDefinitionQueryBean.class);
@@ -215,26 +215,22 @@ public class AnalyticsWebServiceConnector {
                 org.wso2.carbon.analytics.webservice.stub.beans.StreamDefinitionBean streamDefinitionBean =
                         analyticsWebServiceStub.getStreamDefinition(queryBean.getName(), queryBean.getVersion());
                 StreamDefinitionBean streamDefinition = Utils.getStreamDefinitionBean(streamDefinitionBean);
-                return gson.toJson(streamDefinition);
+                return handleResponse(ResponseStatus.SUCCESS, gson.toJson(streamDefinition));
             } else {
-                return gson.toJson(handleResponse(ResponseStatus.NON_EXISTENT, "Name of the Stream is not given"));
+                return handleResponse(ResponseStatus.NON_EXISTENT, "Name of the Stream is not given");
             }
         } catch (RemoteException e) {
             logger.error("Failed to get the stream definition: " + e.getMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get the stream definition: " +
-                                                                     ": " + e.getMessage()));
+            return handleResponse(ResponseStatus.FAILED, "Failed to get the stream definition: " +
+                                                         ": " + e.getMessage());
         } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
             logger.error("Failed to get the stream definition: " + e.getFaultMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get the stream definition: " +
-                                                                     ": " + e.getFaultMessage()));
-        } catch (AnalyticsWebServiceMalformedStreamDefinitionExceptionException e) {
-            logger.error("Failed to get the stream definition: " + e.getFaultMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get the stream definition: " +
-                                                                     ": " + e.getFaultMessage()));
+            return handleResponse(ResponseStatus.FAILED, "Failed to get the stream definition: " +
+                                                         ": " + e.getFaultMessage());
         }
     }
 
-    public String publishEvent(String eventAsString) {
+    public ResponseBean publishEvent(String eventAsString) {
         if (logger.isDebugEnabled()) {
             logger.debug("invoking publishEvent");
         }
@@ -242,35 +238,36 @@ public class AnalyticsWebServiceConnector {
             if (eventAsString != null && !eventAsString.isEmpty()) {
                 EventBean eventBean = gson.fromJson(eventAsString, EventBean.class);
                 if (logger.isDebugEnabled()) {
-                    logger.debug("publishing event: stream id: " + eventBean.getStreamId());
+                    logger.debug("publishing event: stream : " + eventBean.getStreamName() + ", version: " +
+                                 eventBean.getStreamVersion());
                 }
                 analyticsWebServiceStub.publishEvent(Utils.getStreamEvent(eventBean));
-                return gson.toJson(handleResponse(ResponseStatus.SUCCESS, "Event published successfully"));
+                return handleResponse(ResponseStatus.SUCCESS, "Event published successfully");
 
             } else {
-                return gson.toJson(handleResponse(ResponseStatus.NON_EXISTENT, "Stream event is not provided"));
+                return handleResponse(ResponseStatus.NON_EXISTENT, "Stream event is not provided");
             }
         } catch (RemoteException e) {
             logger.error("Failed to publish event: " + e.getMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to publish event: " +
-                                                                     ": " + e.getMessage()));
+            return handleResponse(ResponseStatus.FAILED, "Failed to publish event: " +
+                                                         ": " + e.getMessage());
         } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
             logger.error("Failed to publish event: " + e.getFaultMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to publish event: " +
-                                                                     ": " + e.getFaultMessage()));
+            return handleResponse(ResponseStatus.FAILED, "Failed to publish event: " +
+                                                         ": " + e.getFaultMessage());
         }
     }
 
-    public String getTableList() {
+    public ResponseBean getTableList() {
         String[] tableList;
         try {
             tableList = analyticsWebServiceStub.listTables();
         } catch (RemoteException e) {
             logger.error("Unable to get table list:" + e.getMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Unable to get table list: " + e.getMessage()));
+            return handleResponse(ResponseStatus.FAILED, "Unable to get table list: " + e.getMessage());
         } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
             logger.error("Unable to get table list:" + e.getFaultMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Unable to get table list: " + e.getFaultMessage()));
+            return handleResponse(ResponseStatus.FAILED, "Unable to get table list: " + e.getFaultMessage());
         }
         if (tableList == null) {
             if (logger.isDebugEnabled()) {
@@ -278,7 +275,7 @@ public class AnalyticsWebServiceConnector {
             }
             tableList = new String[0];
         }
-        return gson.toJson(tableList);
+        return handleResponse(ResponseStatus.SUCCESS, gson.toJson(tableList));
     }
 
     /*public String deleteTable(String tableName) {
@@ -363,7 +360,7 @@ public class AnalyticsWebServiceConnector {
         }
     }*/
 
-    public String getRecordCount(String tableName) {
+    public ResponseBean getRecordCount(String tableName) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking getRecordCount for tableName: " + tableName);
         }
@@ -372,19 +369,19 @@ public class AnalyticsWebServiceConnector {
             if (logger.isDebugEnabled()) {
                 logger.debug("RecordCount for tableName: " + tableName + " is " + recordCount);
             }
-            return gson.toJson(handleResponse(ResponseStatus.SUCCESS, (new Long(recordCount)).toString()));
+            return handleResponse(ResponseStatus.SUCCESS, (new Long(recordCount)).toString());
         } catch (RemoteException e) {
             logger.error("Failed to get record count for table: " + tableName + ": " + e.getMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get record count for table: " +
-                                                                     tableName + ": " + e.getMessage()));
+            return handleResponse(ResponseStatus.FAILED, "Failed to get record count for table: " +
+                                                         tableName + ": " + e.getMessage());
         } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
             logger.error("Failed to get record count for table: " + tableName + ": " + e.getFaultMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get record count for table: " +
-                                                                     tableName + ": " + e.getFaultMessage()));
+            return handleResponse(ResponseStatus.FAILED, "Failed to get record count for table: " +
+                                                         tableName + ": " + e.getFaultMessage());
         }
     }
 
-    public String getRecordsByRange(String tableName, String timeFrom, String timeTo, String recordsFrom,
+    public ResponseBean getRecordsByRange(String tableName, String timeFrom, String timeTo, String recordsFrom,
                                     String count, String columns) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking getRecordByRange for tableName: " + tableName);
@@ -407,31 +404,31 @@ public class AnalyticsWebServiceConnector {
                                                                  from, to, start, recordCount);
             }
             List<Record> records = Utils.getRecordBeans(recordBeans);
-            return gson.toJson(records);
+            return handleResponse(ResponseStatus.SUCCESS, gson.toJson(records));
         } catch (RemoteException e) {
             logger.error("failed to get records from table: '" + tableName + "', " + e.getMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get records from table: '" +
-                                                                     tableName + "', " + e.getMessage()));
+            return handleResponse(ResponseStatus.FAILED, "Failed to get records from table: '" +
+                                                         tableName + "', " + e.getMessage());
         } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
             logger.error("failed to get records from table: '" + tableName + "', " + e.getFaultMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get records from table: '" +
-                                                                     tableName + "', " + e.getFaultMessage()));
+            return handleResponse(ResponseStatus.FAILED, "Failed to get records from table: '" +
+                                                         tableName + "', " + e.getFaultMessage());
         } catch (JSServiceException e) {
             logger.error("failed to get records from table: '" + tableName + "', " + e.getMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get records from table: '" +
-                                                                     tableName + "', " + e.getMessage()));
+            return handleResponse(ResponseStatus.FAILED, "Failed to get records from table: '" +
+                                                         tableName + "', " + e.getMessage());
         }
     }
 
     private Long validateNumericValue(String field, String value) throws JSServiceException {
         if (value == null || !NumberUtils.isNumber(value)) {
-            throw new JSServiceException("'" + field + "' is not numeric");
+            throw new JSServiceException("'" + field + "' is not numeric (value is + " + value + ")");
         } else {
             return Long.parseLong(value);
         }
     }
 
-    public String getRecordsByIds(String tableName, String idsAsString) {
+    public ResponseBean getRecordsByIds(String tableName, String idsAsString) {
         if (idsAsString != null && !idsAsString.isEmpty()) {
             try {
                 Type idsType = new TypeToken<List<String>>() {
@@ -443,18 +440,18 @@ public class AnalyticsWebServiceConnector {
                 }
                 RecordBean[] recordBeans = analyticsWebServiceStub.getById(tableName, 1, null, idArray);
                 List<Record> records = Utils.getRecordBeans(recordBeans);
-                return gson.toJson(records);
+                return handleResponse(ResponseStatus.SUCCESS, gson.toJson(records));
             } catch (RemoteException e) {
                 logger.error("failed to get records from table: " + tableName + " : " + e.getMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get records from table: " +
-                                                                         tableName + ": " + e.getMessage()));
+                return handleResponse(ResponseStatus.FAILED, "Failed to get records from table: " +
+                                                             tableName + ": " + e.getMessage());
             } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
                 logger.error("failed to get records from table: " + tableName + " : " + e.getFaultMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get records from table: " +
-                                                                         tableName + ": " + e.getFaultMessage()));
+                return handleResponse(ResponseStatus.FAILED, "Failed to get records from table: " +
+                                                             tableName + ": " + e.getFaultMessage());
             }
         } else {
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Id list is empty"));
+            return handleResponse(ResponseStatus.FAILED, "Id list is empty");
         }
     }
 
@@ -526,27 +523,27 @@ public class AnalyticsWebServiceConnector {
         }
     }*/
 
-    public String clearIndexData(String tableName) {
+    public ResponseBean clearIndexData(String tableName) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking clearIndexData for tableName : " +
                          tableName);
         }
         try {
             analyticsWebServiceStub.clearIndices(tableName);
-            return gson.toJson(handleResponse(ResponseStatus.SUCCESS, "Successfully cleared indices in table: " +
-                                                                      tableName));
+            return handleResponse(ResponseStatus.SUCCESS, "Successfully cleared indices in table: " +
+                                                          tableName);
         } catch (RemoteException e) {
             logger.error("Failed to clear indices for table: " + tableName + ": " + e.getMessage());
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to clear indices for table: " +
-                                                                     tableName + ": " + e.getMessage()));
+            return handleResponse(ResponseStatus.FAILED, "Failed to clear indices for table: " +
+                                                         tableName + ": " + e.getMessage());
         } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
             logger.error("Failed to clear indices for table: " + tableName + ": " + e.getFaultMessage());
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to clear indices for table: " +
-                                                                     tableName + ": " + e.getFaultMessage()));
+            return handleResponse(ResponseStatus.FAILED, "Failed to clear indices for table: " +
+                                                         tableName + ": " + e.getFaultMessage());
         }
     }
 
-    public String search(String tableName, String queryAsString) {
+    public ResponseBean search(String tableName, String queryAsString) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking search for tableName : " + tableName);
         }
@@ -563,25 +560,25 @@ public class AnalyticsWebServiceConnector {
                                      record.toString());
                     }
                 }
-                return gson.toJson(records);
+                return handleResponse(ResponseStatus.SUCCESS, gson.toJson(records));
             } catch (RemoteException e) {
                 logger.error("Failed to perform search on table: " + tableName + " : " +
                              e.getMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED,
-                          "Failed to perform search on table: " + tableName + ": " + e.getMessage()));
+                return handleResponse(ResponseStatus.FAILED,
+                                      "Failed to perform search on table: " + tableName + ": " + e.getMessage());
             } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
                 logger.error("Failed to perform search on table: " + tableName + " : " +
                              e.getFaultMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED,
-                                                  "Failed to perform search on table: " + tableName + ": "
-                                                  + e.getFaultMessage()));
+                return handleResponse(ResponseStatus.FAILED,
+                                      "Failed to perform search on table: " + tableName + ": "
+                                      + e.getFaultMessage());
             }
         } else {
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Search parameters are not provided"));
+            return handleResponse(ResponseStatus.FAILED, "Search parameters are not provided");
         }
     }
 
-    public String searchCount(String tableName, String queryAsString) {
+    public ResponseBean searchCount(String tableName, String queryAsString) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking search count for tableName : " + tableName);
         }
@@ -592,38 +589,38 @@ public class AnalyticsWebServiceConnector {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Search count : " + result);
                 }
-                return gson.toJson(result);
+                return handleResponse(ResponseStatus.SUCCESS, gson.toJson(result));
             } catch (RemoteException e) {
                 logger.error("Failed to get the record count for table: " + tableName +
                              " : " + e.getMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED,
-                            " Failed to get the record count for table: " + tableName + ": " + e.getMessage()));
+                return handleResponse(ResponseStatus.FAILED,
+                                      " Failed to get the record count for table: " + tableName + ": " + e.getMessage());
             } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
                 logger.error("Failed to get the record count for table: " + tableName +
                              " : " + e.getFaultMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED,
-                            " Failed to get the record count for table: " + tableName + ": " + e.getFaultMessage()));
+                return handleResponse(ResponseStatus.FAILED,
+                                      " Failed to get the record count for table: " + tableName + ": " + e.getFaultMessage());
             }
         } else {
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, " Search parameters not provided"));
+            return handleResponse(ResponseStatus.FAILED, " Search parameters not provided");
         }
     }
 
-    public String waitForIndexing(long seconds) {
+    public ResponseBean waitForIndexing(long seconds) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking waiting for indexing - timeout : " + seconds + " seconds");
         }
         try {
             analyticsWebServiceStub.waitForIndexing(seconds * Constants.MILLISECONDSPERSECOND);
-            return gson.toJson(handleResponse(ResponseStatus.SUCCESS, "Indexing Completed successfully"));
+            return handleResponse(ResponseStatus.SUCCESS, "Indexing Completed successfully");
         } catch (RemoteException e) {
             logger.error("Failed to wait till indexing finishes: " + e.getMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED,
-                                              "Failed to wait till indexing finishes: " + e.getMessage()));
+            return handleResponse(ResponseStatus.FAILED,
+                                  "Failed to wait till indexing finishes: " + e.getMessage());
         } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
             logger.error("Failed to wait till indexing finishes: " + e.getFaultMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED,
-                                              "Failed to wait till indexing finishes: " + e.getFaultMessage()));
+            return handleResponse(ResponseStatus.FAILED,
+                                  "Failed to wait till indexing finishes: " + e.getFaultMessage());
         }
     }
 
@@ -653,7 +650,7 @@ public class AnalyticsWebServiceConnector {
         }
     }*/
 
-    public String getTableSchema(String tableName) {
+    public ResponseBean getTableSchema(String tableName) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking getTableSchema for table : " + tableName);
         }
@@ -661,32 +658,32 @@ public class AnalyticsWebServiceConnector {
             org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsSchemaBean
                     analyticsSchema = analyticsWebServiceStub.getTableSchema(tableName);
             AnalyticsSchemaBean analyticsSchemaBean = Utils.createTableSchemaBean(analyticsSchema);
-            return gson.toJson(analyticsSchemaBean);
+            return handleResponse(ResponseStatus.SUCCESS, gson.toJson(analyticsSchemaBean));
         } catch (RemoteException e) {
             logger.error("Failed to get the table schema for table: " + tableName + " : " + e.getMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get the table schema for table: " +
-                                              tableName + ": " + e.getMessage()));
+            return handleResponse(ResponseStatus.FAILED, "Failed to get the table schema for table: " +
+                                                         tableName + ": " + e.getMessage());
         } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
             logger.error("Failed to get the table schema for table: " + tableName + " : " + e.getFaultMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Failed to get the table schema for table: " +
-                                                                     tableName + ": " + e.getFaultMessage()));
+            return handleResponse(ResponseStatus.FAILED, "Failed to get the table schema for table: " +
+                                                         tableName + ": " + e.getFaultMessage());
         }
     }
 
-    public String isPaginationSupported() {
+    public ResponseBean isPaginationSupported() {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking isPaginationSupported");
         }
         try {
-            return gson.toJson(analyticsWebServiceStub.isPaginationSupported());
+            return handleResponse(ResponseStatus.SUCCESS, gson.toJson(analyticsWebServiceStub.isPaginationSupported()));
         } catch (RemoteException e) {
             logger.error("Failed to check pagination support" + e.getMessage(), e);
-            return gson.toJson(handleResponse(ResponseStatus.FAILED,
-                                              "Failed to check pagination support: " + e.getMessage()));
+            return handleResponse(ResponseStatus.FAILED,
+                                  "Failed to check pagination support: " + e.getMessage());
         }
     }
 
-    public String drillDownCategories(String tableName, String queryAsString) {
+    public ResponseBean drillDownCategories(String tableName, String queryAsString) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking drillDownCategories for tableName : " + tableName);
         }
@@ -704,27 +701,27 @@ public class AnalyticsWebServiceConnector {
                                  " values :" + subCategories.getCategories());
 
                 }
-                return gson.toJson(subCategories);
+                return handleResponse(ResponseStatus.SUCCESS, gson.toJson(subCategories));
             } catch (RemoteException e) {
                 logger.error("Failed to perform categoryDrilldown on table: " + tableName + " : " +
                              e.getMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED,
-                                                  "Failed to perform Category Drilldown on table: " +
-                                                  tableName + ": " + e.getMessage()));
+                return handleResponse(ResponseStatus.FAILED,
+                                      "Failed to perform Category Drilldown on table: " +
+                                      tableName + ": " + e.getMessage());
             } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
                 logger.error("Failed to perform categoryDrilldown on table: " + tableName + " : " +
                              e.getFaultMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED,
-                                                  "Failed to perform Category Drilldown on table: " +
-                                                  tableName + ": " + e.getFaultMessage()));
+                return handleResponse(ResponseStatus.FAILED,
+                                      "Failed to perform Category Drilldown on table: " +
+                                      tableName + ": " + e.getFaultMessage());
             }
         } else {
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "Category drilldown parameters " +
-                                                                     "are not provided"));
+            return handleResponse(ResponseStatus.FAILED, "Category drilldown parameters " +
+                                                         "are not provided");
         }
     }
 
-    public String drillDownSearch(String tableName, String queryAsString) {
+    public ResponseBean drillDownSearch(String tableName, String queryAsString) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking drillDownCategories for tableName : " + tableName);
         }
@@ -743,27 +740,27 @@ public class AnalyticsWebServiceConnector {
                                      record.toString());
                     }
                 }
-                return gson.toJson(recordBeans);
+                return handleResponse(ResponseStatus.SUCCESS, gson.toJson(recordBeans));
             } catch (RemoteException e) {
                 logger.error("Failed to perform DrilldownSearch on table: " + tableName + " : " +
                              e.getMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED,
-                                                  "Failed to perform DrilldownSearch on table: " +
-                                                  tableName + ": " + e.getMessage()));
+                return handleResponse(ResponseStatus.FAILED,
+                                      "Failed to perform DrilldownSearch on table: " +
+                                      tableName + ": " + e.getMessage());
             } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
                 logger.error("Failed to perform DrilldownSearch on table: " + tableName + " : " +
                              e.getFaultMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED,
-                                                  "Failed to perform DrilldownSearch on table: " +
-                                                  tableName + ": " + e.getFaultMessage()));
+                return handleResponse(ResponseStatus.FAILED,
+                                      "Failed to perform DrilldownSearch on table: " +
+                                      tableName + ": " + e.getFaultMessage());
             }
         } else {
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "drilldownSearch parameters " +
-                                                                     "are not provided"));
+            return handleResponse(ResponseStatus.FAILED, "drilldownSearch parameters " +
+                                                         "are not provided");
         }
     }
 
-    public String drillDownSearchCount(String tableName, String queryAsString) {
+    public ResponseBean drillDownSearchCount(String tableName, String queryAsString) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking drillDownCategories for tableName : " + tableName);
         }
@@ -778,23 +775,23 @@ public class AnalyticsWebServiceConnector {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Search count Result -- Record Count: " + count);
                 }
-                return gson.toJson(count);
+                return handleResponse(ResponseStatus.SUCCESS, gson.toJson(count));
             } catch (RemoteException e) {
                 logger.error("Failed to perform DrilldownSearch Count on table: " + tableName + " : " +
                              e.getMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED,
-                                                  "Failed to perform DrilldownSearch Count on table: " +
-                                                  tableName + ": " + e.getMessage()));
+                return handleResponse(ResponseStatus.FAILED,
+                                      "Failed to perform DrilldownSearch Count on table: " +
+                                      tableName + ": " + e.getMessage());
             } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
                 logger.error("Failed to perform DrilldownSearch Count on table: " + tableName + " : " +
                              e.getFaultMessage(), e);
-                return gson.toJson(handleResponse(ResponseStatus.FAILED,
-                                                  "Failed to perform DrilldownSearch Count on table: " +
-                                                  tableName + ": " + e.getFaultMessage()));
+                return handleResponse(ResponseStatus.FAILED,
+                                      "Failed to perform DrilldownSearch Count on table: " +
+                                      tableName + ": " + e.getFaultMessage());
             }
         } else {
-            return gson.toJson(handleResponse(ResponseStatus.FAILED, "drilldownSearch parameters " +
-                                                                     "are not provided"));
+            return handleResponse(ResponseStatus.FAILED, "drilldownSearch parameters " +
+                                                         "are not provided");
         }
     }
 

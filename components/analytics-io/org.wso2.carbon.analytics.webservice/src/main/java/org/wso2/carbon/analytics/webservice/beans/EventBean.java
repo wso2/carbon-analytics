@@ -31,7 +31,8 @@ import java.io.Serializable;
 public class EventBean implements Serializable {
 
     private static final long serialVersionUID = -8366231301934561565L;
-    private String streamId;
+    private String streamName;
+    private String streamVersion;
     private long timeStamp;
     private RecordValueEntryBean[] metaData;
     private RecordValueEntryBean[] correlationData;
@@ -42,12 +43,20 @@ public class EventBean implements Serializable {
 
     }
 
-    public String getStreamId() {
-        return streamId;
+    public String getStreamName() {
+        return streamName;
     }
 
-    public void setStreamId(String streamId) {
-        this.streamId = streamId;
+    public void setStreamName(String streamName) {
+        this.streamName = streamName;
+    }
+
+    public String getStreamVersion() {
+        return streamVersion;
+    }
+
+    public void setStreamVersion(String streamVersion) {
+        this.streamVersion = streamVersion;
     }
 
     public long getTimeStamp() {

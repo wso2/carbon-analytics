@@ -138,25 +138,35 @@ public class AnalyticsWebService extends AbstractAdmin {
      * @param version The version of the stream
      * @return The stream definition bean
      * @throws AnalyticsWebServiceException
-     * @throws MalformedStreamDefinitionException
      */
     public StreamDefinitionBean getStreamDefinition(String name, String version)
-            throws AnalyticsWebServiceException, MalformedStreamDefinitionException {
+            throws AnalyticsWebServiceException {
+        try {
+            StreamDefinition streamDefinition = validateAndGetStreamDefinition(name, version);
+            return Utils.getStreamDefinitionBean(streamDefinition);
+        } catch (AnalyticsWebServiceException e) {
+            logger.error("unable to get the stream definition: " + e.getMessage(), e);
+            throw new AnalyticsWebServiceException("unable to get the stream definition: " + e.getMessage(), e);
+        }
+    }
+
+    private StreamDefinition validateAndGetStreamDefinition(String name, String version)
+            throws AnalyticsWebServiceException {
         StreamDefinition streamDefinition;
         try {
-            if (name != null && version != null ) {
+            if (name != null && version != null) {
                 streamDefinition = eventStreamService.getStreamDefinition(name, version);
             } else if (name != null) {
                 streamDefinition = eventStreamService.getStreamDefinition(name);
             } else {
                 throw new AnalyticsWebServiceException("The stream name is not provided");
             }
-            return Utils.getStreamDefinitionBean(streamDefinition);
         } catch (EventStreamConfigurationException e) {
             logger.error("Unable to get the stream definition: " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to get the stream definition: " +
-                         e.getMessage(), e);
+                                                   e.getMessage(), e);
         }
+        return streamDefinition;
     }
 
     /**
@@ -164,9 +174,18 @@ public class AnalyticsWebService extends AbstractAdmin {
      * @param eventBean The event bean representing the event data.
      * @throws AnalyticsWebServiceException
      */
-    public void publishEvent(EventBean eventBean) throws AnalyticsWebServiceException {
-        Event event = Utils.getEvent(eventBean);
-        eventStreamService.publish(event);
+    public void publishEvent(EventBean eventBean)
+            throws AnalyticsWebServiceException {
+        try {
+            StreamDefinition streamDefinition = validateAndGetStreamDefinition(eventBean.getStreamName(),
+                                                                               eventBean.getStreamVersion());
+            Event event = Utils.getEvent(eventBean, streamDefinition);
+
+            eventStreamService.publish(event);
+        } catch (AnalyticsWebServiceException e) {
+            logger.error("unable to publish event: " + e.getMessage(), e);
+            throw new AnalyticsWebServiceException("unable to publish event: " + e.getMessage(), e);
+        }
     }
 
     /**
@@ -310,7 +329,7 @@ public class AnalyticsWebService extends AbstractAdmin {
 
         try {
             List<String> columnList = null;
-            if (columns != null) {
+            if (columns != null && columns.length != 0) {
                 columnList = Arrays.asList(columns);
             }
             List<Record> records = GenericUtils.listRecords(analyticsDataAPI,

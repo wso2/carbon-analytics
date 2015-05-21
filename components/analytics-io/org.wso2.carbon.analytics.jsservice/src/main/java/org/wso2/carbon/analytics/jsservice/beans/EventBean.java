@@ -24,7 +24,8 @@ import java.util.Map;
  * This class represents the bean class for Events
  */
 public class EventBean {
-    private String streamId;
+    private String streamName;
+    private String streamVersion;
     private long timeStamp;
     private Map<String, Object> metaData;
     private Map<String, Object> correlationData;
@@ -33,14 +34,6 @@ public class EventBean {
 
     public EventBean() {
 
-    }
-
-    public String getStreamId() {
-        return streamId;
-    }
-
-    public void setStreamId(String streamId) {
-        this.streamId = streamId;
     }
 
     public long getTimeStamp() {
@@ -81,5 +74,21 @@ public class EventBean {
 
     public void setArbitraryDataMap(Map<String, Object> arbitraryDataMap) {
         this.arbitraryDataMap = arbitraryDataMap;
+    }
+
+    public String getStreamName() {
+        return streamName;
+    }
+
+    public void setStreamName(String streamName) {
+        this.streamName = streamName;
+    }
+
+    public String getStreamVersion() {
+        return streamVersion;
+    }
+
+    public void setStreamVersion(String streamVersion) {
+        this.streamVersion = streamVersion;
     }
 }
