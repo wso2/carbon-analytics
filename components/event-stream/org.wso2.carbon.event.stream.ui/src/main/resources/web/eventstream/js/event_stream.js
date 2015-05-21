@@ -168,9 +168,7 @@ function addEventStreamViaPopup(form, callback) {
                     eventStreamNickName: eventStreamNickName
                 },onSuccess: function (event) {
                     if ("true" == event.responseText.trim()) {
-                        CARBON.showInfoDialog("Stream definition added successfully!!",function () {
-                            form.submit();
-                        });
+                        CARBON.showInfoDialog("Stream definition added successfully!!");
                         //CARBON.showInfoDialog("Stream definition added successfully!!",
                         //    function () {
                         //        if (callback == "inflow") {
