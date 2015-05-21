@@ -15,8 +15,7 @@
  ~ specific language governing permissions and limitations
  ~ under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>org.wso2</groupId>
@@ -28,7 +27,7 @@
     <groupId>org.wso2.carbon.analytics-common</groupId>
     <artifactId>carbon-analytics-common</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>2.0.0-alpha</version>
     <name>WSO2 Carbon - Carbon Analytics Common Aggregator Module</name>
     <url>http://wso2.org</url>
 
@@ -804,7 +803,7 @@
         <url>https://github.com/wso2/carbon-analytics-common.git</url>
         <developerConnection>scm:git:https://github.com/wso2/carbon-analytics-common.git</developerConnection>
         <connection>scm:git:https://github.com/wso2/carbon-analytics-common.git</connection>
-        <tag>HEAD</tag>
+        <tag>v2.0.0-alpha</tag>
     </scm>
 
     <pluginRepositories>
@@ -888,7 +887,7 @@
     </repositories>
 
     <properties>
-        <carbon.analytics.common.version>1.0.1-SNAPSHOT</carbon.analytics.common.version>
+        <carbon.analytics.common.version>2.0.0-alpha</carbon.analytics.common.version>
 
         <!-- Carbon kernel version -->
         <carbon.kernel.version>4.4.0</carbon.kernel.version>

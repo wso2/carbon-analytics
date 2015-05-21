@@ -22,13 +22,13 @@
     <parent>
         <artifactId>carbon-analytics-common</artifactId>
         <groupId>org.wso2.carbon.analytics-common</groupId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>2.0.0-alpha</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>event-receiver-feature</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>2.0.0-alpha</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Event Receiver Aggregate Feature</name>
     <url>http://maven.apache.org</url>

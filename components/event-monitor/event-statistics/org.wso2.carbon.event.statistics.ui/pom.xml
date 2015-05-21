@@ -21,14 +21,14 @@
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>event-statistics</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>2.0.0-alpha</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.event.statistics.ui</artifactId>
     <packaging>bundle</packaging>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>2.0.0-alpha</version>
     <name>WSO2 Carbon - Event Statistics UI</name>
     <description>org.wso2.carbon.event.statistics.ui represent the UI aspects of
         org.wso2.carbon.event.statistics bundle

@@ -22,7 +22,7 @@
     <parent>
         <artifactId>event-receiver-feature</artifactId>
         <groupId>org.wso2.carbon.analytics-common</groupId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>2.0.0-alpha</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     

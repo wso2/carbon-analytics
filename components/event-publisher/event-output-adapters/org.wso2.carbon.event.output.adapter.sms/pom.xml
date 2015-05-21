@@ -21,12 +21,12 @@
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>event-output-adapters</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>2.0.0-alpha</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>2.0.0-alpha</version>
     <artifactId>org.wso2.carbon.event.output.adapter.sms</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Event Output SMS Adapter Module</name>
