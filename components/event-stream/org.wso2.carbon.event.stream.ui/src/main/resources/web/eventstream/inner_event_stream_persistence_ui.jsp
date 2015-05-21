@@ -22,12 +22,21 @@
 <link rel="stylesheet" type="text/css" href="../resources/css/registry.css"/>
 <script type="text/javascript" src="../ajax/js/prototype.js"></script>
 
+<script language="JavaScript">
+    function selectAllCheckbox(source) {
+        var checkboxes = document.getElementsByName('persist');
+        for (var i = 0, n = checkboxes.length; i < n; i++) {
+            checkboxes[i].checked = source.checked;
+        }
+    }
+</script>
+
 <fmt:bundle basename="org.wso2.carbon.event.stream.ui.i18n.Resources">
 
     <table id="analyticsIndexTable" class="styledLeft noBorders spacer-bot" style="width:100%" on>
         <thead>
         <tr>
-            <th><input type="checkbox" name="sample" class="selectall"/>Persist</th>
+            <th><input type="checkbox" onClick="selectAllCheckbox(this)"/>Persist</th>
             <th>Column Name</th>
             <th>Type</th>
             <th>Primary Key</th>

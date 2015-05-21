@@ -63,7 +63,7 @@
 				document.getElementById("stream").style.display = 'none';
 				document.getElementById("persist").style.display = 'block';
 
-				createAnalyticsIndexTable();
+				createAnalyticsIndexTable('add');
 			}
 		}
 

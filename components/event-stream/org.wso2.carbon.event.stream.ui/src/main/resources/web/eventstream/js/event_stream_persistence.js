@@ -13,25 +13,28 @@
  * specific language governing permissions and limitations under the License.
  */
 
-function populateAnalyticsTable(analyticsTable, columnInformation) {
+function populateAnalyticsTable(analyticsTable, columnInformation, action, type) {
     var tbody = analyticsTable.getElementsByTagName('tbody')[0];
     for (var i = 1; i < columnInformation.rows.length; i++) {
         var cellNo = 0;
         var meta = columnInformation.rows[i];
-        var column0 = meta.cells[0].textContent;
+        var column0 = meta.cells[0].textContent.trim();
         var column1 = meta.cells[1].textContent.trim();
         var row = tbody.insertRow(analyticsTable.rows.length - 1);
 
         var persistCell = row.insertCell(cellNo++);
         var persistCheckElement = document.createElement('input');
         persistCheckElement.type = "checkbox";
-        persistCheckElement.checked = true;
+        persistCheckElement.name = "persist";
+        if (action == 'add') {
+            persistCheckElement.checked = true;
+        }
         persistCell.appendChild(persistCheckElement);
 
         var columnCell = row.insertCell(cellNo++);
         var columnInputElement = document.createElement('label');
         columnInputElement.name = "column";
-        columnInputElement.innerHTML = column0;
+        columnInputElement.innerHTML = type + column0;
         columnCell.appendChild(columnInputElement);
 
         var typeCell = row.insertCell(cellNo++);
@@ -73,27 +76,27 @@ function populateAnalyticsTable(analyticsTable, columnInformation) {
     }
 }
 
-function createAnalyticsIndexTable() {
+function createAnalyticsIndexTable(action) {
     var table = document.getElementById('analyticsIndexTable');
     for (var i = table.rows.length; i > 1; i--) {
         table.deleteRow(i - 1);
     }
     var metaDataTable = document.getElementById("outputMetaDataTable");
     if (metaDataTable.rows.length > 1) {
-        populateAnalyticsTable(table, metaDataTable);
+        populateAnalyticsTable(table, metaDataTable, action, 'meta_');
     }
     var correlationDataTable = document.getElementById("outputCorrelationDataTable");
     if (correlationDataTable.rows.length > 1) {
-        populateAnalyticsTable(table, correlationDataTable);
+        populateAnalyticsTable(table, correlationDataTable, action, 'correlation_');
     }
     var payloadDataTable = document.getElementById("outputPayloadDataTable");
     if (payloadDataTable.rows.length > 1) {
-        populateAnalyticsTable(table, payloadDataTable);
+        populateAnalyticsTable(table, payloadDataTable, action, '');
     }
 }
 
 function populateAnalyticsIndexTable(eventStreamName) {
-    createAnalyticsIndexTable();
+    createAnalyticsIndexTable('edit');
     jQuery.ajax({
         type: "GET",
         url: "../eventstream/get_analytics_index_definitions_ajaxprocessor.jsp?eventStreamName=" + eventStreamName,
