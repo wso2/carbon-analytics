@@ -240,7 +240,7 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
             for (String queryAttribute : queryAttributes) {
 
                 for (Attribute attribute : executionInfo.getInsertQueryColumnOrder()) {
-                    if (queryAttribute.equalsIgnoreCase(attribute.getName())) {
+                    if (queryAttribute.trim().equalsIgnoreCase(attribute.getName())) {
                         queryAttributeList.add(attribute);
                         break;
                     }
