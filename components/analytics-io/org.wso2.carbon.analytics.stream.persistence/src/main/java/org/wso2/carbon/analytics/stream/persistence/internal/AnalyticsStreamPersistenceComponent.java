@@ -21,6 +21,7 @@ package org.wso2.carbon.analytics.stream.persistence.internal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.event.stream.core.EventStreamService;
 
 /**
  * This class represents the analytics stream persistence service declarative services component.
@@ -28,22 +29,27 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
  * @scr.component name="analytics.stream.persistence.component" immediate="true"
  * @scr.reference name="analytics.component" interface="org.wso2.carbon.analytics.dataservice.AnalyticsDataService"
  * cardinality="1..1" policy="dynamic" bind="setAnalyticsDataService" unbind="unsetAnalyticsDataService"
+ * @scr.reference name="eventStreamManager.service"
+ * interface="org.wso2.carbon.event.stream.core.EventStreamService" cardinality="1..1"
+ * policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
  */
 public class AnalyticsStreamPersistenceComponent {
 
     private static final Log logger = LogFactory.getLog(AnalyticsStreamPersistenceComponent.class);
 
     protected void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {
-        if (logger.isDebugEnabled()) {
-            logger.info("Setting the Analytics Data Service");
-        }
         ServiceHolder.setAnalyticsDataService(analyticsDataService);
     }
 
     protected void unsetAnalyticsDataService(AnalyticsDataService analyticsDataService) {
-        if (logger.isDebugEnabled()) {
-            logger.info("Unsetting the Analytics Data Service");
-        }
         ServiceHolder.setAnalyticsDataService(null);
+    }
+
+    protected void setEventStreamService(EventStreamService eventStreamService) {
+        ServiceHolder.setEventStreamService(eventStreamService);
+    }
+
+    protected void unsetEventStreamService(EventStreamService eventStreamService) {
+        ServiceHolder.setEventStreamService(null);
     }
 }

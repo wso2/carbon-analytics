@@ -18,16 +18,28 @@
 
 package org.wso2.carbon.analytics.stream.persistence.exception;
 
+import org.apache.axis2.AxisFault;
+
 /**
  * This class represent all the Event Stream Persistence Admin Service exceptions
  */
-public class EventStreamPersistenceAdminServiceException extends Exception {
+public class EventStreamPersistenceAdminServiceException extends AxisFault {
+
+    private static final long serialVersionUID = -1046906533158581316L;
+    private String message;
 
     public EventStreamPersistenceAdminServiceException(String message) {
         super(message);
+        this.message = message;
     }
 
     public EventStreamPersistenceAdminServiceException(String message, Throwable cause) {
         super(message, cause);
+        this.message = message;
+    }
+
+    @Override
+    public String getMessage() {
+        return message;
     }
 }

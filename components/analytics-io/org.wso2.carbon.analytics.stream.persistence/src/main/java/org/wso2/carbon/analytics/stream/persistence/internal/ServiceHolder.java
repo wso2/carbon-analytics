@@ -19,6 +19,7 @@
 package org.wso2.carbon.analytics.stream.persistence.internal;
 
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.event.stream.core.EventStreamService;
 
 /**
  * This represents a service holder class for analytics stream persistence service.
@@ -26,6 +27,7 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 public class ServiceHolder {
 
     private static AnalyticsDataService analyticsDataService;
+    private static EventStreamService eventStreamService;
 
     public static void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {
         ServiceHolder.analyticsDataService = analyticsDataService;
@@ -33,5 +35,13 @@ public class ServiceHolder {
 
     public static AnalyticsDataService getAnalyticsDataService() {
         return analyticsDataService;
+    }
+
+    public static EventStreamService getEventStreamService() {
+        return eventStreamService;
+    }
+
+    public static void setEventStreamService(EventStreamService eventStreamService) {
+        ServiceHolder.eventStreamService = eventStreamService;
     }
 }
