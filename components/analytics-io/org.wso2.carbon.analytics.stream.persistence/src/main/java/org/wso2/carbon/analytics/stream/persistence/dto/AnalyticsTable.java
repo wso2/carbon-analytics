@@ -27,6 +27,8 @@ public class AnalyticsTable implements Serializable {
     private static final long serialVersionUID = 2451467215330903630L;
 
     private String tableName;
+    private String streamVersion;
+    private boolean persist;
     private AnalyticsTableRecord[] analyticsTableRecords;
 
     public AnalyticsTable() {
@@ -40,8 +42,24 @@ public class AnalyticsTable implements Serializable {
         this.tableName = tableName;
     }
 
+    public String getStreamVersion() {
+        return streamVersion;
+    }
+
+    public void setStreamVersion(String streamVersion) {
+        this.streamVersion = streamVersion;
+    }
+
     public AnalyticsTableRecord[] getAnalyticsTableRecords() {
         return analyticsTableRecords;
+    }
+
+    public boolean isPersist() {
+        return persist;
+    }
+
+    public void setPersist(boolean persist) {
+        this.persist = persist;
     }
 
     public void setAnalyticsTableRecords(AnalyticsTableRecord[] analyticsTableRecords) {

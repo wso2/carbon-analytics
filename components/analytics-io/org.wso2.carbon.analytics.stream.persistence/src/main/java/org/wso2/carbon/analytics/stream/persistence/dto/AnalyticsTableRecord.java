@@ -31,6 +31,7 @@ public class AnalyticsTableRecord implements Serializable {
     private boolean scoreParam;
     private boolean indexed;
     private boolean primaryKey;
+    private boolean persist;
 
     public AnalyticsTableRecord() {
     }
@@ -73,5 +74,13 @@ public class AnalyticsTableRecord implements Serializable {
 
     public void setPrimaryKey(boolean primaryKey) {
         this.primaryKey = primaryKey;
+    }
+
+    public boolean isPersist() {
+        return persist;
+    }
+
+    public void setPersist(boolean persist) {
+        this.persist = persist;
     }
 }

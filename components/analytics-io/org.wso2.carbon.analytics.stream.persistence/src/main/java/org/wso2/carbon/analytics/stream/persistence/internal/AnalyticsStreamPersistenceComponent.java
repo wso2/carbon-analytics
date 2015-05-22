@@ -21,6 +21,7 @@ package org.wso2.carbon.analytics.stream.persistence.internal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkService;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 
 /**
@@ -29,9 +30,12 @@ import org.wso2.carbon.event.stream.core.EventStreamService;
  * @scr.component name="analytics.stream.persistence.component" immediate="true"
  * @scr.reference name="analytics.component" interface="org.wso2.carbon.analytics.dataservice.AnalyticsDataService"
  * cardinality="1..1" policy="dynamic" bind="setAnalyticsDataService" unbind="unsetAnalyticsDataService"
- * @scr.reference name="eventStreamManager.service"
+ * @scr.reference name="eventStreamManager.component"
  * interface="org.wso2.carbon.event.stream.core.EventStreamService" cardinality="1..1"
  * policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
+ * @scr.reference name="eventSink.component"
+ * interface="org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkService" cardinality="1..1"
+ * policy="dynamic" bind="setEventSinkService" unbind="unsetEventSinkService"
  */
 public class AnalyticsStreamPersistenceComponent {
 
@@ -51,5 +55,13 @@ public class AnalyticsStreamPersistenceComponent {
 
     protected void unsetEventStreamService(EventStreamService eventStreamService) {
         ServiceHolder.setEventStreamService(null);
+    }
+
+    protected void setEventSinkService(AnalyticsEventSinkService analyticsEventSinkService) {
+        ServiceHolder.setAnalyticsEventSinkService(analyticsEventSinkService);
+    }
+
+    protected void unsetEventSinkService(AnalyticsEventSinkService analyticsEventSinkService) {
+        ServiceHolder.setAnalyticsEventSinkService(null);
     }
 }

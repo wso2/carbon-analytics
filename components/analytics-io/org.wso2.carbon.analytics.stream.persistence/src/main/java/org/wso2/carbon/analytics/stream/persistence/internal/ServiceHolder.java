@@ -19,6 +19,7 @@
 package org.wso2.carbon.analytics.stream.persistence.internal;
 
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkService;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 
 /**
@@ -28,6 +29,7 @@ public class ServiceHolder {
 
     private static AnalyticsDataService analyticsDataService;
     private static EventStreamService eventStreamService;
+    private static AnalyticsEventSinkService analyticsEventSinkService;
 
     public static void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {
         ServiceHolder.analyticsDataService = analyticsDataService;
@@ -43,5 +45,14 @@ public class ServiceHolder {
 
     public static void setEventStreamService(EventStreamService eventStreamService) {
         ServiceHolder.eventStreamService = eventStreamService;
+    }
+
+    public static AnalyticsEventSinkService getAnalyticsEventSinkService() {
+        return analyticsEventSinkService;
+    }
+
+    public static void setAnalyticsEventSinkService(
+            AnalyticsEventSinkService analyticsEventSinkService) {
+        ServiceHolder.analyticsEventSinkService = analyticsEventSinkService;
     }
 }
