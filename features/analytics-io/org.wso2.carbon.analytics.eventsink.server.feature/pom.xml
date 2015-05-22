@@ -56,7 +56,7 @@
                             <propertiesFile>../../etc/feature.properties</propertiesFile>
                             <bundles>
                                 <bundleDef>
-                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasink:${carbon.analytics.version}
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.eventsink:${carbon.analytics.version}
                                 </bundleDef>
                                 <bundleDef>
                                     com.lmax.wso2:disruptor:${orbit.version.disruptor}
