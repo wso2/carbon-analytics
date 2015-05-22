@@ -27,7 +27,7 @@
     <groupId>org.wso2.carbon.analytics-common</groupId>
     <artifactId>carbon-analytics-common</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.0-alpha</version>
+    <version>2.0.0-SNAPSHOT</version>
     <name>WSO2 Carbon - Carbon Analytics Common Aggregator Module</name>
     <url>http://wso2.org</url>
 
@@ -803,7 +803,7 @@
         <url>https://github.com/wso2/carbon-analytics-common.git</url>
         <developerConnection>scm:git:https://github.com/wso2/carbon-analytics-common.git</developerConnection>
         <connection>scm:git:https://github.com/wso2/carbon-analytics-common.git</connection>
-        <tag>v2.0.0-alpha</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <pluginRepositories>
@@ -887,7 +887,7 @@
     </repositories>
 
     <properties>
-        <carbon.analytics.common.version>2.0.0-alpha</carbon.analytics.common.version>
+        <carbon.analytics.common.version>2.0.0-SNAPSHOT</carbon.analytics.common.version>
 
         <!-- Carbon kernel version -->
         <carbon.kernel.version>4.4.0</carbon.kernel.version>
