@@ -470,7 +470,7 @@
                         <span style="float: left; position: relative; margin-top: 5px;">
                             <fmt:message key="event.receiver.error.no.stream"/>
                         </span>
-                    <a onclick="createImportedStreamDefinition()",
+                    <a onclick="createImportedStreamDefinition()"
                        style="background-image:url(images/add.gif);"
                        class="icon-link">
                         Add Event Stream
