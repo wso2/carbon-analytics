@@ -65,6 +65,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Pattern;
 
 /**
  * This class represents the analytics query execution context.
@@ -104,11 +105,11 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private SQLContext sqlCtx;
 
     private String myHost;
-    
+
     private int portOffset;
-    
+
     private int workerCount = 1;
-    
+
     private Object workerActorSystem;
     private Object masterActorSystem;
 
@@ -209,6 +210,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
     }
 
+    @Deprecated
     private void processDefineTable(int tenantId, String query,
                                     String[] tokens) throws AnalyticsExecutionException {
         String tableName = tokens[2].trim();
@@ -224,14 +226,15 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             throw new AnalyticsExecutionException("Error in registering analytics table: " + e.getMessage(), e);
         }
     }
-    
+
     public int getNumPartitionsHint() {
         /* all workers will not have the same CPU count, this is just an approximation */
         return this.getWorkerCount() * Runtime.getRuntime().availableProcessors();
     }
-    
-    private void processInsertInto(int tenantId, String query, 
-            String[] tokens) throws AnalyticsExecutionException {
+
+    @Deprecated
+    private void processInsertInto(int tenantId, String query,
+                                   String[] tokens) throws AnalyticsExecutionException {
         String tableName = tokens[2].trim();
         String selectQuery = query.substring(query.indexOf(tableName) + tableName.length()).trim();
         try {
@@ -241,8 +244,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             throw new AnalyticsExecutionException("Error in executing insert into query: " + e.getMessage(), e);
         }
     }
-    
-    public AnalyticsQueryResult executeQuery(int tenantId, String query) throws AnalyticsExecutionException {
+
+    public AnalyticsQueryResult executeQuery(int tenantId, String query)
+            throws AnalyticsExecutionException {
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         if (acm.isClusteringEnabled() && !acm.isLeader(CLUSTER_GROUP_NAME)) {
             try {
@@ -262,31 +266,40 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         if (query.endsWith(";")) {
             query = query.substring(0, query.length() - 1);
         }
-        String[] tokens = query.split(" ");
-        if (tokens.length >= 3) {
-            if (tokens[0].trim().equalsIgnoreCase(AnalyticsConstants.TERM_DEFINE) &&
-                    tokens[1].trim().equalsIgnoreCase(AnalyticsConstants.TERM_TABLE)) {
-                this.processDefineTable(tenantId, query, tokens);
-                return null;
-            } else if (tokens[0].trim().equalsIgnoreCase(AnalyticsConstants.TERM_INSERT) &&
-                    tokens[1].trim().equalsIgnoreCase(AnalyticsConstants.TERM_INTO)) {
-                this.processInsertInto(tenantId, query, tokens);
-                return null;
-            }
+        //todo: change this! no parsing... just submit the query to relation provider with options
+
+        Pattern p = Pattern.compile("\\b(?i)(" + AnalyticsConstants.TERM_USING + ")\\b " +
+                                    "\\b(" + AnalyticsConstants.SPARK_SHORTHAND_STRING + ")\\b");
+        // if "using CarbonAnalytics" is present, replace with "using AnalyticsRelationProvider class name
+        if (p.matcher(query).find()) {
+            query = query.replaceAll("\\b" + AnalyticsConstants.SPARK_SHORTHAND_STRING + "\\b",
+                                     AnalyticsRelationProvider.class.getName());
         }
         return toResult(this.sqlCtx.sql(encodeQueryWithTenantId(tenantId, query)));
     }
+
+    //todo: update this algo! accomodate create temp table, and insert queries here as well
+    //todo: update the test cases!
 
     private String encodeQueryWithTenantId(int tenantId, String query) {
         String result = query;
         String[] tokens = query.split("\\s+");
         ArrayList<String> tableNames = new ArrayList<>();
         for (int i = 0; i < tokens.length; i++) {
+            // select queries
             if ((tokens[i].compareToIgnoreCase(AnalyticsConstants.TERM_FROM) == 0 ||
                  tokens[i].compareToIgnoreCase(AnalyticsConstants.TERM_JOIN) == 0)
                 && tokens[i + 1].substring(0, 1).matches("[a-zA-Z]")) {
                 tableNames.add(tokens[i + 1]);
                 i++;
+            }
+
+            //create temp table queries
+            if (tokens[i].compareToIgnoreCase(AnalyticsConstants.TERM_CREATE) == 0 &&
+                tokens[i + 1].compareToIgnoreCase(AnalyticsConstants.TERM_TEMPORARY) == 0 &&
+                tokens[i + 2].compareToIgnoreCase(AnalyticsConstants.TERM_TABLE) == 0) {
+                tableNames.add(tokens[i + 3]);
+                i= i+3;
             }
         }
 
@@ -304,7 +317,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         List<Record> records = this.generateInsertRecordsForTable(tenantId, tableName, data);
         ads.put(records);
     }
-    
+
     private Integer[] generateTableKeyIndices(String[] keys, String[] columns) {
         List<Integer> result = new ArrayList<>();
         for (String key : keys) {
@@ -317,7 +330,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
         return result.toArray(new Integer[result.size()]);
     }
-    
+
     private String generateInsertRecordId(List<Object> row, Integer[] keyIndices) {
         StringBuilder builder = new StringBuilder();
         Object obj;
@@ -359,7 +372,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
         return result;
     }
-    
+
     private static Map<String, Object> extractValuesFromRow(List<Object> row, String[] columns) {
         Map<String, Object> result = new HashMap<>(row.size());
         for (int i = 0; i < row.size(); i++) {
@@ -386,20 +399,20 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
         return result;
     }
-    
+
     private static void throwInvalidDefineTableQueryException() throws AnalyticsException {
         throw new AnalyticsException("Invalid define table query, must be in the format of "
-                + "'define table <table> (name1 type1, name2 type2, name3 type3,... primary key(name1, name2..))'");
+                                     + "'define table <table> (name1 type1, name2 type2, name3 type3,... primary key(name1, name2..))'");
     }
-    
+
     private static String generateTableKeysId(int tenantId, String tableName) {
         return tenantId + "_" + tableName;
     }
-    
+
     private static byte[] tableKeysToBinary(String[] keys) throws AnalyticsException {
         return GenericUtils.serializeObject(keys);
     }
-    
+
     private static String[] binaryToTableKeys(byte[] data) throws AnalyticsException {
         return (String[]) GenericUtils.deserializeObject(data);
     }
@@ -428,8 +441,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         AnalyticsDataService ads = ServiceHolder.getAnalyticsDataService();
         Map<String, Object> values = new HashMap<>();
         values.put(AnalyticsConstants.OBJECT, tableKeysToBinary(keys));
-        Record record = new Record(generateTableKeysId(tenantId, tableName), 
-                AnalyticsConstants.TABLE_INFO_TENANT_ID, AnalyticsConstants.TABLE_INFO_TABLE_NAME, values);
+        Record record = new Record(generateTableKeysId(tenantId, tableName),
+                                   AnalyticsConstants.TABLE_INFO_TENANT_ID, AnalyticsConstants.TABLE_INFO_TABLE_NAME, values);
         List<Record> records = new ArrayList<>(1);
         records.add(record);
         try {
@@ -468,9 +481,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             return schemaString;
         }
     }
-    
+
     private void registerTable(int tenantId, String tableName, String alias,
-            String schemaString) throws AnalyticsException {
+                               String schemaString) throws AnalyticsException {
         if (!(schemaString.startsWith("(") && schemaString.endsWith(")"))) {
             throwInvalidDefineTableQueryException();
         }
@@ -482,7 +495,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
 //        AnalyticsRelation table = new AnalyticsRelation(tenantId, tableName, this.sqlCtx, schemaString);
         AnalyticsRelationProvider relationProvider = new AnalyticsRelationProvider();
-        scala.collection.immutable.HashMap<String, String> params = new  scala.collection.immutable.HashMap<>();
+        scala.collection.immutable.HashMap<String, String> params = new scala.collection.immutable.HashMap<>();
         params = params.$plus(new Tuple2<>(AnalyticsConstants.TENANT_ID, Integer.toString(tenantId)));
         params = params.$plus(new Tuple2<>(AnalyticsConstants.TABLE_NAME, tableName));
         params = params.$plus(new Tuple2<>(AnalyticsConstants.SCHEMA_STRING, schemaString));
