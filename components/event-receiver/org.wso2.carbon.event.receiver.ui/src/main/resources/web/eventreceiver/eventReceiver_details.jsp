@@ -265,11 +265,42 @@
 
             <%
                 if (mappingType != null) {
+                    System.out.println("\n\n\n" + mappingType + "\n\n\n");
                     if (mappingType.equals("wso2event")) {
             %>
             <tr fromElementKey="inputWso2EventMapping">
                 <td colspan="2" class="middle-header">
                     <fmt:message key="event.receiver.mapping.wso2event"/>
+                </td>
+            </tr>
+
+            <%
+                String toStreamProperties[] = eventReceiverConfigurationDto.getToStreamNameWithVersion().split(":");
+                String toEventStreamName = toStreamProperties[0];
+                String toEventStreamVersion = toStreamProperties[1];
+            %>
+
+
+            <tr name="outputWSO2EventMapping">
+                <td class="leftCol-med">
+                    <fmt:message key="from.event.stream"/>
+                </td>
+                <td>
+                    <input type="text" name="outputStreamName" id="outputStreamNameId"
+                           class="initE"
+                           value="<%=toEventStreamName%>"
+                           style="width:75%" disabled="disabled"/>
+                </td>
+            </tr>
+            <tr name="outputWSO2EventMapping">
+                <td class="leftCol-med">
+                    <fmt:message key="from.event.version"/>
+                </td>
+                <td>
+                    <input type="text" name="outputStreamVersion" id="outputStreamVersionId"
+                           class="initE"
+                           value="<%=toEventStreamVersion%>"
+                           style="width:75%" disabled="disabled"/>
                 </td>
             </tr>
 
@@ -291,7 +322,10 @@
                         </thead>
                         <tbody>
                         <%
-                            for (EventMappingPropertyDto metaEbProperties : eventReceiverConfigurationDto.getMetaMappingPropertyDtos()) {
+                            EventMappingPropertyDto[] metaMappingDto = eventReceiverConfigurationDto.getMetaMappingPropertyDtos();
+                            if(metaMappingDto != null && metaMappingDto.length > 0){
+                                for (EventMappingPropertyDto metaEbProperties : metaMappingDto) {
+
                         %>
                         <tr id="mappingRow">
                             <td class="property-names"><%=metaEbProperties.getName()%>
@@ -305,10 +339,13 @@
                             </td>
                         </tr>
                         <%
+                                }
                             }
                         %>
                         <%
-                            for (EventMappingPropertyDto correlationEbProperties : eventReceiverConfigurationDto.getCorrelationMappingPropertyDtos()) {
+                            EventMappingPropertyDto[] correlationMappingDto = eventReceiverConfigurationDto.getCorrelationMappingPropertyDtos();
+                            if(correlationMappingDto != null && correlationMappingDto.length > 0){
+                                for (EventMappingPropertyDto correlationEbProperties : correlationMappingDto) {
                         %>
                         <tr id="mappingRow">
                             <td class="property-names"><%=correlationEbProperties.getName()%>
@@ -322,10 +359,13 @@
                             </td>
                         </tr>
                         <%
+                                }
                             }
                         %>
                         <%
-                            for (EventMappingPropertyDto payloadEbProperties : eventReceiverConfigurationDto.getMappingPropertyDtos()) {
+                            EventMappingPropertyDto[] payLoadMappingDto = eventReceiverConfigurationDto.getMappingPropertyDtos();
+                            if(payLoadMappingDto != null && payLoadMappingDto.length > 0){
+                                for (EventMappingPropertyDto payloadEbProperties : payLoadMappingDto) {
                         %>
                         <tr id="mappingRow">
                             <td class="property-names"><%=payloadEbProperties.getName()%>
@@ -339,6 +379,7 @@
                             </td>
                         </tr>
                         <%
+                                }
                             }
                         %>
                         </tbody>
