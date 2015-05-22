@@ -27,6 +27,7 @@ import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.eventsink.exception.AnalyticsEventStoreException;
 import org.wso2.carbon.analytics.eventsink.exception.AnalyticsEventStoreDeploymentException;
+import org.wso2.carbon.analytics.eventsink.internal.AnalyticsEventSinkServerStartupObserver;
 import org.wso2.carbon.analytics.eventsink.internal.AnalyticsEventStoreManager;
 import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkConstants;
 import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkUtil;
@@ -36,9 +37,12 @@ import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AnalyticsEventStoreDeployer extends AbstractDeployer {
     private static Log log = LogFactory.getLog(AnalyticsEventStoreDeployer.class);
+    private static List<DeploymentFileData> pausedDeployments = new ArrayList<>();
 
     @Override
     public void init(ConfigurationContext configurationContext) {
@@ -50,22 +54,28 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
     }
 
     public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {
-        int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
-        try {
-            AnalyticsEventStore eventStoreConfiguration = AnalyticsEventStoreManager.getInstance()
-                    .getAnalyticsEventStore(deploymentFileData.getFile());
-            if (AnalyticsEventSinkUtil.getAnalyticsEventStoreName(deploymentFileData.getName()).
-                    equals(eventStoreConfiguration.getName())) {
-                addEventStore(tenantId, eventStoreConfiguration);
-            } else {
-                throw new AnalyticsEventStoreDeploymentException("Invalid configuration provided! File name: " +
-                        AnalyticsEventSinkUtil.getAnalyticsEventStoreName(deploymentFileData.getName() + " should be " +
-                                "matched with deduced table name : " + eventStoreConfiguration.getName() + " for the streams"));
+        if (AnalyticsEventSinkServerStartupObserver.getInstance().isServerStarted()) {
+            log.info("Deploying analytics event store :" + deploymentFileData.getName());
+            int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+            try {
+                AnalyticsEventStore eventStoreConfiguration = AnalyticsEventStoreManager.getInstance()
+                        .getAnalyticsEventStore(deploymentFileData.getFile());
+                if (AnalyticsEventSinkUtil.getAnalyticsEventStoreName(deploymentFileData.getName()).
+                        equals(eventStoreConfiguration.getName())) {
+                    addEventStore(tenantId, eventStoreConfiguration);
+                } else {
+                    throw new AnalyticsEventStoreDeploymentException("Invalid configuration provided! File name: " +
+                            AnalyticsEventSinkUtil.getAnalyticsEventStoreName(deploymentFileData.getName() + " should be " +
+                                    "matched with deduced table name : " + eventStoreConfiguration.getName() + " for the streams"));
+                }
+            } catch (AnalyticsEventStoreException e) {
+                String errMsg = "Error while deploying file : " + deploymentFileData.getName() + " for tenant id : " + tenantId;
+                log.error(errMsg, e);
+                throw new AnalyticsEventStoreDeploymentException(errMsg, e);
             }
-        } catch (AnalyticsEventStoreException e) {
-            String errMsg = "Error while deploying file : " + deploymentFileData.getName() + " for tenant id : " + tenantId;
-            log.error(errMsg, e);
-            throw new AnalyticsEventStoreDeploymentException(errMsg, e);
+            log.info("Deployed successfully analytics event store :" + deploymentFileData.getName());
+        } else {
+            pausedDeployments.add(deploymentFileData);
         }
     }
 
@@ -90,6 +100,7 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
     }
 
     public void undeploy(String fileName) throws DeploymentException {
+        log.info("Undeploying analytics event store : " + fileName);
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
         String eventStoreName = AnalyticsEventSinkUtil.getAnalyticsEventStoreName(fileName);
         AnalyticsEventStore existingEventStore = AnalyticsEventStoreManager.getInstance().removeEventStoreConfiguration(tenantId,
@@ -106,6 +117,15 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
                         + eventStoreName, e);
             }
         }
+        log.info("Undeployed successfully analytics event store : " + fileName);
+    }
+
+    public static List<DeploymentFileData> getPausedDeployments() {
+        return pausedDeployments;
+    }
+
+    public static void clearPausedDeployments(){
+        pausedDeployments = null;
     }
 
     @Override

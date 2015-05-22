@@ -23,6 +23,10 @@
     <ManagementPermissions>
         <ManagementPermission>
             <DisplayName>Event Sink</DisplayName>
+            <ResourceId>/permission/admin/manage/analytics/event-sink/</ResourceId>
+        </ManagementPermission>
+        <ManagementPermission>
+            <DisplayName>Deploy</DisplayName>
             <ResourceId>/permission/admin/manage/analytics/event-sink/deploy</ResourceId>
         </ManagementPermission>
     </ManagementPermissions>

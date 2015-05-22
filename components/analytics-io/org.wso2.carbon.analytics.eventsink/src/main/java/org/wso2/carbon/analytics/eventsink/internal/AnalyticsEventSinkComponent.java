@@ -25,6 +25,7 @@ import org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkService;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkServiceImpl;
 import org.wso2.carbon.analytics.eventsink.internal.util.ServiceHolder;
 import org.wso2.carbon.analytics.eventsink.subscriber.AnalyticsEventStreamListener;
+import org.wso2.carbon.core.ServerStartupObserver;
 import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
 import org.wso2.carbon.event.stream.core.EventStreamListener;
 import org.wso2.carbon.event.stream.core.EventStreamService;
@@ -48,22 +49,24 @@ public class AnalyticsEventSinkComponent {
     protected void activate(ComponentContext componentContext) {
         try {
             if (log.isDebugEnabled()) {
-                log.debug("Started the Data bridge Analytics Data Sink component");
+                log.debug("Started the Analytics Event Sink component");
             }
             ServiceHolder.setAnalyticsEventSinkService(new AnalyticsEventSinkServiceImpl());
             componentContext.getBundleContext().registerService(EventStreamListener.class.getName(),
                     ServiceHolder.getAnalyticsEventStreamListener(), null);
             componentContext.getBundleContext().registerService(AnalyticsEventSinkService.class.getName(),
                     ServiceHolder.getAnalyticsEventSinkService(), null);
+            componentContext.getBundleContext().registerService(ServerStartupObserver.class.getName(),
+                    AnalyticsEventSinkServerStartupObserver.getInstance(), null);
             ServiceHolder.setAnalyticsDSConnector(new AnalyticsDSConnector());
         } catch (Throwable e) {
-            log.error(e.getCause(), e);
+            log.error("Error while activating the AnalyticsEventSinkComponent.", e);
         }
     }
 
     protected void deactivate(ComponentContext componentContext) {
         if (log.isDebugEnabled()) {
-            log.debug("Stopped the Data bridge Cassandra Data Sink component");
+            log.debug("Stopped AnalyticsEventSink component");
         }
     }
 

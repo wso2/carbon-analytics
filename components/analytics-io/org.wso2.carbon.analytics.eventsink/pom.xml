@@ -15,7 +15,8 @@
 ~ limitations under the License.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>analytics-io</artifactId>
@@ -123,7 +124,7 @@
                         </Bundle-SymbolicName>
                         <Private-Package>org.wso2.carbon.analytics.eventsink.internal.*
                         </Private-Package>
-                        <Export-Package>!org.wso2.carbon.analytics.eventsink.internal,
+                        <Export-Package>!org.wso2.carbon.analytics.eventsink.internal.*,
                             org.wso2.carbon.analytics.eventsink.*
                         </Export-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
