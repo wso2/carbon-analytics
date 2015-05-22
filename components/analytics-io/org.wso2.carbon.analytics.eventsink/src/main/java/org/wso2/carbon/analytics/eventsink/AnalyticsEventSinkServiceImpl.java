@@ -34,9 +34,11 @@ public class AnalyticsEventSinkServiceImpl implements AnalyticsEventSinkService 
         AnalyticsEventStore existingEventStore = AnalyticsEventStoreManager.
                 getInstance().getAnalyticsEventStore(tenantId,
                 analyticsEventStore.getName());
-        for (String aStream : existingEventStore.getEventSource().getStreamIds()) {
-            if (!aStream.equals(streamId)) {
-                analyticsEventStore.getEventSource().getStreamIds().add(aStream);
+        if (existingEventStore != null) {
+            for (String aStream : existingEventStore.getEventSource().getStreamIds()) {
+                if (!aStream.equals(streamId)) {
+                    analyticsEventStore.getEventSource().getStreamIds().add(aStream);
+                }
             }
         }
         putEventStore(tenantId, analyticsEventStore);

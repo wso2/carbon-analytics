@@ -83,7 +83,7 @@ public class AnalyticsEventSinkUtil {
     public static AnalyticsEventStore getAnalyticsEventStore(String streamName, String version, AnalyticsSchema schema)
             throws AnalyticsEventStoreException {
         AnalyticsEventStore store = new AnalyticsEventStore();
-        AnalyticsEventStore.EventSource eventSource = store.new EventSource();
+        AnalyticsEventStore.EventSource eventSource = new AnalyticsEventStore.EventSource();
         List<String> streams = new ArrayList<>();
         streams.add(DataBridgeCommonsUtils.generateStreamId(streamName, version));
         eventSource.setStreamIds(streams);

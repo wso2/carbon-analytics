@@ -82,7 +82,7 @@ public class AnalyticsEventStore {
         return tableName;
     }
 
-    public class EventSource {
+    public static class EventSource {
         private List<String> streamIds;
 
         @XmlElement(name = "StreamId")

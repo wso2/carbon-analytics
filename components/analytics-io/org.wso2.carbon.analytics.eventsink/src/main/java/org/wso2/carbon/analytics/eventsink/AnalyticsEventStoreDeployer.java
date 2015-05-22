@@ -32,6 +32,7 @@ import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkConst
 import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkUtil;
 import org.wso2.carbon.analytics.eventsink.internal.util.ServiceHolder;
 import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.io.File;
@@ -42,8 +43,8 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
     @Override
     public void init(ConfigurationContext configurationContext) {
         File deployementDir = new File(MultitenantUtils.getAxis2RepositoryPath(CarbonContext.getThreadLocalCarbonContext().
-                getTenantId())+ File.separator+ AnalyticsEventSinkConstants.DEPLOYMENT_DIR_NAME);
-        if (!deployementDir.exists()){
+                getTenantId()) + AnalyticsEventSinkConstants.DEPLOYMENT_DIR_NAME);
+        if (!deployementDir.exists()) {
             deployementDir.mkdir();
         }
     }
@@ -76,11 +77,15 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
             ServiceHolder.getAnalyticsDataService().setTableSchema(tenantId, eventStore.getName(),
                     AnalyticsEventSinkUtil.getAnalyticsSchema(eventStore.getAnalyticsTableSchema()));
             for (String streamId : eventStore.getEventSource().getStreamIds()) {
-                ServiceHolder.getAnalyticsEventStreamListener().subscribeForStream(tenantId, streamId);
+                if (ServiceHolder.getStreamDefinitionStoreService().getStreamDefinition(streamId, tenantId) != null) {
+                    ServiceHolder.getAnalyticsEventStreamListener().subscribeForStream(tenantId, streamId);
+                }
             }
         } catch (AnalyticsException e) {
             throw new AnalyticsEventStoreException("Error while creating the table Or setting the " +
                     "schema for table :" + eventStore.getName(), e);
+        } catch (StreamDefinitionStoreException e) {
+            throw new AnalyticsEventStoreException("Error when subscribing to the streams. ", e);
         }
     }
 

@@ -19,6 +19,8 @@ package org.wso2.carbon.analytics.eventsink.internal;
 
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventStore;
 import org.wso2.carbon.analytics.eventsink.exception.AnalyticsEventStoreException;
+import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkConstants;
+import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkUtil;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.xml.bind.*;
@@ -56,9 +58,11 @@ public class AnalyticsEventStoreManager {
 
     public void saveEventStoreConfiguration(int tenantId, AnalyticsEventStore eventStore)
             throws AnalyticsEventStoreException {
-        String fileName = MultitenantUtils.getAxis2RepositoryPath(tenantId) + File.separator + eventStore.getName();
+        String fileName = MultitenantUtils.getAxis2RepositoryPath(tenantId) +
+                AnalyticsEventSinkConstants.DEPLOYMENT_DIR_NAME + File.separator +
+                eventStore.getName() + AnalyticsEventSinkConstants.DEPLOYMENT_FILE_EXT;
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(AnalyticsEventSinkConfiguration.class);
+            JAXBContext jaxbContext = JAXBContext.newInstance(AnalyticsEventStore.class);
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
             jaxbMarshaller.marshal(eventStore, new File(fileName));
         } catch (JAXBException e) {
@@ -103,7 +107,7 @@ public class AnalyticsEventStoreManager {
         if (analyticsEventStoreList != null) {
             for (AnalyticsEventStore analyticsEventStore : analyticsEventStoreList) {
                 if (analyticsEventStore.getName().equals(eventStoreName)) {
-                     analyticsEventStoreList.remove(analyticsEventStore);
+                    analyticsEventStoreList.remove(analyticsEventStore);
                     return analyticsEventStore;
                 }
             }
