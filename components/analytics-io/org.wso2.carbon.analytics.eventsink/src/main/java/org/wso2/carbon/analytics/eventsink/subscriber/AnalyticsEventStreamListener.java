@@ -100,7 +100,7 @@ public class AnalyticsEventStreamListener implements EventStreamListener {
                     new AnalyticsWSO2EventListConsumer(streamId, tenantId);
             int index = consumers.indexOf(analyticsWSO2EventListConsumer);
             if (index != -1) {
-                AnalyticsWSO2EventListConsumer consumer = consumers.get(index);
+                AnalyticsWSO2EventListConsumer consumer = consumers.remove(index);
                 ServiceHolder.getEventStreamService().unsubscribe(consumer);
             }
         }

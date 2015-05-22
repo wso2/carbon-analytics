@@ -74,7 +74,7 @@ public class AnalyticsDSConnector {
                 for (String attributeName : event.getArbitraryDataMap().keySet()) {
                     String attributeKey = "_" + attributeName;
                     eventAttributes.put(attributeKey, getRecordValue(analyticsSchema, attributeKey,
-                            event.getArbitraryDataMap().get(attributeName)));
+                            event.getArbitraryDataMap().get(attributeName), true));
                 }
             }
             if (event.getTimeStamp() != 0L) {
@@ -97,7 +97,10 @@ public class AnalyticsDSConnector {
         int iteration = 0;
         for (Attribute attribute : attributes) {
             String attributeKey = getAttributeKey(type, attribute.getName());
-            eventAttribute.put(attributeKey, getRecordValue(schema, attributeKey, values[iteration]));
+            Object recordValue = getRecordValue(schema, attributeKey, values[iteration], false);
+            if (recordValue != null) {
+                eventAttribute.put(attributeKey, recordValue);
+            }
             iteration++;
         }
     }
@@ -113,10 +116,10 @@ public class AnalyticsDSConnector {
     private void populateCommonAttributes(StreamDefinition streamDefinition, AnalyticsSchema schema,
                                           Map<String, Object> eventAttributes) {
         eventAttributes.put(AnalyticsEventSinkConstants.STREAM_VERSION_KEY, getRecordValue(schema,
-                AnalyticsEventSinkConstants.STREAM_VERSION_KEY, streamDefinition.getVersion()));
+                AnalyticsEventSinkConstants.STREAM_VERSION_KEY, streamDefinition.getVersion(), true));
     }
 
-    private Object getRecordValue(AnalyticsSchema schema, String fieldName, Object fieldValue) {
+    private Object getRecordValue(AnalyticsSchema schema, String fieldName, Object fieldValue, boolean mandatoryValue) {
         if (fieldValue instanceof String) {
             String fieldStrValue = (String) fieldValue;
             ColumnDefinition columnDefinition = schema.getColumns().get(fieldName);
@@ -139,6 +142,10 @@ public class AnalyticsDSConnector {
                     case LONG:
                         return Long.parseLong(fieldStrValue);
                 }
+            } else if (mandatoryValue) {
+                return fieldValue;
+            } else {
+                return null;
             }
         }
         return fieldValue;
