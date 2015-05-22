@@ -17,6 +17,10 @@
 */
 package org.wso2.carbon.analytics.eventsink.exception;
 
+/**
+ * This is the exception thrown when there are some configuration problems
+ * encountered in analytics event store.
+ */
 public class AnalyticsEventStoreException extends Exception {
 
     public AnalyticsEventStoreException(String errorMessage, Exception ex) {

@@ -30,6 +30,11 @@ import org.wso2.carbon.event.stream.core.WSO2EventListConsumer;
 
 import java.util.List;
 
+/**
+ * This is the actual consumer which is getting registered for the list of
+ * wso2 events received in stream junction for a specific stream.
+ *
+ */
 public class AnalyticsWSO2EventListConsumer implements WSO2EventListConsumer {
     private static final Log log = LogFactory.getLog(AnalyticsWSO2EventListConsumer.class);
     private String streamId;

@@ -22,6 +22,10 @@ import org.wso2.carbon.databridge.commons.Event;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * This is the manager class to hold all tenants queues, so that based on the
+ * event arrival it can direct it to the relevant queues.
+ */
 public class AnalyticsEventQueueManager {
 
     private static AnalyticsEventQueueManager instance = new AnalyticsEventQueueManager();

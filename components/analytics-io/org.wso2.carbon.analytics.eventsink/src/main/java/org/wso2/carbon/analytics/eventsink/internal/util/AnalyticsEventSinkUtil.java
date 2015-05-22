@@ -30,6 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * This is the class which holds the util methods to be used in the event sink operations.
+ */
 public class AnalyticsEventSinkUtil {
 
     public static String generateAnalyticsTableName(String streamName) {

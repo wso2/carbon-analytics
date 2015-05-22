@@ -27,6 +27,11 @@ import org.wso2.carbon.databridge.commons.Event;
 
 import java.util.concurrent.Executors;
 
+/**
+ * This is the Queue which is created per tenant basis, and it will buffer all the events received for the tenant,
+ * so that the consumers can do batch insertion.
+ */
+
 public class AnalyticsEventQueue {
     private static final Log log = LogFactory.getLog(AnalyticsEventQueue.class);
     private RingBuffer<Event> ringBuffer;

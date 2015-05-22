@@ -23,6 +23,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
+/**
+ * This is the configuration class which specifies from which streams the tables will be receiving the events,
+ * and the relevant table schema.
+ *
+ */
 @XmlRootElement(name = "EventStoreConfiguration")
 public class AnalyticsEventStore {
 

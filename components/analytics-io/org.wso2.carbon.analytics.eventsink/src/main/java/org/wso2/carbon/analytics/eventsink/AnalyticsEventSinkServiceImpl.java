@@ -23,6 +23,9 @@ import org.wso2.carbon.analytics.eventsink.internal.AnalyticsEventStoreManager;
 import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkUtil;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 
+/**
+ * This is the implementation of AnalyticsEventSink OSGI service which is exposed to other components.
+ */
 public class AnalyticsEventSinkServiceImpl implements AnalyticsEventSinkService {
 
     @Override

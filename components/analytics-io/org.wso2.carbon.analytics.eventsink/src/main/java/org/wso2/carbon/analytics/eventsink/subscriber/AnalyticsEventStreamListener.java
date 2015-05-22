@@ -32,6 +32,9 @@ import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationExcep
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * This is the Stream listener implementation to react upon new stream getting added and removed.
+ */
 public class AnalyticsEventStreamListener implements EventStreamListener {
 
     private static final Log log = LogFactory.getLog(AnalyticsEventStreamListener.class);

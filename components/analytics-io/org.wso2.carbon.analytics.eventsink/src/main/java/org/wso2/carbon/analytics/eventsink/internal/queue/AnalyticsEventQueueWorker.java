@@ -29,6 +29,10 @@ import org.wso2.carbon.databridge.commons.Event;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This is the queue worker which listens to analytics queue, and once the batch size si reached it will
+ * be doing an insertion operation on the analytics data sevrice,
+ */
 public class AnalyticsEventQueueWorker implements EventHandler<Event> {
     private static final Log log = LogFactory.getLog(AnalyticsEventQueueWorker.class);
 

@@ -20,13 +20,15 @@ package org.wso2.carbon.analytics.eventsink.internal;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventStore;
 import org.wso2.carbon.analytics.eventsink.exception.AnalyticsEventStoreException;
 import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkConstants;
-import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkUtil;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.xml.bind.*;
 import java.io.File;
 import java.util.*;
 
+/**
+ * This is the manager class for the event store configuration.
+ */
 public class AnalyticsEventStoreManager {
 
     private static AnalyticsEventStoreManager instance = new AnalyticsEventStoreManager();

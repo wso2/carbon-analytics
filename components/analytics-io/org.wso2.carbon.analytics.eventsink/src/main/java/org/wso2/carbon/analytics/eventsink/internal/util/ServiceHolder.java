@@ -25,6 +25,9 @@ import org.wso2.carbon.analytics.eventsink.subscriber.AnalyticsEventStreamListen
 import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 
+/**
+ * This class holds all the osgi services registered within the component.
+ */
 public class ServiceHolder {
     private static EventStreamService eventStreamService;
     private static AnalyticsEventStreamListener analyticsEventStreamListener;

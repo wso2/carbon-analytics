@@ -33,6 +33,11 @@ import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 /**
+ * This is the declarative service component which registers the required osgi
+ * services for this component's operation.
+ */
+
+/**
  * @scr.component name="analytics.eventsink.comp" immediate="true"
  * @scr.reference name="registry.streamdefn.comp"
  * interface="org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore"

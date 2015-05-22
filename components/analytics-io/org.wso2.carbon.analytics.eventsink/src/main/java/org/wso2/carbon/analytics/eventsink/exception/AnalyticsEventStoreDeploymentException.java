@@ -19,6 +19,10 @@ package org.wso2.carbon.analytics.eventsink.exception;
 
 import org.apache.axis2.deployment.DeploymentException;
 
+/**
+ * This is the exception thrown when there is any deployment related issues encountered for
+ * analytics event store artifacts,
+ */
 public class AnalyticsEventStoreDeploymentException extends DeploymentException {
 
     public AnalyticsEventStoreDeploymentException(String message) {

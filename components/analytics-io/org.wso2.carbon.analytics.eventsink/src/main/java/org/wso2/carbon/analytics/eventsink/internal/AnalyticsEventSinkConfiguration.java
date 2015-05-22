@@ -19,6 +19,10 @@ package org.wso2.carbon.analytics.eventsink.internal;
 
 import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkConstants;
 
+/**
+ * This is the configuration class which specifies about actual queue length and bundle size of the events
+ * that needs to be pushed immediatly to the data store.
+ */
 public class AnalyticsEventSinkConfiguration {
     private int queueSize;
     private int bundleSize;

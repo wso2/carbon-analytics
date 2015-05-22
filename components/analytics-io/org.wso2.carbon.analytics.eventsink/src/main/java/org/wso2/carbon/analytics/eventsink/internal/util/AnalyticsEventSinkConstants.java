@@ -17,6 +17,9 @@
 */
 package org.wso2.carbon.analytics.eventsink.internal.util;
 
+/**
+ * This class holds the constant used in the component.
+ */
 public class AnalyticsEventSinkConstants {
     public static final int DEFAULT_EVENT_QUEUE_SIZE = 131072; // This value need to be power of 2
     public static final int DEFAULT_BUNDLE_SIZE = 1024;

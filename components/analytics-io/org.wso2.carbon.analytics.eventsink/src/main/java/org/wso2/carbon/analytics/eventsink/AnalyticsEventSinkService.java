@@ -20,6 +20,9 @@ package org.wso2.carbon.analytics.eventsink;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.eventsink.exception.AnalyticsEventStoreException;
 
+/**
+ * This is the interface for the OSGI service exposed to do event store/sink related operations.
+ */
 public interface AnalyticsEventSinkService {
 
     void putEventSink(int tenantId, String streamName, String version, AnalyticsSchema analyticsSchema) throws AnalyticsEventStoreException;

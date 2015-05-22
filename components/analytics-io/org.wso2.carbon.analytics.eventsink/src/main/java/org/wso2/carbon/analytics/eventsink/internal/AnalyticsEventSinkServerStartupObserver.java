@@ -29,6 +29,11 @@ import org.wso2.carbon.utils.CarbonUtils;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * This class is to observe the server startup and do any deployments
+ * which got triggered before the server fully startup.
+ */
+
 public class AnalyticsEventSinkServerStartupObserver implements ServerStartupObserver {
 
     private static Log log = LogFactory.getLog(AnalyticsEventSinkServerStartupObserver.class);
