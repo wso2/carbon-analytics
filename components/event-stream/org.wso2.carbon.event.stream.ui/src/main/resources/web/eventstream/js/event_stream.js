@@ -68,6 +68,7 @@ function addEventStream(form, option, eventStreamId) {
                         correlationData: correlationData,
                         payloadData: payloadData,
                         indexData: indexData,
+                        eventPersist: document.getElementById("eventPersistCheckbox").checked,
                         eventStreamDescription: eventStreamDescription,
                         eventStreamNickName: eventStreamNickName
                     },
@@ -82,7 +83,6 @@ function addEventStream(form, option, eventStreamId) {
                     }
                 })
         } else if (option == "edit") {
-
             CARBON.showConfirmationDialog("If event stream is edited then related configuration files will be also affected! Are you sure want to edit?",
                 function () {
                     new Ajax.Request('../eventstream/edit_event_stream_ajaxprocessor.jsp', {
@@ -96,6 +96,7 @@ function addEventStream(form, option, eventStreamId) {
                             correlationData: correlationData,
                             payloadData: payloadData,
                             indexData: indexData,
+                            eventPersist: document.getElementById("eventPersistCheckbox").checked,
                             eventStreamDescription: eventStreamDescription,
                             eventStreamNickName: eventStreamNickName
                         }, onSuccess: function (event) {
