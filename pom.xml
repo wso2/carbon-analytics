@@ -486,12 +486,12 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.analytics.datasink</artifactId>
+                <artifactId>org.wso2.carbon.analytics.eventsink</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.analytics.datasink.server.feature</artifactId>
+                <artifactId>org.wso2.carbon.analytics.eventsink.server.feature</artifactId>
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
