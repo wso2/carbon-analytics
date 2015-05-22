@@ -44,12 +44,13 @@ public class AnalyticsEventStoreManager {
     public void addEventStoreConfiguration(int tenantId,
                                            AnalyticsEventStore analyticsEventStore)
             throws AnalyticsEventStoreException {
-        Set<AnalyticsEventStore> analyticsEventStoreList = tenantEventStoreMap.get(tenantId);
+        Set<AnalyticsEventStore> analyticsEventStoreList = this.tenantEventStoreMap.get(tenantId);
         if (analyticsEventStoreList == null) {
             synchronized (this) {
-                analyticsEventStoreList = tenantEventStoreMap.get(tenantId);
+                analyticsEventStoreList = this.tenantEventStoreMap.get(tenantId);
                 if (analyticsEventStoreList == null) {
                     analyticsEventStoreList = new LinkedHashSet<>();
+                    this.tenantEventStoreMap.put(tenantId, analyticsEventStoreList);
                 }
             }
         }
