@@ -28,16 +28,24 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.analytics.eventsink.exception.AnalyticsEventStoreException;
 import org.wso2.carbon.analytics.eventsink.exception.AnalyticsEventStoreDeploymentException;
 import org.wso2.carbon.analytics.eventsink.internal.AnalyticsEventStoreManager;
+import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkConstants;
 import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkUtil;
 import org.wso2.carbon.analytics.eventsink.internal.util.ServiceHolder;
 import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+
+import java.io.File;
 
 public class AnalyticsEventStoreDeployer extends AbstractDeployer {
     private static Log log = LogFactory.getLog(AnalyticsEventStoreDeployer.class);
 
     @Override
     public void init(ConfigurationContext configurationContext) {
-
+        File deployementDir = new File(MultitenantUtils.getAxis2RepositoryPath(CarbonContext.getThreadLocalCarbonContext().
+                getTenantId())+ File.separator+ AnalyticsEventSinkConstants.DEPLOYMENT_DIR_NAME);
+        if (!deployementDir.exists()){
+            deployementDir.mkdir();
+        }
     }
 
     public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {

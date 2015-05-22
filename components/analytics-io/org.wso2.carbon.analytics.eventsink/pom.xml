@@ -127,6 +127,7 @@
                             org.wso2.carbon.analytics.eventsink.*
                         </Export-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
+                        <Axis2Deployer>AnalyticsEventStoreDeployer</Axis2Deployer>
                     </instructions>
                 </configuration>
             </plugin>
