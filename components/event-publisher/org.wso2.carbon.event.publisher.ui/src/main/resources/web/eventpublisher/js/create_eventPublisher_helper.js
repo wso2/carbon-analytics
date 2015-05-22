@@ -101,7 +101,7 @@ function loadEventAdapterProperties(messageProperty, eventPublisherInputTable, p
 function showEventStreamDefinition() {
 
     var selectedIndex = document.getElementById("streamIdFilter").selectedIndex;
-    var streamNameWithVersion = document.getElementById("streamIdFilter").options[selectedIndex].text
+    var streamNameWithVersion = document.getElementById("streamIdFilter").options[selectedIndex].text;
     jQuery.ajax({
                     type:"POST",
                     url:"../eventpublisher/get_streamdefinition_ajaxprocessor.jsp?streamName=" + streamNameWithVersion + "",
