@@ -102,7 +102,7 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
     public void undeploy(String fileName) throws DeploymentException {
         log.info("Undeploying analytics event store : " + fileName);
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
-        String eventStoreName = AnalyticsEventSinkUtil.getAnalyticsEventStoreName(fileName);
+        String eventStoreName = AnalyticsEventSinkUtil.getAnalyticsEventStoreName(new File(fileName).getName());
         AnalyticsEventStore existingEventStore = AnalyticsEventStoreManager.getInstance().removeEventStoreConfiguration(tenantId,
                 eventStoreName);
         if (existingEventStore != null) {

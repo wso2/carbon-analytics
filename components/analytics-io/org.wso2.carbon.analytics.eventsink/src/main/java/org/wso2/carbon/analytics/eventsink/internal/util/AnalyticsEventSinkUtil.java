@@ -111,4 +111,36 @@ public class AnalyticsEventSinkUtil {
         return tableSchema;
     }
 
+    public static AnalyticsEventStore copyAnalyticsEventStore(AnalyticsEventStore analyticsEventStore)
+            throws AnalyticsEventStoreException {
+        AnalyticsEventStore copyStore = new AnalyticsEventStore();
+        copyStore.setEventSource(copyEventSource(analyticsEventStore.getEventSource()));
+        copyStore.setAnalyticsTableSchema(copyAnalyticsTableSchema(analyticsEventStore.getAnalyticsTableSchema()));
+        return copyStore;
+    }
+
+    private static AnalyticsEventStore.EventSource copyEventSource(AnalyticsEventStore.EventSource eventSource) {
+        AnalyticsEventStore.EventSource copyEventSource = new AnalyticsEventStore.EventSource();
+        List<String> streamIds = new ArrayList<>();
+        for (String streamId : eventSource.getStreamIds()) {
+            streamIds.add(streamId);
+        }
+        copyEventSource.setStreamIds(streamIds);
+        return copyEventSource;
+    }
+
+    private static AnalyticsTableSchema copyAnalyticsTableSchema(AnalyticsTableSchema analyticsTableSchema) {
+        AnalyticsTableSchema copySchema = new AnalyticsTableSchema();
+        List<AnalyticsTableSchema.Column> columns = new ArrayList<>();
+        for (AnalyticsTableSchema.Column originalCol : analyticsTableSchema.getColumns()) {
+            AnalyticsTableSchema.Column column = new AnalyticsTableSchema.Column();
+            column.setColumnName(originalCol.getColumnName());
+            column.setIndexed(originalCol.isIndexed());
+            column.setPrimaryKey(originalCol.isPrimaryKey());
+            column.setScoreParam(originalCol.isScoreParam());
+            column.setType(originalCol.getType());
+        }
+        copySchema.setColumns(columns);
+        return copySchema;
+    }
 }

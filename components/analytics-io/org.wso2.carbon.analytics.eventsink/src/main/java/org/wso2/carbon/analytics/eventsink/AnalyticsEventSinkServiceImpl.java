@@ -57,12 +57,14 @@ public class AnalyticsEventSinkServiceImpl implements AnalyticsEventSinkService 
         String eventStoreName = AnalyticsEventSinkUtil.generateAnalyticsTableName(streamName);
         AnalyticsEventStore existingEventStore = AnalyticsEventStoreManager.getInstance().
                 getAnalyticsEventStore(tenantId, eventStoreName);
-        if (existingEventStore.getEventSource().getStreamIds().remove(streamId)) {
-            if (existingEventStore.getEventSource().getStreamIds().size() == 0){
+        if (existingEventStore.getEventSource().getStreamIds().contains(streamId)) {
+            if (existingEventStore.getEventSource().getStreamIds().size() == 1) {
                 AnalyticsEventStoreManager.getInstance().deleteEventStoreConfiguration(tenantId, eventStoreName);
-            }else {
+            } else {
+                AnalyticsEventStore newAnalyticsEventSink = AnalyticsEventSinkUtil.copyAnalyticsEventStore(existingEventStore);
+                newAnalyticsEventSink.getEventSource().getStreamIds().remove(streamId);
                 AnalyticsEventStoreManager.getInstance().
-                        saveEventStoreConfiguration(tenantId, existingEventStore);
+                        saveEventStoreConfiguration(tenantId, newAnalyticsEventSink);
             }
         }
     }

@@ -73,9 +73,12 @@ public class AnalyticsEventStoreManager {
     }
 
     public void deleteEventStoreConfiguration(int tenantId, String eventStoreName) {
-        File eventStoreFile = new File(MultitenantUtils.getAxis2RepositoryPath(tenantId)
-                + File.separator + eventStoreName);
-        eventStoreFile.deleteOnExit();
+        File eventStoreFile = new File(MultitenantUtils.getAxis2RepositoryPath(tenantId) +
+                AnalyticsEventSinkConstants.DEPLOYMENT_DIR_NAME + File.separator + eventStoreName +
+                AnalyticsEventSinkConstants.DEPLOYMENT_FILE_EXT);
+        if (eventStoreFile.exists()) {
+            eventStoreFile.delete();
+        }
     }
 
     public AnalyticsEventStore getAnalyticsEventStore(File configFile)
