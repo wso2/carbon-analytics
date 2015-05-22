@@ -105,6 +105,7 @@ public class AnalyticsEventSinkUtil {
             if (schema.getPrimaryKeys().contains(column.getKey())) {
                 analyticsColumn.setPrimaryKey(true);
             }
+            columns.add(analyticsColumn);
         }
         tableSchema.setColumns(columns);
         return tableSchema;
