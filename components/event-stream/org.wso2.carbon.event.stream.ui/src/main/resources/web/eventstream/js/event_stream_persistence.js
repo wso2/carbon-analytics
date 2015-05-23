@@ -112,7 +112,8 @@ function populateAnalyticsIndexTable(eventStreamName) {
                 var currentRowCount = table.rows.length;
                 //var nextRowPosition = currentRowCount - 1;
                 var tbody = table.getElementsByTagName('tbody')[0];
-                jQuery.each(resultJson, function (index, element) {
+                document.getElementById('eventPersistCheckbox').checked = resultJson.persist;
+                jQuery.each(resultJson.analyticsTableRecords, function (index, element) {
                     //var columnRecordNotContain = true;
                     for (var j = 1; j < currentRowCount; j++) {
                         var row = table.rows[j];

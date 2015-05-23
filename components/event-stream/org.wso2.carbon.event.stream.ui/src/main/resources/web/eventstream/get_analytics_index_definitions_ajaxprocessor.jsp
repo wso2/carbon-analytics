@@ -33,6 +33,8 @@
                     org.wso2.carbon.event.stream.ui.beans.AnalyticsTableRecord[] tableColumns = new
                             org.wso2.carbon.event.stream.ui.beans.AnalyticsTableRecord[analyticsTableColumns.length];
                     int i = 0;
+                    org.wso2.carbon.event.stream.ui.beans.AnalyticsTable table = new
+                            org.wso2.carbon.event.stream.ui.beans.AnalyticsTable();
                     for (AnalyticsTableRecord analyticsTableColumn : analyticsTableColumns) {
                         org.wso2.carbon.event.stream.ui.beans.AnalyticsTableRecord column = new
                                 org.wso2.carbon.event.stream.ui.beans.AnalyticsTableRecord();
@@ -43,7 +45,9 @@
                         column.setScoreParam(analyticsTableColumn.getScoreParam());
                         tableColumns[i++] = column;
                     }
-                    responseText = new Gson().toJson(tableColumns);
+                    table.setAnalyticsTableRecords(tableColumns);
+                    table.setPersist(schema.getPersist());
+                    responseText = new Gson().toJson(table);
                 }
             }
         } catch (Exception e) {
