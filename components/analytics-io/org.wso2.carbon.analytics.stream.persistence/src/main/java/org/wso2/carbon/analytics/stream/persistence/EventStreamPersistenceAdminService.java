@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
+import org.wso2.carbon.analytics.eventsink.AnalyticsEventStore;
 import org.wso2.carbon.analytics.eventsink.exception.AnalyticsEventStoreException;
 import org.wso2.carbon.analytics.stream.persistence.dto.AnalyticsTable;
 import org.wso2.carbon.analytics.stream.persistence.dto.AnalyticsTableRecord;
@@ -56,7 +57,7 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
     /**
      * This method is use to get Analytics table information for given stream name without considering the version
      *
-     * @param streamName
+     * @param streamName stream name
      * @return AnalyticsTable instance with column details
      */
     public AnalyticsTable getAnalyticsTable(String streamName) throws EventStreamPersistenceAdminServiceException {
@@ -90,6 +91,10 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
                             tableColumns[i++] = analyticsTableRecord;
                         }
                         analyticsTable.setAnalyticsTableRecords(tableColumns);
+                        AnalyticsEventStore eventStore = ServiceHolder.getAnalyticsEventSinkService().getEventStore(getTenantId(), streamName);
+                        if (eventStore != null) {
+                            analyticsTable.setPersist(true);
+                        }
                     }
                 }
             }
@@ -123,7 +128,7 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
     /**
      * This method will create a deployable artifact for given AnalyticsTable information.
      *
-     * @param analyticsTable
+     * @param analyticsTable AnalyticsTable object with index and type information
      */
     public void addAnalyticsTable(AnalyticsTable analyticsTable) throws EventStreamPersistenceAdminServiceException {
         if (analyticsTable != null) {
@@ -148,20 +153,24 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
                                 for (AnalyticsTableRecord analyticsTableRecord : analyticsTableRecords) {
                                     if (columns != null && columns.containsKey(analyticsTableRecord.getColumnName())) {
                                         ColumnDefinition columnDefinition = columns.remove(analyticsTableRecord.getColumnName());
-                                        columnDefinition.setType(getColumnType(analyticsTableRecord.getColumnType()));
-                                        columnDefinition.setIndexed(analyticsTableRecord.isIndexed());
-                                        columnDefinition.setScoreParam(analyticsTableRecord.isScoreParam());
-                                        columnDefinitions.add(columnDefinition);
-                                        if (analyticsTableRecord.isPrimaryKey()) {
+                                        if (analyticsTableRecord.isPersist()) {
+                                            columnDefinition.setType(getColumnType(analyticsTableRecord.getColumnType()));
+                                            columnDefinition.setIndexed(analyticsTableRecord.isIndexed());
+                                            columnDefinition.setScoreParam(analyticsTableRecord.isScoreParam());
+                                            columnDefinitions.add(columnDefinition);
+                                        }
+                                        if (analyticsTableRecord.isPrimaryKey() && analyticsTableRecord.isPersist()) {
                                             primaryKeys.add(analyticsTableRecord.getColumnName());
                                         } else {
                                             primaryKeys.remove(analyticsTableRecord.getColumnName());
                                         }
                                     } else {
-                                        ColumnDefinition columnDefinition = getColumnDefinition(analyticsTableRecord);
-                                        columnDefinitions.add(columnDefinition);
-                                        if (analyticsTableRecord.isPrimaryKey()) {
-                                            primaryKeys.add(analyticsTableRecord.getColumnName());
+                                        if (analyticsTableRecord.isPersist()) {
+                                            ColumnDefinition columnDefinition = getColumnDefinition(analyticsTableRecord);
+                                            columnDefinitions.add(columnDefinition);
+                                            if (analyticsTableRecord.isPrimaryKey()) {
+                                                primaryKeys.add(analyticsTableRecord.getColumnName());
+                                            }
                                         }
                                     }
                                 }
