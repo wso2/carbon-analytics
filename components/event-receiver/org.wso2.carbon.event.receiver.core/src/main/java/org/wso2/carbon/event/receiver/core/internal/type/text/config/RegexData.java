@@ -26,6 +26,7 @@ public class RegexData {
     private List<String> types;
     private List<String> defaultValues;
     private String regex;
+    private boolean matched;
 
     public RegexData(String regex) {
         this.regex = regex;
@@ -52,7 +53,7 @@ public class RegexData {
     public String next() {
         matchGroupIndex++;
         String matchResult;
-        if (matchGroupIndex < matcher.groupCount()) {
+        if (matched && matchGroupIndex < matcher.groupCount()) {
             matchResult = matcher.group(matchGroupIndex + 1);
         } else {
             matchResult = defaultValues.get(matchGroupIndex);
@@ -66,7 +67,7 @@ public class RegexData {
 
     public void matchInput(String input) {
         this.matcher = pattern.matcher(input);
-        this.matcher.find();
+        matched =  this.matcher.find();
         this.matchGroupIndex = -1;
     }
 
