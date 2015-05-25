@@ -478,19 +478,19 @@ public class Utils {
                     if (type != null) {
                         switch (type) {
                             case DOUBLE:
-                                values.add(bean.getDoubleValue());
+                                values.add(Double.parseDouble(bean.getStringValue()));
                                 break;
                             case INT:
-                                values.add(new Double(bean.getDoubleValue()).intValue());
+                                values.add(new Double(Double.parseDouble(bean.getStringValue())).intValue());
                                 break;
                             case BOOL:
-                                values.add(bean.getBooleanValue());
+                                values.add(Boolean.parseBoolean(bean.getStringValue()));
                                 break;
                             case LONG:
-                                values.add(new Double(bean.getDoubleValue()).longValue());
+                                values.add(new Double(Double.parseDouble(bean.getStringValue())).longValue());
                                 break;
                             case FLOAT:
-                                values.add(new Double(bean.getDoubleValue()).floatValue());
+                                values.add(new Double(Double.parseDouble(bean.getStringValue())).floatValue());
                                 break;
                             case STRING:
                                 values.add(bean.getStringValue());
@@ -498,9 +498,11 @@ public class Utils {
                             default:
                                 throw new AnalyticsWebServiceException("DataType is not valid for [" + bean.getFieldName());
                         }
+                    } else {
+                        throw new AnalyticsWebServiceException("Type is not defined for field: " + bean.getFieldName());
                     }
                 } else {
-                    throw new AnalyticsWebServiceException("Type is not defined for field: " + bean.getFieldName());
+                    throw new AnalyticsWebServiceException("Record Values are null");
                 }
             }
         }

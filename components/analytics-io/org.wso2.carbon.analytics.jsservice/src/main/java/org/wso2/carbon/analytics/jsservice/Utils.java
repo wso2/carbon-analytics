@@ -157,18 +157,9 @@ public class Utils {
             RecordValueEntryBean recordValueEntryBean = new RecordValueEntryBean();
             recordValueEntryBean.setFieldName(entry.getKey());
             Object value = entry.getValue();
-            if (value instanceof Number) {
-                recordValueEntryBean.setType("DOUBLE");
-                recordValueEntryBean.setDoubleValue(((Double) value));
-            } else if (value instanceof Boolean) {
-                recordValueEntryBean.setType("BOOLEAN");
-                recordValueEntryBean.setBooleanValue(((Boolean) value));
-            } else if (value instanceof String) {
-                recordValueEntryBean.setType("STRING");
+            recordValueEntryBean.setType("STRING");
+            if (value != null) {
                 recordValueEntryBean.setStringValue(value.toString());
-            } else if (value instanceof ArrayList) {
-                recordValueEntryBean.setType("FACET");
-                recordValueEntryBean.setAnalyticsCategoryPathBeanValue(validateAndReturn(value));
             }
             recordValueEntryBeans.add(recordValueEntryBean);
         }

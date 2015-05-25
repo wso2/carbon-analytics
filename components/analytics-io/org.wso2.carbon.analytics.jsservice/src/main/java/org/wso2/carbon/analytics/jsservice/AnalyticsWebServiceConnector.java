@@ -422,7 +422,7 @@ public class AnalyticsWebServiceConnector {
 
     private Long validateNumericValue(String field, String value) throws JSServiceException {
         if (value == null || !NumberUtils.isNumber(value)) {
-            throw new JSServiceException("'" + field + "' is not numeric (value is + " + value + ")");
+            throw new JSServiceException("'" + field + "' is not numeric (value is: " + value + ")");
         } else {
             return Long.parseLong(value);
         }
