@@ -401,7 +401,8 @@
 														</tr>
 														<%
 															try {
-																AnalyticsTable analyticsTable = streamPersistenceAdminServiceStub.getAnalyticsTable(streamDefinitionDto.getName());
+																AnalyticsTable analyticsTable =
+																		streamPersistenceAdminServiceStub.getAnalyticsTable(streamDefinitionDto.getName(), streamDefinitionDto.getVersion());
 																if (analyticsTable != null &&
 																	analyticsTable.getAnalyticsTableRecords() != null) {
 														%>

@@ -65,7 +65,7 @@
         } else {
             document.getElementById("stream").style.display = 'none';
             document.getElementById("persist").style.display = 'block';
-            populateAnalyticsIndexTable(eventStreamName);
+            populateAnalyticsIndexTable(eventStreamName, eventStreamVersion);
         }
     }
 
