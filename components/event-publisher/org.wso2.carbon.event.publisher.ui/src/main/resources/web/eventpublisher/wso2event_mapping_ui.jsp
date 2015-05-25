@@ -28,9 +28,6 @@
         String streamId = request.getParameter("streamNameWithVersion");
         EventStreamAdminServiceStub eventStreamAdminServiceStub = EventPublisherUIUtils.getEventStreamAdminService(config, session, request);
         EventStreamDefinitionDto streamDefinitionDto = eventStreamAdminServiceStub.getStreamDefinitionDto(streamId);
-        String[] toStreamNameAndVersion = streamId.split(":");
-        String streamName = toStreamNameAndVersion[0];
-        String streamVersion = toStreamNameAndVersion[1];
         List<String> attributeList = EventPublisherUIUtils.getAttributeListWithPrefix(streamDefinitionDto);
     %>
 
@@ -51,7 +48,7 @@
             </td>
             <td>
                 <div class="outputFields">
-                    <input id="property_Required_stream_name" class="initE" type="text" value="<%=streamName%>" name="stream" style="width:75%">
+                    <input id="property_Required_stream_name" class="initE" type="text" value="" name="stream" style="width:75%">
                 </div>
             </td>
         </tr>
@@ -62,7 +59,7 @@
             </td>
             <td>
                 <div class="outputFields">
-                    <input id="property_Required_stream_version" class="initE" type="text" value="<%=streamVersion%>" name="version" style="width:75%">
+                    <input id="property_Required_stream_version" class="initE" type="text" value="" name="version" style="width:75%">
                 </div>
             </td>
         </tr>
