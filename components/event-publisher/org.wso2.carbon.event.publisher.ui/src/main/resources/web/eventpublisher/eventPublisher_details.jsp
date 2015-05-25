@@ -360,8 +360,29 @@
             </td>
         </tr>
         <tr name="outputWSO2EventMapping">
+            <td class="leftCol-med">
+                <fmt:message key="to.event.stream"/>
+            </td>
+            <td>
+                <input type="text" name="outputStreamName" id="outputStreamNameId"
+                class="initE"
+                value="<%=eventPublisherConfigurationDto.getWso2EventOutputMappingDto().getOutputStreamName()%>"
+                style="width:75%" disabled="disabled"/>
+            </td>
+        </tr>
+        <tr name="outputWSO2EventMapping">
+            <td class="leftCol-med">
+                <fmt:message key="to.event.version"/>
+            </td>
+            <td>
+                <input type="text" name="outputStreamVersion" id="outputStreamVersionId"
+                       class="initE"
+                       value="<%=eventPublisherConfigurationDto.getWso2EventOutputMappingDto().getOutputStreamVersion()%>"
+                       style="width:75%" disabled="disabled"/>
+            </td>
+        </tr>
+        <tr name="outputWSO2EventMapping">
             <td colspan="2">
-
                 <h6><fmt:message key="property.data.type.meta"/></h6>
                 <% if (eventPublisherConfigurationDto.getWso2EventOutputMappingDto().getMetaWSO2EventMappingProperties() != null && eventPublisherConfigurationDto.getWso2EventOutputMappingDto().getMetaWSO2EventMappingProperties()[0] != null) { %>
                 <table class="styledLeft noBorders spacer-bot" id="outputMetaDataTable">
