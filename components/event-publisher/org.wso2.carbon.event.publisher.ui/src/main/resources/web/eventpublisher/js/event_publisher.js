@@ -307,6 +307,11 @@ function addEventPublisher(form, streamNameWithVersion) {
             var toStreamName = document.getElementById("property_Required_stream_name").value;
             var toStreamVersion = document.getElementById("property_Required_stream_version").value;
 
+            if (toStreamName.localeCompare("") == 0 || toStreamVersion.localeCompare("") == 0) {
+                CARBON.showErrorDialog("Empty output event stream detail fields are not allowed.");
+                return;
+            }
+
             var metaDataTable = document.getElementById("outputMetaDataTable");
             if (metaDataTable.rows.length > 1) {
                 metaData = getWSO2EventDataValues(metaDataTable);

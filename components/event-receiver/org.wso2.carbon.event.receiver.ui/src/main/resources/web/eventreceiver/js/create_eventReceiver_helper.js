@@ -562,6 +562,10 @@ function addEventReceiverViaPopup(form, toStreamId, redirectPage) {
         if (customMappingValue == "enable") {
             fromStreamName = document.getElementById("property_Required_stream_name").value;
             fromStreamVersion = document.getElementById("property_Required_stream_version").value;
+            if (fromStreamName.localeCompare("") == 0 || fromStreamVersion.localeCompare("") == 0) {
+                CARBON.showErrorDialog("Empty input event stream detail fields are not allowed.");
+                return;
+            }
             metaData = getWso2EventDataValues("addMetaEventDataTable", 'meta');
             correlationData = getWso2EventDataValues("addCorrelationEventDataTable", 'correlation');
             payloadData = getWso2EventDataValues("addPayloadEventDataTable", 'payload');
