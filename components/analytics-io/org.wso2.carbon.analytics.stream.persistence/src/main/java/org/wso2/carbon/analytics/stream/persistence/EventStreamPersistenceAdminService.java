@@ -58,9 +58,11 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
      * This method is use to get Analytics table information for given stream name without considering the version
      *
      * @param streamName stream name
+     * @param version stream version
      * @return AnalyticsTable instance with column details
      */
-    public AnalyticsTable getAnalyticsTable(String streamName) throws EventStreamPersistenceAdminServiceException {
+    public AnalyticsTable getAnalyticsTable(String streamName, String version) throws
+                                                                               EventStreamPersistenceAdminServiceException {
         if (log.isDebugEnabled()) {
             log.debug("Getting analytics schema for stream: " + streamName);
         }
@@ -92,8 +94,11 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
                         }
                         analyticsTable.setAnalyticsTableRecords(tableColumns);
                         AnalyticsEventStore eventStore = ServiceHolder.getAnalyticsEventSinkService().getEventStore(getTenantId(), streamName);
-                        if (eventStore != null) {
-                            analyticsTable.setPersist(true);
+                        if (eventStore != null && eventStore.getEventSource() != null) {
+                            List<String> streamIds = eventStore.getEventSource().getStreamIds();
+                            if (streamIds != null && streamIds.contains(streamName + ":" + version)) {
+                                analyticsTable.setPersist(true);
+                            }
                         }
                     }
                 }
