@@ -265,7 +265,6 @@
 
             <%
                 if (mappingType != null) {
-                    System.out.println("\n\n\n" + mappingType + "\n\n\n");
                     if (mappingType.equals("wso2event")) {
             %>
             <tr fromElementKey="inputWso2EventMapping">
