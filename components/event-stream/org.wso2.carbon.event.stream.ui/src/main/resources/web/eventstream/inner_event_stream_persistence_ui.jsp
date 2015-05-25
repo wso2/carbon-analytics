@@ -30,7 +30,11 @@
         }
     }
 </script>
-
+<div>
+    <span style="float: left; position: relative; margin-top: 2px;">
+        <input type="checkbox" id="eventPersistCheckbox"/> Persist Event Stream
+    </span>
+</div>
 <fmt:bundle basename="org.wso2.carbon.event.stream.ui.i18n.Resources">
 
     <table id="analyticsIndexTable" class="styledLeft noBorders spacer-bot" style="width:100%" on>

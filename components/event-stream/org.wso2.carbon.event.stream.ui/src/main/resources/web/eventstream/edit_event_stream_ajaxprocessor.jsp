@@ -114,18 +114,19 @@
                 List<AnalyticsTableRecord> analyticsTableColumns = new ArrayList<AnalyticsTableRecord>();
                 for (String property : properties) {
                     String[] propertyConfiguration = property.split("\\^=");
-                    if (propertyConfiguration[0].equalsIgnoreCase("true")) {
-                        AnalyticsTableRecord analyticsTableColumn = new AnalyticsTableRecord();
-                        analyticsTableColumn.setColumnName(propertyConfiguration[1]);
-                        analyticsTableColumn.setColumnType(propertyConfiguration[2]);
-                        analyticsTableColumn.setPrimaryKey(Boolean.parseBoolean(propertyConfiguration[3]));
-                        analyticsTableColumn.setIndexed(Boolean.parseBoolean(propertyConfiguration[4]));
-                        analyticsTableColumn.setScoreParam(Boolean.parseBoolean(propertyConfiguration[5]));
-                        analyticsTableColumns.add(analyticsTableColumn);
-                    }
+                    AnalyticsTableRecord analyticsTableColumn = new AnalyticsTableRecord();
+                    analyticsTableColumn.setPersist(Boolean.parseBoolean(propertyConfiguration[0]));
+                    analyticsTableColumn.setColumnName(propertyConfiguration[1]);
+                    analyticsTableColumn.setColumnType(propertyConfiguration[2]);
+                    analyticsTableColumn.setPrimaryKey(Boolean.parseBoolean(propertyConfiguration[3]));
+                    analyticsTableColumn.setIndexed(Boolean.parseBoolean(propertyConfiguration[4]));
+                    analyticsTableColumn.setScoreParam(Boolean.parseBoolean(propertyConfiguration[5]));
+                    analyticsTableColumns.add(analyticsTableColumn);
                 }
                 AnalyticsTable analyticsTable = new AnalyticsTable();
                 analyticsTable.setTableName(request.getParameter("eventStreamName"));
+                analyticsTable.setStreamVersion(request.getParameter("eventStreamVersion"));
+                analyticsTable.setPersist(Boolean.parseBoolean(request.getParameter("eventPersist")));
                 analyticsTable.setAnalyticsTableRecords(
                         analyticsTableColumns.toArray(new AnalyticsTableRecord[analyticsTableColumns.size()]));
                 streamPersistenceAdminServiceStub.addAnalyticsTable(analyticsTable);

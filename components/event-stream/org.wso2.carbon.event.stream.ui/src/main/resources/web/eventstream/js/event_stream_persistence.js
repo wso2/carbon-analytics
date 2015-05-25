@@ -109,27 +109,86 @@ function populateAnalyticsIndexTable(eventStreamName) {
             }
             if (IS_JSON) {
                 var table = document.getElementById('analyticsIndexTable');
-                for (var i in resultJson) {
-                    for (var j = 1; j < table.rows.length; j++) {
+                var currentRowCount = table.rows.length;
+                //var nextRowPosition = currentRowCount - 1;
+                var tbody = table.getElementsByTagName('tbody')[0];
+                document.getElementById('eventPersistCheckbox').checked = resultJson.persist;
+                jQuery.each(resultJson.analyticsTableRecords, function (index, element) {
+                    //var columnRecordNotContain = true;
+                    for (var j = 1; j < currentRowCount; j++) {
                         var row = table.rows[j];
                         var columnName = row.cells[1].textContent;
-                        if (columnName.trim() == resultJson[i].columnName) {
+                        if (columnName.trim() == element.columnName) {
+                            //columnRecordNotContain = false;
                             row.cells[0].childNodes[0].checked = true;
                             var select = row.cells[2].childNodes[0];
                             if (select.value == 'string') {
-                                if (resultJson[i].columnType == 'STRING') {
+                                if (element.columnType == 'STRING') {
                                     select.selectedIndex = 0;
                                 } else {
                                     select.selectedIndex = 1;
                                 }
                             }
-                            row.cells[3].childNodes[0].checked = resultJson[i].primaryKey;
-                            row.cells[4].childNodes[0].checked = resultJson[i].indexed;
-                            row.cells[5].childNodes[0].checked = resultJson[i].scoreParam;
+                            row.cells[3].childNodes[0].checked = element.primaryKey;
+                            row.cells[4].childNodes[0].checked = element.indexed;
+                            row.cells[5].childNodes[0].checked = element.scoreParam;
                             break;
                         }
                     }
-                }
+                    /*// This record not in this current stream, but available in analytics schema
+                     if (columnRecordNotContain) {
+                     var row = tbody.insertRow(nextRowPosition);
+                     var cellNo = 0;
+                     var persistCell = row.insertCell(cellNo++);
+                     var persistCheckElement = document.createElement('input');
+                     persistCheckElement.type = "checkbox";
+                     persistCheckElement.name = "persist";
+                     persistCheckElement.checked = true;
+                     persistCheckElement.disabled = true;
+                     persistCell.appendChild(persistCheckElement);
+
+                     var columnCell = row.insertCell(cellNo++);
+                     var columnInputElement = document.createElement('label');
+                     columnInputElement.name = "column";
+                     columnInputElement.innerHTML = element.columnName;
+                     columnCell.appendChild(columnInputElement);
+
+                     var typeCell = row.insertCell(cellNo++);
+                     var selectElement = document.createElement('select');
+                     selectElement.options[0] = new Option('STRING', 'string');
+                     selectElement.options[1] = new Option('INTEGER', 'int');
+                     selectElement.options[2] = new Option('LONG', 'long');
+                     selectElement.options[3] = new Option('BOOLEAN', 'bool');
+                     selectElement.options[4] = new Option('FLOAT', 'float');
+                     selectElement.options[5] = new Option('DOUBLE', 'double');
+                     selectElement.options[6] = new Option('FACET', 'FACET');
+                     selectElement.value = element.columnType;
+                     selectElement.disabled = true;
+                     typeCell.appendChild(selectElement);
+
+                     var primaryCell = row.insertCell(cellNo++);
+                     var primaryCheckElement = document.createElement('input');
+                     primaryCheckElement.type = "checkbox";
+                     primaryCheckElement.checked = element.primaryKey;
+                     primaryCheckElement.disabled = true;
+                     primaryCell.appendChild(primaryCheckElement);
+
+                     var indexCell = row.insertCell(cellNo++);
+                     var indexCheckElement = document.createElement('input');
+                     indexCheckElement.type = "checkbox";
+                     indexCheckElement.checked = element.indexed;
+                     indexCheckElement.disabled = true;
+                     indexCell.appendChild(indexCheckElement);
+
+                     var scoreParamCell = row.insertCell(cellNo++);
+                     var scoreParamCheckElement = document.createElement('input');
+                     scoreParamCheckElement.type = "checkbox";
+                     scoreParamCheckElement.checked = element.scoreParam;
+                     scoreParamCheckElement.disabled = true;
+                     scoreParamCell.appendChild(scoreParamCheckElement);
+                     nextRowPosition++;
+                     }*/
+                });
             } else {
                 CARBON.showErrorDialog("Failed to get index information, Exception: " + result);
             }
@@ -139,15 +198,17 @@ function populateAnalyticsIndexTable(eventStreamName) {
 
 function getAnalyticsIndexDataValues(dataTable) {
     var wso2EventData = "";
-    for (var i = 1; i < dataTable.rows.length; i++) {
-        var row = dataTable.rows[i];
-        var persist = row.cells[0].childNodes[0].checked;
-        var columnName = row.cells[1].textContent.trim();
-        var type = row.cells[2].childNodes[0].options[row.cells[2].childNodes[0].selectedIndex].text;
-        var primary = row.cells[3].childNodes[0].checked;
-        var index = row.cells[4].childNodes[0].checked;
-        var scoreParam = row.cells[5].childNodes[0].checked;
-        wso2EventData = wso2EventData + persist + "^=" + columnName + "^=" + type + "^=" + primary + "^=" + index + "^=" + scoreParam + "^=" + "$=";
+    if (document.getElementById("eventPersistCheckbox").checked) {
+        for (var i = 1; i < dataTable.rows.length; i++) {
+            var row = dataTable.rows[i];
+            var persist = row.cells[0].childNodes[0].checked;
+            var columnName = row.cells[1].textContent.trim();
+            var type = row.cells[2].childNodes[0].options[row.cells[2].childNodes[0].selectedIndex].text;
+            var primary = row.cells[3].childNodes[0].checked;
+            var index = row.cells[4].childNodes[0].checked;
+            var scoreParam = row.cells[5].childNodes[0].checked;
+            wso2EventData = wso2EventData + persist + "^=" + columnName + "^=" + type + "^=" + primary + "^=" + index + "^=" + scoreParam + "^=" + "$=";
+        }
     }
     return wso2EventData;
 }
