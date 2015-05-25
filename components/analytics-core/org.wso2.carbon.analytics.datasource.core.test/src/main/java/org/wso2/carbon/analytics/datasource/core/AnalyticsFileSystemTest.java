@@ -94,6 +94,44 @@ public class AnalyticsFileSystemTest {
         this.analyticsFileSystem.delete("/d1");
         Assert.assertFalse(this.analyticsFileSystem.exists("/d1/d2/d3"));
         Assert.assertFalse(this.analyticsFileSystem.exists("/d1/d2/d5"));
+        this.analyticsFileSystem.mkdir("/d1");
+        Assert.assertFalse(this.analyticsFileSystem.exists("/d1/d2"));
+        this.analyticsFileSystem.mkdir("/d1/d2");
+        Assert.assertFalse(this.analyticsFileSystem.exists("/d1/d2/d3"));
+        Assert.assertFalse(this.analyticsFileSystem.exists("/d1/d2/f1"));
+        this.analyticsFileSystem.createOutput("/d1/d2/f1").close();
+        Assert.assertEquals(this.analyticsFileSystem.length("/d1/d2/f1"), 0);
+        this.analyticsFileSystem.delete("/d1");
+        Assert.assertFalse(this.analyticsFileSystem.exists("/d1/d2/f1"));
+    }
+    
+    @Test
+    public void testFSDirectoryFileRename() throws IOException {
+        this.analyticsFileSystem.delete("/a");
+        this.analyticsFileSystem.mkdir("/a/b");
+        this.addFilesToDir("/a/b", "x");
+        byte[] data = this.readAll(this.analyticsFileSystem.createInput("/a/b/x"));
+        this.analyticsFileSystem.renameFileInDirectory("/a/b", "x", "y");
+        byte[] dataIn = this.readAll(this.analyticsFileSystem.createInput("/a/b/y"));
+        Assert.assertEquals(data, dataIn);
+        Assert.assertFalse(this.analyticsFileSystem.exists("/a/b/x"));
+        this.analyticsFileSystem.createOutput("/a/b/x").close();
+        data = this.readAll(this.analyticsFileSystem.createInput("/a/b/x"));
+        Assert.assertEquals(data.length, 0);
+        this.analyticsFileSystem.delete("/a");
+        Assert.assertFalse(this.analyticsFileSystem.exists("/a/b/x"));
+        Assert.assertFalse(this.analyticsFileSystem.exists("/a/b/y"));
+    }
+    
+    private byte[] readAll(DataInput input) throws IOException {
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        byte[] buff = new byte[1024];
+        int i;
+        while ((i = input.read(buff, 0, buff.length)) > 0) {
+            byteOut.write(buff, 0, i);
+        }
+        byteOut.close();
+        return byteOut.toByteArray();
     }
     
     public static byte[] generateData(int size) {

@@ -233,4 +233,13 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
         }
     }
 
+    @Override
+    public void renameFileInDirectory(String dirPath, String nameFrom, String nameTo) throws IOException {
+        if (!dirPath.endsWith("/")) {
+            dirPath += "/";
+        }
+        this.fileSystem.rename(HBaseUtils.createPath(dirPath + nameFrom), 
+                HBaseUtils.createPath(dirPath + nameTo));
+    }
+
 }

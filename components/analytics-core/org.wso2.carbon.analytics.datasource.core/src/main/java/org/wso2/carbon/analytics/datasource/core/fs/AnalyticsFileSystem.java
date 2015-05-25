@@ -70,6 +70,15 @@ public interface AnalyticsFileSystem {
     void mkdir(String path) throws IOException;
     
     /**
+     * Renames a file within a directory.
+     * @param dirPath The directory where the files are considered
+     * @param nameFrom The source name of the file
+     * @param nameTo The target name of the file
+     * @throws IOException
+     */
+    void renameFileInDirectory(String dirPath, String nameFrom, String nameTo) throws IOException;
+    
+    /**
      * Creates an object to do read related operations.
      * @param path The path of the file
      * @return The {@link DataInput} object

@@ -83,6 +83,8 @@ public class RDBMSQueryConfigurationEntry {
     
     private String fsListFilesQuery;
     
+    private String fsUpdateDataPathQuery;
+    
     private String fsInsertPathQuery;
     
     private String fsFileLengthRetrievalQuery;
@@ -98,6 +100,8 @@ public class RDBMSQueryConfigurationEntry {
     private String fsMergeDataChunkQuery;
     
     private String fsDeletePathQuery;
+    
+    private String fsDeleteDataQuery;
     
     private int fsDataChunkSize;
 
@@ -362,8 +366,24 @@ public class RDBMSQueryConfigurationEntry {
         return fsDeletePathQuery;
     }
     
+    public String getFsDeleteDataQuery() {
+        return fsDeleteDataQuery;
+    }
+    
     public void setFsDeletePathQuery(String fsDeletePathQuery) {
         this.fsDeletePathQuery = fsDeletePathQuery;
+    }
+    
+    public void setFsDeleteDataQuery(String fsDeleteDataQuery) {
+        this.fsDeleteDataQuery = fsDeleteDataQuery;
+    }
+    
+    public String getFsUpdateDataPathQuery() {
+        return fsUpdateDataPathQuery;
+    }
+    
+    public void setFsUpdateDataPathQuery(String fsUpdateDataPathQuery) {
+        this.fsUpdateDataPathQuery = fsUpdateDataPathQuery;
     }
 
     public int getFsDataChunkSize() {

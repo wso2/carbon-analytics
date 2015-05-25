@@ -147,16 +147,31 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
         path = GenericUtils.normalizePath(path);
         Connection conn = null;
         try {
-            conn = this.getConnection();
-            this.deleteImpl(conn, path);
+            conn = this.getConnection(true);
+            this.deleteRecursively(conn, path);
+            conn.commit();
         } catch (SQLException e) {
+            RDBMSUtils.rollbackConnection(conn);
             throw new IOException("Error in file delete: " + path + ": " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
     }
     
-    protected void deleteImpl(Connection conn, String path) throws SQLException {
+    private void deleteRecursively(Connection conn, String path) throws IOException {
+        List<String> names = this.listImpl(conn, path);
+        for (String name : names) {
+            this.deleteRecursively(conn, path + (path.endsWith("/") ? "" : "/") + name);
+        }
+        try {
+            this.deleteDataImpl(conn, path);
+            this.deletePathImpl(conn, path);
+        } catch (SQLException e) {
+            throw new IOException("Error in deleting path: " + path + ": " + e.getMessage(), e);
+        }
+    }
+    
+    protected void deletePathImpl(Connection conn, String path) throws SQLException {
         PreparedStatement stmt = conn.prepareStatement(this.getDeletePathQuery());
         stmt.setString(1, path);
         stmt.executeUpdate();
@@ -165,6 +180,25 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
     
     protected String getDeletePathQuery() {
         return this.getQueryConfiguration().getFsDeletePathQuery();
+    }
+    
+    protected void deleteDataImpl(Connection conn, String path) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement(this.getDeleteDataQuery());
+        stmt.setString(1, path);
+        stmt.executeUpdate();
+        RDBMSUtils.cleanupConnection(null, stmt, null);
+    }
+    
+    protected void updateDataPathImpl(Connection conn, String fromPath, String toPath) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement(this.getFsUpdateDataPathQuery());
+        stmt.setString(1, toPath);
+        stmt.setString(2, fromPath);
+        stmt.executeUpdate();
+        RDBMSUtils.cleanupConnection(null, stmt, null);
+    }
+    
+    protected String getDeleteDataQuery() {
+        return this.getQueryConfiguration().getFsDeleteDataQuery();
     }
 
     @Override
@@ -200,15 +234,33 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
     protected String getListFilesQuery() {
         return this.getQueryConfiguration().getFsListFilesQuery();
     }
+    
+    protected String getFsDeletePathQuery() {
+        return this.getQueryConfiguration().getFsDeletePathQuery();
+    }
+    
+    protected String getFsUpdateDataPathQuery() {
+        return this.getQueryConfiguration().getFsUpdateDataPathQuery();
+    }
 
     @Override
     public List<String> list(String path) throws IOException {
         path = GenericUtils.normalizePath(path);
         Connection conn = null;
+        try {
+            conn = this.getConnection();
+            return this.listImpl(conn, path);
+        } catch (SQLException e) {
+            throw new IOException("Error in file exists: " + path + ": " + e.getMessage(), e);
+        } finally {
+            RDBMSUtils.cleanupConnection(null, null, conn);
+        }
+    }
+    
+    private List<String> listImpl(Connection conn, String path) throws IOException {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            conn = this.getConnection();
             stmt = conn.prepareStatement(this.getListFilesQuery());
             stmt.setString(1, path);
             rs = stmt.executeQuery();
@@ -220,7 +272,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
         } catch (SQLException e) {
             throw new IOException("Error in file exists: " + path + ": " + e.getMessage(), e);
         } finally {
-            RDBMSUtils.cleanupConnection(rs, stmt, conn);
+            RDBMSUtils.cleanupConnection(rs, stmt, null);
         }
     }
 
@@ -241,6 +293,30 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
         } catch (SQLException e) {
             RDBMSUtils.rollbackConnection(conn);
             throw new IOException("Error in mkdir: " + path + ": " + e.getMessage(), e);
+        } finally {
+            RDBMSUtils.cleanupConnection(null, null, conn);
+        }
+    }
+    
+    @Override
+    public void renameFileInDirectory(String dirPath, String nameFrom, String nameTo) throws IOException {
+        dirPath = GenericUtils.normalizePath(dirPath);
+        if (!dirPath.equals("/")) {
+            dirPath += "/";
+        }
+        Connection conn = null;
+        try {
+            conn = this.getConnection(false);
+            this.deleteRecursively(conn, dirPath + nameTo);
+            this.createFileImpl(conn, dirPath + nameTo, false);
+            this.updateDataPathImpl(conn, dirPath + nameFrom, dirPath + nameTo);
+            this.setLengthImpl(conn, dirPath + nameTo, this.lengthImpl(conn, dirPath + nameFrom));
+            this.deletePathImpl(conn, dirPath + nameFrom);
+            conn.commit();
+        } catch (SQLException e) {
+            RDBMSUtils.rollbackConnection(conn);
+            throw new IOException("Error in file rename: Directory: " + dirPath + 
+                    " Name From: " + nameFrom + " Name To: " + nameTo + ": " + e.getMessage(), e);
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }
@@ -326,17 +402,27 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
     
     protected void setLength(String path, long length) throws IOException {
         Connection conn = null;
-        PreparedStatement stmt = null;
         try {
             conn = this.getConnection();
+            this.setLengthImpl(conn, path, length);
+        } catch (SQLException e) {
+            throw new IOException("Error in file set length: " + path + ": " + e.getMessage());
+        } finally {
+            RDBMSUtils.cleanupConnection(null, null, conn);
+        }
+    }
+    
+    private void setLengthImpl(Connection conn, String path, long length) throws IOException {
+        PreparedStatement stmt = null;
+        try {
             stmt = conn.prepareStatement(this.getSetLengthQuery());
             stmt.setLong(1, length);
             stmt.setString(2, path);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new IOException("Error in file delete: " + path + ": " + e.getMessage());
+            throw new IOException("Error in file set length impl: " + path + ": " + e.getMessage());
         } finally {
-            RDBMSUtils.cleanupConnection(null, stmt, conn);
+            RDBMSUtils.cleanupConnection(null, stmt, null);
         }
     }
     
