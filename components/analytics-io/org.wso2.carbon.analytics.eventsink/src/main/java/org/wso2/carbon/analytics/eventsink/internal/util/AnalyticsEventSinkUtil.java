@@ -142,6 +142,7 @@ public class AnalyticsEventSinkUtil {
             column.setPrimaryKey(originalCol.isPrimaryKey());
             column.setScoreParam(originalCol.isScoreParam());
             column.setType(originalCol.getType());
+            columns.add(column);
         }
         copySchema.setColumns(columns);
         return copySchema;
