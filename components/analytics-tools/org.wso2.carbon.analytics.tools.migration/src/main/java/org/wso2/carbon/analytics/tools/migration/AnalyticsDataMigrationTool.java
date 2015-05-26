@@ -54,23 +54,30 @@ public class AnalyticsDataMigrationTool {
     private static final String BIGINTEGER = "BIGINTEGER";
     private static final String BIGDECIMAL = "BIGDECIMAL" ;
     private static final String DEFAULT_CASSANDRA_CQL_PORT = "9042";
+    private static final String DEFAULT_CASSANDRA_SERVER_URL = "localhost" ;
+    private static final String SERVER_URL = "serverUrl";
+    private static final String PORT = "port";
+    private static final String COLUMN_FAMILY = "columnFamily";
+    private static final String ANALYTIC_TABLE = "analyticTable";
+    private static final String TENANT_ID = "tenantId";
 
     public static void main(String[] args) throws Exception {
         Options options = new Options();
-        options.addOption(new Option("serverUrl", true, "Cassandra server url '<default value: localhost>'"));
-        options.addOption(new Option("port", true, "Cassandra server port '<default value: 9042'"));
-        options.addOption(new Option("columnFamily", true, "Name of the columnFamily to be migrated"));
-        options.addOption(new Option("analyticTable", true, "Destination name of the table which will have the migrated data"));
-        options.addOption(new Option("tenant_id", true, "specify tenant id of the tenant considered '<default value: super tenant>'"));
+        options.addOption(new Option(SERVER_URL, true, "Cassandra server url '<default value: localhost>'"));
+        options.addOption(new Option(PORT, true, "Cassandra server port '<default value: 9042'"));
+        options.addOption(new Option(COLUMN_FAMILY, true, "Name of the columnFamily to be migrated"));
+        options.addOption(new Option(ANALYTIC_TABLE, true, "Destination name of the table which will have the migrated data"));
+        options.addOption(new Option(TENANT_ID, true, "specify tenant id of the tenant considered '<default value: super tenant>'"));
         CommandLineParser parser = new BasicParser();
         CommandLine line = parser.parse(options, args);
-        if (args.length != 6) {
+        if (args.length < 6 ) {
             new HelpFormatter().printHelp("analytics-migrate.sh|cmd", options);
             System.exit(1);
         }
 
         AnalyticsDataService service = null;
         Cluster cluster = null;
+        Session session = null;
         try {
             service = AnalyticsServiceHolder.getAnalyticsDataService();
             int tenantId = 0;
@@ -78,24 +85,24 @@ public class AnalyticsDataMigrationTool {
             int port = 0;
             String columnFamily;
             String analyticTable;
-            if (line.hasOption("tenant_id")) {
-                tenantId = Integer.parseInt(line.getOptionValue("tenant_id", "" + MultitenantConstants.SUPER_TENANT_ID));
+            if (line.hasOption(TENANT_ID)) {
+                tenantId = Integer.parseInt(line.getOptionValue(TENANT_ID, "" + MultitenantConstants.SUPER_TENANT_ID));
             }
-            if (line.hasOption("serverUrl")) {
-                serverUrl = line.getOptionValue("serverUrl");
+            if (line.hasOption(SERVER_URL)) {
+                serverUrl = line.getOptionValue(SERVER_URL, DEFAULT_CASSANDRA_SERVER_URL);
             } else {
                 throw new Exception("Server url is not provided!");
             }
-            if (line.hasOption("port")) {
-                port = Integer.parseInt(line.getOptionValue("port", DEFAULT_CASSANDRA_CQL_PORT));
+            if (line.hasOption(PORT)) {
+                port = Integer.parseInt(line.getOptionValue(PORT, DEFAULT_CASSANDRA_CQL_PORT));
             }
-            if (line.hasOption("columnFamily")) {
-                columnFamily = line.getOptionValue("columnFamily");
+            if (line.hasOption(COLUMN_FAMILY)) {
+                columnFamily = line.getOptionValue(COLUMN_FAMILY);
             } else {
                 throw new Exception("Column Family Name is not provided!");
             }
-            if (line.hasOption("analyticTable")) {
-                analyticTable = line.getOptionValue("analyticTable");
+            if (line.hasOption(ANALYTIC_TABLE)) {
+                analyticTable = line.getOptionValue(ANALYTIC_TABLE);
             } else {
                 throw new Exception("Analytic Table is not provided!");
             }
@@ -112,11 +119,18 @@ public class AnalyticsDataMigrationTool {
                 System.out.printf("Datacenter: %s; Host: %s; Rack: %s\n", host.getDatacenter(), host.getAddress(), host.getRack());
             }
 
-            Session session = cluster.connect();
+            session = cluster.connect();
             final ResultSet results = session.execute(
                     "SELECT * from \"EVENT_KS\"." + columnFamily);
             System.out.println("Migrating data...");
+            if (!service.tableExists(tenantId, analyticTable)) {
+                service.createTable(tenantId, analyticTable);
+                System.out.println("Creating the analytics table: " + analyticTable);
+            } else {
+                System.out.println("Analytics table: " + analyticTable + " already exists. ");
+            }
             Iterator<Row> iterator = results.iterator();
+            System.out.println("Inserting records to Analytic Table: " + analyticTable + " from column family: " + columnFamily);
             while (iterator.hasNext()) {
                 Map<String, Object> values = getAnalyticsValues(iterator.next());
                 List<Record> records = new ArrayList<Record>();
@@ -128,10 +142,13 @@ public class AnalyticsDataMigrationTool {
             System.exit(0);
         }catch(Exception e) {
             System.out.println("Error while migrating: " + e.getMessage());
-            System.exit(1);
+            throw new Exception("Error while migrating: " + e.getMessage(), e);
         } finally {
             if (service != null) {
                 service.destroy();
+            }
+            if (session != null) {
+                session.close();
             }
             if (cluster != null) {
                 cluster.close();
