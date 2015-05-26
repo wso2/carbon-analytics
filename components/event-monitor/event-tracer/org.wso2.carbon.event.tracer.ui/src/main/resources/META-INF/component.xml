@@ -26,7 +26,7 @@
             <region>region4</region>
             <order>18</order>
             <style-class>tools</style-class>
-            <icon>../event-tracer/images/tracer.gif</icon>
+            <icon>../event-tracer/images/event-tracer.png</icon>
             <require-permission>/permission/admin/monitor/event-streams</require-permission>
             <require-super-tenant>true</require-super-tenant>
         </menu>

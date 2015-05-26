@@ -193,7 +193,7 @@ public class EventPublisherConfigurationBuilder {
         String toStreamName = "";
         String toStreamVersion = "";
 
-        String customMappingEnabledAttribute = mappingElement.getAttributeValue(new QName(EventPublisherConstants.ENABLE_CONST));
+        String customMappingEnabledAttribute = mappingElement.getAttributeValue(new QName(EventPublisherConstants.EF_ATTR_CUSTOM_MAPPING));
         if (mappingType.equalsIgnoreCase(EventPublisherConstants.EF_WSO2EVENT_MAPPING_TYPE) && customMappingEnabledAttribute != null && customMappingEnabledAttribute.equalsIgnoreCase(EventPublisherConstants.ENABLE_CONST)) {
             OMElement toOMElement = mappingElement.getFirstChildWithName(new QName(EventPublisherConstants.EF_CONF_NS, EventPublisherConstants.EF_ELEMENT_TO));
             toStreamName = toOMElement.getAttributeValue(new QName(EventPublisherConstants.EF_ATTR_STREAM_NAME));
