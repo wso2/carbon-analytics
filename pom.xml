@@ -852,6 +852,22 @@
 
             <!-- START hbase + hadoop client dependencies -->
             <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-client</artifactId>
+                <version>${hbase.client.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.hadoop</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-client</artifactId>
+                <version>${hadoop.client.260.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.orbit.org.apache.hbase</groupId>
                 <artifactId>hbase-client</artifactId>
                 <version>${hbase.client.orbit.version}</version>
@@ -1170,8 +1186,12 @@
         <commons.collections.orbit.version>3.2.0.wso2v1</commons.collections.orbit.version>
 
         <!-- Orbits for HBase client -->
+        <hbase.client.version>1.0.0</hbase.client.version>
+        <hadoop.client.260.version>2.6.0</hadoop.client.260.version>
         <hbase.client.orbit.version>1.0.0.wso2v1</hbase.client.orbit.version>
         <hadoop.client.260.orbit.version>2.6.0.wso2v1</hadoop.client.260.orbit.version>
+        <hbase.client.import.version>[1.0.0, 1.1.0)</hbase.client.import.version>
+        <hadoop.client.import.version>[2.6.0, 2.7.0)</hadoop.client.import.version>
         <zookeeper.orbit.version>3.4.5.wso2v1</zookeeper.orbit.version>
         <htrace.version>3.0.4.wso2v1</htrace.version>
         <apache.htrace.version>3.1.0-incubating.wso2v1</apache.htrace.version>
