@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.analytics.dashboard;
+package org.wso2.carbon.analytics.dashboard.beans;
 
-public class Dashboard {
-
+public class Page {
     private String id;
     private String title;
+    private Layout layout;
+    private Contents content;
 
     public String getId() {
         return id;
@@ -34,5 +35,21 @@ public class Dashboard {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public Layout getLayout() {
+        return layout;
+    }
+
+    public void setLayout(Layout layout) {
+        this.layout = layout;
+    }
+
+    public Contents getContent() {
+        return content;
+    }
+
+    public void setContent(Contents content) {
+        this.content = content;
     }
 }
