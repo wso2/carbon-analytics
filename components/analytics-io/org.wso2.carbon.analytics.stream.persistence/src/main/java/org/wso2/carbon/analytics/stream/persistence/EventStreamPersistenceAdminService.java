@@ -35,6 +35,7 @@ import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -150,38 +151,46 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
                         }
                         List<ColumnDefinition> columnDefinitions = new ArrayList<>();
                         List<String> primaryKeys = new ArrayList<>();
-                        if (isStreamExist(analyticsTable.getTableName())) {
-                            AnalyticsSchema tableSchema = analyticsDataService.getTableSchema(getTenantId(), tableName);
-                            if (tableSchema != null) {
-                                Map<String, ColumnDefinition> columns = tableSchema.getColumns();
-                                AnalyticsTableRecord[] analyticsTableRecords = analyticsTable.getAnalyticsTableRecords();
-                                for (AnalyticsTableRecord analyticsTableRecord : analyticsTableRecords) {
-                                    if (columns != null && columns.containsKey(analyticsTableRecord.getColumnName())) {
-                                        ColumnDefinition columnDefinition = columns.remove(analyticsTableRecord.getColumnName());
-                                        if (analyticsTableRecord.isPersist()) {
-                                            columnDefinition.setType(getColumnType(analyticsTableRecord.getColumnType()));
-                                            columnDefinition.setIndexed(analyticsTableRecord.isIndexed());
-                                            columnDefinition.setScoreParam(analyticsTableRecord.isScoreParam());
-                                            columnDefinitions.add(columnDefinition);
-                                        }
-                                        if (analyticsTableRecord.isPrimaryKey() && analyticsTableRecord.isPersist()) {
-                                            primaryKeys.add(analyticsTableRecord.getColumnName());
-                                        } else {
-                                            primaryKeys.remove(analyticsTableRecord.getColumnName());
-                                        }
+                        AnalyticsSchema tableSchema = analyticsDataService.getTableSchema(getTenantId(), tableName);
+                        if (isStreamExist(analyticsTable.getTableName()) && tableSchema != null) {
+                            Map<String, ColumnDefinition> columns = tableSchema.getColumns();
+                            if (columns != null) {
+                                // Removing all arbitrary fields
+                                Iterator<String> iterator = columns.keySet().iterator();
+                                while (iterator.hasNext()) {
+                                    String key = iterator.next();
+                                    if (key.startsWith("_")) {
+                                        iterator.remove();
+                                    }
+                                }
+                            }
+                            AnalyticsTableRecord[] analyticsTableRecords = analyticsTable.getAnalyticsTableRecords();
+                            for (AnalyticsTableRecord analyticsTableRecord : analyticsTableRecords) {
+                                if (columns != null && columns.containsKey(analyticsTableRecord.getColumnName())) {
+                                    ColumnDefinition columnDefinition = columns.remove(analyticsTableRecord.getColumnName());
+                                    if (analyticsTableRecord.isPersist()) {
+                                        columnDefinition.setType(getColumnType(analyticsTableRecord.getColumnType()));
+                                        columnDefinition.setIndexed(analyticsTableRecord.isIndexed());
+                                        columnDefinition.setScoreParam(analyticsTableRecord.isScoreParam());
+                                        columnDefinitions.add(columnDefinition);
+                                    }
+                                    if (analyticsTableRecord.isPrimaryKey() && analyticsTableRecord.isPersist()) {
+                                        primaryKeys.add(analyticsTableRecord.getColumnName());
                                     } else {
-                                        if (analyticsTableRecord.isPersist()) {
-                                            ColumnDefinition columnDefinition = getColumnDefinition(analyticsTableRecord);
-                                            columnDefinitions.add(columnDefinition);
-                                            if (analyticsTableRecord.isPrimaryKey()) {
-                                                primaryKeys.add(analyticsTableRecord.getColumnName());
-                                            }
+                                        primaryKeys.remove(analyticsTableRecord.getColumnName());
+                                    }
+                                } else {
+                                    if (analyticsTableRecord.isPersist()) {
+                                        ColumnDefinition columnDefinition = getColumnDefinition(analyticsTableRecord);
+                                        columnDefinitions.add(columnDefinition);
+                                        if (analyticsTableRecord.isPrimaryKey()) {
+                                            primaryKeys.add(analyticsTableRecord.getColumnName());
                                         }
                                     }
                                 }
-                                if (columns != null) {
-                                    columnDefinitions.addAll(columns.values());
-                                }
+                            }
+                            if (columns != null) {
+                                columnDefinitions.addAll(columns.values());
                             }
                         } else {
                             for (AnalyticsTableRecord analyticsTableRecord : analyticsTable.getAnalyticsTableRecords()) {
