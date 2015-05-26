@@ -33,7 +33,6 @@
     <link href="js/jquery-ui.min.css" rel="stylesheet" type="text/css"/>
     <link href="../dialog/css/jqueryui/jqueryui-themeroller.css" rel="stylesheet" type="text/css"/>
     <link href="../dialog/css/dialog.css" rel="stylesheet" type="text/css"/>
-    <link href="js/jquery.datetimepicker.css" rel="stylesheet" type="text/css"/>
     <link href="themes/metro/blue/jtable.css" rel="stylesheet" type="text/css"/>
     <link href="js/validationEngine.jquery.css" rel="stylesheet" type="text/css"/>
 
@@ -42,9 +41,12 @@
     <script src="js/jquery.validationEngine.js" type="text/javascript"></script>
     <script src="js/jquery.validationEngine-en.js" type="text/javascript"></script>
     <script src="js/jquery.jtable.min.js" type="text/javascript"></script>
-    <script src="js/jquery.datetimepicker.js" type="text/javascript"></script>
     <script src="js/messageconsole.js?version=<%= java.lang.Math.round(java.lang.Math.random() * 2) %>"
             type="text/javascript"></script>
+    <script type="text/javascript" src="js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript" src="js/jquery-ui-timepicker-addon.js"></script>
+    <link href="js/jquery-ui-timepicker-addon.min.css" type="text/css" rel="stylesheet"/>
+    <link href="js/jquery-ui-timepicker-addon.css" type="text/css" rel="stylesheet"/>
 
    <%-- <style media="screen" type="text/css">
         .modal {
@@ -129,22 +131,8 @@
             });*/
             loadTableSelect();
 //            $("#DeleteAllButton").hide();
-            jQuery('#timeFrom').datetimepicker({
-                format: 'unixtime',
-                onShow: function (ct) {
-                    this.setOptions({
-                        maxDate: jQuery('#timeTo').val() ? jQuery('#timeTo').val() : false
-                    })
-                }
-            });
-            jQuery('#timeTo').datetimepicker({
-                format: 'unixtime',
-                onShow: function (ct) {
-                    this.setOptions({
-                        minDate: jQuery('#timeFrom').val() ? jQuery('#timeFrom').val() : false
-                    })
-                }
-            });
+            jQuery('#timeFrom').datetimepicker();
+            jQuery('#timeTo').datetimepicker();
 //            $("#createTableDialog").dialog({
 //                autoOpen: false
 //            });

@@ -350,7 +350,7 @@
             if (fromTime != '') {
                 fromTimeStamp = jQuery_new("#fromTime").datetimepicker("getDate").getTime();
             }
-            if (fromTime != '') {
+            if (toTime != '') {
                 toTimeStamp = jQuery_new("#toTime").datetimepicker("getDate").getTime();
             }
             searchActivities(fromTimeStamp, toTimeStamp);

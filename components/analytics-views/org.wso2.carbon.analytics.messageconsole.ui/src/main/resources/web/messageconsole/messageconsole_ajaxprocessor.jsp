@@ -40,13 +40,11 @@
             long from = 0;
             String timeFrom = request.getParameter("timeFrom");
             if (timeFrom != null && !timeFrom.isEmpty()) {
-                timeFrom = timeFrom.concat("000");
                 from = Long.parseLong(timeFrom);
             }
             long to = Long.MAX_VALUE;
             String timeTo = request.getParameter("timeTo");
             if (timeTo != null && !timeTo.isEmpty()) {
-                timeTo = timeTo.concat("000");
                 to = Long.parseLong(timeTo);
             }
             String facets = request.getParameter("facets");
