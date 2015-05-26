@@ -43,6 +43,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -362,11 +363,20 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         }
     }
 
-    private void writeIndexRecordsWithFacets(int tenantId, String tableName, int n, int batch) throws AnalyticsException {
+    private void writeIndexRecordsWithFacets(int tenantId, String[] tableName, int n, int batch) throws AnalyticsException {
         List<Record> records;
-        for (int i = 0; i < n; i++) {
-            records = AnalyticsRecordStoreTest.generateRecordsWithFacets(tenantId, tableName, i, batch, -1, -1);
-            this.service.put(records);
+        Random randomGenerator = new Random();
+        if (tableName.length > 1) {
+            for (int i = 0; i < n; i++) {
+                int randomNumber = randomGenerator.nextInt(tableName.length);
+                records = AnalyticsRecordStoreTest.generateRecordsWithFacets(tenantId, tableName[randomNumber], i, batch, -1, -1);
+                this.service.put(records);
+            }
+        } else {
+            for (int i = 0; i < n; i++) {
+                records = AnalyticsRecordStoreTest.generateRecordsWithFacets(tenantId, tableName[0], i, batch, -1, -1);
+                this.service.put(records);
+            }
         }
     }
 
@@ -474,7 +484,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.setTableSchema(tenantId, tableName, new AnalyticsSchema(columns, null));
 
         long start = System.currentTimeMillis();
-        this.writeIndexRecordsWithFacets(tenantId, tableName, n, batch);
+        this.writeIndexRecordsWithFacets(tenantId, new String[]{tableName}, n, batch);
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
         long end = System.currentTimeMillis();
         System.out.println("* Records: " + (n * batch));
@@ -501,7 +511,79 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         System.out.println("* Search Result Count: " + results.size() + " Time: " + (end - start) + " ms.");
 
         this.cleanupTable(tenantId, tableName);
-        System.out.println("\n************** END ANALYTICS DS (WITH FACET INDEXING, H2-FILE) PERF TEST **************");
+        System.out.println("\n************** END ANALYTICS DS (WITH FACET INDEXING - SINGLE THREAD, H2-FILE) PERF TEST **************");
+    }
+
+    @Test
+    public void testFacetDataRecordAddReadPerformanceIndexMultipleTables1C() throws AnalyticsException {
+        System.out.println("\n************** START ANALYTICS DS (WITH FACET INDEXING - SINGLE THREAD, MULTIPLE TABLES, H2-FILE) PERF TEST **************");
+
+        int tenantId = 50;
+        String[] tableNames = new String[]{"TableY", "TableYY"};
+        List<ColumnDefinition> columns = new ArrayList<>();
+        columns.add(new ColumnDefinition("tenant", ColumnType.INTEGER, true, false));
+        columns.add(new ColumnDefinition("ip", ColumnType.STRING, true, false));
+        columns.add(new ColumnDefinition("log", ColumnType.STRING, true, false));
+        columns.add(new ColumnDefinition("location", ColumnType.FACET, true, false));
+
+        for (String tableName : tableNames) {
+            this.cleanupTable(tenantId, tableName);
+            this.service.createTable(tenantId, tableName);
+            this.service.setTableSchema(tenantId, tableName, new AnalyticsSchema(columns, null));
+        }
+        int n = 250, batch = 200;
+        long start = System.currentTimeMillis();
+        this.writeIndexRecordsWithFacets(tenantId, tableNames, n, batch);
+        this.service.waitForIndexing(DEFAULT_WAIT_TIME);
+        long end = System.currentTimeMillis();
+        System.out.println("* Records: " + (n * batch));
+        System.out.println("* Write Time: " + (end - start) + " ms.");
+        System.out.println("* Write Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
+        start = System.currentTimeMillis();
+        List<Record> recordsIn = new ArrayList<>();
+        for (String tableName : tableNames) {
+            recordsIn.addAll(GenericUtils.listRecords(this.service,
+                                                              this.service.get(tenantId, tableName, 3, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1)));
+        }
+        Assert.assertEquals(recordsIn.size(), (n * batch));
+        end = System.currentTimeMillis();
+        System.out.println("* Read Time: " + (end - start) + " ms.");
+        System.out.println("* Read Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
+        start = System.currentTimeMillis();
+        AnalyticsDrillDownRequest drillDownRequest = new AnalyticsDrillDownRequest();
+        List<SearchResultEntry> results = new ArrayList<>();
+        for (String tableName : tableNames) {
+            drillDownRequest.setTableName(tableName);
+            drillDownRequest.setRecordStartIndex(0);
+            drillDownRequest.setRecordCount(75);
+            drillDownRequest.setQuery("log: exception");
+            List<String> path = Arrays.asList(new String[]{"SomeLocation", "SomeInnerLocation"});
+            drillDownRequest.addCategoryPath("location", path);
+            results.addAll(this.service.drillDownSearch(tenantId, drillDownRequest));
+        }
+        end = System.currentTimeMillis();
+        Assert.assertTrue(results.size() <= 75 * tableNames.length);
+
+        System.out.println("* Search Result Count: " + results.size() + " Time: " + (end - start) + " ms.");
+        start = System.currentTimeMillis();
+        int count = 0;
+        for (String tableName : tableNames) {
+            drillDownRequest.setTableName(tableName);
+            drillDownRequest.setRecordStartIndex(0);
+            drillDownRequest.setRecordCount(75);
+            drillDownRequest.setQuery("log:exception");
+            drillDownRequest.setScoreFunction("_weight");
+            List<String> path = Arrays.asList(new String[]{"SomeLocation", "SomeInnerLocation"});
+            drillDownRequest.addCategoryPath("location", path);
+            count += this.service.drillDownSearchCount(tenantId, drillDownRequest);
+        }
+        end = System.currentTimeMillis();
+        Assert.assertTrue(count == n * batch);
+        System.out.println("* DrilldownSearchCount Result: " + count + " Time: " + (end - start) + " ms.");
+        for (String tableName : tableNames) {
+            this.cleanupTable(tenantId, tableName);
+        }
+        System.out.println("\n************** END ANALYTICS DS (WITH FACET INDEXING - SINGLE THREAD, MULTIPLE TABLES, H2-FILE) PERF TEST **************");
     }
     
     private void writeIndexRecords(final int tenantId, final String tableName, final int n, 
@@ -527,7 +609,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         }
     }
 
-    private void writeIndexRecordsWithFacets(final int tenantId, final String tableName, final int n,
+    private void writeIndexRecordsWithFacets(final int tenantId, final String[] tableName, final int n,
                                    final int batch, final int nThreads) throws AnalyticsException {
         ExecutorService es = Executors.newFixedThreadPool(nThreads);
         for (int i = 0; i < nThreads; i++) {
@@ -606,7 +688,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.setTableSchema(tenantId, tableName, new AnalyticsSchema(columns, null));
 
         long start = System.currentTimeMillis();
-        this.writeIndexRecordsWithFacets(tenantId, tableName, n, batch, nThreads);
+        this.writeIndexRecordsWithFacets(tenantId, new String[]{tableName}, n, batch, nThreads);
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
         long end = System.currentTimeMillis();
         System.out.println("* Records: " + (n * batch * nThreads));
@@ -638,9 +720,83 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         Assert.assertEquals(count, 50000);
         System.out.println("* DrilldownSearch Result Count: " + count + " Time: " + (end - start) + " ms.");
         this.cleanupTable(tenantId, tableName);
-        System.out.println("\n************** END ANALYTICS DS (WITH INDEXING - MULTIPLE THREADS, H2-FILE) PERF TEST **************");
+        System.out.println("\n************** END ANALYTICS DS (WITH FACET INDEXING - MULTIPLE THREADS, H2-FILE) PERF TEST **************");
     }
-    
+
+    @Test
+    public void testFacetDataRecordAddReadPerformanceIndexMultipleTablesNC() throws AnalyticsException {
+        System.out.println("\n************** START ANALYTICS DS (WITH FACET INDEXING - MULTIPLE THREADS, MULTIPLE TABLES, H2-FILE) PERF TEST **************");
+
+        int tenantId = 50;
+        String[] tableNames = new String[]{"TableZ", "TableZZ"};
+        List<ColumnDefinition> columns = new ArrayList<>();
+        columns.add(new ColumnDefinition("tenant", ColumnType.INTEGER, true, false));
+        columns.add(new ColumnDefinition("ip", ColumnType.STRING, true, false));
+        columns.add(new ColumnDefinition("log", ColumnType.STRING, true, false));
+        columns.add(new ColumnDefinition("location", ColumnType.FACET, true, false));
+        for (String tableName : tableNames) {
+            this.cleanupTable(tenantId, tableName);
+            this.service.createTable(tenantId, tableName);
+            this.service.setTableSchema(tenantId, tableName, new AnalyticsSchema(columns, null));
+        }
+
+        int n = 50, batch = 200, nThreads = 5;
+        long start = System.currentTimeMillis();
+        this.writeIndexRecordsWithFacets(tenantId, tableNames, n, batch, nThreads);
+        this.service.waitForIndexing(DEFAULT_WAIT_TIME);
+        long end = System.currentTimeMillis();
+        System.out.println("* Records: " + (n * batch * nThreads));
+        System.out.println("* Write Time: " + (end - start) + " ms.");
+        System.out.println("* Write Throughput (TPS): " + (n * batch * nThreads) / (double) (end - start) * 1000.0);
+        start = System.currentTimeMillis();
+        List<Record> recordsIn = new ArrayList<>();
+        for (String tableName : tableNames) {
+            recordsIn.addAll(GenericUtils.listRecords(this.service,
+                                                      this.service.get(tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1)));
+        }
+
+        Assert.assertEquals(recordsIn.size(), (n * batch * nThreads));
+        end = System.currentTimeMillis();
+        System.out.println("* Read Time: " + (end - start) + " ms.");
+        System.out.println("* Read Throughput (TPS): " + (n * batch * nThreads) / (double) (end - start) * 1000.0);
+        start = System.currentTimeMillis();
+        List<SearchResultEntry> results = new ArrayList<>();
+        for (String tableName : tableNames) {
+            AnalyticsDrillDownRequest drillDownRequest = new AnalyticsDrillDownRequest();
+            drillDownRequest.setTableName(tableName);
+            drillDownRequest.setRecordStartIndex(0);
+            drillDownRequest.setRecordCount(75);
+            drillDownRequest.setQuery("log:exception");
+            drillDownRequest.setScoreFunction("_weight");
+            List<String> path = Arrays.asList(new String[]{"SomeLocation", "SomeInnerLocation"});
+            drillDownRequest.addCategoryPath("location", path);
+            results.addAll(this.service.drillDownSearch(tenantId, drillDownRequest));
+        }
+        end = System.currentTimeMillis();
+        Assert.assertTrue(results.size() <= 75 * tableNames.length);
+        System.out.println("* Drilldown Result Count: " + results.size() + " Time: " + (end - start) + " ms.");
+        start = System.currentTimeMillis();
+        int count = 0;
+        for (String tableName : tableNames) {
+            AnalyticsDrillDownRequest drillDownRequest = new AnalyticsDrillDownRequest();
+            drillDownRequest.setTableName(tableName);
+            drillDownRequest.setRecordStartIndex(0);
+            drillDownRequest.setRecordCount(75);
+            drillDownRequest.setQuery("log:exception");
+            drillDownRequest.setScoreFunction("_weight");
+            List<String> path = Arrays.asList(new String[]{"SomeLocation", "SomeInnerLocation"});
+            drillDownRequest.addCategoryPath("location", path);
+            count += this.service.drillDownSearchCount(tenantId, drillDownRequest);
+        }
+        end = System.currentTimeMillis();
+        Assert.assertTrue(count == n * batch * nThreads);
+        System.out.println("* DrilldownSearchCount Result: " + count + " Time: " + (end - start) + " ms.");
+        for (String tableName: tableNames) {
+            this.cleanupTable(tenantId, tableName);
+        }
+        System.out.println("\n************** END ANALYTICS DS (WITH FACET INDEXING - MULTIPLE THREADS, MULTIPLE TABLES, H2-FILE) PERF TEST **************");
+    }
+
     private void resetClusterTestResults() {
         this.becameLeader = false;
         this.leaderUpdated = false;
