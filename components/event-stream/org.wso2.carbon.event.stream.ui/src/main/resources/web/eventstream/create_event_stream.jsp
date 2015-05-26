@@ -132,7 +132,7 @@
 							<tr>
 								<td class="buttonRow">
 									<input type="button" value="<fmt:message key="back"/>" onclick="back()"/>
-									<input type="button" value="<fmt:message key="add.event.stream"/>"
+									<input type="button" value="<fmt:message key="save.event.stream"/>"
 										   onclick="addEventStream(document.getElementById('addEventStreamDesign'),'add')"/>
 								</td>
 							</tr>

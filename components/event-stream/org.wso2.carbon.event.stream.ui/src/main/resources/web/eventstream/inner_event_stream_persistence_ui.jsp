@@ -127,13 +127,10 @@
                 <table id="addArbitraryData" class="normal">
                     <tbody>
                     <tr>
-                        <td class="col-small"><fmt:message key="attribute.name"/> :</td>
-                        <td>
-                            <input type="text" id="outputArbitraryDataPropName"/>
+                        <td class="col-small"><fmt:message key="attribute.name"/> : <input type="text"
+                                                                                           id="outputArbitraryDataPropName"/>
                         </td>
                         <td class="col-small"><fmt:message key="attribute.type"/> :
-                        </td>
-                        <td>
                             <select id="outputArbitraryDataPropType" onchange="changeScoreParam(this)">
                                 <option value="INTEGER">INTEGER</option>
                                 <option value="STRING">STRING</option>

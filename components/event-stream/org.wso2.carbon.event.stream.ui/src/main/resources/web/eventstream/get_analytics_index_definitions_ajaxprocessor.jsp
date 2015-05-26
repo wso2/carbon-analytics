@@ -47,8 +47,8 @@
                         tableColumns[i++] = column;
                     }
                     table.setAnalyticsTableRecords(tableColumns);
-                    table.setPersist(schema.getPersist());
                 }
+                table.setPersist(schema.getPersist());
                 responseText = new Gson().toJson(table);
             }
         } catch (Exception e) {

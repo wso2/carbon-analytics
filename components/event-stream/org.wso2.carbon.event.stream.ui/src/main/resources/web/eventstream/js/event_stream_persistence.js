@@ -208,17 +208,19 @@ function populateAnalyticsIndexTable(eventStreamName, eventStreamVersion) {
                 var currentPayloadCount = payloadIndexTable.rows.length;
 
                 document.getElementById('eventPersistCheckbox').checked = resultJson.persist;
-                jQuery.each(resultJson.analyticsTableRecords, function (index, element) {
-                    if (element.columnName.startsWith("meta_")) {
-                        setRowValues(currentMetaCount, metaIndexTable, element);
-                    } else if (element.columnName.startsWith("correlation_")) {
-                        setRowValues(currentCorrelationCount, correlationIndexTable, element);
-                    } else if (element.columnName.startsWith("_")) {
-                        setRowValuesForArbitrary(arbitraryIndexTable, element);
-                    } else {
-                        setRowValues(currentPayloadCount, payloadIndexTable, element);
-                    }
-                });
+                if (resultJson.analyticsTableRecords != null) {
+                    jQuery.each(resultJson.analyticsTableRecords, function (index, element) {
+                        if (element.columnName.startsWith("meta_")) {
+                            setRowValues(currentMetaCount, metaIndexTable, element);
+                        } else if (element.columnName.startsWith("correlation_")) {
+                            setRowValues(currentCorrelationCount, correlationIndexTable, element);
+                        } else if (element.columnName.startsWith("_")) {
+                            setRowValuesForArbitrary(arbitraryIndexTable, element);
+                        } else {
+                            setRowValues(currentPayloadCount, payloadIndexTable, element);
+                        }
+                    });
+                }
             } else {
                 CARBON.showErrorDialog("Failed to get index information, Exception: " + result);
             }
