@@ -122,6 +122,11 @@
                         if(eventStreamInfoDto.getEditable()) {
                         %>
 
+                        <a style="background-image: url(images/event-simulator.png);"
+                           class="icon-link"
+                           href = "../eventsimulator/index.jsp?streamId=<%=eventStreamInfoDto.getStreamName()%>:<%=eventStreamInfoDto.getStreamVersion()%>"<font
+                                color="#4682b4">Simulate</font></a>
+
                         <a style="background-image: url(../admin/images/delete.gif);"
                            class="icon-link"
                            onclick="doDelete('<%=eventStreamInfoDto.getStreamName()%>','<%=eventStreamInfoDto.getStreamVersion()%>')"><font
