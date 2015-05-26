@@ -99,7 +99,7 @@ public class AnalyticsEventStoreManager {
         Set<AnalyticsEventStore> eventStoreConfigurations = tenantEventStoreMap.get(tenantId);
         if (eventStoreConfigurations != null) {
             for (AnalyticsEventStore configuration : eventStoreConfigurations) {
-                if (configuration.getName().equals(eventStoreName)) {
+                if (configuration.getName().equalsIgnoreCase(eventStoreName)) {
                     return configuration;
                 }
             }
@@ -112,7 +112,7 @@ public class AnalyticsEventStoreManager {
         Set<AnalyticsEventStore> analyticsEventStoreList = tenantEventStoreMap.get(tenantId);
         if (analyticsEventStoreList != null) {
             for (AnalyticsEventStore analyticsEventStore : analyticsEventStoreList) {
-                if (analyticsEventStore.getName().equals(eventStoreName)) {
+                if (analyticsEventStore.getName().equalsIgnoreCase(eventStoreName)) {
                     analyticsEventStoreList.remove(analyticsEventStore);
                     return analyticsEventStore;
                 }

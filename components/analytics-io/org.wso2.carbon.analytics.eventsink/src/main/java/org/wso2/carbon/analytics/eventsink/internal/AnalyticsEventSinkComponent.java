@@ -23,14 +23,14 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkService;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkServiceImpl;
+import org.wso2.carbon.analytics.eventsink.AnalyticsEventStoreCAppDeployer;
 import org.wso2.carbon.analytics.eventsink.internal.util.ServiceHolder;
 import org.wso2.carbon.analytics.eventsink.subscriber.AnalyticsEventStreamListener;
+import org.wso2.carbon.application.deployer.handler.AppDeploymentHandler;
 import org.wso2.carbon.core.ServerStartupObserver;
 import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
 import org.wso2.carbon.event.stream.core.EventStreamListener;
 import org.wso2.carbon.event.stream.core.EventStreamService;
-import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 /**
  * This is the declarative service component which registers the required osgi
@@ -63,6 +63,8 @@ public class AnalyticsEventSinkComponent {
                     ServiceHolder.getAnalyticsEventSinkService(), null);
             componentContext.getBundleContext().registerService(ServerStartupObserver.class.getName(),
                     AnalyticsEventSinkServerStartupObserver.getInstance(), null);
+            componentContext.getBundleContext().registerService(
+                    AppDeploymentHandler.class.getName(),  new AnalyticsEventStoreCAppDeployer(), null);
             ServiceHolder.setAnalyticsDSConnector(new AnalyticsDSConnector());
         } catch (Throwable e) {
             log.error("Error while activating the AnalyticsEventSinkComponent.", e);

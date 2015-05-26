@@ -73,7 +73,7 @@ public class AnalyticsEventStore {
     public boolean equals(Object object) {
         if (object != null && object instanceof AnalyticsEventStore) {
             AnalyticsEventStore analyticsEventStore = (AnalyticsEventStore) object;
-            return analyticsEventStore.getName().equals(this.getName());
+            return analyticsEventStore.getName().equalsIgnoreCase(this.getName());
         }
         return false;
     }
