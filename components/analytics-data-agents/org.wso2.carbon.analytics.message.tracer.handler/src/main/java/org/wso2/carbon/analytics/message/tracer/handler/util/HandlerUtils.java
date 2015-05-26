@@ -15,13 +15,24 @@
  */
 package org.wso2.carbon.analytics.message.tracer.handler.util;
 
+import org.apache.axiom.om.OMElement;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.wso2.carbon.analytics.message.tracer.handler.data.TracingInfo;
+import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.utils.ServerConstants;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
+import java.util.Map;
 
 public class HandlerUtils {
 
@@ -49,5 +60,93 @@ public class HandlerUtils {
             throw new Exception("Error in creating an XML document from file: " +
                     e.getMessage(), e);
         }
+    }
+
+    public static String getUserNameIN(MessageContext messageContext) {
+        //getting username from messageContext
+        String userName = "";
+
+        if(messageContext == null) {
+            return userName;
+        }
+
+        HttpServletRequest request =
+                (HttpServletRequest) messageContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
+        HttpSession session;
+        if (request != null && (session = request.getSession(false)) != null) {
+            String tenantDomain = (String) session.getAttribute(MultitenantConstants.TENANT_DOMAIN);
+            userName = (String) session.getAttribute(ServerConstants.USER_LOGGED_IN);
+            if(userName != null && tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equalsIgnoreCase(tenantDomain)){
+                userName = userName + tenantDomain;
+            }
+        }
+
+        if(userName != null && !userName.isEmpty()) {
+            return userName;
+        } else {
+            Object transportHeaders = messageContext.getProperty(MessageContext.TRANSPORT_HEADERS);
+            if(transportHeaders != null) {
+                String basicAuthHeader = (String)((Map)transportHeaders).get("Authorization");
+                if(basicAuthHeader != null && !basicAuthHeader.isEmpty()) {
+
+                    String basicAuthHeaderValue = new String(Base64.decodeBase64(basicAuthHeader.replace("Basic", "").trim().getBytes()));
+                    String[] basicAuth = basicAuthHeaderValue.split(":");
+                    if(basicAuth != null && basicAuth.length >= 2) {
+                        userName = basicAuth[0];
+                        return userName;
+                    }
+                }
+            }
+        }
+
+        if(MessageTracerConstants.AUTHENTICATION_ADMIN.equalsIgnoreCase(messageContext.getAxisService().getName()) &&
+           MessageTracerConstants.MESSAGE_DIRECTION.equalsIgnoreCase(messageContext.getAxisMessage().getDirection())
+           && MessageTracerConstants.AUTHENTICATION_OPERATION.equalsIgnoreCase(messageContext.getAxisOperation().getName().getLocalPart())) {
+            try {
+                OMElement responsePayload = messageContext.getEnvelope().getBody().getFirstElement();
+                if(responsePayload != null) {
+                    userName = responsePayload.getFirstChildWithName(new QName(responsePayload.getNamespace().getNamespaceURI()
+                            , "username", responsePayload.getNamespace().getPrefix())).getText();
+                }
+            }catch (Exception e) {
+                log.error("Error while trying to get the user name form authentication request", e);
+            }
+            return userName;
+        }
+
+        //returning empty value if unable to fetch the username
+        return "";
+    }
+
+    public static String getUserNameOUT(MessageContext messageContext) {
+        //getting username from messageContext
+        String userName = "";
+
+        if(messageContext == null) {
+            return userName;
+        }
+
+        userName = CarbonContext.getThreadLocalCarbonContext().getUsername();
+
+        if(userName != null && !userName.isEmpty()) {
+            return userName;
+        } else {
+            Object transportHeaders = messageContext.getProperty(MessageContext.TRANSPORT_HEADERS);
+            if(transportHeaders != null) {
+                String basicAuthHeader = (String)((Map)transportHeaders).get("Authorization");
+                if(basicAuthHeader != null && !basicAuthHeader.isEmpty()) {
+
+                    String basicAuthHeaderValue = new String(Base64.decodeBase64(basicAuthHeader.replace("Basic", "").trim().getBytes()));
+                    String[] basicAuth = basicAuthHeaderValue.split(":");
+                    if(basicAuth != null && basicAuth.length >= 2) {
+                        userName = basicAuth[0];
+                        return userName;
+                    }
+                }
+            }
+        }
+
+        //returning empty value if unable to fetch the username
+        return "";
     }
 }

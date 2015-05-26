@@ -123,6 +123,7 @@ public class ActivityInHandler extends AbstractHandler {
                 tracingInfo.setServiceName(messageContext.getAxisService().getName());
                 tracingInfo.setOperationName(messageContext.getAxisOperation().getName().getLocalPart());
                 tracingInfo.setRequestUrl(String.valueOf(messageContext.getProperty(MessageTracerConstants.TRANSPORT_IN_URL)));
+                tracingInfo.setUserName(HandlerUtils.getUserNameIN(messageContext));
 
                 AgentUtil.setTransportHeaders(tracingInfo, (Map<String, String>) messageContext.getProperty(MessageContext.TRANSPORT_HEADERS));
 
