@@ -231,11 +231,20 @@ function createJTable() {
 
 function listActionMethod(jtParams) {
     var postData = {};
+    var fromTime = document.getElementById('timeFrom').value;
+    var toTime = document.getElementById('timeTo').value;
+    var fromTimeStamp, toTimeStamp;
+    if (fromTime != '') {
+        fromTimeStamp = jQuery('#timeFrom').datetimepicker("getDate").getTime();
+    }
+    if (fromTime != '') {
+        toTimeStamp = jQuery('#timeTo').datetimepicker("getDate").getTime();
+    }
     postData["jtStartIndex"] = jtParams.jtStartIndex;
     postData["jtPageSize"] = jtParams.jtPageSize;
     postData["tableName"] = $("#tableSelect").val();
-    postData["timeFrom"] = $("#timeFrom").val();
-    postData["timeTo"] = $("#timeTo").val();
+    postData["timeFrom"] = fromTimeStamp;
+    postData["timeTo"] = toTimeStamp;
     postData["query"] = $("#query").val();
     var facets = [];
     $('#facetSearchTable > tbody  > tr').each(function () {

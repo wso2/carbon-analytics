@@ -147,6 +147,7 @@ public class ActivityOutHandler extends AbstractHandler {
                 tracingInfo.setActivityId(activityID);
                 tracingInfo.setServer(AgentUtil.getServerName());
                 tracingInfo.setMessageDirection(MessageTracerConstants.OUT_DIRECTION);
+                tracingInfo.setUserName(HandlerUtils.getUserNameOUT(messageContext));
                 tracingInfo.setHost(PublisherUtil.getHostAddress());
                 tracingInfo.setServiceName(messageContext.getAxisService().getName());
                 tracingInfo.setOperationName(messageContext.getAxisOperation().getName().getLocalPart());

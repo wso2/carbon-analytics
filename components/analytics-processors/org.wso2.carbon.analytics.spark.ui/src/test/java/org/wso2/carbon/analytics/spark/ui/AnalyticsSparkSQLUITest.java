@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.rdbms;
+package org.wso2.carbon.analytics.spark.ui;
 
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -82,8 +82,11 @@ public class AnalyticsSparkSQLUITest {
         AnalyticsProcessorService processorService = new CarbonAnalyticsProcessorService();
         AnalyticsExecutionClient client = new AnalyticsExecutionClient();
 
-        String query = "define table Log (server_name STRING, "
-                + "ip STRING, tenant INTEGER, sequence LONG, summary STRING)";
+        String query = "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+                       "OPTIONS" +
+                       "(tableName \"Log\"," +
+                       "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, log STRING\"" +
+                       ")";
         AnalyticsQueryResult queryResult = processorService.executeQuery(1, query);
         AnalyticsQueryResultDto queryResultDto = AnalyticsResultConverter.convertResults(queryResult);
         AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto stubDto = getResult(queryResultDto);

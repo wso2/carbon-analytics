@@ -41,6 +41,8 @@ public class TracingInfo {
 
     private String status;
 
+    private String userName;
+
     private Map<String, String> additionalValues;
 
     public String getActivityId() {
@@ -129,6 +131,14 @@ public class TracingInfo {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public Map<String, String> getAdditionalValues() {

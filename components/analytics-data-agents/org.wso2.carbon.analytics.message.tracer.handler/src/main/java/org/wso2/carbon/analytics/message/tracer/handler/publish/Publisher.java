@@ -90,7 +90,7 @@ public class Publisher {
     }
 
     public static List<Object> getEventData(TracingInfo tracingInfo) {
-        List<Object> payloadData = new ArrayList<Object>(7);
+        List<Object> payloadData = new ArrayList<Object>(8);
         payloadData.add(tracingInfo.getServiceName());
         payloadData.add(tracingInfo.getOperationName());
         payloadData.add(tracingInfo.getMessageDirection());
@@ -98,6 +98,7 @@ public class Publisher {
         payloadData.add(tracingInfo.getHeader());
         payloadData.add(tracingInfo.getTimestamp());
         payloadData.add(tracingInfo.getStatus());
+        payloadData.add(tracingInfo.getUserName());
         return payloadData;
     }
 }

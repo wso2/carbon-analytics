@@ -40,6 +40,8 @@ public class AnalyticsConstants {
                                                             + "org.wso2.carbon.analytics.spark";
     public static final String ANALYTICS_MEDIA_TYPE = "application/xml";
     public static final String SPARK_COMPUTE_CLASSPATH_SCRIPT_PATH = "bin/compute-classpath.sh";
+
+    // spark DataType strings
     public static final String STRING_TYPE = "string";
     public static final String INT_TYPE = "int";
     public static final String INTEGER_TYPE = "integer";
@@ -47,6 +49,8 @@ public class AnalyticsConstants {
     public static final String DOUBLE_TYPE = "double";
     public static final String FLOAT_TYPE = "float";
     public static final String LONG_TYPE = "long";
+    public static final String BINARY_TYPE = "binary";
+
     public static final String TERM_TABLE = "table";
     public static final String TERM_DEFINE = "define";
     public static final String TERM_INSERT = "insert";
@@ -56,6 +60,10 @@ public class AnalyticsConstants {
     public static final String TERM_AS = "as";
     public static final String TERM_FROM = "from";
     public static final String TERM_JOIN = "join";
+    public static final String TERM_CREATE = "create";
+    public static final String TERM_TEMPORARY = "temporary";
+    public static final String TERM_USING = "using";
+    public static final String TERM_OPTIONS = "options";
 
     public static final String TABLE_INFO_TABLE_NAME = "__TABLE_INFO__";
     public static final int TABLE_INFO_TENANT_ID = -1000;
@@ -63,6 +71,18 @@ public class AnalyticsConstants {
     public static final String DEFAULT_CHARSET = "UTF8";
     public static final String SCRIPT_DEPLOYMENT_DIR = "spark-scripts";
     public static final String SPARK_DEFAULTS_PATH = "repository/conf/spark/spark-defaults.conf";
+    public static final int SPARK_DEFAULT_PARTITION_COUNT = 6;
+
+    //Analytics relation strings
+    public static final String TENANT_ID = "tenantId";
+    public static final String TABLE_NAME = "tableName";
+    public static final String SCHEMA_STRING = "schema";
+    public static final String STREAM_NAME = "streamName";
+    public static final String STREAM_VERSION = "streamVersion";
+    public static final String PRIMARY_KEYS = "primaryKeys";
+    public static final String SPARK_SHORTHAND_STRING = "CarbonAnalytics";
+    public static final String TENANT_ID_AND_TABLES_MAP = "tenantIdTablesMap";
+    public static final int MAX_RECORDS = 1000;
 
     //Spark default properties strings
     public static final String SPARK_MASTER_IP = "spark.master.ip";

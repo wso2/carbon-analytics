@@ -69,6 +69,7 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <Private-Package>org.wso2.carbon.analytics.stream.persistence.internal.*</Private-Package>
                         <Export-Package>
                             org.wso2.carbon.analytics.stream.persistence.*,
                         </Export-Package>

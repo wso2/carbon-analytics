@@ -71,7 +71,7 @@ import java.util.Set;
  */
 public class GenericUtils {
 
-    private static final String CUSTOM_WSO2_CONF_DIR_NAME = "wso2conf";
+    private static final String CUSTOM_WSO2_CONF_DIR_NAME = "conf";
 
     private static final String DATA_SOURCES_FIELD = "dataSources";
 

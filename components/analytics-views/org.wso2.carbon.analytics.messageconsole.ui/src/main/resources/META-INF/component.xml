@@ -18,13 +18,24 @@
 <component xmlns="http://products.wso2.org/carbon">
     <menus>
         <menu>
+            <id>interactive_analytics_parent</id>
+            <i18n-key>Interactive Analytics</i18n-key>
+            <i18n-bundle>org.wso2.carbon.analytics.messageconsole.ui.i18n.Resources</i18n-bundle>
+            <parent-menu>manage_menu</parent-menu>
+            <link>#</link>
+            <region>region1</region>
+            <order>7</order>
+            <style-class>tools</style-class>
+            <icon>../messageconsole/images/interactive_analysis.png</icon>
+        </menu>
+        <menu>
             <id>message_console</id>
             <i18n-key>Message Console</i18n-key>
             <i18n-bundle>org.wso2.carbon.analytics.messageconsole.ui.i18n.Resources</i18n-bundle>
-            <parent-menu>dashboard_main_menu</parent-menu>
+            <parent-menu>interactive_analytics_parent</parent-menu>
             <link>../messageconsole/index.jsp</link>
             <region>region1</region>
-            <order>49</order>
+            <order>20</order>
             <style-class>tools</style-class>
             <icon>../messageconsole/images/console.png</icon>
             <require-permission>/permission/admin/manage/analytics/messageconsole</require-permission>

@@ -284,7 +284,7 @@
     </script>
 
     <div id="middle">
-        <h2>Activity Search</h2>
+        <h2>Activity Explorer</h2>
 
         <div id="workArea">
             <div class="sectionSeperator togglebleTitle">Time Search</div>
@@ -350,7 +350,7 @@
             if (fromTime != '') {
                 fromTimeStamp = jQuery_new("#fromTime").datetimepicker("getDate").getTime();
             }
-            if (fromTime != '') {
+            if (toTime != '') {
                 toTimeStamp = jQuery_new("#toTime").datetimepicker("getDate").getTime();
             }
             searchActivities(fromTimeStamp, toTimeStamp);
