@@ -26,7 +26,7 @@ public class DashboardConstants {
 
     public static final String DASHBOARD_ARTIFACT_TYPE = "dashboards/dashboard";
 
-    public static final String DASHBOARD_DEFINITION_FILE = "dashboard.json";
+    public static final String DASHBOARD_EXTENSION = ".json";
 
     public static  final String DASHBOARDS_RESOURCE_PATH = RegistryConstants.PATH_SEPARATOR +
             "ues" + RegistryConstants.PATH_SEPARATOR +  "dashboards" + RegistryConstants.PATH_SEPARATOR;

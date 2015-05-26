@@ -20,7 +20,6 @@ import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.dashboard.Dashboard;
 import org.wso2.carbon.analytics.dashboard.DashboardConstants;
 import org.wso2.carbon.analytics.dashboard.DashboardDeploymentException;
 import org.wso2.carbon.analytics.dashboard.internal.ServiceHolder;
@@ -72,13 +71,15 @@ public class DashboardDeployer implements AppDeploymentHandler {
                     String path = artifact.getExtractedPath() + File.separator + fileName;
                     File file = new File(path);
                     try {
-                        if(DashboardConstants.DASHBOARD_DEFINITION_FILE.equals(file.getName())) {
-                            String dashboardDefn = readFile(file);
-                            Dashboard dashboard = gson.fromJson(dashboardDefn,Dashboard.class);
-                            createRegistryResource(DashboardConstants.DASHBOARDS_RESOURCE_PATH + dashboard.getId() ,
-                                    dashboardDefn)  ;
+                        if(fileName.endsWith(".json")) {
+                            String dashboardDefn = readFileContent(file);
+//                            Dashboard dashboard = gson.fromJson(dashboardDefn,Dashboard.class);
+                            String resourceName =  fileName.substring(0, fileName.lastIndexOf(
+                                    DashboardConstants.DASHBOARD_EXTENSION));
+                            createRegistryResource(DashboardConstants.DASHBOARDS_RESOURCE_PATH + resourceName ,
+                                    dashboardDefn);
                             if(log.isDebugEnabled()) {
-                                log.debug("Dashboard definition [" + dashboard.getId() + "] has been created.");
+                                log.debug("Dashboard definition [" + resourceName + "] has been created.");
                             }
                         }
                         if(file.isDirectory()) {
@@ -107,7 +108,40 @@ public class DashboardDeployer implements AppDeploymentHandler {
     @Override
     public void undeployArtifacts(CarbonApplication carbonApplication, AxisConfiguration axisConfiguration)
             throws DeploymentException {
-        log.info("** Undeploying **");
+        List<Artifact.Dependency> artifacts = carbonApplication.getAppConfig().getApplicationArtifact()
+                .getDependencies();
+        for (Artifact.Dependency dep : artifacts) {
+            Artifact artifact = dep.getArtifact();
+            if (artifact == null) {
+                continue;
+            }
+            if (DashboardConstants.DASHBOARD_ARTIFACT_TYPE.equals(artifact.getType())) {
+                List<CappFile> files = artifact.getFiles();
+                String fileName = artifact.getFiles().get(0).getName();
+                String artifactPath = artifact.getExtractedPath() + File.separator + fileName;
+                File file = new File(artifactPath);
+                try {
+                    if(fileName.endsWith(DashboardConstants.DASHBOARD_EXTENSION)) {
+                        String resourcePath = DashboardConstants.DASHBOARDS_RESOURCE_PATH
+                                + fileName.substring(0,fileName.lastIndexOf(DashboardConstants.DASHBOARD_EXTENSION));
+                        try {
+                            removeRegistryResource(resourcePath);
+                        } catch (RegistryException e) {
+                            String errorMsg = "Error deleting registry resource " + resourcePath;
+                            log.error(errorMsg,e);
+                            throw new DashboardDeploymentException(errorMsg,e);
+                        }
+                    }
+                    if(file.isDirectory()) {
+                        file.delete();
+                    }
+
+                } catch (DeploymentException e) {
+                    log.error("Error occurred while trying to undeploy : " + artifact.getName());
+                }
+
+            }
+        }
     }
 
     private String buildStorePath() {
@@ -127,6 +161,15 @@ public class DashboardDeployer implements AppDeploymentHandler {
         resource.setContent(gson.toJson(content));
         resource.setMediaType("application/json");
         registry.put(url, resource);
+    }
+
+    private void removeRegistryResource(String resourcePath) throws RegistryException {
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        Registry registry = ServiceHolder.getRegistryService().getConfigSystemRegistry(tenantId);
+        if (registry.resourceExists(resourcePath)) {
+            Resource resource = registry.get(resourcePath);
+            registry.delete(resourcePath);
+        }
     }
 
     private  void copyFolder(File src, File dest) throws IOException {
@@ -159,7 +202,7 @@ public class DashboardDeployer implements AppDeploymentHandler {
         }
     }
 
-    private String readFile(File file) throws IOException {
+    private String readFileContent(File file) throws IOException {
         String content = null;
         FileReader reader = null;
         try {
