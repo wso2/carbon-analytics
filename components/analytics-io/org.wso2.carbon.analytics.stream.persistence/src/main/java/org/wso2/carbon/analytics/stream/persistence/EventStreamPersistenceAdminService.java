@@ -102,6 +102,8 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
                             }
                         }
                     }
+                } else {
+                    log.warn("Analytics table does not exist for stream[" + streamName + "]");
                 }
             }
             if (log.isDebugEnabled() && !streamAlreadyExist) {

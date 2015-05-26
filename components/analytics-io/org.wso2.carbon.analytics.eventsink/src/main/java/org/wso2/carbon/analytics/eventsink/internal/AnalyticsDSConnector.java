@@ -120,10 +120,10 @@ public class AnalyticsDSConnector {
     }
 
     private Object getRecordValue(AnalyticsSchema schema, String fieldName, Object fieldValue, boolean mandatoryValue) {
-        if (fieldValue instanceof String) {
-            String fieldStrValue = (String) fieldValue;
-            ColumnDefinition columnDefinition = schema.getColumns().get(fieldName);
-            if (columnDefinition != null) {
+        ColumnDefinition columnDefinition = schema.getColumns().get(fieldName);
+        if (columnDefinition != null) {
+            if (fieldValue instanceof String) {
+                String fieldStrValue = (String) fieldValue;
                 switch (columnDefinition.getType()) {
                     case FACET:
                         return gson.fromJson(fieldStrValue, List.class);
@@ -142,12 +142,14 @@ public class AnalyticsDSConnector {
                     case LONG:
                         return Long.parseLong(fieldStrValue);
                 }
-            } else if (mandatoryValue) {
                 return fieldValue;
-            } else {
-                return null;
+            }else {
+                return fieldValue;
             }
+        }else if (mandatoryValue){
+            return fieldValue;
+        }else {
+            return null;
         }
-        return fieldValue;
     }
 }
