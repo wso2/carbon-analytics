@@ -18,8 +18,8 @@
 <component xmlns="http://products.wso2.org/carbon">
     <ManagementPermissions>
         <ManagementPermission>
-            <DisplayName>Spark Execution</DisplayName>
-            <ResourceId>/permission/admin/manage/analytics/execution</ResourceId>
+            <DisplayName>Analytics</DisplayName>
+            <ResourceId>/permission/admin/manage/analytics</ResourceId>
         </ManagementPermission>
     </ManagementPermissions>
 
