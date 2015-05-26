@@ -25,7 +25,7 @@
             <region>region1</region>
             <order>5</order>
             <style-class>home</style-class>
-            <icon>../eventstream/images/eventProcessor.gif</icon>
+            <icon>../eventstream/images/events.png</icon>
             <require-permission>/permission/admin/manage/event-streams</require-permission>
         </menu>
         <menu>
