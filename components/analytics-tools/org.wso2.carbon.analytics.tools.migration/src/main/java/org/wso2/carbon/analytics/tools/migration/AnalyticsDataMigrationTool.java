@@ -60,14 +60,19 @@ public class AnalyticsDataMigrationTool {
     private static final String COLUMN_FAMILY = "columnFamily";
     private static final String ANALYTIC_TABLE = "analyticTable";
     private static final String TENANT_ID = "tenantId";
+    private static final String SERVER_URL_ARG = "server url";
+    private static final String PORT_ARG = "port";
+    private static final String COLUMN_FAMILY_NAME_ARG = "column family name";
+    private static final String ANALYTIC_TABLE_NAME_ARG = "analytic table name";
+    private static final String TENANT_ID_ARG = "tenant id";
 
     public static void main(String[] args) throws Exception {
         Options options = new Options();
-        options.addOption(new Option(SERVER_URL, true, "Cassandra server url '<default value: localhost>'"));
-        options.addOption(new Option(PORT, true, "Cassandra server port '<default value: 9042'"));
-        options.addOption(new Option(COLUMN_FAMILY, true, "Name of the columnFamily to be migrated"));
-        options.addOption(new Option(ANALYTIC_TABLE, true, "Destination name of the table which will have the migrated data"));
-        options.addOption(new Option(TENANT_ID, true, "specify tenant id of the tenant considered '<default value: super tenant>'"));
+        options.addOption(new Option(SERVER_URL, SERVER_URL_ARG, true, "Cassandra server url '<default value: localhost>'"));
+        options.addOption(new Option(PORT, PORT_ARG, true, "Cassandra server port '<default value: 9042'"));
+        options.addOption(new Option(COLUMN_FAMILY, COLUMN_FAMILY_NAME_ARG, true, "Name of the columnFamily to be migrated"));
+        options.addOption(new Option(ANALYTIC_TABLE, ANALYTIC_TABLE_NAME_ARG, true, "Destination name of the table which will have the migrated data"));
+        options.addOption(new Option(TENANT_ID, TENANT_ID_ARG, true, "specify tenant id of the tenant considered '<default value: super tenant>'"));
         CommandLineParser parser = new BasicParser();
         CommandLine line = parser.parse(options, args);
         if (args.length < 6 ) {
