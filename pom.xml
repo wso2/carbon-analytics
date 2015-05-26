@@ -913,10 +913,21 @@
             </dependency>
             <!-- END hbase + hadoop client dependencies -->
 
-            <!-- START Analytics Dashboard UI -->
+            <!-- START Analytics Dashboard  -->
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.dashboard.ui</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.dashboard</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.dashboard.server.feature</artifactId>
+                <type>zip</type>
                 <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
@@ -925,7 +936,7 @@
                 <type>zip</type>
                 <version>${carbon.analytics.version}</version>
             </dependency>
-            <!-- END Analytics Dashboard UI -->
+            <!-- END Analytics Dashboard  -->
 
             <!--START Log Monitor UIs-->
             <dependency>
