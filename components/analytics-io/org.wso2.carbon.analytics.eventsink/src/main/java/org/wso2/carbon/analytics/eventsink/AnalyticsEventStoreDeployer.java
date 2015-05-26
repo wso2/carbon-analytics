@@ -66,7 +66,7 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
                 AnalyticsEventStore eventStoreConfiguration = AnalyticsEventStoreManager.getInstance()
                         .getAnalyticsEventStore(deploymentFileData.getFile());
                 if (AnalyticsEventSinkUtil.getAnalyticsEventStoreName(deploymentFileData.getName()).
-                        equals(eventStoreConfiguration.getName())) {
+                        equalsIgnoreCase(eventStoreConfiguration.getName())) {
                     addEventStore(tenantId, eventStoreConfiguration);
                 } else {
                     throw new AnalyticsEventStoreDeploymentException("Invalid configuration provided! File name: " +

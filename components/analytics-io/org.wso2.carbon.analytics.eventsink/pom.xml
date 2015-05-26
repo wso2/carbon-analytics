@@ -129,6 +129,7 @@
                         </Export-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                         <Axis2Deployer>AnalyticsEventStoreDeployer</Axis2Deployer>
+                        <WSO2-Application-Deployer>AnalyticsEventStoreCAppDeployer</WSO2-Application-Deployer>
                     </instructions>
                 </configuration>
             </plugin>
