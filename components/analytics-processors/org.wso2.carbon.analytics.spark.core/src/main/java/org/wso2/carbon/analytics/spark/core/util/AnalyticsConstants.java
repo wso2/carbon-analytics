@@ -63,6 +63,7 @@ public class AnalyticsConstants {
     public static final String TERM_CREATE = "create";
     public static final String TERM_TEMPORARY = "temporary";
     public static final String TERM_USING = "using";
+    public static final String TERM_OPTIONS = "options";
 
     public static final String TABLE_INFO_TABLE_NAME = "__TABLE_INFO__";
     public static final int TABLE_INFO_TENANT_ID = -1000;
@@ -80,6 +81,7 @@ public class AnalyticsConstants {
     public static final String STREAM_VERSION = "streamVersion";
     public static final String PRIMARY_KEYS = "primaryKeys";
     public static final String SPARK_SHORTHAND_STRING = "CarbonAnalytics";
+    public static final String TENANT_ID_AND_TABLES_MAP = "tenantIdTablesMap";
 
     //Spark default properties strings
     public static final String SPARK_MASTER_IP = "spark.master.ip";

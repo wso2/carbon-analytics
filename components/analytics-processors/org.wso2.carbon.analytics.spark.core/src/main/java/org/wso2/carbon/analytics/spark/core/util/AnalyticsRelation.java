@@ -87,6 +87,14 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
         }
     }
 
+    public AnalyticsRelation(int tenantId, String tableName,
+                             SQLContext sqlContext, StructType schema) {
+        this.tenantId = tenantId;
+        this.tableName = tableName;
+        this.sqlContext = sqlContext;
+        this.schema = schema;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public RDD<Row> buildScan() {

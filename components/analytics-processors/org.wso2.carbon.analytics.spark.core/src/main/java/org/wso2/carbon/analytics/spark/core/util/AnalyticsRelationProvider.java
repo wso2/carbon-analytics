@@ -20,11 +20,8 @@ package org.wso2.carbon.analytics.spark.core.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.SQLContext;
-import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.sources.BaseRelation;
-import org.apache.spark.sql.sources.CreatableRelationProvider;
 import org.apache.spark.sql.sources.RelationProvider;
 import org.apache.spark.sql.sources.SchemaRelationProvider;
 import org.apache.spark.sql.types.StructType;
@@ -43,23 +40,23 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Created by niranda on 5/12/15.
+ * This class allows spark to communicate with the the Analytics Dataservice when used in Spark SQL
+ * with the 'USING' keyword
  */
 public class AnalyticsRelationProvider implements RelationProvider,
-                                                  SchemaRelationProvider,
-                                                  CreatableRelationProvider {
+                                                  SchemaRelationProvider {
 
     private static final Log log = LogFactory.getLog(AnalyticsRelationProvider.class);
 
     private int tenantId;
     private String tableName;
-    private String schema;
+    private String schemaString;
     private String streamName;
     private String streamVersion;
     private String primaryKeys;
     private AnalyticsDataService dataService;
 
-    public AnalyticsRelationProvider(){
+    public AnalyticsRelationProvider() {
         this.dataService = ServiceHolder.getAnalyticsDataService();
     }
 
@@ -74,8 +71,8 @@ public class AnalyticsRelationProvider implements RelationProvider,
     @Override
     public AnalyticsRelation createRelation(SQLContext sqlContext, Map<String, String> parameters) {
         setParameters(parameters);
-        createTableIfNotExist(this.dataService);
-        setSchemaIfProvided(this.dataService);
+        createTableIfNotExist();
+        setSchemaIfProvided();
 
         return new AnalyticsRelation(this.tenantId, this.tableName, sqlContext);
     }
@@ -83,18 +80,18 @@ public class AnalyticsRelationProvider implements RelationProvider,
     private void setParameters(Map<String, String> parameters) {
         this.tenantId = Integer.parseInt(extractValuesFromMap(AnalyticsConstants.TENANT_ID, parameters, "-1234"));
         this.tableName = extractValuesFromMap(AnalyticsConstants.TABLE_NAME, parameters, "");
-        this.schema = extractValuesFromMap(AnalyticsConstants.SCHEMA_STRING, parameters, "");
+        this.schemaString = extractValuesFromMap(AnalyticsConstants.SCHEMA_STRING, parameters, "");
         this.streamName = extractValuesFromMap(AnalyticsConstants.STREAM_NAME, parameters, "");
         this.streamVersion = extractValuesFromMap(AnalyticsConstants.STREAM_VERSION, parameters, "");
         this.primaryKeys = extractValuesFromMap(AnalyticsConstants.PRIMARY_KEYS, parameters, "");
     }
 
-    private void createTableIfNotExist(AnalyticsDataService dataService) {
+    private void createTableIfNotExist() {
         if (!this.tableName.isEmpty()) {
             try {
                 // if table does not exists, create table
-                if (!dataService.tableExists(this.tenantId, this.tableName)) {
-                    dataService.createTable(this.tenantId, this.tableName);
+                if (!this.dataService.tableExists(this.tenantId, this.tableName)) {
+                    this.dataService.createTable(this.tenantId, this.tableName);
                 }
             } catch (AnalyticsException e) {
                 log.error("Error while accessing tables", e);
@@ -105,8 +102,8 @@ public class AnalyticsRelationProvider implements RelationProvider,
             // if stream name and version provided, create a table from the streamID
             try {
                 this.tableName = DataBridgeCommonsUtils.generateStreamId(this.streamName, this.streamVersion);
-                if (!dataService.tableExists(this.tenantId, this.tableName)) {
-                    dataService.createTable(this.tenantId, this.tableName);
+                if (!this.dataService.tableExists(this.tenantId, this.tableName)) {
+                    this.dataService.createTable(this.tenantId, this.tableName);
                 }
             } catch (AnalyticsException e) {
                 log.error("Error while accessing tables", e);
@@ -120,20 +117,20 @@ public class AnalyticsRelationProvider implements RelationProvider,
 
     }
 
-    private void setSchemaIfProvided(AnalyticsDataService dataService) {
+    private void setSchemaIfProvided() {
         //create schema if exists
-        if (!this.schema.isEmpty()) {
+        if (!this.schemaString.isEmpty()) {
             AnalyticsSchema analyticsSchema;
             if (!this.primaryKeys.isEmpty()) {
                 //process schema string & primaryKeys & create a analytics schema
-                analyticsSchema = new AnalyticsSchema(createColumnsList(this.schema), createPrimaryKeyList(this.primaryKeys));
+                analyticsSchema = new AnalyticsSchema(createColumnsList(this.schemaString), createPrimaryKeyList(this.primaryKeys));
             } else {
                 //process schema with an empty string & create an analytics schema
-                analyticsSchema = new AnalyticsSchema(createColumnsList(this.schema), Collections.<String>emptyList());
+                analyticsSchema = new AnalyticsSchema(createColumnsList(this.schemaString), Collections.<String>emptyList());
             }
 
             try {
-                dataService.setTableSchema(this.tenantId, this.tableName, analyticsSchema);
+                this.dataService.setTableSchema(this.tenantId, this.tableName, analyticsSchema);
             } catch (AnalyticsException e) {
                 log.error("Error while setting table schema ", e);
                 e.printStackTrace();
@@ -176,30 +173,33 @@ public class AnalyticsRelationProvider implements RelationProvider,
      *
      * @param sqlContext sqlContext
      * @param parameters tenantId, tableName, schema, streamName, streamVersion, primaryKeys
-     * @param schema schema specified in line with the query
+     * @param schema     schema specified in line with the query
      */
     @Override
     public BaseRelation createRelation(SQLContext sqlContext, Map<String, String> parameters,
                                        StructType schema) {
-        //todo: implement this. here the schema is provided as struct type & NOT in the parameters
-        //todo: exctract the schema information, set schema in the ds and create the first relation
-        //NOTE: this schema contains comments, which are included in the metadata fields
+        //Here the schema is provided as struct type & NOT in the parameters
+        //This exctracts the schema information, set schema in the ds and create a new analytics relationNOTE: this schema contains comments, which are included in the metadata fields
 
         setParameters(parameters);
-        AnalyticsSchema schemaFromDS;
+        createTableIfNotExist();
+        setSchemaIfProvided();
+
         try {
+            AnalyticsSchema schemaFromDS;
             schemaFromDS = dataService.getTableSchema(this.tenantId, this.tableName);
+            if (!AnalyticsCommonUtils.validateSchemaColumns(schema, schemaFromDS)) {
+                throw new RuntimeException("Incompatible schemas for the tables");
+            }
         } catch (AnalyticsException e) {
             log.error("Failed to load the schema for table " + tableName, e);
-            throw new RuntimeException ("Failed to load the schema for table " + tableName);
+            throw new RuntimeException("Failed to load the schema for table " + tableName);
         }
 
-        AnalyticsCommonUtils.validateSchemaColumns(schema, schemaFromDS);
-
-        throw new RuntimeException("Schema relation is not implemented as yet");
+        return new AnalyticsRelation(this.tenantId, this.tableName, sqlContext, schema);
     }
 
-
+//    todo: Implement the creatable relation
     /**
      * Creates a relation with the given parameters based on the contents of the given
      * DataFrame. The mode specifies the expected behavior of createRelation when
@@ -217,11 +217,11 @@ public class AnalyticsRelationProvider implements RelationProvider,
      * @param parameters
      * @param data
      */
-    @Override
-    public BaseRelation createRelation(SQLContext sqlContext, SaveMode mode,
-                                       Map<String, String> parameters, DataFrame data) {
-        //todo: implement this
-        //todo: extract data from the dataframe, save it using the savemode and create the relation using the first initializer
-        throw new RuntimeException("Creatable relation is not implemented as yet");
-    }
+//    @Override
+//    public BaseRelation createRelation(SQLContext sqlContext, SaveMode mode,
+//                                       Map<String, String> parameters, DataFrame data) {
+//        //implement this
+//        //extract data from the dataframe, save it using the savemode and create the relation using the first initializer
+//        throw new RuntimeException("Creatable relation is not implemented as yet");
+//    }
 }

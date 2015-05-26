@@ -18,6 +18,8 @@
  */
 package org.wso2.carbon.analytics.spark.core.internal;
 
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.MultiMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.spark.SparkConf;
@@ -30,41 +32,31 @@ import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.util.Utils;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterException;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
-import org.wso2.carbon.analytics.datasource.commons.Record;
-import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionCall;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
+import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
-import org.wso2.carbon.analytics.spark.core.util.AnalyticsRelation;
-import org.wso2.carbon.analytics.spark.core.util.AnalyticsRelationProvider;
 import org.wso2.carbon.utils.CarbonUtils;
 import scala.None$;
 import scala.Option;
-import scala.Tuple2;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -109,6 +101,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private int portOffset;
 
     private int workerCount = 1;
+
+    private MultiMap<Integer, String> sparkTableNames;
 
     private Object workerActorSystem;
     private Object masterActorSystem;
@@ -210,39 +204,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
     }
 
-    @Deprecated
-    private void processDefineTable(int tenantId, String query,
-                                    String[] tokens) throws AnalyticsExecutionException {
-        String tableName = tokens[2].trim();
-        String alias = tableName;
-        if (tokens[tokens.length - 2].equalsIgnoreCase(AnalyticsConstants.TERM_AS)) {
-            alias = tokens[tokens.length - 1];
-            query = query.substring(0, query.lastIndexOf(tokens[tokens.length - 2]));
-        }
-        String schemaString = query.substring(query.indexOf(tableName) + tableName.length()).trim();
-        try {
-            registerTable(tenantId, tableName, alias, schemaString);
-        } catch (AnalyticsException e) {
-            throw new AnalyticsExecutionException("Error in registering analytics table: " + e.getMessage(), e);
-        }
-    }
-
     public int getNumPartitionsHint() {
         /* all workers will not have the same CPU count, this is just an approximation */
         return this.getWorkerCount() * Runtime.getRuntime().availableProcessors();
-    }
-
-    @Deprecated
-    private void processInsertInto(int tenantId, String query,
-                                   String[] tokens) throws AnalyticsExecutionException {
-        String tableName = tokens[2].trim();
-        String selectQuery = query.substring(query.indexOf(tableName) + tableName.length()).trim();
-        try {
-            insertIntoTable(tenantId, tableName, toResult(this.sqlCtx.sql
-                    (encodeQueryWithTenantId(tenantId, selectQuery))));
-        } catch (AnalyticsException e) {
-            throw new AnalyticsExecutionException("Error in executing insert into query: " + e.getMessage(), e);
-        }
     }
 
     public AnalyticsQueryResult executeQuery(int tenantId, String query)
@@ -266,117 +230,51 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         if (query.endsWith(";")) {
             query = query.substring(0, query.length() - 1);
         }
-        //todo: change this! no parsing... just submit the query to relation provider with options
-
-        Pattern p = Pattern.compile("\\b(?i)(" + AnalyticsConstants.TERM_USING + ")\\b " +
-                                    "\\b(" + AnalyticsConstants.SPARK_SHORTHAND_STRING + ")\\b");
-        // if "using CarbonAnalytics" is present, replace with "using AnalyticsRelationProvider class name
-        if (p.matcher(query).find()) {
-            query = query.replaceAll("\\b" + AnalyticsConstants.SPARK_SHORTHAND_STRING + "\\b",
-                                     AnalyticsRelationProvider.class.getName());
-        }
+        query = AnalyticsCommonUtils.parseQueryWithAnalyticsData(tenantId, query);
+        query = encodeQueryWithTenantId(tenantId, query);
         return toResult(this.sqlCtx.sql(encodeQueryWithTenantId(tenantId, query)));
     }
-
-    //todo: update this algo! accomodate create temp table, and insert queries here as well
     //todo: update the test cases!
+    private String encodeQueryWithTenantId(int tenantId, String query)
+            throws AnalyticsExecutionException {
+        String result;
+        // parse the query to see if it is a create temporary table
+        // add the table names to the hz cluster map with tenantId -> table Name (put if absent)
+        // iterate through the dist map and replace the relevant table names
+        HazelcastInstance hz = AnalyticsServiceHolder.getHazelcastInstance();
+        this.sparkTableNames = hz.getMultiMap(AnalyticsConstants.TENANT_ID_AND_TABLES_MAP);
+        Pattern p = Pattern.compile("(?i)(?<=(" + AnalyticsConstants.TERM_CREATE +
+                                    "\\s" + AnalyticsConstants.TERM_TEMPORARY +
+                                    "\\s" + AnalyticsConstants.TERM_TABLE + "))\\s+\\w+");
+        Matcher m = p.matcher(query);
+        if (m.find()) {
+            //this is a create table query
+            String tempTableName = m.group().trim();
+            if (tempTableName.matches("(?i)if")) {
+                throw new AnalyticsExecutionException("Malformed query: CREATE TEMPORARY TABLE IF NOT " +
+                                                      "EXISTS is not supported");
+            } else {
+                this.sparkTableNames.put(tenantId, tempTableName);
 
-    private String encodeQueryWithTenantId(int tenantId, String query) {
-        String result = query;
-        String[] tokens = query.split("\\s+");
-        ArrayList<String> tableNames = new ArrayList<>();
-        for (int i = 0; i < tokens.length; i++) {
-            // select queries
-            if ((tokens[i].compareToIgnoreCase(AnalyticsConstants.TERM_FROM) == 0 ||
-                 tokens[i].compareToIgnoreCase(AnalyticsConstants.TERM_JOIN) == 0)
-                && tokens[i + 1].substring(0, 1).matches("[a-zA-Z]")) {
-                tableNames.add(tokens[i + 1]);
-                i++;
+                //replace the table names in the create table query
+                int optStrStart = query.toLowerCase().indexOf(AnalyticsConstants.TERM_OPTIONS, m.end());
+                int optStrEnd = query.indexOf(")", optStrStart);
+
+                String beforeOptions = replaceTableNamesInQuery(tenantId, query.substring(0, optStrStart));
+                String afterOptions = replaceTableNamesInQuery(tenantId, query.substring(optStrEnd + 1, query.length()));
+                result = beforeOptions + query.substring(optStrStart, optStrEnd + 1) + afterOptions;
             }
-
-            //create temp table queries
-            if (tokens[i].compareToIgnoreCase(AnalyticsConstants.TERM_CREATE) == 0 &&
-                tokens[i + 1].compareToIgnoreCase(AnalyticsConstants.TERM_TEMPORARY) == 0 &&
-                tokens[i + 2].compareToIgnoreCase(AnalyticsConstants.TERM_TABLE) == 0) {
-                tableNames.add(tokens[i + 3]);
-                i= i+3;
-            }
+        } else {
+                result = replaceTableNamesInQuery(tenantId, query);
         }
-
-        for (String name : tableNames) {
-            result = result.replaceAll("\\b" + name + "\\b", encodeTableName(tenantId, name));
-        }
-
         return result.trim();
     }
 
-    private void insertIntoTable(int tenantId, String tableName,
-                                 AnalyticsQueryResult data)
-            throws AnalyticsException {
-        AnalyticsDataService ads = ServiceHolder.getAnalyticsDataService();
-        List<Record> records = this.generateInsertRecordsForTable(tenantId, tableName, data);
-        ads.put(records);
-    }
-
-    private Integer[] generateTableKeyIndices(String[] keys, String[] columns) {
-        List<Integer> result = new ArrayList<>();
-        for (String key : keys) {
-            for (int i = 0; i < columns.length; i++) {
-                if (key.equals(columns[i])) {
-                    result.add(i);
-                    break;
-                }
-            }
-        }
-        return result.toArray(new Integer[result.size()]);
-    }
-
-    private String generateInsertRecordId(List<Object> row, Integer[] keyIndices) {
-        StringBuilder builder = new StringBuilder();
-        Object obj;
-        for (int index : keyIndices) {
-            obj = row.get(index);
-            if (obj != null) {
-                builder.append(obj.toString());
-            }
-        }
-        /* to make sure, we don't have an empty string */
-        builder.append("X");
-        try {
-            byte[] data = builder.toString().getBytes(AnalyticsConstants.DEFAULT_CHARSET);
-            return UUID.nameUUIDFromBytes(data).toString();
-        } catch (UnsupportedEncodingException e) {
-            /* this wouldn't happen */
-            throw new RuntimeException(e);
-        }
-    }
-
-    private List<Record> generateInsertRecordsForTable(int tenantId, String tableName,
-                                                       AnalyticsQueryResult data)
-            throws AnalyticsException {
-        String[] keys = loadTableKeys(tenantId, tableName);
-        boolean primaryKeysExists = keys.length > 0;
-        List<List<Object>> rows = data.getRows();
-        String[] columns = data.getColumns();
-        Integer[] keyIndices = this.generateTableKeyIndices(keys, columns);
-        List<Record> result = new ArrayList<>(rows.size());
-        Record record;
-        for (List<Object> row : rows) {
-            if (primaryKeysExists) {
-                record = new Record(this.generateInsertRecordId(row, keyIndices), tenantId, tableName,
-                                    extractValuesFromRow(row, columns));
-            } else {
-                record = new Record(tenantId, tableName, extractValuesFromRow(row, columns));
-            }
-            result.add(record);
-        }
-        return result;
-    }
-
-    private static Map<String, Object> extractValuesFromRow(List<Object> row, String[] columns) {
-        Map<String, Object> result = new HashMap<>(row.size());
-        for (int i = 0; i < row.size(); i++) {
-            result.put(columns[i], row.get(i));
+    private String replaceTableNamesInQuery(int tenantId, String query) {
+        String result = query;
+        for (String name : this.sparkTableNames.get(tenantId)) {
+            result = result.replaceAll("\\b" + name + "\\b",
+                                      AnalyticsCommonUtils.encodeTableNameWithTenantId(tenantId, name));
         }
         return result;
     }
@@ -398,122 +296,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             result.add(objects);
         }
         return result;
-    }
-
-    private static void throwInvalidDefineTableQueryException() throws AnalyticsException {
-        throw new AnalyticsException("Invalid define table query, must be in the format of "
-                                     + "'define table <table> (name1 type1, name2 type2, name3 type3,... primary key(name1, name2..))'");
-    }
-
-    private static String generateTableKeysId(int tenantId, String tableName) {
-        return tenantId + "_" + tableName;
-    }
-
-    private static byte[] tableKeysToBinary(String[] keys) throws AnalyticsException {
-        return GenericUtils.serializeObject(keys);
-    }
-
-    private static String[] binaryToTableKeys(byte[] data) throws AnalyticsException {
-        return (String[]) GenericUtils.deserializeObject(data);
-    }
-
-    private static String[] loadTableKeys(int tenantId, String tableName)
-            throws AnalyticsException {
-        AnalyticsDataService ads = ServiceHolder.getAnalyticsDataService();
-        List<String> ids = new ArrayList<>(1);
-        ids.add(generateTableKeysId(tenantId, tableName));
-        List<Record> records = GenericUtils.listRecords(ads, ads.get(
-                AnalyticsConstants.TABLE_INFO_TENANT_ID,
-                AnalyticsConstants.TABLE_INFO_TABLE_NAME, 1, null, ids));
-        if (records.size() == 0) {
-            throw new AnalyticsException("Table keys cannot be found for tenant: " + tenantId + " table: " + tableName);
-        }
-        Record record = records.get(0);
-        byte[] data = (byte[]) record.getValue(AnalyticsConstants.OBJECT);
-        if (data == null) {
-            throw new AnalyticsException("Corrupted table keys for tenant: " + tenantId + " table: " + tableName);
-        }
-        return binaryToTableKeys(data);
-    }
-
-    private static void registerTableKeys(int tenantId, String tableName,
-                                          String[] keys) throws AnalyticsException {
-        AnalyticsDataService ads = ServiceHolder.getAnalyticsDataService();
-        Map<String, Object> values = new HashMap<>();
-        values.put(AnalyticsConstants.OBJECT, tableKeysToBinary(keys));
-        Record record = new Record(generateTableKeysId(tenantId, tableName),
-                                   AnalyticsConstants.TABLE_INFO_TENANT_ID, AnalyticsConstants.TABLE_INFO_TABLE_NAME, values);
-        List<Record> records = new ArrayList<>(1);
-        records.add(record);
-        try {
-            ads.put(records);
-        } catch (AnalyticsTableNotAvailableException e) {
-            ads.createTable(AnalyticsConstants.TABLE_INFO_TENANT_ID, AnalyticsConstants.TABLE_INFO_TABLE_NAME);
-            ads.put(records);
-        }
-    }
-
-    private static String processPrimaryKeyAndReturnSchema(int tenantId, String tableName,
-                                                           String schemaString)
-            throws AnalyticsException {
-        int index = schemaString.toLowerCase().lastIndexOf(AnalyticsConstants.TERM_PRIMARY);
-        String lastSection = "";
-        if (index != -1) {
-            index = schemaString.lastIndexOf(',', index);
-            lastSection = schemaString.substring(index + 1).trim();
-        }
-        String[] lastTokens = lastSection.split(" ");
-        if (lastTokens.length >= 2 && lastTokens[1].trim().toLowerCase().startsWith(AnalyticsConstants.TERM_KEY)) {
-            String keysSection = lastSection.substring(lastSection.toLowerCase().indexOf(
-                    AnalyticsConstants.TERM_KEY) + 3).trim();
-            if (!(keysSection.startsWith("(") && keysSection.endsWith(")"))) {
-                throwInvalidDefineTableQueryException();
-            }
-            keysSection = keysSection.substring(1, keysSection.length() - 1).trim();
-            String keys[] = keysSection.split(",");
-            for (int i = 0; i < keys.length; i++) {
-                keys[i] = keys[i].trim();
-            }
-            registerTableKeys(tenantId, tableName, keys);
-            return schemaString.substring(0, index).trim();
-        } else {
-            registerTableKeys(tenantId, tableName, new String[0]);
-            return schemaString;
-        }
-    }
-
-    private void registerTable(int tenantId, String tableName, String alias,
-                               String schemaString) throws AnalyticsException {
-        if (!(schemaString.startsWith("(") && schemaString.endsWith(")"))) {
-            throwInvalidDefineTableQueryException();
-        }
-        schemaString = schemaString.substring(1, schemaString.length() - 1).trim();
-        schemaString = processPrimaryKeyAndReturnSchema(tenantId, tableName, schemaString);
-        AnalyticsDataService ads = ServiceHolder.getAnalyticsDataService();
-        if (!ads.tableExists(tenantId, tableName)) {
-            ads.createTable(tenantId, tableName);
-        }
-//        AnalyticsRelation table = new AnalyticsRelation(tenantId, tableName, this.sqlCtx, schemaString);
-        AnalyticsRelationProvider relationProvider = new AnalyticsRelationProvider();
-        scala.collection.immutable.HashMap<String, String> params = new scala.collection.immutable.HashMap<>();
-        params = params.$plus(new Tuple2<>(AnalyticsConstants.TENANT_ID, Integer.toString(tenantId)));
-        params = params.$plus(new Tuple2<>(AnalyticsConstants.TABLE_NAME, tableName));
-        params = params.$plus(new Tuple2<>(AnalyticsConstants.SCHEMA_STRING, schemaString));
-
-        AnalyticsRelation table = relationProvider.createRelation(this.sqlCtx, params);
-        DataFrame dataFrame = this.sqlCtx.baseRelationToDataFrame(table);
-        dataFrame.registerTempTable(encodeTableName(tenantId, alias));
-    }
-
-    private String encodeTableName(int tenantId, String tableName) {
-        String tenantStr;
-        String delimiter = "_";
-        if (tenantId < 0) {
-            tenantStr = "X" + String.valueOf(-tenantId);
-        } else {
-            tenantStr = "T" + String.valueOf(tenantId);
-        }
-        return tenantStr + delimiter + tableName;
     }
 
     @Override
@@ -595,12 +377,14 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         this.startWorker(this.myHost, masterHost, masterPort, workerPort, workerUiPort, workerCores,
                          workerMem, workerDir, propsFile, this.sparkConf);
 
+        log.info("Analytics worker started: [" + this.myHost + ":" + workerPort + ":" + workerUiPort + "] "
+                 + "Master [" + masterHost + ":" + masterPort + "]");
+
         if (acm.isLeader(CLUSTER_GROUP_NAME)) {
             this.initClient("spark://" + masterHost + ":" + masterPort, appName);
         }
 
-        log.info("Analytics worker started: [" + this.myHost + ":" + workerPort + ":" + workerUiPort + "] "
-                 + "Master [" + masterHost + ":" + masterPort + "]");
+        log.info("Analytics client started: App Name [" + appName + "] Master [" + masterHost + ":" + masterPort + "]");
     }
 
     public int getWorkerCount() {

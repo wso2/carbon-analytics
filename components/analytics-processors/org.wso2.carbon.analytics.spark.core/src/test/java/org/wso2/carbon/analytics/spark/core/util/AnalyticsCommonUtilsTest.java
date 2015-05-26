@@ -26,7 +26,6 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
-import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,6 +34,7 @@ public class AnalyticsCommonUtilsTest {
 
     @Test
     public void testValidateSchemaColumns() throws Exception {
+        System.out.println("\n************** START: VALIDATE SCHEMA UTIL METHOD TEST **************");
         StructType sparkSchema = new StructType(new StructField[]{
                 new StructField("name", DataTypes.StringType, true, Metadata.empty()),
                 new StructField("age", DataTypes.IntegerType, true, Metadata.empty()),
@@ -47,6 +47,22 @@ public class AnalyticsCommonUtilsTest {
         colDefList.add(new ColumnDefinition("field", AnalyticsSchema.ColumnType.STRING));
         AnalyticsSchema analyticsSchema = new AnalyticsSchema(colDefList, Collections.<String>emptyList());
 
-        Assert.assertTrue(AnalyticsCommonUtils.validateSchemaColumns(sparkSchema, analyticsSchema));
+        System.out.println("Testing equal schemas.. ");
+        Assert.assertTrue(AnalyticsCommonUtils.validateSchemaColumns(sparkSchema, analyticsSchema),
+                          "two schemas are expected to be equal, but returned different!");
+        System.out.println("\n************** END: VALIDATE SCHEMA UTIL METHOD TEST **************");
+    }
+
+    @Test
+    public void testParseQueryWithAnalyticsData() throws Exception {
+        System.out.println("\n************** START: PARSE QUERY WITH ANALYTICS DATA UTIL METHOD TEST **************");
+        String query = "CREATE TEMPORARY TABLE tempTable(a int, b string) USING CarbonAnalytics OPTIONS (tenantId -1234, tableName TEMP_TABLE )";
+        String queryExp = "CREATE TEMPORARY TABLE tempTable(a int, b string) USING org.wso2.carbon.analytics.spark.core.util.AnalyticsRelationProvider OPTIONS (tenantId -1234, tableName TEMP_TABLE )";
+        int tenantId = -1234;
+
+        System.out.println(AnalyticsCommonUtils.parseQueryWithAnalyticsData(tenantId, query));
+        Assert.assertEquals(AnalyticsCommonUtils.parseQueryWithAnalyticsData(tenantId, query),
+                            queryExp);
+        System.out.println("\n************** END: PARSE QUERY WITH ANALYTICS DATA UTIL METHOD TEST **************");
     }
 }

@@ -60,6 +60,22 @@
             <artifactId>xercesImpl</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.analytics.datasource.core.test</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.analytics.datasource.rdbms</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.ndatasource.rdbms</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!--extra dependancies -->
         <!--        <dependency>
                     <groupId>org.spark-project.akka</groupId>
