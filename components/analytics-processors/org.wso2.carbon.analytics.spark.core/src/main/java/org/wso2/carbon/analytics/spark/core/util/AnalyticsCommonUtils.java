@@ -25,7 +25,6 @@ import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructType;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
-import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +34,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by niranda on 5/21/15.
+ * This class contains the common methods used by the Analytics Spark Core
  */
 public class AnalyticsCommonUtils {
 
@@ -112,52 +111,6 @@ public class AnalyticsCommonUtils {
         String[] tableCols = temp.toArray(new String[temp.size()]);
 
         return Arrays.equals(rddCols, tableCols);
-    }
-
-    public static String parseQueryWithAnalyticsData(int tenantId, String query)
-            throws AnalyticsExecutionException {
-        int index = query.toLowerCase().indexOf(AnalyticsConstants.TERM_USING);
-        while (index > -1) {
-            index = index + AnalyticsConstants.TERM_USING.length();
-            String replaceStr = query.substring(index);
-            String[] replaceStrSplits = replaceStr.trim().split("\\s+");
-            //this is a carbon analytics relation provider
-            // 1. replace the shorthand string
-            // 2. validate the tenant Ids
-            if (replaceStrSplits[0].equals(AnalyticsConstants.SPARK_SHORTHAND_STRING)) {
-                if (replaceStrSplits[1].equalsIgnoreCase(AnalyticsConstants.TERM_OPTIONS)) {
-                    // 2. validate the tenant Ids
-                    // replace str = (USING) <something> OPTIONS (<options str>)
-                    // get the options string within the parenthesis after OPTIONS
-                    String optionsStr = replaceStr.substring(replaceStr.indexOf('(') + 1,
-                                                             replaceStr.indexOf(')')).trim();
-                    String[] options = optionsStr.split("\\s*,\\s*");
-
-                    boolean hasTenantId = false;
-                    for (String option : options) {
-                        String[] optionSplits = option.trim().split("\\s+", 2);
-                        hasTenantId = optionSplits[0].equals(AnalyticsConstants.TENANT_ID);
-                        if (hasTenantId) {
-                            if (tenantId != Integer.parseInt(optionSplits[1].replaceAll("^\"|\"$", "")) && tenantId != -1234) {
-                                throw new AnalyticsExecutionException("Mismatching tenants : " + tenantId +
-                                                                      " and " + optionSplits[1]);
-                            }
-                            break;
-                        }
-                    }
-                    if (!hasTenantId) {
-                        throw new AnalyticsExecutionException("No tenantId given under OPTIONS ");
-                    }
-
-                    // 1. replace the shorthand string
-                    query = query.substring(0, index) + replaceStr.replaceFirst
-                            ("\\b" + AnalyticsConstants.SPARK_SHORTHAND_STRING + "\\b",
-                             AnalyticsRelationProvider.class.getName());
-                }
-                index = query.toLowerCase().indexOf(AnalyticsConstants.TERM_USING, index);
-            }
-        }
-        return query;
     }
 
     public static String encodeTableNameWithTenantId(int tenantId, String tableName) {

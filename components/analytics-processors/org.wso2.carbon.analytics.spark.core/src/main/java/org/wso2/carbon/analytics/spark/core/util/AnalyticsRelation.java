@@ -116,13 +116,16 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
 
     @Override
     public void insert(DataFrame data, boolean overwrite) {
-//        todo: can we incorporate the partitions here?
         AnalyticsDataService dataService = ServiceHolder.getAnalyticsDataService();
         try {
             if (overwrite) {
                 dataService.deleteTable(this.tenantId, this.tableName);
                 dataService.createTable(this.tenantId, this.tableName);
             }
+// todo: implement partitions
+// data.foreachPartition(new Function1<Iterator<Row>, BoxedUnit>() {
+//
+//            });
             dataService.put(AnalyticsCommonUtils.dataFrameToRecordsList(this.tenantId,
                                                                         this.tableName, data));
         } catch (AnalyticsException e) {

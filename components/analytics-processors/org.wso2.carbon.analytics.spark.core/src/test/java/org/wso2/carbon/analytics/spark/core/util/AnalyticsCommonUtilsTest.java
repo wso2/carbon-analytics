@@ -52,17 +52,4 @@ public class AnalyticsCommonUtilsTest {
                           "two schemas are expected to be equal, but returned different!");
         System.out.println("\n************** END: VALIDATE SCHEMA UTIL METHOD TEST **************");
     }
-
-    @Test
-    public void testParseQueryWithAnalyticsData() throws Exception {
-        System.out.println("\n************** START: PARSE QUERY WITH ANALYTICS DATA UTIL METHOD TEST **************");
-        String query = "CREATE TEMPORARY TABLE tempTable(a int, b string) USING CarbonAnalytics OPTIONS (tenantId -1234, tableName TEMP_TABLE )";
-        String queryExp = "CREATE TEMPORARY TABLE tempTable(a int, b string) USING org.wso2.carbon.analytics.spark.core.util.AnalyticsRelationProvider OPTIONS (tenantId -1234, tableName TEMP_TABLE )";
-        int tenantId = -1234;
-
-        System.out.println(AnalyticsCommonUtils.parseQueryWithAnalyticsData(tenantId, query));
-        Assert.assertEquals(AnalyticsCommonUtils.parseQueryWithAnalyticsData(tenantId, query),
-                            queryExp);
-        System.out.println("\n************** END: PARSE QUERY WITH ANALYTICS DATA UTIL METHOD TEST **************");
-    }
 }

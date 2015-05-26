@@ -25,23 +25,23 @@
 			<scope>test</scope>
 		</dependency>		
 
-		<dependency>
-            <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.analytics.spark.core</artifactId>
-            <scope>test</scope>
-        </dependency>
+		<!--<dependency>-->
+            <!--<groupId>org.wso2.carbon.analytics</groupId>-->
+            <!--<artifactId>org.wso2.carbon.analytics.spark.core</artifactId>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
 
-        <dependency>
-            <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.analytics.spark.ui</artifactId>
-            <scope>test</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.wso2.carbon.analytics</groupId>-->
+            <!--<artifactId>org.wso2.carbon.analytics.spark.ui</artifactId>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
 
-		<dependency>
-			<groupId>org.wso2.carbon.analytics</groupId>
-			<artifactId>org.wso2.carbon.analytics.spark.admin</artifactId>
-			<scope>test</scope>
-		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>org.wso2.carbon.analytics</groupId>-->
+			<!--<artifactId>org.wso2.carbon.analytics.spark.admin</artifactId>-->
+			<!--<scope>test</scope>-->
+		<!--</dependency>-->
 
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>

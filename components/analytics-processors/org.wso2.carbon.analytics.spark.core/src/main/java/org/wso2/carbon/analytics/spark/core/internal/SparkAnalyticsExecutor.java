@@ -18,6 +18,8 @@
  */
 package org.wso2.carbon.analytics.spark.core.internal;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.MultiMap;
 import org.apache.commons.logging.Log;
@@ -41,6 +43,7 @@ import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionExceptio
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
+import org.wso2.carbon.analytics.spark.core.util.AnalyticsRelationProvider;
 import org.wso2.carbon.utils.CarbonUtils;
 import scala.None$;
 import scala.Option;
@@ -51,6 +54,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -103,6 +107,10 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private int workerCount = 1;
 
     private MultiMap<Integer, String> sparkTableNames;
+
+    private ListMultimap<Integer, String> inMemSparkTableNames;
+
+    private boolean isClustered = false;
 
     private Object workerActorSystem;
     private Object masterActorSystem;
@@ -230,51 +238,108 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         if (query.endsWith(";")) {
             query = query.substring(0, query.length() - 1);
         }
-        query = AnalyticsCommonUtils.parseQueryWithAnalyticsData(tenantId, query);
         query = encodeQueryWithTenantId(tenantId, query);
-        return toResult(this.sqlCtx.sql(encodeQueryWithTenantId(tenantId, query)));
+        System.out.println("Executing : " + query);
+        return toResult(this.sqlCtx.sql(query));
     }
+
     //todo: update the test cases!
     private String encodeQueryWithTenantId(int tenantId, String query)
             throws AnalyticsExecutionException {
-        String result;
+        String result = query;
         // parse the query to see if it is a create temporary table
         // add the table names to the hz cluster map with tenantId -> table Name (put if absent)
         // iterate through the dist map and replace the relevant table names
         HazelcastInstance hz = AnalyticsServiceHolder.getHazelcastInstance();
-        this.sparkTableNames = hz.getMultiMap(AnalyticsConstants.TENANT_ID_AND_TABLES_MAP);
+        if (hz != null) {
+            this.isClustered = true;
+            this.sparkTableNames = hz.getMultiMap(AnalyticsConstants.TENANT_ID_AND_TABLES_MAP);
+        } else if (this.inMemSparkTableNames == null) {
+            this.inMemSparkTableNames = ArrayListMultimap.create();
+        }
+
         Pattern p = Pattern.compile("(?i)(?<=(" + AnalyticsConstants.TERM_CREATE +
                                     "\\s" + AnalyticsConstants.TERM_TEMPORARY +
                                     "\\s" + AnalyticsConstants.TERM_TABLE + "))\\s+\\w+");
-        Matcher m = p.matcher(query);
+        Matcher m = p.matcher(query.trim());
         if (m.find()) {
             //this is a create table query
+            // CREATE TEMPORARY TABLE <name> USING CarbonAnalytics OPTIONS(...)
             String tempTableName = m.group().trim();
             if (tempTableName.matches("(?i)if")) {
                 throw new AnalyticsExecutionException("Malformed query: CREATE TEMPORARY TABLE IF NOT " +
                                                       "EXISTS is not supported");
             } else {
-                this.sparkTableNames.put(tenantId, tempTableName);
+                if (this.isClustered) {
+                    this.sparkTableNames.put(tenantId, tempTableName);
+                } else {
+                    this.inMemSparkTableNames.put(tenantId, tempTableName);
+                }
+                //replace the CA shorthand string in the query
+                boolean carbonQuery = false;
+                query = query.replaceFirst("\\b" + AnalyticsConstants.SPARK_SHORTHAND_STRING + "\\b",
+                                           AnalyticsRelationProvider.class.getName());
+                if (query.length() > result.length()) {
+                    carbonQuery = true;
+                }
 
-                //replace the table names in the create table query
                 int optStrStart = query.toLowerCase().indexOf(AnalyticsConstants.TERM_OPTIONS, m.end());
-                int optStrEnd = query.indexOf(")", optStrStart);
+                int bracketsOpen = query.indexOf("(", optStrStart);
+                int bracketsClose = query.indexOf(")", bracketsOpen);
+
+                //if its a carbon query, append the tenantId to the end of options
+                String options;
+                if (carbonQuery) {
+                    options = query.substring(optStrStart, bracketsOpen + 1)
+                              + addTenantIdToOptions(tenantId, query.substring(bracketsOpen + 1, bracketsClose))
+                              + ")";
+                } else {
+                    options = query.substring(optStrStart, bracketsClose + 1);
+                }
 
                 String beforeOptions = replaceTableNamesInQuery(tenantId, query.substring(0, optStrStart));
-                String afterOptions = replaceTableNamesInQuery(tenantId, query.substring(optStrEnd + 1, query.length()));
-                result = beforeOptions + query.substring(optStrStart, optStrEnd + 1) + afterOptions;
+                String afterOptions = replaceTableNamesInQuery(tenantId, query.substring(bracketsClose + 1, query.length()));
+                result = beforeOptions + options + afterOptions;
+
             }
         } else {
-                result = replaceTableNamesInQuery(tenantId, query);
+            result = replaceTableNamesInQuery(tenantId, query);
         }
         return result.trim();
     }
 
+    private String addTenantIdToOptions(int tenantId, String optStr)
+            throws AnalyticsExecutionException {
+        String[] opts = optStr.split("\\s*,\\s*");
+        boolean hasTenantId = false;
+        for (String option : opts) {
+            String[] splits = option.trim().split("\\s+", 2);
+            hasTenantId = splits[0].equals(AnalyticsConstants.TENANT_ID);
+            if (hasTenantId && tenantId != Integer.parseInt(splits[1].replaceAll("^\"|\"$", ""))) {
+                throw new AnalyticsExecutionException("Mismatching tenants : " + tenantId +
+                                                      " and " + splits[1].replaceAll("^\"|\"$", ""));
+            }
+        }
+        // if tenatId is not present, add it as another field
+        if (!hasTenantId) {
+            optStr = optStr + " , " + AnalyticsConstants.TENANT_ID + " \"" + tenantId + "\"";
+        }
+        return optStr;
+    }
+
     private String replaceTableNamesInQuery(int tenantId, String query) {
         String result = query;
-        for (String name : this.sparkTableNames.get(tenantId)) {
+
+        Collection<String> tableNames;
+        if (this.isClustered) {
+            tableNames = this.sparkTableNames.get(tenantId);
+        } else {
+            tableNames = this.inMemSparkTableNames.get(tenantId);
+        }
+
+        for (String name : tableNames) {
             result = result.replaceAll("\\b" + name + "\\b",
-                                      AnalyticsCommonUtils.encodeTableNameWithTenantId(tenantId, name));
+                                       AnalyticsCommonUtils.encodeTableNameWithTenantId(tenantId, name));
         }
         return result;
     }
