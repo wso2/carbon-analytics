@@ -70,8 +70,10 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     public void createTable(int tenantId, String tableName) throws AnalyticsException {
         String tsTable = this.generateTargetTSTableName(tenantId, tableName);
         String dataTable = this.generateTargetDataTableName(tenantId, tableName);
-        this.session.execute("CREATE TABLE IF NOT EXISTS ARS." + tsTable);
-        this.session.execute("CREATE TABLE IF NOT EXISTS ARS." + dataTable);
+        this.session.execute("CREATE TABLE IF NOT EXISTS ARS." + tsTable +
+                " (timestamp BIGINT, id VARCHAR, PRIMARY KEY (timestamp, id))");
+        this.session.execute("CREATE TABLE IF NOT EXISTS ARS." + dataTable +
+                " (id VARCHAR, timestamp BIGINT, data MAP<VARCHAR, BLOB>, PRIMARY KEY (id))");
         this.session.execute("INSERT INTO ARS.META (tenantId, tableName) VALUES (?, ?)", 
                 tenantId, GenericUtils.normalizeTableName(tableName));
     }
@@ -89,7 +91,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
 
     @Override
     public void deleteTable(int tenantId, String tableName) throws AnalyticsException {
-        this.session.execute("DELETE FROM ARS.META (tenantId, tableName) VALUES (?, ?)", tenantId, tableName);
+        this.session.execute("DELETE FROM ARS.META WHERE tenantId = ? AND tableName = ?", tenantId, tableName);
         String tsTable = this.generateTargetTSTableName(tenantId, tableName);
         String dataTable = this.generateTargetDataTableName(tenantId, tableName);
         this.session.execute("DROP TABLE IF EXISTS ARS." + dataTable);
@@ -130,7 +132,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     @Override
     public AnalyticsSchema getTableSchema(int tenantId, String tableName) throws AnalyticsTableNotAvailableException,
             AnalyticsException {
-        ResultSet rs = this.session.execute("SELECT tableSchema FROM ARS.META (tenantId, tableName) VALUES (?, ?)", 
+        ResultSet rs = this.session.execute("SELECT tableSchema FROM ARS.META WHERE tenantId = ? AND tableName = ?", 
                 tenantId, GenericUtils.normalizeTableName(tableName));
         Row row = rs.one();
         if (row == null) {
@@ -171,7 +173,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     public void setTableSchema(int tenantId, String tableName, AnalyticsSchema schema) throws AnalyticsTableNotAvailableException,
             AnalyticsException {
         try {
-            this.session.execute("UPDATE ARS.META SET tableSchema = ? WHERE tenantId = ? AND tableName = ?) VALUES (?, ?, ?)", 
+            this.session.execute("UPDATE ARS.META SET tableSchema = ? WHERE tenantId = ? AND tableName = ?", 
                 ByteBuffer.wrap(GenericUtils.serializeObject(schema)), tenantId, tableName);
         } catch (Exception e) {
             if (!tableExists(tenantId, tableName)) {
@@ -194,7 +196,19 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         Map<String, String> props = new HashMap<String, String>();
         props.put("servers", "localhost");
         x.init(props);
-        System.out.println("Done.");
+        System.out.println("Start..");
+        
+        x.createTable(1, "T1");
+        x.createTable(1, "T2");
+        x.createTable(1, "T3");
+        x.createTable(2, "TX");
+        x.setTableSchema(1, "T2", new AnalyticsSchema());
+        System.out.println("A:" + x.getTableSchema(1, "T2"));
+        x.deleteTable(1, "T3");
+        System.out.println("B:" + x.tableExists(1, "T3"));
+        System.out.println("X:" + x.listTables(1));
+        System.out.println("Y:" + x.listTables(2));
+        System.out.println("End.");
         System.exit(0);
     }
 
