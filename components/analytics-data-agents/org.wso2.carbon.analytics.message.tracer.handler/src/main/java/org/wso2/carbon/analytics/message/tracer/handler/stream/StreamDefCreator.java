@@ -75,6 +75,7 @@ public class StreamDefCreator {
         payloadList.add(new Attribute(MessageTracerConstants.SOAP_HEADER, AttributeType.STRING));
         payloadList.add(new Attribute(MessageTracerConstants.TIMESTAMP, AttributeType.LONG));
         payloadList.add(new Attribute(ACTIVITY_STATUS, AttributeType.STRING));
+        payloadList.add(new Attribute(MessageTracerConstants.USERNAME, AttributeType.STRING));
 
         return payloadList;
     }

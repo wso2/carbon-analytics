@@ -16,10 +16,14 @@
 package org.wso2.carbon.analytics.dashboard.deployment;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.analytics.dashboard.beans.Dashboard;
 import org.wso2.carbon.analytics.dashboard.DashboardConstants;
 import org.wso2.carbon.analytics.dashboard.DashboardDeploymentException;
 import org.wso2.carbon.analytics.dashboard.internal.ServiceHolder;
@@ -71,13 +75,13 @@ public class DashboardDeployer implements AppDeploymentHandler {
                     String path = artifact.getExtractedPath() + File.separator + fileName;
                     File file = new File(path);
                     try {
-                        if(fileName.endsWith(".json")) {
-                            String dashboardDefn = readFileContent(file);
-//                            Dashboard dashboard = gson.fromJson(dashboardDefn,Dashboard.class);
-                            String resourceName =  fileName.substring(0, fileName.lastIndexOf(
-                                    DashboardConstants.DASHBOARD_EXTENSION));
+                        if(fileName.endsWith(DashboardConstants.DASHBOARD_EXTENSION)) {
+                            JsonObject dashboardDefn = convertFileToJSON(file);
+                            Dashboard dashboard = gson.fromJson(dashboardDefn,Dashboard.class);
+                            String resourceName =  fileName.substring(0,
+                                    fileName.lastIndexOf(DashboardConstants.DASHBOARD_EXTENSION));
                             createRegistryResource(DashboardConstants.DASHBOARDS_RESOURCE_PATH + resourceName ,
-                                    dashboardDefn);
+                                    dashboard);
                             if(log.isDebugEnabled()) {
                                 log.debug("Dashboard definition [" + resourceName + "] has been created.");
                             }
@@ -139,7 +143,6 @@ public class DashboardDeployer implements AppDeploymentHandler {
                 } catch (DeploymentException e) {
                     log.error("Error occurred while trying to undeploy : " + artifact.getName());
                 }
-
             }
         }
     }
@@ -202,19 +205,18 @@ public class DashboardDeployer implements AppDeploymentHandler {
         }
     }
 
-    private String readFileContent(File file) throws IOException {
-        String content = null;
-        FileReader reader = null;
+    private  JsonObject convertFileToJSON (File file){
+        // Read from File to String
+        JsonObject jsonObject = new JsonObject();
         try {
-            reader = new FileReader(file);
-            char[] chars = new char[(int) file.length()];
-            reader.read(chars);
-            content = new String(chars);
-        } catch (IOException e) {
-            throw e;
-        } finally {
-            reader.close();
+            JsonParser parser = new JsonParser();
+            JsonElement jsonElement = parser.parse(new FileReader(file));
+            jsonObject = jsonElement.getAsJsonObject();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException ioe){
+            ioe.printStackTrace();
         }
-        return content;
+        return jsonObject;
     }
 }

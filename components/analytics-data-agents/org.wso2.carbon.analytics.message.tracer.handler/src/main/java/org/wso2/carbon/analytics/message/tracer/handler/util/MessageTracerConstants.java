@@ -70,4 +70,11 @@ public class MessageTracerConstants {
     public static final String BAM_URL = "BAMUrl";
     public static final String BAM_USER_NAME = "BAMUserName";
     public static final String BAM_PASSWORD = "BAMPassword";
+    public static final String USERNAME = "username";
+
+    public static final String AUTHENTICATION_ADMIN = "AuthenticationAdmin";
+
+    public static final String MESSAGE_DIRECTION = "in";
+
+    public static final String AUTHENTICATION_OPERATION = "login";
 }
