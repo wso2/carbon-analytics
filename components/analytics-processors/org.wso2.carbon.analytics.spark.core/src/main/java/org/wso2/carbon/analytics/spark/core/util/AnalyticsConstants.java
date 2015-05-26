@@ -82,6 +82,7 @@ public class AnalyticsConstants {
     public static final String PRIMARY_KEYS = "primaryKeys";
     public static final String SPARK_SHORTHAND_STRING = "CarbonAnalytics";
     public static final String TENANT_ID_AND_TABLES_MAP = "tenantIdTablesMap";
+    public static final int MAX_RECORDS = 1000;
 
     //Spark default properties strings
     public static final String SPARK_MASTER_IP = "spark.master.ip";

@@ -34,6 +34,7 @@ import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import scala.collection.immutable.Map;
 import scala.runtime.AbstractFunction0;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,9 +45,10 @@ import java.util.List;
  * with the 'USING' keyword
  */
 public class AnalyticsRelationProvider implements RelationProvider,
-                                                  SchemaRelationProvider {
+                                                  SchemaRelationProvider, Serializable {
 
     private static final Log log = LogFactory.getLog(AnalyticsRelationProvider.class);
+    private static final long serialVersionUID = 8688336885845108375L;
 
     private int tenantId;
     private String tableName;

@@ -40,6 +40,7 @@ import scala.reflect.ClassTag$;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -115,23 +116,27 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
     }
 
     @Override
-    public void insert(DataFrame data, boolean overwrite) {
-        AnalyticsDataService dataService = ServiceHolder.getAnalyticsDataService();
+    public void insert(final DataFrame data, boolean overwrite) {
+            final AnalyticsDataService dataService = ServiceHolder.getAnalyticsDataService();
         try {
-            if (overwrite) {
+            if (overwrite && dataService.tableExists(this.tenantId, this.tableName)) {
                 dataService.deleteTable(this.tenantId, this.tableName);
                 dataService.createTable(this.tenantId, this.tableName);
             }
-// todo: implement partitions
-// data.foreachPartition(new Function1<Iterator<Row>, BoxedUnit>() {
-//
-//            });
-            dataService.put(AnalyticsCommonUtils.dataFrameToRecordsList(this.tenantId,
-                                                                        this.tableName, data));
+            data.foreachPartition(new AnalyticsFunction1(tenantId, tableName, data.schema()));
         } catch (AnalyticsException e) {
             log.error("Error while inserting data into table " + tableName, e);
             e.printStackTrace();
         }
+    }
+
+    public Map<String, Object> convertRowAndSchemaToValuesMap(Row row, StructType schema) {
+        String[] colNames = schema.fieldNames();
+        Map<String, Object> result = new HashMap<>();
+        for (int i = 0; i < row.length(); i++) {
+            result.put(colNames[i], row.get(i));
+        }
+        return result;
     }
 
     private StructField[] extractFieldsFromColumns(Map<String, ColumnDefinition> columns) {
@@ -162,3 +167,4 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
         return resFields;
     }
 }
+
