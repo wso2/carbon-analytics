@@ -146,7 +146,7 @@ public class TCPEventServer {
                                     event[i] = bbuf.getLong();
                                     continue;
                                 case STRING:
-                                    int size = bbuf.getShort() & 0xffff;
+                                    int size = bbuf.getInt();
                                     byte[] stringData = loadData(in, new byte[size]);
                                     event[i] = new String(stringData, 0, stringData.length);
                             }

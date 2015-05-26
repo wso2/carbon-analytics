@@ -58,7 +58,7 @@ public class EventServerUtils {
                     attributeTypes[i] = Attribute.Type.DOUBLE;
                     break;
                 case STRING:
-                    messageSize += 2;
+                    messageSize += 4;
                     stringAttributes++;
                     attributeTypes[i] = Attribute.Type.STRING;
                     break;

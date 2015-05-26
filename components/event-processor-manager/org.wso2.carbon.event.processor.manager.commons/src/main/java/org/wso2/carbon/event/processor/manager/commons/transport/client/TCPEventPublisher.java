@@ -128,8 +128,8 @@ public class TCPEventPublisher {
                     buf.putDouble((Double) event[i]);
                     continue;
                 case STRING:
-                    short length = (short) ((String) event[i]).length();
-                    buf.putShort(length);
+                    int length = ((String) event[i]).length();
+                    buf.putInt(length);
                     stringDataIndex[stringIndex] = i;
                     stringIndex++;
                     stringSize += length;
