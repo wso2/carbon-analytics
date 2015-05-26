@@ -24,13 +24,12 @@
             <artifactId>org.wso2.carbon.analytics.datasource.core.test</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.orbit.org.apache.hbase</groupId>
+            <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-client</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.orbit.org.apache.hadoop</groupId>
+            <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
-            <version>2.6.0.wso2v1</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -50,6 +49,15 @@
             <artifactId>testng</artifactId>
             <version>6.3.1</version>
         </dependency>
+
+<!--        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.analytics.datasource.rdbms</artifactId>
+            <version>${carbon.analytics.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>-->
+
     </dependencies>
 
     <build>

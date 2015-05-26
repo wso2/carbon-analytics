@@ -19,7 +19,6 @@ package org.wso2.carbon.analytics.datasource.hbase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -36,6 +35,7 @@ import org.wso2.carbon.analytics.datasource.hbase.rg.HBaseRegionSplitRecordGroup
 import org.wso2.carbon.analytics.datasource.hbase.rg.HBaseTimestampRecordGroup;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseAnalyticsDSConstants;
 import org.wso2.carbon.analytics.datasource.hbase.util.HBaseUtils;
+import org.wso2.carbon.ndatasource.common.DataSourceException;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -66,27 +66,18 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
     @Override
     public void init(Map<String, String> properties) throws AnalyticsException {
         this.queryConfig = HBaseUtils.lookupConfiguration();
-/*        String dsName = properties.get(HBaseAnalyticsDSConstants.DATASOURCE_NAME);
+        String dsName = properties.get(HBaseAnalyticsDSConstants.DATASOURCE_NAME);
         if (dsName == null) {
             throw new AnalyticsException("The property '" + HBaseAnalyticsDSConstants.DATASOURCE_NAME +
                     "' is required");
         }
         try {
-            this.conn = (Connection) InitialContext.doLookup(dsName);
-        } catch (NamingException e) {
-            throw new AnalyticsException("Error in looking up data source: " + e.getMessage(), e);
-        }*/
-        Configuration config = new Configuration();
-        String hbaseHost = this.queryConfig.getHbaseHost();
-        config.set("hbase.master", hbaseHost);
-        try {
-            this.conn = ConnectionFactory.createConnection(config);
-            this.queryConfig = new HBaseAnalyticsConfigurationEntry();
-        } catch (Exception e) {
-            throw new AnalyticsException("Error establishing connection to HBase instance: " + e.getMessage(), e);
+            this.conn = (Connection) GenericUtils.loadGlobalDataSource(dsName);
+        } catch (DataSourceException e) {
+            throw new AnalyticsException("Error establishing connection to HBase instance based on data source" +
+                    " definition: " + e.getMessage(), e);
         }
         this.createMetaTable();
-
     }
 
     private void createMetaTable() throws AnalyticsException {
@@ -261,7 +252,6 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
 
     @Override
     public void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
-        // TODO: refactor into methods
         int tenantId = 0;
         String tableName = null;
         Table table, indexTable;
