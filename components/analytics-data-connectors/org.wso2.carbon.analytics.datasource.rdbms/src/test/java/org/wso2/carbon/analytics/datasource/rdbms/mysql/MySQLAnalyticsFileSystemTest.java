@@ -35,7 +35,7 @@ import java.util.Map;
 /**
  * MySQL implementation of analytics file system tests.
  */
-public class MySQLInnoDBAnalyticsFileSystemTest extends AnalyticsFileSystemTest {
+public class MySQLAnalyticsFileSystemTest extends AnalyticsFileSystemTest {
 
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException, IOException {

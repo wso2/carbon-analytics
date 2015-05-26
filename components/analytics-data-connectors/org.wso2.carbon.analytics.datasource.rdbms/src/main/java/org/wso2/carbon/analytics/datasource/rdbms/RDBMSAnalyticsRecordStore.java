@@ -709,7 +709,9 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             queries.putAll(RDBMSUtils.generateNoParamQueryMap(tableInitQueries));
             RDBMSUtils.executeAllUpdateQueries(conn, queries);
         } catch (SQLException | AnalyticsException e) {
-            throw new AnalyticsException("Error in deleting table: " + e.getMessage(), e);
+            if (this.tableExists(tenantId, tableName)) {
+                throw new AnalyticsException("Error in deleting table: " + e.getMessage(), e);
+            }            
         } finally {
             RDBMSUtils.cleanupConnection(null, null, conn);
         }

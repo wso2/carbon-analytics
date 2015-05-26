@@ -33,6 +33,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
@@ -41,6 +43,8 @@ import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
  * Utility methods for RDBMS based operations for analytics data source.
  */
 public class RDBMSUtils {
+    
+    private static final Log log = LogFactory.getLog(RDBMSUtils.class);
     
     private static final String RDBMS_QUERY_CONFIG_FILE = "rdbms-query-config.xml";
     
@@ -147,6 +151,9 @@ public class RDBMSUtils {
         }
         String exs = messages.toString();
         if (exs.length() > 0) {
+            if (log.isDebugEnabled()) {
+                log.debug("executeAllUpdateQueries exceptions: [" + exs + "]");
+            }
             throw new AnalyticsException("Error in executing SQL queries: " + exs);
         }
     }

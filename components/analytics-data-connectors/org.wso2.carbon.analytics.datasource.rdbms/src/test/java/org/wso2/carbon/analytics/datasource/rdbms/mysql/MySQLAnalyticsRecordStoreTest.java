@@ -34,7 +34,7 @@ import java.util.Map;
 /**
  * MySQL implementation of analytics record store tests.
  */
-public class MySQLInnoDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
+public class MySQLAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
         
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException {

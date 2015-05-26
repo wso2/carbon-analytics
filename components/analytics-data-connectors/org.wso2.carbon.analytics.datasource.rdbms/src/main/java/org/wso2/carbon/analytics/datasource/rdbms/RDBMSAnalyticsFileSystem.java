@@ -147,7 +147,7 @@ public class RDBMSAnalyticsFileSystem implements AnalyticsFileSystem {
         path = GenericUtils.normalizePath(path);
         Connection conn = null;
         try {
-            conn = this.getConnection(true);
+            conn = this.getConnection(false);
             this.deleteRecursively(conn, path);
             conn.commit();
         } catch (SQLException e) {

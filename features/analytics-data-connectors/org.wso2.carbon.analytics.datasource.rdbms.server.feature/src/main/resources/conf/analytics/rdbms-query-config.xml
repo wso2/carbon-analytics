@@ -59,25 +59,23 @@
         <recordDeletionQuery>DELETE FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordDeletionQuery>
         <recordDeletionWithIdsQuery>DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordDeletionWithIdsQuery>
         <recordMergeQuery>INSERT INTO {{TABLE_NAME}} (timestamp, data, record_id) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE timestamp=VALUES(timestamp), data=VALUES(data)</recordMergeQuery>
-        <recordInsertQuery>INSERT INTO {{TABLE_NAME}} (timestamp, data, record_id) VALUES (?, ?, ?)</recordInsertQuery>
-        <recordUpdateQuery>UPDATE {{TABLE_NAME}} SET timestamp = ?, data = ? WHERE record_id = ?</recordUpdateQuery>
         <recordRetrievalQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ? LIMIT ?,?</recordRetrievalQuery>
         <recordRetrievalWithIdsQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordRetrievalWithIdsQuery>
         <recordTableDeleteQueries>
             <query>DROP TABLE IF EXISTS {{TABLE_NAME}}</query>
-            <query>DROP INDEX IF EXISTS {{TABLE_NAME}}_TIMESTAMP</query>
+            <query>DROP INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}}</query>
         </recordTableDeleteQueries>
         <recordMetaTableInitQueries>
-            <query>CREATE TABLE AN_TABLE_META (tenantId INTEGER, tableName VARCHAR(256), tableSchema BINARY, PRIMARY KEY(tenantId, tableName))</query>
+            <query>CREATE TABLE AN_TABLE_META (tenantId INTEGER, tableName VARCHAR(256), tableSchema BLOB, PRIMARY KEY(tenantId, tableName))</query>
         </recordMetaTableInitQueries>
         <recordMetaTableSelectQuery>SELECT tableSchema FROM AN_TABLE_META WHERE tenantId = ? AND tableName = ?</recordMetaTableSelectQuery>
         <recordMetaTablesSelectByTenantQuery>SELECT tableName FROM AN_TABLE_META WHERE tenantId = ?</recordMetaTablesSelectByTenantQuery>
         <recordMetaTableInsertQuery>INSERT INTO AN_TABLE_META (tenantId, tableName) VALUES (?, ?)</recordMetaTableInsertQuery>
         <recordMetaTableUpdateQuery>UPDATE AN_TABLE_META SET tableSchema = ? WHERE tenantId = ? AND tableName = ?</recordMetaTableUpdateQuery>
-        <recordMetaTableDeleteQuery>DELETE AN_TABLE_META WHERE tenantId = ? AND tableName = ?</recordMetaTableDeleteQuery>
+        <recordMetaTableDeleteQuery>DELETE FROM AN_TABLE_META WHERE tenantId = ? AND tableName = ?</recordMetaTableDeleteQuery>
         <recordMetaTableCheckQuery>SELECT * FROM AN_TABLE_META WHERE tenantId = -1 AND tableName = '_X_'</recordMetaTableCheckQuery>
         <recordTableInitQueries>
-            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data BLOB, PRIMARY KEY(record_id))</query>
+            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data BLOB, PRIMARY KEY(record_id)) ENGINE='MyISAM'</query>
             <query>CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)</query>
         </recordTableInitQueries>
         <fsDataChunkSize>10240</fsDataChunkSize>
@@ -91,8 +89,8 @@
         <fsReadDataChunkQuery>SELECT data FROM AN_FS_DATA WHERE path = ? AND sequence = ?</fsReadDataChunkQuery>
         <fsSetFileLengthQuery>UPDATE AN_FS_PATH SET length = ? WHERE path = ?</fsSetFileLengthQuery>
         <fsTableInitQueries>
-            <query>CREATE TABLE AN_FS_PATH (path VARCHAR(256), is_directory BOOLEAN, length BIGINT, parent_path VARCHAR(256), PRIMARY KEY(path), FOREIGN KEY (parent_path) REFERENCES AN_FS_PATH(path)) ENGINE='InnoDB'</query>
-            <query>CREATE TABLE AN_FS_DATA (path VARCHAR(256), sequence BIGINT, data BLOB, PRIMARY KEY (path,sequence), FOREIGN KEY (path) REFERENCES AN_FS_PATH(path)) ENGINE='InnoDB'</query>
+            <query>CREATE TABLE AN_FS_PATH (path VARCHAR(256), is_directory BOOLEAN, length BIGINT, parent_path VARCHAR(256), PRIMARY KEY(path)) ENGINE='MyISAM'</query>
+            <query>CREATE TABLE AN_FS_DATA (path VARCHAR(256), sequence BIGINT, data BLOB, PRIMARY KEY (path,sequence)) ENGINE='MyISAM'</query>
             <query>CREATE INDEX index_parent_id ON AN_FS_PATH(parent_path)</query>
         </fsTableInitQueries>
         <fsTablesCheckQuery>SELECT path FROM AN_FS_PATH WHERE path = '/'</fsTablesCheckQuery>

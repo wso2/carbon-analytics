@@ -23,7 +23,7 @@
         <recordMetaTablesSelectByTenantQuery>SELECT tableName FROM AN_TABLE_META WHERE tenantId = ?</recordMetaTablesSelectByTenantQuery>
         <recordMetaTableInsertQuery>INSERT INTO AN_TABLE_META (tenantId, tableName) VALUES (?, ?)</recordMetaTableInsertQuery>
         <recordMetaTableUpdateQuery>UPDATE AN_TABLE_META SET tableSchema = ? WHERE tenantId = ? AND tableName = ?</recordMetaTableUpdateQuery>
-        <recordMetaTableDeleteQuery>DELETE AN_TABLE_META WHERE tenantId = ? AND tableName = ?</recordMetaTableDeleteQuery>
+        <recordMetaTableDeleteQuery>DELETE FROM AN_TABLE_META WHERE tenantId = ? AND tableName = ?</recordMetaTableDeleteQuery>
         <recordMetaTableCheckQuery>SELECT * FROM AN_TABLE_META WHERE tenantId = -1 AND tableName = '_X_'</recordMetaTableCheckQuery>
         <recordTableInitQueries>
             <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data BINARY, PRIMARY KEY(record_id))</query>
