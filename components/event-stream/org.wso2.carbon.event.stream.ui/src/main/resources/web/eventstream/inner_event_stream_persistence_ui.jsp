@@ -22,33 +22,145 @@
 <link rel="stylesheet" type="text/css" href="../resources/css/registry.css"/>
 <script type="text/javascript" src="../ajax/js/prototype.js"></script>
 
-<script language="JavaScript">
-    function selectAllCheckbox(source) {
-        var checkboxes = document.getElementsByName('persist');
-        for (var i = 0, n = checkboxes.length; i < n; i++) {
-            checkboxes[i].checked = source.checked;
-        }
-    }
-</script>
-<div>
-    <span style="float: left; position: relative; margin-top: 2px;">
-        <input type="checkbox" id="eventPersistCheckbox"/> Persist Event Stream
-    </span>
-</div>
-<fmt:bundle basename="org.wso2.carbon.event.stream.ui.i18n.Resources">
 
-    <table id="analyticsIndexTable" class="styledLeft noBorders spacer-bot" style="width:100%" on>
-        <thead>
-        <tr>
-            <th><input type="checkbox" onClick="selectAllCheckbox(this)"/>Persist</th>
-            <th>Column Name</th>
-            <th>Type</th>
-            <th>Primary Key</th>
-            <th>Index</th>
-            <th>Score Param</th>
-        </tr>
-        </thead>
+<fmt:bundle basename="org.wso2.carbon.event.stream.ui.i18n.Resources">
+    <table class="styledLeft noBorders spacer-bot" style="width:100%">
         <tbody>
+        <tr>
+            <td class="middle-header">
+                <div>
+                    <span style="float: left; position: relative; margin-top: 2px;">
+                        <input type="checkbox" id="eventPersistCheckbox"/><fmt:message key="persist.event.stream"/>
+                    </span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <h6><fmt:message key="attribute.data.type.meta"/></h6>
+
+                <table id="metaIndexTable" class="styledLeft noBorders spacer-bot">
+                    <thead>
+                    <tr>
+                        <th><fmt:message key="attribute.persist"/></th>
+                        <th><fmt:message key="attribute.name"/></th>
+                        <th><fmt:message key="attribute.type"/></th>
+                        <th><fmt:message key="attribute.primay"/></th>
+                        <th><fmt:message key="attribute.index"/></th>
+                        <th><fmt:message key="attribute.scoreParam"/></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <div class="noDataDiv-plain" id="noOutputMetaIndexData">
+                    <fmt:message key="no.meta.attributes.defined"/>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <h6><fmt:message key="attribute.data.type.correlation"/></h6>
+                <table id="correlationIndexTable" class="styledLeft noBorders spacer-bot">
+                    <thead>
+                    <tr>
+                        <th><fmt:message key="attribute.persist"/></th>
+                        <th><fmt:message key="attribute.name"/></th>
+                        <th><fmt:message key="attribute.type"/></th>
+                        <th><fmt:message key="attribute.primay"/></th>
+                        <th><fmt:message key="attribute.index"/></th>
+                        <th><fmt:message key="attribute.scoreParam"/></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <div class="noDataDiv-plain" id="noOutputCorrelationIndexData">
+                    <fmt:message key="no.correlation.attributes.defined"/>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <h6><fmt:message key="attribute.data.type.payload"/></h6>
+
+                <table id="payloadIndexTable" class="styledLeft noBorders spacer-bot">
+                    <thead>
+                    <tr>
+                        <th><fmt:message key="attribute.persist"/></th>
+                        <th><fmt:message key="attribute.name"/></th>
+                        <th><fmt:message key="attribute.type"/></th>
+                        <th><fmt:message key="attribute.primay"/></th>
+                        <th><fmt:message key="attribute.index"/></th>
+                        <th><fmt:message key="attribute.scoreParam"/></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <div class="noDataDiv-plain" id="noOutputPayloadIndexData">
+                    <fmt:message key="no.payload.attributes.defined"/>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <h6><fmt:message key="attribute.data.type.arbitrary"/></h6>
+
+                <div class="noDataDiv-plain" id="noOutputArbitraryData">
+                    <fmt:message key="no.arbitrary.attributes.defined"/>
+                </div>
+                <table id="arbitraryIndexTable" class="styledLeft noBorders spacer-bot" style="display:none">
+                    <thead>
+                    <tr>
+                        <th><fmt:message key="attribute.name"/></th>
+                        <th><fmt:message key="attribute.type"/></th>
+                        <th><fmt:message key="attribute.primay"/></th>
+                        <th><fmt:message key="attribute.index"/></th>
+                        <th><fmt:message key="attribute.scoreParam"/></th>
+                        <th><fmt:message key="actions"/></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <table id="addArbitraryData" class="normal">
+                    <tbody>
+                    <tr>
+                        <td class="col-small"><fmt:message key="attribute.name"/> :</td>
+                        <td>
+                            <input type="text" id="outputArbitraryDataPropName"/>
+                        </td>
+                        <td class="col-small"><fmt:message key="attribute.type"/> :
+                        </td>
+                        <td>
+                            <select id="outputArbitraryDataPropType" onchange="changeScoreParam(this)">
+                                <option value="INTEGER">INTEGER</option>
+                                <option value="STRING">STRING</option>
+                                <option value="FACET">FACET</option>
+                                <option value="LONG">LONG</option>
+                                <option value="BOOLEAN">BOOLEAN</option>
+                                <option value="FLOAT">FLOAT</option>
+                                <option value="DOUBLE">DOUBLE</option>
+                            </select>
+                        </td>
+                        <td class="col-small"><fmt:message key="attribute.primay"/> : <input type="checkbox"
+                                                                                             id="eventPersistPrimaryKeyCheckbox"/>
+                        </td>
+                        <td class="col-small"><fmt:message key="attribute.index"/> : <input type="checkbox"
+                                                                                            id="eventPersistIndexCheckbox"/>
+                        </td>
+                        <td class="col-small"><fmt:message key="attribute.scoreParam"/> : <input type="checkbox"
+                                                                                                 id="eventPersistScoreParamCheckbox"/>
+                        </td>
+                        <td><input type="button" class="button" value="<fmt:message key="add"/>"
+                                   onclick="addArbitraryAttribute()"/>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
         </tbody>
     </table>
 </fmt:bundle>

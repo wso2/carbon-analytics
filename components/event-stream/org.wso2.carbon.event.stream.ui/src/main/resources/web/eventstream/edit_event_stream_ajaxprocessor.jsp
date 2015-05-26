@@ -108,29 +108,40 @@
                 streamPersistenceAdminServiceStub = EventStreamUIUtils.getEventStreamPersistenceAdminService(config, session, request);
 
         if (EventStreamUIUtils.isEventStreamPersistenceAdminServiceAvailable(streamPersistenceAdminServiceStub)) {
-            String indexDataString = request.getParameter("indexData");
-            if (indexDataString != null && !indexDataString.isEmpty()) {
-                String[] properties = indexDataString.split("\\$=");
-                List<AnalyticsTableRecord> analyticsTableColumns = new ArrayList<AnalyticsTableRecord>();
-                for (String property : properties) {
-                    String[] propertyConfiguration = property.split("\\^=");
-                    AnalyticsTableRecord analyticsTableColumn = new AnalyticsTableRecord();
-                    analyticsTableColumn.setPersist(Boolean.parseBoolean(propertyConfiguration[0]));
-                    analyticsTableColumn.setColumnName(propertyConfiguration[1]);
-                    analyticsTableColumn.setColumnType(propertyConfiguration[2]);
-                    analyticsTableColumn.setPrimaryKey(Boolean.parseBoolean(propertyConfiguration[3]));
-                    analyticsTableColumn.setIndexed(Boolean.parseBoolean(propertyConfiguration[4]));
-                    analyticsTableColumn.setScoreParam(Boolean.parseBoolean(propertyConfiguration[5]));
-                    analyticsTableColumns.add(analyticsTableColumn);
-                }
-                AnalyticsTable analyticsTable = new AnalyticsTable();
-                analyticsTable.setTableName(request.getParameter("eventStreamName"));
-                analyticsTable.setStreamVersion(request.getParameter("eventStreamVersion"));
-                analyticsTable.setPersist(Boolean.parseBoolean(request.getParameter("eventPersist")));
-                analyticsTable.setAnalyticsTableRecords(
-                        analyticsTableColumns.toArray(new AnalyticsTableRecord[analyticsTableColumns.size()]));
-                streamPersistenceAdminServiceStub.addAnalyticsTable(analyticsTable);
+            List<AnalyticsTableRecord> analyticsTableRecords = new ArrayList<AnalyticsTableRecord>();
+            String metaIndexString = request.getParameter("metaIndex");
+            if (metaIndexString != null && !metaIndexString.isEmpty()) {
+                String[] properties = metaIndexString.split("\\$=");
+                List<AnalyticsTableRecord> metaColumns = EventStreamUIUtils.getAnalyticsRecordList(properties, "meta_");
+                analyticsTableRecords.addAll(metaColumns);
             }
+            String correlationIndexString = request.getParameter("correlationIndex");
+            if (correlationIndexString != null && !correlationIndexString.isEmpty()) {
+                String[] properties = correlationIndexString.split("\\$=");
+                List<AnalyticsTableRecord> correlationColumns = EventStreamUIUtils.getAnalyticsRecordList(properties,
+                                                                                                          "correlation_");
+                analyticsTableRecords.addAll(correlationColumns);
+            }
+            String payloadIndexString = request.getParameter("payloadIndex");
+            if (payloadIndexString != null && !payloadIndexString.isEmpty()) {
+                String[] properties = payloadIndexString.split("\\$=");
+                List<AnalyticsTableRecord> payloadColumns = EventStreamUIUtils.getAnalyticsRecordList(properties, "");
+                analyticsTableRecords.addAll(payloadColumns);
+            }
+            String arbitraryIndexString = request.getParameter("arbitraryIndex");
+            if (arbitraryIndexString != null && !arbitraryIndexString.isEmpty()) {
+                String[] properties = arbitraryIndexString.split("\\$=");
+                List<AnalyticsTableRecord> arbitraryColumns = EventStreamUIUtils.getArbitraryRecordList(properties);
+                analyticsTableRecords.addAll(arbitraryColumns);
+            }
+
+            AnalyticsTable analyticsTable = new AnalyticsTable();
+            analyticsTable.setTableName(request.getParameter("eventStreamName"));
+            analyticsTable.setStreamVersion(request.getParameter("eventStreamVersion"));
+            analyticsTable.setPersist(Boolean.parseBoolean(request.getParameter("eventPersist")));
+            analyticsTable.setAnalyticsTableRecords(
+                    analyticsTableRecords.toArray(new AnalyticsTableRecord[analyticsTableRecords.size()]));
+            streamPersistenceAdminServiceStub.addAnalyticsTable(analyticsTable);
         }
         msg = "true";
 

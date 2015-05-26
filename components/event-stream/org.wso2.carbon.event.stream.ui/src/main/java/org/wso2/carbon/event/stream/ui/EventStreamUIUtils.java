@@ -24,6 +24,7 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.analytics.stream.persistence.stub.EventStreamPersistenceAdminServiceStub;
+import org.wso2.carbon.analytics.stream.persistence.stub.dto.AnalyticsTableRecord;
 import org.wso2.carbon.event.stream.stub.EventStreamAdminServiceStub;
 import org.wso2.carbon.event.stream.stub.types.EventStreamAttributeDto;
 import org.wso2.carbon.event.stream.stub.types.EventStreamDefinitionDto;
@@ -132,5 +133,35 @@ public class EventStreamUIUtils {
         return eventStreamInfoDto;
     }
 
+    public static List<AnalyticsTableRecord> getArbitraryRecordList(String[] properties) {
+        List<AnalyticsTableRecord> analyticsTableColumns = new ArrayList<AnalyticsTableRecord>();
+        for (String property : properties) {
+            String[] propertyConfiguration = property.split("\\^=");
+            AnalyticsTableRecord analyticsTableColumn = new AnalyticsTableRecord();
+            analyticsTableColumn.setPersist(true);
+            analyticsTableColumn.setColumnName("_" + propertyConfiguration[0]);
+            analyticsTableColumn.setColumnType(propertyConfiguration[1]);
+            analyticsTableColumn.setPrimaryKey(Boolean.parseBoolean(propertyConfiguration[2]));
+            analyticsTableColumn.setIndexed(Boolean.parseBoolean(propertyConfiguration[3]));
+            analyticsTableColumn.setScoreParam(Boolean.parseBoolean(propertyConfiguration[4]));
+            analyticsTableColumns.add(analyticsTableColumn);
+        }
+        return analyticsTableColumns;
+    }
 
+    public static List<AnalyticsTableRecord> getAnalyticsRecordList(String[] properties, String type) {
+        List<AnalyticsTableRecord> analyticsTableColumns = new ArrayList<AnalyticsTableRecord>();
+        for (String property : properties) {
+            String[] propertyConfiguration = property.split("\\^=");
+            AnalyticsTableRecord analyticsTableColumn = new AnalyticsTableRecord();
+            analyticsTableColumn.setPersist(Boolean.parseBoolean(propertyConfiguration[0]));
+            analyticsTableColumn.setColumnName(type + propertyConfiguration[1]);
+            analyticsTableColumn.setColumnType(propertyConfiguration[2]);
+            analyticsTableColumn.setPrimaryKey(Boolean.parseBoolean(propertyConfiguration[3]));
+            analyticsTableColumn.setIndexed(Boolean.parseBoolean(propertyConfiguration[4]));
+            analyticsTableColumn.setScoreParam(Boolean.parseBoolean(propertyConfiguration[5]));
+            analyticsTableColumns.add(analyticsTableColumn);
+        }
+        return analyticsTableColumns;
+    }
 }

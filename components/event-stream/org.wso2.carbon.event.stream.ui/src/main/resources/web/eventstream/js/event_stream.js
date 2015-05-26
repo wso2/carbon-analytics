@@ -30,7 +30,10 @@ function addEventStream(form, option, eventStreamId) {
         var metaData = "";
         var correlationData = "";
         var payloadData = "";
-        var indexData = "";
+        var metaIndex = "";
+        var correlationIndex = "";
+        var payloadIndex = "";
+        var arbitraryIndex = "";
         var newEventStreamId = eventStreamName + ":" + eventStreamVersion;
 
         var metaDataTable = document.getElementById("outputMetaDataTable");
@@ -47,9 +50,24 @@ function addEventStream(form, option, eventStreamId) {
             payloadData = getWSO2EventDataValues(payloadDataTable);
         }
 
-        var indexDataTable = document.getElementById("analyticsIndexTable");
-        if (indexDataTable != null && indexDataTable.rows.length > 1) {
-            indexData = getAnalyticsIndexDataValues(indexDataTable);
+        var metaIndexTable = document.getElementById("metaIndexTable");
+        if (metaIndexTable != null && metaIndexTable.rows.length > 1) {
+            metaIndex = getAnalyticsIndexDataValues(metaIndexTable);
+        }
+
+        var correlationIndexTable = document.getElementById("correlationIndexTable");
+        if (correlationIndexTable != null && correlationIndexTable.rows.length > 1) {
+            correlationIndex = getAnalyticsIndexDataValues(correlationIndexTable);
+        }
+
+        var payloadIndexTable = document.getElementById("payloadIndexTable");
+        if (payloadIndexTable != null && payloadIndexTable.rows.length > 1) {
+            payloadIndex = getAnalyticsIndexDataValues(payloadIndexTable);
+        }
+
+        var arbitraryIndexTable = document.getElementById("arbitraryIndexTable");
+        if (arbitraryIndexTable != null && arbitraryIndexTable.rows.length > 1) {
+            arbitraryIndex = getArbitraryIndexDataValues(arbitraryIndexTable);
         }
 
         if (metaData == "" && correlationData == "" && payloadData == "") {
@@ -67,7 +85,10 @@ function addEventStream(form, option, eventStreamId) {
                         metaData: metaData,
                         correlationData: correlationData,
                         payloadData: payloadData,
-                        indexData: indexData,
+                        metaIndex: metaIndex,
+                        correlationIndex: correlationIndex,
+                        payloadIndex: payloadIndex,
+                        arbitraryIndex: arbitraryIndex,
                         eventPersist: document.getElementById("eventPersistCheckbox").checked,
                         eventStreamDescription: eventStreamDescription,
                         eventStreamNickName: eventStreamNickName
@@ -95,7 +116,10 @@ function addEventStream(form, option, eventStreamId) {
                             metaData: metaData,
                             correlationData: correlationData,
                             payloadData: payloadData,
-                            indexData: indexData,
+                            metaIndex: metaIndex,
+                            correlationIndex: correlationIndex,
+                            payloadIndex: payloadIndex,
+                            arbitraryIndex: arbitraryIndex,
                             eventPersist: document.getElementById("eventPersistCheckbox").checked,
                             eventStreamDescription: eventStreamDescription,
                             eventStreamNickName: eventStreamNickName
