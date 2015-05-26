@@ -29,7 +29,7 @@ import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
@@ -68,11 +68,19 @@ public class AnalyticsDataMigrationTool {
 
     public static void main(String[] args) throws Exception {
         Options options = new Options();
-        options.addOption(new Option(SERVER_URL, SERVER_URL_ARG, true, "Cassandra server url '<default value: localhost>'"));
-        options.addOption(new Option(PORT, PORT_ARG, true, "Cassandra server port '<default value: 9042'"));
-        options.addOption(new Option(COLUMN_FAMILY, COLUMN_FAMILY_NAME_ARG, true, "Name of the columnFamily to be migrated"));
-        options.addOption(new Option(ANALYTIC_TABLE, ANALYTIC_TABLE_NAME_ARG, true, "Destination name of the table which will have the migrated data"));
-        options.addOption(new Option(TENANT_ID, TENANT_ID_ARG, true, "specify tenant id of the tenant considered '<default value: super tenant>'"));
+        options.addOption(OptionBuilder.withArgName(SERVER_URL_ARG).hasArg()
+                                  .withDescription("Cassandra server url '<default value: localhost>'")
+                                  .create(SERVER_URL));
+        options.addOption(OptionBuilder.withArgName(PORT_ARG).hasArg()
+                                  .withDescription("Cassandra server port '<default value: 9042'").create(PORT));
+        options.addOption(OptionBuilder.withArgName(COLUMN_FAMILY_NAME_ARG).hasArg()
+                                  .withDescription("Name of the columnFamily to be migrated").create(COLUMN_FAMILY));
+        options.addOption(OptionBuilder.withArgName(ANALYTIC_TABLE_NAME_ARG).hasArg()
+                                  .withDescription("Destination name of the table which will have the migrated data")
+                                  .create(ANALYTIC_TABLE));
+        options.addOption(OptionBuilder.withArgName(TENANT_ID_ARG).hasArg()
+                                  .withDescription("specify tenant id of the tenant considered '<default value: super tenant>'")
+                                  .create(TENANT_ID));
         CommandLineParser parser = new BasicParser();
         CommandLine line = parser.parse(options, args);
         if (args.length < 6 ) {
