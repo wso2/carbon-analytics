@@ -123,4 +123,8 @@ public class OutputAdapterRuntime {
             outputEventAdapter.destroy();
         }
     }
+
+    public boolean isPolled() {
+        return outputEventAdapter.isPolled();
+    }
 }

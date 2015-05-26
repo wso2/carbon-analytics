@@ -22,6 +22,10 @@ import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterService;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
+import org.wso2.carbon.event.processor.manager.core.EventManagementUtil;
+import org.wso2.carbon.event.processor.manager.core.EventSync;
+import org.wso2.carbon.event.processor.manager.core.Manager;
+import org.wso2.carbon.event.processor.manager.core.config.Mode;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConfiguration;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
@@ -33,7 +37,7 @@ import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationExcep
 
 import java.util.*;
 
-public class EventPublisher implements RawEventConsumer {
+public class EventPublisher implements RawEventConsumer, EventSync {
 
     private static final Log log = LogFactory.getLog(EventPublisher.class);
 
@@ -53,6 +57,11 @@ public class EventPublisher implements RawEventConsumer {
     private String afterTracerPrefix;
     private boolean dynamicMessagePropertyEnabled = false;
     private boolean customMappingEnabled = false;
+    private boolean isPolled = false;
+    private String syncId;
+    private boolean sendToOther = false;
+    private org.wso2.siddhi.query.api.definition.StreamDefinition streamDefinition;
+
 
     public EventPublisher(EventPublisherConfiguration eventPublisherConfiguration)
             throws EventPublisherConfigurationException {
@@ -113,49 +122,29 @@ public class EventPublisher implements RawEventConsumer {
         } catch (OutputEventAdapterException e) {
             throw new EventPublisherConfigurationException("Error in creating the output Adapter for Event Publisher :" + eventPublisherConfiguration.getEventPublisherName() + ", " + e.getMessage(), e);
         }
-
+        try {
+            isPolled = eventAdapterService.isPolled(eventPublisherConfiguration.getToAdapterConfiguration().getName());
+        } catch (OutputEventAdapterException e) {
+            throw new EventPublisherConfigurationException("Error in creating Event Publisher :" + eventPublisherConfiguration.getEventPublisherName() + ", " + e.getMessage(), e);
+        }
+        syncId = EventManagementUtil.constructEventSyncId(tenantId, eventPublisherConfiguration.getToAdapterConfiguration().getName(), Manager.ManagerType.Publisher);
+        sendToOther = EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode() != Mode.SingleNode;
+        streamDefinition = EventManagementUtil.constructStreamDefinition(syncId, inputStreamDefinition);
+        EventPublisherServiceValueHolder.getEventManagementService().registerEventSync(this);
     }
 
     public EventPublisherConfiguration getEventPublisherConfiguration() {
         return eventPublisherConfiguration;
     }
 
-    public void sendEventData(Object[] eventData) {
+    public void sendEventData(Object[] data) {
         if (EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()) {
             return;
         }
-
-        Map<String, String> dynamicProperties = new HashMap<String, String>(eventPublisherConfiguration.getToAdapterDynamicProperties());
-
-        Object outObject;
-        if (traceEnabled) {
-            trace.info(beforeTracerPrefix + Arrays.deepToString(eventData));
+        process(data);
+        if (isPolled && sendToOther) {
+            EventPublisherServiceValueHolder.getEventManagementService().syncEvent(syncId, Manager.ManagerType.Publisher, data);
         }
-        if (statisticsEnabled) {
-            statisticsMonitor.incrementResponse();
-        }
-        try {
-            if (customMappingEnabled) {
-                outObject = outputMapper.convertToMappedInputEvent(eventData);
-            } else {
-                outObject = outputMapper.convertToTypedInputEvent(eventData);
-            }
-        } catch (EventPublisherConfigurationException e) {
-            log.error("Cannot send event:" + Arrays.deepToString(eventData) + " from " + eventPublisherConfiguration.getEventPublisherName());
-            return;
-        }
-
-        if (traceEnabled) {
-            trace.info(afterTracerPrefix + outObject);
-        }
-
-        if (dynamicMessagePropertyEnabled) {
-            changeDynamicEventAdapterMessageProperties(eventData, dynamicProperties);
-        }
-
-        OutputEventAdapterService eventAdapterService = EventPublisherServiceValueHolder.getOutputEventAdapterService();
-        eventAdapterService.publish(eventPublisherConfiguration.getEventPublisherName(), eventPublisherConfiguration.getToAdapterDynamicProperties(), outObject);
-
     }
 
     private void createPropertyPositionMap(StreamDefinition streamDefinition) {
@@ -235,7 +224,48 @@ public class EventPublisher implements RawEventConsumer {
 
     public void destroy() {
         OutputEventAdapterService eventAdapterService = EventPublisherServiceValueHolder.getOutputEventAdapterService();
+        EventPublisherServiceValueHolder.getEventManagementService().unregisterEventSync(syncId);
         eventAdapterService.destroy(eventPublisherConfiguration.getEventPublisherName());
+    }
 
+    @Override
+    public void process(Object[] data) {
+
+        Map<String, String> dynamicProperties = new HashMap<String, String>(eventPublisherConfiguration.getToAdapterDynamicProperties());
+
+        Object outObject;
+        if (traceEnabled) {
+            trace.info(beforeTracerPrefix + Arrays.deepToString(data));
+        }
+        if (statisticsEnabled) {
+            statisticsMonitor.incrementResponse();
+        }
+        try {
+            if (customMappingEnabled) {
+                outObject = outputMapper.convertToMappedInputEvent(data);
+            } else {
+                outObject = outputMapper.convertToTypedInputEvent(data);
+            }
+        } catch (EventPublisherConfigurationException e) {
+            log.error("Cannot send event:" + Arrays.deepToString(data) + " from " + eventPublisherConfiguration.getEventPublisherName());
+            return;
+        }
+
+        if (traceEnabled) {
+            trace.info(afterTracerPrefix + outObject);
+        }
+
+        if (dynamicMessagePropertyEnabled) {
+            changeDynamicEventAdapterMessageProperties(data, dynamicProperties);
+        }
+
+        OutputEventAdapterService eventAdapterService = EventPublisherServiceValueHolder.getOutputEventAdapterService();
+        eventAdapterService.publish(eventPublisherConfiguration.getEventPublisherName(), eventPublisherConfiguration.getToAdapterDynamicProperties(), outObject);
+
+    }
+
+    @Override
+    public org.wso2.siddhi.query.api.definition.StreamDefinition getStreamDefinition() {
+        return streamDefinition;
     }
 }

@@ -213,5 +213,10 @@ public class CassandraEventAdapter implements OutputEventAdapter {
         credentials = null;
     }
 
+    @Override
+    public boolean isPolled() {
+        return false;
+    }
+
 
 }

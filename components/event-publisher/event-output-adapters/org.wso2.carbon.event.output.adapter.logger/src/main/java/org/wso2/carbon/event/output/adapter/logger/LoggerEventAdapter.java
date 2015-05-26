@@ -78,4 +78,9 @@ public final class LoggerEventAdapter implements OutputEventAdapter {
     public void destroy() {
         //not required
     }
+
+    @Override
+    public boolean isPolled() {
+        return false;
+    }
 }

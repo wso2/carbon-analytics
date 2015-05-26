@@ -21,6 +21,7 @@ package org.wso2.carbon.event.receiver.core.internal.management;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.Attribute;
+import org.wso2.carbon.event.processor.manager.core.EventManagementUtil;
 import org.wso2.carbon.event.processor.manager.core.EventSync;
 import org.wso2.carbon.event.processor.manager.core.Manager;
 import org.wso2.carbon.event.receiver.core.internal.ds.EventReceiverServiceValueHolder;
@@ -52,25 +53,7 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
         this.readLock = readLock;
         this.tenantId = tenantId;
         this.syncId = syncId;
-
-        org.wso2.siddhi.query.api.definition.StreamDefinition streamDefinition = new org.wso2.siddhi.query.api.definition.StreamDefinition();
-        streamDefinition.setId(syncId);
-
-        List<Attribute> attributes = new ArrayList<Attribute>();
-        if (exportedStreamDefinition.getMetaData() != null) {
-            attributes.addAll(exportedStreamDefinition.getMetaData());
-        }
-        if (exportedStreamDefinition.getCorrelationData() != null) {
-            attributes.addAll(exportedStreamDefinition.getCorrelationData());
-        }
-        if (exportedStreamDefinition.getPayloadData() != null) {
-            attributes.addAll(exportedStreamDefinition.getPayloadData());
-        }
-        for (Attribute attr : attributes) {
-            streamDefinition.attribute(attr.getName(), org.wso2.siddhi.query.api.definition.Attribute.Type.valueOf(attr.getType().toString()));
-        }
-        this.streamDefinition = streamDefinition;
-
+        this.streamDefinition = EventManagementUtil.constructStreamDefinition(syncId, exportedStreamDefinition);
         executorService.submit(new QueueInputEventDispatcherWorker());
     }
 

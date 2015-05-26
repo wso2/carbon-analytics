@@ -153,6 +153,11 @@ public final class WSO2EventAdapter implements OutputEventAdapter {
 
     }
 
+    @Override
+    public boolean isPolled() {
+        return false;
+    }
+
     private void throwRuntimeException(String receiverUrl, String authUrl, String protocol, String userName,
                                        Exception e) {
         throw new OutputEventAdapterRuntimeException(

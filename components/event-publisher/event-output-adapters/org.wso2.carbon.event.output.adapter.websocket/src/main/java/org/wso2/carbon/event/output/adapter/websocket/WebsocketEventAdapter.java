@@ -160,6 +160,11 @@ public final class WebsocketEventAdapter implements OutputEventAdapter {
         //Nothing to be destroyed.
     }
 
+    @Override
+    public boolean isPolled() {
+        return false;
+    }
+
     private void validateOutputEventAdapterConfigurations(OutputEventAdapterConfiguration eventAdapterConfiguration) throws OutputEventAdapterException {
         String socketServerUrl = eventAdapterConfiguration.getStaticProperties().get(WebsocketEventAdapterConstants.ADAPTER_SERVER_URL);
         if (!socketServerUrl.startsWith("ws://")) {

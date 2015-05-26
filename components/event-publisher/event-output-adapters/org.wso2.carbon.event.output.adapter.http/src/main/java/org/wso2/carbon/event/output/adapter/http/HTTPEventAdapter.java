@@ -144,6 +144,11 @@ public class HTTPEventAdapter implements OutputEventAdapter {
         //not required
     }
 
+    @Override
+    public boolean isPolled() {
+        return false;
+    }
+
     private void checkHTTPClientInit(
             Map<String, String> staticProperties) {
         if (this.httpClient != null) {

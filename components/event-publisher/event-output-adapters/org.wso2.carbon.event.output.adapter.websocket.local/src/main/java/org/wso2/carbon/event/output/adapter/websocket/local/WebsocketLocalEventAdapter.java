@@ -125,6 +125,11 @@ public final class WebsocketLocalEventAdapter implements OutputEventAdapter {
         //Nothing to be destroyed.
     }
 
+    @Override
+    public boolean isPolled() {
+        return true;
+    }
+
     private class WebSocketSender implements Runnable {
 
         private String message;

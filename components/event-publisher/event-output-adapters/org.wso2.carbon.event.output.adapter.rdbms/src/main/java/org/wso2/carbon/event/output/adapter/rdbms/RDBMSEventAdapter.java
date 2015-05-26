@@ -595,4 +595,9 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
             dataSource = null;
         }
     }
+
+    @Override
+    public boolean isPolled() {
+        return false;
+    }
 }

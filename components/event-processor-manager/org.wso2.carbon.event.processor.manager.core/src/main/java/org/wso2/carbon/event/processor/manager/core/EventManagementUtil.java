@@ -15,6 +15,12 @@
 
 package org.wso2.carbon.event.processor.manager.core;
 
+import org.wso2.carbon.databridge.commons.Attribute;
+import org.wso2.siddhi.query.api.definition.StreamDefinition;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created on 5/26/15.
  */
@@ -22,5 +28,26 @@ public class EventManagementUtil {
 
     public static String constructEventSyncId(int tenantId, String name, Manager.ManagerType type) {
         return tenantId + "/" + type + "/" + name;
+    }
+
+    public static StreamDefinition constructStreamDefinition(String syncId, org.wso2.carbon.databridge.commons.StreamDefinition inStreamDefinition){
+
+        org.wso2.siddhi.query.api.definition.StreamDefinition streamDefinition = new org.wso2.siddhi.query.api.definition.StreamDefinition();
+        streamDefinition.setId(syncId);
+
+        List<Attribute> attributes = new ArrayList<Attribute>();
+        if (inStreamDefinition.getMetaData() != null) {
+            attributes.addAll(inStreamDefinition.getMetaData());
+        }
+        if (inStreamDefinition.getCorrelationData() != null) {
+            attributes.addAll(inStreamDefinition.getCorrelationData());
+        }
+        if (inStreamDefinition.getPayloadData() != null) {
+            attributes.addAll(inStreamDefinition.getPayloadData());
+        }
+        for (Attribute attr : attributes) {
+            streamDefinition.attribute(attr.getName(), org.wso2.siddhi.query.api.definition.Attribute.Type.valueOf(attr.getType().toString()));
+        }
+        return streamDefinition;
     }
 }

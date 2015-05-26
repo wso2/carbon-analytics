@@ -15,17 +15,14 @@
 
 package org.wso2.carbon.event.input.adapter.core.internal;
 
-import com.hazelcast.core.ILock;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.event.input.adapter.core.InputAdapterRuntime;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapter;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterSubscription;
 import org.wso2.carbon.event.input.adapter.core.exception.ConnectionUnavailableException;
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterException;
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterRuntimeException;
-import org.wso2.carbon.event.input.adapter.core.internal.ds.InputEventAdapterServiceValueHolder;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -33,21 +30,20 @@ import java.util.concurrent.Executors;
 /**
  * Created on 2/27/15.
  */
-public class CarbonInputAdapterRuntime implements InputEventAdapterListener, InputAdapterRuntime {
-    private static Log log = LogFactory.getLog(CarbonInputAdapterRuntime.class);
+public class InputAdapterRuntime implements InputEventAdapterListener {
+    private static Log log = LogFactory.getLog(InputAdapterRuntime.class);
     private InputEventAdapter inputEventAdapter;
     private String name;
     private InputEventAdapterSubscription inputEventAdapterSubscription;
     private volatile boolean connected = false;
-    private static boolean startPolling = false;
-    private boolean start = false;
     private DecayTimer timer = new DecayTimer();
     private volatile long nextConnectionTime;
     private ExecutorService executorService;
-    private ILock lock;
+    private boolean startedTriggered = false;
+    private boolean startPollingTriggered =false;
 
-    public CarbonInputAdapterRuntime(InputEventAdapter inputEventAdapter, String name,
-                                     InputEventAdapterSubscription inputEventAdapterSubscription) throws InputEventAdapterException {
+    public InputAdapterRuntime(InputEventAdapter inputEventAdapter, String name,
+                               InputEventAdapterSubscription inputEventAdapterSubscription) throws InputEventAdapterException {
         this.inputEventAdapter = inputEventAdapter;
         this.name = name;
         this.inputEventAdapterSubscription = inputEventAdapterSubscription;
@@ -58,24 +54,23 @@ public class CarbonInputAdapterRuntime implements InputEventAdapterListener, Inp
     }
 
     public void startPolling() {
-        if (!connected && start && isPolling()) {
+        startPollingTriggered =true;
+        if (!connected && startedTriggered && isPolling()) {
             start();
         }
     }
 
-    @Override
     public void start() {
         try {
-            start = true;
-            if (!isPolling() ||
-                    InputEventAdapterServiceValueHolder.getCarbonInputEventAdapterService().isStartPolling()) {
+            startedTriggered = true;
+            if (!isPolling() || startPollingTriggered) {
                 if (!connected) {
-                    log.info("Connecting receiver "+this.name);
+                    log.info("Connecting receiver " + this.name);
                     inputEventAdapter.connect();
                     connected = true;
                 }
             } else {
-                log.info("Waiting to connect receiver "+this.name);
+                log.info("Waiting to connect receiver " + this.name);
             }
         } catch (ConnectionUnavailableException e) {
             connectionUnavailable(e);
@@ -149,12 +144,10 @@ public class CarbonInputAdapterRuntime implements InputEventAdapterListener, Inp
 
     }
 
-    @Override
     public boolean isEventDuplicatedInCluster() {
         return inputEventAdapter.isEventDuplicatedInCluster();
     }
 
-    @Override
     public boolean isPolling() {
         return inputEventAdapter.isPolling();
     }

@@ -265,6 +265,11 @@ public class UIEventAdapter implements OutputEventAdapter {
 
     }
 
+    @Override
+    public boolean isPolled() {
+        return true;
+    }
+
     private class WebSocketSender implements Runnable {
 
         private String message;

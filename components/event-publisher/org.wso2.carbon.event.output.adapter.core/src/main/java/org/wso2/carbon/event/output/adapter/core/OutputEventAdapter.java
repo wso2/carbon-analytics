@@ -63,4 +63,10 @@ public interface OutputEventAdapter {
      */
     void destroy();
 
+    /**
+     * Whether events get accumulated at the adopter and clients connect to it to collect events
+     * @return is polled
+     */
+    boolean isPolled();
+
 }

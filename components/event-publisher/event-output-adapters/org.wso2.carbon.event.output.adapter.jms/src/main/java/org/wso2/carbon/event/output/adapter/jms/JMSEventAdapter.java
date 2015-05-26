@@ -153,6 +153,11 @@ public class JMSEventAdapter implements OutputEventAdapter {
         //not required
     }
 
+    @Override
+    public boolean isPolled() {
+        return false;
+    }
+
     private PublisherDetails initPublisher(
             OutputEventAdapterConfiguration outputEventAdaptorConfiguration,
             Map<String, String> messageConfig) {

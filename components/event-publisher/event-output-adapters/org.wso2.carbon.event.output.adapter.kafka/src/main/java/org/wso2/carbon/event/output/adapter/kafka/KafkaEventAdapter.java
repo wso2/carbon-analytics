@@ -157,6 +157,11 @@ public class KafkaEventAdapter implements OutputEventAdapter {
         //not required
     }
 
+    @Override
+    public boolean isPolled() {
+        return false;
+    }
+
 
     class KafkaSender implements Runnable {
 

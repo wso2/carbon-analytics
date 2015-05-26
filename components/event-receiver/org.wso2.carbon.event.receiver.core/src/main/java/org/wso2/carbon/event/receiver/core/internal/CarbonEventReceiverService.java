@@ -52,7 +52,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
     private static final Log log = LogFactory.getLog(CarbonEventReceiverService.class);
     private Map<Integer, Map<String, EventReceiver>> tenantSpecificEventReceiverConfigurationMap;
     private Map<Integer, List<EventReceiverConfigurationFile>> tenantSpecificEventReceiverConfigurationFileMap;
-    private boolean started = false;
+    //  private boolean started = false;
 
     public CarbonEventReceiverService() {
         tenantSpecificEventReceiverConfigurationMap = new ConcurrentHashMap<Integer, Map<String, EventReceiver>>();
@@ -319,7 +319,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
 
         // End; Checking preconditions to add the event receiver
         EventReceiver eventReceiver = new EventReceiver(eventReceiverConfiguration, exportedStreamDefinition,
-                EventReceiverServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode(), started);
+                EventReceiverServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode());
 
         try {
             EventReceiverServiceValueHolder.getEventStreamService().subscribe(eventReceiver);
@@ -610,48 +610,12 @@ public class CarbonEventReceiverService implements EventReceiverService {
         return tenantSpecificEventReceiverConfigurationMap;
     }
 
-    public void startInputAdapterRuntimes() {
-        started = true;
-        Map<String, EventReceiver> map;
-        int tenantId;
-        for (Map.Entry<Integer, Map<String, EventReceiver>> pair : tenantSpecificEventReceiverConfigurationMap.entrySet()) {
-            map = pair.getValue();
-            tenantId = pair.getKey();
-            try {
-                PrivilegedCarbonContext.startTenantFlow();
-                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
-                PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
-                for (EventReceiver eventReceiver : map.values()) {
-                    eventReceiver.getInputAdapterRuntime().start();
-                }
-            } catch (Exception e) {
-                log.error("Unable to start event adpaters for tenant :" + tenantId, e);
-            } finally {
-                PrivilegedCarbonContext.endTenantFlow();
-            }
-        }
+    public void start() {
+        EventReceiverServiceValueHolder.getInputEventAdapterService().start();
     }
 
-    public void startPollingInputAdapterRuntimes() {
-        EventReceiverServiceValueHolder.getInputEventAdapterService().setStartPolling(true);
-        Map<String, EventReceiver> map;
-        int tenantId;
-        for (Map.Entry<Integer, Map<String, EventReceiver>> pair : tenantSpecificEventReceiverConfigurationMap.entrySet()) {
-            map = pair.getValue();
-            tenantId = pair.getKey();
-            try {
-                PrivilegedCarbonContext.startTenantFlow();
-                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
-                PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
-                for (EventReceiver eventReceiver : map.values()) {
-                    eventReceiver.getInputAdapterRuntime().startPolling();
-                }
-            } catch (Exception e) {
-                log.error("Unable to start event adapters for tenant :" + tenantId, e);
-            } finally {
-                PrivilegedCarbonContext.endTenantFlow();
-            }
-        }
+    public void startPolling() {
+        EventReceiverServiceValueHolder.getInputEventAdapterService().startPolling();
     }
 
     public EventReceiver getEventReceiver(int tenantId, String eventReceiverName) {

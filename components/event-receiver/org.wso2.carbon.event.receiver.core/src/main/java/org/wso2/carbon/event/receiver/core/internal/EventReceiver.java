@@ -20,7 +20,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
-import org.wso2.carbon.event.input.adapter.core.InputAdapterRuntime;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterSubscription;
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterException;
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterRuntimeException;
@@ -50,6 +49,7 @@ import java.util.concurrent.locks.Lock;
 public class EventReceiver implements EventProducer {
 
     private static final Log log = LogFactory.getLog(EventReceiver.class);
+    private boolean isEventDuplicatedInCluster;
     private boolean traceEnabled = false;
     private boolean statisticsEnabled = false;
     private boolean customMappingEnabled = false;
@@ -61,12 +61,10 @@ public class EventReceiver implements EventProducer {
     private String beforeTracerPrefix;
     private String afterTracerPrefix;
     private AbstractInputEventDispatcher inputEventDispatcher;
-    private InputAdapterRuntime inputAdapterRuntime;
-
+    private boolean eventDuplicatedInCluster;
 
     public EventReceiver(EventReceiverConfiguration eventReceiverConfiguration,
-                         StreamDefinition exportedStreamDefinition, Mode mode,
-                         boolean started)
+                         StreamDefinition exportedStreamDefinition, Mode mode)
             throws EventReceiverConfigurationException {
         this.eventReceiverConfiguration = eventReceiverConfiguration;
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
@@ -111,9 +109,10 @@ public class EventReceiver implements EventProducer {
                 } else {
                     inputEventAdapterSubscription = new TypedEventSubscription();
                 }
-                inputAdapterRuntime = EventReceiverServiceValueHolder.getInputEventAdapterService().create(
+                EventReceiverServiceValueHolder.getInputEventAdapterService().create(
                         eventReceiverConfiguration.getFromAdapterConfiguration(), inputEventAdapterSubscription);
 
+                isEventDuplicatedInCluster = EventReceiverServiceValueHolder.getInputEventAdapterService().isEventDuplicatedInCluster(eventReceiverConfiguration.getFromAdapterConfiguration().getName());
             } catch (InputEventAdapterException e) {
                 throw new EventReceiverConfigurationException("Cannot subscribe to input event adapter :" + inputEventAdapterName + ", error in configuration.", e);
             } catch (InputEventAdapterRuntimeException e) {
@@ -123,19 +122,17 @@ public class EventReceiver implements EventProducer {
             if (mode == Mode.HA) {
                 Lock readLock = EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().getReadLock();
                 inputEventDispatcher = new QueueInputEventDispatcher(tenantId, EventManagementUtil.constructEventSyncId(tenantId, eventReceiverConfiguration.getEventReceiverName(), Manager.ManagerType.Receiver), readLock, exportedStreamDefinition);
-                inputEventDispatcher.setSendToOther(!inputAdapterRuntime.isEventDuplicatedInCluster());
+                inputEventDispatcher.setSendToOther(!isEventDuplicatedInCluster);
                 EventReceiverServiceValueHolder.getEventManagementService().registerEventSync((EventSync) inputEventDispatcher);
             } else if (mode == Mode.Distributed) {
                 inputEventDispatcher = new InputEventDispatcher();
-                inputEventDispatcher.setDrop(inputAdapterRuntime.isEventDuplicatedInCluster());
+                inputEventDispatcher.setDrop(isEventDuplicatedInCluster);
             } else {
                 inputEventDispatcher = new InputEventDispatcher();
             }
 
-            if (started) {
-                inputAdapterRuntime.start();
-            } else if (mode == Mode.HA && inputAdapterRuntime.isEventDuplicatedInCluster()) {
-                inputAdapterRuntime.start();
+            if (mode == Mode.HA && eventDuplicatedInCluster) {
+                EventReceiverServiceValueHolder.getInputEventAdapterService().start(inputEventAdapterName);
             }
         }
     }
@@ -269,15 +266,15 @@ public class EventReceiver implements EventProducer {
         this.inputEventDispatcher.setCallBack(callBack);
     }
 
-    public InputAdapterRuntime getInputAdapterRuntime() {
-        return inputAdapterRuntime;
-    }
-
     public void destroy() {
         EventReceiverServiceValueHolder.getInputEventAdapterService().destroy(eventReceiverConfiguration.getFromAdapterConfiguration().getName());
         if (inputEventDispatcher instanceof EventSync) {
             EventReceiverServiceValueHolder.getEventManagementService().unregisterEventSync(((EventSync) inputEventDispatcher).getStreamDefinition().getId());
         }
+    }
+
+    public boolean isEventDuplicatedInCluster() {
+        return eventDuplicatedInCluster;
     }
 
     private class MappedEventSubscription implements InputEventAdapterSubscription {

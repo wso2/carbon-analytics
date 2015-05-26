@@ -130,6 +130,11 @@ public final class SMSEventAdapter implements OutputEventAdapter {
         //Not required.
     }
 
+    @Override
+    public boolean isPolled() {
+        return false;
+    }
+
     class SMSSender implements Runnable {
         String smsNo;
         String message;

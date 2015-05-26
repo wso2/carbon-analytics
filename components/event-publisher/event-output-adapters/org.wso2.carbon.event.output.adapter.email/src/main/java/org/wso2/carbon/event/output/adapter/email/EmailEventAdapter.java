@@ -256,6 +256,11 @@ public class EmailEventAdapter implements OutputEventAdapter {
         //not required
     }
 
+    @Override
+    public boolean isPolled() {
+        return false;
+    }
+
 
     class EmailSender implements Runnable {
         String to;

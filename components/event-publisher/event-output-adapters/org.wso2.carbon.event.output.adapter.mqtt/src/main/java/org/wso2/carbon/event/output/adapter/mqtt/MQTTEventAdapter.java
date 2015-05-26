@@ -158,6 +158,11 @@ public class MQTTEventAdapter implements OutputEventAdapter {
         //not required
     }
 
+    @Override
+    public boolean isPolled() {
+        return false;
+    }
+
     class MQTTSender implements Runnable {
 
         String topic;

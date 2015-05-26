@@ -20,23 +20,11 @@ package org.wso2.carbon.event.receiver.core.internal;
 
 
 import org.apache.log4j.Logger;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.databridge.commons.Attribute;
-import org.wso2.carbon.databridge.commons.StreamDefinition;
-import org.wso2.carbon.event.processor.manager.commons.transport.client.TCPEventPublisher;
-import org.wso2.carbon.event.processor.manager.commons.transport.server.StreamCallback;
-import org.wso2.carbon.event.processor.manager.commons.transport.server.TCPEventServer;
-import org.wso2.carbon.event.processor.manager.commons.transport.server.TCPEventServerConfig;
-import org.wso2.carbon.event.processor.manager.commons.utils.HostAndPort;
 import org.wso2.carbon.event.processor.manager.core.EventReceiverManagementService;
-import org.wso2.carbon.event.receiver.core.exception.EventReceiverConfigurationException;
 import org.wso2.carbon.event.receiver.core.internal.ds.EventReceiverServiceValueHolder;
 import org.wso2.siddhi.core.util.snapshot.ByteSerializer;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -56,7 +44,7 @@ public class CarbonEventReceiverManagementService extends EventReceiverManagemen
             HashMap<String, byte[]> tenantData = new HashMap<String, byte[]>();
 
             for (Map.Entry<String, EventReceiver> receiverEntry : map.entrySet()) {
-                if (receiverEntry.getValue().getInputAdapterRuntime().isEventDuplicatedInCluster()) {
+                if (receiverEntry.getValue().isEventDuplicatedInCluster()) {
                     byte[] state = receiverEntry.getValue().getInputEventDispatcher().getState();
                     tenantData.put(receiverEntry.getKey(), state);
                 }
@@ -92,12 +80,12 @@ public class CarbonEventReceiverManagementService extends EventReceiverManagemen
 
     @Override
     public void start() {
-        EventReceiverServiceValueHolder.getCarbonEventReceiverService().startInputAdapterRuntimes();
+        EventReceiverServiceValueHolder.getCarbonEventReceiverService().start();
     }
 
     @Override
     public void startPolling() {
-        EventReceiverServiceValueHolder.getCarbonEventReceiverService().startPollingInputAdapterRuntimes();
+        EventReceiverServiceValueHolder.getCarbonEventReceiverService().startPolling();
     }
 
     public Lock getReadLock() {

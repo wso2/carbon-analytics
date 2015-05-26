@@ -192,4 +192,17 @@ public class CarbonOutputEventAdapterService implements OutputEventAdapterServic
         }
     }
 
+    @Override
+    public boolean isPolled(String outputAdapterName) throws OutputEventAdapterException {
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            ConcurrentHashMap<String, OutputAdapterRuntime> inputRuntimeMap = tenantSpecificEventAdapters.get(tenantId);
+            if (inputRuntimeMap != null) {
+                OutputAdapterRuntime outputAdapterRuntime = inputRuntimeMap.get(outputAdapterName);
+                if (outputAdapterRuntime != null) {
+                    return outputAdapterRuntime.isPolled();
+                }
+            }
+            throw new OutputEventAdapterException("Adopter with name'" + outputAdapterName + "' not found");
+    }
+
 }

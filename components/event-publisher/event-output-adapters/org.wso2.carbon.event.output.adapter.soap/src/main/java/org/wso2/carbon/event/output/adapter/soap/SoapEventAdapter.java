@@ -209,6 +209,11 @@ public class SoapEventAdapter implements OutputEventAdapter {
         //not required
     }
 
+    @Override
+    public boolean isPolled() {
+        return false;
+    }
+
     private Map<String, String> extractHeaders(String headers) {
         if (headers == null || headers.trim().length() == 0) {
             return null;
