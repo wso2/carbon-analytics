@@ -22,9 +22,12 @@ var TRACE = "Tracing";
 
 
 function deleteEventReceiver(eventReceiverName) {
-    var theform = document.getElementById('deleteForm');
-    theform.eventReceiver.value = eventReceiverName;
-    theform.submit();
+    CARBON.showConfirmationDialog(
+        "Are you sure want to delete event receiver: " + eventReceiverName + "?", function () {
+            var theform = document.getElementById('deleteForm');
+            theform.eventReceiver.value = eventReceiverName;
+            theform.submit();
+        }, null, null);
 }
 
 function disableReceiverStat(eventReceiverName) {
