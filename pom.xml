@@ -238,6 +238,11 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.tools.migration</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.datasource.rdbms</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
@@ -950,6 +955,13 @@
                 <artifactId>org.wso2.carbon.analytics.stream.persistence</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
+
+            <!--cassandra dependancy for the migration tool-->
+            <dependency>
+                <groupId>com.datastax.cassandra</groupId>
+                <artifactId>cassandra-driver-core</artifactId>
+                <version>${datastax.cassandra.driver.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1298,7 +1310,7 @@
         <roaringbitmap.version>0.4.5</roaringbitmap.version>
         <roaringbitmap.import.version>[0.4.5, 0.5.0)</roaringbitmap.import.version>
         <objenesis.orbit.version>2.1.wso2v1</objenesis.orbit.version>
-
+        <datastax.cassandra.driver.version>2.1.5</datastax.cassandra.driver.version>
 
     </properties>
 
