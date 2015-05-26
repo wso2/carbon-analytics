@@ -72,6 +72,8 @@ public class EventReceiverServiceDS {
             EventReceiverServiceValueHolder.registerEventReceiverService(carbonEventReceiverService);
 
             CarbonEventReceiverManagementService carbonEventReceiverManagementService = new CarbonEventReceiverManagementService();
+            EventReceiverServiceValueHolder.getEventManagementService().subscribe(carbonEventReceiverManagementService);
+
             EventReceiverServiceValueHolder.registerReceiverManagementService(carbonEventReceiverManagementService);
 
             context.getBundleContext().registerService(EventReceiverService.class.getName(), carbonEventReceiverService, null);
@@ -174,6 +176,8 @@ public class EventReceiverServiceDS {
 
     protected void unsetEventManagementService(EventManagementService eventManagementService) {
         EventReceiverServiceValueHolder.registerEventManagementService(null);
+        eventManagementService.unsubscribe(EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService());
+
     }
 
 }

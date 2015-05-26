@@ -18,28 +18,21 @@
 
 package org.wso2.carbon.event.processor.manager.core;
 
-import com.hazelcast.core.HazelcastInstance;
 import org.wso2.carbon.event.processor.manager.core.config.ManagementModeInfo;
-import org.wso2.carbon.utils.ConfigurationContextService;
 
 public interface EventManagementService {
 
-    public void init(HazelcastInstance hazelcastInstance);
-
-    public void init(ConfigurationContextService configurationContextService);
-
-    public void shutdown() ;
-
-    public byte[] getState();
-
     public void subscribe(Manager manager);
 
-    public EventProcessorManagementService getEventProcessorManagementService();
-
-    public EventReceiverManagementService getEventReceiverManagementService();
-
-    public EventPublisherManagementService getEventPublisherManagementService();
-
     public ManagementModeInfo getManagementModeInfo();
+
+    public void unsubscribe(Manager manager);
+
+    public void syncEvent(String syncId, Manager.ManagerType type, Object[] data);
+
+    public void registerEventSync(EventSync eventSync);
+
+    public void unregisterEventSync(String syncId);
+
 
 }

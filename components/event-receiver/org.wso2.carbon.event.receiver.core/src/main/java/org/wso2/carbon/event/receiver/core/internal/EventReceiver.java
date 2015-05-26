@@ -24,7 +24,9 @@ import org.wso2.carbon.event.input.adapter.core.InputAdapterRuntime;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterSubscription;
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterException;
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterRuntimeException;
-import org.wso2.carbon.event.processor.manager.core.config.ManagementModeInfo;
+import org.wso2.carbon.event.processor.manager.core.EventManagementUtil;
+import org.wso2.carbon.event.processor.manager.core.EventSync;
+import org.wso2.carbon.event.processor.manager.core.Manager;
 import org.wso2.carbon.event.processor.manager.core.config.Mode;
 import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfiguration;
@@ -63,7 +65,7 @@ public class EventReceiver implements EventProducer {
 
 
     public EventReceiver(EventReceiverConfiguration eventReceiverConfiguration,
-                         StreamDefinition exportedStreamDefinition, ManagementModeInfo modeInfo,
+                         StreamDefinition exportedStreamDefinition, Mode mode,
                          boolean started)
             throws EventReceiverConfigurationException {
         this.eventReceiverConfiguration = eventReceiverConfiguration;
@@ -118,24 +120,21 @@ public class EventReceiver implements EventProducer {
                 throw new EventReceiverProcessingException("Cannot subscribe to input event adapter :" + inputEventAdapterName + ", error while connecting by adapter.", e);
             }
 
-            if (modeInfo.getMode() == Mode.HA) {
+            if (mode == Mode.HA) {
                 Lock readLock = EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().getReadLock();
-                inputEventDispatcher = new QueueInputEventDispatcher(tenantId, eventReceiverConfiguration.getEventReceiverName(), readLock);
+                inputEventDispatcher = new QueueInputEventDispatcher(tenantId, EventManagementUtil.constructEventSyncId(tenantId, eventReceiverConfiguration.getEventReceiverName(), Manager.ManagerType.Receiver), readLock, exportedStreamDefinition);
                 inputEventDispatcher.setSendToOther(!inputAdapterRuntime.isEventDuplicatedInCluster());
-            } else if (modeInfo.getMode() == Mode.Distributed) {
+                EventReceiverServiceValueHolder.getEventManagementService().registerEventSync((EventSync) inputEventDispatcher);
+            } else if (mode == Mode.Distributed) {
                 inputEventDispatcher = new InputEventDispatcher();
                 inputEventDispatcher.setDrop(inputAdapterRuntime.isEventDuplicatedInCluster());
             } else {
                 inputEventDispatcher = new InputEventDispatcher();
             }
 
-            if (modeInfo.getMode() == Mode.HA) {
-                if (started || inputAdapterRuntime.isEventDuplicatedInCluster()) {
-                    inputAdapterRuntime.start();
-                }
-            } else if (modeInfo.getMode() == Mode.Distributed) {
+            if (started) {
                 inputAdapterRuntime.start();
-            } else {
+            } else if (mode == Mode.HA && inputAdapterRuntime.isEventDuplicatedInCluster()) {
                 inputAdapterRuntime.start();
             }
         }
@@ -182,7 +181,7 @@ public class EventReceiver implements EventProducer {
                     if (convertedEvent instanceof Object[][]) {
                         Object[][] arrayOfEvents = (Object[][]) convertedEvent;
                         for (Object[] outObjArray : arrayOfEvents) {
-                            if(outObjArray != null){
+                            if (outObjArray != null) {
                                 sendEvent(outObjArray);
                             }
                         }
@@ -276,7 +275,9 @@ public class EventReceiver implements EventProducer {
 
     public void destroy() {
         EventReceiverServiceValueHolder.getInputEventAdapterService().destroy(eventReceiverConfiguration.getFromAdapterConfiguration().getName());
-
+        if (inputEventDispatcher instanceof EventSync) {
+            EventReceiverServiceValueHolder.getEventManagementService().unregisterEventSync(((EventSync) inputEventDispatcher).getStreamDefinition().getId());
+        }
     }
 
     private class MappedEventSubscription implements InputEventAdapterSubscription {

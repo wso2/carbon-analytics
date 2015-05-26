@@ -45,4 +45,9 @@ public abstract class EventProcessorManagementService implements Manager{
     public abstract void resume();
 
     public abstract ManagementModeInfo getManagementModeInfo();
+
+    @Override
+    public ManagerType getType() {
+        return ManagerType.Processor;
+    }
 }

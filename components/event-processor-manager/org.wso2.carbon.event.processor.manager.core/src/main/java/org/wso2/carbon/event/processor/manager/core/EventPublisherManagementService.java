@@ -23,4 +23,9 @@ public abstract class EventPublisherManagementService implements Manager{
     public abstract boolean isDrop();
 
     public abstract void setDrop(boolean isDrop);
+
+    @Override
+    public ManagerType getType() {
+        return ManagerType.Publisher;
+    }
 }

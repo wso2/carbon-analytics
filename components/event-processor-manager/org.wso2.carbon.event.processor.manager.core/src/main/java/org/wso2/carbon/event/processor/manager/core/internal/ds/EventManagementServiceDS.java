@@ -44,10 +44,10 @@ public class EventManagementServiceDS {
     protected void activate(ComponentContext context) {
         try {
 
-            CarbonEventManagementService eventManagementService = new CarbonEventManagementService();
-            EventManagementServiceValueHolder.setEventManagementService(eventManagementService);
+            CarbonEventManagementService carbonEventManagementService = new CarbonEventManagementService();
+            EventManagementServiceValueHolder.setCarbonEventManagementService(carbonEventManagementService);
 
-            context.getBundleContext().registerService(EventManagementService.class.getName(), eventManagementService, null);
+            context.getBundleContext().registerService(EventManagementService.class.getName(), carbonEventManagementService, null);
 
             if (log.isDebugEnabled()) {
                 log.debug("Successfully deployed EventProcessorManagementService");
@@ -60,7 +60,7 @@ public class EventManagementServiceDS {
     }
 
     protected void deactivate(ComponentContext context) {
-        EventManagementServiceValueHolder.getEventManagementService().shutdown();
+        EventManagementServiceValueHolder.getCarbonEventManagementService().shutdown();
     }
 
     protected void setHazelcastInstance(HazelcastInstance hazelcastInstance) {
@@ -83,40 +83,16 @@ public class EventManagementServiceDS {
             }
 
         });
-        EventManagementServiceValueHolder.getEventManagementService().init(hazelcastInstance);
+        EventManagementServiceValueHolder.getCarbonEventManagementService().init(hazelcastInstance);
     }
 
     protected void unsetHazelcastInstance(HazelcastInstance hazelcastInstance) {
         EventManagementServiceValueHolder.registerHazelcastInstance(null);
     }
 
-//    public void setEventProcessorManagementService(EventProcessorManagementService eventProcessorManagementService) {
-//        EventManagementServiceValueHolder.registerEventProcessorManagementService(eventProcessorManagementService);
-//    }
-//
-//    public void unSetEventProcessorManagementService(EventProcessorManagementService eventProcessorManagementService) {
-//        EventManagementServiceValueHolder.registerEventProcessorManagementService(null);
-//    }
-
-//    public void setEventReceiverManagementService(EventReceiverManagementService eventReceiverManagementService) {
-//        EventManagementServiceValueHolder.registerEventReceiverManagementService(eventReceiverManagementService);
-//    }
-//
-//    public void unSetEventReceiverManagementService(EventReceiverManagementService eventReceiverManagementService) {
-//        EventManagementServiceValueHolder.registerEventReceiverManagementService(null);
-//    }
-
-//    public void setEventPublisherManagementService(EventPublisherManagementService eventPublisherManagementService) {
-//        EventManagementServiceValueHolder.registerEventPublisherManagementService(eventPublisherManagementService);
-//    }
-//
-//    public void unSetEventPublisherManagementService(EventPublisherManagementService eventPublisherManagementService) {
-//        EventManagementServiceValueHolder.registerEventPublisherManagementService(null);
-//    }
-
     protected void setConfigurationContextService(
             ConfigurationContextService configurationContextService) {
-        EventManagementServiceValueHolder.getEventManagementService().init(configurationContextService);
+        EventManagementServiceValueHolder.getCarbonEventManagementService().init(configurationContextService);
     }
 
     protected void unsetConfigurationContextService(

@@ -88,6 +88,11 @@ public class TCPEventPublisher {
         log.info("Stream definition added for stream: " + streamDefinition.getId());
     }
 
+    public void removeStreamDefinition(StreamDefinition streamDefinition) {
+        streamRuntimeInfoMap.remove(streamDefinition.getId());
+        log.info("Stream definition removed for stream: " + streamDefinition.getId());
+    }
+
     /**
      * Send Events to the remote server. In synchronous mode this method call returns only after writing data to the socket
      * in asynchronous mode disruptor pattern is used

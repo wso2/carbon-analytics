@@ -20,13 +20,11 @@ package org.wso2.carbon.event.publisher.core.internal;
 
 
 import org.wso2.carbon.event.processor.manager.core.EventPublisherManagementService;
-import org.wso2.carbon.event.publisher.core.internal.ds.EventPublisherServiceValueHolder;
 
 public class CarbonEventPublisherManagementService extends EventPublisherManagementService {
     private boolean isDrop = false;
 
     public CarbonEventPublisherManagementService() {
-        EventPublisherServiceValueHolder.getEventManagementService().subscribe(this);
     }
 
     @Override
@@ -39,8 +37,4 @@ public class CarbonEventPublisherManagementService extends EventPublisherManagem
         this.isDrop = isDrop;
     }
 
-    @Override
-    public ManagerType getType() {
-        return ManagerType.Publisher;
-    }
 }

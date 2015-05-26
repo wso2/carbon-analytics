@@ -19,8 +19,6 @@
 package org.wso2.carbon.event.processor.manager.core;
 
 
-import org.wso2.carbon.event.processor.manager.commons.utils.HostAndPort;
-
 public abstract class EventReceiverManagementService implements Manager{
     /**
      * Get the state of the input event adapter service
@@ -55,7 +53,8 @@ public abstract class EventReceiverManagementService implements Manager{
      */
     public abstract void startPolling();
 
-    public abstract void setOtherMember(HostAndPort otherMember);
-
-    public abstract void startServer(HostAndPort member);
+    @Override
+    public ManagerType getType() {
+        return ManagerType.Receiver;
+    }
 }

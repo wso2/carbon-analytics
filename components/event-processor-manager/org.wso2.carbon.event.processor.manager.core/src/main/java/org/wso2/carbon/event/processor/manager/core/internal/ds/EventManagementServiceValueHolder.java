@@ -18,19 +18,19 @@
 package org.wso2.carbon.event.processor.manager.core.internal.ds;
 
 import com.hazelcast.core.HazelcastInstance;
-import org.wso2.carbon.event.processor.manager.core.EventManagementService;
+import org.wso2.carbon.event.processor.manager.core.internal.CarbonEventManagementService;
 
 
 public class EventManagementServiceValueHolder {
-    private static EventManagementService eventManagementService;
+    private static CarbonEventManagementService carbonEventManagementService;
     private static HazelcastInstance hazelcastInstance;
 
-    public static EventManagementService getEventManagementService() {
-        return eventManagementService;
+    public static CarbonEventManagementService getCarbonEventManagementService() {
+        return carbonEventManagementService;
     }
 
-    public static void setEventManagementService(EventManagementService eventManagementService) {
-        EventManagementServiceValueHolder.eventManagementService = eventManagementService;
+    public static void setCarbonEventManagementService(CarbonEventManagementService eventManagementService) {
+        EventManagementServiceValueHolder.carbonEventManagementService = eventManagementService;
     }
 
     public static void registerHazelcastInstance(HazelcastInstance hazelcastInstance) {
@@ -41,27 +41,4 @@ public class EventManagementServiceValueHolder {
         return hazelcastInstance;
     }
 
-//    public static EventProcessorManagementService getEventProcessorManagementService() {
-//        return eventProcessorManagementService;
-//    }
-//
-//    public static void registerEventProcessorManagementService(EventProcessorManagementService eventProcessorManagementService) {
-//        EventManagementServiceValueHolder.eventProcessorManagementService = eventProcessorManagementService;
-//    }
-//
-//    public static EventReceiverManagementService getEventReceiverManagementService() {
-//        return eventReceiverManagementService;
-//    }
-//
-//    public static void registerEventReceiverManagementService(EventReceiverManagementService eventReceiverManagementService) {
-//        EventManagementServiceValueHolder.eventReceiverManagementService = eventReceiverManagementService;
-//    }
-
-//    public static EventPublisherManagementService getEventPublisherManagementService() {
-//        return eventPublisherManagementService;
-//    }
-//
-//    public static void registerEventPublisherManagementService(EventPublisherManagementService eventPublisherManagementService) {
-//        EventManagementServiceValueHolder.eventPublisherManagementService = eventPublisherManagementService;
-//    }
 }

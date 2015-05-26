@@ -25,7 +25,6 @@ import org.wso2.carbon.event.input.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterSchema;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterService;
 import org.wso2.carbon.event.input.adapter.core.Property;
-import org.wso2.carbon.event.processor.manager.core.config.ManagementModeInfo;
 import org.wso2.carbon.event.receiver.core.EventReceiverService;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfiguration;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfigurationFile;
@@ -55,15 +54,9 @@ public class CarbonEventReceiverService implements EventReceiverService {
     private Map<Integer, List<EventReceiverConfigurationFile>> tenantSpecificEventReceiverConfigurationFileMap;
     private boolean started = false;
 
-    private ManagementModeInfo managementModeInfo;
-
     public CarbonEventReceiverService() {
         tenantSpecificEventReceiverConfigurationMap = new ConcurrentHashMap<Integer, Map<String, EventReceiver>>();
         tenantSpecificEventReceiverConfigurationFileMap = new ConcurrentHashMap<Integer, List<EventReceiverConfigurationFile>>();
-    }
-
-    public void setManagementModeInfo(ManagementModeInfo modeInfo) {
-        this.managementModeInfo = modeInfo;
     }
 
     @Override
@@ -154,7 +147,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
 
     @Override
     public EventReceiverConfiguration getActiveEventReceiverConfiguration(String eventReceiverName) {
-        int tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         EventReceiverConfiguration eventReceiverConfiguration = null;
         Map<String, EventReceiver> tenantSpecificEventReceiverMap = this.tenantSpecificEventReceiverConfigurationMap.get(tenantId);
         if (tenantSpecificEventReceiverMap != null && tenantSpecificEventReceiverMap.size() > 0) {
@@ -168,7 +161,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
 
     @Override
     public List<EventReceiverConfiguration> getAllActiveEventReceiverConfigurations() {
-        int tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         List<EventReceiverConfiguration> eventReceiverConfigurations = new ArrayList<EventReceiverConfiguration>();
         Map<String, EventReceiver> tenantSpecificEventReceiverMap = this.tenantSpecificEventReceiverConfigurationMap.get(tenantId);
         if (tenantSpecificEventReceiverMap != null) {
@@ -182,7 +175,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
     @Override
     public List<EventReceiverConfiguration> getAllActiveEventReceiverConfigurations(
             String streamId) {
-        int tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         List<EventReceiverConfiguration> eventReceiverConfigurations = new ArrayList<EventReceiverConfiguration>();
         Map<String, EventReceiver> tenantSpecificEventReceiverMap = this.tenantSpecificEventReceiverConfigurationMap.get(tenantId);
         if (tenantSpecificEventReceiverMap != null) {
@@ -326,10 +319,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
 
         // End; Checking preconditions to add the event receiver
         EventReceiver eventReceiver = new EventReceiver(eventReceiverConfiguration, exportedStreamDefinition,
-                managementModeInfo, started);
-
-        EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().addToPublisherAndServer(
-                tenantId, eventReceiverConfiguration.getEventReceiverName(), exportedStreamDefinition);
+                EventReceiverServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode(), started);
 
         try {
             EventReceiverServiceValueHolder.getEventStreamService().subscribe(eventReceiver);
@@ -343,7 +333,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
 
     public void removeEventReceiverConfigurationFile(String fileName)
             throws EventReceiverConfigurationException {
-        int tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         List<EventReceiverConfigurationFile> eventReceiverConfigurationFileList =
                 tenantSpecificEventReceiverConfigurationFileMap.get(tenantId);
         if (eventReceiverConfigurationFileList != null) {
@@ -520,7 +510,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
     }
 
     private String getFileName(String eventReceiverName) {
-        int tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         if (tenantSpecificEventReceiverConfigurationFileMap.size() > 0) {
             List<EventReceiverConfigurationFile> eventReceiverConfigurationFiles = tenantSpecificEventReceiverConfigurationFileMap.get(tenantId);
             if (eventReceiverConfigurationFiles != null) {
@@ -665,7 +655,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
     }
 
     public EventReceiver getEventReceiver(int tenantId, String eventReceiverName) {
-        if(tenantSpecificEventReceiverConfigurationMap.containsKey(tenantId)) {
+        if (tenantSpecificEventReceiverConfigurationMap.containsKey(tenantId)) {
             return tenantSpecificEventReceiverConfigurationMap.get(tenantId).get(eventReceiverName);
         }
         return null;

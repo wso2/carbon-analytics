@@ -71,6 +71,7 @@ public class EventPublisherServiceDS {
             EventPublisherServiceValueHolder.registerPublisherService(carbonEventPublisherService);
 
             CarbonEventPublisherManagementService carbonEventPublisherManagementService = new CarbonEventPublisherManagementService();
+            EventPublisherServiceValueHolder.getEventManagementService().subscribe(carbonEventPublisherManagementService);
             EventPublisherServiceValueHolder.registerPublisherManagementService(carbonEventPublisherManagementService);
 
             context.getBundleContext().registerService(EventPublisherService.class.getName(), carbonEventPublisherService, null);
@@ -177,6 +178,8 @@ public class EventPublisherServiceDS {
 
     protected void unsetEventManagementService(EventManagementService eventManagementService) {
         EventPublisherServiceValueHolder.registerEventManagementService(null);
+        eventManagementService.unsubscribe(EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService());
+
     }
 
 

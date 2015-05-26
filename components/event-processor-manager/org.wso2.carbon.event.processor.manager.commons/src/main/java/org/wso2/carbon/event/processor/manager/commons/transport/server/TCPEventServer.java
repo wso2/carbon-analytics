@@ -55,6 +55,10 @@ public class TCPEventServer {
         this.streamRuntimeInfoMap.put(streamId, EventServerUtils.createStreamRuntimeInfo(streamDefinition));
     }
 
+    public void unsubscribe(String streamId) {
+        this.streamRuntimeInfoMap.remove(streamId);
+    }
+
     public void start() {
         if (!serverWorker.isRunning()) {
             new Thread(serverWorker).start();
@@ -157,8 +161,8 @@ public class TCPEventServer {
                     log.info("Closing listener socket. " + e.getMessage());
                 } catch (IOException e) {
                     log.error("Error reading data from receiver socket:" + e.getMessage(), e);
-                } catch (Throwable t){
-                    log.error("Error :"  + t.getMessage(), t);
+                } catch (Throwable t) {
+                    log.error("Error :" + t.getMessage(), t);
                 }
             }
 

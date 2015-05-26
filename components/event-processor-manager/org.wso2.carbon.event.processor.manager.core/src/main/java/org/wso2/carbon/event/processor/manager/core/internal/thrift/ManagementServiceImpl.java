@@ -32,7 +32,7 @@ public class ManagementServiceImpl implements ManagementService.Iface {
     @Override
     public SnapshotData takeSnapshot() throws InternalServerException {
         try {
-            byte[] state = EventManagementServiceValueHolder.getEventManagementService().getState();
+            byte[] state = EventManagementServiceValueHolder.getCarbonEventManagementService().getState();
             SnapshotData snapshotData = new SnapshotData();
             snapshotData.setState(state);
             return snapshotData;

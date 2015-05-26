@@ -20,10 +20,16 @@ package org.wso2.carbon.event.receiver.core.internal.management;
 
 import org.apache.log4j.Logger;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.databridge.commons.Attribute;
+import org.wso2.carbon.event.processor.manager.core.EventSync;
+import org.wso2.carbon.event.processor.manager.core.Manager;
 import org.wso2.carbon.event.receiver.core.internal.ds.EventReceiverServiceValueHolder;
 import org.wso2.siddhi.core.util.snapshot.ByteSerializer;
+import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,34 +37,49 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class QueueInputEventDispatcher extends AbstractInputEventDispatcher {
+public class QueueInputEventDispatcher extends AbstractInputEventDispatcher implements EventSync {
 
+    private final StreamDefinition streamDefinition;
     private Logger log = Logger.getLogger(AbstractInputEventDispatcher.class);
     private final BlockingQueue<Object[]> eventQueue = new LinkedBlockingQueue<Object[]>();
     private Lock readLock;
-    private ReentrantLock lock = new ReentrantLock();
-    private ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private String eventReceiverName;
+    private String syncId;
     private int tenantId;
+    private ReentrantLock threadBarrier = new ReentrantLock();
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-    public QueueInputEventDispatcher(int tenantId, String eventReceiverName, Lock readLock) {
+    public QueueInputEventDispatcher(int tenantId, String syncId, Lock readLock, org.wso2.carbon.databridge.commons.StreamDefinition exportedStreamDefinition) {
         this.readLock = readLock;
         this.tenantId = tenantId;
-        this.eventReceiverName = eventReceiverName;
-        executorService.submit(new QueueInputEventDispatcherWorker());
-    }
+        this.syncId = syncId;
 
-    public BlockingQueue<Object[]> getEventQueue() {
-        return eventQueue;
+        org.wso2.siddhi.query.api.definition.StreamDefinition streamDefinition = new org.wso2.siddhi.query.api.definition.StreamDefinition();
+        streamDefinition.setId(syncId);
+
+        List<Attribute> attributes = new ArrayList<Attribute>();
+        if (exportedStreamDefinition.getMetaData() != null) {
+            attributes.addAll(exportedStreamDefinition.getMetaData());
+        }
+        if (exportedStreamDefinition.getCorrelationData() != null) {
+            attributes.addAll(exportedStreamDefinition.getCorrelationData());
+        }
+        if (exportedStreamDefinition.getPayloadData() != null) {
+            attributes.addAll(exportedStreamDefinition.getPayloadData());
+        }
+        for (Attribute attr : attributes) {
+            streamDefinition.attribute(attr.getName(), org.wso2.siddhi.query.api.definition.Attribute.Type.valueOf(attr.getType().toString()));
+        }
+        this.streamDefinition = streamDefinition;
+
+        executorService.submit(new QueueInputEventDispatcherWorker());
     }
 
     @Override
     public void onEvent(Object[] event) {
         try {
-            //todo:check lock
-            lock.lock();
+            threadBarrier.lock();
             eventQueue.put(event);
-            lock.unlock();
+            threadBarrier.unlock();
         } catch (InterruptedException e) {
             log.error("Interrupted while waiting to put the event to queue.", e);
         }
@@ -71,23 +92,34 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher {
 
     @Override
     public byte[] getState() {
-        //todo:check lock
-        lock.lock();
+        threadBarrier.lock();
         byte[] state = ByteSerializer.OToB(eventQueue);
-        lock.unlock();
+        threadBarrier.unlock();
         return state;
     }
 
     @Override
     public void syncState(byte[] bytes) {
         BlockingQueue<Object[]> events = (BlockingQueue<Object[]>) ByteSerializer.BToO(bytes);
-        for(Object object: events) {
-            if(Arrays.deepEquals((Object[]) object, eventQueue.peek())) {
+        for (Object object : events) {
+            if (Arrays.deepEquals((Object[]) object, eventQueue.peek())) {
                 eventQueue.poll();
             } else {
                 break;
             }
         }
+    }
+
+    @Override
+    public void process(Object[] data) {
+        readLock.lock();
+        readLock.unlock();
+        callBack.sendEventData(data);
+    }
+
+    @Override
+    public StreamDefinition getStreamDefinition() {
+        return streamDefinition;
     }
 
     class QueueInputEventDispatcherWorker implements Runnable {
@@ -120,13 +152,13 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher {
                             callBack.sendEventData(event);
                         }
                         if (isSendToOther()) {
-                            EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().sendToOther(tenantId, eventReceiverName, event);
+                            EventReceiverServiceValueHolder.getEventManagementService().syncEvent(syncId, Manager.ManagerType.Receiver, event);
                         }
                     } catch (InterruptedException e) {
                         log.error("Interrupted while waiting to get an event from queue.", e);
                     }
                 }
-            } catch (Exception e){
+            } catch (Exception e) {
                 log.error("Error in dispatching events.");
             } finally {
                 PrivilegedCarbonContext.endTenantFlow();
