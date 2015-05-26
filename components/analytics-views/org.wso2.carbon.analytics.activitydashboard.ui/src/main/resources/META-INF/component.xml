@@ -31,7 +31,7 @@
         <menu>
             <id>activity_dashboard</id>
             <i18n-bundle>org.wso2.carbon.analytics.activitydashboard.ui.i18n.Resources</i18n-bundle>
-            <i18n-key>Activity Search</i18n-key>
+            <i18n-key>Activity Explorer</i18n-key>
             <parent-menu>interactive_analytics_parent</parent-menu>
             <link>../activitydashboard/index.jsp</link>
             <region>region1</region>

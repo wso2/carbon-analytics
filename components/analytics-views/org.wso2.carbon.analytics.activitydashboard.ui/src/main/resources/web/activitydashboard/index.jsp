@@ -284,7 +284,7 @@
     </script>
 
     <div id="middle">
-        <h2>Activity Search</h2>
+        <h2>Activity Explorer</h2>
 
         <div id="workArea">
             <div class="sectionSeperator togglebleTitle">Time Search</div>
