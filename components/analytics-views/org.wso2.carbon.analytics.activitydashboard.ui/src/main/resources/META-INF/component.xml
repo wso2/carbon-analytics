@@ -18,13 +18,24 @@
 <component xmlns="http://products.wso2.org/carbon">
     <menus>
         <menu>
+            <id>interactive_analytics_parent</id>
+            <i18n-key>Interactive Analytics</i18n-key>
+            <i18n-bundle>org.wso2.carbon.analytics.messageconsole.ui.i18n.Resources</i18n-bundle>
+            <parent-menu>manage_menu</parent-menu>
+            <link>#</link>
+            <region>region1</region>
+            <order>7</order>
+            <style-class>tools</style-class>
+            <icon>../activitydashboard/images/interactive_analysis.png</icon>
+        </menu>
+        <menu>
             <id>activity_dashboard</id>
             <i18n-bundle>org.wso2.carbon.analytics.activitydashboard.ui.i18n.Resources</i18n-bundle>
-            <i18n-key>Activity Dashboard</i18n-key>
-            <parent-menu>dashboard_main_menu</parent-menu>
+            <i18n-key>Activity Search</i18n-key>
+            <parent-menu>interactive_analytics_parent</parent-menu>
             <link>../activitydashboard/index.jsp</link>
             <region>region1</region>
-            <order>51</order>
+            <order>22</order>
             <style-class>tools</style-class>
             <icon>../activitydashboard/images/activity-monitor-icon.png</icon>
             <require-permission>/permission/admin/manage/analytics/activitydashboard</require-permission>
