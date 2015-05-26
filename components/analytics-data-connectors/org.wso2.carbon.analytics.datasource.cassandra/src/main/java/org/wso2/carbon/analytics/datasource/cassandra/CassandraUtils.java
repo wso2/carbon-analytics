@@ -35,6 +35,8 @@ import com.datastax.driver.core.Session;
  */
 public class CassandraUtils {
 
+    public static final String CASSANDRA_SERVERS = "servers";
+    
     public static String[] splitParentChild(String path) {
         if (path.equals("/")) {
             return new String[] { ".", "/" };
