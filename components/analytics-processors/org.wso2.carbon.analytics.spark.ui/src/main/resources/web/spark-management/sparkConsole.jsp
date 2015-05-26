@@ -69,6 +69,13 @@
                         );
 
                         $.register_command(
+                                'create',
+                                'Creates a table in the underlying data source',
+                                'CREATE [TEMPORARY] TABLE [query]',
+                                '../spark-management/execute_sparkquery_ajaxprocessor.jsp'
+                        );
+
+                        $.register_command(
                                 'about',
                                 'Interactive Spark SQL shell',
                                 'about [no options]',
