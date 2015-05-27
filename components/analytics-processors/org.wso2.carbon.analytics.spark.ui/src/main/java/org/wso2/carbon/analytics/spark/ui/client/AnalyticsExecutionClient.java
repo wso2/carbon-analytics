@@ -108,7 +108,7 @@ public class AnalyticsExecutionClient {
         meta.addProperty("responseMessage", "EXECUTED QUERY : " + query);
         JsonArray colArray = new JsonArray();
 
-        if (res != null) {
+        if (res != null && res.getColumnNames()!= null) {
             for (String col : res.getColumnNames()) {
                 if (col != null) {
                     colArray.add(new JsonPrimitive(col));
@@ -127,7 +127,7 @@ public class AnalyticsExecutionClient {
                     JsonArray singleRow = new JsonArray();
                     for (String elm : row.getColumnValues()) {
                         if (elm != null) {
-                            singleRow.add(new JsonPrimitive(elm.toString()));
+                            singleRow.add(new JsonPrimitive(elm));
                         } else {
                             singleRow.add(new JsonPrimitive("NULL"));
                         }

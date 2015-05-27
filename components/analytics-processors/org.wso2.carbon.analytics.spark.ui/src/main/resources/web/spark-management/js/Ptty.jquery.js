@@ -202,18 +202,23 @@
                                 help_out += '<li><p><b>' + i + '</b> - ' + dispatch[i].desc + '</br>';
                                 help_out += 'Usage: ' + dispatch[i].usage + '</p></li>';
                             }
-                            help_out += '</ul>' + "\n";
-                        } else if (typeof dispatch[cmd_to_show] !== 'undefined') {
-                            help_out = '<b>' + cmd_to_show + '</b> - ' + dispatch[cmd_to_show].desc + '</br>';
-                            help_out += 'Usage: ' + dispatch[cmd_to_show].usage + "\n";
+                            help_out += '</ul>' + "\n\n";
                         } else {
-                            help_out = 'help:</br>The "' + cmd_to_show + '" option does not exist.' + "\n";
+                            for (i=2; i<tokens.length;i++){
+                                cmd_to_show = cmd_to_show + ' ' + tokens[i];
+                            }
+                            if (typeof dispatch[cmd_to_show] !== 'undefined') {
+                                help_out = '<b>' + cmd_to_show + '</b> - ' + dispatch[cmd_to_show].desc + '</br>';
+                                help_out += 'Usage: ' + dispatch[cmd_to_show].usage + "\n\n";
+                            } else {
+                                help_out = 'help:</br>The "' + cmd_to_show + '" option does not exist.' + "\n\n";
+                            }
                         }
-                    } else {
+                    }else {
                         help_out = 'Use "help [comand name]" to display specific info about a command.</br>' + "\n";
                         help_out += 'Available commands are:</br><ul class="sq-li">';
-                        for (i in dispatch) {
-                            help_out += '<li>' + i + '</li>';
+                        for (var i in dispatch) {
+                            help_out += '<li>' + i.toUpperCase() + '</li>';
                         }
                         help_out += '</ul>' + "\n";
                     }
