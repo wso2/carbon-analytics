@@ -218,7 +218,7 @@
                         help_out = 'Use "help [comand name]" to display specific info about a command.</br>' + "\n";
                         help_out += 'Available commands are:</br><ul class="sq-li">';
                         for (var i in dispatch) {
-                            help_out += i.toUpperCase() + "\n";
+                            help_out += '<li>' + i.toUpperCase() + '</li>';
                         }
                         help_out += '</ul>' + "\n";
                     }

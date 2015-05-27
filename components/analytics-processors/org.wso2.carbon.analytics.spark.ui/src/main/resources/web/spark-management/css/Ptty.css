@@ -82,15 +82,16 @@
 .cmd_terminal ul.ve-li{ display: inherit; }
 .cmd_terminal ul.ho-li li{ display: inline; }
 .cmd_terminal ul.sq-li li{
-    min-width: 175px;
+    min-width: 120px;
     min-height: 20px;
-    display: -moz-inline-stack; 
+    display: -moz-inline-stack;
     display: inline-block;
     vertical-align: top;
+    text-align: center;
     margin: 2px;
     zoom: 1;
     *display: inline;
-    _height: 20px; 
+    _height: 20px;
 }
 
 /* boring theme */
