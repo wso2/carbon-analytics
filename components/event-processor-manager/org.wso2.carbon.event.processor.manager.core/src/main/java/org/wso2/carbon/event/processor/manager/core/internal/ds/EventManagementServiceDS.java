@@ -18,9 +18,6 @@
 package org.wso2.carbon.event.processor.manager.core.internal.ds;
 
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.MemberAttributeEvent;
-import com.hazelcast.core.MembershipEvent;
-import com.hazelcast.core.MembershipListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
@@ -43,7 +40,6 @@ public class EventManagementServiceDS {
 
     protected void activate(ComponentContext context) {
         try {
-
             CarbonEventManagementService carbonEventManagementService = new CarbonEventManagementService();
             EventManagementServiceValueHolder.setCarbonEventManagementService(carbonEventManagementService);
 
@@ -65,24 +61,6 @@ public class EventManagementServiceDS {
 
     protected void setHazelcastInstance(HazelcastInstance hazelcastInstance) {
         EventManagementServiceValueHolder.registerHazelcastInstance(hazelcastInstance);
-
-        hazelcastInstance.getCluster().addMembershipListener(new MembershipListener() {
-            @Override
-            public void memberAdded(MembershipEvent membershipEvent) {
-
-            }
-
-            @Override
-            public void memberRemoved(MembershipEvent membershipEvent) {
-
-            }
-
-            @Override
-            public void memberAttributeChanged(MemberAttributeEvent memberAttributeEvent) {
-
-            }
-
-        });
         EventManagementServiceValueHolder.getCarbonEventManagementService().init(hazelcastInstance);
     }
 

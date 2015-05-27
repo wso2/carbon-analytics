@@ -50,12 +50,12 @@ public class TCPEventServer {
         this.pool = Executors.newFixedThreadPool(TCPEventServerConfig.getNumberOfThreads());
     }
 
-    public void subscribe(StreamDefinition streamDefinition) {
+    public void addStreamDefinition(StreamDefinition streamDefinition) {
         String streamId = streamDefinition.getId();
         this.streamRuntimeInfoMap.put(streamId, EventServerUtils.createStreamRuntimeInfo(streamDefinition));
     }
 
-    public void unsubscribe(String streamId) {
+    public void removeStreamDefinition(String streamId) {
         this.streamRuntimeInfoMap.remove(streamId);
     }
 

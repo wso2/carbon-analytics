@@ -128,7 +128,7 @@ public class EventPublisher implements RawEventConsumer, EventSync {
             throw new EventPublisherConfigurationException("Error in creating Event Publisher :" + eventPublisherConfiguration.getEventPublisherName() + ", " + e.getMessage(), e);
         }
         syncId = EventManagementUtil.constructEventSyncId(tenantId, eventPublisherConfiguration.getToAdapterConfiguration().getName(), Manager.ManagerType.Publisher);
-        sendToOther = EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode() != Mode.SingleNode;
+        sendToOther = EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode() == Mode.Distributed;
         streamDefinition = EventManagementUtil.constructStreamDefinition(syncId, inputStreamDefinition);
         EventPublisherServiceValueHolder.getEventManagementService().registerEventSync(this);
     }
@@ -138,12 +138,11 @@ public class EventPublisher implements RawEventConsumer, EventSync {
     }
 
     public void sendEventData(Object[] data) {
-        if (EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()) {
-            return;
-        }
-        process(data);
         if (isPolled && sendToOther) {
             EventPublisherServiceValueHolder.getEventManagementService().syncEvent(syncId, Manager.ManagerType.Publisher, data);
+        }
+        if (isPolled || !EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()) {
+            process(data);
         }
     }
 

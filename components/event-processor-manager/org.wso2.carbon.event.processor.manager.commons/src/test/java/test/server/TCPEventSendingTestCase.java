@@ -62,10 +62,10 @@ public class TCPEventSendingTestCase {
         TestStreamCallback streamCallback = new TestStreamCallback();
         TCPEventServer TCPEventServer = new TCPEventServer(new TCPEventServerConfig(7612), streamCallback);
         try {
-            TCPEventServer.subscribe(streamDefinition);
+            TCPEventServer.addStreamDefinition(streamDefinition);
             TCPEventServer.start();
             Thread.sleep(1000);
-            threadPool.submit(new ClientThread(streamDefinition, new SimpleDataProvider(), 100));
+            threadPool.submit(new ClientThread(streamDefinition, new SimpleDataProvider(), 100, true, 0));
             Thread.sleep(5000);
             Assert.assertEquals(100, streamCallback.getEventCount());
             log.info("Shutting down server...");
@@ -89,16 +89,42 @@ public class TCPEventSendingTestCase {
         TestStreamCallback streamCallback = new TestStreamCallback();
         TCPEventServer TCPEventServer = new TCPEventServer(new TCPEventServerConfig(7612), streamCallback);
         try {
-            TCPEventServer.subscribe(streamDefinition);
+            TCPEventServer.addStreamDefinition(streamDefinition);
             TCPEventServer.start();
             Thread.sleep(1000);
             for (int i = 0; i < TOTAL_CLIENTS; i++) {
-                threadPool.submit(new ClientThread(streamDefinition, new AnalyticStatDataProvider(), EVENTS_PER_CLIENT));
+                threadPool.submit(new ClientThread(streamDefinition, new AnalyticStatDataProvider(), EVENTS_PER_CLIENT, true, 0));
             }
             while (streamCallback.getEventCount() < TOTAL_CLIENTS * EVENTS_PER_CLIENT) {
                 Thread.sleep(5000);
             }
             Assert.assertEquals(TOTAL_CLIENTS * EVENTS_PER_CLIENT, streamCallback.getEventCount());
+            log.info("Shutting down server...");
+            TCPEventServer.shutdown();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Test
+    public void testEventSendingOnServerFailure() {
+
+        StreamDefinition streamDefinition = new StreamDefinition().id("TestStream")
+                .attribute("att1", Attribute.Type.INT)
+                .attribute("att2", Attribute.Type.FLOAT)
+                .attribute("att3", Attribute.Type.STRING)
+                .attribute("att4", Attribute.Type.INT);
+
+        TestStreamCallback streamCallback = new TestStreamCallback();
+        TCPEventServer TCPEventServer = new TCPEventServer(new TCPEventServerConfig(7612), streamCallback);
+        try {
+            threadPool.submit(new ClientThread(streamDefinition, new SimpleDataProvider(), 100, false, 1000));
+            Thread.sleep(10000);
+            TCPEventServer.addStreamDefinition(streamDefinition);
+            TCPEventServer.start();
+            Thread.sleep(5000);
+            Assert.assertTrue(streamCallback.getEventCount()>0);
             log.info("Shutting down server...");
             TCPEventServer.shutdown();
         } catch (InterruptedException e) {
@@ -123,24 +149,31 @@ public class TCPEventSendingTestCase {
         int eventsToSend = 0;
         StreamDefinition streamDefinition;
         DataProvider dataProvider;
+        private boolean isSynchronous;
+        private int delay;
 
-        public ClientThread(StreamDefinition streamDefinition, DataProvider dataProvider, int eventsToSend) {
+        public ClientThread(StreamDefinition streamDefinition, DataProvider dataProvider, int eventsToSend, boolean isSynchronous, int delay) {
             this.eventsToSend = eventsToSend;
             this.streamDefinition = streamDefinition;
             this.dataProvider = dataProvider;
+            this.isSynchronous = isSynchronous;
+            this.delay = delay;
         }
 
         @Override
         public void run() {
             TCPEventPublisher TCPEventPublisher = null;
             try {
-                TCPEventPublisher = new TCPEventPublisher("localhost:7612",true);
+                TCPEventPublisher = new TCPEventPublisher("localhost:7612", isSynchronous);
                 TCPEventPublisher.addStreamDefinition(streamDefinition);
                 Thread.sleep(1000);
                 log.info("Starting event client to send events to localhost:7612");
 
                 for (int i = 0; i < eventsToSend; i++) {
-                    TCPEventPublisher.sendEvent(streamDefinition.getId(), dataProvider.getEvent(),true);
+                    TCPEventPublisher.sendEvent(streamDefinition.getId(), dataProvider.getEvent(), true);
+                    if (delay > 0) {
+                        Thread.sleep(delay);
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();

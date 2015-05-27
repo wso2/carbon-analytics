@@ -21,6 +21,7 @@ package org.wso2.carbon.event.receiver.core.internal;
 
 import org.apache.log4j.Logger;
 import org.wso2.carbon.event.processor.manager.core.EventReceiverManagementService;
+import org.wso2.carbon.event.processor.manager.core.exception.EventManagementException;
 import org.wso2.carbon.event.receiver.core.internal.ds.EventReceiverServiceValueHolder;
 import org.wso2.siddhi.core.util.snapshot.ByteSerializer;
 
@@ -56,14 +57,23 @@ public class CarbonEventReceiverManagementService extends EventReceiverManagemen
 
     @Override
     public void syncState(byte[] bytes) {
+
+        Map<Integer, HashMap<String, byte[]>> snapshotDataList = (HashMap<Integer, HashMap<String, byte[]>>) ByteSerializer.BToO(bytes);
         Map<Integer, Map<String, EventReceiver>> tenantSpecificEventAdapters = EventReceiverServiceValueHolder.getCarbonEventReceiverService().getTenantSpecificEventReceiverMap();
-        Map<Integer, HashMap<String, byte[]>> data = new HashMap<Integer, HashMap<String, byte[]>>();
-        for (Map.Entry<Integer, HashMap<String, byte[]>> pair : data.entrySet()) {
-            Map<String, byte[]> map = pair.getValue();
-            int tenantId = pair.getKey();
-            for (Map.Entry<String, byte[]> receiverEntry : map.entrySet()) {
-                tenantSpecificEventAdapters.get(tenantId).get(receiverEntry.getKey())
-                        .getInputEventDispatcher().syncState(receiverEntry.getValue());
+
+        for (Map.Entry<Integer, HashMap<String, byte[]>> tenantEntry : snapshotDataList.entrySet()) {
+            for (Map.Entry<String, byte[]> eventReceiverData : tenantEntry.getValue().entrySet()) {
+                Map<String, EventReceiver> eventReceiverMap = tenantSpecificEventAdapters.get(tenantEntry.getKey());
+                if (eventReceiverMap != null) {
+                    EventReceiver eventReceiver = eventReceiverMap.get(eventReceiverData.getKey());
+                    if (eventReceiver != null) {
+                        eventReceiver.getInputEventDispatcher().syncState(eventReceiverData.getValue());
+                    } else {
+                        throw new EventManagementException("No event receiver with name '" + eventReceiverData.getKey() + "' exist for tenant  " + tenantEntry.getKey());
+                    }
+                } else {
+                    throw new EventManagementException("No event receiver exist for tenant  " + tenantEntry.getKey());
+                }
             }
         }
     }

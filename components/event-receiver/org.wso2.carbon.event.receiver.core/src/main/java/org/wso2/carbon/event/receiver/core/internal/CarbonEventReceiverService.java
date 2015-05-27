@@ -640,7 +640,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
 //                EventReceiver eventReceiver = eventReceiverIterator.next();
 //                if (eventReceiver.getEventReceiverConfiguration().getEventReceiverName().equals(eventReceiverConfiguration.getEventReceiverName())) {
 //                    eventReceiver.unsubscribeFromEventAdapter(null);
-//                    EventReceiverServiceValueHolder.getEventStreamService().unsubscribe(eventReceiver, tenantId);
+//                    EventReceiverServiceValueHolder.getEventStreamService().removeStreamDefinition(eventReceiver, tenantId);
 //                    eventReceiverIterator.remove();
 //                    removedCount++;
 //                }

@@ -29,23 +29,22 @@
     <!-- HA Mode Config -->
 
     <!--<mode name="HA">
-
-
-        <transport>
+        <eventSync>
             <hostName>localhost</hostName>
             <port>11224</port>
             <reconnectionInterval>20000</reconnectionInterval>
-        </transport>
+            <serverThreads>20000</serverThreads>
+        </eventSync>
         <management>
             <hostName>localhost</hostName>
             <port>10005</port>
         </management>
-    </mode>  -->
+    </mode>-->
 
 
     <!-- Distributed Mode Config -->
 
-   <!-- <mode name="Distributed" class="">
+    <!--<mode name="Distributed">
 
         <nodeType>
             <receiver enable="true"/>

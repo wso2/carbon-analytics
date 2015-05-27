@@ -79,8 +79,8 @@ public class TCPEventTestServer {
             }
         });
 
-        eventServer.subscribe(streamDefinition);
-        eventServer.subscribe(streamDefinition1);
+        eventServer.addStreamDefinition(streamDefinition);
+        eventServer.addStreamDefinition(streamDefinition1);
 
         eventServer.start();
 

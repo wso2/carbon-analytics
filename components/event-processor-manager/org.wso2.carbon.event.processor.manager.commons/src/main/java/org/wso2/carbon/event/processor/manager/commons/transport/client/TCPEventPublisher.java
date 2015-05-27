@@ -20,7 +20,6 @@ package org.wso2.carbon.event.processor.manager.commons.transport.client;
 
 import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventHandler;
-import com.lmax.disruptor.ExceptionHandler;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import org.apache.log4j.Logger;
@@ -62,42 +61,46 @@ public class TCPEventPublisher {
         this.streamRuntimeInfoMap = new ConcurrentHashMap<String, StreamRuntimeInfo>();
         this.isSynchronous = isSynchronous;
 
+        if (!isSynchronous) {
+            try {
+                connect(hostUrl);
+            } catch (IOException e) {
+                log.error("Error connection to " + hostUrl, e);
+            }
+            initializeDisruptor(publisherConfig);
+        } else {
+            connect(hostUrl);
+        }
+    }
+
+    private void connect(String hostUrl) throws IOException {
         String[] hp = hostUrl.split(":");
         String host = hp[0];
         int port = Integer.parseInt(hp[1]);
 
         this.clientSocket = new Socket(host, port);
         this.outputStream = new BufferedOutputStream(this.clientSocket.getOutputStream());
-
-        if (!isSynchronous){
-            initializeDisruptor(publisherConfig);
-        }
-        log.info("Client configured to send events to " + hostUrl);
+        log.info("Connecting to " + hostUrl);
     }
 
     public TCPEventPublisher(String hostUrl, boolean isSynchronous) throws IOException {
         this(hostUrl, new TCPEventPublisherConfig(), isSynchronous);
     }
 
-    public String getHostUrl(){
-        return hostUrl;
-    }
-
     public void addStreamDefinition(StreamDefinition streamDefinition) {
         streamRuntimeInfoMap.put(streamDefinition.getId(), EventServerUtils.createStreamRuntimeInfo(streamDefinition));
-        log.info("Stream definition added for stream: " + streamDefinition.getId());
     }
 
     public void removeStreamDefinition(StreamDefinition streamDefinition) {
         streamRuntimeInfoMap.remove(streamDefinition.getId());
-        log.info("Stream definition removed for stream: " + streamDefinition.getId());
     }
 
     /**
      * Send Events to the remote server. In synchronous mode this method call returns only after writing data to the socket
      * in asynchronous mode disruptor pattern is used
+     *
      * @param streamId ID of the stream
-     * @param event event to send
+     * @param event    event to send
      * @throws java.io.IOException
      */
     public void sendEvent(String streamId, Object[] event, boolean flush) throws IOException {
@@ -148,14 +151,14 @@ public class TCPEventPublisher {
         }
         arrayOutputStream.write(buf.array());
 
-        if (!isSynchronous){
+        if (!isSynchronous) {
             publishToDisruptor(arrayOutputStream.toByteArray());
-        }else {
+        } else {
             publishEvent(arrayOutputStream.toByteArray(), flush);
         }
     }
 
-    private void publishToDisruptor(byte[] byteArray){
+    private void publishToDisruptor(byte[] byteArray) {
         long sequenceNo = ringBuffer.next();
         try {
             BiteArrayHolder existingHolder = ringBuffer.get(sequenceNo);
@@ -172,6 +175,46 @@ public class TCPEventPublisher {
         }
     }
 
+    private void publishEventAsync(byte[] data, boolean flush) throws IOException {
+        if (outputStream != null) {
+            try {
+                outputStream.write(data);
+                if (flush) {
+                    outputStream.flush();
+                }
+
+            } catch (IOException e) {
+                try {
+                    log.error("Error on sending to " + hostUrl, e);
+                    log.info("Reconnecting to " + hostUrl);
+                    disconnect();
+                    connect(hostUrl);
+                    outputStream.write(data);
+                    if (flush) {
+                        outputStream.flush();
+                    }
+                } catch (IOException ex) {
+                    log.error("Error on reconnection to " + hostUrl, ex);
+                }
+            }
+
+        } else {
+            try {
+                log.info("Reconnecting to " + hostUrl);
+                disconnect();
+                connect(hostUrl);
+                outputStream.write(data);
+                if (flush) {
+                    outputStream.flush();
+                }
+            } catch (IOException ex) {
+                log.error("Error on reconnection to " + hostUrl, ex);
+            }
+
+        }
+
+    }
+
     private void initializeDisruptor(TCPEventPublisherConfig publisherConfig) {
         this.disruptor = new Disruptor<BiteArrayHolder>(new EventFactory<BiteArrayHolder>() {
             @Override
@@ -182,19 +225,10 @@ public class TCPEventPublisher {
 
         this.ringBuffer = disruptor.getRingBuffer();
 
-        this.disruptor.handleExceptionsWith(new ExceptionHandler() {
-            @Override
-            public void handleEventException(Throwable throwable, long l, Object o) {}
-            @Override
-            public void handleOnStartException(Throwable throwable) {}
-            @Override
-            public void handleOnShutdownException(Throwable throwable) {}
-        });
-
         this.disruptor.handleEventsWith(new EventHandler<BiteArrayHolder>() {
             @Override
             public void onEvent(BiteArrayHolder biteArrayHolder, long sequence, boolean endOfBatch) throws IOException {
-                publishEvent(biteArrayHolder.bytes, endOfBatch);
+                publishEventAsync(biteArrayHolder.bytes, endOfBatch);
             }
         });
 
@@ -208,33 +242,52 @@ public class TCPEventPublisher {
      */
     public void shutdown() {
         try {
-            if (!isSynchronous){
+            if (!isSynchronous) {
                 disruptor.shutdown();
             }
             outputStream.flush();
-            outputStream.close();
-            clientSocket.close();
         } catch (IOException e) {
             log.warn("Error while closing stream to " + hostUrl + " : " + e.getMessage(), e);
+        } finally {
+            disconnect();
+        }
+
+    }
+
+    private void disconnect() {
+        try {
+            if (outputStream != null) {
+                outputStream.close();
+                outputStream = null;
+            }
+        } catch (IOException e) {
+            log.debug("Error while disconnecting to " + hostUrl + " : " + e.getMessage(), e);
+        }
+        try {
+            if (clientSocket != null) {
+                clientSocket.close();
+                clientSocket = null;
+            }
+        } catch (IOException e) {
+            log.debug("Error while closing socket to " + hostUrl + " : " + e.getMessage(), e);
         }
     }
 
     /**
      * Discard all buffered messages and terminate the connection
      */
-    public void terminate(){
-        try {
-            if (!isSynchronous){
-                disruptor.halt();
-            }
-            outputStream.close();
-            clientSocket.close();
-        } catch (IOException e) {
-            log.warn("Error while closing stream to " + hostUrl + " : " + e.getMessage(), e);
+    public void terminate() {
+        if (!isSynchronous) {
+            disruptor.halt();
         }
+        disconnect();
     }
 
     class BiteArrayHolder {
         byte[] bytes;
+    }
+
+    public String getHostUrl() {
+        return hostUrl;
     }
 }

@@ -24,7 +24,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.event.processor.manager.commons</artifactId>
     <packaging>bundle</packaging>
-    <name>WSO2 Carbon - Event Processor Manager components</name>
+    <name>WSO2 Carbon - Event Processor Manager Commons</name>
     <description>Provide management functionalities for different processing modes</description>
 
     <dependencies>
