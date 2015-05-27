@@ -66,7 +66,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
     }
 
     public DataEndpointGroup(HAType haType, DataEndpointAgent agent) {
-        this.dataEndpoints = new ArrayList<DataEndpoint>();
+        this.dataEndpoints = new ArrayList<>();
         this.haType = haType;
         this.reconnectionInterval = agent.getAgentConfiguration().getReconnectionInterval();
         this.eventQueue = new EventQueue(agent.getAgentConfiguration().getQueueSize());
@@ -95,6 +95,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
     class EventQueue {
         private RingBuffer<Event> ringBuffer;
         private Disruptor<Event> eventQueue;
+        private ExecutorService eventQueuePool;
 
         public final EventFactory<Event> EVENT_FACTORY = new EventFactory<Event>() {
             public Event newInstance() {
@@ -103,7 +104,8 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         };
 
         EventQueue(int queueSize) {
-            eventQueue = new Disruptor<Event>(EVENT_FACTORY, queueSize, Executors.newCachedThreadPool());
+            eventQueuePool = Executors.newCachedThreadPool();
+            eventQueue = new Disruptor<>(EVENT_FACTORY, queueSize, eventQueuePool);
             eventQueue.handleEventsWith(new EventQueueWorker());
             this.ringBuffer = eventQueue.start();
         }
@@ -156,6 +158,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
         private void shutdown() {
             eventQueue.shutdown();
+            eventQueuePool.shutdown();
         }
     }
 
@@ -256,7 +259,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
     }
 
     private List<Event> trySendActiveEndpoints(List<Event> events) {
-        ArrayList<Event> unsuccessfulEvents = new ArrayList<Event>();
+        ArrayList<Event> unsuccessfulEvents = new ArrayList<>();
         for (Event event : events) {
             DataEndpoint endpoint = getDataEndpoint(false);
             if (endpoint != null) {
