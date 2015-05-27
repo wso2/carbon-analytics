@@ -477,9 +477,6 @@
                 pageSize: 500,
                 </c:otherwise>
                 </c:choose>
-                selecting: true,
-                multiselect: true,
-                selectingCheckboxes: true,
                 actions: {
                     // For Details: http://jtable.org/Demo/FunctionsAsActions
                     listAction: function (postData, jtParams) {
