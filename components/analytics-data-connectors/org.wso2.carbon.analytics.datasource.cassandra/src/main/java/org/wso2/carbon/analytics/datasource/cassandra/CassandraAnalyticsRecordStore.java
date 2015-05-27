@@ -30,7 +30,6 @@ import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
-import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
@@ -161,7 +160,9 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
             return this.lookupRecordsByRS(tenantId, tableName, rs, columns);
         } else {
             ResultSet tsrs = this.session.execute("SELECT id FROM ARS.TS WHERE tenantId = ? AND tableName = ? AND timestamp >= ? AND timestamp < ?",
-                    tenantId, GenericUtils.normalizeTableName(tableName), recordGroup.getTimeFrom() * TS_MULTIPLIER, recordGroup.getTimeTo() * TS_MULTIPLIER);
+                    tenantId, GenericUtils.normalizeTableName(tableName), 
+                    recordGroup.getTimeFrom() == Long.MIN_VALUE ? recordGroup.getTimeFrom() : recordGroup.getTimeFrom() * TS_MULTIPLIER, 
+                    recordGroup.getTimeTo() == Long.MAX_VALUE ? recordGroup.getTimeTo() : recordGroup.getTimeTo() * TS_MULTIPLIER);
             List<String> ids = this.resultSetToIds(tsrs);
             return this.lookupRecordsByIds(tenantId, tableName, ids, columns);
         }
@@ -435,25 +436,6 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
             return ids;
         }
         
-    }
-    
-    public static void main(String[] args) throws Exception {
-        AnalyticsRecordStore x = new CassandraAnalyticsRecordStore();
-        Map<String, String> props = new HashMap<String, String>();
-        props.put("servers", "localhost");
-        x.init(props);
-        System.out.println("Start..");
-        
-        Iterator<Record> itr = x.readRecords(x.get(-1234, "ORG_WSO2_SAMPLE_HTTPD_LOGS", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, -1, 0)[0]);
-        int c = 0;
-        while (itr.hasNext()) {
-            if (c > 10) break;
-            System.out.println("-> " + itr.next());
-            c++;
-        }
-        
-        System.out.println("End.");
-        System.exit(0);
     }
 
 }
