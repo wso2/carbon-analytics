@@ -278,7 +278,7 @@ public class AnalyticsRecordStoreTest {
         this.analyticsRS.deleteTable(t2, tableName);
         this.analyticsRS.createTable(t1, tableName);
         this.analyticsRS.createTable(t2, tableName);
-        List<Record> records1 = generateRecords(t1, tableName, 1, 30, -1, -1);
+        List<Record> records1 = generateRecords(t1, tableName, 1, 1, -1, -1);
         List<Record> records2 = generateRecords(t2, tableName, 1, 40, -1, -1);
         this.analyticsRS.put(records1);
         this.analyticsRS.put(records2);

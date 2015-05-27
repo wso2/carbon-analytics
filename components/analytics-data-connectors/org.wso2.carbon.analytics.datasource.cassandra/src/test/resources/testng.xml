@@ -3,6 +3,7 @@
    <test name="Cassandra Tests">
      <classes>
         <!--class name="org.wso2.carbon.analytics.datasource.cassandra.CassandraAnalyticsFileSystemTest"/-->
+        <!--class name="org.wso2.carbon.analytics.datasource.cassandra.CassandraAnalyticsRecordStoreTest"/-->
      </classes>
    </test>
 </suite>

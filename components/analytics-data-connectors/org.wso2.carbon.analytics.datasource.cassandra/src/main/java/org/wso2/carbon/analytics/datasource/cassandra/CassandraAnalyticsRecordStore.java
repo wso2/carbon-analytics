@@ -67,7 +67,11 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     }
     
     private String generateTargetDataTableName(int tenantId, String tableName) {
-        return "DATA_" + tenantId + "_" + GenericUtils.normalizeTableName(tableName);
+        if (tenantId < 0) {
+            return "DATA_X" + Math.abs(tenantId) + "_" + GenericUtils.normalizeTableName(tableName);
+        } else {
+            return "DATA_" + tenantId + "_" + GenericUtils.normalizeTableName(tableName);
+        }
     }
 
     @Override
@@ -142,7 +146,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     
     private Iterator<Record> readRecordsByRange(CassandraRecordGroup recordGroup) throws AnalyticsException {
         int tenantId = recordGroup.getTenantId();
-        String tableName = GenericUtils.normalizeTableName(recordGroup.getTableName());
+        String tableName = recordGroup.getTableName();
         String dataTable = this.generateTargetDataTableName(tenantId, tableName);
         List<String> columns = recordGroup.getColumns();
         ResultSet rs;
@@ -151,7 +155,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
             return this.lookupRecordsByRS(tenantId, tableName, rs, columns);
         } else {
             ResultSet tsrs = this.session.execute("SELECT id FROM ARS.TS WHERE tenantId = ? AND tableName = ? AND timestamp >= ? AND timestamp < ?",
-                    tenantId, tableName, recordGroup.getTimeFrom() * TS_MULTIPLIER, recordGroup.getTimeTo() * TS_MULTIPLIER);
+                    tenantId, GenericUtils.normalizeTableName(tableName), recordGroup.getTimeFrom() * TS_MULTIPLIER, recordGroup.getTimeTo() * TS_MULTIPLIER);
             List<String> ids = this.resultSetToIds(tsrs);
             return this.lookupRecordsByIds(tenantId, tableName, ids, columns);
         }
@@ -168,7 +172,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     
     private Iterator<Record> readRecordsByIds(CassandraRecordGroup recordGroup) throws AnalyticsException {
         return this.lookupRecordsByIds(recordGroup.getTenantId(), 
-                GenericUtils.normalizeTableName(recordGroup.getTableName()), recordGroup.getIds(), recordGroup.getColumns());
+                recordGroup.getTableName(), recordGroup.getIds(), recordGroup.getColumns());
     }
     
     private Iterator<Record> lookupRecordsByIds(int tenantId, String tableName, List<String> ids, List<String> columns) {
@@ -258,7 +262,8 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
             ps = session.prepare("INSERT INTO ARS.TS (tenantId, tableName, timestamp, id) VALUES (?, ?, ?, ?)");
             stmt = new BatchStatement();
             for (Record record : batch) {
-                stmt.add(ps.bind(tenantId, tableName, this.toTSTableTimestamp(record.getTimestamp()), record.getId()));
+                stmt.add(ps.bind(record.getTenantId(), record.getTableName(), 
+                        this.toTSTableTimestamp(record.getTimestamp()), record.getId()));
             }
             this.session.execute(stmt);
         } catch (Exception e) {
@@ -273,6 +278,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     @Override
     public void setTableSchema(int tenantId, String tableName, AnalyticsSchema schema) throws AnalyticsTableNotAvailableException,
             AnalyticsException {
+        tableName = GenericUtils.normalizeTableName(tableName);
         try {
             this.session.execute("UPDATE ARS.META SET tableSchema = ? WHERE tenantId = ? AND tableName = ?", 
                 ByteBuffer.wrap(GenericUtils.serializeObject(schema)), tenantId, tableName);
@@ -287,6 +293,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
 
     @Override
     public boolean tableExists(int tenantId, String tableName) throws AnalyticsException {
+        tableName = GenericUtils.normalizeTableName(tableName);
         ResultSet rs = this.session.execute("SELECT tableSchema FROM ARS.META WHERE tenantId = ? AND tableName = ?", 
                 tenantId, tableName);
         return rs.iterator().hasNext();

@@ -143,4 +143,10 @@ public class Record implements Serializable {
         return result;
     }
     
+    @Override
+    public String toString() {
+        return "TID: " + this.getTenantId() + " Table Name: " + this.getTableName() + 
+                " ID: " + this.getId() + " Timestamp: " + this.getTimestamp() + " Values: " + this.getValues();
+    }
+    
 }
