@@ -86,7 +86,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private static final String CARBON_ANALYTICS_SPARK_APP_NAME = "CarbonAnalytics";
 
-    private static final String WORKER_CORES = "1";
+    private sere
+    tatic final String WORKER_CORES = "1";
 
     private static final String WORKER_MEMORY = "1g";
 
