@@ -269,8 +269,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
             ps = session.prepare("INSERT INTO ARS.TS (tenantId, tableName, timestamp, id) VALUES (?, ?, ?, ?)");
             stmt = new BatchStatement();
             for (Record record : batch) {
-                stmt.add(ps.bind(record.getTenantId(), record.getTableName(), 
-                        this.toTSTableTimestamp(record.getTimestamp()), record.getId()));
+                stmt.add(ps.bind(tenantId, tableName, this.toTSTableTimestamp(record.getTimestamp()), record.getId()));
             }
             this.session.execute(stmt);
         } catch (Exception e) {
