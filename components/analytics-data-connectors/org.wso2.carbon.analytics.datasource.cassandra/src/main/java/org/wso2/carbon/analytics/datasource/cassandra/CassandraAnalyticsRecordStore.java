@@ -130,7 +130,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     
     private Iterator<Record> readRecordsByRange(CassandraRecordGroup recordGroup) throws AnalyticsException {
         int tenantId = recordGroup.getTenantId();
-        String tableName = GenericUtils.normalizePath(recordGroup.getTableName());
+        String tableName = GenericUtils.normalizeTableName(recordGroup.getTableName());
         String dataTable = this.generateTargetDataTableName(tenantId, tableName);
         List<String> columns = recordGroup.getColumns();
         ResultSet rs;
@@ -140,6 +140,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         } else {
             ResultSet tsrs = this.session.execute("SELECT id FROM ARS.TS WHERE tenantId = ? AND tableName = ? AND timestamp >= ? AND timestamp < ?",
                     tenantId, tableName, recordGroup.getTimeFrom() * TS_MULTIPLIER, recordGroup.getTimeTo() * TS_MULTIPLIER);
+            System.out.println("J:" + tenantId + ":" + tableName + ":" + recordGroup.getTimeFrom() * TS_MULTIPLIER + ":" + recordGroup.getTimeTo() * TS_MULTIPLIER);
             List<Row> rows = tsrs.all();
             List<String> ids = new ArrayList<String>(rows.size());
             for (Row row : rows) {
@@ -425,6 +426,16 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         List<Record> records = AnalyticsRecordStoreTest.generateRecords(20, "Table1", 43, 100, System.currentTimeMillis(), 10);
         records.addAll(AnalyticsRecordStoreTest.generateRecords(21, "Table2", 43, 100, System.currentTimeMillis(), 10));
         x.put(records);
+        
+        //public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, long timeFrom, 
+        //long timeTo, int recordsFrom, int recordsCount) 
+        List<String> ids = new ArrayList<String>();
+        ids.add("14326968675030.027887209563738198");
+        ids.add("14326968675030.01835622596262782");
+        Iterator<Record> itr = x.readRecords(x.get(21, "Table2", 1, null, ids)[0]);
+        while (itr.hasNext()) {
+            System.out.println("-> " + itr.next());
+        }
         
         System.out.println("End.");
         System.exit(0);
