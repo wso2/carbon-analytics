@@ -132,10 +132,11 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         int tenantId = recordGroup.getTenantId();
         String tableName = GenericUtils.normalizePath(recordGroup.getTableName());
         String dataTable = this.generateTargetDataTableName(tenantId, tableName);
+        List<String> columns = recordGroup.getColumns();
         ResultSet rs;
         if (recordGroup.getTimeFrom() == Long.MIN_VALUE && recordGroup.getTimeTo() == Long.MAX_VALUE) {
             rs = this.session.execute("SELECT id, timestamp, data FROM ARS." + dataTable);
-            return this.lookupRecordsByRS(tenantId, tableName, rs);
+            return this.lookupRecordsByRS(tenantId, tableName, rs, columns);
         } else {
             ResultSet tsrs = this.session.execute("SELECT id FROM ARS.TS WHERE tenantId = ? AND tableName = ? AND timestamp >= ? AND timestamp < ?",
                     tenantId, tableName, recordGroup.getTimeFrom() * TS_MULTIPLIER, recordGroup.getTimeTo() * TS_MULTIPLIER);
@@ -144,23 +145,23 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
             for (Row row : rows) {
                 ids.add(row.getString(0));
             }
-            return this.lookupRecordsByIds(tenantId, tableName, ids);
+            return this.lookupRecordsByIds(tenantId, tableName, ids, columns);
         }
     }
     
     private Iterator<Record> readRecordsByIds(CassandraRecordGroup recordGroup) throws AnalyticsException {
         return this.lookupRecordsByIds(recordGroup.getTenantId(), 
-                GenericUtils.normalizeTableName(recordGroup.getTableName()), recordGroup.getIds());
+                GenericUtils.normalizeTableName(recordGroup.getTableName()), recordGroup.getIds(), recordGroup.getColumns());
     }
     
-    private Iterator<Record> lookupRecordsByIds(int tenantId, String tableName, List<String> ids) {
+    private Iterator<Record> lookupRecordsByIds(int tenantId, String tableName, List<String> ids, List<String> columns) {
         String dataTable = this.generateTargetDataTableName(tenantId, tableName);
         ResultSet rs = this.session.execute("SELECT id, timestamp, data FROM ARS." + dataTable + " WHERE id IN ?", ids);
-        return this.lookupRecordsByRS(tenantId, tableName, rs);
+        return this.lookupRecordsByRS(tenantId, tableName, rs, columns);
     }
     
-    private Iterator<Record> lookupRecordsByRS(int tenantId, String tableName, ResultSet rs) {
-        return null;
+    private Iterator<Record> lookupRecordsByRS(int tenantId, String tableName, ResultSet rs, List<String> columns) {
+        return new CassandraDataIterator(tenantId, tableName, rs, columns);
     }
 
     @Override
@@ -274,6 +275,63 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         return rs.iterator().hasNext();
     }
     
+    /**
+     * Cassandra data {@link Iterator} implementation for streaming.
+     */
+    public static class CassandraDataIterator implements Iterator<Record> {
+
+        private int tenantId;
+        
+        private String tableName;
+        
+        private List<String> columns;
+        
+        private Iterator<Row> resultSetItr;
+        
+        public CassandraDataIterator(int tenantId, String tableName, ResultSet rs, List<String> columns) {
+            this.tenantId = tenantId;
+            this.tableName = tableName;
+            this.columns = columns;
+            this.resultSetItr = rs.iterator();
+        }
+        
+        @Override
+        public boolean hasNext() {
+            return this.resultSetItr.hasNext();
+        }
+        
+        private byte[] extractBytes(ByteBuffer byteBuffer) {
+            byte[] data = new byte[byteBuffer.remaining()];
+            byteBuffer.get(data);
+            return data;
+        }
+
+        @Override
+        public Record next() {
+            Row row = this.resultSetItr.next();
+            Map<String, Object> values;
+            Map<String, ByteBuffer> binaryValues = row.getMap(2, String.class, ByteBuffer.class);
+            if (this.columns == null) {
+                values = new HashMap<String, Object>(binaryValues.size());
+                for (Map.Entry<String, ByteBuffer> binaryValue : binaryValues.entrySet()) {
+                    values.put(binaryValue.getKey(), GenericUtils.deserializeObject(this.extractBytes(binaryValue.getValue())));
+                }
+            } else {
+                values = new HashMap<String, Object>(this.columns.size());
+                for (String column : this.columns) {
+                    if (binaryValues.containsKey(column)) {
+                        values.put(column, GenericUtils.deserializeObject(this.extractBytes(binaryValues.get(column))));
+                    }
+                }
+            }
+            return new Record(row.getString(0), this.tenantId, this.tableName, values, row.getLong(1));
+        }
+        
+    }
+    
+    /**
+     * Cassandra {@link RecordGroup} implementation.
+     */
     public static class CassandraRecordGroup implements RecordGroup {
 
         private static final long serialVersionUID = 4922546772273816597L;
