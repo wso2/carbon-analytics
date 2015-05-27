@@ -243,7 +243,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         return toResult(this.sqlCtx.sql(query));
     }
 
-    //todo: update the test cases!
     private String encodeQueryWithTenantId(int tenantId, String query)
             throws AnalyticsExecutionException {
         String result = query;
