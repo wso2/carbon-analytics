@@ -42,46 +42,18 @@
                 </section>
 
                 <script>
-                    var sparkVersion = '1.2.1';
+                    var sparkVersion = '1.3.0';
                     $(document).ready(function () {
                         /* Start Ptty terminal */
                         $('#terminal').Ptty();
 
                         $.register_command(
-                                'define',
-                                'Defines the schema of a table',
-                                'DEFINE TABLE [table]',
-                                '../spark-management/execute_sparkquery_ajaxprocessor.jsp'
-                        );
-
-                        $.register_command(
-                                'select',
-                                'Execute a Spark SELECT query',
-                                'SELECT [query]',
-                                '../spark-management/execute_sparkquery_ajaxprocessor.jsp'
-                        );
-
-                        $.register_command(
-                                'insert',
-                                'Inserts data into tables',
-                                'INSERT INTO [query]',
-                                '../spark-management/execute_sparkquery_ajaxprocessor.jsp'
-                        );
-
-                        $.register_command(
-                                'create',
-                                'Creates a table in the underlying data source',
-                                'CREATE [TEMPORARY] TABLE [query]',
-                                '../spark-management/execute_sparkquery_ajaxprocessor.jsp'
-                        );
-
-                        $.register_command(
                                 'about',
                                 'Interactive Spark SQL shell',
-                                'about [no options]',
+                                'ABOUT [no options]',
                                 function () {
                                     var about = '<p>This interactive shell lets you execute Spark SQL commands against a local Spark cluster.<br>' +
-                                            'Running on Spark v'+ sparkVersion +'</p>';
+                                                'Running on Spark v' + sparkVersion + '</p>';
 
                                     return {
                                         type: 'print',
@@ -90,46 +62,72 @@
                                 }
                         );
 
-                        /* Register Commands and Callbacks*/
                         $.register_command(
-                                'date',
-                                'returns the current date',
-                                'date [no options]',
-                                function () {
-                                    var now = new Date();
-                                    return {
-                                        type: 'print',
-                                        out: now + ' '
-                                    };
-                                }
+                                'create temporary table',
+                                'Creates a table in the underlying data source. Data source can be specified from the corresponding relation provider class. ' +
+                                'Relevant provider options should be specified within the \'OPTIONS\' paranthesis. \n' +
+                                'For default DAS Data Sources, use \'CarbonAnalytics\' as the provider class. \n' +
+                                'Ex: CREATE TEMPORARY TABLE students_table USING CarbonAnalytics OPTIONS (tableName \"students\", schema \"name STRING, marks INTEGER\")',
+                                'CREATE TEMPORARY TABLE [table name] USING [CarbonAnalytics | relation provider class] OPTIONS ( [comma separated options] )',
+                                '../spark-management/execute_sparkquery_ajaxprocessor.jsp'
                         );
 
+                        $.register_command(
+                                'select',
+                                'Execute a Spark SQL SELECT query\n' +
+                                'Ex: select * from students_table',
+                                'SELECT [sql query]',
+                                '../spark-management/execute_sparkquery_ajaxprocessor.jsp'
+                        );
+
+                        $.register_command(
+                                'insert',
+                                'Inserts data into tables. These tables needs to be created before inserting.\n' +
+                                'Ex: insert into table temp_table select * from students_table',
+                                'INSERT [INTO | OVERWRITE] TABLE [table name] [sql query]',
+                                '../spark-management/execute_sparkquery_ajaxprocessor.jsp'
+                        );
+
+                        /* Register Commands and Callbacks*/
+//                        $.register_command(
+//                                'date',
+//                                'returns the current date',
+//                                'date [no options]',
+//                                function () {
+//                                    var now = new Date();
+//                                    return {
+//                                        type: 'print',
+//                                        out: now + ' '
+//                                    };
+//                                }
+//                        );
+
                         // Typewriter effect callback
-                        $.register_callback('typewriter', function (data) {
-                            var text_input = $('.cmd_terminal_prompt');
-                            text_input.hide();
-                            if (typeof data.write === 'string') {
-                                // decode special entities.
-                                var str = $('<div/>').html(data.write + ' ').text(),
-                                        typebox = $('<div></div>').appendTo('.cmd_terminal_content'),
-                                        i = 0,
-                                        isTag,
-                                        text;
-                                (function typewriter() {
-                                    text = str.slice(0, ++i);
-                                    if (text === str) return text_input.show();
-
-                                    typebox.html(text);
-
-                                    var char = text.slice(-1);
-                                    if (char === '<') isTag = true;
-                                    if (char === '>') isTag = false;
-
-                                    if (isTag) return typewriter();
-                                    setTimeout(typewriter, 40);
-                                }());
-                            }
-                        });
+//                        $.register_callback('typewriter', function (data) {
+//                            var text_input = $('.cmd_terminal_prompt');
+//                            text_input.hide();
+//                            if (typeof data.write === 'string') {
+//                                // decode special entities.
+//                                var str = $('<div/>').html(data.write + ' ').text(),
+//                                        typebox = $('<div></div>').appendTo('.cmd_terminal_content'),
+//                                        i = 0,
+//                                        isTag,
+//                                        text;
+//                                (function typewriter() {
+//                                    text = str.slice(0, ++i);
+//                                    if (text === str) return text_input.show();
+//
+//                                    typebox.html(text);
+//
+//                                    var char = text.slice(-1);
+//                                    if (char === '<') isTag = true;
+//                                    if (char === '>') isTag = false;
+//
+//                                    if (isTag) return typewriter();
+//                                    setTimeout(typewriter, 40);
+//                                }());
+//                            }
+//                        });
 
                     });
                 </script>
