@@ -125,12 +125,18 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, long timeFrom, 
             long timeTo, int recordsFrom, int recordsCount) 
             throws AnalyticsException, AnalyticsTableNotAvailableException {
+        if (!this.tableExists(tenantId, tableName)) {
+            throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+        }
         return new RecordGroup[] { new CassandraRecordGroup(tenantId, tableName, columns, timeFrom, timeTo) };
     }
 
     @Override
     public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, 
             List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
+        if (!this.tableExists(tenantId, tableName)) {
+            throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+        }
         return new RecordGroup[] { new CassandraRecordGroup(tenantId, tableName, columns, ids) };
     }
     
