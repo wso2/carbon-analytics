@@ -135,9 +135,12 @@ var STAT = "statistics";
 var TRACE = "Tracing";
 
 function deleteEventPublisher(eventPublisherName) {
-    var theform = document.getElementById('deleteForm');
-    theform.eventPublisher.value = eventPublisherName;
-    theform.submit();
+    CARBON.showConfirmationDialog(
+        "Are you sure want to delete event publisher: " + eventPublisherName + "?", function () {
+            var theform = document.getElementById('deleteForm');
+            theform.eventPublisher.value = eventPublisherName;
+            theform.submit();
+        }, null, null);
 }
 
 function disablePublisherStat(eventPublisherName) {
