@@ -47,6 +47,7 @@ import com.datastax.driver.core.Session;
 public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
 
     private static final int TS_MULTIPLIER = 100000;
+    
     private Session session;
     
     @Override
@@ -81,12 +82,23 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     @Override
     public void delete(int tenantId, String tableName, long timeFrom, long timeTo) 
             throws AnalyticsException, AnalyticsTableNotAvailableException {
-        
+        tableName = GenericUtils.normalizeTableName(tableName);
+        ResultSet rs = this.session.execute("SELECT id FROM ARS.TS WHERE tenantId = ? AND tableName = ? AND timestamp >= ? AND timestamp < ?",
+                tenantId, tableName, timeFrom == Long.MIN_VALUE ? timeFrom : timeFrom * TS_MULTIPLIER, 
+                        timeTo == Long.MAX_VALUE ? timeTo : timeTo * TS_MULTIPLIER);
+        List<String> ids = this.resultSetToIds(rs);
+        this.delete(tenantId, tableName, ids);
+        /** this.session.execute("DELETE FROM ARS.TS WHERE tenantId = ? AND tableName = ? AND timestamp >= ? AND timestamp < ?",
+                tenantId, tableName, timeFrom == Long.MAX_VALUE ? timeFrom : timeFrom * TS_MULTIPLIER, 
+                        timeTo == Long.MIN_VALUE ? timeTo : timeTo * TS_MULTIPLIER); **/
     }
 
     @Override
     public void delete(int tenantId, String tableName, List<String> ids) 
             throws AnalyticsException, AnalyticsTableNotAvailableException {
+        String dataTable = this.generateTargetDataTableName(tenantId, tableName);
+        this.session.execute("DELETE FROM ARS." + dataTable + " WHERE id IN ?", ids);
+        /* should delete the TS ids also */
     }
 
     @Override
@@ -140,14 +152,18 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         } else {
             ResultSet tsrs = this.session.execute("SELECT id FROM ARS.TS WHERE tenantId = ? AND tableName = ? AND timestamp >= ? AND timestamp < ?",
                     tenantId, tableName, recordGroup.getTimeFrom() * TS_MULTIPLIER, recordGroup.getTimeTo() * TS_MULTIPLIER);
-            System.out.println("J:" + tenantId + ":" + tableName + ":" + recordGroup.getTimeFrom() * TS_MULTIPLIER + ":" + recordGroup.getTimeTo() * TS_MULTIPLIER);
-            List<Row> rows = tsrs.all();
-            List<String> ids = new ArrayList<String>(rows.size());
-            for (Row row : rows) {
-                ids.add(row.getString(0));
-            }
+            List<String> ids = this.resultSetToIds(tsrs);
             return this.lookupRecordsByIds(tenantId, tableName, ids, columns);
         }
+    }
+    
+    private List<String> resultSetToIds(ResultSet rs) {
+        List<Row> rows = rs.all();
+        List<String> ids = new ArrayList<String>(rows.size());
+        for (Row row : rows) {
+            ids.add(row.getString(0));
+        }
+        return ids;
     }
     
     private Iterator<Record> readRecordsByIds(CassandraRecordGroup recordGroup) throws AnalyticsException {
@@ -430,9 +446,15 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         //public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, long timeFrom, 
         //long timeTo, int recordsFrom, int recordsCount) 
         List<String> ids = new ArrayList<String>();
-        ids.add("14326968675030.027887209563738198");
-        ids.add("14326968675030.01835622596262782");
+        ids.add("14326968675030.17803871774693977");
+        ids.add("14326968675030.2092802183285299");
         Iterator<Record> itr = x.readRecords(x.get(21, "Table2", 1, null, ids)[0]);
+        while (itr.hasNext()) {
+            System.out.println("-> " + itr.next());
+        }
+        
+        x.delete(21, "Table2", Long.MIN_VALUE, Long.MAX_VALUE);
+        itr = x.readRecords(x.get(21, "Table2", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1)[0]);
         while (itr.hasNext()) {
             System.out.println("-> " + itr.next());
         }
