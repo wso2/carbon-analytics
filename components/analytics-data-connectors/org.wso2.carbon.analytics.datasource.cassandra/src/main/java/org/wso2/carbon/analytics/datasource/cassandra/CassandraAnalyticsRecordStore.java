@@ -109,17 +109,57 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, long timeFrom, 
             long timeTo, int recordsFrom, int recordsCount) 
             throws AnalyticsException, AnalyticsTableNotAvailableException {
-        return null;
+        return new RecordGroup[] { new CassandraRecordGroup(tenantId, tableName, columns, timeFrom, timeTo) };
     }
 
     @Override
     public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, 
             List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
-        return null;
+        return new RecordGroup[] { new CassandraRecordGroup(tenantId, tableName, columns, ids) };
     }
     
     @Override
     public Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException {
+        CassandraRecordGroup crg = (CassandraRecordGroup) recordGroup;
+        if (crg.isByIds()) {
+            return this.readRecordsByIds(crg);
+        } else {
+            return this.readRecordsByRange(crg);
+        }
+    }
+    
+    private Iterator<Record> readRecordsByRange(CassandraRecordGroup recordGroup) throws AnalyticsException {
+        int tenantId = recordGroup.getTenantId();
+        String tableName = GenericUtils.normalizePath(recordGroup.getTableName());
+        String dataTable = this.generateTargetDataTableName(tenantId, tableName);
+        ResultSet rs;
+        if (recordGroup.getTimeFrom() == Long.MIN_VALUE && recordGroup.getTimeTo() == Long.MAX_VALUE) {
+            rs = this.session.execute("SELECT id, timestamp, data FROM ARS." + dataTable);
+            return this.lookupRecordsByRS(tenantId, tableName, rs);
+        } else {
+            ResultSet tsrs = this.session.execute("SELECT id FROM ARS.TS WHERE tenantId = ? AND tableName = ? AND timestamp >= ? AND timestamp < ?",
+                    tenantId, tableName, recordGroup.getTimeFrom() * TS_MULTIPLIER, recordGroup.getTimeTo() * TS_MULTIPLIER);
+            List<Row> rows = tsrs.all();
+            List<String> ids = new ArrayList<String>(rows.size());
+            for (Row row : rows) {
+                ids.add(row.getString(0));
+            }
+            return this.lookupRecordsByIds(tenantId, tableName, ids);
+        }
+    }
+    
+    private Iterator<Record> readRecordsByIds(CassandraRecordGroup recordGroup) throws AnalyticsException {
+        return this.lookupRecordsByIds(recordGroup.getTenantId(), 
+                GenericUtils.normalizeTableName(recordGroup.getTableName()), recordGroup.getIds());
+    }
+    
+    private Iterator<Record> lookupRecordsByIds(int tenantId, String tableName, List<String> ids) {
+        String dataTable = this.generateTargetDataTableName(tenantId, tableName);
+        ResultSet rs = this.session.execute("SELECT id, timestamp, data FROM ARS." + dataTable + " WHERE id IN ?", ids);
+        return this.lookupRecordsByRS(tenantId, tableName, rs);
+    }
+    
+    private Iterator<Record> lookupRecordsByRS(int tenantId, String tableName, ResultSet rs) {
         return null;
     }
 
@@ -232,6 +272,76 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         ResultSet rs = this.session.execute("SELECT tableSchema FROM ARS.META WHERE tenantId = ? AND tableName = ?", 
                 tenantId, tableName);
         return rs.iterator().hasNext();
+    }
+    
+    public static class CassandraRecordGroup implements RecordGroup {
+
+        private static final long serialVersionUID = 4922546772273816597L;
+        
+        private boolean byIds;
+        
+        private int tenantId;
+        
+        private String tableName;
+        
+        private List<String> columns;
+        
+        private long timeFrom;
+        
+        private long timeTo;
+        
+        private List<String> ids;
+        
+        public CassandraRecordGroup(int tenantId, String tableName, List<String> columns, long timeFrom, long timeTo) {
+            this.tenantId = tenantId;
+            this.tableName = tableName;
+            this.columns = columns;
+            this.timeFrom = timeFrom;
+            this.timeTo = timeTo;
+            this.byIds = false;
+        }
+        
+        public CassandraRecordGroup(int tenantId, String tableName, List<String> columns, List<String> ids) {
+            this.tenantId = tenantId;
+            this.tableName = tableName;
+            this.columns = columns;
+            this.ids = ids;
+            this.byIds = true;
+        }
+
+        @Override
+        public String[] getLocations() throws AnalyticsException {
+            return new String[] { "localhost" };
+        }
+        
+        public boolean isByIds() {
+            return byIds;
+        }
+        
+        public int getTenantId() {
+            return tenantId;
+        }
+        
+        public String getTableName() {
+            return tableName;
+        }
+        
+        public List<String> getColumns() {
+            return columns;
+        }
+        
+        public long getTimeFrom() {
+            return timeFrom;
+        }
+        
+        public long getTimeTo() {
+            return timeTo;
+        }
+
+        public List<String> getIds() {
+            return ids;
+        }
+        
     }
     
     public static void main(String[] args) throws Exception {
