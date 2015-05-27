@@ -357,6 +357,11 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
             return new Record(row.getString(0), this.tenantId, this.tableName, values, row.getLong(1));
         }
         
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+        
     }
     
     /**
@@ -439,37 +444,12 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         x.init(props);
         System.out.println("Start..");
         
-        x.createTable(1, "T1");
-        x.createTable(1, "T2");
-        x.createTable(1, "T3");
-        x.createTable(2, "TX");
-        x.setTableSchema(1, "T2", new AnalyticsSchema());
-        System.out.println("A:" + x.getTableSchema(1, "T2"));
-        x.deleteTable(1, "T3");
-        System.out.println("B:" + x.tableExists(1, "T3"));
-        System.out.println("X:" + x.listTables(1));
-        System.out.println("Y:" + x.listTables(2));
-        
-        x.createTable(20, "Table1");
-        x.createTable(21, "Table2");
-        List<Record> records = AnalyticsRecordStoreTest.generateRecords(20, "Table1", 43, 100, System.currentTimeMillis(), 10);
-        records.addAll(AnalyticsRecordStoreTest.generateRecords(21, "Table2", 43, 100, System.currentTimeMillis(), 10));
-        x.put(records);
-        
-        //public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, long timeFrom, 
-        //long timeTo, int recordsFrom, int recordsCount) 
-        List<String> ids = new ArrayList<String>();
-        ids.add("14326968675030.17803871774693977");
-        ids.add("14326968675030.2092802183285299");
-        Iterator<Record> itr = x.readRecords(x.get(21, "Table2", 1, null, ids)[0]);
+        Iterator<Record> itr = x.readRecords(x.get(-1234, "ORG_WSO2_SAMPLE_HTTPD_LOGS", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, -1, 0)[0]);
+        int c = 0;
         while (itr.hasNext()) {
+            if (c > 10) break;
             System.out.println("-> " + itr.next());
-        }
-        
-        x.delete(21, "Table2", Long.MIN_VALUE, Long.MAX_VALUE);
-        itr = x.readRecords(x.get(21, "Table2", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1)[0]);
-        while (itr.hasNext()) {
-            System.out.println("-> " + itr.next());
+            c++;
         }
         
         System.out.println("End.");
