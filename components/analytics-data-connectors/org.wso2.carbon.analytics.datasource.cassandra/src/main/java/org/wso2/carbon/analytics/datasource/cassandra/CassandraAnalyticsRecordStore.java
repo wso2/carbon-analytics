@@ -19,6 +19,7 @@ package org.wso2.carbon.analytics.datasource.cassandra;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -29,10 +30,13 @@ import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
+import com.datastax.driver.core.BatchStatement;
 import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
@@ -42,6 +46,7 @@ import com.datastax.driver.core.Session;
  */
 public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
 
+    private static final int TS_MULTIPLIER = 100000;
     private Session session;
     
     @Override
@@ -56,22 +61,17 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
                 + "{'class':'SimpleStrategy', 'replication_factor':3};");
         this.session.execute("CREATE TABLE IF NOT EXISTS ARS.META (tenantId INT, "
                 + "tableName VARCHAR, tableSchema BLOB, PRIMARY KEY (tenantId, tableName))");
+        this.session.execute("CREATE TABLE IF NOT EXISTS ARS.TS (tenantId INT, "
+                + "tableName VARCHAR, timestamp BIGINT, id VARCHAR, PRIMARY KEY ((tenantId, tableName), timestamp))");
     }
     
     private String generateTargetDataTableName(int tenantId, String tableName) {
         return "DATA_" + tenantId + "_" + GenericUtils.normalizeTableName(tableName);
     }
-    
-    private String generateTargetTSTableName(int tenantId, String tableName) {
-        return "TS_" + tenantId + "_" + GenericUtils.normalizeTableName(tableName);
-    }
 
     @Override
     public void createTable(int tenantId, String tableName) throws AnalyticsException {
-        String tsTable = this.generateTargetTSTableName(tenantId, tableName);
         String dataTable = this.generateTargetDataTableName(tenantId, tableName);
-        this.session.execute("CREATE TABLE IF NOT EXISTS ARS." + tsTable +
-                " (timestamp BIGINT, id VARCHAR, PRIMARY KEY (timestamp, id))");
         this.session.execute("CREATE TABLE IF NOT EXISTS ARS." + dataTable +
                 " (id VARCHAR, timestamp BIGINT, data MAP<VARCHAR, BLOB>, PRIMARY KEY (id))");
         this.session.execute("INSERT INTO ARS.META (tenantId, tableName) VALUES (?, ?)", 
@@ -91,11 +91,11 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
 
     @Override
     public void deleteTable(int tenantId, String tableName) throws AnalyticsException {
+        tableName = GenericUtils.normalizeTableName(tableName);
         this.session.execute("DELETE FROM ARS.META WHERE tenantId = ? AND tableName = ?", tenantId, tableName);
-        String tsTable = this.generateTargetTSTableName(tenantId, tableName);
         String dataTable = this.generateTargetDataTableName(tenantId, tableName);
+        this.session.execute("DELETE FROM ARS.TS WHERE tenantId = ? AND tableName = ?", tenantId, tableName);
         this.session.execute("DROP TABLE IF EXISTS ARS." + dataTable);
-        this.session.execute("DROP TABLE IF EXISTS ARS." + tsTable);
     }
 
     @Override
@@ -166,7 +166,50 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     }
 
     @Override
-    public void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {        
+    public void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
+        Collection<List<Record>> batches = GenericUtils.generateRecordBatches(records);
+        for (List<Record> batch : batches) {
+            this.addBatch(batch);
+        }
+    }
+    
+    private Map<String, ByteBuffer> getDataMapFromValues(Map<String, Object> values) {
+        Map<String, ByteBuffer> result = new HashMap<String, ByteBuffer>(values.size());
+        for (Map.Entry<String, Object> entry : values.entrySet()) {
+            result.put(entry.getKey(), ByteBuffer.wrap(GenericUtils.serializeObject(entry.getValue())));
+        }
+        return result;
+    }
+    
+    private long toTSTableTimestamp(long timestamp) {
+        return timestamp * TS_MULTIPLIER + (int) (Math.random() * TS_MULTIPLIER);
+    }
+    
+    private void addBatch(List<Record> batch) throws AnalyticsException, AnalyticsTableNotAvailableException {
+        Record firstRecord = batch.get(0);
+        int tenantId = firstRecord.getTenantId();
+        String tableName = GenericUtils.normalizeTableName(firstRecord.getTableName());
+        try {                
+            String dataTable = this.generateTargetDataTableName(tenantId, tableName);
+            PreparedStatement ps = session.prepare("INSERT INTO ARS." + dataTable +" (id, timestamp, data) VALUES (?, ?, ?)");
+            BatchStatement stmt = new BatchStatement();
+            for (Record record : batch) {
+                stmt.add(ps.bind(record.getId(), record.getTimestamp(), this.getDataMapFromValues(record.getValues())));
+            }
+            this.session.execute(stmt);
+            ps = session.prepare("INSERT INTO ARS.TS (tenantId, tableName, timestamp, id) VALUES (?, ?, ?, ?)");
+            stmt = new BatchStatement();
+            for (Record record : batch) {
+                stmt.add(ps.bind(tenantId, tableName, this.toTSTableTimestamp(record.getTimestamp()), record.getId()));
+            }
+            this.session.execute(stmt);
+        } catch (Exception e) {
+            if (!this.tableExists(tenantId, tableName)) {
+                throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+            } else {
+                throw new AnalyticsException("Error in adding record batch: " + e.getMessage(), e);
+            }
+        }
     }
 
     @Override
@@ -208,6 +251,13 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         System.out.println("B:" + x.tableExists(1, "T3"));
         System.out.println("X:" + x.listTables(1));
         System.out.println("Y:" + x.listTables(2));
+        
+        x.createTable(20, "Table1");
+        x.createTable(21, "Table2");
+        List<Record> records = AnalyticsRecordStoreTest.generateRecords(20, "Table1", 43, 100, System.currentTimeMillis(), 10);
+        records.addAll(AnalyticsRecordStoreTest.generateRecords(21, "Table2", 43, 100, System.currentTimeMillis(), 10));
+        x.put(records);
+        
         System.out.println("End.");
         System.exit(0);
     }
