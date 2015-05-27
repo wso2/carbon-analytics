@@ -23,7 +23,6 @@ import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.deployment.repository.util.DeploymentFileData;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.eventsink.exception.AnalyticsEventStoreException;
 import org.wso2.carbon.analytics.eventsink.exception.AnalyticsEventStoreDeploymentException;
@@ -42,13 +41,13 @@ import java.util.List;
 
 /**
  * Analytics Event Store deployer which basically combines the streams and tables connectivity.
- *
  */
 
 public class AnalyticsEventStoreDeployer extends AbstractDeployer {
     private static Log log = LogFactory.getLog(AnalyticsEventStoreDeployer.class);
     private static List<DeploymentFileData> pausedDeployments = new ArrayList<>();
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void init(ConfigurationContext configurationContext) {
         File deployementDir = new File(MultitenantUtils.getAxis2RepositoryPath(CarbonContext.getThreadLocalCarbonContext().
@@ -111,15 +110,8 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
         AnalyticsEventStore existingEventStore = AnalyticsEventStoreManager.getInstance().removeEventStoreConfiguration(tenantId,
                 eventStoreName);
         if (existingEventStore != null) {
-            try {
-                for (String streamId : existingEventStore.getEventSource().getStreamIds()) {
-                    ServiceHolder.getAnalyticsEventStreamListener().unsubscribeFromStream(tenantId, streamId);
-                }
-                ServiceHolder.getAnalyticsDataService().
-                        setTableSchema(tenantId, eventStoreName, new AnalyticsSchema());
-            } catch (AnalyticsException e) {
-                throw new AnalyticsEventStoreDeploymentException("Error while setting empty schema for the table :"
-                        + eventStoreName, e);
+            for (String streamId : existingEventStore.getEventSource().getStreamIds()) {
+                ServiceHolder.getAnalyticsEventStreamListener().unsubscribeFromStream(tenantId, streamId);
             }
         }
         log.info("Undeployed successfully analytics event store : " + fileName);
@@ -129,7 +121,7 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
         return pausedDeployments;
     }
 
-    public static void clearPausedDeployments(){
+    public static void clearPausedDeployments() {
         pausedDeployments = null;
     }
 
