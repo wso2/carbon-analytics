@@ -30,6 +30,9 @@ public class EventConverter {
 
         int attributeIndex = 0;
 
+        long timeStamp = (Long)objArray[0];
+        attributeIndex++;
+
         if (streamDefinition.getMetaData() != null) { // If there is at least 1 meta data field
             metaSize = streamDefinition.getMetaData().size();
             metaAttributes = new Object[metaSize];
@@ -52,7 +55,7 @@ public class EventConverter {
             }
         }
 
-        return new Event(streamDefinition.getStreamId(), System.currentTimeMillis(), metaAttributes, correlationAttributes, payloadAttributes);
+        return new Event(streamDefinition.getStreamId(), timeStamp, metaAttributes, correlationAttributes, payloadAttributes);
     }
 
     public static Object[] convertToEventData(Event event, boolean metaFlag, boolean correlationFlag, boolean payloadFlag, int size) {
