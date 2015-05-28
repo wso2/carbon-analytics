@@ -20,7 +20,6 @@ import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
-import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsCategoryPathBean;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.webservice.beans.EventBean;
@@ -46,38 +45,9 @@ import java.util.Map;
  * This class represents a set of utility functionalities for the analytics REST API.
  */
 public class Utils {
-    /**
-     * Gets the records from record beans.
-     *
-     * @param recordBeans the record beans
-     * @return the records from record beans
-     * @throws AnalyticsException if the tableName is not specified
-     *//*
-    public static List<Record> getRecords(String username, List<RecordBean> recordBeans) throws AnalyticsException {
-        List<Record> records = new ArrayList<>();
-        int tenantId = getTenantId(username);
-        if (recordBeans != null) {
-            for (RecordBean recordBean : recordBeans) {
-                if (recordBean != null) {
-                    if (recordBean.getTableName().isEmpty()) {
-                        throw new AnalyticsException("TableName cannot be empty!");
-                    }
-                    records.add(new Record(recordBean.getId(), tenantId, recordBean.getTableName(), validateAndReturn(recordBean.getValues())));
-                }
-            }
-        }
-        return records;
-    }*/
 
-    /*private static Map<String, Object> validateAndReturn(RecordValueEntryBean[] values) {
-        Map<String, Object> valueMap = new LinkedHashMap<>();
-        if (values != null) {
-            for (RecordValueEntryBean recordEntry : values) {
-                valueMap.put(recordEntry.getFieldName(), getValue(recordEntry));
-            }
-        }
-        return valueMap;
-    }*/
+    private Utils() {
+    }
 
     /**
      * Creates the record beans from records.
@@ -150,30 +120,6 @@ public class Utils {
     }
 
     /**
-     * Create a Analytics schema from a bean class
-     *
-     * @param analyticsSchemaBean bean table schema to be converted to Analytics Schema.
-     * @return Analytics schema
-     *//*
-    public static AnalyticsSchema createAnalyticsSchema(AnalyticsSchemaBean analyticsSchemaBean) {
-        List<ColumnDefinition> columnTypes = new ArrayList<>();
-        if (analyticsSchemaBean == null) {
-            return null;
-        }
-        if (analyticsSchemaBean.getColumns() != null) {
-            for (SchemaColumnBean columnBean : analyticsSchemaBean.getColumns()) {
-                columnTypes.add(getColumnDefinition(columnBean.getColumnName(), columnBean.getColumnType(), 
-                        columnBean.isIndex(), columnBean.isScoreParam()));
-            }
-        }
-        List<String> primaryKeys = null;
-        if (analyticsSchemaBean.getPrimaryKeys() != null) {
-            primaryKeys = Arrays.asList(analyticsSchemaBean.getPrimaryKeys());
-        }
-        return new AnalyticsSchema(columnTypes, primaryKeys);
-    }*/
-
-    /**
      * Create table schema bean from a analytics schema
      *
      * @param analyticsSchema Analytics schema to be converted to table schema bean
@@ -203,46 +149,6 @@ public class Utils {
     }
 
     /**
-     * Converts a column type bean to ColumnType.
-     *//*
-    private static ColumnDefinition getColumnDefinition(String name, String type, boolean isIndex,
-                                                        boolean isScoreParam) {
-        ColumnDefinition columnDefinition = new ColumnDefinition();
-        switch (type) {
-            case RecordValueEntryBean.STRING:
-                columnDefinition.setType(ColumnType.STRING);
-                break;
-            case RecordValueEntryBean.INTEGER:
-                columnDefinition.setType(ColumnType.INTEGER);
-                break;
-            case RecordValueEntryBean.LONG:
-                columnDefinition.setType(ColumnType.LONG);
-                break;
-            case RecordValueEntryBean.FLOAT:
-                columnDefinition.setType(ColumnType.FLOAT);
-                break;
-            case RecordValueEntryBean.DOUBLE:
-                columnDefinition.setType(ColumnType.DOUBLE);
-                break;
-            case RecordValueEntryBean.BOOLEAN:
-                columnDefinition.setType(ColumnType.BOOLEAN);
-                break;
-            case RecordValueEntryBean.BINARY:
-                columnDefinition.setType(ColumnType.BINARY);
-                break;
-            case RecordValueEntryBean.FACET:
-                columnDefinition.setType(ColumnType.FACET);
-                break;
-            default:
-                columnDefinition.setType(ColumnType.STRING);
-        }
-        columnDefinition.setName(name);
-        columnDefinition.setIndexed(isIndex);
-        columnDefinition.setScoreParam(isScoreParam);
-        return columnDefinition;
-    }*/
-
-    /**
      * convert a column type to bean type
      *
      * @param columnDefinition the ColumnType to be converted to bean type
@@ -270,57 +176,6 @@ public class Utils {
                 return RecordValueEntryBean.STRING;
         }
     }
-
-    /*private static int getTenantId(String username) throws AnalyticsException {
-        try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(username);
-            return AnalyticsServiceHolder.getRealmService().getTenantManager().getTenantId(tenantDomain);
-        } catch (UserStoreException e) {
-            throw new AnalyticsException("Unable to get tenantId for user: " + username, e);
-        }
-    }*/
-
-    /*private static Object getValue(RecordValueEntryBean recordValueEntryBean) {
-        Object resultObj;
-        switch (recordValueEntryBean.getType()) {
-            case RecordValueEntryBean.STRING: {
-                resultObj = recordValueEntryBean.getStringValue();
-                break;
-            }
-            case RecordValueEntryBean.INTEGER: {
-                resultObj = recordValueEntryBean.getIntValue();
-                break;
-            }
-            case RecordValueEntryBean.LONG: {
-                resultObj = recordValueEntryBean.getLongValue();
-                break;
-            }
-            case RecordValueEntryBean.BOOLEAN: {
-                resultObj = recordValueEntryBean.getBooleanValue();
-                break;
-            }
-            case RecordValueEntryBean.FLOAT: {
-                resultObj = recordValueEntryBean.getFloatValue();
-                break;
-            }
-            case RecordValueEntryBean.DOUBLE: {
-                resultObj = recordValueEntryBean.getDoubleValue();
-                break;
-            }
-            case RecordValueEntryBean.FACET: {
-                List<String> analyticsCategoryPath = new ArrayList<>();
-                if (recordValueEntryBean.getAnalyticsCategoryPathBeanValue() != null) {
-                    analyticsCategoryPath.addAll(Arrays.asList(recordValueEntryBean.getAnalyticsCategoryPathBeanValue().getPath()));
-                }
-                resultObj = analyticsCategoryPath;
-                break;
-            }
-            default: {
-                resultObj = recordValueEntryBean.getStringValue();
-            }
-        }
-        return resultObj;
-    }*/
 
     private static RecordValueEntryBean getRecordValueEntryBean(String fieldName, Object value) {
         RecordValueEntryBean recordValueEntryBean = new RecordValueEntryBean();
@@ -463,7 +318,7 @@ public class Utils {
     }
 
     private static Object[] getEventData(RecordValueEntryBean[] valueEntryBeans, List<Attribute> columns)
-            throws AnalyticsWebServiceException, NumberFormatException {
+            throws AnalyticsWebServiceException {
         List<Object> values = new ArrayList<>();
         Map<String, AttributeType> columnMap = new HashMap<>();
         if (columns != null) {
@@ -520,10 +375,18 @@ public class Utils {
         List<Attribute> metaData = streamDefinition.getMetaData();
         List<Attribute> correlationData = streamDefinition.getCorrelationData();
         List<Attribute> payloadData = streamDefinition.getPayloadData();
-        if (tags != null) bean.setTags(tags.toArray(new String[tags.size()]));
-        if (metaData != null) bean.setMetaData(createStreamDefAttributes(metaData));
-        if (correlationData != null) bean.setCorrelationData(createStreamDefAttributes(correlationData));
-        if (payloadData != null) bean.setPayloadData(createStreamDefAttributes(payloadData));
+        if (tags != null) {
+            bean.setTags(tags.toArray(new String[tags.size()]));
+        }
+        if (metaData != null) {
+            bean.setMetaData(createStreamDefAttributes(metaData));
+        }
+        if (correlationData != null) {
+            bean.setCorrelationData(createStreamDefAttributes(correlationData));
+        }
+        if (payloadData != null) {
+            bean.setPayloadData(createStreamDefAttributes(payloadData));
+        }
         return bean;
     }
 

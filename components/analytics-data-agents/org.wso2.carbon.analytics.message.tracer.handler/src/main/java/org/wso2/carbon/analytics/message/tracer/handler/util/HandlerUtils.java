@@ -36,19 +36,22 @@ import java.util.Map;
 
 public class HandlerUtils {
 
-    private static Log log = LogFactory.getLog(HandlerUtils.class);
+    private static final Log LOG = LogFactory.getLog(HandlerUtils.class);
+
+    private HandlerUtils() {
+    }
 
     public static String getUniqueId() {
-        return (String.valueOf(System.nanoTime()) + Math.round(Math.random() * 123456789));
+        return String.valueOf(System.nanoTime()) + Math.round(Math.random() * 123456789);
     }
 
     public static void logTracingInfo(TracingInfo tracingInfo) {
-        log.info("Massage Info: Transaction id=" + tracingInfo.getActivityId() +
-                "  Message direction=" + tracingInfo.getMessageDirection() +
-                "  Server name=" + tracingInfo.getHost() +
-                "  Timestamp=" + tracingInfo.getTimestamp() +
-                "  Service name=" + tracingInfo.getServiceName() +
-                "  Operation Name=" + tracingInfo.getOperationName());
+        LOG.info("Massage Info: Transaction id=" + tracingInfo.getActivityId() +
+                 "  Message direction=" + tracingInfo.getMessageDirection() +
+                 "  Server name=" + tracingInfo.getHost() +
+                 "  Timestamp=" + tracingInfo.getTimestamp() +
+                 "  Service name=" + tracingInfo.getServiceName() +
+                 "  Operation Name=" + tracingInfo.getOperationName());
     }
 
     public static Document convertToDocument(File file) throws Exception {
@@ -65,13 +68,10 @@ public class HandlerUtils {
     public static String getUserNameIN(MessageContext messageContext) {
         //getting username from messageContext
         String userName = "";
-
         if(messageContext == null) {
             return userName;
         }
-
-        HttpServletRequest request =
-                (HttpServletRequest) messageContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
+        HttpServletRequest request = (HttpServletRequest) messageContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
         HttpSession session;
         if (request != null && (session = request.getSession(false)) != null) {
             String tenantDomain = (String) session.getAttribute(MultitenantConstants.TENANT_DOMAIN);
@@ -80,7 +80,6 @@ public class HandlerUtils {
                 userName = userName + tenantDomain;
             }
         }
-
         if(userName != null && !userName.isEmpty()) {
             return userName;
         } else {
@@ -98,7 +97,6 @@ public class HandlerUtils {
                 }
             }
         }
-
         if(MessageTracerConstants.AUTHENTICATION_ADMIN.equalsIgnoreCase(messageContext.getAxisService().getName()) &&
            MessageTracerConstants.MESSAGE_DIRECTION.equalsIgnoreCase(messageContext.getAxisMessage().getDirection())
            && MessageTracerConstants.AUTHENTICATION_OPERATION.equalsIgnoreCase(messageContext.getAxisOperation().getName().getLocalPart())) {
@@ -109,11 +107,10 @@ public class HandlerUtils {
                             , "username", responsePayload.getNamespace().getPrefix())).getText();
                 }
             }catch (Exception e) {
-                log.error("Error while trying to get the user name form authentication request", e);
+                LOG.error("Error while trying to get the user name form authentication request", e);
             }
             return userName;
         }
-
         //returning empty value if unable to fetch the username
         return "";
     }
@@ -121,13 +118,10 @@ public class HandlerUtils {
     public static String getUserNameOUT(MessageContext messageContext) {
         //getting username from messageContext
         String userName = "";
-
         if(messageContext == null) {
             return userName;
         }
-
         userName = CarbonContext.getThreadLocalCarbonContext().getUsername();
-
         if(userName != null && !userName.isEmpty()) {
             return userName;
         } else {
@@ -135,7 +129,6 @@ public class HandlerUtils {
             if(transportHeaders != null) {
                 String basicAuthHeader = (String)((Map)transportHeaders).get("Authorization");
                 if(basicAuthHeader != null && !basicAuthHeader.isEmpty()) {
-
                     String basicAuthHeaderValue = new String(Base64.decodeBase64(basicAuthHeader.replace("Basic", "").trim().getBytes()));
                     String[] basicAuth = basicAuthHeaderValue.split(":");
                     if(basicAuth != null && basicAuth.length >= 2) {
@@ -145,7 +138,6 @@ public class HandlerUtils {
                 }
             }
         }
-
         //returning empty value if unable to fetch the username
         return "";
     }

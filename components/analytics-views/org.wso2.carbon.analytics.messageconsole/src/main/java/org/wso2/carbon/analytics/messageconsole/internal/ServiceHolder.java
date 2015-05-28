@@ -29,6 +29,9 @@ public class ServiceHolder {
     private static AnalyticsDataService analyticsDataService;
     private static TaskService taskService;
 
+    private ServiceHolder() {
+    }
+
     public static AnalyticsDataService getAnalyticsDataService() {
         return analyticsDataService;
     }

@@ -28,6 +28,9 @@ public class ServiceHolder {
     private static AnalyticsDataAPI analyticsDataAPI;
     private static EventStreamService eventStreamService;
 
+    private ServiceHolder() {
+    }
+
     public static void setAnalyticsDataAPIService(AnalyticsDataAPI analyticsDataAPI) {
         ServiceHolder.analyticsDataAPI = analyticsDataAPI;
     }

@@ -18,10 +18,16 @@
 
 package org.wso2.carbon.analytics.message.tracer.handler.conf;
 
+import org.wso2.carbon.analytics.message.tracer.handler.exception.MessageTracerHandlerException;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlValue;
 import java.util.Set;
 
 @XmlRootElement (name = "MessageTracer")
@@ -31,12 +37,12 @@ public class MessageTracerConfiguration {
 
     private Set<String> messageTracingEnabledAdminServices;
 
-    public MessageTracerConfiguration() throws Exception {
+    public MessageTracerConfiguration() throws MessageTracerHandlerException {
         try {
             JAXBContext ctx = JAXBContext.newInstance(MessageTracerConfiguration.class);
             msgTracingMarshaller = ctx.createMarshaller();
         } catch (JAXBException e) {
-            throw new Exception("Error creating message tracing configuration info marshaller: " +
+            throw new MessageTracerHandlerException("Error creating message tracing configuration info marshaller: " +
                     e.getMessage(), e);
         }
     }

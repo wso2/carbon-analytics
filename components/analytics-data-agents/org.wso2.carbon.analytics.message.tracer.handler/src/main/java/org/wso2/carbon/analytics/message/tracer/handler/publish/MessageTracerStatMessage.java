@@ -34,7 +34,8 @@ import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
  */
 public class MessageTracerStatMessage extends ClusteringMessage {
 
-    private static Log log = LogFactory.getLog(MessageTracerStatMessage.class);
+    private static final Log LOG = LogFactory.getLog(MessageTracerStatMessage.class);
+    private static final long serialVersionUID = -3716900058204870390L;
 
     private int tenantId;
 
@@ -62,8 +63,8 @@ public class MessageTracerStatMessage extends ClusteringMessage {
             } else {
                 ctx.setTenantId(this.getTenantId(), true);
             }
-            if (log.isDebugEnabled()) {
-                log.debug("Cluster message arrived for tenant: " + this.getTenantId());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Cluster message arrived for tenant: " + this.getTenantId());
             }
 
             RegistryPersistenceManager registryPersistenceManager = new RegistryPersistenceManager();
@@ -71,5 +72,22 @@ public class MessageTracerStatMessage extends ClusteringMessage {
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        MessageTracerStatMessage message = (MessageTracerStatMessage) obj;
+        if (tenantId == message.getTenantId()) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

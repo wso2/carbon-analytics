@@ -31,11 +31,11 @@ import java.util.Map;
 
 public class RegistryPersistenceManager {
 
-    private static Log log = LogFactory.getLog(RegistryPersistenceManager.class);
+    private static final Log LOG = LogFactory.getLog(RegistryPersistenceManager.class);
 
     public EventingConfigData load(int tenantId) {
-        if (log.isDebugEnabled()) {
-            log.debug("Loading config info from registry.");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Loading config info from registry.");
         }
         EventingConfigData eventingConfigData = new EventingConfigData();
         // First set it to defaults, but do not persist
@@ -46,7 +46,6 @@ public class RegistryPersistenceManager {
         eventingConfigData.setDumpBodyEnable(false);
         eventingConfigData.setLoggingEnable(false);
         eventingConfigData.setPublishToBAMEnable(false);
-
         // then load it from registry
         try {
             String enableTrace = getConfigurationProperty(tenantId, MessageTracerConstants.ENABLE_TRACE);
@@ -56,7 +55,6 @@ public class RegistryPersistenceManager {
             String bamPassword = getConfigurationProperty(tenantId, MessageTracerConstants.BAM_PASSWORD);
             String dumpBody = getConfigurationProperty(tenantId, MessageTracerConstants.ENABLE_DUMP_MESSAGE_BODY);
             String enableLogging = getConfigurationProperty(tenantId, MessageTracerConstants.ENABLE_LOGGING);
-
             if (enableTrace != null) {
                 eventingConfigData.setMessageTracingEnable(Boolean.valueOf(enableTrace));
                 if (dumpBody != null) {
@@ -75,14 +73,14 @@ public class RegistryPersistenceManager {
                 tenantEventConfigData.put(tenantId, eventingConfigData);
 
             } else { // Registry does not have eventing config. Set to defaults.
-                if (log.isDebugEnabled()) {
-                    log.debug("Registry values are empty. Setting default values.");
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Registry values are empty. Setting default values.");
                 }
                 update(eventingConfigData);
             }
         } catch (Exception ignored) {
-            if (log.isDebugEnabled()) {
-                log.debug(ignored);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(ignored);
             }
             // If something went wrong, then we have the default, or whatever loaded so far
         }
@@ -95,15 +93,15 @@ public class RegistryPersistenceManager {
         Registry registry = ServiceHolder.getRegistryService().getConfigSystemRegistry(tenantId);
         Resource resource;
         if (!registry.resourceExists(resourcePath)) {
-            if (log.isDebugEnabled()) {
-                log.debug("Resource " + propertyName + "available.");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Resource " + propertyName + "available.");
             }
             resource = registry.newResource();
             resource.addProperty(propertyName, String.valueOf(value));
             registry.put(resourcePath, resource);
         } else {
-            if (log.isDebugEnabled()) {
-                log.debug("Resource " + propertyName + "creating.");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Resource " + propertyName + "creating.");
             }
             resource = registry.get(resourcePath);
             resource.setProperty(propertyName, String.valueOf(value));
@@ -112,14 +110,12 @@ public class RegistryPersistenceManager {
     }
 
     public void update(EventingConfigData eventingConfigData) throws RegistryException {
-
-        if (log.isDebugEnabled()) {
-            log.debug("Updating config ino.");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating config ino.");
         }
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
         Map<Integer, EventingConfigData> tenantEventConfigData = TenantEventConfigData.getTenantSpecificEventingConfigData();
         tenantEventConfigData.put(tenantId, eventingConfigData);
-
         updateConfigurationProperty(tenantId, MessageTracerConstants.ENABLE_TRACE,
                                     eventingConfigData.isMessageTracingEnable());
         updateConfigurationProperty(tenantId, MessageTracerConstants.BAM_URL,
@@ -134,7 +130,6 @@ public class RegistryPersistenceManager {
                                     eventingConfigData.isLoggingEnable());
         updateConfigurationProperty(tenantId, MessageTracerConstants.ENABLE_PUBLISH_TO_BAM,
                                     eventingConfigData.isPublishToBAMEnable());
-
         ClusterNotifier notifier  = new ClusterNotifier();
         notifier.setTenantId(tenantId);
         notifier.notifyClusterMessageTraceChange();

@@ -45,136 +45,58 @@ import java.util.TreeMap;
 
 public class ActivityInHandler extends AbstractHandler {
 
-    private static Log log = LogFactory.getLog(ActivityInHandler.class);
+    private static final Log LOG = LogFactory.getLog(ActivityInHandler.class);
 
     private Publisher publisher;
 
     @Override
     public void init(HandlerDescription handlerdesc) {
-        if (log.isDebugEnabled()) {
-            log.debug("Initiate message tracer handler");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Initiate message tracer handler");
         }
         super.init(handlerdesc);
         publisher = new Publisher();
     }
 
+    @Override
     public InvocationResponse invoke(MessageContext messageContext) throws AxisFault {
-
         int tenantID = PublisherUtil.getTenantId(messageContext);
-
         Map<Integer, EventingConfigData> tenantSpecificEventConfig = TenantEventConfigData.getTenantSpecificEventingConfigData();
         EventingConfigData eventingConfigData = tenantSpecificEventConfig.get(tenantID);
-
         if (eventingConfigData != null && eventingConfigData.isMessageTracingEnable()) {
-
-            if (log.isDebugEnabled()) {
-                log.debug("Message tracing enabled.");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Message tracing enabled.");
             }
-
             AxisService service = messageContext.getAxisService();
-
             // Temporary fix for track API manager calls
             if (service == null ||
                 (SystemFilter.isFilteredOutService(service.getAxisServiceGroup()) && !AgentUtil.allowedServices(service.getName()))
                 || service.isClientSide()) {
                 return InvocationResponse.CONTINUE;
             } else {
-
-                String activityUUID = HandlerUtils.getUniqueId();
-                Object transportHeaders = messageContext.getProperty(MessageContext.TRANSPORT_HEADERS);
-
-                if (transportHeaders != null) {
-                    String aid = (String) ((Map) transportHeaders).get(MessageTracerConstants.ACTIVITY_ID);
-                    if (aid != null) {
-                        if (aid.equals(MessageTracerConstants.EMPTY_STRING)) {
-                            ((Map) messageContext.getProperty(MessageContext.TRANSPORT_HEADERS)).
-                                    put(MessageTracerConstants.ACTIVITY_ID, activityUUID);
-                            if (log.isDebugEnabled()) {
-                                log.debug("Propagated AID was empty, IN generating new AID");
-                            }
-                        } else {
-                            activityUUID = aid;
-                            if (log.isDebugEnabled()) {
-                                log.debug("IN using propagated AID");
-                            }
-                        }
-                    } else {
-                        ((Map) transportHeaders).put(MessageTracerConstants.ACTIVITY_ID, activityUUID);
-                        if (log.isDebugEnabled()) {
-                            log.debug("Propagated AID was null, IN generating new AID");
-                        }
-                    }
-                } else {
-                    Map<String, String> headers = new TreeMap<String, String>();
-                    headers.put(MessageTracerConstants.ACTIVITY_ID, activityUUID);
-                    messageContext.setProperty(MessageContext.TRANSPORT_HEADERS, headers);
-                    if (log.isDebugEnabled()) {
-                        log.debug("Transport headers absent, IN generating new AID");
-                    }
-                }
-
+                String activityUUID = getActivityUUID(messageContext);
                 messageContext.setProperty(MessageTracerConstants.TENANT_ID, tenantID);
-
-                TracingInfo tracingInfo = new TracingInfo();
-                tracingInfo.setActivityId(activityUUID);
-                tracingInfo.setServer(AgentUtil.getServerName());
-                tracingInfo.setMessageDirection(MessageTracerConstants.IN_DIRECTION);
-                tracingInfo.setHost(PublisherUtil.getHostAddress());
-                tracingInfo.setServiceName(messageContext.getAxisService().getName());
-                tracingInfo.setOperationName(messageContext.getAxisOperation().getName().getLocalPart());
-                tracingInfo.setRequestUrl(String.valueOf(messageContext.getProperty(MessageTracerConstants.TRANSPORT_IN_URL)));
-                tracingInfo.setUserName(HandlerUtils.getUserNameIN(messageContext));
-
+                TracingInfo tracingInfo = getTracingInfo(messageContext, activityUUID);
                 AgentUtil.setTransportHeaders(tracingInfo, (Map<String, String>) messageContext.getProperty(MessageContext.TRANSPORT_HEADERS));
-
                 try {
                     if (eventingConfigData.isDumpBodyEnable()) {
-                        try {
-                            Class cls = Class.forName(MessageTracerConstants.ORG_APACHE_SYNAPSE_TRANSPORT_PASSTHRU_UTIL_RELAY_UTILS_CLASS_NAME);
-                            Class[] paramClasses = new Class[]{MessageContext.class, Boolean.TYPE};
-                            Method method = cls.getMethod(MessageTracerConstants.BUILD_MESSAGE_METHOD_NAME, paramClasses);
-                            method.invoke(null, messageContext, false);
-                        } catch (ClassNotFoundException ignore) {
-                            // ignore
-                        } catch (Exception e) {
-                            throw new AxisFault("Error in building input message: " + e.getMessage(), e);
-                        }
+                        buildSoapMessage(messageContext);
                         SOAPEnvelope soapEnvelope = messageContext.getEnvelope();
-						if (soapEnvelope.getHeader() != null) {
-							Iterator headerBlocks = soapEnvelope.getHeader()
-									.getHeadersToProcess(null);
-							while (headerBlocks.hasNext()) {
-								SOAPHeaderBlock headerBlock = (SOAPHeaderBlock) headerBlocks
-										.next();
-								// if this header block mustUnderstand but has
-								// not been processed
-								// then mark it as processed to get the message
-								// in to Synapse
-								if (!headerBlock.isProcessed()
-										&& headerBlock.getMustUnderstand()) {
-									headerBlock.setProcessed();
-								}
-							}
-						}                      
+                        setMustUnderstandHeader(soapEnvelope);
                         SOAPBody body = soapEnvelope.getBody();
                         if (body != null) {
                             tracingInfo.setPayload(body.toString());
                         }
-
                         SOAPHeader header = soapEnvelope.getHeader();
                         if (header != null) {
                             tracingInfo.setHeader(header.toString());
                         }
                     }
-
-                    tracingInfo.setTimestamp(System.currentTimeMillis());
-
                     if (MessageContext.IN_FLOW == messageContext.getFLOW()) {
                         tracingInfo.setStatus(MessageTracerConstants.STATUS_SUCCESS);
                     } else if (MessageContext.IN_FAULT_FLOW == messageContext.getFLOW()) {
                         tracingInfo.setStatus(MessageTracerConstants.STATUS_FAULT);
                     }
-
                     if (eventingConfigData.isPublishToBAMEnable()) {
                         publisher.publish(tracingInfo);
                     }
@@ -182,12 +104,88 @@ public class ActivityInHandler extends AbstractHandler {
                         HandlerUtils.logTracingInfo (tracingInfo);
                     }
                 } catch (OMException e) {
-                    log.error("Unable to get SOAP details " + e.getMessage(), e);
+                    LOG.error("Unable to get SOAP details " + e.getMessage(), e);
                 }
             }
         }
         return InvocationResponse.CONTINUE;
     }
 
+    private void setMustUnderstandHeader(SOAPEnvelope soapEnvelope) {
+        if (soapEnvelope.getHeader() != null) {
+            Iterator headerBlocks = soapEnvelope.getHeader().getHeadersToProcess(null);
+            while (headerBlocks.hasNext()) {
+                SOAPHeaderBlock headerBlock = (SOAPHeaderBlock) headerBlocks.next();
+// if this header block mustUnderstand but has
+// not been processed
+// then mark it as processed to get the message
+                // in to Synapse
+                if (!headerBlock.isProcessed() && headerBlock.getMustUnderstand()) {
+                    headerBlock.setProcessed();
+                }
+            }
+        }
+    }
 
+    private void buildSoapMessage(MessageContext messageContext) throws AxisFault {
+        try {
+            Class cls = Class.forName(MessageTracerConstants.ORG_APACHE_SYNAPSE_TRANSPORT_PASSTHRU_UTIL_RELAY_UTILS_CLASS_NAME);
+            Class[] paramClasses = new Class[]{MessageContext.class, Boolean.TYPE};
+            Method method = cls.getMethod(MessageTracerConstants.BUILD_MESSAGE_METHOD_NAME, paramClasses);
+            method.invoke(null, messageContext, false);
+        } catch (ClassNotFoundException ignore) {
+            LOG.warn(ignore);
+        } catch (Exception e) {
+            throw new AxisFault("Error in building input message: " + e.getMessage(), e);
+        }
+    }
+
+    private String getActivityUUID(MessageContext messageContext) {
+        String activityUUID = HandlerUtils.getUniqueId();
+        Object transportHeaders = messageContext.getProperty(MessageContext.TRANSPORT_HEADERS);
+        if (transportHeaders != null) {
+            String aid = (String) ((Map) transportHeaders).get(MessageTracerConstants.ACTIVITY_ID);
+            if (aid != null) {
+                if (aid.equals(MessageTracerConstants.EMPTY_STRING)) {
+                    ((Map) messageContext.getProperty(MessageContext.TRANSPORT_HEADERS)).
+                            put(MessageTracerConstants.ACTIVITY_ID, activityUUID);
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Propagated AID was empty, IN generating new AID");
+                    }
+                } else {
+                    activityUUID = aid;
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("IN using propagated AID");
+                    }
+                }
+            } else {
+                ((Map) transportHeaders).put(MessageTracerConstants.ACTIVITY_ID, activityUUID);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Propagated AID was null, IN generating new AID");
+                }
+            }
+        } else {
+            Map<String, String> headers = new TreeMap<String, String>();
+            headers.put(MessageTracerConstants.ACTIVITY_ID, activityUUID);
+            messageContext.setProperty(MessageContext.TRANSPORT_HEADERS, headers);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Transport headers absent, IN generating new AID");
+            }
+        }
+        return activityUUID;
+    }
+
+    private TracingInfo getTracingInfo(MessageContext messageContext, String activityUUID) {
+        TracingInfo tracingInfo = new TracingInfo();
+        tracingInfo.setActivityId(activityUUID);
+        tracingInfo.setServer(AgentUtil.getServerName());
+        tracingInfo.setMessageDirection(MessageTracerConstants.IN_DIRECTION);
+        tracingInfo.setHost(PublisherUtil.getHostAddress());
+        tracingInfo.setServiceName(messageContext.getAxisService().getName());
+        tracingInfo.setOperationName(messageContext.getAxisOperation().getName().getLocalPart());
+        tracingInfo.setRequestUrl(String.valueOf(messageContext.getProperty(MessageTracerConstants.TRANSPORT_IN_URL)));
+        tracingInfo.setUserName(HandlerUtils.getUserNameIN(messageContext));
+        tracingInfo.setTimestamp(System.currentTimeMillis());
+        return tracingInfo;
+    }
 }

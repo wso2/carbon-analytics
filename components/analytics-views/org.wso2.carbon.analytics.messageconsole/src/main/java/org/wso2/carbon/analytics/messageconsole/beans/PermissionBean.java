@@ -17,6 +17,9 @@
 */
 package org.wso2.carbon.analytics.messageconsole.beans;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.Serializable;
 import java.lang.reflect.Field;
 
@@ -26,6 +29,8 @@ import java.lang.reflect.Field;
 public class PermissionBean implements Serializable {
 
     private static final long serialVersionUID = -5034605258834260595L;
+
+    private static final Log log = LogFactory.getLog(PermissionBean.class);
 
     private boolean createTable;
     private boolean listTable;
@@ -94,6 +99,7 @@ public class PermissionBean implements Serializable {
         this.createTable = createTable;
     }
 
+    @Override
     public String toString() {
         try {
             StringBuilder sb = new StringBuilder();
@@ -103,13 +109,12 @@ public class PermissionBean implements Serializable {
             for (Field field : fields) {
                 String name = field.getName();
                 Object value = field.get(this);
-
                 sb.append(name).append(":").append(value.toString()).append("||");
             }
             return sb.toString();
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            log.error(e);
+            return super.toString();
         }
     }
 }

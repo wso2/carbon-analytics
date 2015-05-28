@@ -34,16 +34,17 @@ import java.util.Enumeration;
 
 public class PublisherUtil {
 
-    private static Log log = LogFactory.getLog(PublisherUtil.class);
+    private static final Log LOG = LogFactory.getLog(PublisherUtil.class);
 
     private static final String PORTS_OFFSET = "Ports.Offset";
     private static final int CARBON_SERVER_DEFAULT_PORT = 9763;
     private static String hostAddressAndPort = null;
     private static final String HOST_NAME = "HostName";
 
+    private PublisherUtil() {
+    }
 
     public static String getHostAddress() {
-
         if (hostAddressAndPort != null) {
             return hostAddressAndPort;
         }
@@ -54,7 +55,7 @@ public class PublisherUtil {
                 hostAddress = localAddress.getHostAddress();
             } else {
                 hostAddress = "localhost"; // Defaults to localhost
-                log.warn("Unable to get the ip address, hence using hostname as localhost");
+                LOG.warn("Unable to get the ip address, hence using hostname as localhost");
             }
             int portsOffset = Integer.parseInt(CarbonUtils.getServerConfiguration().getFirstProperty(
                     PORTS_OFFSET));
@@ -71,13 +72,12 @@ public class PublisherUtil {
         try {
             ifaces = NetworkInterface.getNetworkInterfaces();
         } catch (SocketException e) {
-            log.error("Failed to get host address", e);
+            LOG.error("Failed to get host address", e);
         }
         if (ifaces != null) {
             while (ifaces.hasMoreElements()) {
                 NetworkInterface iface = ifaces.nextElement();
                 Enumeration<InetAddress> addresses = iface.getInetAddresses();
-
                 while (addresses.hasMoreElements()) {
                     InetAddress addr = addresses.nextElement();
                     if (addr instanceof Inet4Address && !addr.isLoopbackAddress()) {
@@ -86,7 +86,6 @@ public class PublisherUtil {
                 }
             }
         }
-
         return null;
     }
 

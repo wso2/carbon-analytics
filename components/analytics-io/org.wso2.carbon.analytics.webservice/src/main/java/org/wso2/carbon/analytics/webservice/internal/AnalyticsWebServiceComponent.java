@@ -48,6 +48,7 @@ public class AnalyticsWebServiceComponent {
     }
 
     protected void unsetAnalyticsDataAPIService(AnalyticsDataAPI analyticsDataAPI) {
+        // Nothing to do in unset
     }
 
     protected void setEventStreamService(EventStreamService eventStreamService) {
@@ -55,6 +56,6 @@ public class AnalyticsWebServiceComponent {
     }
 
     protected void unsetEventStreamService(EventStreamService eventStreamService) {
-
+        // Nothing to do in unset
     }
 }

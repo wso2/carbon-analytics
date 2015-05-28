@@ -35,8 +35,9 @@ import java.util.Map;
 */
 public class MessageTracerAxis2ConfigurationContextObserver extends
                                                             AbstractAxis2ConfigurationContextObserver {
-    private static final Log log = LogFactory.getLog(MessageTracerAxis2ConfigurationContextObserver.class);
+    private static final Log LOG = LogFactory.getLog(MessageTracerAxis2ConfigurationContextObserver.class);
 
+    @Override
     public void createdConfigurationContext(ConfigurationContext configContext) {
 
         AxisConfiguration axisConfiguration = configContext.getAxisConfiguration();
@@ -50,7 +51,7 @@ public class MessageTracerAxis2ConfigurationContextObserver extends
                 axisConfiguration
                         .engageModule(MessageTracerConstants.ANALYTICS_SERVICE_MESSAGE_TRACER_MODULE_NAME);
             } catch (AxisFault e) {
-                log.error("Cannot engage BAM MessageTracer module for the tenant :" + tenantId, e);
+                LOG.error("Cannot engage BAM MessageTracer module for the tenant :" + tenantId, e);
             }
         }
     }
@@ -63,9 +64,13 @@ public class MessageTracerAxis2ConfigurationContextObserver extends
     }
 
 
+    @Override
     public void terminatedConfigurationContext(ConfigurationContext configCtx) {
+        // Do nothing
     }
 
+    @Override
     public void terminatingConfigurationContext(ConfigurationContext configCtx) {
+        // Do nothing
     }
 }

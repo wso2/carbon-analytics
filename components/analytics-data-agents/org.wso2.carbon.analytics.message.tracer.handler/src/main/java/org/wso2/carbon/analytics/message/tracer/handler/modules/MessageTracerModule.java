@@ -28,10 +28,12 @@ public class MessageTracerModule implements Module {
     @Override
     public void init(ConfigurationContext configurationContext, AxisModule axisModule)
             throws AxisFault {
+        // Do nothing
     }
 
     @Override
     public void engageNotify(AxisDescription axisDescription) throws AxisFault {
+        // Do nothing
     }
 
     @Override
@@ -41,9 +43,11 @@ public class MessageTracerModule implements Module {
 
     @Override
     public void applyPolicy(Policy policy, AxisDescription axisDescription) throws AxisFault {
+        // Do nothing
     }
 
     @Override
     public void shutdown(ConfigurationContext configurationContext) throws AxisFault {
+        // Do nothing
     }
 }

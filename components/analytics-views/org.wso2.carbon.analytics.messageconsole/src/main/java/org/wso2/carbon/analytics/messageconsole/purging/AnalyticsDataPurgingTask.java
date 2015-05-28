@@ -32,12 +32,12 @@ import java.util.Map;
  * This class is responsible to execute purging task operation
  */
 public class AnalyticsDataPurgingTask extends AbstractTask {
-    private static final Log logger = LogFactory.getLog(AnalyticsDataPurgingTask.class);
+    private static final Log log = LogFactory.getLog(AnalyticsDataPurgingTask.class);
 
     @Override
     public void execute() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Staring execute analytics data puring task");
+        if (log.isDebugEnabled()) {
+            log.debug("Staring execute analytics data puring task");
         }
         Map<String, String> taskProperties = this.getProperties();
         String retention = taskProperties.get(Constants.RETENTION_PERIOD);
@@ -52,15 +52,15 @@ public class AnalyticsDataPurgingTask extends AbstractTask {
             calendar.set(Calendar.MILLISECOND, 999);
             calendar.add(Calendar.DATE, -retentionPeriod);
             try {
-                logger.info("All the data records before " + calendar.getTime() + "[" + calendar.getTimeInMillis() +
+                log.info("All the data records before " + calendar.getTime() + "[" + calendar.getTimeInMillis() +
                             "] going to purge from " + table);
                 ServiceHolder.getAnalyticsDataService().delete(Integer.parseInt(tenantId), table, Long.MIN_VALUE,
                                                                calendar.getTimeInMillis());
             } catch (AnalyticsException e) {
-                logger.error("Unable to perform data purging task due to " + e.getMessage(), e);
+                log.error("Unable to perform data purging task due to " + e.getMessage(), e);
             }
         } else {
-            logger.error("Retention period either empty or null.");
+            log.error("Retention period either empty or null.");
         }
     }
 }

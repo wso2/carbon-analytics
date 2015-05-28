@@ -19,6 +19,9 @@ import org.wso2.carbon.core.RegistryResources;
 
 public class MessageTracerConstants {
 
+    private MessageTracerConstants() {
+    }
+
     public static final String ACTIVITY_REG_PATH = RegistryResources.COMPONENTS
                                                    + "org.wso2.carbon.analytics.message.tracer.handler/tracing/";
 
@@ -43,8 +46,6 @@ public class MessageTracerConstants {
     public static final String EMPTY_STRING = "";
 
     public static final String SYNAPSE_SERVICE = "__SynapseService";
-
-    public static final String MULTITENANT_SYNAPSE_SERVICE = "__MultitenantDispatcherService";
 
     public static final String ORG_APACHE_SYNAPSE_TRANSPORT_PASSTHRU_UTIL_RELAY_UTILS_CLASS_NAME = "org.apache.synapse.transport.passthru.util.RelayUtils";
 

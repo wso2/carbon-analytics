@@ -15,7 +15,6 @@
  */
 package org.wso2.carbon.analytics.message.tracer.handler.internal;
 
-import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -50,7 +49,7 @@ import org.wso2.carbon.utils.ConfigurationContextService;
 
 public class MessageTracerServiceComponent {
 
-    private static Log log = LogFactory.getLog(MessageTracerServiceComponent.class);
+    private static final Log LOG = LogFactory.getLog(MessageTracerServiceComponent.class);
 
     private static ConfigurationContext configurationContext;
 
@@ -58,8 +57,8 @@ public class MessageTracerServiceComponent {
 
     protected void activate(ComponentContext context) {
 
-        if (log.isDebugEnabled()) {
-            log.debug("BAM message tracer handler bundle is activated");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("BAM message tracer handler bundle is activated");
         }
         try {
             //initialize the messageTracer configuration
@@ -72,19 +71,8 @@ public class MessageTracerServiceComponent {
                     new MessageTracerAxis2ConfigurationContextObserver(), null);
 
             new RegistryPersistenceManager().load(CarbonContext.getThreadLocalCarbonContext().getTenantId());
-
-        } catch (AxisFault axisFault) {
-            if (log.isErrorEnabled()) {
-                log.error("Failed to activate BAM message tracer handler bundle", axisFault);
-            }
-        } catch (Throwable t) {
-            log.error("Failed to activate BAM message tracer handler bundle", t);
-        }
-    }
-
-    protected void deactivate(ComponentContext context) {
-        if (log.isDebugEnabled()) {
-            log.debug("BAM message tracer handler bundle is deactivated");
+        } catch (Exception e) {
+            LOG.error("Failed to activate BAM message tracer handler bundle", e);
         }
     }
 

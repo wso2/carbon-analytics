@@ -43,8 +43,8 @@ import java.util.Map;
 
 public class MessageConsoleService extends AbstractAdmin {
 
-    private static final Log logger = LogFactory.getLog(MessageConsoleService.class);
-    public static final String AT_SIGN = "@";
+    private static final Log log = LogFactory.getLog(MessageConsoleService.class);
+    private static final String AT_SIGN = "@";
 
     public MessageConsoleService() {
     }
@@ -78,8 +78,8 @@ public class MessageConsoleService extends AbstractAdmin {
         } catch (UserStoreException e) {
             throw new MessageConsoleException("Unable to get user permission details due to " + e.getMessage(), e);
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Granted analytics permission for user[" + username + "] :" + permission.toString());
+        if (log.isDebugEnabled()) {
+            log.debug("Granted analytics permission for user[" + username + "] :" + permission.toString());
         }
         return permission;
     }

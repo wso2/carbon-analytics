@@ -27,7 +27,7 @@ import org.wso2.carbon.utils.ConfigurationContextService;
 
 public class ClusterNotifier {
 
-    private static Log log = LogFactory.getLog(ClusterNotifier.class);
+    private static final Log LOG = LogFactory.getLog(ClusterNotifier.class);
 
     private int tenantId;
 
@@ -41,18 +41,18 @@ public class ClusterNotifier {
 
     public void notifyClusterMessageTraceChange() {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Notifying cluster message trace updates.");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Notifying cluster message trace updates.");
         }
         ConfigurationContextService configCtxService = ServiceHolder.getConfigurationContextService();
         if (configCtxService == null) {
-            log.error("ConfigurationContextService is empty.");
+            LOG.error("ConfigurationContextService is empty.");
             return;
         }
         ConfigurationContext configCtx = configCtxService.getServerConfigContext();
         ClusteringAgent agent = configCtx.getAxisConfiguration().getClusteringAgent();
-        if (log.isDebugEnabled()) {
-            log.debug("Clustering Agent: " + agent);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Clustering Agent: " + agent);
         }
         if (agent != null) {
             MessageTracerStatMessage msg = new MessageTracerStatMessage();
@@ -60,7 +60,7 @@ public class ClusterNotifier {
             try {
                 agent.sendMessage(msg, true);
             } catch (ClusteringFault e) {
-                log.error("Unable to send cluster message :" + e.getMessage(), e);
+                LOG.error("Unable to send cluster message :" + e.getMessage(), e);
             }
         }
     }

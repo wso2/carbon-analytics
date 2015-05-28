@@ -21,8 +21,10 @@ import java.util.Map;
 
 public class EventPublishConfigHolder {
 
-    private static Map<String, EventPublisherConfig> eventPublisherConfigMap
-            = new HashMap<String, EventPublisherConfig>();
+    private static Map<String, EventPublisherConfig> eventPublisherConfigMap = new HashMap<String, EventPublisherConfig>();
+
+    private EventPublishConfigHolder() {
+    }
 
     public static EventPublisherConfig getEventPublisherConfig(String key) {
         return eventPublisherConfigMap.get(key);

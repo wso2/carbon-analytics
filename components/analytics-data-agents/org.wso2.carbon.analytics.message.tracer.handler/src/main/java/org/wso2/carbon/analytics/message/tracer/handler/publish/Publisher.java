@@ -32,7 +32,7 @@ import java.util.Map;
 
 public class Publisher {
 
-    private static Log log = LogFactory.getLog(Publisher.class);
+    private static final Log LOG = LogFactory.getLog(Publisher.class);
 
     public Publisher() {
     }
@@ -47,7 +47,7 @@ public class Publisher {
         try {
             streamDef = StreamDefCreator.getStreamDef();
         } catch (MalformedStreamDefinitionException e) {
-            log.error("Unable to create stream: " + e.getMessage(), e);
+            LOG.error("Unable to create stream: " + e.getMessage(), e);
             return;
         }
         if (streamDef != null) {
@@ -55,11 +55,11 @@ public class Publisher {
             if (eventStreamService != null) {
                 try {
                     eventStreamService.addEventStreamDefinition(streamDef);
-                    if (log.isDebugEnabled()) {
-                        log.debug("Added stream definition to event publisher service.");
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Added stream definition to event publisher service.");
                     }
                 } catch (EventStreamConfigurationException e) {
-                    log.error("Error in adding stream definition to service:" + e.getMessage(), e);
+                    LOG.error("Error in adding stream definition to service:" + e.getMessage(), e);
                 }
                 Event tracingEvent = new Event();
                 tracingEvent.setStreamId(streamDef.getStreamId());
@@ -68,8 +68,8 @@ public class Publisher {
                 tracingEvent.setPayloadData(payLoadData.toArray());
                 tracingEvent.setArbitraryDataMap(arbitraryData);
                 eventStreamService.publish(tracingEvent);
-                if (log.isDebugEnabled()) {
-                    log.debug("Successfully published event");
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Successfully published event");
                 }
             }
         }

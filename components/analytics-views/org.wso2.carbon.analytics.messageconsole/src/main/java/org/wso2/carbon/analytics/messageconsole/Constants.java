@@ -23,6 +23,9 @@ package org.wso2.carbon.analytics.messageconsole;
  */
 public class Constants {
 
+    private Constants() {
+    }
+
     public static final String RETENTION_PERIOD = "retention_period";
     public static final String TABLE = "table";
     public static final String TENANT_ID = "tenantId";
