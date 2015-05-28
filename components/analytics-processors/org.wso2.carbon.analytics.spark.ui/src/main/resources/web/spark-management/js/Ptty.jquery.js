@@ -204,7 +204,7 @@
                             }
                             help_out += '</ul>' + "\n\n";
                         } else {
-                            for (i=2; i<tokens.length;i++){
+                            for (i = 2; i < tokens.length; i++) {
                                 cmd_to_show = cmd_to_show + ' ' + tokens[i];
                             }
                             if (typeof dispatch[cmd_to_show] !== 'undefined') {
@@ -214,7 +214,7 @@
                                 help_out = 'help:</br>The "' + cmd_to_show + '" option does not exist.' + "\n\n";
                             }
                         }
-                    }else {
+                    } else {
                         help_out = 'Use "help [comand name]" to display specific info about a command.</br>' + "\n";
                         help_out += 'Available commands are:</br><ul class="sq-li">';
                         for (var i in dispatch) {
@@ -801,6 +801,13 @@
 
                 var tokens = value.split(/\s+/);
                 var key = tokens[0].toLowerCase();
+                for (var i = 0; i < 3; i++) {
+                    if (typeof dispatch[key] === 'undefined') {
+                        key = key + ' ' + tokens[i + 1].toLowerCase();
+                    } else {
+                        break;
+                    }
+                }
 
                 // Add to history
                 if (settings.history && (typeof dispatch[key] !== 'undefined' || cdispatch)
