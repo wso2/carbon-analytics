@@ -108,9 +108,9 @@ public class TCPEventPublisher {
 
         ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
 
-        byte streamIdSize = streamRuntimeInfo.getStreamIdSize();
-        ByteBuffer buf = ByteBuffer.allocate(streamRuntimeInfo.getFixedMessageSize() + streamIdSize + 1);
-        buf.put(streamIdSize);
+        int streamIdSize = (streamRuntimeInfo.getStreamId()).getBytes(DEFAULT_CHARSET).length;
+        ByteBuffer buf = ByteBuffer.allocate(streamRuntimeInfo.getFixedMessageSize() + streamIdSize + 4);
+        buf.putInt(streamIdSize);
         buf.put((streamRuntimeInfo.getStreamId()).getBytes(DEFAULT_CHARSET));
 
         int[] stringDataIndex = new int[streamRuntimeInfo.getNoOfStringAttributes()];
@@ -136,7 +136,7 @@ public class TCPEventPublisher {
                     buf.putDouble((Double) event[i]);
                     continue;
                 case STRING:
-                    int length = ((String) event[i]).length();
+                    int length = ((String) event[i]).getBytes(DEFAULT_CHARSET).length;
                     buf.putInt(length);
                     stringDataIndex[stringIndex] = i;
                     stringIndex++;

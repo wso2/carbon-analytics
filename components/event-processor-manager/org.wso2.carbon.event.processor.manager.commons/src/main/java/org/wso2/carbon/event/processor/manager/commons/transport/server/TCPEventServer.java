@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -121,7 +123,9 @@ public class TCPEventServer {
                     BufferedInputStream in = new BufferedInputStream(connectionSocket.getInputStream());
                     while (true) {
 
-                        int streamNameSize = loadData(in) & 0xff;
+                        byte[] streamNameByteSize = loadData(in, new byte[4]) ;
+                        ByteBuffer sizeBuf = ByteBuffer.wrap(streamNameByteSize);
+                        int streamNameSize = sizeBuf.getInt();
                         byte[] streamNameData = loadData(in, new byte[streamNameSize]);
                         String streamId = new String(streamNameData, 0, streamNameData.length);
                         StreamRuntimeInfo streamRuntimeInfo = streamRuntimeInfoMap.get(streamId);
@@ -130,6 +134,7 @@ public class TCPEventServer {
                         byte[] fixedMessageData = loadData(in, new byte[streamRuntimeInfo.getFixedMessageSize()]);
 
                         ByteBuffer bbuf = ByteBuffer.wrap(fixedMessageData, 0, fixedMessageData.length);
+                        List<Integer> stringValueSizes = new ArrayList<>();
                         Attribute.Type[] attributeTypes = streamRuntimeInfo.getAttributeTypes();
                         for (int i = 0; i < attributeTypes.length; i++) {
                             Attribute.Type type = attributeTypes[i];
@@ -151,8 +156,17 @@ public class TCPEventServer {
                                     continue;
                                 case STRING:
                                     int size = bbuf.getInt();
-                                    byte[] stringData = loadData(in, new byte[size]);
-                                    event[i] = new String(stringData, 0, stringData.length);
+                                    stringValueSizes.add(size);
+                            }
+                        }
+
+                        int stringSizePosition = 0;
+                        for (int i = 0; i < attributeTypes.length; i++) {
+                            Attribute.Type type = attributeTypes[i];
+                            if(Attribute.Type.STRING == type) {
+                                byte[] stringData = loadData(in, new byte[stringValueSizes.get(stringSizePosition)]);
+                                stringSizePosition++;
+                                event[i] = new String(stringData, 0, stringData.length);
                             }
                         }
                         streamCallback.receive(streamId, event);

@@ -69,11 +69,4 @@ public class StreamRuntimeInfo {
         this.attributes = attributes;
     }
 
-    public byte getStreamIdSize() {
-        return streamIdSize;
-    }
-
-    public void setStreamIdSize(byte streamIdSize) {
-        this.streamIdSize = streamIdSize;
-    }
 }
