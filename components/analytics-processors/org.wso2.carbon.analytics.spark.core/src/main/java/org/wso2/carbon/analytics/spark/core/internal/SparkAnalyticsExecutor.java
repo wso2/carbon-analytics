@@ -165,7 +165,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
         Class<?> udf1 = Class.forName("org.wso2.carbon.analytics.spark.core.udf.CompositeID");
         Object instance1 = udf1.newInstance();
-        sqlCtx.udf().register("compositeID", (UDF3<?, ?, ?, ?>) instance1, DataTypes.StringType);
+        sqlCtx.udf().register("compositeID", (UDF3<?, ?, ?, ?>) instance1, DataTypes.createArrayType(DataTypes.StringType));
     }
 
     private void startMaster(String host, String port, String webUIport, String propsFile,

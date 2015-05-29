@@ -56,6 +56,8 @@ public class AnalyticsCommonUtils {
                 return DataTypes.StringType;
             case AnalyticsConstants.BINARY_TYPE:
                 return DataTypes.BinaryType;
+            case AnalyticsConstants.FACET_TYPE:
+                return DataTypes.createArrayType(DataTypes.StringType);
             default:
                 throw new RuntimeException("Invalid DataType: " + strType);
         }

@@ -20,13 +20,25 @@ package org.wso2.carbon.analytics.spark.core.udf;
 
 import org.apache.spark.sql.api.java.UDF3;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+
 /**
  * Created by niranda on 5/29/15.
  */
-public class CompositeID implements UDF3<Integer, Integer, Integer, String> {
+public class CompositeID implements UDF3<Integer, Integer, Integer, List<String>>, Serializable{
+
+    private static final long serialVersionUID = -9073977448886578865L;
 
     @Override
-    public String call(Integer integer, Integer integer2, Integer integer3) throws Exception {
-        return integer.toString() + "+" + integer2.toString() + "+" + integer3.toString();
+    public List<String> call(Integer integer, Integer integer2, Integer integer3) throws Exception {
+        ArrayList<String> arr = new ArrayList<>();
+        arr.add(integer.toString());
+        arr.add(integer2.toString());
+        arr.add(integer3.toString());
+
+        return arr;
     }
 }
