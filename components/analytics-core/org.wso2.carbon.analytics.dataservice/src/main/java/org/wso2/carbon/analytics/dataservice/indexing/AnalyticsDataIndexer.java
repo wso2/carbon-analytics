@@ -809,11 +809,33 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId,
                                                                 drillDownRequest.getTableName());
             FacetsConfig config = this.getFacetsConfigurations(indices);
-            DrillSideways drillSideways = new DrillSideways(indexSearcher, config, taxonomyReader);
             DrillDownQuery drillDownQuery = this.createDrillDownQuery(drillDownRequest,
                                                                       indices, config,rangeField, range);
-            DrillSideways.DrillSidewaysResult result = drillSideways.search(drillDownQuery, Integer.MAX_VALUE);
-            return result.hits.totalHits;
+            ValueSource scoreFunction = this.getCompiledScoreFunction(drillDownRequest.getScoreFunction(), indices);
+            FacetsCollector facetsCollector = new FacetsCollector(true);
+            Map<String, List<String>> categoryPaths = drillDownRequest.getCategoryPaths();
+            int count = 0;
+            if (!categoryPaths.isEmpty()) {
+                Map.Entry<String, List<String>> aCategory = categoryPaths.entrySet().iterator().next();
+                String categoryName = aCategory.getKey();
+                List<String> path = aCategory.getValue();
+                String[] pathAsArray;
+                if (path == null) {
+                    pathAsArray = path.toArray(new String[aCategory.getValue().size()]);
+                } else {
+                    pathAsArray = new String[]{};
+                }
+                FacetsCollector.search(indexSearcher, drillDownQuery, Integer.MAX_VALUE, facetsCollector);
+                Facets facets = new TaxonomyFacetSumValueSource(taxonomyReader, config, facetsCollector, scoreFunction);
+                FacetResult facetResult = facets.getTopChildren(Integer.MAX_VALUE, categoryName, pathAsArray);
+                if (facetResult != null) {
+                    LabelAndValue[] subCategories = facetResult.labelValues;
+                    for (LabelAndValue category : subCategories) {
+                        count += category.value.intValue();
+                    }
+                }
+            }
+            return count;
         } catch (IOException e) {
             throw new AnalyticsIndexException("Error while getting drilldownCount: " + e.getMessage(), e);
         } finally {

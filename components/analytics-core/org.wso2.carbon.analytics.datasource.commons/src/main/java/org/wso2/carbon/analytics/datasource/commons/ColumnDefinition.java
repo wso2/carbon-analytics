@@ -16,9 +16,9 @@
 
 package org.wso2.carbon.analytics.datasource.commons;
 
-import java.io.Serializable;
-
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema.ColumnType;
+
+import java.io.Serializable;
 
 /**
  * This class represents a defintion of a column in an analytics schema.
@@ -44,7 +44,7 @@ public class ColumnDefinition implements Serializable {
     public ColumnDefinition(String name, ColumnType type, boolean indexed, boolean scoreParam) {
         this.name = name;
         this.type = type;
-        this.indexed = indexed;
+        this.indexed = type == ColumnType.FACET || indexed;
         this.scoreParam = scoreParam;
     }
 
@@ -69,6 +69,12 @@ public class ColumnDefinition implements Serializable {
     }
 
     public void setIndexed(boolean indexed) {
+        if (this.type != null) {
+            if (this.type == ColumnType.FACET) {
+                this.indexed = true;
+                return;
+            }
+        }
         this.indexed = indexed;
     }
 

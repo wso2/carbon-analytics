@@ -41,6 +41,7 @@ import org.wso2.carbon.analytics.restapi.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.restapi.beans.QueryBean;
 import org.wso2.carbon.analytics.restapi.beans.RecordBean;
 import org.wso2.carbon.analytics.restapi.beans.SubCategoriesBean;
+import org.wso2.carbon.analytics.restapi.beans.TableBean;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.user.api.UserRealm;
@@ -188,7 +189,7 @@ public class AnalyticsResource extends AbstractResource {
 	 * @return the response
 	 * @throws AnalyticsException the analytics exception
 	 */
-	/*@DELETE
+	@DELETE
 	@Path(Constants.ResourcePath.TABLES)
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON })
@@ -211,7 +212,7 @@ public class AnalyticsResource extends AbstractResource {
         } else {
             throw new AnalyticsException("The table name is empty");
         }
-    }*/
+    }
 
 	/**
 	 * Inserts or update a list of records to a table. updating happens only if there are matching record ids
