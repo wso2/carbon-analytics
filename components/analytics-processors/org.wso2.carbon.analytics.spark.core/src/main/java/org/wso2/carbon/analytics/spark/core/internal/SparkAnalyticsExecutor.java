@@ -33,6 +33,7 @@ import org.apache.spark.deploy.worker.WorkerArguments;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
+import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.util.Utils;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterException;
@@ -50,6 +51,7 @@ import scala.Option;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
@@ -130,14 +132,36 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private void initClient(String masterUrl, String appName) {
         this.sparkConf = initSparkConf(masterUrl, appName);
         this.javaSparkCtx = new JavaSparkContext(this.sparkConf);
-        this.sqlCtx = new SQLContext(this.javaSparkCtx);
+//        this.sqlCtx = new SQLContext(this.javaSparkCtx);
+        initSqlContext (this.javaSparkCtx);
     }
 
     private void initLocalClient() {
         this.sparkConf = new SparkConf();
         this.sparkConf.setMaster(LOCAL_MASTER_URL).setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
         this.javaSparkCtx = new JavaSparkContext(this.sparkConf);
-        this.sqlCtx = new SQLContext(this.javaSparkCtx);
+//        this.sqlCtx = new SQLContext(this.javaSparkCtx);
+        initSqlContext (this.javaSparkCtx);
+    }
+
+    private void initSqlContext(JavaSparkContext jsc) {
+        this.sqlCtx = new SQLContext(jsc);
+        try {
+            registerUDFs(this.sqlCtx);
+        } catch (IllegalAccessException | InvocationTargetException | InstantiationException
+                | ClassNotFoundException | NoSuchMethodException e) {
+            log.error("Error while registering UDFs: ", e);
+//            e.printStackTrace();
+        }
+    }
+
+    private void registerUDFs(SQLContext sqlCtx)
+            throws IllegalAccessException, InvocationTargetException, InstantiationException,
+                   ClassNotFoundException, NoSuchMethodException {
+        Class<?> udf = Class.forName("org.wso2.carbon.analytics.spark.core.udf.StringLengthUDF");
+        Object instance = udf.newInstance();
+
+        sqlCtx.udf().register("stringLengthTest", (org.apache.spark.sql.api.java.UDF1<?, ?>) instance, DataTypes.IntegerType);
     }
 
     private void startMaster(String host, String port, String webUIport, String propsFile,
@@ -239,7 +263,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             query = query.substring(0, query.length() - 1);
         }
         query = encodeQueryWithTenantId(tenantId, query);
-        System.out.println("Executing : " + query);
+        if (log.isDebugEnabled()) {
+            log.debug("Executing : " + query);
+        }
         return toResult(this.sqlCtx.sql(query));
     }
 

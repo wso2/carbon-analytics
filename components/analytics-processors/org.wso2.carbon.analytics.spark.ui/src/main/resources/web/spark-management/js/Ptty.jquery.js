@@ -802,7 +802,7 @@
                 var tokens = value.split(/\s+/);
                 var key = tokens[0].toLowerCase();
                 for (var i = 0; i < 3; i++) {
-                    if (typeof dispatch[key] === 'undefined') {
+                    if (typeof dispatch[key] === 'undefined' && tokens.length>1) {
                         key = key + ' ' + tokens[i + 1].toLowerCase();
                     } else {
                         break;
