@@ -201,6 +201,16 @@ public class AnalyticsSparkExecutorTest {
         this.service.deleteTable(2, "log");
         System.out.println(testString("end : multi tenancy test "));
     }
+    @Test
+    public void testSparkUdfTest() throws AnalyticsException {
+        System.out.println(testString("start : spark udf test"));
+        SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
+        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT stringLengthTest('test') ");
+        Assert.assertEquals(result.getRows().get(0).get(0), 4);
+        System.out.println(result.getRows().get(0).get(0));
+        System.out.println(testString("end : spark udf test"));
+    }
+
 
 //    @Test
 //    public void testCreateTableQuerySchemaInLine() throws AnalyticsException {
