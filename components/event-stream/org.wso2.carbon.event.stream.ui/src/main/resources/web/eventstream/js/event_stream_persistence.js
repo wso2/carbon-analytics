@@ -109,11 +109,16 @@ function createAnalyticsIndexTable() {
     }
 }
 
-function setRowValues(currentCount, indexTable, element) {
+function setRowValues(currentCount, indexTable, element, isPayload) {
     for (var j = 1; j < currentCount; j++) {
         var row = indexTable.rows[j];
         var columnName = row.cells[1].textContent;
-        var jsonColumnName = element.columnName.slice(element.columnName.indexOf("_") + 1, element.columnName.length);
+        var jsonColumnName
+        if (isPayload) {
+            jsonColumnName = element.columnName;
+        } else {
+            jsonColumnName = element.columnName.slice(element.columnName.indexOf("_") + 1, element.columnName.length);
+        }
         if (columnName.trim() == jsonColumnName) {
             row.cells[0].childNodes[0].checked = true;
             var select = row.cells[2].childNodes[0];
@@ -211,13 +216,13 @@ function populateAnalyticsIndexTable(eventStreamName, eventStreamVersion) {
                 if (resultJson.analyticsTableRecords != null) {
                     jQuery.each(resultJson.analyticsTableRecords, function (index, element) {
                         if (element.columnName.startsWith("meta_")) {
-                            setRowValues(currentMetaCount, metaIndexTable, element);
+                            setRowValues(currentMetaCount, metaIndexTable, element, false);
                         } else if (element.columnName.startsWith("correlation_")) {
-                            setRowValues(currentCorrelationCount, correlationIndexTable, element);
+                            setRowValues(currentCorrelationCount, correlationIndexTable, element, false);
                         } else if (element.columnName.startsWith("_")) {
                             setRowValuesForArbitrary(arbitraryIndexTable, element);
                         } else {
-                            setRowValues(currentPayloadCount, payloadIndexTable, element);
+                            setRowValues(currentPayloadCount, payloadIndexTable, element, true);
                         }
                     });
                 }
