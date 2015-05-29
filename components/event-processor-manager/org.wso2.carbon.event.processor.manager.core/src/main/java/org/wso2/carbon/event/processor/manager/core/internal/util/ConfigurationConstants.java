@@ -25,7 +25,7 @@ public final class ConfigurationConstants {
     private ConfigurationConstants() {
     }
 
-    public static final String CEP_MANAGEMENT_XML = "event-processing.xml";
+    public static final String CEP_MANAGEMENT_XML = "event-processor.xml";
 
     public static final String CARBON_CONFIG_PORT_OFFSET_NODE = "Ports.Offset";
     public static final String MODE_ELEMENT = "mode";
@@ -36,6 +36,7 @@ public final class ConfigurationConstants {
     public static final String MANAGEMENT_ELEMENT = "management";
     public static final String RECONNECTION_INTERVAL_ELEMENT = "reconnectionInterval";
     public static final String TRANSPORT_ELEMENT = "transport";
+    public static final String EVENT_SYNC_ELEMENT = "eventSync";
 
 
     public static final String PROCESSING_MODE_HA = "HA";

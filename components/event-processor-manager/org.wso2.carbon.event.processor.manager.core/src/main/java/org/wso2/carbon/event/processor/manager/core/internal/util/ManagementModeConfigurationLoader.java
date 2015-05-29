@@ -176,7 +176,7 @@ public class ManagementModeConfigurationLoader {
                 log.info("No storm managers are provided. Hence automatically electing " + hostName + ":" + port + " node as " +
                         "manager");
             } catch (SocketException e) {
-                log.error("Error while automatically populating storm managers. Please check the event-processing.xml" +
+                log.error("Error while automatically populating storm managers. Please check the event-processor.xml" +
                         " at CARBON_HOME/repository/conf", e);
                 return null;
             }
@@ -275,7 +275,7 @@ public class ManagementModeConfigurationLoader {
     private static HAConfiguration getHAConfiguration(OMElement processing) {
         HAConfiguration haConfiguration = new HAConfiguration();
         OMElement transport = processing.getFirstChildWithName(
-                new QName(ConfigurationConstants.TRANSPORT_ELEMENT));
+                new QName(ConfigurationConstants.EVENT_SYNC_ELEMENT));
         haConfiguration.setTransport(readHostName(transport),
                 readPort(transport, ConfigurationConstants.HA_DEFAULT_TRANSPORT_PORT),
                 readReconnectionInterval(transport));
