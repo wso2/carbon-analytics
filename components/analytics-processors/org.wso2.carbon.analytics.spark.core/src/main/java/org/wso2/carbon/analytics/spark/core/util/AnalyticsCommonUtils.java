@@ -56,6 +56,8 @@ public class AnalyticsCommonUtils {
                 return DataTypes.StringType;
             case AnalyticsConstants.BINARY_TYPE:
                 return DataTypes.BinaryType;
+            case AnalyticsConstants.FACET_TYPE:
+                return DataTypes.createArrayType(DataTypes.StringType);
             default:
                 throw new RuntimeException("Invalid DataType: " + strType);
         }
@@ -79,6 +81,8 @@ public class AnalyticsCommonUtils {
                 return AnalyticsSchema.ColumnType.STRING;
             case AnalyticsConstants.BINARY_TYPE:
                 return AnalyticsSchema.ColumnType.BINARY;
+            case AnalyticsConstants.FACET_TYPE:
+                return AnalyticsSchema.ColumnType.FACET;
             default:
                 throw new RuntimeException("Invalid ColumnType: " + strType);
         }
@@ -122,5 +126,14 @@ public class AnalyticsCommonUtils {
             tenantStr = "T" + String.valueOf(tenantId);
         }
         return tenantStr + delimiter + tableName;
+    }
+
+    public static String convertStreamNameToTableName(String stream){
+        return stream.replaceAll("\\.", "_");
+    }
+
+    public static boolean isNumericType(AnalyticsSchema.ColumnType colType){
+        return !(colType.name().equals("STRING") || colType.name().equals("BINARY")
+                 || colType.name().equals("FACET"));
     }
 }
