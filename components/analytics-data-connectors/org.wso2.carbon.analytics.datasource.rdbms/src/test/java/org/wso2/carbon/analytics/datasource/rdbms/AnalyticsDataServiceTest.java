@@ -572,7 +572,6 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
             drillDownRequest.setRecordStartIndex(0);
             drillDownRequest.setRecordCount(75);
             drillDownRequest.setQuery("log:exception");
-            drillDownRequest.setScoreFunction("_weight");
             List<String> path = Arrays.asList(new String[]{"SomeLocation", "SomeInnerLocation"});
             drillDownRequest.addCategoryPath("location", path);
             count += this.service.drillDownSearchCount(tenantId, drillDownRequest);
@@ -707,7 +706,6 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         drillDownRequest.setRecordStartIndex(0);
         drillDownRequest.setRecordCount(75);
         drillDownRequest.setQuery("log:exception");
-        drillDownRequest.setScoreFunction("_weight");
         List<String> path = Arrays.asList(new String[] {"SomeLocation", "SomeInnerLocation"});
         drillDownRequest.addCategoryPath("location", path);
         List<SearchResultEntry> results = this.service.drillDownSearch(tenantId, drillDownRequest);
@@ -783,7 +781,6 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
             drillDownRequest.setRecordStartIndex(0);
             drillDownRequest.setRecordCount(75);
             drillDownRequest.setQuery("log:exception");
-            drillDownRequest.setScoreFunction("_weight");
             List<String> path = Arrays.asList(new String[]{"SomeLocation", "SomeInnerLocation"});
             drillDownRequest.addCategoryPath("location", path);
             count += this.service.drillDownSearchCount(tenantId, drillDownRequest);
