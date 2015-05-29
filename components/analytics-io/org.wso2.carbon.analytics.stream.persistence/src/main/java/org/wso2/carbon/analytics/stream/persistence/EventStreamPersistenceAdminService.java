@@ -227,7 +227,11 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
         ColumnDefinition columnDefinition = new ColumnDefinition();
         columnDefinition.setName(analyticsTableRecord.getColumnName());
         columnDefinition.setType(getColumnType(analyticsTableRecord.getColumnType()));
-        columnDefinition.setIndexed(analyticsTableRecord.isIndexed());
+        if ("FACET".equals(analyticsTableRecord.getColumnType())) {
+            columnDefinition.setIndexed(true);
+        } else {
+            columnDefinition.setIndexed(analyticsTableRecord.isIndexed());
+        }
         columnDefinition.setScoreParam(analyticsTableRecord.isScoreParam());
         return columnDefinition;
     }

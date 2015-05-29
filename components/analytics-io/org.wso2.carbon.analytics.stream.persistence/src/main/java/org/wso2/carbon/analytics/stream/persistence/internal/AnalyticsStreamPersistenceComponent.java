@@ -18,8 +18,6 @@
 
 package org.wso2.carbon.analytics.stream.persistence.internal;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkService;
 import org.wso2.carbon.event.stream.core.EventStreamService;
@@ -38,8 +36,6 @@ import org.wso2.carbon.event.stream.core.EventStreamService;
  * policy="dynamic" bind="setEventSinkService" unbind="unsetEventSinkService"
  */
 public class AnalyticsStreamPersistenceComponent {
-
-    private static final Log logger = LogFactory.getLog(AnalyticsStreamPersistenceComponent.class);
 
     protected void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {
         ServiceHolder.setAnalyticsDataService(analyticsDataService);

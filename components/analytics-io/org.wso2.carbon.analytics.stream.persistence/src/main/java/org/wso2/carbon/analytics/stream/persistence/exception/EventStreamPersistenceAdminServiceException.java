@@ -26,7 +26,7 @@ import org.apache.axis2.AxisFault;
 public class EventStreamPersistenceAdminServiceException extends AxisFault {
 
     private static final long serialVersionUID = -1046906533158581316L;
-    private String message;
+    private final String message;
 
     public EventStreamPersistenceAdminServiceException(String message) {
         super(message);

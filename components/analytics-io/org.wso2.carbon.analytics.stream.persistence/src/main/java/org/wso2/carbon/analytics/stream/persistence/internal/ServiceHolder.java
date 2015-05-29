@@ -31,6 +31,9 @@ public class ServiceHolder {
     private static EventStreamService eventStreamService;
     private static AnalyticsEventSinkService analyticsEventSinkService;
 
+    private ServiceHolder() {
+    }
+
     public static void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {
         ServiceHolder.analyticsDataService = analyticsDataService;
     }

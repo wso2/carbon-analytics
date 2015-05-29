@@ -21,10 +21,7 @@ package org.wso2.carbon.analytics.message.tracer.handler.exception;
 public class MessageTracerHandlerException extends Exception {
 
     private static final long serialVersionUID = 5354457059768331553L;
-    private String errorMessage;
-
-    public MessageTracerHandlerException() {
-    }
+    private final String errorMessage;
 
     public MessageTracerHandlerException(String message) {
         super(message);
@@ -34,10 +31,6 @@ public class MessageTracerHandlerException extends Exception {
     public MessageTracerHandlerException(String message, Throwable cause) {
         super(message, cause);
         errorMessage = message;
-    }
-
-    public MessageTracerHandlerException(Throwable cause) {
-        super(cause);
     }
 
     public String getErrorMessage() {
