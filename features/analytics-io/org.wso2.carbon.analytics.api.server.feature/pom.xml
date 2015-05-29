@@ -49,7 +49,6 @@
                             <id>org.wso2.carbon.analytics.api.server</id>
                             <propertiesFile>../../etc/feature.properties</propertiesFile>
                             <bundles>
-                                <bundleDef>org.wso2.orbit.org.apache.httpcomponents:httpclient</bundleDef>
                                 <bundleDef>
                                     org.wso2.carbon.analytics:org.wso2.carbon.analytics.io.commons
                                 </bundleDef>
