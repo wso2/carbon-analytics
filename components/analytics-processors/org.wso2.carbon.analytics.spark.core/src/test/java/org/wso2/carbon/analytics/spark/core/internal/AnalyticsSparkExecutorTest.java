@@ -106,6 +106,14 @@ public class AnalyticsSparkExecutorTest {
                            "schema \"server_name STRING, ip STRING, tenant INTEGER, sequence LONG, log STRING\"," +
                            "primaryKeys \"ip, log\""+
                            ")");
+
+        ex.executeQuery(1, "CREATE TEMPORARY TABLE Log2 USING CarbonAnalytics " +
+                           "OPTIONS" +
+                           "(tableName \"Log2\"," +
+                           "schema \"server_name STRING -i, ip STRING, tenant INTEGER -sp, sequence LONG, log STRING\"," +
+                           "primaryKeys \"ip, log\""+
+                           ")");
+
         ex.executeQuery(1, "CREATE TEMPORARY TABLE Log3 USING CarbonAnalytics " +
                            "OPTIONS" +
                            "(tableName \"Log3\"," +
@@ -201,6 +209,8 @@ public class AnalyticsSparkExecutorTest {
         this.service.deleteTable(2, "log");
         System.out.println(testString("end : multi tenancy test "));
     }
+
+
     @Test
     public void testSparkUdfTest() throws AnalyticsException {
         System.out.println(testString("start : spark udf test"));
@@ -210,7 +220,68 @@ public class AnalyticsSparkExecutorTest {
         System.out.println(result.getRows().get(0).get(0));
         System.out.println(testString("end : spark udf test"));
     }
+    @Test//(expectedExceptions = RuntimeException.class)
+    public void testCreateTableWithColumnOptions() throws AnalyticsException {
+        System.out.println(testString("start : create temp table with column options test"));
+        SparkAnalyticsExecutor ex = ServiceHolder.getAnalyticskExecutor();
+        List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "Log", 0, 10, -1, -1);
+        this.service.deleteTable(1, "Log");
+        this.service.createTable(1, "Log");
+        this.service.put(records);
+        String query = "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+                       "OPTIONS" +
+                       "(tableName \"Log\"," +
+                       "schema \"server_name STRING, ip STRING -i, tenant INTEGER -sp, sequence LONG -i, summary STRING\", " +
+                       "primaryKeys \"ip, log\"" +
+                       ")";
+        ex.executeQuery(1, query);
+        AnalyticsQueryResult result = ex.executeQuery(1, "SELECT ip FROM Log");
+        Assert.assertEquals(result.getRows().size(), 10);
+        System.out.println(result);
 
+
+        query = "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+                "OPTIONS" +
+                "(tableName \"Log\"," +
+                "schema \"server_name STRING -sp, ip STRING, tenant INTEGER, sequence LONG, summary STRING\", " +
+                "primaryKeys \"ip, log\"" +
+                ")";
+        try {
+            ex.executeQuery(1, query);
+        } catch (Exception e) {
+            System.out.println("Query failed with : " + e.getMessage());
+            Assert.assertEquals("Score-param assigned to a non-numeric ColumnType", e.getMessage());
+        }
+
+        query = "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+                "OPTIONS" +
+                "(tableName \"Log\"," +
+                "schema \"server_name STRING -XX, ip STRING, tenant INTEGER, sequence LONG, summary STRING\", " +
+                "primaryKeys \"ip, log\"" +
+                ")";
+        try {
+            ex.executeQuery(1, query);
+        } catch (Exception e) {
+            System.out.println("Query failed with : " + e.getMessage());
+            Assert.assertEquals("Invalid option for ColumnType", e.getMessage());
+        }
+
+        query = "CREATE TEMPORARY TABLE Log USING CarbonAnalytics " +
+                "OPTIONS" +
+                "(tableName \"Log\"," +
+                "schema \"server_name STRING -xx xx, ip STRING, tenant INTEGER, sequence LONG, summary STRING\", " +
+                "primaryKeys \"ip, log\"" +
+                ")";
+        try {
+            ex.executeQuery(1, query);
+        } catch (Exception e) {
+            System.out.println("Query failed with : " + e.getMessage());
+            Assert.assertEquals("Invalid ColumnType", e.getMessage());
+        }
+
+        this.service.deleteTable(1, "Log");
+        System.out.println(testString("end : create temp table with column options test"));
+    }
 
 //    @Test
 //    public void testCreateTableQuerySchemaInLine() throws AnalyticsException {

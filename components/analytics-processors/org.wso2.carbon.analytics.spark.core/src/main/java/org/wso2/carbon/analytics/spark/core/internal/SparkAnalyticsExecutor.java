@@ -33,6 +33,7 @@ import org.apache.spark.deploy.worker.WorkerArguments;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
+import org.apache.spark.sql.api.java.UDF3;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.util.Utils;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
@@ -133,7 +134,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         this.sparkConf = initSparkConf(masterUrl, appName);
         this.javaSparkCtx = new JavaSparkContext(this.sparkConf);
 //        this.sqlCtx = new SQLContext(this.javaSparkCtx);
-        initSqlContext (this.javaSparkCtx);
+        initSqlContext(this.javaSparkCtx);
     }
 
     private void initLocalClient() {
@@ -141,7 +142,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         this.sparkConf.setMaster(LOCAL_MASTER_URL).setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
         this.javaSparkCtx = new JavaSparkContext(this.sparkConf);
 //        this.sqlCtx = new SQLContext(this.javaSparkCtx);
-        initSqlContext (this.javaSparkCtx);
+        initSqlContext(this.javaSparkCtx);
     }
 
     private void initSqlContext(JavaSparkContext jsc) {
@@ -160,8 +161,11 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                    ClassNotFoundException, NoSuchMethodException {
         Class<?> udf = Class.forName("org.wso2.carbon.analytics.spark.core.udf.StringLengthUDF");
         Object instance = udf.newInstance();
-
         sqlCtx.udf().register("stringLengthTest", (org.apache.spark.sql.api.java.UDF1<?, ?>) instance, DataTypes.IntegerType);
+
+        Class<?> udf1 = Class.forName("org.wso2.carbon.analytics.spark.core.udf.CompositeID");
+        Object instance1 = udf1.newInstance();
+        sqlCtx.udf().register("compositeID", (UDF3<?, ?, ?, ?>) instance1, DataTypes.StringType);
     }
 
     private void startMaster(String host, String port, String webUIport, String propsFile,
