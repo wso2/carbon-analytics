@@ -43,10 +43,10 @@ public class MQTTEventAdapterServiceDS {
             context.getBundleContext().registerService(OutputEventAdapterFactory.class.getName(),
                     mqttEventAdapterFactory, null);
             if (log.isDebugEnabled()) {
-                log.debug("Successfully deployed the output MQTT event adapter service ");
+                log.debug("The MQTT publisher service has been deployed successfully");
             }
         } catch (RuntimeException e) {
-            log.error("Can not deployed the output MQTT event adapter service ", e);
+            log.error("Exception occurred when deploying MQTT publisher service", e);
         }
     }
 
