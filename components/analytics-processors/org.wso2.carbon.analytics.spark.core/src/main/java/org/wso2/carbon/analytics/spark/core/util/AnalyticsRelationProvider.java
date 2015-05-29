@@ -30,7 +30,6 @@ import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
-import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import scala.collection.immutable.Map;
 import scala.runtime.AbstractFunction0;
 
@@ -54,7 +53,6 @@ public class AnalyticsRelationProvider implements RelationProvider,
     private String tableName;
     private String schemaString;
     private String streamName;
-    private String streamVersion;
     private String primaryKeys;
     private AnalyticsDataService dataService;
 
@@ -84,7 +82,6 @@ public class AnalyticsRelationProvider implements RelationProvider,
         this.tableName = extractValuesFromMap(AnalyticsConstants.TABLE_NAME, parameters, "");
         this.schemaString = extractValuesFromMap(AnalyticsConstants.SCHEMA_STRING, parameters, "");
         this.streamName = extractValuesFromMap(AnalyticsConstants.STREAM_NAME, parameters, "");
-        this.streamVersion = extractValuesFromMap(AnalyticsConstants.STREAM_VERSION, parameters, "");
         this.primaryKeys = extractValuesFromMap(AnalyticsConstants.PRIMARY_KEYS, parameters, "");
     }
 
@@ -99,11 +96,9 @@ public class AnalyticsRelationProvider implements RelationProvider,
                 log.error("Error while accessing tables", e);
                 e.printStackTrace();
             }
-
-        } else if (!this.streamName.isEmpty() && !this.streamVersion.isEmpty()) {
-            // if stream name and version provided, create a table from the streamID
+        } else if (!this.streamName.isEmpty()) {
             try {
-                this.tableName = DataBridgeCommonsUtils.generateStreamId(this.streamName, this.streamVersion);
+                this.tableName = AnalyticsCommonUtils.convertStreamNameToTableName(this.streamName);
                 if (!this.dataService.tableExists(this.tenantId, this.tableName)) {
                     this.dataService.createTable(this.tenantId, this.tableName);
                 }
@@ -112,9 +107,8 @@ public class AnalyticsRelationProvider implements RelationProvider,
                 e.printStackTrace();
             }
         } else {
-            throw new RuntimeException("Empty " + AnalyticsConstants.TABLE_NAME + " OR ( "
-                                       + AnalyticsConstants.STREAM_NAME + " AND "
-                                       + AnalyticsConstants.STREAM_VERSION + " ) ");
+            throw new RuntimeException("Empty " + AnalyticsConstants.TABLE_NAME + " OR "
+                                       + AnalyticsConstants.STREAM_NAME);
         }
 
     }
@@ -153,13 +147,33 @@ public class AnalyticsRelationProvider implements RelationProvider,
         });
     }
 
-    private List<ColumnDefinition> createColumnsList(String primaryKeyStr) {
-        String[] strFields = primaryKeyStr.split("\\s*,\\s*");
+    private List<ColumnDefinition> createColumnsList(String colsStr) {
+        String[] strFields = colsStr.split("\\s*,\\s*");
         ArrayList<ColumnDefinition> resList = new ArrayList<>();
         for (String strField : strFields) {
-            String[] strFieldTokens = strField.trim().split("\\s+");
-            resList.add(new ColumnDefinition(strFieldTokens[0],
-                                             AnalyticsCommonUtils.stringToColumnType(strFieldTokens[1])));
+            String[] tokens = strField.trim().split("\\s+");
+            AnalyticsSchema.ColumnType type = AnalyticsCommonUtils.stringToColumnType(tokens[1]);
+
+            switch (tokens.length) {
+                case 2:
+                    resList.add(new ColumnDefinition(tokens[0], type));
+                    break;
+                case 3:
+                    if (tokens[2].equalsIgnoreCase("-i")) { // if indexed
+                        resList.add(new ColumnDefinition(tokens[0], type, true, false));
+                    } else if (tokens[2].equalsIgnoreCase("-sp")) { // if score param
+                        if (AnalyticsCommonUtils.isNumericType(type)) { // if score param && numeric type
+                            resList.add(new ColumnDefinition(tokens[0], type, true, true));
+                        } else {
+                            throw new RuntimeException("Score-param assigned to a non-numeric ColumnType");
+                        }
+                    } else {
+                        throw new RuntimeException("Invalid option for ColumnType");
+                    }
+                    break;
+                default:
+                    throw new RuntimeException("Invalid ColumnType");
+            }
         }
         return resList;
     }
