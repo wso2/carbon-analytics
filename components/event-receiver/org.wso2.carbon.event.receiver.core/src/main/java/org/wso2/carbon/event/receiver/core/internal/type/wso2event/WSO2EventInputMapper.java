@@ -235,12 +235,11 @@ public class WSO2EventInputMapper implements InputMapper {
         Object[] outObjArray = null;
         if (obj instanceof Event) {
             Event inputEvent = (Event) obj;
-            Object [] timeStamp = new Object[]{inputEvent.getTimeStamp()};
             Object[] metaCorrArray = ObjectArrays.concat( inputEvent.getMetaData() != null ? inputEvent.getMetaData() : new Object[0]
                     , inputEvent.getCorrelationData() != null ? inputEvent.getCorrelationData() : new Object[0], Object.class);
-            Object[] metaTimeStpArray = ObjectArrays.concat(timeStamp, metaCorrArray, Object.class);
-            outObjArray = ObjectArrays.concat
-                    (metaTimeStpArray, inputEvent.getPayloadData() != null ? inputEvent.getPayloadData() : new Object[0], Object.class);
+            Object[] payloadArray =  ObjectArrays.concat
+                    (metaCorrArray, inputEvent.getPayloadData() != null ? inputEvent.getPayloadData() : new Object[0], Object.class);
+            outObjArray = ObjectArrays.concat(payloadArray, new Object[]{"Timestamp:"+inputEvent.getTimeStamp()}, Object.class);
         }
         return outObjArray;
     }

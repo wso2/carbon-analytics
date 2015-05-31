@@ -28,10 +28,9 @@ public class EventConverter {
         Object[] correlationAttributes = null;
         Object[] payloadAttributes = null;
 
-        int attributeIndex = 0;
+        long timeStamp = System.currentTimeMillis();
 
-        long timeStamp = (Long)objArray[0];
-        attributeIndex++;
+        int attributeIndex = 0;
 
         if (streamDefinition.getMetaData() != null) { // If there is at least 1 meta data field
             metaSize = streamDefinition.getMetaData().size();
@@ -52,6 +51,14 @@ public class EventConverter {
             payloadAttributes = new Object[payloadSize];
             for (int i = 0; i < payloadSize; i++) {
                 payloadAttributes[i] = objArray[attributeIndex++];
+            }
+        }
+
+        if (objArray.length - 1 == attributeIndex) {
+            //If timestamp is added
+            String timeStampData = (String) objArray[attributeIndex++];
+            if (timeStampData.startsWith("Timestamp:")) {
+                timeStamp = Long.parseLong(timeStampData.replace("Timestamp:", ""));
             }
         }
 
