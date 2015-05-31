@@ -627,7 +627,7 @@ public class AnalyticsWebService extends AbstractAdmin {
      * @return the count of the records which match the drilldown query
      * @throws AnalyticsWebServiceException
      */
-    public int drillDownSearchCount(AnalyticsDrillDownRequestBean drillDownRequest)
+    public double drillDownSearchCount(AnalyticsDrillDownRequestBean drillDownRequest)
             throws AnalyticsWebServiceException {
         try {
             return analyticsDataAPI.drillDownSearchCount(getUsername(), getAnalyticsDrillDownRequest(drillDownRequest));

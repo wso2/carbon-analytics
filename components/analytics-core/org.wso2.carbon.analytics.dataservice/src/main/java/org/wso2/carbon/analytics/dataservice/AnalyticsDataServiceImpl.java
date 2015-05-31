@@ -472,7 +472,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     @Override
-    public int drillDownSearchCount(int tenantId, AnalyticsDrillDownRequest drillDownRequest)
+    public double drillDownSearchCount(int tenantId, AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
         return this.getIndexer().getDrillDownRecordCount(tenantId, drillDownRequest, null, null);
     }

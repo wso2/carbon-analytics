@@ -245,7 +245,7 @@ public interface AnalyticsDataService extends AnalyticsRecordReader {
      * @return the count of the records which match the drilldown query
      * @throws AnalyticsIndexException
      */
-    public int drillDownSearchCount(int tenantId, AnalyticsDrillDownRequest drillDownRequest)
+    public double drillDownSearchCount(int tenantId, AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException;
 
     /**

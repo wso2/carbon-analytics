@@ -25,9 +25,9 @@ public class CategorySearchResultEntry implements Comparable<CategorySearchResul
 
     private String categoryValue;
 
-    private float score;
+    private double score;
 
-    public CategorySearchResultEntry(String category, float score) {
+    public CategorySearchResultEntry(String category, double score) {
         this.categoryValue = category;
         this.score = score;
     }
@@ -36,7 +36,7 @@ public class CategorySearchResultEntry implements Comparable<CategorySearchResul
         return categoryValue;
     }
 
-    public float getScore() {
+    public double getScore() {
         return score;
     }
 

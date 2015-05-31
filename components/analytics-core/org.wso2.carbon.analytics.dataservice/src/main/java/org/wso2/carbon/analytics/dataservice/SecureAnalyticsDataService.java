@@ -269,7 +269,7 @@ public interface SecureAnalyticsDataService extends AnalyticsRecordReader {
      * @return the count of the records which match the drilldown query
      * @throws AnalyticsIndexException
      */
-    int drillDownSearchCount(String username, AnalyticsDrillDownRequest drillDownRequest)
+    double drillDownSearchCount(String username, AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException;
 
     /**

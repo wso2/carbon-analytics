@@ -175,7 +175,7 @@ public class AnalyticsSearchProcessor extends HttpServlet {
         ServletInputStream servletInputStream = req.getInputStream();
         try {
             AnalyticsDrillDownRequest drillDownRequest = (AnalyticsDrillDownRequest) GenericUtils.deserializeObject(servletInputStream);
-            int resultCount;
+            double resultCount;
             if (!securityEnabled) {
                 resultCount = ServiceHolder.getAnalyticsDataService().drillDownSearchCount(tenantIdParam, drillDownRequest);
             } else {

@@ -638,7 +638,7 @@ public class AnalyticsResource extends AbstractResource {
         String username = authenticate(authHeader);
         if (requestBean != null) {
             AnalyticsDrillDownRequest request = Utils.createDrilldownRequest(requestBean);
-            int result = analyticsDataService.drillDownSearchCount(username, request);
+            double result = analyticsDataService.drillDownSearchCount(username, request);
             return Response.ok(result).build();
         } else {
             throw new AnalyticsException("DrilldownCount parameters not provided");
