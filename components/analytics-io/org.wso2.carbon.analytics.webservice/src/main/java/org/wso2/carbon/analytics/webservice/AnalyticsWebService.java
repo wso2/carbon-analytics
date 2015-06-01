@@ -81,39 +81,6 @@ public class AnalyticsWebService extends AbstractAdmin {
     }
 
     /**
-     * Creates a table, if not already there, where the columns are not defined here, but can contain any arbitrary number
-     * of columns when data is added. The table names are not case sensitive.
-     *
-     * @param tableName The name of the table to be created
-     * @throws AnalyticsWebServiceException
-     */
-    /*public void createTable(String tableName) throws AnalyticsWebServiceException {
-        try {
-            analyticsDataAPI.createTable(getUsername(), tableName);
-        } catch (Exception e) {
-            logger.error("Unable to create table[" + tableName + "] due to " + e.getMessage(), e);
-            throw new AnalyticsWebServiceException("Unable to create table due to " + e.getMessage(), e);
-        }
-    }*/
-
-    /**
-     * Sets the schema for the target analytics table, if there is already one assigned, it will be
-     * overwritten.
-     *
-     * @param tableName The table name
-     * @param schema    The schema to be applied to the table
-     * @throws AnalyticsWebServiceException
-     */
-    /*public void setTableSchema(String tableName, AnalyticsSchemaBean schema) throws AnalyticsWebServiceException {
-        try {
-            analyticsDataAPI.setTableSchema(getUsername(), tableName, Utils.createAnalyticsSchema(schema));
-        } catch (Exception e) {
-            logger.error("Unable to set table schema[" + tableName + "] due to " + e.getMessage(), e);
-            throw new AnalyticsWebServiceException("Unable to set table schema due to " + e.getMessage(), e);
-        }
-    }*/
-
-    /**
      * Add a stream definition using the Event stream publisher.
      * @param streamDefinitionBean The stream definition bean class.
      */
@@ -224,22 +191,6 @@ public class AnalyticsWebService extends AbstractAdmin {
     }
 
     /**
-     * Deletes the table with the given category and name if a table exists already.
-     * This will not throw an error if the table is not there.
-     *
-     * @param tableName The name of the table to be dropped
-     * @throws AnalyticsWebServiceException
-     */
-    /*public void deleteTable(String tableName) throws AnalyticsWebServiceException {
-        try {
-            analyticsDataAPI.deleteTable(getUsername(), tableName);
-        } catch (Exception e) {
-            logger.error("Unable to delete table[" + tableName + "] due to " + e.getMessage(), e);
-            throw new AnalyticsWebServiceException("Unable to delete table[" + tableName + "] due to " + e.getMessage(), e);
-        }
-    }*/
-
-    /**
      * Lists all the current tables with the given category.
      *
      * @return The list of table names
@@ -281,33 +232,6 @@ public class AnalyticsWebService extends AbstractAdmin {
                     .getMessage(), e);
         }
     }
-
-    /**
-     * Adds a new record to the table. If the record id is mentioned,
-     * it will be used to do the insert, or else, it will check the table's schema to check for the existence of
-     * primary keys, if there are any, the primary keys will be used to derive the id, or else
-     * the insert will be done with a randomly generated id.
-     * If the record already exists, it updates the record store with the given records, matches by its record id,
-     * this will be a full replace of the record, where the older record is effectively deleted and the new one is
-     * added, there will not be a merge of older record's field's with the new one.
-     *
-     * @param recordBeans Arrays of RecordBean to be inserted
-     * @return Arrays of updated RecordBean with ids
-     * @throws AnalyticsWebServiceException
-     */
-    /*public RecordBean[] put(RecordBean[] recordBeans) throws AnalyticsWebServiceException {
-        try {
-            List<RecordBean> recordBeanList = Arrays.asList(recordBeans);
-            String username = getUsername();
-            List<Record> records = Utils.getRecords(username, recordBeanList);
-            analyticsDataAPI.put(username, records);
-            recordBeans = Utils.createRecordBeans(records).toArray(recordBeans);
-        } catch (Exception e) {
-            logger.error("Unable to put records  due to " + e.getMessage(), e);
-            throw new AnalyticsWebServiceException("Unable to add record due to " + e.getMessage(), e);
-        }
-        return recordBeans;
-    }*/
 
     /**
      * Retrieves data from a table, with a given range.
@@ -378,24 +302,6 @@ public class AnalyticsWebService extends AbstractAdmin {
                     .getMessage(), e);
         }
     }
-
-    /**
-     * Deletes a set of records in the table.
-     *
-     * @param tableName The name of the table to search on
-     * @param timeFrom  The starting time to get records from for deletion
-     * @param timeTo    The ending time to get records to for deletion
-     * @throws AnalyticsWebServiceException
-     */
-    /*public void deleteByRange(String tableName, long timeFrom, long timeTo) throws AnalyticsWebServiceException {
-        try {
-            analyticsDataAPI.delete(getUsername(), tableName, timeFrom, timeTo);
-        } catch (Exception e) {
-            logger.error("Unable to delete records from table[" + tableName + "] due to " + e.getMessage(), e);
-            throw new AnalyticsWebServiceException("Unable to delete record from table[" + tableName + "] due to " + e
-                    .getMessage(), e);
-        }
-    }*/
 
     /**
      * Delete data in a table with given ids.
