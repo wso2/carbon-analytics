@@ -118,7 +118,7 @@ public class TCPEventServer {
                 if (isRunning) {
                     log.error("Error while the server was listening for events: " + e.getMessage(), e);
                 } else {
-                    log.info("EventServer stopped listening for socket connections.");
+                    log.info("EventServer stopped listening for socket connections.", e);
                 }
             } finally {
                 isRunning = false;
@@ -168,7 +168,7 @@ public class TCPEventServer {
                                     event[i] = bbuf.getFloat();
                                     continue;
                                 case DOUBLE:
-                                    event[i] = bbuf.getLong();
+                                    event[i] = bbuf.getDouble();
                                     continue;
                                 case STRING:
                                     int size = bbuf.getInt();
