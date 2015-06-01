@@ -29,6 +29,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,6 +75,7 @@ public class TCPEventServer {
     private class ServerWorker implements Runnable {
         private ServerSocket receiverSocket;
         private boolean isRunning = false;
+        private List<ListenerProcessor> listenerProcessorList = new ArrayList<>();
 
         public boolean isRunning() {
             return isRunning;
@@ -82,7 +84,19 @@ public class TCPEventServer {
         public void shutdownServerWorker() {
             isRunning = false;
             try {
+
+                for (ListenerProcessor listenerProcessor : listenerProcessorList) {
+                    try {
+                        listenerProcessor.connectionSocket.shutdownInput();
+                        listenerProcessor.connectionSocket.shutdownOutput();
+                        listenerProcessor.connectionSocket.close();
+                    } catch (IOException e) {
+                        log.error("Error occurred while trying to shutdown listener socket: " + e.getMessage(), e);
+                    }
+                }
+                pool.shutdownNow();
                 receiverSocket.close();
+
             } catch (IOException e) {
                 log.error("Error occurred while trying to shutdown socket: " + e.getMessage(), e);
             }
@@ -96,7 +110,9 @@ public class TCPEventServer {
                 receiverSocket = new ServerSocket(TCPEventServerConfig.getPort());
                 while (isRunning) {
                     final Socket connectionSocket = receiverSocket.accept();
-                    pool.execute(new ListenerProcessor(connectionSocket));
+                    ListenerProcessor listenerProcessor = new ListenerProcessor(connectionSocket);
+                    pool.execute(listenerProcessor);
+                    listenerProcessorList.add(listenerProcessor);
                 }
             } catch (Throwable e) {
                 if (isRunning) {
@@ -123,7 +139,7 @@ public class TCPEventServer {
                     BufferedInputStream in = new BufferedInputStream(connectionSocket.getInputStream());
                     while (true) {
 
-                        byte[] streamNameByteSize = loadData(in, new byte[4]) ;
+                        byte[] streamNameByteSize = loadData(in, new byte[4]);
                         ByteBuffer sizeBuf = ByteBuffer.wrap(streamNameByteSize);
                         int streamNameSize = sizeBuf.getInt();
                         byte[] streamNameData = loadData(in, new byte[streamNameSize]);
@@ -163,7 +179,7 @@ public class TCPEventServer {
                         int stringSizePosition = 0;
                         for (int i = 0; i < attributeTypes.length; i++) {
                             Attribute.Type type = attributeTypes[i];
-                            if(Attribute.Type.STRING == type) {
+                            if (Attribute.Type.STRING == type) {
                                 byte[] stringData = loadData(in, new byte[stringValueSizes.get(stringSizePosition)]);
                                 stringSizePosition++;
                                 event[i] = new String(stringData, 0, stringData.length);
@@ -201,14 +217,18 @@ public class TCPEventServer {
 
                 int start = 0;
                 while (true) {
-                    int readCount = in.read(dataArray, start, dataArray.length - start);
-                    if (readCount != -1) {
-                        start += readCount;
-                        if (start == dataArray.length) {
-                            return dataArray;
+                    try {
+                        int readCount = in.read(dataArray, start, dataArray.length - start);
+                        if (readCount != -1) {
+                            start += readCount;
+                            if (start == dataArray.length) {
+                                return dataArray;
+                            }
+                        } else {
+                            throw new EOFException("Connection closed from remote end.");
                         }
-                    } else {
-                        throw new EOFException("Connection closed from remote end.");
+                    } catch (SocketException e) {
+                        throw new IOException("Connection closed while reading message.");
                     }
                 }
             }
