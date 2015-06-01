@@ -303,6 +303,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public void deleteTable(int tenantId, String tableName) throws AnalyticsException {
         this.getAnalyticsRecordStore().deleteTable(tenantId, tableName);
+        this.setTableSchema(tenantId, tableName, new AnalyticsSchema());
         this.clearIndices(tenantId, tableName);
     }
 
