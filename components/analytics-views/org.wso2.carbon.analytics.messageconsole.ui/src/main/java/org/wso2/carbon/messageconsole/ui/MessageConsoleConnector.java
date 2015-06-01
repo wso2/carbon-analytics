@@ -186,7 +186,7 @@ public class MessageConsoleConnector {
             if (!facetsList.isEmpty()) {
                 AnalyticsDrillDownRequestBean requestBean = getAnalyticsDrillDownRequestBean(tableName, startIndex, pageSize, searchQuery, facetsList);
                 resultRecordBeans = analyticsWebServiceStub.drillDownSearch(requestBean);
-                responseResult.setTotalRecordCount(analyticsWebServiceStub.drillDownSearchCount(requestBean));
+                responseResult.setTotalRecordCount(new Double(analyticsWebServiceStub.drillDownSearchCount(requestBean)).intValue());
             } else if (searchQuery != null && !searchQuery.isEmpty()) {
                 resultRecordBeans = analyticsWebServiceStub.search(tableName, searchQuery, startIndex, pageSize);
                 responseResult.setTotalRecordCount(analyticsWebServiceStub.searchCount(tableName, searchQuery));

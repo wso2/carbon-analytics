@@ -245,7 +245,7 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     }
 
     @Override
-    public int drillDownSearchCount(String username, AnalyticsDrillDownRequest drillDownRequest)
+    public double drillDownSearchCount(String username, AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
         try {
             int tenantId = getTenantId(username);

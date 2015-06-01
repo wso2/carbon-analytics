@@ -770,7 +770,7 @@ public class AnalyticsWebServiceConnector {
                         gson.fromJson(queryAsString,DrillDownRequestBean.class);
                 org.wso2.carbon.analytics.webservice.stub.beans.AnalyticsDrillDownRequestBean requestBean =
                         Utils.createDrillDownSearchRequest(tableName, queryBean);
-                int count =
+                double count =
                         analyticsWebServiceStub.drillDownSearchCount(requestBean);
                 if (logger.isDebugEnabled()) {
                     logger.debug("Search count Result -- Record Count: " + count);

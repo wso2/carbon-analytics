@@ -329,11 +329,11 @@ public class Utils {
         return bean;
     }
 
-    private static List<String> getCategories(CategorySearchResultEntryBean[] categories) {
-        List<String> subCategories = new ArrayList<>();
+    private static Map<String, Double> getCategories(CategorySearchResultEntryBean[] categories) {
+        Map<String, Double> subCategories = new LinkedHashMap<>();
         if (categories != null) {
             for (CategorySearchResultEntryBean bean : categories) {
-                subCategories.add(bean.getCategoryName());
+                subCategories.put(bean.getCategoryName(), bean.getScore());
             }
         }
         return subCategories;

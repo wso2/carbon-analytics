@@ -50,6 +50,7 @@ public class AnalyticsConstants {
     public static final String FLOAT_TYPE = "float";
     public static final String LONG_TYPE = "long";
     public static final String BINARY_TYPE = "binary";
+    public static final String FACET_TYPE = "facet";
 
     public static final String TERM_TABLE = "table";
     public static final String TERM_DEFINE = "define";
@@ -78,7 +79,6 @@ public class AnalyticsConstants {
     public static final String TABLE_NAME = "tableName";
     public static final String SCHEMA_STRING = "schema";
     public static final String STREAM_NAME = "streamName";
-    public static final String STREAM_VERSION = "streamVersion";
     public static final String PRIMARY_KEYS = "primaryKeys";
     public static final String SPARK_SHORTHAND_STRING = "CarbonAnalytics";
     public static final String TENANT_ID_AND_TABLES_MAP = "tenantIdTablesMap";

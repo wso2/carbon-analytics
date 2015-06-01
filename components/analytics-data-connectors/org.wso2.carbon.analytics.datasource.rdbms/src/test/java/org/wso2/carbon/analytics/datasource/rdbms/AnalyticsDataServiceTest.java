@@ -566,13 +566,12 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
 
         System.out.println("* Search Result Count: " + results.size() + " Time: " + (end - start) + " ms.");
         start = System.currentTimeMillis();
-        int count = 0;
+        double count = 0;
         for (String tableName : tableNames) {
             drillDownRequest.setTableName(tableName);
             drillDownRequest.setRecordStartIndex(0);
             drillDownRequest.setRecordCount(75);
             drillDownRequest.setQuery("log:exception");
-            drillDownRequest.setScoreFunction("_weight");
             List<String> path = Arrays.asList(new String[]{"SomeLocation", "SomeInnerLocation"});
             drillDownRequest.addCategoryPath("location", path);
             count += this.service.drillDownSearchCount(tenantId, drillDownRequest);
@@ -707,7 +706,6 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         drillDownRequest.setRecordStartIndex(0);
         drillDownRequest.setRecordCount(75);
         drillDownRequest.setQuery("log:exception");
-        drillDownRequest.setScoreFunction("_weight");
         List<String> path = Arrays.asList(new String[] {"SomeLocation", "SomeInnerLocation"});
         drillDownRequest.addCategoryPath("location", path);
         List<SearchResultEntry> results = this.service.drillDownSearch(tenantId, drillDownRequest);
@@ -715,9 +713,9 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         Assert.assertEquals(results.size(), 75);
         System.out.println("* Drilldown Result Count: " + results.size() + " Time: " + (end - start) + " ms.");
         start = System.currentTimeMillis();
-        int count = this.service.drillDownSearchCount(tenantId, drillDownRequest);
+        double count = this.service.drillDownSearchCount(tenantId, drillDownRequest);
         end = System.currentTimeMillis();
-        Assert.assertEquals(count, 50000);
+        Assert.assertEquals(count, 50000.0);
         System.out.println("* DrilldownSearch Result Count: " + count + " Time: " + (end - start) + " ms.");
         this.cleanupTable(tenantId, tableName);
         System.out.println("\n************** END ANALYTICS DS (WITH FACET INDEXING - MULTIPLE THREADS, H2-FILE) PERF TEST **************");
@@ -776,14 +774,13 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         Assert.assertTrue(results.size() <= 75 * tableNames.length);
         System.out.println("* Drilldown Result Count: " + results.size() + " Time: " + (end - start) + " ms.");
         start = System.currentTimeMillis();
-        int count = 0;
+        double count = 0;
         for (String tableName : tableNames) {
             AnalyticsDrillDownRequest drillDownRequest = new AnalyticsDrillDownRequest();
             drillDownRequest.setTableName(tableName);
             drillDownRequest.setRecordStartIndex(0);
             drillDownRequest.setRecordCount(75);
             drillDownRequest.setQuery("log:exception");
-            drillDownRequest.setScoreFunction("_weight");
             List<String> path = Arrays.asList(new String[]{"SomeLocation", "SomeInnerLocation"});
             drillDownRequest.addCategoryPath("location", path);
             count += this.service.drillDownSearchCount(tenantId, drillDownRequest);

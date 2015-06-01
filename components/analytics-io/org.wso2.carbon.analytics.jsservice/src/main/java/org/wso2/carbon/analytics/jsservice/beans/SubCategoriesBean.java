@@ -19,7 +19,7 @@ package org.wso2.carbon.analytics.jsservice.beans;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
+import java.util.Map;
 
 /**
  * This class Contains Sub-categories of a given facet field/column. "path" represents the hierarchical
@@ -30,7 +30,7 @@ import java.util.List;
 public class SubCategoriesBean {
 
     private String[] categoryPath;
-    private List<String> categories;
+    private Map<String, Double> categories;
 
     /**
      * This constructor is used by JAX-RS
@@ -39,12 +39,12 @@ public class SubCategoriesBean {
 
     }
     public SubCategoriesBean(String[] path,
-                             List<String> categories) {
+                             Map<String, Double> categories) {
         this.categoryPath = path;
         this.categories = categories;
     }
 
-    public void setCategories(List<String> categories) {
+    public void setCategories(Map<String, Double> categories) {
         this.categories = categories;
     }
 
@@ -56,7 +56,7 @@ public class SubCategoriesBean {
         return categoryPath;
     }
 
-    public List<String> getCategories() {
+    public Map<String, Double> getCategories() {
         return categories;
     }
 }

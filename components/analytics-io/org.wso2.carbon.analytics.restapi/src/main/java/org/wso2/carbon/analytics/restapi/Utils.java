@@ -286,9 +286,9 @@ public class Utils {
     public static SubCategoriesBean createSubCategoriesBean(SubCategories categories) {
         SubCategoriesBean bean = new SubCategoriesBean();
         bean.setCategoryPath(categories.getPath());
-        List<String> subCategories = new ArrayList<>();
+        Map<String, Double> subCategories = new LinkedHashMap<>();
         for (CategorySearchResultEntry entry : categories.getCategories()) {
-            subCategories.add(entry.getCategoryValue());
+            subCategories.put(entry.getCategoryValue(), entry.getScore());
         }
         bean.setCategories(subCategories);
         return bean;

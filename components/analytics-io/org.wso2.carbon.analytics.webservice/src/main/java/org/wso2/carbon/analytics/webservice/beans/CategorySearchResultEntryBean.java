@@ -26,7 +26,7 @@ public class CategorySearchResultEntryBean implements Serializable {
     private static final long serialVersionUID = -1168090243724348417L;
 
     private String categoryName;
-    private float score;
+    private double score;
 
     public CategorySearchResultEntryBean() {
     }
@@ -45,7 +45,7 @@ public class CategorySearchResultEntryBean implements Serializable {
      *
      * @param score the new score
      */
-    public void setScore(float score) {
+    public void setScore(double score) {
         this.score = score;
     }
 
@@ -63,7 +63,7 @@ public class CategorySearchResultEntryBean implements Serializable {
      *
      * @return the score
      */
-    public float getScore() {
+    public double getScore() {
         return score;
     }
 }

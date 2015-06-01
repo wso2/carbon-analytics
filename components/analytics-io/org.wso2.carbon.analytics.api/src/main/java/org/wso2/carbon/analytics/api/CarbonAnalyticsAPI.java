@@ -398,7 +398,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
         }
     }
     @Override
-    public int drillDownSearchCount(String username, AnalyticsDrillDownRequest drillDownRequest)
+    public double drillDownSearchCount(String username, AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             return ServiceHolder.getSecureAnalyticsDataService().drillDownSearchCount(username, drillDownRequest);
@@ -506,7 +506,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
         }
     }
     @Override
-    public int drillDownSearchCount(int tenantId, AnalyticsDrillDownRequest drillDownRequest)
+    public double drillDownSearchCount(int tenantId, AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             return ServiceHolder.getAnalyticsDataService().drillDownSearchCount(tenantId, drillDownRequest);
