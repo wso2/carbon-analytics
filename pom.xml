@@ -1257,8 +1257,8 @@
         <lucene.regex.version>3.0.3</lucene.regex.version>
         <lucene.orbit.version>4.10.3.wso2v2</lucene.orbit.version>
         <asm4.orbit.version>4.0.0.wso2v1</asm4.orbit.version>
-        <carbon.commons.version>4.4.0</carbon.commons.version>
-        <carbon.commons.imp.pkg.version>[4.4.0, 4.5.0)</carbon.commons.imp.pkg.version>
+        <carbon.commons.version>4.4.3</carbon.commons.version>
+        <carbon.commons.imp.pkg.version>[4.4.3, 4.5.0)</carbon.commons.imp.pkg.version>
         <carbon.event-processing.version>2.0.4-SNAPSHOT</carbon.event-processing.version>
         <carbon.analytics.common.version>2.0.0-SNAPSHOT</carbon.analytics.common.version>
         <carbon.analytics.common.imp.pkg.version>[2.0.0-SNAPSHOT, 2.1.0)</carbon.analytics.common.imp.pkg.version>
