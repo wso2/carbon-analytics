@@ -13,6 +13,9 @@
     AnalyticsExecutionClient client = new AnalyticsExecutionClient(cookie, serverURL, configContext);
     String query = request.getParameter("query");
     String jsonResult = "";
+
+    query = query.replaceAll("&lt;", "<");
+    query = query.replaceAll("&gt;", ">");
     try {
         jsonResult = client.execute(query.trim());
         response.setStatus(HttpServletResponse.SC_OK);
