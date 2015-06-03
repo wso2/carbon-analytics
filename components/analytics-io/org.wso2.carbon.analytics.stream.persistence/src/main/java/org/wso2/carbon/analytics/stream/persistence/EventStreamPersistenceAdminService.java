@@ -106,9 +106,9 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
                     log.warn("Analytics table does not exist for stream[" + streamName + "]");
                 }
             }
-            if (log.isDebugEnabled() && !streamAlreadyExist) {
-                log.debug("Stream[" + streamName + "] not existing in file system. Retuning empty AnalyticsTable " +
-                          "object.");
+            if (!streamAlreadyExist) {
+                log.warn("Stream[" + streamName + "] not existing in file system. Retuning empty AnalyticsTable " +
+                         "object.");
             }
         } catch (Exception e) {
             log.error("Unable to get analytics schema[" + streamName + "]: " + e.getMessage(), e);
