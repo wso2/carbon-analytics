@@ -28,11 +28,10 @@ import org.apache.spark.sql.jdbc.{JDBCPartition, DriverQuirks, JDBCRDD}
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * Data corresponding to one partition of a Wso2JDBCRDD.
+ * This class represents an extension of Spark's original JDBC relation provider.
+ * This was done because, the current released version does not support JDBC insert.
+ * this class has applied the corresponding PR regarding the JDBC inserts.
  */
-//case class JDBCPartition(whereClause: String, idx: Int) extends Partition {
-//  override def index: Int = idx
-//}
 
 /**
  * Instructions on how to partition the table among workers.
