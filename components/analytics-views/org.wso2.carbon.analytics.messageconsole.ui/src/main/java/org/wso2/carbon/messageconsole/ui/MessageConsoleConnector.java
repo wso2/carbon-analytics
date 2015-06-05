@@ -123,11 +123,8 @@ public class MessageConsoleConnector {
         Permissions permissions = new Permissions();
         try {
             PermissionBean permissionBean = messageConsoleStub.getAvailablePermissions();
-            permissions.setCreateTable(permissionBean.getCreateTable());
             permissions.setListTable(permissionBean.getListTable());
-            permissions.setDropTable(permissionBean.getDropTable());
             permissions.setListRecord(permissionBean.getListRecord());
-            permissions.setPutRecord(permissionBean.getPutRecord());
             permissions.setSearchRecord(permissionBean.getSearchRecord());
             permissions.setDeleteRecord(permissionBean.getDeleteRecord());
         } catch (Exception e) {

@@ -21,7 +21,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
 
 /**
  * This class represent user's analytics data service level permissions.
@@ -69,24 +68,5 @@ public class PermissionBean implements Serializable {
 
     public void setListTable(boolean listTable) {
         this.listTable = listTable;
-    }
-
-    @Override
-    public String toString() {
-        try {
-            StringBuilder sb = new StringBuilder();
-            Class<?> objClass = this.getClass();
-
-            Field[] fields = objClass.getDeclaredFields();
-            for (Field field : fields) {
-                String name = field.getName();
-                Object value = field.get(this);
-                sb.append(name).append(":").append(value.toString()).append("||");
-            }
-            return sb.toString();
-        } catch (Exception e) {
-            log.error(e);
-            return super.toString();
-        }
     }
 }
