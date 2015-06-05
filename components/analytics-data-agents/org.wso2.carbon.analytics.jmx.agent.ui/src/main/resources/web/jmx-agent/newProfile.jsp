@@ -343,19 +343,6 @@ function selectAttribute() {
             return 0;
         }
 
-        if (document.getElementById('pubAddress').value == "") {
-            valid = false;
-        }
-        if (document.getElementById('pubUserName').value == "") {
-            valid = false;
-        }
-        if (document.getElementById('pubUserPass').value == "") {
-            valid = false;
-        }
-        if (document.getElementById('pubSecureAddress').value == "") {
-            valid = false;
-        }
-
         //if a custom cron is selected
         if (jQuery('#cronType').val() == "custom" && document.getElementById('#cronExprTxtInput').value == "") {
             valid = false;
