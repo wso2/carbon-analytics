@@ -60,14 +60,12 @@ public final class ConfigurationConstants {
 
     public static final String PROCESSING_MODE_DISTRIBUTED = "Distributed";
     public static final String DISTRIBUTED_NODE_CONFIG_ELEMENT = "nodeType";
-    public static final String DISTRIBUTED_NODE_CONFIG_RECEIVER_ELEMENT = "receiver";
-    public static final String DISTRIBUTED_NODE_CONFIG_PUBLISHER_ELEMENT = "publisher";
+    public static final String DISTRIBUTED_NODE_CONFIG_WORKER_ELEMENT = "worker";
     public static final String DISTRIBUTED_NODE_CONFIG_MANAGER_ELEMENT = "manager";
     public static final String DISTRIBUTED_NODE_CONFIG_MANAGERS_ELEMENT = "managers";
     public static final String DISTRIBUTED_NODE_CONFIG_HEARTBEAT_INTERVAL_ELEMENT = "heartbeatInterval";
     public static final String DISTRIBUTED_NODE_CONFIG_TOPOLOGY_RESUBMIT_INTERVAL_ELEMENT = "topologyResubmitInterval";
     public static final String DISTRIBUTED_NODE_CONFIG_PORT_RANGE_ELEMENT = "portRange";
-    public static final String DISTRIBUTED_NODE_CONFIG_DEFAULT_PARALLELISM_ELEMENT = "defaultParallelism";
     public static final String DISTRIBUTED_NODE_CONFIG_DISTRIBUTED_UI_URL_ELEMENT = "distributedUIUrl";
     public static final String DISTRIBUTED_NODE_CONFIG_STORM_JAR_ELEMENT = "stormJar";
     public static final String ENABLE_ATTRIBUTE = "enable";

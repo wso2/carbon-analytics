@@ -55,7 +55,8 @@ public class ManagementModeConfigurationLoader {
         }
         attribute = processing.getAttribute(new QName(ConfigurationConstants.PROCESSING_MODE_NAME_ATTRIBUTE))
                 .getAttributeValue();
-        if (attribute.equalsIgnoreCase(ConfigurationConstants.PROCESSING_MODE_HA)) {
+        managementModeInfo.setMode(Mode.SingleNode);
+        if (attribute.equalsIgnoreCase(ConfigurationConstants.PROCESSING_MODE_HA) && nodeType(ConfigurationConstants.ENABLE_ATTRIBUTE, processing)) {
             managementModeInfo.setMode(Mode.HA);
             log.info("CEP started in HA mode");
             managementModeInfo.setHaConfiguration(getHAConfiguration(processing));
@@ -63,14 +64,15 @@ public class ManagementModeConfigurationLoader {
             managementModeInfo.setMode(Mode.SingleNode);
             OMElement nodeConfig = processing.getFirstChildWithName(
                     new QName(ConfigurationConstants.SN_PERSISTENCE_ELEMENT));
-            if(nodeConfig != null && nodeType(ConfigurationConstants.ENABLE_ATTRIBUTE,nodeConfig)) {
+            if (nodeConfig != null && nodeType(ConfigurationConstants.ENABLE_ATTRIBUTE, nodeConfig)) {
                 managementModeInfo.setPersistenceConfiguration(getPersistConfigurations(nodeConfig));
                 log.info("CEP started in Persistence mode");
             }
-        } else if (attribute.equalsIgnoreCase(ConfigurationConstants.PROCESSING_MODE_DISTRIBUTED)) {
+        } else if (attribute.equalsIgnoreCase(ConfigurationConstants.PROCESSING_MODE_DISTRIBUTED) && nodeType(ConfigurationConstants.ENABLE_ATTRIBUTE, processing)) {
             managementModeInfo.setMode(Mode.Distributed);
             log.info("CEP started in Distributed mode");
             managementModeInfo.setDistributedConfiguration(getDistributedConfiguration(processing));
+
         }
         return managementModeInfo;
     }
@@ -227,14 +229,9 @@ public class ManagementModeConfigurationLoader {
         //Reading node info
         OMElement node = processingElement.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_ELEMENT));
         if (node != null) {
-            OMElement receiver = node.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_RECEIVER_ELEMENT));
-            if ("true".equalsIgnoreCase(receiver.getAttributeValue(new QName(ConfigurationConstants.ENABLE_ATTRIBUTE)))) {
-                stormDeploymentConfig.setReceiverNode(true);
-            }
-
-            OMElement publisher = node.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_PUBLISHER_ELEMENT));
-            if ("true".equalsIgnoreCase(publisher.getAttributeValue(new QName(ConfigurationConstants.ENABLE_ATTRIBUTE)))) {
-                stormDeploymentConfig.setPublisherNode(true);
+            OMElement worker = node.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_WORKER_ELEMENT));
+            if ("true".equalsIgnoreCase(worker.getAttributeValue(new QName(ConfigurationConstants.ENABLE_ATTRIBUTE)))) {
+                stormDeploymentConfig.setWorkerNode(true);
             }
 
             OMElement manager = node.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_MANAGER_ELEMENT));
@@ -246,17 +243,6 @@ public class ManagementModeConfigurationLoader {
             }
         } else {
             log.info("No node type configurations provided. Hence using default node type configurations");
-        }
-
-        OMElement defaultParallelism = processingElement.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_DEFAULT_PARALLELISM_ELEMENT));
-        if(defaultParallelism != null){
-            int receiver = Integer.parseInt(defaultParallelism.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_RECEIVER_ELEMENT)).getText());
-            int publisher = Integer.parseInt(defaultParallelism.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_PUBLISHER_ELEMENT)).getText());
-            stormDeploymentConfig.setReceiverSpoutParallelism(receiver);
-            stormDeploymentConfig.setPublisherBoltParallelism(publisher);
-        } else {
-            log.info("No parallelism configurations provided. Hence using default parallelism configurations. Event " +
-                    "Receiver Spout = 1. Event Publisher Bolt = 1.");
         }
 
         OMElement distributedUI = processingElement.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_DISTRIBUTED_UI_URL_ELEMENT));

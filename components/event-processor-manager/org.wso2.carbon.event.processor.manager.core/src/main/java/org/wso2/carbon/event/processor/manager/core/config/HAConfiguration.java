@@ -23,33 +23,33 @@ import java.io.Serializable;
 
 
 public class HAConfiguration implements Serializable {
-        private HostAndPort management;
-        private HostAndPort transport;
-        private int reconnectionInterval;
+    private HostAndPort management;
+    private HostAndPort transport;
+    private int reconnectionInterval;
 
-        public int getReconnectionInterval() {
-            return reconnectionInterval;
-        }
+    public int getReconnectionInterval() {
+        return reconnectionInterval;
+    }
 
-        public void setReconnectionInterval(int reconnectionInterval) {
-            this.reconnectionInterval = reconnectionInterval;
-        }
+    public void setReconnectionInterval(int reconnectionInterval) {
+        this.reconnectionInterval = reconnectionInterval;
+    }
 
-        public HostAndPort getManagement() {
-            return management;
-        }
+    public HostAndPort getManagement() {
+        return management;
+    }
 
-        public HostAndPort getTransport() {
-            return transport;
-        }
+    public HostAndPort getTransport() {
+        return transport;
+    }
 
-        public void setManagement(String host, int port) {
-            this.management = new HostAndPort(host, port);
-        }
+    public void setManagement(String host, int port) {
+        this.management = new HostAndPort(host, port);
+    }
 
-        public void setTransport(String host, int port, int reconnectionInterval) {
-            this.transport = new HostAndPort(host, port);
-            this.reconnectionInterval = reconnectionInterval;
-        }
+    public void setTransport(String host, int port, int reconnectionInterval) {
+        this.transport = new HostAndPort(host, port);
+        this.reconnectionInterval = reconnectionInterval;
+    }
 
 }

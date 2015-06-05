@@ -28,7 +28,7 @@
 
     <!-- HA Mode Config -->
 
-    <!--<mode name="HA">
+    <!--<mode name="HA" enable="false">
         <eventSync>
             <hostName>localhost</hostName>
             <port>11224</port>
@@ -44,11 +44,10 @@
 
     <!-- Distributed Mode Config -->
 
-    <!--<mode name="Distributed">
+    <!--<mode name="Distributed" enable="false">
 
         <nodeType>
-            <receiver enable="true"/>
-            <publisher enable="true"/>
+            <worker enable="true"/>
             <manager enable="true">
                 <hostName>localhost</hostName>
                 <port>8904</port>
@@ -80,11 +79,6 @@
         </transport>
 
         <stormJar>org.wso2.carbon.event.processor.storm.jar</stormJar>
-
-        <defaultParalalisum>
-            <receiver></receiver>
-            <publishr></publishr>
-        </defaultParalalisum>
 
         <distributedUIUrl></distributedUIUrl>
 

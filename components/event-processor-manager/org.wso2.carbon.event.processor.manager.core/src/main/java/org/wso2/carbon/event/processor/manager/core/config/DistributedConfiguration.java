@@ -25,8 +25,7 @@ import java.util.List;
 
 public class DistributedConfiguration implements Serializable {
 
-    private boolean receiverNode = false;
-    private boolean publisherNode = false;
+    private boolean workerNode = false;
     private boolean managerNode = false;
     private HostAndPort localManagerConfig = new HostAndPort("localhost", 8904);
 
@@ -41,9 +40,6 @@ public class DistributedConfiguration implements Serializable {
     private int topologySubmitRetryInterval = 10000;
     private int heartbeatInterval = 5000;
     private int managementReconnectInterval = 10000;
-
-    private int receiverSpoutParallelism = 1;
-    private int publisherBoltParallelism = 1;
 
     private String distributedUIUrl;
 
@@ -64,20 +60,12 @@ public class DistributedConfiguration implements Serializable {
         this.topologySubmitRetryInterval = topologySubmitRetryInterval;
     }
 
-    public boolean isReceiverNode() {
-        return receiverNode;
+    public boolean isWorkerNode() {
+        return workerNode;
     }
 
-    public void setReceiverNode(boolean receiverNode) {
-        this.receiverNode = receiverNode;
-    }
-
-    public boolean isPublisherNode() {
-        return publisherNode;
-    }
-
-    public void setPublisherNode(boolean publisherNode) {
-        this.publisherNode = publisherNode;
+    public void setWorkerNode(boolean workerNode) {
+        this.workerNode = workerNode;
     }
 
     public boolean isManagerNode() {
@@ -142,22 +130,6 @@ public class DistributedConfiguration implements Serializable {
 
     public String getJar() {
         return jar;
-    }
-
-    public int getPublisherBoltParallelism() {
-        return publisherBoltParallelism;
-    }
-
-    public void setPublisherBoltParallelism(int publisherBoltParallelism) {
-        this.publisherBoltParallelism = publisherBoltParallelism;
-    }
-
-    public int getReceiverSpoutParallelism() {
-        return receiverSpoutParallelism;
-    }
-
-    public void setReceiverSpoutParallelism(int receiverSpoutParallelism) {
-        this.receiverSpoutParallelism = receiverSpoutParallelism;
     }
 
     public String getDistributedUIUrl() {
