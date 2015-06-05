@@ -18,9 +18,6 @@
 
 package org.wso2.carbon.analytics.webservice.internal;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 
@@ -35,13 +32,6 @@ import org.wso2.carbon.event.stream.core.EventStreamService;
  * cardinality="1..1" policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
  */
 public class AnalyticsWebServiceComponent {
-    private static final Log logger = LogFactory.getLog(AnalyticsWebServiceComponent.class);
-
-    protected void activate(ComponentContext ctx) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Activating AnalyticsWebServiceComponent");
-        }
-    }
 
     protected void setAnalyticsDataAPIService(AnalyticsDataAPI analyticsDataAPI) {
         ServiceHolder.setAnalyticsDataAPIService(analyticsDataAPI);

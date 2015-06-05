@@ -31,13 +31,9 @@ public class PermissionBean implements Serializable {
     private static final long serialVersionUID = -5034605258834260595L;
 
     private static final Log log = LogFactory.getLog(PermissionBean.class);
-
-    private boolean createTable;
     private boolean listTable;
-    private boolean dropTable;
     private boolean searchRecord;
     private boolean listRecord;
-    private boolean putRecord;
     private boolean deleteRecord;
 
     public PermissionBean() {
@@ -49,14 +45,6 @@ public class PermissionBean implements Serializable {
 
     public void setDeleteRecord(boolean deleteRecord) {
         this.deleteRecord = deleteRecord;
-    }
-
-    public boolean isPutRecord() {
-        return putRecord;
-    }
-
-    public void setPutRecord(boolean putRecord) {
-        this.putRecord = putRecord;
     }
 
     public boolean isListRecord() {
@@ -75,28 +63,12 @@ public class PermissionBean implements Serializable {
         this.searchRecord = searchRecord;
     }
 
-    public boolean isDropTable() {
-        return dropTable;
-    }
-
-    public void setDropTable(boolean dropTable) {
-        this.dropTable = dropTable;
-    }
-
     public boolean isListTable() {
         return listTable;
     }
 
     public void setListTable(boolean listTable) {
         this.listTable = listTable;
-    }
-
-    public boolean isCreateTable() {
-        return createTable;
-    }
-
-    public void setCreateTable(boolean createTable) {
-        this.createTable = createTable;
     }
 
     @Override

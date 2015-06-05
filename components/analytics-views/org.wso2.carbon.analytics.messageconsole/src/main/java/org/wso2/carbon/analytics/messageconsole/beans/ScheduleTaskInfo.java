@@ -32,11 +32,6 @@ public class ScheduleTaskInfo implements Serializable {
     public ScheduleTaskInfo() {
     }
 
-    public ScheduleTaskInfo(String cronString, int retentionPeriod) {
-        this.cronString = cronString;
-        this.retentionPeriod = retentionPeriod;
-    }
-
     public String getCronString() {
         return cronString;
     }

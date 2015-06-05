@@ -20,18 +20,7 @@ function getArbitraryFields(rowData) {
                             postData['tableName'] = $("#tableSelect").val();
                             postData['_unique_rec_id'] = rowData.record._unique_rec_id;
                             return arbitraryFieldListActionMethod(postData, jtParams);
-                        }/*,
-                        createAction: function (postData) {
-                            return arbitraryFieldCreateActionMethod(postData);
-                        },
-                        updateAction: function (postData) {
-                            return arbitraryFieldUpdateActionMethod(postData);
-                        },
-                        deleteAction: function (postData) {
-                            postData['tableName'] = $("#tableSelect").val();
-                            postData['_unique_rec_id'] = rowData.record._unique_rec_id;
-                            return arbitraryFieldDeleteActionMethod(postData);
-                        }*/
+                        }
                     },
                     deleteConfirmation: function (data) {
                         arbitraryColumnName = data.record.Name;
@@ -96,78 +85,6 @@ function arbitraryFieldListActionMethod(postData, jtParams) {
         );
     });
 }
-
-/*function arbitraryFieldCreateActionMethod(postData) {
-    var recordId;
-    var $selectedRows = $('#AnalyticsTableContainer').jtable('selectedRows');
-    if ($selectedRows.length > 0) {
-        $selectedRows.each(function () {
-            var record = $(this).data('record');
-            recordId = record._unique_rec_id;
-        });
-    }
-    return $.Deferred(function ($dfd) {
-        $.ajax({
-                    url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeCreateArbitraryRecord + "&tableName=" + $("#tableSelect").val() + "&_unique_rec_id=" + recordId,
-                    type: 'POST',
-                    dataType: 'json',
-                    data: postData,
-                    success: function (data) {
-                        $dfd.resolve(data);
-                    },
-                    error: function () {
-                        $dfd.reject();
-                    }
-                }
-        );
-    });
-}*/
-
-/*function arbitraryFieldUpdateActionMethod(postData) {
-    var recordId;
-    var $selectedRows = $('#AnalyticsTableContainer').jtable('selectedRows');
-    if ($selectedRows.length > 0) {
-        $selectedRows.each(function () {
-            var record = $(this).data('record');
-            recordId = record._unique_rec_id;
-        });
-    }
-    return $.Deferred(function ($dfd) {
-        $.ajax({
-                    url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeUpdateArbitraryRecord + "&tableName=" + $("#tableSelect").val() + "&_unique_rec_id=" + recordId,
-                    type: 'POST',
-                    dataType: 'json',
-                    data: postData,
-                    success: function (data) {
-                        $dfd.resolve(data);
-                    },
-                    error: function () {
-                        $dfd.reject();
-                    }
-                }
-        );
-    });
-}*/
-
-/*function arbitraryFieldDeleteActionMethod(postData) {
-    postData["Name"] = arbitraryColumnName;
-    return $.Deferred(function ($dfd) {
-        $.ajax({
-                    url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeDeleteArbitraryRecord,
-                    type: 'POST',
-                    dataType: 'json',
-                    data: postData,
-                    success: function (data) {
-                        $dfd.resolve(data);
-                    },
-                    error: function () {
-                        $dfd.reject();
-                    }
-                }
-        );
-    });
-}*/
-
 function createJTable() {
     var table = $("#tableSelect").val();
     if (table != '-1') {
@@ -276,65 +193,6 @@ function listActionMethod(jtParams) {
         );
     });
 }
-
-/*function createActionMethod(postData) {
-    return $.Deferred(function ($dfd) {
-        $.ajax({
-            url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeCreateRecord + '&tableName=' + $("#tableSelect").val(),
-            type: 'POST',
-            dataType: 'json',
-            data: postData,
-            success: function (data) {
-                $dfd.resolve(data);
-            },
-            error: function () {
-                $dfd.reject();
-            }
-        });
-    });
-}*/
-
-/*function updateActionMethod(postData) {
-    return $.Deferred(function ($dfd) {
-        $.ajax({
-            url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?' +
-                 'type=' + typeUpdateRecord + '&tableName=' + $("#tableSelect").val(),
-            type: 'POST',
-            dataType: 'json',
-            data: postData,
-            success: function (data) {
-                $dfd.resolve(data);
-            },
-            error: function () {
-                $dfd.reject();
-            }
-        });
-    });
-}*/
-
-/*function deleteRecords(postData) {
-    console.log(postData);
-    postData["tableName"] = $("#tableSelect").val();
-    return $.Deferred(function ($dfd) {
-        $.ajax({
-                    url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeDeleteRecord,
-                    type: 'POST',
-                    dataType: 'json',
-                    data: postData,
-                    success: function (data) {
-                        $dfd.resolve(data);
-                    },
-                    error: function () {
-                        $dfd.reject();
-                    }
-                }
-        );
-    });
-}
-
-function deleteActionMethod(postData) {
-    return deleteRecords(postData);
-}*/
 
 function tableSelectChange() {
     var table = $("#tableSelect").val();

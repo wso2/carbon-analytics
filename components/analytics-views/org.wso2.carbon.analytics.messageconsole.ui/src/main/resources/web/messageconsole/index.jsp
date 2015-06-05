@@ -49,39 +49,10 @@
     <link href="js/jquery-ui-timepicker-addon.min.css" type="text/css" rel="stylesheet"/>
     <link href="js/jquery-ui-timepicker-addon.css" type="text/css" rel="stylesheet"/>
 
-   <%-- <style media="screen" type="text/css">
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 100%;
-            background: rgba(255, 255, 255, .8) url('images/ajax-loader.gif') 50% 50% no-repeat;
-        }
-
-        body.loading {
-            overflow: hidden;
-        }
-
-        body.loading .modal {
-            display: block;
-        }
-    </style>--%>
-
     <script type="text/javascript">
-        <%--var typeCreateRecord = '<%= MessageConsoleConnector.TYPE_CREATE_RECORD%>';--%>
         var typeListRecord = '<%= MessageConsoleConnector.TYPE_LIST_RECORD%>';
-        <%--var typeDeleteRecord = '<%= MessageConsoleConnector.TYPE_DELETE_RECORD%>';--%>
-        <%--var typeUpdateRecord = '<%= MessageConsoleConnector.TYPE_UPDATE_RECORD%>';--%>
         var typeTableInfo = '<%= MessageConsoleConnector.TYPE_TABLE_INFO%>';
         var typeListArbitraryRecord = '<%= MessageConsoleConnector.TYPE_LIST_ARBITRARY_RECORD%>';
-        <%--var typeCreateArbitraryRecord = '<%= MessageConsoleConnector.TYPE_CRATE_ARBITRARY_RECORD%>';--%>
-        <%--var typeUpdateArbitraryRecord = '<%= MessageConsoleConnector.TYPE_UPDATE_ARBITRARY_RECORD%>';--%>
-        <%--var typeDeleteArbitraryRecord = '<%= MessageConsoleConnector.TYPE_DELETE_ARBITRARY_RECORD%>';--%>
-        <%--var typeCreateTable = '<%= MessageConsoleConnector.TYPE_CREATE_TABLE%>';--%>
-        <%--var typeDeleteTable = '<%= MessageConsoleConnector.TYPE_DELETE_TABLE%>';--%>
         var typeGetTableInfo = '<%= MessageConsoleConnector.TYPE_GET_TABLE_INFO%>';
         var typeGetPurgingTask = '<%= MessageConsoleConnector.TYPE_GET_PURGING_TASK_INFO%>';
         var typeSavePurgingTask = '<%= MessageConsoleConnector.TYPE_SAVE_PURGING_TASK_INFO%>';
@@ -104,14 +75,11 @@
                       $("#tableSelect").append(tableNames);
                   });
             </c:if>
-//            $("#deleteTableButton").hide();
-//            $("#editTableButton").hide();
             $("#purgeRecordButton").hide();
             $('#facetListSelect').find('option:gt(0)').remove();
             $('#facetSearchTable tr').remove();
             $('#query').val('');
             try {
-//                $('#DeleteAllButton').hide();
                 if (tableLoaded == true) {
                     $('#AnalyticsTableContainer').jtable('destroy');
                     tableLoaded = false;
@@ -121,100 +89,11 @@
         }
 
         $(document).ready(function () {
-            /*$.ajaxSetup({
-                beforeSend: function () {
-                    $("body").addClass("loading");
-                },
-                complete: function () {
-                    $("body").removeClass("loading");
-                },
-                cache: false
-            });*/
             loadTableSelect();
-//            $("#DeleteAllButton").hide();
-            jQuery('#timeFrom').datetimepicker();
-            jQuery('#timeTo').datetimepicker();
-//            $("#createTableDialog").dialog({
-//                autoOpen: false
-//            });
             $("#purgeRecordDialog").dialog({
                 autoOpen: false
             });
-
-//            $("#tableForm").validationEngine();
             $("#dataPurgingForm").validationEngine();
-
-            /*$("#addNewTable").on("click", function () {
-                $("#column-details").find('tr').slice(1, document.getElementById('column-details').rows.length - 1).remove();
-                $('#column-details tr').each(function () {
-                    $(this).find('select.select').prop("disabled", false)
-                });
-                $('#tableForm')[0].reset();
-                $('#createTableDialog').dialog({
-                    title: 'Create a new table...',
-                    height: 300,
-                    width: 500,
-                    modal: true,
-                    resizable: true
-                });
-                $("#createTableDialog").dialog("open");
-                document.getElementById("tableName").readOnly = false;
-                document.getElementById("tableName").value = "";
-                tablePopupAction = 'add';
-                document.getElementById('createTablePopup').style.display = 'block';
-                document.getElementById('msgLabel').style.display = 'none';
-            });*/
-
-            <%--<c:if test="${permissions != null && permissions.isCreateTable()}">
-            $("#column-details tbody").on("click", ".del", function () {
-                $(this).parent().parent().remove();
-            });
-
-            $("#column-details tbody").on("click", ".add", function () {
-                $(this).val('Delete');
-                $(this).attr('class', 'del');
-                var appendTxt =
-                        "<tr><td><input type='text' name='column'/></td><td><select class='select'><option value='STRING'>STRING</option><option value='INTEGER'>INTEGER</option><option value='LONG'>LONG</option><option value='BOOLEAN'>BOOLEAN</option><option value='FLOAT'>FLOAT</option><option value='DOUBLE'>DOUBLE</option><option value='FACET'>FACET</option></select></td><td><input type='checkbox' name='primary'/></td><td><input type='checkbox' name='index'/></td><td><input type='checkbox' name='scoreParam' class='score-param-class'/></td><td><input class='add' type='button' value='Add More'/></td></tr>";
-                $("#column-details tbody tr:last").after(appendTxt);
-            });
-            </c:if>--%>
-
-            /*$("#deleteTableButton").on("click", function () {
-                $("#table-delete-confirm").dialog({
-                    height: 300,
-                    width: 500,
-                    modal: true,
-                    resizable: true,
-                    buttons: {
-                        "Delete Table": function () {
-                            $.post('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeDeleteTable, {tableName: $("#tableSelect").val()},
-                                   function (result) {
-                                       var label = document.getElementById('deleteTableMsgLabel');
-                                       label.style.display = 'block';
-                                       label.innerHTML = result;
-                                       loadTableSelect();
-                                       $('#deleteTableMsg').fadeOut(10000);
-                                       $('#DeleteAllButton').hide();
-                                       try {
-                                           if (tableLoaded == true) {
-                                               $('#AnalyticsTableContainer').jtable('destroy');
-                                               tableLoaded = false;
-                                           }
-                                       } catch (err) {
-                                       }
-
-                                   });
-                            $(this).dialog("close");
-                        },
-                        Cancel: function () {
-                            $(this).dialog("close");
-                        }
-                    }
-                });
-                $("#table-delete-confirm").dialog("open");
-                return true;
-            });*/
-
             $("#purgeRecordButton").on("click", function () {
                 var label = document.getElementById('dataPurgingMsgLabel');
                 label.style.display = 'none';
@@ -231,93 +110,6 @@
                        });
                 return true;
             });
-
-            /*$("#editTableButton").on("click", function () {
-                $.post('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeGetTableInfo, {tableName: $("#tableSelect").val()},
-                       function (result) {
-                           var resultArray = jQuery.parseJSON(result);
-                           var arrayLength = resultArray.length;
-                           $("#column-details").find('tr').slice(1, document.getElementById('column-details').rows.length - 1).remove();
-                           $('#tableForm')[0].reset();
-                           $('#column-details tr').each(function () {
-                               $(this).find('select.select').prop("disabled", false)
-                           });
-                           var table = document.getElementById('column-details');
-                           $('#createTableDialog').dialog({
-                               title: 'Edit table',
-                               height: 300,
-                               width: 500,
-                               modal: true,
-                               resizable: true
-                           });
-                           document.getElementById('createTablePopup').style.display = 'block';
-                           document.getElementById('msgLabel').style.display = 'none';
-
-                           document.getElementById("tableName").value = $("#tableSelect").val();
-                           document.getElementById("tableName").readOnly = true;
-
-                           var tbody = table.getElementsByTagName('tbody')[0];
-
-                           for (var i = 0; i < arrayLength; i++) {
-                               var cellNo = 0;
-                               var rowCount = table.rows.length - 2;
-                               var row = tbody.insertRow(rowCount);
-
-                               var columnCell = row.insertCell(cellNo++);
-                               var columnInputElement = document.createElement('input');
-                               columnInputElement.name = "column";
-                               columnInputElement.type = "text";
-                               columnInputElement.value = resultArray[i].column;
-                               columnCell.appendChild(columnInputElement);
-
-                               var typeCell = row.insertCell(cellNo++);
-                               var selectElement = document.createElement('select');
-                               selectElement.options[0] = new Option('STRING', 'STRING');
-                               selectElement.options[1] = new Option('INTEGER', 'INTEGER');
-                               selectElement.options[2] = new Option('LONG', 'LONG');
-                               selectElement.options[3] = new Option('BOOLEAN', 'BOOLEAN');
-                               selectElement.options[4] = new Option('FLOAT', 'FLOAT');
-                               selectElement.options[5] = new Option('DOUBLE', 'DOUBLE');
-                               selectElement.options[5] = new Option('FACET', 'FACET');
-                               selectElement.value = resultArray[i].type;
-                               selectElement.className = "select";
-                               typeCell.appendChild(selectElement);
-
-                               var primaryCell = row.insertCell(cellNo++);
-                               var primaryCheckElement = document.createElement('input');
-                               primaryCheckElement.type = "checkbox";
-                               primaryCheckElement.checked = resultArray[i].primary;
-                               primaryCell.appendChild(primaryCheckElement);
-
-                               var indexCell = row.insertCell(cellNo++);
-                               var indexCheckElement = document.createElement('input');
-                               indexCheckElement.type = "checkbox";
-                               indexCheckElement.checked = resultArray[i].index;
-                               indexCell.appendChild(indexCheckElement);
-
-                               var scoreParamCell = row.insertCell(cellNo++);
-                               var scoreParamCheckElement = document.createElement('input');
-                               scoreParamCheckElement.type = "checkbox";
-                               scoreParamCheckElement.className = "score-param-class";
-                               scoreParamCheckElement.checked = resultArray[i].scoreParam;
-                               scoreParamCell.appendChild(scoreParamCheckElement);
-                               if (resultArray[i].scoreParam) {
-                                   selectElement.disabled = true;
-                               }
-
-                               var buttonCell = row.insertCell(cellNo++);
-                               var delButtonElement = document.createElement('input');
-                               delButtonElement.type = "button";
-                               delButtonElement.value = "Delete";
-                               delButtonElement.className = "del";
-                               buttonCell.appendChild(delButtonElement);
-                           }
-                           tablePopupAction = 'edit';
-                           $("#createTableDialog").dialog("open");
-                       });
-                return true;
-            });*/
-
             $('#dataPurgingCheckBox').change(function () {
                 if ($(this).is(":checked")) {
                     $("#dataPurgingScheudleTime").prop('disabled', false);
@@ -327,10 +119,6 @@
                     $("#dataPurgingDay").prop('disabled', true);
                 }
             });
-
-            /*$("#column-details tbody").on("change", ".score-param-class", function () {
-                $(this).parents("tr:eq(0)").find(".select").prop("disabled", this.checked);
-            });*/
 
             $('#facetListSelect').on('change', function () {
                 var facetName = $(this).val();
@@ -411,60 +199,6 @@
                 $(this).parent().parent().remove();
             });
         });
-
-        /*function createTable() {
-            if (!$("#tableForm").validationEngine('validate')) {
-                return false;
-            }
-            var result;
-            var tableName = document.getElementById('tableName').value;
-            var jsonObj = [];
-            var table = document.getElementById('column-details');
-            for (var r = 1, n = table.rows.length; r < n; r++) {
-                var item = {};
-                for (var c = 0, m = table.rows[r].cells.length; c < m; c++) {
-                    if (table.rows[r].cells[c].childNodes[0].value != '') {
-                        if (c == 0) {
-                            item ["column"] = table.rows[r].cells[c].childNodes[0].value;
-                        } else if (c == 1) {
-                            item ["type"] = table.rows[r].cells[c].childNodes[0].value;
-                        } else if (c == 2) {
-                            item ["primary"] = table.rows[r].cells[c].childNodes[0].checked;
-                        } else if (c == 3) {
-                            item ["index"] = table.rows[r].cells[c].childNodes[0].checked;
-                        } else if (c == 4) {
-                            item ["scoreParam"] = table.rows[r].cells[c].childNodes[0].checked;
-                        }
-                    }
-                }
-                jsonObj.push(item);
-            }
-            var values = {};
-            values.tableInfo = JSON.stringify(jsonObj);
-            $.ajax({
-                type: 'POST',
-                url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' +
-                     typeCreateTable + "&tableName=" + tableName + "&action=" + tablePopupAction,
-                data: values,
-                success: function (data) {
-                    result = true;
-                    var label = document.getElementById('msgLabel');
-                    label.style.display = 'block';
-                    label.innerHTML = data;
-                    document.getElementById('createTablePopup').style.display = 'none';
-                    loadTableSelect();
-                },
-                error: function (data) {
-                    result = false;
-                    var label = document.getElementById('msgLabel');
-                    label.style.display = 'block';
-                    label.innerHTML = data;
-                }
-            });
-
-            return result;
-        }*/
-
         function createMainJTable(fields) {
             $('#AnalyticsTableContainer').jtable({
                 title: $("#tableSelect").val(),
@@ -483,44 +217,11 @@
                     listAction: function (postData, jtParams) {
                         return listActionMethod(jtParams);
                     }
-                    <%--<c:if test="${permissions != null && permissions.isPutRecord()}">
-                    // Don't remove this leading comma
-                    , createAction: function (postData) {
-                        return createActionMethod(postData);
-                    },
-                    updateAction: function (postData) {
-                        return updateActionMethod(postData);
-                    }
-                    </c:if>
-                    <c:if test="${permissions != null && permissions.isDeleteRecord()}">
-                    // Don't remove this leading comma
-                    , deleteAction: function (postData) {
-                        return deleteActionMethod(postData);
-                    }
-                    </c:if>--%>
                 },
-                /*formCreated: function (event, data) {
-                    data.form.validationEngine();
-                },
-                //Validate form when it is being submitted
-                formSubmitting: function (event, data) {
-                    return data.form.validationEngine('validate');
-                },
-                //Dispose validation logic when form is closed
-                formClosed: function (event, data) {
-                    data.form.validationEngine('hide');
-                    data.form.validationEngine('detach');
-                },*/
                 fields: fields
 
             });
             $('#AnalyticsTableContainer').jtable('load');
-//            $("#DeleteAllButton").show();
-            /*$("#DeleteAllButton").on("click", function () {
-                var $selectedRows = $('#AnalyticsTableContainer').jtable('selectedRows');
-                $('#AnalyticsTableContainer').jtable('deleteRows', $selectedRows);
-                $('#AnalyticsTableContainer').jtable('reload');
-            });*/
             tableLoaded = true;
             $("#resultsTable").show();
         }
@@ -546,41 +247,7 @@
                                     postData['_unique_rec_id'] = rowData.record._unique_rec_id;
                                     return arbitraryFieldListActionMethod(postData, jtParams);
                                 }
-                                <%--<c:if test="${permissions != null && permissions.isPutRecord()}">
-                                ,
-                                createAction: function (postData) {
-                                    return arbitraryFieldCreateActionMethod(postData);
-                                },
-                                updateAction: function (postData) {
-                                    return arbitraryFieldUpdateActionMethod(postData);
-                                }
-                                </c:if>
-                                <c:if test="${permissions != null && permissions.isDeleteRecord()}">,
-                                deleteAction: function (postData) {
-                                    postData['tableName'] = $("#tableSelect").val();
-                                    postData['_unique_rec_id'] = rowData.record._unique_rec_id;
-                                    return arbitraryFieldDeleteActionMethod(postData);
-                                }
-                                </c:if>--%>
                             },
-                            /*deleteConfirmation: function (data) {
-                                arbitraryColumnName = data.record.Name;
-                            },
-                            rowsRemoved: function (event, data) {
-                                arbitraryColumnName = "";
-                            },
-                            formCreated: function (event, data) {
-                                data.form.validationEngine();
-                            },
-                            //Validate form when it is being submitted
-                            formSubmitting: function (event, data) {
-                                return data.form.validationEngine('validate');
-                            },
-                            //Dispose validation logic when form is closed
-                            formClosed: function (event, data) {
-                                data.form.validationEngine('hide');
-                                data.form.validationEngine('detach');
-                            },*/
                             fields: {
                                 _unique_rec_id: {
                                     type: 'hidden',
@@ -691,27 +358,6 @@
                 <p><c:out value="${permissionError.message}"/></p>
             </div>
         </c:if>
-        <%--<div>
-            <label id="deleteTableMessage"></label>
-        </div>--%>
-        <%--<div id="table-delete-confirm" title="Remove entire table?" style="display: none">
-            <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-                This will be permanently delete entire table. Are you sure? </p>
-        </div>--%>
-        <%--<c:if test="${permissions != null && permissions.isCreateTable()}">
-            <table class="normal" width="100%">
-                <tbody>
-                <tr>
-                    <td><input type="button" id="addNewTable" value="Add New Table" class="button"></td>
-                    <td>&nbsp;</td>
-                </tr>
-                </tbody>
-            </table>
-            <br/>
-        </c:if>--%>
-        <%--<div id="deleteTableMsg">
-            <label id="deleteTableMsgLabel" style="display: none"></label>
-        </div>--%>
         <table class="styledLeft">
             <thead>
             <tr>
@@ -731,12 +377,6 @@
                                     <select id="tableSelect" onchange="tableSelectChange()">
                                         <option value="-1">Select a Table</option>
                                     </select>
-                                    <%--<c:if test="${permissions != null && permissions.isDropTable()}">
-                                        <input type="button" id="deleteTableButton" value="Delete Table" class="button"
-                                               style="display: none">
-                                    </c:if>
-                                        <input type="button" id="editTableButton" value="Edit Table" class="button"
-                                               style="display: none">--%>
                                     <c:if test="${permissions != null && permissions.isDeleteRecord()}">
                                         <input type="button" id="purgeRecordButton" class="button"
                                                value="Schedule Data Purging"
@@ -804,82 +444,11 @@
                     <div id="AnalyticsTableContainer" class="overflowAuto"></div>
                 </td>
             </tr>
-            <%--<c:if test="${permissions != null && permissions.isDeleteRecord()}">
-                <tr>
-                    <td class="buttonRow">
-                        <input type="button" id="DeleteAllButton" value="Delete all selected records" class="button">
-                    </td>
-                </tr>
-            </c:if>--%>
             </tbody>
         </table>
         <br/>
     </div>
     <br/>
-
-    <%--<div id="createTableDialog" title="Create a new table">
-        <div id="msg">
-            <label id="msgLabel" style="display: none"></label>
-        </div>
-        <div id="createTablePopup">
-            <form class="noteform" id="tableForm" action="javascript:createTable()">
-                <table class="normal">
-                    <tbody>
-                    <tr>
-                        <td>Table Name</td>
-                        <td>
-                            <input type="text" id="tableName" class="validate[required]">
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-                <br/>
-                <table id="column-details" class="styledLeft">
-                    <thead>
-                    <tr>
-                        <th>Column</th>
-                        <th>Type</th>
-                        <th>Primary key</th>
-                        <th>Index</th>
-                        <th>Score Param</th>
-                        <th>&nbsp;</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <c:if test="${permissions != null && permissions.isCreateTable()}">
-                    <tr>
-                        <td><input type="text" name="column"/></td>
-                        <td><select class="select">
-                            <option value="STRING">STRING</option>
-                            <option value="INTEGER">INTEGER</option>
-                            <option value="LONG">LONG</option>
-                            <option value="BOOLEAN">BOOLEAN</option>
-                            <option value="FLOAT">FLOAT</option>
-                            <option value="DOUBLE">DOUBLE</option>
-                            <option value="FACET">FACET</option>
-                        </select></td>
-                        <td><input type="checkbox" name="primary"/></td>
-                        <td><input type="checkbox" name="index"/></td>
-                        <td><input type="checkbox" name="scoreParam" class="score-param-class"/></td>
-                        <td><input class="add" type="button" value="Add More"/></td>
-                    </tr>
-                    </c:if>
-                    </tbody>
-                </table>
-                <c:if test="${permissions != null && permissions.isCreateTable()}">
-                <table class="styledLeft">
-                    <tbody>
-                    <tr>
-                        <td class="buttonRow">
-                            <input type="submit" value="Save" class="button">
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-                </c:if>
-            </form>
-        </div>
-    </div>--%>
     <div id="purgeRecordDialog" title="Schedule Data Purging">
         <div id="dataPurgingMsg">
             <label id="dataPurgingMsgLabel" style="display: none"></label>
@@ -916,6 +485,5 @@
     </div>
 </div>
 </fmt:bundle>
-<%--<div class="modal"></div>--%>
 </body>
 </html>

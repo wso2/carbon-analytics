@@ -61,18 +61,12 @@ public class MessageConsoleService extends AbstractAdmin {
         String username = super.getUsername();
         try {
             AuthorizationManager authorizationManager = getUserRealm().getAuthorizationManager();
-            permission.setCreateTable(authorizationManager.isUserAuthorized(username, Constants.PERMISSION_CREATE_TABLE,
-                                                                            CarbonConstants.UI_PERMISSION_ACTION));
             permission.setListTable(authorizationManager.isUserAuthorized(username, Constants.PERMISSION_LIST_TABLE,
-                                                                          CarbonConstants.UI_PERMISSION_ACTION));
-            permission.setDropTable(authorizationManager.isUserAuthorized(username, Constants.PERMISSION_DROP_TABLE,
                                                                           CarbonConstants.UI_PERMISSION_ACTION));
             permission.setSearchRecord(authorizationManager.isUserAuthorized(username, Constants.PERMISSION_SEARCH_RECORD,
                                                                              CarbonConstants.UI_PERMISSION_ACTION));
             permission.setListRecord(authorizationManager.isUserAuthorized(username, Constants.PERMISSION_LIST_RECORD,
                                                                            CarbonConstants.UI_PERMISSION_ACTION));
-            permission.setPutRecord(authorizationManager.isUserAuthorized(username, Constants.PERMISSION_PUT_RECORD,
-                                                                          CarbonConstants.UI_PERMISSION_ACTION));
             permission.setDeleteRecord(authorizationManager.isUserAuthorized(username, Constants.PERMISSION_DELETE_RECORD,
                                                                              CarbonConstants.UI_PERMISSION_ACTION));
         } catch (UserStoreException e) {

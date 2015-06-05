@@ -39,9 +39,6 @@ public class MessageConsoleServiceComponent {
     private static final Log log = LogFactory.getLog(MessageConsoleServiceComponent.class);
 
     protected void activate(ComponentContext ctx) {
-        if (log.isDebugEnabled()) {
-            log.debug("Activating Analytics MessageConsoleServiceComponent module.");
-        }
         try {
             ServiceHolder.getTaskService().registerTaskType(Constants.ANALYTICS_DATA_PURGING);
         } catch (TaskException e) {
@@ -50,30 +47,18 @@ public class MessageConsoleServiceComponent {
     }
 
     protected void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {
-        if (log.isDebugEnabled()) {
-            log.info("Setting the Analytics Data Service");
-        }
         ServiceHolder.setAnalyticsDataService(analyticsDataService);
     }
 
     protected void unsetAnalyticsDataService(AnalyticsDataService analyticsDataService) {
-        if (log.isDebugEnabled()) {
-            log.info("Unsetting the Analytics Data Service");
-        }
         ServiceHolder.setAnalyticsDataService(null);
     }
 
     protected void setTaskService(TaskService taskService) {
-        if (log.isDebugEnabled()) {
-            log.debug("Setting the Task Service");
-        }
         ServiceHolder.setTaskService(taskService);
     }
 
     protected void unsetTaskService(TaskService taskService) {
-        if (log.isDebugEnabled()) {
-            log.debug("Unsetting the Task Service");
-        }
         ServiceHolder.setTaskService(null);
     }
 }
