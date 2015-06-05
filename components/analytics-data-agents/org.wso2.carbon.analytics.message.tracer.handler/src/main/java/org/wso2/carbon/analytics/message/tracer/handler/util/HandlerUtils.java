@@ -90,7 +90,7 @@ public class HandlerUtils {
 
                     String basicAuthHeaderValue = new String(Base64.decodeBase64(basicAuthHeader.replace("Basic", "").trim().getBytes()));
                     String[] basicAuth = basicAuthHeaderValue.split(":");
-                    if(basicAuth != null && basicAuth.length >= 2) {
+                    if(basicAuth.length >= 2) {
                         userName = basicAuth[0];
                         return userName;
                     }
@@ -131,7 +131,7 @@ public class HandlerUtils {
                 if(basicAuthHeader != null && !basicAuthHeader.isEmpty()) {
                     String basicAuthHeaderValue = new String(Base64.decodeBase64(basicAuthHeader.replace("Basic", "").trim().getBytes()));
                     String[] basicAuth = basicAuthHeaderValue.split(":");
-                    if(basicAuth != null && basicAuth.length >= 2) {
+                    if(basicAuth.length >= 2) {
                         userName = basicAuth[0];
                         return userName;
                     }

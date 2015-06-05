@@ -46,15 +46,14 @@ public class AgentUtil {
                        getMessageTracingEnabledAdminServices().contains(serverName);
     }
 
-    public static void setTransportHeaders(TracingInfo tracingInfo,
-                                           Map<String, String> properties) {
+    public static void setTransportHeaders(TracingInfo tracingInfo, Map<String, Object> properties) {
 
         if ((tracingInfo != null) && (properties != null)) {
             Map<String, String> transportHeaders = new HashMap<String, String>(properties.size());
             for (String headerName : properties.keySet()) {
-                String headerValue = properties.get(headerName);
+                Object headerValue = properties.get(headerName);
                 if (headerValue != null) {
-                    transportHeaders.put(TRANSPORT_HEADER + headerName, properties.get(headerName));
+                    transportHeaders.put(TRANSPORT_HEADER + headerName, headerValue.toString());
                 }
             }
 

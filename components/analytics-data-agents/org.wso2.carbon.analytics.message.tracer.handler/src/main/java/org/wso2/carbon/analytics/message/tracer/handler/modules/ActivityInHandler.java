@@ -59,6 +59,7 @@ public class ActivityInHandler extends AbstractHandler {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public InvocationResponse invoke(MessageContext messageContext) throws AxisFault {
         int tenantID = PublisherUtil.getTenantId(messageContext);
         Map<Integer, EventingConfigData> tenantSpecificEventConfig = TenantEventConfigData.getTenantSpecificEventingConfigData();
@@ -77,7 +78,8 @@ public class ActivityInHandler extends AbstractHandler {
                 String activityUUID = getActivityUUID(messageContext);
                 messageContext.setProperty(MessageTracerConstants.TENANT_ID, tenantID);
                 TracingInfo tracingInfo = getTracingInfo(messageContext, activityUUID);
-                AgentUtil.setTransportHeaders(tracingInfo, (Map<String, String>) messageContext.getProperty(MessageContext.TRANSPORT_HEADERS));
+                AgentUtil.setTransportHeaders(tracingInfo, (Map<String, Object>) messageContext.getProperty(MessageContext
+                                                                                                               .TRANSPORT_HEADERS));
                 try {
                     if (eventingConfigData.isDumpBodyEnable()) {
                         buildSoapMessage(messageContext);
@@ -127,6 +129,7 @@ public class ActivityInHandler extends AbstractHandler {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void buildSoapMessage(MessageContext messageContext) throws AxisFault {
         try {
             Class cls = Class.forName(MessageTracerConstants.ORG_APACHE_SYNAPSE_TRANSPORT_PASSTHRU_UTIL_RELAY_UTILS_CLASS_NAME);
@@ -140,6 +143,7 @@ public class ActivityInHandler extends AbstractHandler {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private String getActivityUUID(MessageContext messageContext) {
         String activityUUID = HandlerUtils.getUniqueId();
         Object transportHeaders = messageContext.getProperty(MessageContext.TRANSPORT_HEADERS);
@@ -165,7 +169,7 @@ public class ActivityInHandler extends AbstractHandler {
                 }
             }
         } else {
-            Map<String, String> headers = new TreeMap<String, String>();
+            Map<String, String> headers = new TreeMap<>();
             headers.put(MessageTracerConstants.ACTIVITY_ID, activityUUID);
             messageContext.setProperty(MessageContext.TRANSPORT_HEADERS, headers);
             if (LOG.isDebugEnabled()) {

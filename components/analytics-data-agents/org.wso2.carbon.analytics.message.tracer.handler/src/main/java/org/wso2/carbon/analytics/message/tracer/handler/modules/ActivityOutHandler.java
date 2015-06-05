@@ -60,9 +60,9 @@ public class ActivityOutHandler extends AbstractHandler {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public InvocationResponse invoke(MessageContext messageContext) throws AxisFault {
         MessageContext inMessageContext = null;
-        Object inTransportHeaders = null;
         int tenantID = PublisherUtil.getTenantId(messageContext);
         if (tenantID == MultitenantConstants.INVALID_TENANT_ID) {
             inMessageContext = messageContext.getOperationContext().getMessageContext(WSDL2Constants.MESSAGE_LABEL_IN);
@@ -93,9 +93,10 @@ public class ActivityOutHandler extends AbstractHandler {
                 if (inMessageContext == null) {
                     inMessageContext = messageContext.getOperationContext().getMessageContext(WSDL2Constants.MESSAGE_LABEL_IN);
                 }
-                String activityID = getActivityId(messageContext, inMessageContext, inTransportHeaders);
+                String activityID = getActivityId(messageContext, inMessageContext);
                 TracingInfo tracingInfo = getTracingInfo(messageContext, activityID);
-                Map<String, String> transportHeadersMap = (Map<String, String>) messageContext.getProperty(MessageContext.TRANSPORT_HEADERS);
+                Map<String, Object> transportHeadersMap = (Map<String, Object>) messageContext.getProperty(MessageContext
+                                                                                                              .TRANSPORT_HEADERS);
                 AgentUtil.setTransportHeaders(tracingInfo, transportHeadersMap);
                 try {
                     if (eventingConfigData.isDumpBodyEnable()) {
@@ -152,22 +153,23 @@ public class ActivityOutHandler extends AbstractHandler {
         return status;
     }
 
-    private boolean isEmptyBody(Map<String, String> transportHeadersMap) {
+    private boolean isEmptyBody(Map<String, Object> transportHeadersMap) {
         boolean isEmptyBody = false;
         if (transportHeadersMap != null) {
-            String contentLength = transportHeadersMap.get(HTTPConstants.HEADER_CONTENT_LENGTH);
-            if (contentLength != null && Integer.parseInt(contentLength) == 0) {
+            Object contentLength = transportHeadersMap.get(HTTPConstants.HEADER_CONTENT_LENGTH);
+            if (contentLength != null && Integer.parseInt(contentLength.toString()) == 0) {
                 isEmptyBody = true;
             }
         }
         return isEmptyBody;
     }
 
-    private String getActivityId(MessageContext messageContext, MessageContext inMessageContext,
-                                 Object inTransportHeaders) {
+    @SuppressWarnings("unchecked")
+    private String getActivityId(MessageContext messageContext, MessageContext inMessageContext) {
         String activityID = HandlerUtils.getUniqueId();
         //engage transport headers
         Object transportHeaders = messageContext.getProperty(MessageContext.TRANSPORT_HEADERS);
+        Object inTransportHeaders = null;
         if (inMessageContext != null) {
             inTransportHeaders = inMessageContext.getProperty(MessageContext.TRANSPORT_HEADERS);
         }
@@ -201,13 +203,14 @@ public class ActivityOutHandler extends AbstractHandler {
                     }
                 }
             }
-            Map<String, String> headers = new HashMap<String, String>(1);
+            Map<String, String> headers = new HashMap<>(1);
             headers.put(MessageTracerConstants.ACTIVITY_ID, activityID);
             messageContext.setProperty(MessageContext.TRANSPORT_HEADERS, headers);
         }
         return activityID;
     }
 
+    @SuppressWarnings("unchecked")
     private void buildSoapMessage(MessageContext messageContext) throws AxisFault {
         try {
             Class cls = Class.forName(MessageTracerConstants.ORG_APACHE_SYNAPSE_TRANSPORT_PASSTHRU_UTIL_RELAY_UTILS_CLASS_NAME);
