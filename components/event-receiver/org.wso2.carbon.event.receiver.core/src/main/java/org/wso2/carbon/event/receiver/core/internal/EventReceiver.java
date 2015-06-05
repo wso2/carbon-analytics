@@ -61,7 +61,7 @@ public class EventReceiver implements EventProducer {
     private String beforeTracerPrefix;
     private String afterTracerPrefix;
     private AbstractInputEventDispatcher inputEventDispatcher;
-    private boolean eventDuplicatedInCluster;
+    private Mode mode;
 
     public EventReceiver(EventReceiverConfiguration eventReceiverConfiguration,
                          StreamDefinition exportedStreamDefinition, Mode mode)
@@ -118,20 +118,17 @@ public class EventReceiver implements EventProducer {
             } catch (InputEventAdapterRuntimeException e) {
                 throw new EventReceiverProcessingException("Cannot subscribe to input event adapter :" + inputEventAdapterName + ", error while connecting by adapter.", e);
             }
-
+            this.mode = mode;
             if (mode == Mode.HA) {
                 Lock readLock = EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().getReadLock();
                 inputEventDispatcher = new QueueInputEventDispatcher(tenantId, EventManagementUtil.constructEventSyncId(tenantId, eventReceiverConfiguration.getEventReceiverName(), Manager.ManagerType.Receiver), readLock, exportedStreamDefinition);
                 inputEventDispatcher.setSendToOther(!isEventDuplicatedInCluster);
                 EventReceiverServiceValueHolder.getEventManagementService().registerEventSync((EventSync) inputEventDispatcher);
-            } else if (mode == Mode.Distributed) {
-                inputEventDispatcher = new InputEventDispatcher();
-                inputEventDispatcher.setDrop(isEventDuplicatedInCluster);
             } else {
                 inputEventDispatcher = new InputEventDispatcher();
             }
 
-            if (mode == Mode.HA && eventDuplicatedInCluster) {
+            if (mode == Mode.HA && isEventDuplicatedInCluster) {
                 EventReceiverServiceValueHolder.getInputEventAdapterService().start(inputEventAdapterName);
             }
         }
@@ -231,7 +228,11 @@ public class EventReceiver implements EventProducer {
         if (statisticsEnabled) {
             statisticsMonitor.incrementRequest();
         }
-        this.inputEventDispatcher.onEvent(outObjArray);
+        //in distributed mode if events are duplicated in cluster, send event only if the node is receiver coordinator
+        if (!(mode == Mode.Distributed) || !isEventDuplicatedInCluster || EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().isReceiverCoordinator()) {
+            this.inputEventDispatcher.onEvent(outObjArray);
+        }
+
     }
 
     public AbstractInputEventDispatcher getInputEventDispatcher() {
@@ -274,7 +275,7 @@ public class EventReceiver implements EventProducer {
     }
 
     public boolean isEventDuplicatedInCluster() {
-        return eventDuplicatedInCluster;
+        return isEventDuplicatedInCluster;
     }
 
     private class MappedEventSubscription implements InputEventAdapterSubscription {

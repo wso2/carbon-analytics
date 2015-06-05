@@ -131,9 +131,7 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
                         Object[] event = eventQueue.take();
                         readLock.lock();
                         readLock.unlock();
-                        if (!isDrop()) {
-                            callBack.sendEventData(event);
-                        }
+                        callBack.sendEventData(event);
                         if (isSendToOther()) {
                             EventReceiverServiceValueHolder.getEventManagementService().syncEvent(syncId, Manager.ManagerType.Receiver, event);
                         }

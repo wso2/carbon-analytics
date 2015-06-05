@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.event.processor.manager.core;
+package org.wso2.carbon.event.processor.manager.core.internal;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.siddhi.core.SiddhiManager;
+import org.wso2.carbon.event.processor.manager.core.EventProcessorManagementService;
+import org.wso2.carbon.event.processor.manager.core.internal.ds.EventManagementServiceValueHolder;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -26,19 +24,13 @@ import java.util.concurrent.TimeUnit;
 
 public class PersistenceManager implements Runnable {
 
-    private static final Log log = LogFactory.getLog(PersistenceManager.class);
-    private final SiddhiManager siddhiManager;
     private final ScheduledExecutorService scheduledExecutorService;
     private final long interval;
-    private final int tenantId;
     private ScheduledFuture<?> scheduledFuture = null;
 
-    public PersistenceManager(SiddhiManager siddhiManager, ScheduledExecutorService scheduledExecutorService,
-                              long interval, int tenantId) {
-        this.siddhiManager = siddhiManager;
+    public PersistenceManager(ScheduledExecutorService scheduledExecutorService, long interval) {
         this.scheduledExecutorService = scheduledExecutorService;
         this.interval = interval;
-        this.tenantId = tenantId;
     }
 
     public void init() {
@@ -52,6 +44,7 @@ public class PersistenceManager implements Runnable {
             scheduledFuture.cancel(false);
         }
         persist();
+        scheduledExecutorService.shutdown();
     }
 
     @Override
@@ -60,15 +53,8 @@ public class PersistenceManager implements Runnable {
     }
 
     private void persist() {
-        try {
-            PrivilegedCarbonContext.startTenantFlow();
-            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId,true);
-            siddhiManager.persist();
-        } catch (Throwable e) {
-            log.error("Unable to persist state for tenant :" + tenantId, e);
-        } finally {
-            PrivilegedCarbonContext.endTenantFlow();
-        }
+        EventProcessorManagementService eventProcessorManagementService = EventManagementServiceValueHolder.getCarbonEventManagementService().getEventProcessorManagementService();
+        eventProcessorManagementService.persist();
     }
 
 }

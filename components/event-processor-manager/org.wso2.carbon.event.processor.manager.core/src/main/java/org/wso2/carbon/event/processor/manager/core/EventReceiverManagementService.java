@@ -53,6 +53,15 @@ public abstract class EventReceiverManagementService implements Manager{
      */
     public abstract void startPolling();
 
+    /**
+     * Check whether the node is the elected receiver coordinator
+     * communication with endpoint.
+     * @return Returns true if the nodes is te receiver coordinator
+     */
+    public abstract boolean isReceiverCoordinator();
+
+    public abstract void setReceiverCoordinator(boolean isReceiverCoordinator) ;
+
     @Override
     public ManagerType getType() {
         return ManagerType.Receiver;

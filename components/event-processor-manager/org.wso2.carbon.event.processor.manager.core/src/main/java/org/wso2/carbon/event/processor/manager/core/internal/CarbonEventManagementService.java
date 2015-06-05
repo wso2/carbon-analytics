@@ -26,10 +26,7 @@ import org.wso2.carbon.event.processor.manager.commons.transport.server.TCPEvent
 import org.wso2.carbon.event.processor.manager.commons.transport.server.TCPEventServerConfig;
 import org.wso2.carbon.event.processor.manager.commons.utils.HostAndPort;
 import org.wso2.carbon.event.processor.manager.core.*;
-import org.wso2.carbon.event.processor.manager.core.config.DistributedConfiguration;
-import org.wso2.carbon.event.processor.manager.core.config.HAConfiguration;
-import org.wso2.carbon.event.processor.manager.core.config.ManagementModeInfo;
-import org.wso2.carbon.event.processor.manager.core.config.Mode;
+import org.wso2.carbon.event.processor.manager.core.config.*;
 import org.wso2.carbon.event.processor.manager.core.exception.EventManagementException;
 import org.wso2.carbon.event.processor.manager.core.exception.ManagementConfigurationException;
 import org.wso2.carbon.event.processor.manager.core.internal.ds.EventManagementServiceValueHolder;
@@ -51,6 +48,8 @@ public class CarbonEventManagementService implements EventManagementService {
     private ManagementModeInfo managementModeInfo;
 
     private HAManager haManager = null;
+    private PersistenceManager persistenceManager = null;
+    private StormReceiverCoordinator stormReceiverCoordinator = null;
     private ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(3);
 
     private EventProcessorManagementService processorManager;
@@ -77,14 +76,29 @@ public class CarbonEventManagementService implements EventManagementService {
         if (mode == Mode.HA) {
             HAConfiguration haConfiguration = managementModeInfo.getHaConfiguration();
             startServer(haConfiguration.getTransport());
+        } else if (mode == Mode.SingleNode) {
+            PersistenceConfiguration persistConfig = managementModeInfo.getPersistenceConfiguration();
+            if (persistConfig != null) {
+                ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(persistConfig.getThreadPoolSize());
+                long persistenceTimeInterval = persistConfig.getPersistenceTimeInterval();
+                if (persistenceTimeInterval > 0) {
+                    persistenceManager = new PersistenceManager(scheduledExecutorService, persistenceTimeInterval);
+                    persistenceManager.init();
+                }
+            }
         } else if (mode == Mode.Distributed) {
             DistributedConfiguration distributedConfiguration = managementModeInfo.getDistributedConfiguration();
-//            startServer(distributedConfiguration.getTransport()); //Todo
+            if (distributedConfiguration.isWorkerNode()) {
+                stormReceiverCoordinator = new StormReceiverCoordinator();
+            }
+//            startServer(distributedConfiguration.getEventSyncHostAndPort()); //Todo
         }
     }
 
     public void init(HazelcastInstance hazelcastInstance) {
-
+        if (stormReceiverCoordinator != null) {
+            stormReceiverCoordinator.tryBecomeCoordinator();
+        }
         hazelcastInstance.getCluster().addMembershipListener(new MembershipListener() {
             @Override
             public void memberAdded(MembershipEvent membershipEvent) {
@@ -98,6 +112,10 @@ public class CarbonEventManagementService implements EventManagementService {
                 if (mode == Mode.HA) {
                     if (haManager != null) {
                         haManager.tryChangeState();
+                    }
+                } else if(mode == mode.Distributed){
+                    if (stormReceiverCoordinator != null) {
+                        stormReceiverCoordinator.tryBecomeCoordinator();
                     }
                 }
             }
@@ -123,7 +141,7 @@ public class CarbonEventManagementService implements EventManagementService {
         } else if (mode == Mode.Distributed) {
             //Todo
 //            IMap<Object, Object> members = hazelcastInstance.getMap(ConfigurationConstants.MEMBERS);
-//            members.set(hazelcastInstance.getCluster().getLocalMember().getUuid(), haConfiguration.getTransport());
+//            members.set(hazelcastInstance.getCluster().getLocalMember().getUuid(), haConfiguration.getEventSyncHostAndPort());
 //            EventManagementServiceValueHolder.getCarbonEventManagementService().setPublisherMembers(new ArrayList<HostAndPort>(members.values()));
         } else if (mode == Mode.SingleNode) {
             log.warn("CEP started with clustering enabled, but SingleNode configuration given.");
@@ -157,6 +175,9 @@ public class CarbonEventManagementService implements EventManagementService {
         }
         if (executorService != null) {
             executorService.shutdown();
+        }
+        if(persistenceManager!=null){
+            persistenceManager.shutdown();
         }
         if (members != null) {
             members.remove(EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getLocalMember().getUuid());

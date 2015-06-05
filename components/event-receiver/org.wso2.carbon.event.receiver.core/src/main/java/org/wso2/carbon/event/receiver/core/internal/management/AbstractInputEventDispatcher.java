@@ -22,7 +22,6 @@ import org.wso2.carbon.event.stream.core.EventProducerCallback;
 
 public abstract class AbstractInputEventDispatcher {
 
-    protected boolean drop = false;
     protected boolean sendToOther = false;
 
     protected EventProducerCallback callBack;
@@ -41,14 +40,6 @@ public abstract class AbstractInputEventDispatcher {
 
     public EventProducerCallback getCallBack() {
         return callBack;
-    }
-
-    public boolean isDrop() {
-        return drop;
-    }
-
-    public void setDrop(boolean drop) {
-        this.drop = drop;
     }
 
     public boolean isSendToOther() {

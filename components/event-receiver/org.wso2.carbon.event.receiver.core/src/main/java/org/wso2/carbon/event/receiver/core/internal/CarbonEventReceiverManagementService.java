@@ -34,6 +34,7 @@ public class CarbonEventReceiverManagementService extends EventReceiverManagemen
 
     private Logger log = Logger.getLogger(CarbonEventReceiverManagementService.class);
     private ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+    private boolean isReceiverCoordinator = false;
 
     @Override
     public byte[] getState() {
@@ -98,8 +99,17 @@ public class CarbonEventReceiverManagementService extends EventReceiverManagemen
         EventReceiverServiceValueHolder.getCarbonEventReceiverService().startPolling();
     }
 
+    @Override
+    public boolean isReceiverCoordinator() {
+        return isReceiverCoordinator;
+    }
+
     public Lock getReadLock() {
         return readWriteLock.readLock();
     }
 
+
+    public void setReceiverCoordinator(boolean isReceiverCoordinator) {
+        this.isReceiverCoordinator = isReceiverCoordinator;
+    }
 }

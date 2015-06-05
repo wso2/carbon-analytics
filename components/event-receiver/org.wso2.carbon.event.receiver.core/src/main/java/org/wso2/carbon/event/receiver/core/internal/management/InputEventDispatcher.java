@@ -22,9 +22,7 @@ public class InputEventDispatcher extends AbstractInputEventDispatcher {
 
     @Override
     public void onEvent(Object[] object) {
-        if (!isDrop()) {
-            callBack.sendEventData(object);
-        }
+       callBack.sendEventData(object);
     }
 
     @Override
