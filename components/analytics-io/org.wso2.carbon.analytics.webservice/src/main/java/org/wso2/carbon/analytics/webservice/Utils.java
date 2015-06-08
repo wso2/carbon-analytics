@@ -333,19 +333,19 @@ public class Utils {
                     if (type != null) {
                         switch (type) {
                             case DOUBLE:
-                                values.add(Double.parseDouble(bean.getStringValue()));
+                                values.add(bean.getDoubleValue());
                                 break;
                             case INT:
-                                values.add(new Double(Double.parseDouble(bean.getStringValue())).intValue());
+                                values.add(bean.getIntValue());
                                 break;
                             case BOOL:
-                                values.add(Boolean.parseBoolean(bean.getStringValue()));
+                                values.add(bean.getBooleanValue());
                                 break;
                             case LONG:
-                                values.add(new Double(Double.parseDouble(bean.getStringValue())).longValue());
+                                values.add(bean.getLongValue());
                                 break;
                             case FLOAT:
-                                values.add(new Double(Double.parseDouble(bean.getStringValue())).floatValue());
+                                values.add(bean.getFloatValue());
                                 break;
                             case STRING:
                                 values.add(bean.getStringValue());
