@@ -22,8 +22,8 @@ package org.wso2.carbon.analytics.eventtable;
  */
 public class AnalyticsEventTableConstants {
 
-    public static final String ANNOTATION_STREAM_NAME = "streamName";
+    public static final String ANNOTATION_STREAM_NAME = "stream.name";
     
-    public static final String ANNOTATION_TABLE_NAME = "tableName";
+    public static final String ANNOTATION_TABLE_NAME = "table.name";
     
 }

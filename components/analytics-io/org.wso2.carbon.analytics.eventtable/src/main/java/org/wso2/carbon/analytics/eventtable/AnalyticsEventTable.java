@@ -17,15 +17,10 @@
 */
 package org.wso2.carbon.analytics.eventtable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.wso2.carbon.analytics.datasource.commons.Record;
-import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
-import org.wso2.carbon.analytics.eventtable.internal.ServiceHolder;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.siddhi.core.config.ExecutionPlanContext;
 import org.wso2.siddhi.core.event.ComplexEvent;
@@ -37,7 +32,6 @@ import org.wso2.siddhi.core.table.EventTable;
 import org.wso2.siddhi.core.util.collection.operator.Finder;
 import org.wso2.siddhi.core.util.collection.operator.Operator;
 import org.wso2.siddhi.query.api.annotation.Annotation;
-import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.TableDefinition;
 import org.wso2.siddhi.query.api.expression.Expression;
 import org.wso2.siddhi.query.api.util.AnnotationHelper;
@@ -75,8 +69,9 @@ public class AnalyticsEventTable implements EventTable {
     public Finder constructFinder(Expression expression, MetaComplexEvent metaComplexEvent, 
             ExecutionPlanContext executionPlanContext, List<VariableExpressionExecutor> variableExpressionExecutors, 
             Map<String, EventTable> eventTableMap, int matchingStreamIndex, long withinTime) {
-        // TODO Auto-generated method stub
-        return null;
+        return new AnalyticsTableOperator(this.tenantId, this.tableName, this.tableDefinition.getAttributeList(), 
+                expression, metaComplexEvent, executionPlanContext, variableExpressionExecutors, 
+                eventTableMap, matchingStreamIndex, withinTime);
     }
 
     @Override
@@ -87,51 +82,27 @@ public class AnalyticsEventTable implements EventTable {
     @Override
     public void add(ComplexEventChunk<StreamEvent> addingEventChunk) {
         addingEventChunk.reset();
-        List<Record> records = new ArrayList<Record>();
-        StreamEvent event;
-        while (addingEventChunk.hasNext()) {
-            event = addingEventChunk.next();
-            records.add(this.streamEventToRecord(event));
-        }
-        try {
-            ServiceHolder.getAnalyticsDataService().put(records);
-        } catch (AnalyticsException e) {
-            throw new IllegalStateException("Error in adding records to analytics event table: " + 
-                    e.getMessage(), e);
-        }
-    }
-    
-    private Record streamEventToRecord(StreamEvent event) {
-        Object[] data = event.getOutputData();
-        Map<String, Object> values = new HashMap<String, Object>();
-        List<Attribute> attrs = this.getTableDefinition().getAttributeList();
-        for (int i = 0; i < attrs.size(); i++) {
-            if (data.length > i) {
-                values.put(attrs.get(i).getName(), data[i]);
-            } else {
-                break;
-            }
-        }
-        return new Record(this.tenantId, this.tableName, values, event.getTimestamp());
+        AnalyticsEventTableUtils.putEvents(this.tenantId, this.tableName, 
+                this.tableDefinition.getAttributeList(), addingEventChunk);
     }
 
     @Override
     public Operator constructOperator(Expression expression, MetaComplexEvent metaComplexEvent, 
             ExecutionPlanContext executionPlanContext, List<VariableExpressionExecutor> variableExpressionExecutors, 
             Map<String, EventTable> eventTableMap, int matchingStreamIndex, long withinTime) {
-        // TODO Auto-generated method stub
-        return null;
+        return new AnalyticsTableOperator(this.tenantId, this.tableName, this.tableDefinition.getAttributeList(), 
+                expression, metaComplexEvent, executionPlanContext, variableExpressionExecutors, 
+                eventTableMap, matchingStreamIndex, withinTime);
     }
 
     @Override
     public boolean contains(ComplexEvent matchingEvent, Finder finder) {
-        // TODO Auto-generated method stub
-        return false;
+        return finder.contains(matchingEvent, null);
     }
 
     @Override
     public void delete(ComplexEventChunk<StreamEvent> deletingEventChunk, Operator operator) {
-        throw new IllegalStateException("cannot delete records in analytics event tables.");
+        operator.delete(deletingEventChunk, null);
     }
 
     @Override
@@ -141,8 +112,7 @@ public class AnalyticsEventTable implements EventTable {
 
     @Override
     public void update(ComplexEventChunk<StreamEvent> updatingEventChunk, Operator operator, int[] mappingPosition) {
-        // TODO Auto-generated method stub
-        
+        operator.update(updatingEventChunk, null, null);
     }
 
 }
