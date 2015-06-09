@@ -633,4 +633,8 @@ public class GenericUtils {
         }
     }
     
+    public static String streamToTableName(String streamName) {
+        return streamName.replace('.', '_');
+    }
+    
 }

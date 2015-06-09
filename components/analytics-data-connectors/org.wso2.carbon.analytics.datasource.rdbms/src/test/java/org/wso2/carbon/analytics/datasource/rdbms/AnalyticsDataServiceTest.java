@@ -44,6 +44,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -425,6 +426,62 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         recordsIn = GenericUtils.listRecords(this.service,
                 this.service.get(tenantId, tableName, 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 97);
+        this.cleanupTable(tenantId, tableName);
+    }
+    
+    @Test
+    public void testRecordAddRetreiveWithKeyValues() throws AnalyticsException {
+        int tenantId = 1;
+        String tableName = "MyT1";
+        this.cleanupTable(tenantId, tableName);
+        this.service.createTable(tenantId, tableName);
+        List<ColumnDefinition> columns = new ArrayList<>();
+        columns.add(new ColumnDefinition("tenant", ColumnType.INTEGER, true, false));
+        columns.add(new ColumnDefinition("log", ColumnType.STRING, true, false));
+        List<String> primaryKeys = new ArrayList<String>();
+        primaryKeys.add("tenant");
+        primaryKeys.add("log");
+        AnalyticsSchema schema = new AnalyticsSchema(columns, primaryKeys);
+        this.service.setTableSchema(tenantId, tableName, schema);
+        List<Record> records = new ArrayList<Record>();
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put("tenant", "1");
+        values.put("log", "log statement 1");
+        Record record1 = new Record(tenantId, tableName, values);
+        values = new HashMap<String, Object>();
+        values.put("tenant", "1");
+        values.put("log", "log statement 2");
+        Record record2 = new Record(tenantId, tableName, values);
+        values = new HashMap<String, Object>();
+        values.put("tenant", "2");
+        values.put("log", "log statement 1");
+        Record record3 = new Record(tenantId, tableName, values);
+        values = new HashMap<String, Object>();
+        values.put("tenant", "2");
+        values.put("log", "log statement 2");
+        Record record4 = new Record(tenantId, tableName, values);
+        records.add(record1);
+        records.add(record2);
+        records.add(record3);
+        records.add(record4);
+        this.service.put(records);
+        List<Map<String, Object>> valuesBatch = new ArrayList<Map<String,Object>>();
+        values = new HashMap<String, Object>();
+        values.put("tenant", "1");
+        values.put("log", "log statement 1");
+        valuesBatch.add(values);
+        values = new HashMap<String, Object>();
+        values.put("tenant", "2");
+        values.put("log", "log statement 2");
+        values.put("some_other_field", "xxxxxxxx zzzzzz");
+        valuesBatch.add(values);
+        List<Record> recordsIn = GenericUtils.listRecords(this.service,
+                this.service.getWithKeyValues(tenantId, tableName, 1, null, valuesBatch));
+        Set<Record> matchRecords = new HashSet<Record>();
+        matchRecords.add(record1);
+        matchRecords.add(record4);
+        Assert.assertEquals(recordsIn.size(), 2);
+        Assert.assertEquals(new HashSet<Record>(recordsIn), matchRecords);
         this.cleanupTable(tenantId, tableName);
     }
     

@@ -38,9 +38,11 @@ import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
@@ -562,6 +564,20 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
             AnalyticsAPIHttpClient.getInstance().destroy();
+        }
+    }
+
+    @Override
+    public RecordGroup[] getWithKeyValues(int tenantId, String tableName, int numPartitionsHint, List<String> columns, 
+            List<Map<String, Object>> valuesBatch) throws AnalyticsException, AnalyticsTableNotAvailableException {
+        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+            return ServiceHolder.getAnalyticsDataService().getWithKeyValues(tenantId, tableName, numPartitionsHint,
+                    columns, valuesBatch);
+        } else {
+            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
+                    analyticsDataConfiguration.getPassword());
+            //TODO: implement
+            return null;
         }
     }
 }

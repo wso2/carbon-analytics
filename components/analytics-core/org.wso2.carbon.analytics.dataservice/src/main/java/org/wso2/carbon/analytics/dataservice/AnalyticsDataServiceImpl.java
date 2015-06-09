@@ -53,6 +53,7 @@ import org.wso2.carbon.ntask.core.service.TaskService;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -348,11 +349,11 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         }
     }
     
-    private void populateRecordWithPrimaryKeyAwareId(Record record, List<String> primaryKeys) {
+    private String generateRecordIdFromPrimaryKeyValues(Map<String, Object> values, List<String> primaryKeys) {
         StringBuilder builder = new StringBuilder();
         Object obj;
         for (String key : primaryKeys) {
-            obj = record.getValue(key);
+            obj = values.get(key);
             if (obj != null) {
                 builder.append(obj.toString());
             }
@@ -361,11 +362,15 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         builder.append("");
         try {
             byte[] data = builder.toString().getBytes(Constants.DEFAULT_CHARSET);
-            record.setId(UUID.nameUUIDFromBytes(data).toString());
+            return UUID.nameUUIDFromBytes(data).toString();
         } catch (UnsupportedEncodingException e) {
             /* this wouldn't happen */
             throw new RuntimeException(e);
         }
+    }
+    
+    private void populateRecordWithPrimaryKeyAwareId(Record record, List<String> primaryKeys) {
+        record.setId(this.generateRecordIdFromPrimaryKeyValues(record.getValues(), primaryKeys));
     }
     
     private void populateRecordsWithPrimaryKeyAwareIds(List<Record> records, List<String> primaryKeys) {
@@ -410,6 +415,19 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             int recordsCount) throws AnalyticsException, AnalyticsTableNotAvailableException {
         return this.getAnalyticsRecordStore().get(tenantId, tableName, numPartitionsHint, columns, timeFrom, 
                 timeTo, recordsFrom, recordsCount);
+    }
+    
+    public RecordGroup[] getWithKeyValues(int tenantId, String tableName, int numPartitionsHint, List<String> columns,
+            List<Map<String, Object>> valuesBatch) throws AnalyticsException, AnalyticsTableNotAvailableException {
+        List<String> ids = new ArrayList<String>();
+        AnalyticsSchema schema = this.lookupSchema(tenantId, tableName);
+        List<String> primaryKeys = schema.getPrimaryKeys();
+        if (primaryKeys != null && primaryKeys.size() > 0) {
+            for (Map<String, Object> values : valuesBatch) {
+                ids.add(this.generateRecordIdFromPrimaryKeyValues(values, primaryKeys));
+            }
+        }
+        return this.get(tenantId, tableName, numPartitionsHint, null, ids);
     }
 
     @Override

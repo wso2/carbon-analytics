@@ -821,7 +821,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 String categoryName = aCategory.getKey();
                 List<String> path = aCategory.getValue();
                 String[] pathAsArray;
-                if (path == null) {
+                if (path != null) {
                     pathAsArray = path.toArray(new String[aCategory.getValue().size()]);
                 } else {
                     pathAsArray = new String[]{};
