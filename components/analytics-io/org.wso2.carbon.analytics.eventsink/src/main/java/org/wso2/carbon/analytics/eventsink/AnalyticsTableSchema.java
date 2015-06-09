@@ -18,10 +18,8 @@
 package org.wso2.carbon.analytics.eventsink;
 
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
-import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 
 import javax.xml.bind.annotation.XmlElement;
-import java.util.ArrayList;
 import java.util.List;
 
 /**

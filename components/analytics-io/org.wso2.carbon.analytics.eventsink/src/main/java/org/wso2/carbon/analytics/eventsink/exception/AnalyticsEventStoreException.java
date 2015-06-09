@@ -23,6 +23,8 @@ package org.wso2.carbon.analytics.eventsink.exception;
  */
 public class AnalyticsEventStoreException extends Exception {
 
+    private static final long serialVersionUID = -3347767827802938007L;
+
     public AnalyticsEventStoreException(String errorMessage, Exception ex) {
         super(errorMessage, ex);
     }

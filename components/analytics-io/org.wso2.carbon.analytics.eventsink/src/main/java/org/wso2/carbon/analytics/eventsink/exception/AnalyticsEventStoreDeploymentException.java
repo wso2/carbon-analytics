@@ -25,6 +25,8 @@ import org.apache.axis2.deployment.DeploymentException;
  */
 public class AnalyticsEventStoreDeploymentException extends DeploymentException {
 
+    private static final long serialVersionUID = -2360951217560199496L;
+
     public AnalyticsEventStoreDeploymentException(String message) {
         super(message);
     }

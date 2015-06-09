@@ -47,7 +47,6 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
     private static Log log = LogFactory.getLog(AnalyticsEventStoreDeployer.class);
     private static List<DeploymentFileData> pausedDeployments = new ArrayList<>();
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void init(ConfigurationContext configurationContext) {
         File deployementDir = new File(MultitenantUtils.getAxis2RepositoryPath(CarbonContext.getThreadLocalCarbonContext().
