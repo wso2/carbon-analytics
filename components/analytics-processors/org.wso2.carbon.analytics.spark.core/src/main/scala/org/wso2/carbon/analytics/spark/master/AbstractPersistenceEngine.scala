@@ -25,10 +25,6 @@ import scala.reflect.ClassTag
 /**
  * Created by niranda on 6/4/15.
  */
-class AnalyticsPersistenceEngine extends PersistenceEngine{
-  override def persist(name: String, obj: Object) = ???
+abstract  class AbstractPersistenceEngine extends PersistenceEngine{
 
-  override def unpersist(name: String) = ???
-
-  override def read[T](prefix: String)(implicit evidence$1: ClassTag[T]) = ???
 }
