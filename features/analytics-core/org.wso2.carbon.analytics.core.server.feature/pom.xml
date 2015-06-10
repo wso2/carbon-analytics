@@ -115,6 +115,8 @@
                                 <bundleDef>org.wso2.orbit.org.apache.lucene:lucene</bundleDef>
                                 <bundleDef>org.wso2.orbit.asm4:asm4-all</bundleDef>
                                 <bundleDef>com.datastax.cassandra:cassandra-driver-core</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.objenesis:objenesis</bundleDef>
+                                <bundleDef>io.dropwizard.metrics:metrics-core</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.esotericsoftware.kryo:kryo</bundleDef>
                                 <!--<bundleDef>com.esotericsoftware.kryo:kryo</bundleDef>-->
                                 <bundleDef>org.antlr.wso2:antlr-runtime</bundleDef>
