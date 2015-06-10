@@ -152,7 +152,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException
                 | ClassNotFoundException | NoSuchMethodException e) {
             log.error("Error while registering UDFs: ", e);
-//            e.printStackTrace();
         }
     }
 

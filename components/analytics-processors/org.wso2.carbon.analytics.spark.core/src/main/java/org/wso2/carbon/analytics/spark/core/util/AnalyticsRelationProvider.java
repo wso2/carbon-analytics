@@ -94,7 +94,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
                 }
             } catch (AnalyticsException e) {
                 log.error("Error while accessing tables", e);
-                e.printStackTrace();
+                
             }
         } else if (!this.streamName.isEmpty()) {
             try {
@@ -104,7 +104,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
                 }
             } catch (AnalyticsException e) {
                 log.error("Error while accessing tables", e);
-                e.printStackTrace();
+                
             }
         } else {
             throw new RuntimeException("Empty " + AnalyticsConstants.TABLE_NAME + " OR "
@@ -129,7 +129,7 @@ public class AnalyticsRelationProvider implements RelationProvider,
                 this.dataService.setTableSchema(this.tenantId, this.tableName, analyticsSchema);
             } catch (AnalyticsException e) {
                 log.error("Error while setting table schema ", e);
-                e.printStackTrace();
+                
             }
         } else {
             if (!this.primaryKeys.isEmpty()) {

@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.analytics.spark.core.util;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.StructType;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -37,6 +39,8 @@ public class AnalyticsFunction1 extends AbstractFunction1<Iterator<Row>, BoxedUn
         implements Serializable {
 
     private static final long serialVersionUID = -1919222653470217466L;
+    private static final Log log = LogFactory.getLog(AnalyticsFunction1.class);
+
     private int tId;
     private String tName;
     private StructType sch;
@@ -62,7 +66,7 @@ public class AnalyticsFunction1 extends AbstractFunction1<Iterator<Row>, BoxedUn
                     ServiceHolder.getAnalyticsDataService().put(records);
                 } catch (AnalyticsException e) {
 //                                log.error("Error while inserting data into table " + tableName, e);
-                    e.printStackTrace();
+
                 }
                 records.clear();
             } else {
@@ -76,8 +80,8 @@ public class AnalyticsFunction1 extends AbstractFunction1<Iterator<Row>, BoxedUn
             try {
                 ServiceHolder.getAnalyticsDataService().put(records);
             } catch (AnalyticsException e) {
-//                                log.error("Error while inserting data into table " + tableName, e);
-                e.printStackTrace();
+                log.error("Error while pushing data to the dataservice ", e);
+
             }
         }
         return BoxedUnit.UNIT;
