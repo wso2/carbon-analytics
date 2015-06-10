@@ -26,4 +26,8 @@ public class AnalyticsEventTableConstants {
     
     public static final String ANNOTATION_TABLE_NAME = "table.name";
     
+    public static final String ANNOTATION_SCHEMA = "schema";
+    
+    public static final String ANNOTATION_PRIMARY_KEYS = "primary.keys";
+    
 }

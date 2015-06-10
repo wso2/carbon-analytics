@@ -17,10 +17,16 @@
 */
 package org.wso2.carbon.analytics.eventtable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema.ColumnType;
+import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.analytics.eventtable.internal.ServiceHolder;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.siddhi.core.config.ExecutionPlanContext;
 import org.wso2.siddhi.core.event.ComplexEvent;
@@ -62,7 +68,60 @@ public class AnalyticsEventTable implements EventTable {
             }
             this.tableName = GenericUtils.streamToTableName(streamName);
         }
-        this.tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+        String schema = fromAnnotation.getElement(AnalyticsEventTableConstants.ANNOTATION_SCHEMA);
+        try {
+            this.tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+        } catch (Throwable e) {
+            this.tenantId = -1;
+        }
+        if (schema != null) {
+            String primaryKeys = fromAnnotation.getElement(AnalyticsEventTableConstants.ANNOTATION_PRIMARY_KEYS);
+            try {
+                this.processTableSchema(this.tenantId, this.tableName, schema, primaryKeys);
+            } catch (AnalyticsException e) {
+                throw new IllegalStateException("Error in processing analytics event table schema: " + 
+                        e.getMessage(), e);
+            }
+        }
+    }
+    
+    private List<String> trimArray(String[] tokens) {
+        List<String> result = new ArrayList<String>(tokens.length);
+        for (int i = 0; i < tokens.length; i++) {
+            result.add(tokens[i].trim());
+        }
+        return result;
+    }
+    
+    private void processTableSchema(int tenantId, String tableName, String schemaStr, 
+            String primaryKeys) throws AnalyticsException {
+        List<ColumnDefinition> cols = new ArrayList<ColumnDefinition>();
+        String[] fields = schemaStr.split(",");
+        String[] tokens;
+        String name, type;
+        ColumnType colType;
+        for (String field : fields) {
+            tokens = field.split(" ");
+            name = tokens[0].trim();
+            type = tokens[1].trim().toLowerCase();
+            if ("int".equals(type)) {
+                colType = ColumnType.INTEGER;
+            } else if ("long".equals(type)) {
+                colType = ColumnType.LONG;
+            } else if ("float".equals(type)) {
+                colType = ColumnType.FLOAT;
+            } else if ("double".equals(type)) {
+                colType = ColumnType.DOUBLE;
+            } else if ("boolean".equals(type)) {
+                colType = ColumnType.BOOLEAN;
+            } else {
+                colType = ColumnType.STRING;
+            }
+            cols.add(new ColumnDefinition(name, colType));
+        }
+        AnalyticsSchema schema = new AnalyticsSchema(cols, this.trimArray(primaryKeys.split(",")));
+        ServiceHolder.getAnalyticsDataService().createTable(tenantId, tableName);
+        ServiceHolder.getAnalyticsDataService().setTableSchema(tenantId, tableName, schema);
     }
     
     @Override
