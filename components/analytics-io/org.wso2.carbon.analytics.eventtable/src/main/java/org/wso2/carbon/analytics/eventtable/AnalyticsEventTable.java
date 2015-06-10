@@ -96,12 +96,12 @@ public class AnalyticsEventTable implements EventTable {
     private void processTableSchema(int tenantId, String tableName, String schemaStr, 
             String primaryKeys) throws AnalyticsException {
         List<ColumnDefinition> cols = new ArrayList<ColumnDefinition>();
-        String[] fields = schemaStr.split(",");
+        String[] fields = schemaStr.trim().split(",");
         String[] tokens;
         String name, type;
         ColumnType colType;
         for (String field : fields) {
-            tokens = field.split(" ");
+            tokens = field.trim().split(" ");
             name = tokens[0].trim();
             type = tokens[1].trim().toLowerCase();
             if ("int".equals(type)) {
