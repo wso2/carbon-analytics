@@ -69,8 +69,8 @@ public class AnalyticsEventTableTest {
                 "@from(eventtable = 'analytics.table' , table.name = 'stocks', schema = 'symbol string, price float, volume long', primary.keys = 'symbol') " +
                 "define table StockTable (symbol string, price float, volume long); ";
         String query = "" +
-                "@info(name = 'query1')" +
-                "from StockStream" +
+                "@info(name = 'query1') " +
+                "from StockStream " +
                 "insert into StockTable;";
         ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(streams + query);
         InputHandler stockStream = executionPlanRuntime.getInputHandler("StockStream");

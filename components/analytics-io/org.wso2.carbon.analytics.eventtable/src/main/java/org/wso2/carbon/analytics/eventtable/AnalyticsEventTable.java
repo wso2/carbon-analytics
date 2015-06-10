@@ -155,6 +155,7 @@ public class AnalyticsEventTable implements EventTable {
 
     @Override
     public void add(ComplexEventChunk<StreamEvent> addingEventChunk) {
+        this.checkAndProcessPostInit();
         addingEventChunk.reset();
         AnalyticsEventTableUtils.putEvents(this.tenantId, this.tableName, 
                 this.tableDefinition.getAttributeList(), addingEventChunk);
