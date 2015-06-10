@@ -16,6 +16,8 @@
 
     query = query.replaceAll("&lt;", "<");
     query = query.replaceAll("&gt;", ">");
+    query = query.replaceAll("&amp;", "&");
+
     try {
         jsonResult = client.execute(query.trim());
         response.setStatus(HttpServletResponse.SC_OK);
