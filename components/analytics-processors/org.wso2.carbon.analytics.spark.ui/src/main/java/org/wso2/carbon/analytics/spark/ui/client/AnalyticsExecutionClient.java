@@ -25,6 +25,7 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.wso2.carbon.analytics.spark.admin.stub.AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException;
 import org.wso2.carbon.analytics.spark.admin.stub.AnalyticsProcessorAdminServiceStub;
 
@@ -56,6 +57,7 @@ public class AnalyticsExecutionClient {
     }
 
     public String execute(String query) throws RemoteException, AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
+        query = StringEscapeUtils.unescapeHtml(query);
         AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto queryResult = stub.executeQuery(query);
         return toJsonResult(query, queryResult);
     }
