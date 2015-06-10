@@ -63,10 +63,11 @@ public class AnalyticsEventTableTest {
     
     @Test
     public void testInsert() throws InterruptedException, AnalyticsTableNotAvailableException, AnalyticsException {
+        this.service.deleteTable(-1, "stocks");
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
-                "@from(eventtable = 'analytics.table' , table.name = 'stocks', schema = 'symbol string, price float, volume long', primary.keys = 'symbol') " +
+                "@from(eventtable = 'analytics.table' , table.name = 'stocks', primary.keys = 'symbol') " +
                 "define table StockTable (symbol string, price float, volume long); ";
         String query = "" +
                 "@info(name = 'query1') " +

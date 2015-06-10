@@ -26,7 +26,6 @@ import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema.ColumnType;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.eventtable.internal.ServiceHolder;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.siddhi.core.config.ExecutionPlanContext;
@@ -58,9 +57,7 @@ public class AnalyticsEventTable implements EventTable {
     private int tenantId;
     
     private boolean postInit;
-    
-    private String schema;
-    
+        
     private String primaryKeys;
 
     @Override
@@ -70,17 +67,10 @@ public class AnalyticsEventTable implements EventTable {
         this.tableDefinition = tableDefinition;
         this.tableName = fromAnnotation.getElement(AnalyticsEventTableConstants.ANNOTATION_TABLE_NAME);
         if (this.tableName == null) {
-            String streamName = fromAnnotation.getElement(AnalyticsEventTableConstants.ANNOTATION_STREAM_NAME);
-            if (streamName == null) {
-                throw new IllegalArgumentException("The properties either " + AnalyticsEventTableConstants.ANNOTATION_STREAM_NAME + " or " + 
-                        AnalyticsEventTableConstants.ANNOTATION_TABLE_NAME + " must be provided for analytics event tables.");
-            }
-            this.tableName = GenericUtils.streamToTableName(streamName);
+            throw new IllegalArgumentException("The property " + AnalyticsEventTableConstants.ANNOTATION_TABLE_NAME + 
+                    " must be provided for analytics event tables.");
         }
-        this.schema = fromAnnotation.getElement(AnalyticsEventTableConstants.ANNOTATION_SCHEMA);
-        if (schema != null) {
-            this.primaryKeys = fromAnnotation.getElement(AnalyticsEventTableConstants.ANNOTATION_PRIMARY_KEYS);
-        }
+        this.primaryKeys = fromAnnotation.getElement(AnalyticsEventTableConstants.ANNOTATION_PRIMARY_KEYS);
         try {
             this.tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
         } catch (Throwable e) {
@@ -89,10 +79,10 @@ public class AnalyticsEventTable implements EventTable {
     }
     
     private void checkAndProcessPostInit() {
-        if (!this.postInit && this.schema != null) {
+        if (!this.postInit) {
             try {
                 this.postInit = true;
-                this.processTableSchema(this.tenantId, this.tableName, this.schema, this.primaryKeys);
+                this.processTableSchema();
             } catch (AnalyticsException e) {
                 throw new IllegalStateException("Error in processing analytics event table schema: " + 
                         e.getMessage(), e);
@@ -108,31 +98,37 @@ public class AnalyticsEventTable implements EventTable {
         return result;
     }
     
-    private void processTableSchema(int tenantId, String tableName, String schemaStr, 
-            String primaryKeys) throws AnalyticsException {
+    private void processTableSchema() throws AnalyticsException {
         List<ColumnDefinition> cols = new ArrayList<ColumnDefinition>();
-        String[] fields = schemaStr.trim().split(",");
-        String[] tokens;
-        String name, type;
         ColumnType colType;
-        for (String field : fields) {
-            tokens = field.trim().split(" ");
-            name = tokens[0].trim();
-            type = tokens[1].trim().toLowerCase();
-            if ("int".equals(type)) {
-                colType = ColumnType.INTEGER;
-            } else if ("long".equals(type)) {
-                colType = ColumnType.LONG;
-            } else if ("float".equals(type)) {
-                colType = ColumnType.FLOAT;
-            } else if ("double".equals(type)) {
-                colType = ColumnType.DOUBLE;
-            } else if ("boolean".equals(type)) {
+        for (Attribute attr : this.tableDefinition.getAttributeList()) {
+            switch (attr.getType()) {
+            case BOOL:
                 colType = ColumnType.BOOLEAN;
-            } else {
+                break;
+            case DOUBLE:
+                colType = ColumnType.DOUBLE;
+                break;
+            case FLOAT:
+                colType = ColumnType.FLOAT;
+                break;
+            case INT:
+                colType = ColumnType.INTEGER;
+                break;
+            case LONG:
+                colType = ColumnType.LONG;
+                break;
+            case OBJECT:
                 colType = ColumnType.STRING;
+                break;
+            case STRING:
+                colType = ColumnType.STRING;
+                break;
+            default:
+                colType = ColumnType.STRING;
+                break;            
             }
-            cols.add(new ColumnDefinition(name, colType));
+            cols.add(new ColumnDefinition(attr.getName(), colType));
         }
         AnalyticsSchema schema = new AnalyticsSchema(cols, this.trimArray(primaryKeys.split(",")));
         ServiceHolder.getAnalyticsDataService().createTable(tenantId, tableName);
@@ -189,7 +185,6 @@ public class AnalyticsEventTable implements EventTable {
     public void update(ComplexEventChunk<StreamEvent> updatingEventChunk, Operator operator, int[] mappingPosition) {
         operator.update(updatingEventChunk, null, null);
     }
-    
     
     /**
      * Analytics table {@link Operator} implementation.
