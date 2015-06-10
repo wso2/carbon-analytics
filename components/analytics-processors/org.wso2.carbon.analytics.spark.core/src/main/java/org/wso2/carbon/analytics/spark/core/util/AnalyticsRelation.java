@@ -126,7 +126,7 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
             data.foreachPartition(new AnalyticsFunction1(tenantId, tableName, data.schema()));
         } catch (AnalyticsException e) {
             log.error("Error while inserting data into table " + tableName, e);
-            e.printStackTrace();
+            
         }
     }
 
