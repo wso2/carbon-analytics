@@ -32,6 +32,7 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutEx
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordReader;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * This interface validate user permissions before execute analytics data service operations.
@@ -179,6 +180,20 @@ public interface SecureAnalyticsDataService extends AnalyticsRecordReader {
      */
     RecordGroup[] get(String username, String tableName, int numPartitionsHint, List<String> columns,
                       List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException;
+
+    /**
+     * Retrieves data from a table with the values for all the given primary key value composites.
+     * @param username The username of the user that invoke this method
+     * @param tableName The name of the table to search on
+     * @param numPartitionsHint The best effort number of splits this should return
+     * @param columns The list of columns to required in results, null if all needs to be returned
+     * @param valuesBatch A batch of key/values which contains the primary keys values to match the data in the table
+     * @return An array of {@link RecordGroup} objects, which contains individual data sets in their local location
+     * @throws AnalyticsException
+     * @throws AnalyticsTableNotAvailableException
+     */
+    RecordGroup[] getWithKeyValues(String username, String tableName, int numPartitionsHint, List<String> columns,
+                                   List<Map<String, Object>> valuesBatch) throws AnalyticsException, AnalyticsTableNotAvailableException;
 
     /**
      * Checks whether or not pagination (i.e. jumping to record n and then retrieving k further records)

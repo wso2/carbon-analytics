@@ -28,6 +28,7 @@ import org.wso2.carbon.analytics.webservice.beans.RecordValueEntryBean;
 import org.wso2.carbon.analytics.webservice.beans.SchemaColumnBean;
 import org.wso2.carbon.analytics.webservice.beans.StreamDefAttributeBean;
 import org.wso2.carbon.analytics.webservice.beans.StreamDefinitionBean;
+import org.wso2.carbon.analytics.webservice.beans.ValuesBatchBean;
 import org.wso2.carbon.analytics.webservice.exception.AnalyticsWebServiceException;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.AttributeType;
@@ -35,6 +36,7 @@ import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -317,44 +319,48 @@ public class Utils {
         return arbitraryDataMap;
     }
 
-    private static Object[] getEventData(RecordValueEntryBean[] valueEntryBeans, List<Attribute> columns)
+    private static Object[] getEventData(RecordValueEntryBean[] beans, List<Attribute> columns)
             throws AnalyticsWebServiceException {
         List<Object> values = new ArrayList<>();
-        Map<String, AttributeType> columnMap = new HashMap<>();
-        if (columns != null) {
-            for (Attribute attribute : columns) {
-                columnMap.put(attribute.getName(), attribute.getType());
+        Map<String, RecordValueEntryBean> valueEntryBeans = new HashMap<>();
+        if (beans != null) {
+            for (RecordValueEntryBean bean : beans) {
+                valueEntryBeans.put(bean.getFieldName(), bean);
             }
         }
-        if (valueEntryBeans != null) {
-            for (RecordValueEntryBean bean : valueEntryBeans) {
-                if (bean != null) {
-                    AttributeType type = columnMap.get(bean.getFieldName());
-                    if (type != null) {
+        if (columns != null) {
+            for (Attribute column : columns) {
+                if (column != null) {
+                    AttributeType type = column.getType();
+                    String columnName = column.getName();
+                    RecordValueEntryBean bean = valueEntryBeans.get(columnName);
+                    if (bean != null) {
                         switch (type) {
                             case DOUBLE:
-                                values.add(bean.getDoubleValue());
+                                values.add(new BigDecimal(bean.toString()).doubleValue());
                                 break;
                             case INT:
-                                values.add(bean.getIntValue());
+                                values.add(new BigDecimal(bean.toString()).intValue());
                                 break;
                             case BOOL:
-                                values.add(bean.getBooleanValue());
+                                values.add(Boolean.parseBoolean(bean.toString()));
                                 break;
                             case LONG:
-                                values.add(bean.getLongValue());
+                                values.add(new BigDecimal(bean.toString()).longValue());
                                 break;
                             case FLOAT:
-                                values.add(bean.getFloatValue());
+                                values.add(new BigDecimal(bean.toString()).floatValue());
                                 break;
                             case STRING:
-                                values.add(bean.getStringValue());
+                                values.add(bean.toString());
                                 break;
                             default:
-                                throw new AnalyticsWebServiceException("DataType is not valid for [" + bean.getFieldName());
+                                throw new AnalyticsWebServiceException("DataType is not valid for [" +
+                                                                       bean.getFieldName());
                         }
                     } else {
-                        throw new AnalyticsWebServiceException("Type is not defined for field: " + bean.getFieldName());
+                        throw new AnalyticsWebServiceException("value is not given for field: " +
+                                                               columnName);
                     }
                 } else {
                     throw new AnalyticsWebServiceException("Record Values are null");
@@ -421,5 +427,63 @@ public class Utils {
             beans.add(bean);
         }
         return beans.toArray(new StreamDefAttributeBean[beans.size()]);
+    }
+
+    public static List<Map<String, Object>> getValuesBatch(ValuesBatchBean[] valuesBatchBeans, AnalyticsSchema schema)
+            throws AnalyticsWebServiceException {
+        List<Map<String, Object>> valuesBatch = new ArrayList<>();
+        Map<String, ColumnDefinition> columns = schema.getColumns();
+        if (valuesBatchBeans != null) {
+            for (ValuesBatchBean valuesBatchBean : valuesBatchBeans) {
+                RecordValueEntryBean[] beans = valuesBatchBean.getKeyValues();
+                if (beans != null) {
+                    Map<String, Object> keyValues = new HashMap<>();
+                    for (RecordValueEntryBean recordValueEntryBean : beans) {
+                        String fieldName = recordValueEntryBean.getFieldName();
+                        keyValues.put(fieldName, getObjectValue(columns.get(fieldName).getType(), recordValueEntryBean));
+                    }
+                    if (!keyValues.isEmpty()) {
+                        valuesBatch.add(keyValues);
+                    }
+                } else {
+                    throw new AnalyticsWebServiceException("Key values are null in the valuesBatch");
+                }
+            }
+            return valuesBatch;
+        } else {
+            throw new AnalyticsWebServiceException("ValuesBatch is null");
+        }
+    }
+
+    private static Object getObjectValue(AnalyticsSchema.ColumnType type,
+                                         RecordValueEntryBean recordValueEntryBean)
+            throws AnalyticsWebServiceException {
+        Object value;
+        switch (type) {
+            case FACET:
+                value = recordValueEntryBean.getAnalyticsCategoryPathBeanValue().getPath();
+                break;
+            case FLOAT:
+                value = new BigDecimal(recordValueEntryBean.toString()).floatValue();
+                break;
+            case DOUBLE:
+                value = new BigDecimal(recordValueEntryBean.toString()).doubleValue();
+                break;
+            case INTEGER:
+                value = new BigDecimal(recordValueEntryBean.toString()).intValue();
+                break;
+            case LONG:
+                value = new BigDecimal(recordValueEntryBean.toString()).longValue();
+                break;
+            case BOOLEAN:
+                value = Boolean.parseBoolean(recordValueEntryBean.toString());
+                break;
+            case STRING:
+                value = recordValueEntryBean.toString();
+                break;
+            default:
+                throw new AnalyticsWebServiceException("Value cannot be mapped to the data type given in the schema");
+        }
+        return value;
     }
 }

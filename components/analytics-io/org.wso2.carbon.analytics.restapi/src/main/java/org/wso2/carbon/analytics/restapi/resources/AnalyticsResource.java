@@ -36,6 +36,7 @@ import org.wso2.carbon.analytics.restapi.UnauthenticatedUserException;
 import org.wso2.carbon.analytics.restapi.Utils;
 import org.wso2.carbon.analytics.restapi.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.restapi.beans.CategoryDrillDownRequestBean;
+import org.wso2.carbon.analytics.restapi.beans.ColumnKeyValueBean;
 import org.wso2.carbon.analytics.restapi.beans.DrillDownRangeBean;
 import org.wso2.carbon.analytics.restapi.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.restapi.beans.QueryBean;
@@ -369,7 +370,7 @@ public class AnalyticsResource extends AbstractResource {
                                @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
 	                                          throws AnalyticsException {
 		if (logger.isDebugEnabled()) {
-			logger.debug("Invoking getRecordGroups for tableName: " + tableName);
+			logger.debug("Invoking getRecords for tableName: " + tableName);
 		}
 		SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
@@ -473,6 +474,57 @@ public class AnalyticsResource extends AbstractResource {
 		return getRecords(tableName, DEFAULT_FROM_TIME, DEFAULT_TO_TIME,
 		                  DEFAULT_START_INDEX, DEFAULT_INFINITY_INDEX, authHeader);
 	}
+
+    /**
+     * Gets the records which match the primary key values batch.
+     * @param tableName the table name
+     * @param columnKeyValueBean bean containing the columns and values batch
+     * @param authHeader the count
+     * @return the record groups
+     * @throws AnalyticsException
+     */
+    @POST
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({ MediaType.APPLICATION_JSON})
+    @Path("tables/{tableName}/keyed_records")
+    public StreamingOutput getRecordsWithKeyValues(@PathParam("tableName") String tableName,
+                                        ColumnKeyValueBean columnKeyValueBean,
+                                      @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
+            throws AnalyticsException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Invoking getWithkeyValues for tableName: " + tableName);
+        }
+        SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+        String username = authenticate(authHeader);
+        final RecordGroup[] recordGroups;
+        recordGroups = analyticsDataService.getWithKeyValues(username, tableName, 1, columnKeyValueBean.getColumns(),
+                                                             columnKeyValueBean.getValueBatches());
+
+        final List<Iterator<Record>> iterators = Utils.getRecordIterators(recordGroups, analyticsDataService);
+        return new StreamingOutput() {
+            @Override
+            public void write(OutputStream outputStream)
+                    throws IOException, WebApplicationException {
+                Writer recordWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+                recordWriter.write(STR_JSON_ARRAY_OPEN_SQUARE_BRACKET);
+                for (Iterator<Record> iterator : iterators) {
+                    while (iterator.hasNext()) {
+                        RecordBean recordBean = Utils.createRecordBean(iterator.next());
+                        recordWriter.write(gson.toJson(recordBean));
+                        if (iterator.hasNext()) {
+                            recordWriter.write(STR_JSON_COMMA);
+                        }
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Retrieved -- Record Id: " + recordBean.getId() + " values :" +
+                                         recordBean.toString());
+                        }
+                    }
+                }
+                recordWriter.write(STR_JSON_ARRAY_CLOSING_SQUARE_BRACKET);
+                recordWriter.flush();
+            }
+        };
+    }
 
 	/**
 	 * Inserts or update a list of records. Update only happens if there are matching record ids

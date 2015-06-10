@@ -39,6 +39,7 @@ import org.wso2.carbon.analytics.webservice.beans.EventBean;
 import org.wso2.carbon.analytics.webservice.beans.RecordBean;
 import org.wso2.carbon.analytics.webservice.beans.StreamDefinitionBean;
 import org.wso2.carbon.analytics.webservice.beans.SubCategoriesBean;
+import org.wso2.carbon.analytics.webservice.beans.ValuesBatchBean;
 import org.wso2.carbon.analytics.webservice.exception.AnalyticsWebServiceException;
 import org.wso2.carbon.analytics.webservice.internal.ServiceHolder;
 import org.wso2.carbon.core.AbstractAdmin;
@@ -224,6 +225,7 @@ public class AnalyticsWebService extends AbstractAdmin {
      */
     public long getRecordCount(String tableName, long timeFrom, long timeTo)
             throws AnalyticsWebServiceException {
+        logger.error("XXXXXXXXXX " + timeFrom + "  " + timeTo);
         try {
             return analyticsDataAPI.getRecordCount(getUsername(), tableName, timeFrom, timeTo);
         } catch (Exception e) {
@@ -259,6 +261,39 @@ public class AnalyticsWebService extends AbstractAdmin {
             List<Record> records = GenericUtils.listRecords(analyticsDataAPI,
                                                             analyticsDataAPI.get(getUsername(), tableName, numPartitionsHint, columnList, timeFrom, timeTo, recordsFrom,
                                                                                  recordsCount));
+            List<RecordBean> recordBeans = Utils.createRecordBeans(records);
+            RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
+            return recordBeans.toArray(resultRecordBeans);
+        } catch (Exception e) {
+            logger.error("Unable to get records from table[" + tableName + "] due to " + e.getMessage(), e);
+            throw new AnalyticsWebServiceException("Unable to get record from table[" + tableName + "] due to " + e
+                    .getMessage(), e);
+        }
+    }
+
+    /**
+     * Retrieves data from a table, which matches the primary key values batch.
+     *
+     * @param tableName         The name of the table to search on
+     * @param numPartitionsHint The best effort number of splits this should return
+     * @param columns           The list of columns to required in results, null if all needs to be returned
+     * @param valuesBatchBeans  The values batch containing the key values of primary keys to match
+     * @return An array of {@link RecordBean} objects, which represents individual data sets in their local location
+     * @throws AnalyticsWebServiceException
+     */
+    public RecordBean[] getWithKeyValues(String tableName, int numPartitionsHint, String[] columns, ValuesBatchBean[] valuesBatchBeans)
+            throws AnalyticsWebServiceException {
+
+        try {
+            List<String> columnList = null;
+            if (columns != null && columns.length != 0) {
+                columnList = Arrays.asList(columns);
+            }
+            List<Map<String, Object>> valuesBatch = Utils.getValuesBatch(valuesBatchBeans,
+                                                                         analyticsDataAPI.getTableSchema(getUsername(), tableName));
+            List<Record> records = GenericUtils.listRecords(analyticsDataAPI,
+                                                            analyticsDataAPI.getWithKeyValues(getUsername(), tableName, numPartitionsHint,
+                                                                                              columnList, valuesBatch));
             List<RecordBean> recordBeans = Utils.createRecordBeans(records);
             RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
             return recordBeans.toArray(resultRecordBeans);

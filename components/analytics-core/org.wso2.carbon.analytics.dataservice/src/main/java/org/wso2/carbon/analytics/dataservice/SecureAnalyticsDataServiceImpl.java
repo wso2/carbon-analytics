@@ -34,6 +34,7 @@ import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The implementation of {@link SecureAnalyticsDataService}.
@@ -163,6 +164,19 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
                                                            "permission to get records");
         }
         return analyticsDataService.get(tenantId, tableName, numPartitionsHint, columns, ids);
+    }
+
+    @Override
+    public RecordGroup[] getWithKeyValues(String username, String tableName, int numPartitionsHint,
+                                          List<String> columns,
+                                          List<Map<String, Object>> valuesBatch)
+            throws AnalyticsException, AnalyticsTableNotAvailableException {
+        int tenantId = getTenantId(username);
+        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_GET_RECORD)) {
+            throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                           "permission to get records");
+        }
+        return analyticsDataService.getWithKeyValues(tenantId, tableName, numPartitionsHint, columns, valuesBatch);
     }
 
     @Override

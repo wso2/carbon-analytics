@@ -329,6 +329,14 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
+    public RecordGroup[] getWithKeyValues(String username, String tableName, int numPartitionsHint,
+                                          List<String> columns,
+                                          List<Map<String, Object>> valuesBatch)
+            throws AnalyticsException, AnalyticsTableNotAvailableException {
+        return new RecordGroup[0];
+    }
+
+    @Override
     public boolean isPaginationSupported() {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             return ServiceHolder.getAnalyticsDataService().isPaginationSupported();

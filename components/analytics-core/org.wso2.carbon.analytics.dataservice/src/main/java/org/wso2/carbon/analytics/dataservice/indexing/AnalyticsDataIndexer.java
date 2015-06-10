@@ -551,6 +551,9 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             IndexSearcher searcher = new IndexSearcher(reader, searchExecutor);
             Map<String, ColumnDefinition> indices = this.lookupIndices(tenantId, tableName);
             Query indexQuery = new AnalyticsQueryParser(this.luceneAnalyzer, indices).parse(query);
+            if (count <= 0) {
+                log.warn("Record Count/Page size is ZERO!. Please set Record count/Page size.");
+            }
             TopScoreDocCollector collector = TopScoreDocCollector.create(count, true);
             searcher.search(indexQuery, collector);
             ScoreDoc[] hits = collector.topDocs(start).scoreDocs;

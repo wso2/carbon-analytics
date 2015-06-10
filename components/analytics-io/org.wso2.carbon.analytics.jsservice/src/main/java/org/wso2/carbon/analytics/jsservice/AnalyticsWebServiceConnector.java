@@ -29,6 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.jsservice.beans.AnalyticsSchemaBean;
 import org.wso2.carbon.analytics.jsservice.beans.CategoryDrillDownRequestBean;
+import org.wso2.carbon.analytics.jsservice.beans.ColumnKeyValueBean;
 import org.wso2.carbon.analytics.jsservice.beans.DrillDownRequestBean;
 import org.wso2.carbon.analytics.jsservice.beans.EventBean;
 import org.wso2.carbon.analytics.jsservice.beans.QueryBean;
@@ -42,17 +43,20 @@ import org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceAnalyticsWeb
 import org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceMalformedStreamDefinitionExceptionException;
 import org.wso2.carbon.analytics.webservice.stub.AnalyticsWebServiceStub;
 import org.wso2.carbon.analytics.webservice.stub.beans.RecordBean;
+import org.wso2.carbon.analytics.webservice.stub.beans.ValuesBatchBean;
 
 import java.lang.reflect.Type;
 import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class will expose all the MessageConsoleService stub operations.
  */
 public class AnalyticsWebServiceConnector {
 
+    private static final long AXIS2_MIN = Long.MIN_VALUE + 1; //Long.MIN_VALUE is used for unset long variables inside stub
     private Log logger = LogFactory.getLog(AnalyticsWebServiceConnector.class);
     private static final String ANALYTICS_WEB_SERVICE = "AnalyticsWebService";
     private AnalyticsWebServiceStub analyticsWebServiceStub;
@@ -80,8 +84,8 @@ public class AnalyticsWebServiceConnector {
     public static final int TYPE_DRILLDOWN_SEARCH = 20;
     public static final int TYPE_DRILLDOWN_SEARCH_COUNT = 21;
     public static final int TYPE_ADD_STREAM_DEFINITION = 22;
-    public static final int TYPE_PUBLISH_EVENT = 23;
-    public static final int TYPE_GET_STREAM_DEFINITION = 24;
+    public static final int TYPE_GET_STREAM_DEFINITION = 23;
+    public static final int TYPE_PUBLISH_EVENT = 24;
 
     public AnalyticsWebServiceConnector(ConfigurationContext configCtx, String backendServerURL, String cookie) {
         try {
@@ -365,7 +369,7 @@ public class AnalyticsWebServiceConnector {
             logger.debug("Invoking getRecordCount for tableName: " + tableName);
         }
         try {
-            long recordCount = analyticsWebServiceStub.getRecordCount(tableName, Long.MIN_VALUE, Long.MAX_VALUE);
+            long recordCount = analyticsWebServiceStub.getRecordCount(tableName, AXIS2_MIN, Long.MAX_VALUE);
             if (logger.isDebugEnabled()) {
                 logger.debug("RecordCount for tableName: " + tableName + " is " + recordCount);
             }
@@ -392,19 +396,52 @@ public class AnalyticsWebServiceConnector {
             int start = validateNumericValue("start", recordsFrom).intValue();
             int recordCount = validateNumericValue("count", count).intValue();
             RecordBean[] recordBeans;
-            if (columns == null) {
-                recordBeans = analyticsWebServiceStub.getByRange(tableName, 1, null,
-                                                                              from, to, start, recordCount);
-            } else {
-                Type columnType = new TypeToken<List<String>>() {
+            String[] columnList = null;
+            if (columns != null) {
+                Type columnType = new TypeToken<String[]>() {
                 }.getType();
-                List<String> fields = gson.fromJson(columns, columnType);
-                recordBeans = analyticsWebServiceStub.getByRange(tableName, 1,
-                                                                 fields.toArray(new String[fields.size()]),
-                                                                 from, to, start, recordCount);
+                columnList = gson.fromJson(columns, columnType);
             }
+            recordBeans = analyticsWebServiceStub.getByRange(tableName, 1, columnList,
+                                                                              from, to, start, recordCount);
             List<Record> records = Utils.getRecordBeans(recordBeans);
             return handleResponse(ResponseStatus.SUCCESS, gson.toJson(records));
+        } catch (RemoteException e) {
+            logger.error("failed to get records from table: '" + tableName + "', " + e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED, "Failed to get records from table: '" +
+                                                         tableName + "', " + e.getMessage());
+        } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
+            logger.error("failed to get records from table: '" + tableName + "', " + e.getFaultMessage(), e);
+            return handleResponse(ResponseStatus.FAILED, "Failed to get records from table: '" +
+                                                         tableName + "', " + e.getFaultMessage());
+        } catch (JSServiceException e) {
+            logger.error("failed to get records from table: '" + tableName + "', " + e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED, "Failed to get records from table: '" +
+                                                         tableName + "', " + e.getMessage());
+        }
+    }
+
+    public ResponseBean getWithKeyValues(String tableName, String valuesBatch) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Invoking getRecordByRange for tableName: " + tableName);
+        }
+        try {
+            if (valuesBatch != null) {
+                ColumnKeyValueBean columnKeyValueBean = gson.fromJson(valuesBatch, ColumnKeyValueBean.class);
+                List<Map<String, Object>> valueBatchList = columnKeyValueBean.getValueBatches();
+                if (valueBatchList != null && !valueBatchList.isEmpty()) {
+                    RecordBean[] recordBeans;
+                    String[] columns = columnKeyValueBean.getColumns();
+                    ValuesBatchBean[] valuesBatchBeans = Utils.getValuesBatch(valueBatchList);
+                    recordBeans = analyticsWebServiceStub.getWithKeyValues(tableName, 1, columns, valuesBatchBeans);
+                    List<Record> records = Utils.getRecordBeans(recordBeans);
+                    return handleResponse(ResponseStatus.SUCCESS, gson.toJson(records));
+                } else {
+                    throw new JSServiceException("Values batch is null or empty");
+                }
+            } else {
+                throw new JSServiceException("Values batch is not provided");
+            }
         } catch (RemoteException e) {
             logger.error("failed to get records from table: '" + tableName + "', " + e.getMessage(), e);
             return handleResponse(ResponseStatus.FAILED, "Failed to get records from table: '" +
@@ -690,7 +727,7 @@ public class AnalyticsWebServiceConnector {
         if (queryAsString != null && !queryAsString.isEmpty()) {
             try {
                 CategoryDrillDownRequestBean queryBean =
-                         gson.fromJson(queryAsString,CategoryDrillDownRequestBean.class);
+                         gson.fromJson(queryAsString, CategoryDrillDownRequestBean.class);
                 org.wso2.carbon.analytics.webservice.stub.beans.CategoryDrillDownRequestBean requestBean =
                         Utils.createCategoryDrillDownRequest(tableName, queryBean);
                 org.wso2.carbon.analytics.webservice.stub.beans.SubCategoriesBean searchResults =

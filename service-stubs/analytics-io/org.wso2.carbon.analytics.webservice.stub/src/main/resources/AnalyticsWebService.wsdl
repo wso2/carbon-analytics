@@ -47,6 +47,11 @@
                     <xs:element minOccurs="0" name="scoreParam" type="xs:boolean"/>
                 </xs:sequence>
             </xs:complexType>
+            <xs:complexType name="ValuesBatchBean">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="keyValues" nillable="true" type="ax227:RecordValueEntryBean"/>
+                </xs:sequence>
+            </xs:complexType>
             <xs:complexType name="AnalyticsDrillDownRequestBean">
                 <xs:sequence>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="categoryPaths" nillable="true" type="ax227:CategoryPathBean"/>
@@ -142,11 +147,23 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="deleteByIds">
+            <xs:element name="getByRange">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="ids" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="numPartitionsHint" type="xs:int"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="timeFrom" type="xs:long"/>
+                        <xs:element minOccurs="0" name="timeTo" type="xs:long"/>
+                        <xs:element minOccurs="0" name="recordsFrom" type="xs:int"/>
+                        <xs:element minOccurs="0" name="recordsCount" type="xs:int"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getByRangeResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax228:RecordBean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -167,23 +184,11 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getByRange">
+            <xs:element name="deleteByIds">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="numPartitionsHint" type="xs:int"/>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="timeFrom" type="xs:long"/>
-                        <xs:element minOccurs="0" name="timeTo" type="xs:long"/>
-                        <xs:element minOccurs="0" name="recordsFrom" type="xs:int"/>
-                        <xs:element minOccurs="0" name="recordsCount" type="xs:int"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getByRangeResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax228:RecordBean"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="ids" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -243,10 +248,20 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="clearIndices">
+            <xs:element name="getWithKeyValues">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="numPartitionsHint" type="xs:int"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="valuesBatchBeans" nillable="true" type="ax228:ValuesBatchBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getWithKeyValuesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax228:RecordBean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -323,6 +338,13 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" nillable="true" type="ax228:SubCategoriesBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="clearIndices">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="tableName" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -490,6 +512,12 @@
     <wsdl:message name="getStreamDefinitionResponse">
         <wsdl:part name="parameters" element="ns:getStreamDefinitionResponse"/>
     </wsdl:message>
+    <wsdl:message name="getWithKeyValuesRequest">
+        <wsdl:part name="parameters" element="ns:getWithKeyValues"/>
+    </wsdl:message>
+    <wsdl:message name="getWithKeyValuesResponse">
+        <wsdl:part name="parameters" element="ns:getWithKeyValuesResponse"/>
+    </wsdl:message>
     <wsdl:portType name="AnalyticsWebServicePortType">
         <wsdl:operation name="searchCount">
             <wsdl:input message="ns:searchCountRequest" wsaw:Action="urn:searchCount"/>
@@ -576,6 +604,11 @@
             <wsdl:input message="ns:getStreamDefinitionRequest" wsaw:Action="urn:getStreamDefinition"/>
             <wsdl:output message="ns:getStreamDefinitionResponse" wsaw:Action="urn:getStreamDefinitionResponse"/>
             <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getStreamDefinitionAnalyticsWebServiceAnalyticsWebServiceException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getWithKeyValues">
+            <wsdl:input message="ns:getWithKeyValuesRequest" wsaw:Action="urn:getWithKeyValues"/>
+            <wsdl:output message="ns:getWithKeyValuesResponse" wsaw:Action="urn:getWithKeyValuesResponse"/>
+            <wsdl:fault message="ns:AnalyticsWebServiceAnalyticsWebServiceException" name="AnalyticsWebServiceAnalyticsWebServiceException" wsaw:Action="urn:getWithKeyValuesAnalyticsWebServiceAnalyticsWebServiceException"/>
         </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="AnalyticsWebServiceSoap11Binding" type="ns:AnalyticsWebServicePortType">
@@ -774,6 +807,18 @@
         </wsdl:operation>
         <wsdl:operation name="getStreamDefinition">
             <soap:operation soapAction="urn:getStreamDefinition" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getWithKeyValues">
+            <soap:operation soapAction="urn:getWithKeyValues" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -991,6 +1036,18 @@
                 <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
             </wsdl:fault>
         </wsdl:operation>
+        <wsdl:operation name="getWithKeyValues">
+            <soap12:operation soapAction="urn:getWithKeyValues" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsWebServiceAnalyticsWebServiceException">
+                <soap12:fault use="literal" name="AnalyticsWebServiceAnalyticsWebServiceException"/>
+            </wsdl:fault>
+        </wsdl:operation>
     </wsdl:binding>
     <wsdl:binding name="AnalyticsWebServiceHttpBinding" type="ns:AnalyticsWebServicePortType">
         <http:binding verb="POST"/>
@@ -1137,6 +1194,15 @@
         </wsdl:operation>
         <wsdl:operation name="getStreamDefinition">
             <http:operation location="getStreamDefinition"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getWithKeyValues">
+            <http:operation location="getWithKeyValues"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>

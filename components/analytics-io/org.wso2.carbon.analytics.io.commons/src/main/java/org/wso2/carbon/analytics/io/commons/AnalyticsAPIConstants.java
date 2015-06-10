@@ -44,6 +44,7 @@ public class AnalyticsAPIConstants {
     public static final String PARTITIONER_NO_PARAM = "partitionerNo";
     public static final String COLUMNS_PARAM = "columns";
     public static final String RECORD_FROM_PARAM = "recordFrom";
+    public static final String KEY_VALUE_PARAM = "keyValues";
 
     public static final String OPERATION = "__operation";
     public static final String SESSION_ID = "__sessionId";
@@ -79,6 +80,7 @@ public class AnalyticsAPIConstants {
     public static final String DESTROY_OPERATION = "__destroy_opr";
     public static final String READ_RECORD_OPERATION = "__readRecord_opr";
     public static final String GET_RANGE_RECORD_GROUP_OPERATION = "__get_range_record_group_opr";
+    public static final String GET_RECORDS_WITH_KEY_VALUES_OPERATION = "__get_records_with_key_values_opr";
     public static final String GET_IDS_RECORD_GROUP_OPERATION = "__get_ids_record_group_opr";
     public static final String IS_PAGINATION_SUPPORTED_OPERATION = "__is_pagination_supported_opr";
     public static final String ANALYTICS_REMOTE_API_INVOCATION_PERMISSION = "/permission/admin/manage/analytics/api";

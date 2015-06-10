@@ -19,15 +19,14 @@ package org.wso2.carbon.analytics.servlet;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
-import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
-import org.wso2.carbon.analytics.io.commons.RemoteRecordGroup;
-import org.wso2.carbon.analytics.servlet.exception.AnalyticsAPIAuthenticationException;
-import org.wso2.carbon.analytics.servlet.internal.ServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
+import org.wso2.carbon.analytics.io.commons.RemoteRecordGroup;
+import org.wso2.carbon.analytics.servlet.exception.AnalyticsAPIAuthenticationException;
+import org.wso2.carbon.analytics.servlet.internal.ServiceHolder;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.servlet.ServletException;
@@ -35,11 +34,11 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import java.io.*;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This servlet processes the RecordGroup and streams the records into the wire.
@@ -121,6 +120,36 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
                                 partitionHint, columns, ids);
                     else recordGroups = ServiceHolder.getSecureAnalyticsDataService().get(userName, tableName,
                             partitionHint, columns, ids);
+                    RemoteRecordGroup[] remoteRecordGroup = new RemoteRecordGroup[recordGroups.length];
+                    for (int i = 0; i < recordGroups.length; i++) {
+                        remoteRecordGroup[i] = new RemoteRecordGroup();
+                        remoteRecordGroup[i].setBinaryRecordGroup(GenericUtils.serializeObject(recordGroups[i]));
+                        remoteRecordGroup[i].setLocations(recordGroups[i].getLocations());
+                    }
+                    resp.setStatus(HttpServletResponse.SC_OK);
+                    GenericUtils.serializeObject(remoteRecordGroup, resp.getOutputStream());
+                } catch (AnalyticsException e) {
+                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+                }
+            } else if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.GET_RECORDS_WITH_KEY_VALUES_OPERATION)) {
+                int tenantId = MultitenantConstants.INVALID_TENANT_ID;
+                if (!securityEnabled)
+                    tenantId = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.TENANT_ID_PARAM));
+                String userName = req.getParameter(AnalyticsAPIConstants.USERNAME_PARAM);
+                String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
+                int partitionHint = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.PARTITIONER_NO_PARAM));
+                Type columnsList = new TypeToken<List<String>>() {
+                }.getType();
+                Type keyValueList = new TypeToken<List<Map<String, Object>>>() {}.getType();
+                List<String> columns = gson.fromJson(req.getParameter(AnalyticsAPIConstants.COLUMNS_PARAM), columnsList);
+                List<Map<String, Object>> valuesBatch = gson.fromJson(req.getParameter(AnalyticsAPIConstants.KEY_VALUE_PARAM), keyValueList);
+                try {
+                    RecordGroup[] recordGroups;
+                    if (!securityEnabled)
+                        recordGroups = ServiceHolder.getAnalyticsDataService().getWithKeyValues(tenantId, tableName,
+                                                                                   partitionHint, columns, valuesBatch);
+                    else recordGroups = ServiceHolder.getSecureAnalyticsDataService().getWithKeyValues(userName, tableName,
+                                                                                          partitionHint, columns, valuesBatch);
                     RemoteRecordGroup[] remoteRecordGroup = new RemoteRecordGroup[recordGroups.length];
                     for (int i = 0; i < recordGroups.length; i++) {
                         remoteRecordGroup[i] = new RemoteRecordGroup();

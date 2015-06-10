@@ -37,6 +37,7 @@ import org.wso2.carbon.analytics.webservice.stub.beans.RecordValueEntryBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.SchemaColumnBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.StreamDefAttributeBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.SubCategoriesBean;
+import org.wso2.carbon.analytics.webservice.stub.beans.ValuesBatchBean;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.user.api.UserRealm;
@@ -157,9 +158,10 @@ public class Utils {
             RecordValueEntryBean recordValueEntryBean = new RecordValueEntryBean();
             recordValueEntryBean.setFieldName(entry.getKey());
             Object value = entry.getValue();
-            recordValueEntryBean.setType("STRING");
             if (value != null) {
+                recordValueEntryBean.setType("STRING");
                 recordValueEntryBean.setStringValue(value.toString());
+
             }
             recordValueEntryBeans.add(recordValueEntryBean);
         }
@@ -460,5 +462,28 @@ public class Utils {
             }
         }
         return attributeMap;
+    }
+
+    public static ValuesBatchBean[] getValuesBatch(List<Map<String, Object>> valueBatchList) {
+        List<ValuesBatchBean> valuesBatchBeans = new ArrayList<>();
+        for (Map<String, Object> keyValueMap : valueBatchList) {
+            if (keyValueMap != null) {
+                ValuesBatchBean valuesBatchBean = new ValuesBatchBean();
+                List<RecordValueEntryBean> keyValues = new ArrayList<>();
+                for (Map.Entry<String, Object> entry : keyValueMap.entrySet()) {
+                    RecordValueEntryBean recordValueEntryBean = new RecordValueEntryBean();
+                    recordValueEntryBean.setFieldName(entry.getKey());
+                    if (entry.getValue() instanceof List) {
+                        recordValueEntryBean.setAnalyticsCategoryPathBeanValue(validateAndReturn(entry.getValue()));
+                    } else {
+                        recordValueEntryBean.setStringValue(entry.getValue().toString());
+                    }
+                    keyValues.add(recordValueEntryBean);
+                }
+                valuesBatchBean.setKeyValues(keyValues.toArray(new RecordValueEntryBean[keyValues.size()]));
+                valuesBatchBeans.add(valuesBatchBean);
+            }
+        }
+        return valuesBatchBeans.toArray(new ValuesBatchBean[valuesBatchBeans.size()]);
     }
 }
