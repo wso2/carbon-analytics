@@ -97,6 +97,7 @@ public class AnalyticsEventTableUtils {
         for (int i = 0; i < attrs.size(); i++) {
             data[i] = record.getValue(attrs.get(i).getName());
         }
+        event.setOutputData(data);
         return event;
     }
     
