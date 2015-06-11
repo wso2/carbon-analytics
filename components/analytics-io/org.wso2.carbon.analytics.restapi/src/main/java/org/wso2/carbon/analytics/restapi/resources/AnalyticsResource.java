@@ -109,7 +109,7 @@ public class AnalyticsResource extends AbstractResource {
 	 * @return the response
 	 * @throws AnalyticsException
 	 */
-	/*@POST
+	@POST
 	@Path(Constants.ResourcePath.TABLES)
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON })
@@ -132,7 +132,7 @@ public class AnalyticsResource extends AbstractResource {
         } else {
             throw new AnalyticsException("Table name is not defined");
         }
-    }*/
+    }
 
 	/**
 	 * Check if the table Exists

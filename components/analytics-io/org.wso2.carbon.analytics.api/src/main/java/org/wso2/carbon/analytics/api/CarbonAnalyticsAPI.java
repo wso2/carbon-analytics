@@ -333,7 +333,14 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
                                           List<String> columns,
                                           List<Map<String, Object>> valuesBatch)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
-        return new RecordGroup[0];
+        if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
+            return ServiceHolder.getSecureAnalyticsDataService().getWithKeyValues(username, tableName, numPartitionsHint, columns, valuesBatch);
+        } else {
+            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
+                                                                         analyticsDataConfiguration.getPassword());
+            return AnalyticsAPIHttpClient.getInstance().getWithKeyValues(MultitenantConstants.INVALID_TENANT_ID, username,
+                                                                       tableName, numPartitionsHint, columns, valuesBatch, true);
+        }
     }
 
     @Override
@@ -584,8 +591,10 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
-            //TODO: implement
-            return null;
+            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
+                                                                         analyticsDataConfiguration.getPassword());
+            return AnalyticsAPIHttpClient.getInstance().getWithKeyValues(tenantId, null, tableName, numPartitionsHint,
+                                                                       columns, valuesBatch, false);
         }
     }
 }

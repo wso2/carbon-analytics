@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -19,10 +18,14 @@
 
 package org.wso2.carbon.analytics.webservice.beans;
 
+import java.io.Serializable;
+
 /**
  * This class represents the primary key values batch
  */
-public class ValuesBatchBean {
+public class ValuesBatchBean implements Serializable {
+
+    private static final long serialVersionUID = -8260715251012715139L;
     private RecordValueEntryBean[] keyValues;
 
     public ValuesBatchBean() {

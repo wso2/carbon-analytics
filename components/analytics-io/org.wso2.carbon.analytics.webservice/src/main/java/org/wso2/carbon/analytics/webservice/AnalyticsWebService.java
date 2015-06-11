@@ -225,7 +225,6 @@ public class AnalyticsWebService extends AbstractAdmin {
      */
     public long getRecordCount(String tableName, long timeFrom, long timeTo)
             throws AnalyticsWebServiceException {
-        logger.error("XXXXXXXXXX " + timeFrom + "  " + timeTo);
         try {
             return analyticsDataAPI.getRecordCount(getUsername(), tableName, timeFrom, timeTo);
         } catch (Exception e) {
