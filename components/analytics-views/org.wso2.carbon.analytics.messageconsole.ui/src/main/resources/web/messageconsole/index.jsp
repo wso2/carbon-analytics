@@ -59,6 +59,7 @@
         var typeListTable = '<%= MessageConsoleConnector.TYPE_LIST_TABLE%>';
         var typeGetFacetNameList = '<%= MessageConsoleConnector.TYPE_GET_FACET_NAME_LIST%>';
         var typeGetFacetCategories = '<%= MessageConsoleConnector.TYPE_GET_FACET_CATEGORIES%>';
+        var typeGetPrymaryKeyList = '<%= MessageConsoleConnector.TYPE_GET_PRIMARY_KEY_LIST%>';
 
         var tablePopupAction;
 
@@ -413,11 +414,17 @@
                                 <tr id="facetSearchTableRow" style="display: none">
                                     <td></td>
                                     <td>
-                                        <div>
-                                            <table id="facetSearchTable" class="normal">
-                                                <tbody></tbody>
-                                            </table>
-                                        </div>
+                                        <table id="facetSearchTable" class="normal">
+                                            <tbody></tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr id="primaryKeySearch" style="display: none">
+                                    <td>By Primary Key</td>
+                                    <td>
+                                        <table id="primaryKeyTable" class="normal">
+                                            <tbody></tbody>
+                                        </table>
                                     </td>
                                 </tr>
                             </c:if>
@@ -429,6 +436,7 @@
                     <tr>
                         <td class="buttonRow">
                             <input id="search" type="button" value="Search" onclick="createJTable();" class="button">
+                            <input id="reset" type="button" value="Reset" onclick="reset();" class="button">
                         </td>
                     </tr>
                 </c:if>

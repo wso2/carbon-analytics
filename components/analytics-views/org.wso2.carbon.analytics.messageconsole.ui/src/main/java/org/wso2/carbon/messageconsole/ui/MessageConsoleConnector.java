@@ -42,6 +42,7 @@ import org.wso2.carbon.analytics.webservice.stub.beans.RecordBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.RecordValueEntryBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.SchemaColumnBean;
 import org.wso2.carbon.analytics.webservice.stub.beans.SubCategoriesBean;
+import org.wso2.carbon.analytics.webservice.stub.beans.ValuesBatchBean;
 import org.wso2.carbon.messageconsole.ui.beans.Column;
 import org.wso2.carbon.messageconsole.ui.beans.FacetBean;
 import org.wso2.carbon.messageconsole.ui.beans.Permissions;
@@ -84,6 +85,7 @@ public class MessageConsoleConnector {
     public static final int TYPE_LIST_TABLE = 15;
     public static final int TYPE_GET_FACET_NAME_LIST = 16;
     public static final int TYPE_GET_FACET_CATEGORIES = 17;
+    public static final int TYPE_GET_PRIMARY_KEY_LIST = 18;
 
     private static final GsonBuilder RESPONSE_RESULT_BUILDER = new GsonBuilder().registerTypeAdapter(ResponseResult.class,
                                                                                                      new ResponseResultSerializer());
@@ -93,6 +95,8 @@ public class MessageConsoleConnector {
     public static final Type STRING_ARRAY_TYPE = new TypeToken<String[]>() {
     }.getType();
     public static final Type FACET_LIST_TYPE = new TypeToken<List<FacetBean>>() {
+    }.getType();
+    public static final Type PRIMARY_KEYS_TYPE = new TypeToken<List<Column>>() {
     }.getType();
 
     private MessageConsoleStub messageConsoleStub;
@@ -151,7 +155,7 @@ public class MessageConsoleConnector {
     }
 
     public String getRecords(String tableName, long timeFrom, long timeTo, int startIndex, int pageSize,
-                             String searchQuery, String facetsJsonString) {
+                             String searchQuery, String facetsJsonString, String primarySearchString) {
         if (log.isDebugEnabled()) {
             log.debug("Search Query: " + searchQuery);
             log.debug("timeFrom: " + timeFrom);
@@ -159,12 +163,28 @@ public class MessageConsoleConnector {
             log.debug("Start Index: " + startIndex);
             log.debug("Page Size: " + pageSize);
             log.debug("Facet String: " + facetsJsonString);
+            log.debug("Primary key String: " + primarySearchString);
         }
         ResponseResult responseResult = new ResponseResult();
         try {
             RecordBean[] resultRecordBeans;
+            List<Column> primaryKeys = new Gson().fromJson(primarySearchString, PRIMARY_KEYS_TYPE);
             List<FacetBean> facetsList = new Gson().fromJson(facetsJsonString, FACET_LIST_TYPE);
-            if (!facetsList.isEmpty()) {
+            if (!primaryKeys.isEmpty()) {
+                ValuesBatchBean[] batchBeans = new ValuesBatchBean[1];
+                ValuesBatchBean batchBean = new ValuesBatchBean();
+                batchBeans[0] = batchBean;
+                RecordValueEntryBean[] valueEntryBeans = new RecordValueEntryBean[primaryKeys.size()];
+                int i = 0;
+                for (Column primaryKey : primaryKeys) {
+                    RecordValueEntryBean entryBean = new RecordValueEntryBean();
+                    entryBean.setFieldName(primaryKey.getKey());
+                    entryBean.setStringValue(primaryKey.getValue());
+                    valueEntryBeans[i++] = entryBean;
+                }
+                batchBean.setKeyValues(valueEntryBeans);
+                resultRecordBeans = analyticsWebServiceStub.getWithKeyValues(tableName, 1, null, batchBeans);
+            } else if (!facetsList.isEmpty()) {
                 AnalyticsDrillDownRequestBean requestBean = getAnalyticsDrillDownRequestBean(tableName, startIndex, pageSize, searchQuery, facetsList);
                 resultRecordBeans = analyticsWebServiceStub.drillDownSearch(requestBean);
                 responseResult.setTotalRecordCount(new Double(analyticsWebServiceStub.drillDownSearchCount(requestBean)).intValue());
@@ -449,6 +469,18 @@ public class MessageConsoleConnector {
             log.error("Unable to get facet column list for table:" + table, e);
         }
         return new Gson().toJson(facetNameList.toArray(new String[facetNameList.size()]));
+    }
+
+    public String getPrimaryKeys(String table) {
+        try {
+            AnalyticsSchemaBean tableSchema = analyticsWebServiceStub.getTableSchema(table);
+            if (tableSchema != null && tableSchema.getPrimaryKeys() != null) {
+                return new Gson().toJson(tableSchema.getPrimaryKeys());
+            }
+        } catch (Exception e) {
+            log.error("Unable to get facet column list for table:" + table, e);
+        }
+        return new Gson().toJson(new String[0]);
     }
 
     public String getFacetCategoryList(String table, String fieldName, String categoryPaths) {

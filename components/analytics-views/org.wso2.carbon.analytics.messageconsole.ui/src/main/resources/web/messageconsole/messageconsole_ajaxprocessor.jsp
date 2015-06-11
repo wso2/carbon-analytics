@@ -48,7 +48,8 @@
                 to = Long.parseLong(timeTo);
             }
             String facets = request.getParameter("facets");
-            out.print(connector.getRecords(tableName, from, to, startIndex, pageSize, query, facets));
+            String primary = request.getParameter("primary");
+            out.print(connector.getRecords(tableName, from, to, startIndex, pageSize, query, facets, primary));
             break;
         }
         case MessageConsoleConnector.TYPE_TABLE_INFO: {
@@ -82,6 +83,10 @@
             out.print(connector.getFacetCategoryList(tableName,
                                                      request.getParameter("fieldName"),
                                                      request.getParameter("categoryPath")));
+            break;
+        }
+        case MessageConsoleConnector.TYPE_GET_PRIMARY_KEY_LIST: {
+            out.print(connector.getPrimaryKeys(tableName));
             break;
         }
     }

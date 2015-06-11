@@ -154,7 +154,7 @@ function listActionMethod(jtParams) {
     if (fromTime != '') {
         fromTimeStamp = jQuery('#timeFrom').datetimepicker("getDate").getTime();
     }
-    if (fromTime != '') {
+    if (toTime != '') {
         toTimeStamp = jQuery('#timeTo').datetimepicker("getDate").getTime();
     }
     postData["jtStartIndex"] = jtParams.jtStartIndex;
@@ -177,6 +177,17 @@ function listActionMethod(jtParams) {
         facets.push(facet);
     });
     postData["facets"] = JSON.stringify(facets);
+    var primaryKeys = [];
+    $('#primaryKeyTable > tbody  > tr').each(function () {
+        var primary = {};
+        var row = $(this);
+        primary.key = row.find("label").text();
+        primary.value = row.find("input").val();
+        if (primary.value != '') {
+            primaryKeys.push(primary);
+        }
+    });
+    postData["primary"] = JSON.stringify(primaryKeys);
     return $.Deferred(function ($dfd) {
         $.ajax({
                     url: '/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeListRecord,
@@ -197,13 +208,10 @@ function listActionMethod(jtParams) {
 function tableSelectChange() {
     var table = $("#tableSelect").val();
     if (table != '-1') {
-        $("#deleteTableButton").show();
-        $("#editTableButton").show();
         $("#purgeRecordButton").show();
         loadFacetNames();
+        loadPrimaryKeys();
     } else {
-        $("#deleteTableButton").hide();
-        $("#editTableButton").hide();
         $("#purgeRecordButton").hide();
         $('#facetListSelect').find('option:gt(0)').remove();
         $('#query').val('');
@@ -262,4 +270,35 @@ function loadFacetNames() {
               $("#facetListSelect").append(facetNames);
           }
     );
+}
+
+function loadPrimaryKeys() {
+    $('#primaryKeyTable tr').remove();
+    $.get('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeGetPrymaryKeyList + '&tableName=' + $("#tableSelect").val(),
+          function (result) {
+              var resultObj = jQuery.parseJSON(result);
+              $(resultObj).each(function (key, columnName) {
+                  $("#primaryKeyTable").find('tbody').
+                          append($('<tr>').
+                                         append($('<td>').append($('<label>').text(columnName))).
+                                         append($('<td>').append('<input id="' + columnName + '" type="text">'))
+                  );
+              });
+              if (resultObj.length > 0) {
+                  document.getElementById('primaryKeySearch').style.display = 'block';
+              } else {
+                  document.getElementById('primaryKeySearch').style.display = 'none';
+              }
+          }
+    );
+}
+
+function reset() {
+    $('#primaryKeyTable tr').remove();
+    document.getElementById('primaryKeySearch').style.display = 'none';
+    $('#facetSearchTable tr').remove();
+    $('#facetListSelect').find('option:gt(0)').remove();
+    $('#query').val('');
+    document.getElementById('facetSearchCombo').style.display = 'none';
+    document.getElementById('facetSearchTableRow').style.display = 'none';
 }
