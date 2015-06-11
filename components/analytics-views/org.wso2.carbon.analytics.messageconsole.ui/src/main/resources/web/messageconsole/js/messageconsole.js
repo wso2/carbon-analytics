@@ -206,8 +206,9 @@ function tableSelectChange() {
         $("#editTableButton").hide();
         $("#purgeRecordButton").hide();
         $('#facetListSelect').find('option:gt(0)').remove();
-        $('#facetSearchTable tr').remove();
         $('#query').val('');
+        document.getElementById('facetSearchCombo').style.display = 'none';
+        document.getElementById('facetSearchTableRow').style.display = 'none';
     }
     try {
         $('#DeleteAllButton').hide();
@@ -242,6 +243,7 @@ function scheduleDataPurge() {
 }
 
 function loadFacetNames() {
+    $('#facetSearchTable tr').remove();
     $('#facetListSelect').find('option:gt(0)').remove();
     $.get('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeGetFacetNameList + '&tableName=' + $("#tableSelect").val(),
           function (result) {
@@ -250,6 +252,13 @@ function loadFacetNames() {
               $(resultObj).each(function (key, tableName) {
                   facetNames += "<option value=" + tableName + ">" + tableName + "</option>";
               });
+              if (resultObj.length > 0) {
+                  document.getElementById('facetSearchCombo').style.display = 'block';
+                  document.getElementById('facetSearchTableRow').style.display = 'block';
+              } else {
+                  document.getElementById('facetSearchCombo').style.display = 'none';
+                  document.getElementById('facetSearchTableRow').style.display = 'none';
+              }
               $("#facetListSelect").append(facetNames);
           }
     );
