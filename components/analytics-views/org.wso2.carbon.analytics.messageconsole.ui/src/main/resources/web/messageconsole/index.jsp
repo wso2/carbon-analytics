@@ -90,6 +90,8 @@
 
         $(document).ready(function () {
             loadTableSelect();
+            jQuery('#timeFrom').datetimepicker();
+            jQuery('#timeTo').datetimepicker();
             $("#purgeRecordDialog").dialog({
                 autoOpen: false
             });
@@ -400,7 +402,7 @@
                                         <textarea id="query" rows="4" cols="100" placeholder="Search Query"></textarea>
                                     </td>
                                 </tr>
-                                <tr>
+                                <tr id="facetSearchCombo" style="display: none">
                                     <td>By Facet</td>
                                     <td>
                                         <select id="facetListSelect">
@@ -408,12 +410,14 @@
                                         </select>
                                     </td>
                                 </tr>
-                                <tr>
+                                <tr id="facetSearchTableRow" style="display: none">
                                     <td></td>
                                     <td>
-                                        <table id="facetSearchTable" class="normal">
-                                            <tbody></tbody>
-                                        </table>
+                                        <div>
+                                            <table id="facetSearchTable" class="normal">
+                                                <tbody></tbody>
+                                            </table>
+                                        </div>
                                     </td>
                                 </tr>
                             </c:if>
