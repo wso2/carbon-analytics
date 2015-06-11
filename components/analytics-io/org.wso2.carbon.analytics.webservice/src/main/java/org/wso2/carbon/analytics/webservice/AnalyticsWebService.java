@@ -47,7 +47,6 @@ import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 import org.wso2.carbon.event.stream.core.EventStreamService;
-import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -91,7 +90,7 @@ public class AnalyticsWebService extends AbstractAdmin {
         try {
             eventStreamService.addEventStreamDefinition(streamDefinition);
             return streamDefinition.getStreamId();
-        } catch (EventStreamConfigurationException e) {
+        } catch (Exception e) {
             logger.error("Unable to set the stream definition: [" + streamDefinition.getName() + ":" +
                          streamDefinition.getVersion()+ "]" + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to set the stream definition: [" +
@@ -112,7 +111,7 @@ public class AnalyticsWebService extends AbstractAdmin {
         try {
             StreamDefinition streamDefinition = validateAndGetStreamDefinition(name, version);
             return Utils.getStreamDefinitionBean(streamDefinition);
-        } catch (AnalyticsWebServiceException e) {
+        } catch (Exception e) {
             logger.error("unable to get the stream definition: " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("unable to get the stream definition: " + e.getMessage(), e);
         }
@@ -129,7 +128,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             } else {
                 throw new AnalyticsWebServiceException("The stream name is not provided");
             }
-        } catch (EventStreamConfigurationException e) {
+        } catch (Exception e) {
             logger.error("Unable to get the stream definition: " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to get the stream definition: " +
                                                    e.getMessage(), e);
@@ -150,7 +149,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             Event event = Utils.getEvent(eventBean, streamDefinition);
 
             eventStreamService.publish(event);
-        } catch (AnalyticsWebServiceException e) {
+        } catch (Exception e) {
             logger.error("unable to publish event: " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("unable to publish event: " + e.getMessage(), e);
         }
