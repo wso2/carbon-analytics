@@ -120,8 +120,10 @@ public class AnalyticsRelation extends BaseRelation implements TableScan,
             final AnalyticsDataService dataService = ServiceHolder.getAnalyticsDataService();
         try {
             if (overwrite && dataService.tableExists(this.tenantId, this.tableName)) {
+                AnalyticsSchema tempSchema = dataService.getTableSchema(this.tenantId, this.tableName);
                 dataService.deleteTable(this.tenantId, this.tableName);
                 dataService.createTable(this.tenantId, this.tableName);
+                dataService.setTableSchema(this.tenantId, this.tableName, tempSchema);
             }
             data.foreachPartition(new AnalyticsFunction1(tenantId, tableName, data.schema()));
         } catch (AnalyticsException e) {
