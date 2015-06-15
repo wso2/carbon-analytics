@@ -18,6 +18,7 @@
 package org.wso2.carbon.analytics.eventtable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -76,6 +77,8 @@ public class AnalyticsEventTable implements EventTable {
         
     private String primaryKeys;
     
+    private String indices;
+    
     @Override
     public void init(TableDefinition tableDefinition, ExecutionPlanContext executionPlanContext) {
         Annotation fromAnnotation = AnnotationHelper.getAnnotation(SiddhiConstants.ANNOTATION_FROM,
@@ -87,6 +90,13 @@ public class AnalyticsEventTable implements EventTable {
                     " must be provided for analytics event tables.");
         }
         this.primaryKeys = fromAnnotation.getElement(AnalyticsEventTableConstants.ANNOTATION_PRIMARY_KEYS);
+        if (this.primaryKeys == null) {
+            this.primaryKeys = "";
+        }
+        this.indices = fromAnnotation.getElement(AnalyticsEventTableConstants.ANNOTATION_INDICES);
+        if (this.indices == null) {
+            this.indices = "";
+        }
         try {
             this.tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
         } catch (Throwable e) {
@@ -142,13 +152,34 @@ public class AnalyticsEventTable implements EventTable {
                 break;
             default:
                 colType = ColumnType.STRING;
-                break;            
+                break;
             }
             cols.add(new ColumnDefinition(attr.getName(), colType));
         }
-        AnalyticsSchema schema = new AnalyticsSchema(cols, this.trimArray(primaryKeys.split(",")));
-        ServiceHolder.getAnalyticsDataService().createTable(tenantId, tableName);
-        ServiceHolder.getAnalyticsDataService().setTableSchema(tenantId, tableName, schema);
+        AnalyticsSchema schema = new AnalyticsSchema(cols, this.trimArray(this.primaryKeys.split(",")));
+        Map<String, ColumnDefinition> indexedColumns = new HashMap<String, ColumnDefinition>();
+        for (String index : this.indices.split(",")) {
+            this.processIndex(indexedColumns, index.trim());
+        }
+        schema.setIndexedColumns(indexedColumns);
+        ServiceHolder.getAnalyticsDataService().createTable(this.tenantId, this.tableName);
+        ServiceHolder.getAnalyticsDataService().setTableSchema(this.tenantId, this.tableName, schema);
+    }
+    
+    private void processIndex(Map<String, ColumnDefinition> indexedColumns, String index) {
+        String[] tokens = index.split(" ");
+        String name = tokens[0].trim();
+        ColumnDefinition column = indexedColumns.get(name);
+        if (column != null) {
+            column.setIndexed(true);
+            Set<String> options = new HashSet<String>();
+            for (int i = 1; i < tokens.length; i++) {
+                options.add(tokens[i]);
+            }
+            if (options.contains(AnalyticsEventTableConstants.OPTION_SCORE_PARAM)) {
+                column.setScoreParam(true);
+            }
+        }
     }
     
     @Override
