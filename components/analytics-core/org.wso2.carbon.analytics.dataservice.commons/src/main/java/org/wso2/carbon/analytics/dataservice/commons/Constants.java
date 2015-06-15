@@ -20,7 +20,6 @@ package org.wso2.carbon.analytics.dataservice.commons;
  * This class contains the constants required by the AnalyticsDataService
  */
 public class Constants {
-    public static final String QUERY_LANGUAGE_LUCENE = "lucene";
-    public static final String QUERY_LANGUAGE_REGEX = "REGEX";
+    public static final String NON_TOKENIZED_FIELD_PREFIX = "_";
 }
 
