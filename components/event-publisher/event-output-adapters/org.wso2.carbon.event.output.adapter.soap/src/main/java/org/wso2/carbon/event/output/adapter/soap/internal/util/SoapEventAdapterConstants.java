@@ -17,6 +17,8 @@
 */
 package org.wso2.carbon.event.output.adapter.soap.internal.util;
 
+import java.io.File;
+
 public class SoapEventAdapterConstants {
 
     public static final String ADAPTER_TYPE_SOAP = "soap";
@@ -27,8 +29,10 @@ public class SoapEventAdapterConstants {
     public static final String ADAPTER_CONF_SOAP_PASSWORD = "password";
     public static final String ADAPTER_CONF_SOAP_HEADERS = "soapHeaders";
     public static final String ADAPTER_CONF_SOAP_HEADERS_HINT = "soapHeaders.hint";
-    public static final String AXIS2_CLIENT_CONF_FILE = "/axis2/axis2_client.xml";
-    public static final String SERVER_CLIENT_DEPLOYMENT_DIR = "/repository/deployment/client/";
+    public static final String AXIS2_CLIENT_CONF_FILE = File.separator + "axis2"
+            + File.separator + "axis2_client.xml";
+    public static final String SERVER_CLIENT_DEPLOYMENT_DIR = File.separator + "repository" + File.separator +
+            "deployment" + File.separator + "client" + File.separator;
 
     public static final int ADAPTER_MIN_THREAD_POOL_SIZE = 8;
     public static final int ADAPTER_MAX_THREAD_POOL_SIZE = 100;

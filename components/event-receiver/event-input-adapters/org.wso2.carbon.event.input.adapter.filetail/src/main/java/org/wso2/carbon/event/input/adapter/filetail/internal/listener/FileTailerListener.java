@@ -37,7 +37,7 @@ public class FileTailerListener extends TailerListenerAdapter {
     private static final Log log = LogFactory.getLog(FileTailerListener.class);
     private int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
-    public FileTailerListener(String fileName,InputEventAdapterListener inputEventAdapterListener) {
+    public FileTailerListener(String fileName, InputEventAdapterListener inputEventAdapterListener) {
         this.fileName = fileName;
         this.inputEventAdapterListener = inputEventAdapterListener;
     }
@@ -72,7 +72,9 @@ public class FileTailerListener extends TailerListenerAdapter {
             isFileFound = false;
             log.warn(" fileName: " + fileName + " not found, will retry continuously.");
         }
-        log.debug("File  " + fileName + " not found");
+        if (log.isDebugEnabled()) {
+            log.debug("File  " + fileName + " not found");
+        }
         super.fileNotFound();
     }
 
