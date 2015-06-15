@@ -18,14 +18,20 @@
 package org.wso2.carbon.analytics.eventtable;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema.ColumnType;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.eventtable.internal.ServiceHolder;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.siddhi.core.config.ExecutionPlanContext;
@@ -42,6 +48,16 @@ import org.wso2.siddhi.query.api.annotation.Annotation;
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.TableDefinition;
 import org.wso2.siddhi.query.api.expression.Expression;
+import org.wso2.siddhi.query.api.expression.condition.And;
+import org.wso2.siddhi.query.api.expression.condition.Compare;
+import org.wso2.siddhi.query.api.expression.condition.Or;
+import org.wso2.siddhi.query.api.expression.constant.BoolConstant;
+import org.wso2.siddhi.query.api.expression.constant.Constant;
+import org.wso2.siddhi.query.api.expression.constant.DoubleConstant;
+import org.wso2.siddhi.query.api.expression.constant.FloatConstant;
+import org.wso2.siddhi.query.api.expression.constant.IntConstant;
+import org.wso2.siddhi.query.api.expression.constant.LongConstant;
+import org.wso2.siddhi.query.api.expression.constant.StringConstant;
 import org.wso2.siddhi.query.api.util.AnnotationHelper;
 import org.wso2.siddhi.core.util.SiddhiConstants;
 
@@ -59,7 +75,7 @@ public class AnalyticsEventTable implements EventTable {
     private boolean postInit;
         
     private String primaryKeys;
-
+    
     @Override
     public void init(TableDefinition tableDefinition, ExecutionPlanContext executionPlanContext) {
         Annotation fromAnnotation = AnnotationHelper.getAnnotation(SiddhiConstants.ANNOTATION_FROM,
@@ -211,6 +227,20 @@ public class AnalyticsEventTable implements EventTable {
         
         private long withinTime;
         
+        private String luceneQuery;
+        
+        private boolean pkMatchCompatible = true;
+        
+        private boolean returnAllRecords = true;
+        
+        private Set<String> primaryKeySet;
+        
+        private Set<String> indexedKeySet;
+        
+        private Set<String> mentionedFields;
+        
+        private boolean initExprLogic;
+        
         public AnalyticsTableOperator(int tenantId, String tableName, List<Attribute> attrs, Expression expression, 
                 MetaComplexEvent metaComplexEvent, ExecutionPlanContext executionPlanContext, 
                 List<VariableExpressionExecutor> variableExpressionExecutors, 
@@ -225,8 +255,173 @@ public class AnalyticsEventTable implements EventTable {
             this.eventTableMap = eventTableMap;
             this.matchingStreamIndex = matchingStreamIndex;
             this.withinTime = withinTime;
+            this.primaryKeySet = new HashSet<String>();
+            this.indexedKeySet = new HashSet<String>();
+            this.mentionedFields = new HashSet<String>();
         }
         
+        private void initExpressionLogic() {
+            if (this.initExprLogic) {
+                return;
+            }
+            this.initExprLogic = true;
+            checkAndProcessPostInit();
+            try {                
+                AnalyticsSchema schema = ServiceHolder.getAnalyticsDataService().getTableSchema(this.tenantId, this.tableName);
+                List<String> primaryKeys = schema.getPrimaryKeys();
+                if (primaryKeys != null) {
+                    this.primaryKeySet.addAll(primaryKeys);
+                }
+                Set<String> indices = schema.getIndexedColumns().keySet();
+                if (indices != null) {
+                    this.indexedKeySet.addAll(indices);
+                }
+            } catch (AnalyticsException e) {
+                throw new IllegalStateException("Unable to lookup table schema: " + e.getMessage(), e);
+            }
+            this.luceneQuery = this.luceneQueryFromExpression(this.expression).toString();
+            Set<String> nonIndixedFields = new HashSet<String>(this.mentionedFields);
+            nonIndixedFields.removeAll(this.indexedKeySet);
+            if (nonIndixedFields.size() > 0) {
+                throw new IllegalStateException("The table [" + this.tenantId + ", " + this.tableName + 
+                        "] requires the field(s): " + nonIndixedFields + 
+                        " to be indexed for the given analytics event table based query to execute.");
+            }
+        }
+        
+        private void checkPrimaryKeyUsage(String field) {
+            if (!this.primaryKeySet.contains(field)) {
+                this.pkMatchCompatible = false;
+            }
+        }
+        
+        private Object luceneQueryFromExpression(Expression expr) {
+            if (expr instanceof And) {
+                this.returnAllRecords = false;
+                And andExpr = (And) expr;
+                return "(" + luceneQueryFromExpression(andExpr.getLeftExpression()) + 
+                        " AND " + luceneQueryFromExpression(andExpr.getRightExpression()) + ")";
+            } else if (expr instanceof Or) {
+                this.returnAllRecords = false;
+                Or orExpr = (Or) expr;
+                this.pkMatchCompatible = false;
+                return "(" + luceneQueryFromExpression(orExpr.getLeftExpression()) + 
+                        " OR " + luceneQueryFromExpression(orExpr.getRightExpression()) + ")";
+            } else if (expr instanceof Compare) {
+                this.returnAllRecords = false;
+                Compare compare = (Compare) expr;
+                Object rhv;
+                String field = luceneQueryFromExpression(compare.getLeftExpression()).toString();
+                switch (compare.getOperator()) {
+                case CONTAINS:
+                    this.pkMatchCompatible = false;
+                    this.mentionedFields.add(field);
+                    return "(" + field + ": " + luceneQueryFromExpression(compare.getRightExpression()) + ")";
+                case EQUAL:
+                    this.checkPrimaryKeyUsage(field);
+                    this.mentionedFields.add(field);
+                    return "(" + field + ": " + luceneQueryFromExpression(compare.getRightExpression()) + ")";
+                case GREATER_THAN:
+                    this.pkMatchCompatible = false;
+                    rhv = luceneQueryFromExpression(compare.getRightExpression());
+                    this.mentionedFields.add(field);
+                    return "(" + field + ": {" + this.toLuceneQueryRHSValue(rhv) + " TO " + 
+                            this.rangeExtentValueForValueType(rhv, true) + "]" + ")";
+                case GREATER_THAN_EQUAL:
+                    this.pkMatchCompatible = false;
+                    rhv = luceneQueryFromExpression(compare.getRightExpression());
+                    this.mentionedFields.add(field);
+                    return "(" + field + ": [" + this.toLuceneQueryRHSValue(rhv) + " TO " + 
+                            this.rangeExtentValueForValueType(rhv, true) + "]" + ")";
+                case INSTANCE_OF:
+                    this.pkMatchCompatible = false;
+                    throw new IllegalStateException("INSTANCE_OF is not supported in analytics event tables.");
+                case LESS_THAN:
+                    this.pkMatchCompatible = false;
+                    rhv = luceneQueryFromExpression(compare.getRightExpression());
+                    this.mentionedFields.add(field);
+                    return "(" + field + ": [" + this.rangeExtentValueForValueType(rhv, false) + " TO " + 
+                            this.toLuceneQueryRHSValue(rhv) + "}" + ")";
+                case LESS_THAN_EQUAL:
+                    this.pkMatchCompatible = false;
+                    rhv = luceneQueryFromExpression(compare.getRightExpression());
+                    this.mentionedFields.add(field);
+                    return "(" + field + ": [" + this.rangeExtentValueForValueType(rhv, false) + " TO " + 
+                            this.toLuceneQueryRHSValue(rhv) + "]" + ")";
+                case NOT_EQUAL:
+                    this.pkMatchCompatible = false;
+                    this.mentionedFields.add(field);
+                    return "(-" + field + ": " + luceneQueryFromExpression(compare.getRightExpression()) + ")";
+                default:
+                    return true;                
+                }
+            } else if (expr instanceof Constant) {
+                return this.returnConstantValue((Constant) expr);
+            } else {
+                return true;
+            }
+        }
+        
+        private String toLuceneQueryRHSValue(Object value) {
+            if (value instanceof String || value instanceof Boolean) {
+                return "\"" + value + "\"";
+            } else {
+                return value.toString();
+            }
+        }
+        
+        private String rangeExtentValueForValueType(Object value, boolean max) {
+            if (value instanceof Integer) {
+                if (max) {
+                    return Integer.toString(Integer.MAX_VALUE);
+                } else {
+                    return Integer.toString(Integer.MIN_VALUE);
+                }
+            } else if (value instanceof Long) {
+                if (max) {
+                    return Long.toString(Long.MAX_VALUE);
+                } else {
+                    return Long.toString(Long.MIN_VALUE);
+                }
+            } else if (value instanceof Float) {
+                if (max) {
+                    return Float.toString(Float.MAX_VALUE);
+                } else {
+                    return Float.toString(Float.MIN_VALUE);
+                }
+            } else if (value instanceof Double) {
+                if (max) {
+                    return Double.toString(Double.MAX_VALUE);
+                } else {
+                    return Double.toString(Double.MIN_VALUE);
+                }
+            } else if (value instanceof Boolean) {
+                return "*";
+            } else if (value instanceof String) {
+                return "*";
+            } else {
+                return "*";
+            }
+        }
+        
+        private Object returnConstantValue(Constant constant) {
+            if (constant instanceof IntConstant) {
+                return ((IntConstant) constant).getValue();
+            } else if (constant instanceof LongConstant) {
+                return ((LongConstant) constant).getValue();
+            } else if (constant instanceof FloatConstant) {
+                return ((FloatConstant) constant).getValue();
+            } else if (constant instanceof DoubleConstant) {
+                return ((DoubleConstant) constant).getValue();
+            } else if (constant instanceof BoolConstant) {
+                return ((BoolConstant) constant).getValue();
+            } else if (constant instanceof StringConstant) {
+                return ((StringConstant) constant).getValue();
+            } else {
+                return constant.toString();
+            }
+        }
+                
         @Override
         public Finder cloneFinder() {
             return new AnalyticsTableOperator(this.tenantId, this.tableName, this.attrs, this.expression, this.metaComplexEvent, 
@@ -241,20 +436,44 @@ public class AnalyticsEventTable implements EventTable {
     
         @Override
         public StreamEvent find(ComplexEvent matchingEvent, Object candidateEvents, StreamEventCloner streamEventCloner) {
-            checkAndProcessPostInit();
-            Record record = AnalyticsEventTableUtils.getRecordWithEventValues(this.tenantId, this.tableName, 
-                    this.attrs, matchingEvent);
-            return AnalyticsEventTableUtils.recordToStreamEvent(this.attrs, record);
+            this.initExpressionLogic();
+            if (this.returnAllRecords) {
+                List<Record> records = AnalyticsEventTableUtils.getAllRecords(this.tenantId, this.tableName);
+                return AnalyticsEventTableUtils.recordsToStreamEvent(this.attrs, records);
+            } else if (this.pkMatchCompatible) {
+                Record record = AnalyticsEventTableUtils.getRecordWithEventValues(this.tenantId, this.tableName, 
+                        this.attrs, matchingEvent);
+                return AnalyticsEventTableUtils.recordToStreamEvent(this.attrs, record);
+            } else {
+                List<Record> records = this.executeLuceneQuery();
+                return AnalyticsEventTableUtils.recordsToStreamEvent(this.attrs, records);
+            }
+        }
+        
+        private List<Record> executeLuceneQuery() {
+            try {
+                AnalyticsDataService service = ServiceHolder.getAnalyticsDataService();
+                List<SearchResultEntry> searchResults = service.search(this.tenantId, this.tableName, this.luceneQuery, 0, -1);
+                List<String> ids = new ArrayList<String>();
+                for (SearchResultEntry entry : searchResults) {
+                    ids.add(entry.getId());
+                }
+                RecordGroup[] rgs = service.get(this.tenantId, this.tableName, 1, null, ids);
+                return GenericUtils.listRecords(service, rgs);
+            } catch (AnalyticsException e) {
+                throw new IllegalStateException("Error in executing lucene query: " + e.getMessage(), e);
+            }
         }
     
         @Override
         public void delete(ComplexEventChunk<StreamEvent> deletingEventChunk, Object candidateEvents) {
+            this.initExpressionLogic();
             throw new IllegalStateException("cannot delete records in analytics event tables.");
         }
     
         @Override
         public void update(ComplexEventChunk<StreamEvent> updatingEventChunk, Object candidateEvents, int[] mappingPosition) {
-            checkAndProcessPostInit();
+            this.initExpressionLogic();
             AnalyticsEventTableUtils.putEvents(this.tenantId, this.tableName, this.attrs, updatingEventChunk);
         }
     

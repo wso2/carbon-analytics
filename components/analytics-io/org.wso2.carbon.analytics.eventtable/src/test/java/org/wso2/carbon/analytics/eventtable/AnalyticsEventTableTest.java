@@ -83,6 +83,7 @@ public class AnalyticsEventTableTest {
         List<Record> recordsIn = GenericUtils.listRecords(this.service,
                 this.service.get(-1, "stocks", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 2);
+        this.service.deleteTable(-1, "stocks");
     }
     
 }

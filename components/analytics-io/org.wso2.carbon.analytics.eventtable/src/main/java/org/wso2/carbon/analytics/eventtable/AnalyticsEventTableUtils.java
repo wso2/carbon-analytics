@@ -91,6 +91,23 @@ public class AnalyticsEventTableUtils {
         }
     }
     
+    public static List<Record> getAllRecords(int tenantId, String tableName) {
+        try {
+            RecordGroup rgs[] = ServiceHolder.getAnalyticsDataService().get(tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
+            return GenericUtils.listRecords(ServiceHolder.getAnalyticsDataService(), rgs);
+        } catch (AnalyticsException e) {
+            throw new IllegalStateException("Error in getting event records: " + e.getMessage(), e);
+        }
+    }
+    
+    public static StreamEvent recordsToStreamEvent(List<Attribute> attrs, List<Record> records) {
+        ComplexEventChunk<StreamEvent> eventChunk = new ComplexEventChunk<StreamEvent>();
+        for (Record record : records) {
+            eventChunk.add(recordToStreamEvent(attrs, record));
+        }
+        return eventChunk.getFirst();
+    }
+    
     public static StreamEvent recordToStreamEvent(List<Attribute> attrs, Record record) {
         StreamEvent event = new StreamEvent(0, 0, attrs.size());
         Object[] data = new Object[attrs.size()];
