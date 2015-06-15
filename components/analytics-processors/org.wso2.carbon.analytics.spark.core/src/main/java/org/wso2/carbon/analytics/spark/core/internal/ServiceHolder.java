@@ -21,6 +21,7 @@ import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
+import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.TaskManager;
 import org.wso2.carbon.ntask.core.service.TaskService;
@@ -52,6 +53,8 @@ public class ServiceHolder {
     private static TenantRegistryLoader tenantRegistryLoader;
     
     private static SparkAnalyticsExecutor analyticskExecutor;
+
+    private static EventStreamService eventStreamService;
 
     public static void setTaskService(TaskService taskService) {
         ServiceHolder.taskService = taskService;
@@ -107,5 +110,13 @@ public class ServiceHolder {
 
     public static void setAnalyticskExecutor(SparkAnalyticsExecutor analyticskExecutor) {
         ServiceHolder.analyticskExecutor = analyticskExecutor;
+    }
+
+    public static EventStreamService getEventStreamService() {
+        return ServiceHolder.eventStreamService;
+    }
+
+    public static void setEventStreamService(EventStreamService eventStreamService) {
+        ServiceHolder.eventStreamService = eventStreamService;
     }
 }
