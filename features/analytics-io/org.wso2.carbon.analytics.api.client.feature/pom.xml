@@ -43,9 +43,6 @@
                                 <bundleDef>
                                     org.wso2.carbon.analytics:org.wso2.carbon.analytics.io.commons
                                 </bundleDef>
-                                <bundleDef>
-                                    org.wso2.orbit.org.apache.httpcomponents:httpclient
-                                </bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}</importFeatureDef>

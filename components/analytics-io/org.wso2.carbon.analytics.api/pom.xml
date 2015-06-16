@@ -28,7 +28,7 @@
             <artifactId>org.wso2.carbon.analytics.datasource.commons</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.orbit.org.apache.httpcomponents</groupId>
+            <groupId>org.apache.httpcomponents.wso2</groupId>
             <artifactId>httpclient</artifactId>
         </dependency>
         <dependency>
