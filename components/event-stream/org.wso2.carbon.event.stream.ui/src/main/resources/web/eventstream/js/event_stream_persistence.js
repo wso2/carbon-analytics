@@ -13,7 +13,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-function populateAnalyticsTable(analyticsTable, columnInformation) {
+function populateAnalyticsTable(analyticsTable, columnInformation, type) {
     var tbody = analyticsTable.getElementsByTagName('tbody')[0];
     for (var i = 1; i < columnInformation.rows.length; i++) {
         var cellNo = 0;
@@ -26,6 +26,11 @@ function populateAnalyticsTable(analyticsTable, columnInformation) {
         YAHOO.util.Dom.addClass(persistCell, "property-names");
         var persistCheckElement = document.createElement('input');
         persistCheckElement.type = "checkbox";
+        persistCheckElement.className = type;
+        persistCheckElement.addEventListener('change',
+                                             function () {
+                                                 uncheckedRoot(type);
+                                             }, false);
         persistCell.appendChild(persistCheckElement);
 
         var columnCell = row.insertCell(cellNo++);
@@ -84,7 +89,7 @@ function createAnalyticsIndexTable() {
         metaIndexTable.deleteRow(i - 1);
     }
     if (metaDataTable.rows.length > 1) {
-        populateAnalyticsTable(metaIndexTable, metaDataTable);
+        populateAnalyticsTable(metaIndexTable, metaDataTable, 'meta');
         document.getElementById("noOutputMetaIndexData").style.display = 'none';
     }
 
@@ -94,7 +99,7 @@ function createAnalyticsIndexTable() {
         correlationIndexTable.deleteRow(i - 1);
     }
     if (correlationDataTable.rows.length > 1) {
-        populateAnalyticsTable(correlationIndexTable, correlationDataTable);
+        populateAnalyticsTable(correlationIndexTable, correlationDataTable, 'correlation');
         document.getElementById("noOutputCorrelationIndexData").style.display = 'none';
     }
 
@@ -104,7 +109,7 @@ function createAnalyticsIndexTable() {
         payloadIndexTable.deleteRow(i - 1);
     }
     if (payloadDataTable.rows.length > 1) {
-        populateAnalyticsTable(payloadIndexTable, payloadDataTable);
+        populateAnalyticsTable(payloadIndexTable, payloadDataTable, 'payload');
         document.getElementById("noOutputPayloadIndexData").style.display = 'none';
     }
 }
@@ -198,6 +203,7 @@ function populateAnalyticsIndexTable(eventStreamName, eventStreamVersion) {
         success: function (result) {
             var IS_JSON = true;
             try {
+                document.getElementById('attributeFieldSet').disabled = true;
                 var resultJson = JSON.parse(result.trim());
             } catch (err) {
                 IS_JSON = false;
@@ -213,16 +219,20 @@ function populateAnalyticsIndexTable(eventStreamName, eventStreamVersion) {
                 var currentPayloadCount = payloadIndexTable.rows.length;
 
                 document.getElementById('eventPersistCheckbox').checked = resultJson.persist;
+                document.getElementById('attributeFieldSet').disabled = !resultJson.persist;
                 if (resultJson.analyticsTableRecords != null) {
                     jQuery.each(resultJson.analyticsTableRecords, function (index, element) {
                         if (element.columnName.startsWith("meta_")) {
                             setRowValues(currentMetaCount, metaIndexTable, element, false);
+                            uncheckedRoot('meta');
                         } else if (element.columnName.startsWith("correlation_")) {
                             setRowValues(currentCorrelationCount, correlationIndexTable, element, false);
+                            uncheckedRoot('correlation');
                         } else if (element.columnName.startsWith("_")) {
                             setRowValuesForArbitrary(arbitraryIndexTable, element);
                         } else {
                             setRowValues(currentPayloadCount, payloadIndexTable, element, true);
+                            uncheckedRoot('payload');
                         }
                     });
                 }
@@ -344,4 +354,41 @@ function changeScoreParam(ele) {
     } else {
         document.getElementById("eventPersistScoreParamCheckbox").disabled = false;
     }
+}
+
+function checkAllMeta(ele, type) {
+    var checkboxes = document.getElementsByClassName(type);
+    if (ele.checked) {
+        for (var i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i].type == 'checkbox') {
+                checkboxes[i].checked = true;
+            }
+        }
+    } else {
+        for (var i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i].type == 'checkbox') {
+                checkboxes[i].checked = false;
+            }
+        }
+    }
+}
+
+function uncheckedRoot(type) {
+    var checkboxes = document.getElementsByClassName(type);
+    var checkedCount = 0;
+    for (var i = 0; i < checkboxes.length; i++) {
+        if (checkboxes[i].checked) {
+            checkedCount++;
+        }
+    }
+    var element = document.getElementById(type + 'PersistCheckbox');
+    if (checkedCount == checkboxes.length) {
+        element.checked = true;
+    } else {
+        element.checked = false;
+    }
+}
+
+function enableAttribute(ele) {
+    document.getElementById('attributeFieldSet').disabled = !ele.checked;
 }
