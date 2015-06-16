@@ -25,6 +25,8 @@ public class DashboardConstants {
     public static final String APP_NAME = "portal";
 
     public static final String DASHBOARD_ARTIFACT_TYPE = "dashboards/dashboard";
+    public static final String LAYOUT_ARTIFACT_TYPE = "dashboards/layout";
+    public static final String GADGET_ARTIFACT_TYPE = "dashboards/gadget";
 
     public static final String DASHBOARD_EXTENSION = ".json";
 
