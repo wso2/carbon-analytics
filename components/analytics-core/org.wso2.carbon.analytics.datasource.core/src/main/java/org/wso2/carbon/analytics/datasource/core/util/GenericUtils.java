@@ -99,7 +99,7 @@ public class GenericUtils {
 
     private static final byte DATA_TYPE_BINARY = 0x07;
 
-    private static final byte DATA_TYPE_CATEGORY = 0x10;
+    private static final byte DATA_TYPE_OBJECT = 0x10;
 
     private static final String DEFAULT_CHARSET = "UTF8";
     
@@ -203,17 +203,13 @@ public class GenericUtils {
                 binData = (byte[]) value;
                 buffer.putInt(binData.length);
                 buffer.put(binData);
-            } else if (value instanceof List<?>) {
-                buffer.put(DATA_TYPE_CATEGORY);
-                List<String> analyticsCategoryPath = (List<String>) value;
-                binData = GenericUtils.serializeObject(analyticsCategoryPath);
-                buffer.putInt(binData.length);
-                buffer.put(binData);
             } else if (value == null) {
                 buffer.put(DATA_TYPE_NULL);
             } else {
-                throw new AnalyticsException("Invalid column value type in encoding "
-                        + "column value: " + value.getClass());
+                buffer.put(DATA_TYPE_OBJECT);
+                binData = GenericUtils.serializeObject(value);
+                buffer.putInt(binData.length);
+                buffer.put(binData);
             }
         } catch (UnsupportedEncodingException e) {
             throw new AnalyticsException("Error in encoding record values: " + e.getMessage());
@@ -315,7 +311,7 @@ public class GenericUtils {
                         buffer.get(binData);
                         value = binData;
                         break;
-                    case DATA_TYPE_CATEGORY:
+                    case DATA_TYPE_OBJECT:
                         size = buffer.getInt();
                         binData = new byte[size];
                         buffer.get(binData);
