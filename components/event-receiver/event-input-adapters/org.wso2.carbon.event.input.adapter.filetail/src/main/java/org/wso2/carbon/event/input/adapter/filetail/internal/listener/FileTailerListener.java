@@ -1,19 +1,17 @@
 /*
  * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- *  WSO2 Inc. licenses this file to you under the Apache License,
- *  Version 2.0 (the "License"); you may not use this file except
- *  in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an
- *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- *  KIND, either express or implied.  See the License for the
- *  specific language governing permissions and limitations
- *  under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.wso2.carbon.event.input.adapter.filetail.internal.listener;
@@ -37,7 +35,7 @@ public class FileTailerListener extends TailerListenerAdapter {
     private static final Log log = LogFactory.getLog(FileTailerListener.class);
     private int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
-    public FileTailerListener(String fileName,InputEventAdapterListener inputEventAdapterListener) {
+    public FileTailerListener(String fileName, InputEventAdapterListener inputEventAdapterListener) {
         this.fileName = fileName;
         this.inputEventAdapterListener = inputEventAdapterListener;
     }
@@ -72,7 +70,9 @@ public class FileTailerListener extends TailerListenerAdapter {
             isFileFound = false;
             log.warn(" fileName: " + fileName + " not found, will retry continuously.");
         }
-        log.debug("File  " + fileName + " not found");
+        if (log.isDebugEnabled()) {
+            log.debug("File  " + fileName + " not found");
+        }
         super.fileNotFound();
     }
 

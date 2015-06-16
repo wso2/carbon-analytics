@@ -171,9 +171,9 @@ public class MQTTAdapterListener implements MqttCallback, Runnable {
                 connectionSucceeded = true;
                 log.info("MQTT Connection successful");
             } catch (InterruptedException e) {
-                log.error(e.getMessage(), e);
+                log.error("Interruption occurred while waiting for reconnection", e);
             } catch (MqttException e) {
-                log.error(e.getMessage(), e);
+                log.error("MQTT Exception occurred when starting listener", e);
 
             }
 
