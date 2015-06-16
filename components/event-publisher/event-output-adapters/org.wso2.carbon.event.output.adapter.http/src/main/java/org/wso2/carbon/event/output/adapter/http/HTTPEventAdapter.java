@@ -18,16 +18,16 @@
 package org.wso2.carbon.event.output.adapter.http;
 
 import org.apache.axiom.om.util.Base64;
+
+import org.apache.commons.httpclient.*;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.apache.http.HttpHost;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
+
 import org.apache.http.conn.params.ConnRoutePNames;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.SystemDefaultHttpClient;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
@@ -35,6 +35,7 @@ import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants;
+
 
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -46,16 +47,22 @@ public class HTTPEventAdapter implements OutputEventAdapter {
     private OutputEventAdapterConfiguration eventAdapterConfiguration;
     private Map<String, String> globalProperties;
     private static ExecutorService executorService;
-    private HttpClient httpClient;
     private String clientMethod;
     private int tenantId;
 
+    private int defaultMaxConnectionsPerHost;
+    private int maxTotalConnections;
+    private String contentType;
+    private HttpConnectionManager connectionManager;
+    private HttpClient httpClient;
+    private Map<String, String> staticProperties;
 
     public HTTPEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String,
             String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
         this.globalProperties = globalProperties;
         this.clientMethod = eventAdapterConfiguration.getStaticProperties().get(HTTPEventAdapterConstants.ADAPTER_HTTP_CLIENT_METHOD);
+
     }
 
     @Override
@@ -98,9 +105,23 @@ public class HTTPEventAdapter implements OutputEventAdapter {
             } else {
                 jobQueSize = HTTPEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE;
             }
-
             executorService = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime, TimeUnit.MILLISECONDS,
                     new LinkedBlockingQueue<Runnable>(jobQueSize));
+        }
+
+        //configurations for the httpConnectionManager
+        if(globalProperties.get(HTTPEventAdapterConstants.DEFAULT_MAX_CONNECTIONS_PER_HOST) != null){
+            defaultMaxConnectionsPerHost = Integer.parseInt(globalProperties.get(
+                    HTTPEventAdapterConstants.DEFAULT_MAX_CONNECTIONS_PER_HOST));
+        }else{
+            defaultMaxConnectionsPerHost = HTTPEventAdapterConstants.DEFAULT_DEFAULT_MAX_CONNECTIONS_PER_HOST;
+        }
+
+        if(globalProperties.get(HTTPEventAdapterConstants.MAX_TOTAL_CONNECTIONS) != null){
+            maxTotalConnections = Integer.parseInt(globalProperties.get(
+                    HTTPEventAdapterConstants.MAX_TOTAL_CONNECTIONS));
+        }else{
+            maxTotalConnections = HTTPEventAdapterConstants.DEFAULT_MAX_TOTAL_CONNECTIONS;
         }
 
     }
@@ -117,8 +138,6 @@ public class HTTPEventAdapter implements OutputEventAdapter {
 
     @Override
     public void publish(Object message, Map<String, String> dynamicProperties) {
-
-
         //Load dynamic properties
         String url = dynamicProperties.get(HTTPEventAdapterConstants.ADAPTER_MESSAGE_URL);
         String username = dynamicProperties.get(HTTPEventAdapterConstants.ADAPTER_USERNAME);
@@ -128,7 +147,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
         String payload = message.toString();
 
         try {
-            executorService.submit(new HTTPSender(url, payload, username, password, headers));
+            executorService.submit(new HTTPSender(url, payload, username, password, headers, httpClient));
         } catch (RejectedExecutionException e) {
             EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
         }
@@ -151,28 +170,33 @@ public class HTTPEventAdapter implements OutputEventAdapter {
 
     private void checkHTTPClientInit(
             Map<String, String> staticProperties) {
-        if (this.httpClient != null) {
+
+        this.staticProperties = staticProperties;
+
+        if(this.connectionManager != null){
             return;
         }
+
         synchronized (HTTPEventAdapter.class) {
-            if (this.httpClient != null) {
+            if (this.connectionManager != null) {
                 return;
             }
-            /* this needs to be created as late as possible, for the SSL trust store properties
-             * to be set by Carbon in Java system properties */
-            this.httpClient = new SystemDefaultHttpClient();
-            String proxyHost = staticProperties.get(HTTPEventAdapterConstants.ADAPTER_PROXY_HOST);
-            String proxyPort = staticProperties.get(HTTPEventAdapterConstants.ADAPTER_PROXY_PORT);
-            if (proxyHost != null && proxyHost.trim().length() > 0) {
-                try {
-                    HttpHost host = new HttpHost(proxyHost, Integer.parseInt(proxyPort));
-                    this.httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, host);
-                } catch (NumberFormatException e) {
-                    log.error("Invalid proxy port: " + proxyPort + ", "
-                            + "ignoring proxy settings for HTTP output event adaptor...");
-                }
+
+            connectionManager = new MultiThreadedHttpConnectionManager();
+            connectionManager.getParams().setDefaultMaxConnectionsPerHost(defaultMaxConnectionsPerHost);
+            connectionManager.getParams().setMaxTotalConnections(maxTotalConnections);
+            httpClient = new HttpClient(connectionManager);
+
+            String messageFormat = eventAdapterConfiguration.getMessageFormat();
+            if(messageFormat.equalsIgnoreCase("json")){
+                contentType = "application/json";
+            }else if(messageFormat.equalsIgnoreCase("text")){
+                contentType = "text/plain";
+            }else{
+                contentType = "text/xml";
             }
         }
+
     }
 
     private Map<String, String> extractHeaders(String headers) {
@@ -210,13 +234,16 @@ public class HTTPEventAdapter implements OutputEventAdapter {
 
         private Map<String, String> headers;
 
+        private HttpClient httpClient;
+
         public HTTPSender(String url, String payload, String username, String password,
-                          Map<String, String> headers) {
+                          Map<String, String> headers, HttpClient httpClient) {
             this.url = url;
             this.payload = payload;
             this.username = username;
             this.password = password;
             this.headers = headers;
+            this.httpClient = httpClient;
         }
 
         public String getUrl() {
@@ -239,40 +266,63 @@ public class HTTPEventAdapter implements OutputEventAdapter {
             return headers;
         }
 
+        public HttpClient getHttpClient(){
+            return httpClient;
+        }
+
         public void run() {
 
-            HttpEntityEnclosingRequestBase method;
+            EntityEnclosingMethod method = null;
 
-            if (clientMethod.equalsIgnoreCase(HTTPEventAdapterConstants.CONSTANT_HTTP_PUT)) {
-                method = new HttpPut(this.getUrl());
-            } else {
-                method = new HttpPost(this.getUrl());
-            }
-
-            StringEntity entity;
             try {
-                entity = new StringEntity(this.getPayload());
-                method.setEntity(entity);
+
+                String proxyHost = staticProperties.get(HTTPEventAdapterConstants.ADAPTER_PROXY_HOST);
+                String proxyPort = staticProperties.get(HTTPEventAdapterConstants.ADAPTER_PROXY_PORT);
+                if (proxyHost != null && proxyHost.trim().length() > 0) {
+                    try {
+                        HttpHost host = new HttpHost(proxyHost, Integer.parseInt(proxyPort));
+                        httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, host);
+                    } catch (NumberFormatException e) {
+                        log.error("Invalid proxy port: " + proxyPort + ", "
+                                + "ignoring proxy settings for HTTP output event adaptor...");
+                    }
+                }
+
+                if (clientMethod.equalsIgnoreCase(HTTPEventAdapterConstants.CONSTANT_HTTP_PUT)) {
+                    method = new PutMethod(this.getUrl());
+                } else {
+                    method = new PostMethod(this.getUrl());
+                }
+
+                method.setRequestEntity(new StringRequestEntity(this.getPayload(), contentType, "UTF-8"));
+
                 if (this.getUsername() != null && this.getUsername().trim().length() > 0) {
-                    method.setHeader("Authorization", "Basic " + Base64.encode(
+                    method.setRequestHeader("Authorization", "Basic " + Base64.encode(
                             (this.getUsername() + HTTPEventAdapterConstants.ENTRY_SEPARATOR
                                     + this.getPassword()).getBytes()));
                 }
 
                 if (this.getHeaders() != null) {
                     for (Map.Entry<String, String> header : this.getHeaders().entrySet()) {
-                        method.setHeader(header.getKey(), header.getValue());
+                        method.setRequestHeader(header.getKey(), header.getValue());
                     }
                 }
 
-                httpClient.execute(method).getEntity().getContent().close();
-            } catch (UnknownHostException e) {
-                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), this.getPayload(), "Cannot connect to " + this.getUrl(), e, log, tenantId);
-            } catch (Throwable e) {
-                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), this.getPayload(), null, e, log, tenantId);
+                this.getHttpClient().executeMethod(method);
+
+
+            }catch (UnknownHostException e) {
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), this.getPayload(),
+                        "Cannot connect to " + this.getUrl(), e, log, tenantId);
+            }catch (Throwable e) {
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), this.getPayload(),
+                        null, e, log, tenantId);
+            }finally {
+                if (method != null) {
+                    method.releaseConnection();
+                }
             }
         }
-
     }
 
 }
