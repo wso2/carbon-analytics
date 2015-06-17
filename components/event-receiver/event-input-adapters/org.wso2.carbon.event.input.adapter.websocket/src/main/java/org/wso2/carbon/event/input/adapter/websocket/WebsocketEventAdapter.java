@@ -80,8 +80,10 @@ public class WebsocketEventAdapter implements InputEventAdapter {
 
     @Override
     public void disconnect() {
-        client.shutdown();
-        client = null;
+        if(client!=null) {
+            client.shutdown();
+            client = null;
+        }
     }
 
     @Override
