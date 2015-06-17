@@ -125,7 +125,7 @@ public class InputAdapterRuntime implements InputEventAdapterListener {
                         log.error("Connection unavailable on " + name + " reconnecting.", connectionUnavailableException);
                         inputEventAdapter.connect();
                     } else {
-                        log.error("Connection unavailable on " + name + " reconnection will be retried in" + (timer.returnTimeToWait()) + " milliseconds.", connectionUnavailableException);
+                        log.error("Connection unavailable on " + name + " . Reconnection will be retried in " + (timer.returnTimeToWait()) + " milliseconds.", connectionUnavailableException);
                         executorService.execute(new Runnable() {
                             @Override
                             public void run() {
