@@ -30,9 +30,14 @@ import org.apache.spark.deploy.master.StandaloneRecoveryModeFactory;
  */
 public class AnalyticsStandaloneRecoveryModeFactory extends StandaloneRecoveryModeFactory {
 
+    SparkConf conf;
+    Serialization serializer;
+
     public AnalyticsStandaloneRecoveryModeFactory(SparkConf conf,
                                                   Serialization serializer) {
         super(conf, serializer);
+        this.conf =  conf;
+        this.serializer = serializer;
     }
 
     /**
@@ -41,7 +46,7 @@ public class AnalyticsStandaloneRecoveryModeFactory extends StandaloneRecoveryMo
      */
     @Override
     public PersistenceEngine createPersistenceEngine() {
-        return null;
+        return new AnalyticsPersistenceEngine(conf, serializer);
     }
 
     /**

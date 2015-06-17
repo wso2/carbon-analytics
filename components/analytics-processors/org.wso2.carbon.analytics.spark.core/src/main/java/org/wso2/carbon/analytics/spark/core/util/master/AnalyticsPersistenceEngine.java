@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.analytics.spark.core.util.master;
 
+import akka.serialization.Serialization;
+import org.apache.spark.SparkConf;
 import org.wso2.carbon.analytics.spark.master.AbstractPersistenceEngine;
 import scala.collection.Seq;
 import scala.reflect.ClassTag;
@@ -25,7 +27,11 @@ import scala.reflect.ClassTag;
 /**
  * Created by niranda on 6/9/15.
  */
-public class AnalyticsPersistanceEngine extends AbstractPersistenceEngine {
+public class AnalyticsPersistenceEngine extends AbstractPersistenceEngine {
+    public AnalyticsPersistenceEngine(SparkConf conf, Serialization serializer) {
+
+    }
+
     /**
      * Defines how the object is serialized and persisted. Implementation will
      * depend on the store used.

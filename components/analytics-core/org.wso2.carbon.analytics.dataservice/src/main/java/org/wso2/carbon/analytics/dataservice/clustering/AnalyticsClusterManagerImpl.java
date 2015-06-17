@@ -48,17 +48,19 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
     private static final String ANALYTICS_GROUP_EXECUTOR_SERVICE_PREFIX = "_ANALYTICS_GROUP_EXECUTOR_SERVICE_";
 
     private static final String ANALYTICS_CLUSTER_GROUP_MEMBERS_PREFIX = "_ANALYTICS_CLUSTER_GROUP_MEMBERS_";
-    
+
     private static final String ANALYTICS_CLUSTER_GROUP_DATA_PREFIX = "_ANALYTICS_CLUSTER_GROUP_DATA_";
-    
+
+    private static final String MEMBERSHIP_NUMBER_STRING = "MEMBERSHIP_NUMBER";
+
     private static final Log log = LogFactory.getLog(AnalyticsClusterManagerImpl.class);
-        
+
     private HazelcastInstance hz;
-    
+
     private Map<String, GroupEventListener> groups = new HashMap<String, GroupEventListener>();
-    
+
     private Map<String, Member> leaders = new HashMap<String, Member>();
-        
+
     public AnalyticsClusterManagerImpl() {
         this.hz = AnalyticsServiceHolder.getHazelcastInstance();
         if (this.isClusteringEnabled()) {
@@ -67,13 +69,17 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
     }
 
     @Override
-    public void joinGroup(String groupId, GroupEventListener groupEventListener) throws AnalyticsClusterException {
+    public int joinGroup(String groupId, GroupEventListener groupEventListener)
+            throws AnalyticsClusterException {
         if (!this.isClusteringEnabled()) {
             throw new AnalyticsClusterException("Clustering is not enabled");
         }
         if (this.groups.containsKey(groupId)) {
             throw new AnalyticsClusterException("This node has already joined the group: " + groupId);
         }
+        // when joining the group, get the membership number
+        int membershipNumber = (int) this.hz.getAtomicLong(MEMBERSHIP_NUMBER_STRING).incrementAndGet();
+
         this.checkAndCleanupGroups(groupId);
         this.groups.put(groupId, groupEventListener);
         List<Member> groupMembers = this.getGroupMembers(groupId);
@@ -95,24 +101,25 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
             }
             this.sendMemberAddedNotificationToLeader(groupId);
         }
+        return membershipNumber;
     }
-    
+
     private boolean checkLeader(Member member, String groupId) {
         return member.equals(this.getLeader(groupId));
     }
-    
+
     private String generateLeaderInitDoneFlagName(String groupId) {
         return groupId + "_" + LEADER_INIT_DONE_FLAG;
     }
-    
+
     private void setLeaderInitDoneFlag(String groupId) {
         this.hz.getAtomicLong(this.generateLeaderInitDoneFlagName(groupId)).set(1);
     }
-    
+
     private void resetLeaderInitDoneFlag(String groupId) {
         this.hz.getAtomicLong(this.generateLeaderInitDoneFlagName(groupId)).set(0);
     }
-    
+
     private void waitForInitialLeader(String groupId) {
         if (log.isDebugEnabled()) {
             log.debug("Waiting for initial leader...");
@@ -128,22 +135,23 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
             log.debug("Done waiting for initial leader.");
         }
     }
-    
-    private void sendMemberAddedNotificationToLeader(String groupId) throws AnalyticsClusterException {
+
+    private void sendMemberAddedNotificationToLeader(String groupId)
+            throws AnalyticsClusterException {
         Member member = this.getLeader(groupId);
         this.executeOne(groupId, member, new LeaderMemberAddedNotification(groupId));
     }
-    
+
     @Override
     public Member getLeader(String groupId) {
         return this.getGroupMembers(groupId).get(0);
     }
-    
+
     @Override
     public boolean isLeader(String groupId) {
         return this.hz.getCluster().getLocalMember().equals(this.leaders.get(groupId));
     }
-    
+
     private void executeMyselfBecomingLeader(String groupId) throws AnalyticsClusterException {
         this.leaders.put(groupId, this.hz.getCluster().getLocalMember());
         GroupEventListener listener = this.groups.get(groupId);
@@ -152,27 +160,28 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         }
         this.executeAll(groupId, new LeaderUpdateNotification(groupId));
     }
-    
+
     private String generateGroupListId(String groupId) {
         return ANALYTICS_CLUSTER_GROUP_MEMBERS_PREFIX + groupId;
     }
-    
+
     private String generateGroupExecutorId(String groupId) {
         return ANALYTICS_GROUP_EXECUTOR_SERVICE_PREFIX + groupId;
     }
-    
+
     private String generateGroupDataMapId(String groupId) {
         return ANALYTICS_CLUSTER_GROUP_DATA_PREFIX + groupId;
     }
-    
+
     private List<Member> getGroupMembers(String groupId) {
         return this.hz.getList(this.generateGroupListId(groupId));
     }
-    
+
     /**
      * This method checks the current active members to see if there any members left in the member list,
      * that is actually not in the cluster and clean it up. This can happen, when the last member of the group
      * also goes away, but the distributed memory is retained from other nodes in the cluster.
+     *
      * @param groupId The group id
      */
     private void checkAndCleanupGroups(String groupId) {
@@ -185,17 +194,20 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
             }
         }
         if (this.getGroupMembers(groupId).size() == 0) {
-            this.resetLeaderInitDoneFlag(groupId); 
+            this.resetLeaderInitDoneFlag(groupId);
+            //clean up the membership number
+            this.hz.getAtomicLong(MEMBERSHIP_NUMBER_STRING).set(0);
         }
     }
-    
+
     @Override
     public List<Object> getMembers(String groupId) throws AnalyticsClusterException {
         return new ArrayList<Object>(this.getGroupMembers(groupId));
     }
 
     @Override
-    public <T> T executeOne(String groupId, Object member, Callable<T> callable) throws AnalyticsClusterException {
+    public <T> T executeOne(String groupId, Object member, Callable<T> callable)
+            throws AnalyticsClusterException {
         Future<T> result = this.hz.getExecutorService(
                 this.generateGroupExecutorId(groupId)).submitToMember(callable, (Member) member);
         try {
@@ -206,10 +218,11 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
     }
 
     @Override
-    public <T> List<T> executeAll(String groupId, Callable<T> callable) throws AnalyticsClusterException {
+    public <T> List<T> executeAll(String groupId, Callable<T> callable)
+            throws AnalyticsClusterException {
         if (!this.groups.containsKey(groupId)) {
-            throw new AnalyticsClusterException("The node is required to join the group (" + 
-                    groupId + ") before sending cluster messages");
+            throw new AnalyticsClusterException("The node is required to join the group (" +
+                                                groupId + ") before sending cluster messages");
         }
         List<Member> members = this.getGroupMembers(groupId);
         List<T> result = new ArrayList<T>();
@@ -224,7 +237,7 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         }
         return result;
     }
-    
+
     @Override
     public void setProperty(String groupId, String name, Serializable value) {
         Map<String, Serializable> data = this.hz.getMap(this.generateGroupDataMapId(groupId));
@@ -252,7 +265,8 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         /* nothing to do */
     }
 
-    private void checkGroupMemberRemoval(String groupId, Member member) throws AnalyticsClusterException {
+    private void checkGroupMemberRemoval(String groupId, Member member)
+            throws AnalyticsClusterException {
         List<Member> groupMembers = this.getGroupMembers(groupId);
         if (groupMembers.contains(member)) {
             groupMembers.remove(member);
@@ -268,21 +282,21 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
             this.executeMyselfBecomingLeader(groupId);
         }
     }
-        
+
     private void leaderUpdateNotificationReceived(String groupId) {
         GroupEventListener listener = this.groups.get(groupId);
         if (listener != null) {
             listener.onLeaderUpdate();
         }
     }
-    
+
     private void leaderMemberAdditionNotificationReceived(String groupId) {
         GroupEventListener listener = this.groups.get(groupId);
         if (listener != null) {
             listener.onMembersChangeForLeader();
         }
     }
-    
+
     @Override
     public void memberRemoved(MembershipEvent event) {
         Set<String> groupIds = this.groups.keySet();
@@ -294,20 +308,20 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
             }
         }
     }
-    
+
     /**
      * This class represents the cluster message that notifies the cluster of a new member to the group.
      */
     public static class LeaderMemberAddedNotification implements Callable<String>, Serializable {
-        
+
         private static final long serialVersionUID = -3363760290841109792L;
-        
+
         private String groupId;
-                
+
         public LeaderMemberAddedNotification(String groupId) {
             this.groupId = groupId;
         }
-        
+
         public String getGroupId() {
             return groupId;
         }
@@ -321,26 +335,26 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
             }
             return "OK";
         }
-        
+
     }
-    
+
     /**
      * This class represents the cluster message that notifies the cluster of a new leader.
      */
     public static class LeaderUpdateNotification implements Callable<String>, Serializable {
 
         private static final long serialVersionUID = -8378187556136928045L;
-        
+
         private String groupId;
-                
+
         public LeaderUpdateNotification(String groupId) {
             this.groupId = groupId;
         }
-        
+
         public String getGroupId() {
             return groupId;
         }
-        
+
         @Override
         public String call() throws Exception {
             AnalyticsClusterManager cm = AnalyticsServiceHolder.getAnalyticsClusterManager();
@@ -352,5 +366,5 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
         }
 
     }
-    
+
 }
