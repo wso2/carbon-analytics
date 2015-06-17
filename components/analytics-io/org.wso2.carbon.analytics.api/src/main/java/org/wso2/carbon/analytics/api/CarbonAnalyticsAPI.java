@@ -17,6 +17,8 @@
 */
 package org.wso2.carbon.analytics.api;
 
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceException;
 import org.wso2.carbon.analytics.api.internal.AnalyticsDataConfiguration;
 import org.wso2.carbon.analytics.api.internal.ServiceHolder;
@@ -34,12 +36,18 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+import org.wso2.securevault.SecretResolver;
+import org.wso2.securevault.SecretResolverFactory;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLStreamException;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -53,9 +61,14 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             JAXBContext context = JAXBContext.newInstance(AnalyticsDataConfiguration.class);
             Unmarshaller un = context.createUnmarshaller();
             this.analyticsDataConfiguration = (AnalyticsDataConfiguration) un.unmarshal(new File(configFilePath));
+            this.resolveSecureVaultCredentials(configFilePath);
             AnalyticsAPIHttpClient.init(analyticsDataConfiguration);
         } catch (JAXBException ex) {
             throw new AnalyticsServiceException("Error while loading the configuration : " + configFilePath, ex);
+        } catch (FileNotFoundException ex) {
+            throw new AnalyticsServiceException("Unable to load the configuration file : " + configFilePath, ex);
+        } catch (XMLStreamException ex) {
+            throw new AnalyticsServiceException("Invalid XML configuration provided at the file : " + configFilePath, ex);
         }
     }
 
@@ -81,7 +94,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             ServiceHolder.getAnalyticsDataService().clearIndexData(tenantId, tableName);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
-                                                                         analyticsDataConfiguration.getPassword());
+                    analyticsDataConfiguration.getPassword());
             AnalyticsAPIHttpClient.getInstance().clearIndices(tenantId, null, tableName, false);
         }
     }
@@ -212,9 +225,9 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             ServiceHolder.getSecureAnalyticsDataService().clearIndexData(username, tableName);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
-                                                                         analyticsDataConfiguration.getPassword());
+                    analyticsDataConfiguration.getPassword());
             AnalyticsAPIHttpClient.getInstance().clearIndices(MultitenantConstants.INVALID_TENANT_ID,
-                                                              username, tableName, false);
+                    username, tableName, false);
         }
     }
 
@@ -337,9 +350,9 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             return ServiceHolder.getSecureAnalyticsDataService().getWithKeyValues(username, tableName, numPartitionsHint, columns, valuesBatch);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
-                                                                         analyticsDataConfiguration.getPassword());
+                    analyticsDataConfiguration.getPassword());
             return AnalyticsAPIHttpClient.getInstance().getWithKeyValues(MultitenantConstants.INVALID_TENANT_ID, username,
-                                                                       tableName, numPartitionsHint, columns, valuesBatch, true);
+                    tableName, numPartitionsHint, columns, valuesBatch, true);
         }
     }
 
@@ -409,11 +422,12 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             return ServiceHolder.getSecureAnalyticsDataService().drillDownSearch(username, drillDownRequest);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
-                                                                         analyticsDataConfiguration.getPassword());
+                    analyticsDataConfiguration.getPassword());
             return AnalyticsAPIHttpClient.getInstance().drillDownSearch(MultitenantConstants.INVALID_TENANT_ID,
-                   username, drillDownRequest, true);
+                    username, drillDownRequest, true);
         }
     }
+
     @Override
     public double drillDownSearchCount(String username, AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
@@ -421,9 +435,9 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             return ServiceHolder.getSecureAnalyticsDataService().drillDownSearchCount(username, drillDownRequest);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
-                                                                         analyticsDataConfiguration.getPassword());
+                    analyticsDataConfiguration.getPassword());
             return AnalyticsAPIHttpClient.getInstance().drillDownSearchCount(MultitenantConstants.INVALID_TENANT_ID,
-                                                                             username, drillDownRequest, true);
+                    username, drillDownRequest, true);
         }
     }
 
@@ -435,9 +449,9 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             return ServiceHolder.getSecureAnalyticsDataService().drillDownCategories(username, drillDownRequest);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
-                                                                         analyticsDataConfiguration.getPassword());
+                    analyticsDataConfiguration.getPassword());
             return AnalyticsAPIHttpClient.getInstance().drillDownCategories(MultitenantConstants.INVALID_TENANT_ID,
-                                                                            username, drillDownRequest, true);
+                    username, drillDownRequest, true);
         }
     }
 
@@ -449,9 +463,9 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             return ServiceHolder.getSecureAnalyticsDataService().drillDownRangeCount(username, drillDownRequest);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
-                                                                         analyticsDataConfiguration.getPassword());
+                    analyticsDataConfiguration.getPassword());
             return AnalyticsAPIHttpClient.getInstance().drillDownRangeCount(MultitenantConstants.INVALID_TENANT_ID,
-                                                                            username, drillDownRequest, true);
+                    username, drillDownRequest, true);
         }
     }
 
@@ -522,6 +536,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             return AnalyticsAPIHttpClient.getInstance().drillDownSearch(tenantId, null, drillDownRequest, false);
         }
     }
+
     @Override
     public double drillDownSearchCount(int tenantId, AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
@@ -529,7 +544,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             return ServiceHolder.getAnalyticsDataService().drillDownSearchCount(tenantId, drillDownRequest);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
-                                                                         analyticsDataConfiguration.getPassword());
+                    analyticsDataConfiguration.getPassword());
             return AnalyticsAPIHttpClient.getInstance().drillDownSearchCount(tenantId, null, drillDownRequest, false);
         }
     }
@@ -542,7 +557,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             return ServiceHolder.getAnalyticsDataService().drillDownCategories(tenantId, drillDownRequest);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
-                                                                         analyticsDataConfiguration.getPassword());
+                    analyticsDataConfiguration.getPassword());
             return AnalyticsAPIHttpClient.getInstance().drillDownCategories(tenantId, null, drillDownRequest, false);
         }
     }
@@ -555,7 +570,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             return ServiceHolder.getAnalyticsDataService().drillDownRangeCount(tenantId, drillDownRequest);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
-                                                                         analyticsDataConfiguration.getPassword());
+                    analyticsDataConfiguration.getPassword());
             return AnalyticsAPIHttpClient.getInstance().drillDownRangeCount(tenantId, null, drillDownRequest, false);
         }
     }
@@ -583,8 +598,8 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public RecordGroup[] getWithKeyValues(int tenantId, String tableName, int numPartitionsHint, List<String> columns, 
-            List<Map<String, Object>> valuesBatch) throws AnalyticsException, AnalyticsTableNotAvailableException {
+    public RecordGroup[] getWithKeyValues(int tenantId, String tableName, int numPartitionsHint, List<String> columns,
+                                          List<Map<String, Object>> valuesBatch) throws AnalyticsException, AnalyticsTableNotAvailableException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             return ServiceHolder.getAnalyticsDataService().getWithKeyValues(tenantId, tableName, numPartitionsHint,
                     columns, valuesBatch);
@@ -592,9 +607,38 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
-                                                                         analyticsDataConfiguration.getPassword());
+                    analyticsDataConfiguration.getPassword());
             return AnalyticsAPIHttpClient.getInstance().getWithKeyValues(tenantId, null, tableName, numPartitionsHint,
-                                                                       columns, valuesBatch, false);
+                    columns, valuesBatch, false);
+        }
+    }
+
+    private void resolveSecureVaultCredentials(String configPath) throws FileNotFoundException, XMLStreamException {
+        FileInputStream fileInputStream = null;
+        File configFile = new File(configPath);
+        if (configFile.exists()) {
+            try {
+                fileInputStream = new FileInputStream(configFile);
+                StAXOMBuilder builder = new StAXOMBuilder(fileInputStream);
+                OMElement configElement = builder.getDocumentElement();
+                SecretResolver secretResolver = SecretResolverFactory.create(configElement, true);
+                if (secretResolver != null && secretResolver.isInitialized()) {
+                    if (secretResolver.isTokenProtected(AnalyticsDataConstants.ANALYTICS_API_CONF_PASSWORD_ALIAS)) {
+                        String resolvedPassword = secretResolver.
+                                resolve(AnalyticsDataConstants.ANALYTICS_API_CONF_PASSWORD_ALIAS);
+                        if (resolvedPassword != null && !resolvedPassword.isEmpty()) {
+                            this.analyticsDataConfiguration.setPassword(resolvedPassword);
+                        }
+                    }
+                }
+            } finally {
+                if (fileInputStream != null) {
+                    try {
+                        fileInputStream.close();
+                    } catch (IOException ignored) {
+                    }
+                }
+            }
         }
     }
 }
