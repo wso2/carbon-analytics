@@ -105,7 +105,7 @@ public class InputAdapterRuntime implements InputEventAdapterListener {
     public synchronized void connectionUnavailable(ConnectionUnavailableException connectionUnavailableException) {
         try {
             try {
-                if (!connected) {
+                if (!connected && connectionUnavailableException==null) {
                     if (nextConnectionTime <= System.currentTimeMillis()) {
                         inputEventAdapter.connect();
                         connected = true;
