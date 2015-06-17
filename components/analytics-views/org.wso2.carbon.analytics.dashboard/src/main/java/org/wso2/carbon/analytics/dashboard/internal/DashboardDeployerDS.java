@@ -57,11 +57,12 @@ public class DashboardDeployerDS {
             appHandlerRegistration = ctxt.getBundleContext().registerService(
                     AppDeploymentHandler.class.getName(), new DashboardDeployer(), null);
             //layouts deployer
-            appHandlerRegistration = ctxt.getBundleContext().registerService(
-                    AppDeploymentHandler.class.getName(), new LayoutDeployer(), null);
-            //layouts deployer
-            appHandlerRegistration = ctxt.getBundleContext().registerService(
-                    AppDeploymentHandler.class.getName(), new GadgetDeployer(), null);
+            //TODO: Commenting out as this needs be merged into one capp deployer
+//            appHandlerRegistration = ctxt.getBundleContext().registerService(
+//                    AppDeploymentHandler.class.getName(), new LayoutDeployer(), null);
+//            //layouts deployer
+//            appHandlerRegistration = ctxt.getBundleContext().registerService(
+//                    AppDeploymentHandler.class.getName(), new GadgetDeployer(), null);
 
             // read required-features.xml
             URL reqFeaturesResource = ctxt.getBundleContext().getBundle()

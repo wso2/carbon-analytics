@@ -261,8 +261,8 @@ function loadFacetNames() {
                   facetNames += "<option value=" + tableName + ">" + tableName + "</option>";
               });
               if (resultObj.length > 0) {
-                  document.getElementById('facetSearchCombo').style.display = 'block';
-                  document.getElementById('facetSearchTableRow').style.display = 'block';
+                  document.getElementById('facetSearchCombo').style.display = '';
+                  document.getElementById('facetSearchTableRow').style.display = '';
               } else {
                   document.getElementById('facetSearchCombo').style.display = 'none';
                   document.getElementById('facetSearchTableRow').style.display = 'none';
@@ -285,7 +285,7 @@ function loadPrimaryKeys() {
                   );
               });
               if (resultObj.length > 0) {
-                  document.getElementById('primaryKeySearch').style.display = 'block';
+                  document.getElementById('primaryKeySearch').style.display = '';
               } else {
                   document.getElementById('primaryKeySearch').style.display = 'none';
               }
