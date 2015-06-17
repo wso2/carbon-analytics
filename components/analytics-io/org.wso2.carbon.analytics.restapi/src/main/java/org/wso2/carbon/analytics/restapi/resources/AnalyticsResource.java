@@ -231,7 +231,7 @@ public class AnalyticsResource extends AbstractResource {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking insertRecordsToTable");
 		}
-		SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+		AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         if (recordBeans != null) {
             if (logger.isDebugEnabled()) {
@@ -284,7 +284,7 @@ public class AnalyticsResource extends AbstractResource {
 			logger.debug("Invoking deleteRecords for tableName : " +
 			             tableName);
 		}
-		SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+		AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         if (logger.isDebugEnabled()) {
             logger.debug("deleting the records from " + timeFrom + " to " + timeTo);
@@ -312,7 +312,7 @@ public class AnalyticsResource extends AbstractResource {
 			logger.debug("Invoking deleteRecords for tableName : " +
 			             tableName);
 		}
-        SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         if (ids != null) {
             if (logger.isDebugEnabled()) {
@@ -542,7 +542,7 @@ public class AnalyticsResource extends AbstractResource {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking insertRecords");
         }
-        SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         if (recordBeans != null) {
             if (logger.isDebugEnabled()) {
@@ -823,7 +823,7 @@ public class AnalyticsResource extends AbstractResource {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking setTableSchema for tableName : " + tableName);
         }
-        SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         if (analyticsSchemaBean != null) {
             AnalyticsSchema analyticsSchema = Utils.createAnalyticsSchema(analyticsSchemaBean);
