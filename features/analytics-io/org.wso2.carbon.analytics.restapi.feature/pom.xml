@@ -133,7 +133,13 @@
                             </adviceFile>
                             <importFeatures>
                                 <importFeatureDef>
-                                    org.wso2.carbon.analytics.core:${carbon.analytics.version}
+                                    org.wso2.carbon.core:${carbon.kernel.version}
+                                </importFeatureDef>
+                                <importFeatureDef>
+                                    org.wso2.carbon.analytics.core.server:${carbon.analytics.version}
+                                </importFeatureDef>
+                                <importFeatureDef>
+                                    org.wso2.carbon.analytics.api:${carbon.analytics.version}
                                 </importFeatureDef>
                             </importFeatures>
                         </configuration>
