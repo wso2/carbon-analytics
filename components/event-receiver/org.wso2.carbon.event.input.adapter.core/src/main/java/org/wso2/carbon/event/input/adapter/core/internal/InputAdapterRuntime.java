@@ -81,19 +81,20 @@ public class InputAdapterRuntime implements InputEventAdapterListener {
         }
     }
 
-    public void destroy() {
-        if (inputEventAdapter != null) {
-            try {
-                try {
-                    inputEventAdapter.disconnect();
-                } finally {
-                    inputEventAdapter.destroy();
-                }
-            }catch (Throwable e){
-                log.error("Error when destroying InputEventAdapter of '"+name+"',"+e.getMessage(),e);
-            }
-        }
-    }
+	public void destroy() {
+		if (inputEventAdapter != null) {
+			try {
+				try {
+					inputEventAdapter.disconnect();
+				} finally {
+					inputEventAdapter.destroy();
+				}
+			} catch (Throwable e) {
+				log.error("Error when destroying InputEventAdapter of '" + name + "'," +
+				          e.getMessage(), e);
+			}
+		}
+	}
 
     /**
      * when an event happens event proxy call this method with the received event.
