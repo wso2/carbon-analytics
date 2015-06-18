@@ -51,9 +51,9 @@ public class DashboardDeployerDS {
 
     protected void activate(ComponentContext ctxt) {
         try {
-            DashboardDeployer dashboardDeployer = new DashboardDeployer();
+            //dashboard artifacts deployer
             appHandlerRegistration = ctxt.getBundleContext().registerService(
-                    AppDeploymentHandler.class.getName(), dashboardDeployer, null);
+                    AppDeploymentHandler.class.getName(), new DashboardDeployer(), null);
 
             // read required-features.xml
             URL reqFeaturesResource = ctxt.getBundleContext().getBundle()

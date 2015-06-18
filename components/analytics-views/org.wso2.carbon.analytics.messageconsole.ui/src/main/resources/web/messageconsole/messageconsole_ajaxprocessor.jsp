@@ -37,7 +37,7 @@
             }
             int pageSize = Integer.parseInt(jtPageSize);
             String query = request.getParameter("query");
-            long from = 0;
+            long from = Long.MIN_VALUE + 1;
             String timeFrom = request.getParameter("timeFrom");
             if (timeFrom != null && !timeFrom.isEmpty()) {
                 from = Long.parseLong(timeFrom);

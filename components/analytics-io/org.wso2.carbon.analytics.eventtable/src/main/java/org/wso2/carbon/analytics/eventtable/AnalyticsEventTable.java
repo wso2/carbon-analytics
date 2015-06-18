@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.commons.Constants;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
@@ -38,16 +39,21 @@ import org.wso2.siddhi.core.config.ExecutionPlanContext;
 import org.wso2.siddhi.core.event.ComplexEvent;
 import org.wso2.siddhi.core.event.ComplexEventChunk;
 import org.wso2.siddhi.core.event.MetaComplexEvent;
+import org.wso2.siddhi.core.event.state.MetaStateEvent;
+import org.wso2.siddhi.core.event.stream.MetaStreamEvent;
 import org.wso2.siddhi.core.event.stream.StreamEvent;
 import org.wso2.siddhi.core.event.stream.StreamEventCloner;
+import org.wso2.siddhi.core.executor.ExpressionExecutor;
 import org.wso2.siddhi.core.executor.VariableExpressionExecutor;
 import org.wso2.siddhi.core.table.EventTable;
 import org.wso2.siddhi.core.util.collection.operator.Finder;
 import org.wso2.siddhi.core.util.collection.operator.Operator;
+import org.wso2.siddhi.core.util.parser.ExpressionParser;
 import org.wso2.siddhi.query.api.annotation.Annotation;
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.TableDefinition;
 import org.wso2.siddhi.query.api.expression.Expression;
+import org.wso2.siddhi.query.api.expression.Variable;
 import org.wso2.siddhi.query.api.expression.condition.And;
 import org.wso2.siddhi.query.api.expression.condition.Compare;
 import org.wso2.siddhi.query.api.expression.condition.Or;
@@ -76,6 +82,8 @@ public class AnalyticsEventTable implements EventTable {
         
     private String primaryKeys;
     
+    private String indices;
+    
     @Override
     public void init(TableDefinition tableDefinition, ExecutionPlanContext executionPlanContext) {
         Annotation fromAnnotation = AnnotationHelper.getAnnotation(SiddhiConstants.ANNOTATION_FROM,
@@ -87,6 +95,7 @@ public class AnalyticsEventTable implements EventTable {
                     " must be provided for analytics event tables.");
         }
         this.primaryKeys = fromAnnotation.getElement(AnalyticsEventTableConstants.ANNOTATION_PRIMARY_KEYS);
+        this.indices = fromAnnotation.getElement(AnalyticsEventTableConstants.ANNOTATION_INDICES);
         try {
             this.tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
         } catch (Throwable e) {
@@ -106,10 +115,19 @@ public class AnalyticsEventTable implements EventTable {
         }
     }
     
-    private List<String> trimArray(String[] tokens) {
+    private List<String> tokenizeAndTrimToList(String value, String delimeter) {
+        if (value == null) {
+            return new ArrayList<String>(0);
+        }
+        value = value.trim();
+        String[] tokens = value.split(delimeter);
+        String token;
         List<String> result = new ArrayList<String>(tokens.length);
         for (int i = 0; i < tokens.length; i++) {
-            result.add(tokens[i].trim());
+            token = tokens[i].trim();
+            if (token.length() > 0) {
+                result.add(token);
+            }
         }
         return result;
     }
@@ -142,19 +160,39 @@ public class AnalyticsEventTable implements EventTable {
                 break;
             default:
                 colType = ColumnType.STRING;
-                break;            
+                break;
             }
             cols.add(new ColumnDefinition(attr.getName(), colType));
         }
-        AnalyticsSchema schema = new AnalyticsSchema(cols, this.trimArray(primaryKeys.split(",")));
-        ServiceHolder.getAnalyticsDataService().createTable(tenantId, tableName);
-        ServiceHolder.getAnalyticsDataService().setTableSchema(tenantId, tableName, schema);
+        AnalyticsSchema schema = new AnalyticsSchema(cols, this.tokenizeAndTrimToList(this.primaryKeys, ","));
+        for (String index : this.tokenizeAndTrimToList(this.indices, ",")) {
+            this.processIndex(schema.getColumns(), index.trim());
+        }
+        ServiceHolder.getAnalyticsDataService().createTable(this.tenantId, this.tableName);
+        ServiceHolder.getAnalyticsDataService().setTableSchema(this.tenantId, this.tableName, schema);
+    }
+    
+    private void processIndex(Map<String, ColumnDefinition> indexedColumns, String index) {
+        String[] tokens = index.split(" ");
+        String name = tokens[0].trim();
+        ColumnDefinition column = indexedColumns.get(name);
+        if (column != null) {
+            column.setIndexed(true);
+            Set<String> options = new HashSet<String>();
+            for (int i = 1; i < tokens.length; i++) {
+                options.add(tokens[i]);
+            }
+            if (options.contains(AnalyticsEventTableConstants.OPTION_SCORE_PARAM)) {
+                column.setScoreParam(true);
+            }
+        }
     }
     
     @Override
     public Finder constructFinder(Expression expression, MetaComplexEvent metaComplexEvent, 
             ExecutionPlanContext executionPlanContext, List<VariableExpressionExecutor> variableExpressionExecutors, 
             Map<String, EventTable> eventTableMap, int matchingStreamIndex, long withinTime) {
+        this.checkAndProcessPostInit();
         return new AnalyticsTableOperator(this.tenantId, this.tableName, this.tableDefinition.getAttributeList(), 
                 expression, metaComplexEvent, executionPlanContext, variableExpressionExecutors, 
                 eventTableMap, matchingStreamIndex, withinTime);
@@ -177,6 +215,7 @@ public class AnalyticsEventTable implements EventTable {
     public Operator constructOperator(Expression expression, MetaComplexEvent metaComplexEvent, 
             ExecutionPlanContext executionPlanContext, List<VariableExpressionExecutor> variableExpressionExecutors, 
             Map<String, EventTable> eventTableMap, int matchingStreamIndex, long withinTime) {
+        this.checkAndProcessPostInit();
         return new AnalyticsTableOperator(this.tenantId, this.tableName, this.tableDefinition.getAttributeList(), 
                 expression, metaComplexEvent, executionPlanContext, variableExpressionExecutors, 
                 eventTableMap, matchingStreamIndex, withinTime);
@@ -207,6 +246,10 @@ public class AnalyticsEventTable implements EventTable {
      */
     public class AnalyticsTableOperator implements Operator {
     
+        private static final String LUCENE_QUERY_PARAM = "KKJIOJEEFEFXA";
+
+        private static final int MAX_SEARCH_QUERY_RESULT_SIZE = 1000;
+
         private int tenantId;
         
         private String tableName;
@@ -238,8 +281,12 @@ public class AnalyticsEventTable implements EventTable {
         private Set<String> indexedKeySet;
         
         private Set<String> mentionedFields;
+                
+        private List<ExpressionExecutor> expressionExecs = new ArrayList<ExpressionExecutor>();
         
-        private boolean initExprLogic;
+        private MetaStateEvent metaStateEvent;
+        
+        private int paramIndex = 0;
         
         public AnalyticsTableOperator(int tenantId, String tableName, List<Attribute> attrs, Expression expression, 
                 MetaComplexEvent metaComplexEvent, ExecutionPlanContext executionPlanContext, 
@@ -258,15 +305,12 @@ public class AnalyticsEventTable implements EventTable {
             this.primaryKeySet = new HashSet<String>();
             this.indexedKeySet = new HashSet<String>();
             this.mentionedFields = new HashSet<String>();
+            this.initExpressionLogic();
         }
         
         private void initExpressionLogic() {
-            if (this.initExprLogic) {
-                return;
-            }
-            this.initExprLogic = true;
-            checkAndProcessPostInit();
-            try {                
+            this.initMetaStateEvent();
+            try {
                 AnalyticsSchema schema = ServiceHolder.getAnalyticsDataService().getTableSchema(this.tenantId, this.tableName);
                 List<String> primaryKeys = schema.getPrimaryKeys();
                 if (primaryKeys != null) {
@@ -286,6 +330,29 @@ public class AnalyticsEventTable implements EventTable {
                 throw new IllegalStateException("The table [" + this.tenantId + ", " + this.tableName + 
                         "] requires the field(s): " + nonIndixedFields + 
                         " to be indexed for the given analytics event table based query to execute.");
+            }
+        }
+        
+        private void initMetaStateEvent() {
+            if (metaComplexEvent instanceof MetaStreamEvent) {
+                metaStateEvent = new MetaStateEvent(1);
+                metaStateEvent.addEvent(((MetaStreamEvent) metaComplexEvent));
+            } else {
+                MetaStreamEvent[] metaStreamEvents = ((MetaStateEvent) metaComplexEvent).getMetaStreamEvents();
+                for (int candidateEventPosition = 0; candidateEventPosition < metaStreamEvents.length; candidateEventPosition++) {
+                    MetaStreamEvent metaStreamEvent = metaStreamEvents[candidateEventPosition];
+                    if (candidateEventPosition != matchingStreamIndex
+                            && metaStreamEvent.getLastInputDefinition().equalsIgnoreAnnotations(tableDefinition)) {
+                        metaStateEvent = ((MetaStateEvent) metaComplexEvent);
+                        break;
+                    }
+                }
+                if (metaStateEvent == null) {
+                    metaStateEvent = new MetaStateEvent(metaStreamEvents.length + 1);
+                    for (MetaStreamEvent metaStreamEvent : metaStreamEvents) {
+                        metaStateEvent.addEvent(metaStreamEvent);
+                    }
+                }
             }
         }
         
@@ -320,7 +387,10 @@ public class AnalyticsEventTable implements EventTable {
                 case EQUAL:
                     this.checkPrimaryKeyUsage(field);
                     this.mentionedFields.add(field);
-                    return "(" + field + ": " + luceneQueryFromExpression(compare.getRightExpression()) + ")";
+//                    return "(" + Constants.NON_TOKENIZED_FIELD_PREFIX + field + ": " + 
+//                            luceneQueryFromExpression(compare.getRightExpression()) + ")";
+                    return "(" + field + ": " + 
+                    luceneQueryFromExpression(compare.getRightExpression()) + ")";                    
                 case GREATER_THAN:
                     this.pkMatchCompatible = false;
                     rhv = luceneQueryFromExpression(compare.getRightExpression());
@@ -351,12 +421,23 @@ public class AnalyticsEventTable implements EventTable {
                 case NOT_EQUAL:
                     this.pkMatchCompatible = false;
                     this.mentionedFields.add(field);
-                    return "(-" + field + ": " + luceneQueryFromExpression(compare.getRightExpression()) + ")";
+                    return "(-" + Constants.NON_TOKENIZED_FIELD_PREFIX + field + ": " + 
+                    luceneQueryFromExpression(compare.getRightExpression()) + ")";
                 default:
                     return true;                
                 }
             } else if (expr instanceof Constant) {
                 return this.returnConstantValue((Constant) expr);
+            } else if (expr instanceof Variable) {
+                Variable var = (Variable) expr;
+                if (var.getStreamId().equals(tableDefinition.getId())) {
+                    return var.getAttributeName();
+                } else {
+                    ExpressionExecutor expressionExecutor = ExpressionParser.parseExpression(expr,
+                            metaStateEvent, matchingStreamIndex, eventTableMap, variableExpressionExecutors, executionPlanContext, false, 0);
+                    this.expressionExecs.add(expressionExecutor);
+                    return LUCENE_QUERY_PARAM + (this.paramIndex++);
+                }
             } else {
                 return true;
             }
@@ -436,7 +517,6 @@ public class AnalyticsEventTable implements EventTable {
     
         @Override
         public StreamEvent find(ComplexEvent matchingEvent, Object candidateEvents, StreamEventCloner streamEventCloner) {
-            this.initExpressionLogic();
             if (this.returnAllRecords) {
                 List<Record> records = AnalyticsEventTableUtils.getAllRecords(this.tenantId, this.tableName);
                 return AnalyticsEventTableUtils.recordsToStreamEvent(this.attrs, records);
@@ -445,15 +525,27 @@ public class AnalyticsEventTable implements EventTable {
                         this.attrs, matchingEvent);
                 return AnalyticsEventTableUtils.recordToStreamEvent(this.attrs, record);
             } else {
-                List<Record> records = this.executeLuceneQuery();
+                List<Record> records = this.executeLuceneQuery(matchingEvent);
                 return AnalyticsEventTableUtils.recordsToStreamEvent(this.attrs, records);
             }
         }
         
-        private List<Record> executeLuceneQuery() {
+        private String getTranslatedLuceneQuery(ComplexEvent matchingEvent) {
+            String query = this.luceneQuery;
+            String value;
+            for (int i = 0; i < this.expressionExecs.size(); i++) {
+                value = this.toLuceneQueryRHSValue(this.expressionExecs.get(i).execute(matchingEvent));
+                query = query.replace(LUCENE_QUERY_PARAM + i, value);
+            }
+            return query;
+        }
+        
+        private List<Record> executeLuceneQuery(ComplexEvent matchingEvent) {
             try {
                 AnalyticsDataService service = ServiceHolder.getAnalyticsDataService();
-                List<SearchResultEntry> searchResults = service.search(this.tenantId, this.tableName, this.luceneQuery, 0, -1);
+                String query = this.getTranslatedLuceneQuery(matchingEvent);
+                List<SearchResultEntry> searchResults = service.search(this.tenantId, this.tableName, 
+                        query, 0, MAX_SEARCH_QUERY_RESULT_SIZE);
                 List<String> ids = new ArrayList<String>();
                 for (SearchResultEntry entry : searchResults) {
                     ids.add(entry.getId());
@@ -467,16 +559,14 @@ public class AnalyticsEventTable implements EventTable {
     
         @Override
         public void delete(ComplexEventChunk<StreamEvent> deletingEventChunk, Object candidateEvents) {
-            this.initExpressionLogic();
             throw new IllegalStateException("cannot delete records in analytics event tables.");
         }
     
         @Override
         public void update(ComplexEventChunk<StreamEvent> updatingEventChunk, Object candidateEvents, int[] mappingPosition) {
-            this.initExpressionLogic();
             AnalyticsEventTableUtils.putEvents(this.tenantId, this.tableName, this.attrs, updatingEventChunk);
         }
     
     }
-
+    
 }

@@ -221,7 +221,7 @@ public class AnalyticsResource extends AbstractResource {
 	 * @return the response
 	 * @throws AnalyticsException
 	 */
-	@POST
+	/*@POST
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}")
@@ -231,7 +231,7 @@ public class AnalyticsResource extends AbstractResource {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking insertRecordsToTable");
 		}
-        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
+		AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         if (recordBeans != null) {
             if (logger.isDebugEnabled()) {
@@ -262,7 +262,7 @@ public class AnalyticsResource extends AbstractResource {
         } else {
             throw new AnalyticsException("List of records is empty");
         }
-    }
+    }*/
 
 	/**
 	 * Delete records either the time range, but not both
@@ -284,7 +284,7 @@ public class AnalyticsResource extends AbstractResource {
 			logger.debug("Invoking deleteRecords for tableName : " +
 			             tableName);
 		}
-		SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+		AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         if (logger.isDebugEnabled()) {
             logger.debug("deleting the records from " + timeFrom + " to " + timeTo);
@@ -312,7 +312,7 @@ public class AnalyticsResource extends AbstractResource {
 			logger.debug("Invoking deleteRecords for tableName : " +
 			             tableName);
 		}
-        SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         if (ids != null) {
             if (logger.isDebugEnabled()) {
@@ -542,7 +542,7 @@ public class AnalyticsResource extends AbstractResource {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking insertRecords");
         }
-        SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         if (recordBeans != null) {
             if (logger.isDebugEnabled()) {
@@ -812,7 +812,7 @@ public class AnalyticsResource extends AbstractResource {
      * @return the {@link Response} response
      * @throws AnalyticsException
      */
-    @POST
+    /*@POST
     @Consumes({MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_JSON})
     @Path("tables/{tableName}/schema")
@@ -833,7 +833,7 @@ public class AnalyticsResource extends AbstractResource {
         } else {
             throw new AnalyticsException("Table schema is not provided");
         }
-    }
+    }*/
 
     /**
      * Gets the analytics schema of a table

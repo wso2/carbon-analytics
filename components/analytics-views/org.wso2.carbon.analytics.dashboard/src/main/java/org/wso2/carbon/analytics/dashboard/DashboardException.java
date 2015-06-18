@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.analytics.dashboard.beans;
+package org.wso2.carbon.analytics.dashboard;
 
-import java.util.List;
+import org.apache.axis2.AxisFault;
 
-public class Contents {
-    private List<Content> a;
+public class DashboardException extends AxisFault {
 
-    public List<Content> getA() {
-        return a;
+    private static final long serialVersionUID = -5279904261730788461L;
+
+    public DashboardException(String message) {
+        super(message);
     }
 
-    public void setA(List<Content> a) {
-        this.a = a;
+    public DashboardException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

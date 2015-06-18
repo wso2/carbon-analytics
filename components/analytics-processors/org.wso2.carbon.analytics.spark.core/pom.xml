@@ -77,6 +77,10 @@
             <artifactId>org.wso2.carbon.ndatasource.rdbms</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.event.stream.core</artifactId>
+        </dependency>
 
         <!--extra dependancies -->
         <!--        <dependency>

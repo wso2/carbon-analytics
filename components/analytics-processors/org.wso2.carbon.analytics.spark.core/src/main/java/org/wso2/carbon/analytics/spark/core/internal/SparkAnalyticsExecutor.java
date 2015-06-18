@@ -75,6 +75,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private static final int BASE_WORKER_PORT = 4501;
 
+    private static final int DEFAULT_SPARK_UI_PORT = 4040;
+
     private static final String MASTER_PORT_GROUP_PROP = "MASTER_PORT";
 
     private static final String MASTER_HOST_GROUP_PROP = "MASTER_HOST";
@@ -140,6 +142,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private void initLocalClient() {
         this.sparkConf = new SparkConf();
         this.sparkConf.setMaster(LOCAL_MASTER_URL).setAppName(CARBON_ANALYTICS_SPARK_APP_NAME);
+        this.sparkConf.set("spark.ui.port", String.valueOf(DEFAULT_SPARK_UI_PORT + portOffset));
         this.javaSparkCtx = new JavaSparkContext(this.sparkConf);
 //        this.sqlCtx = new SQLContext(this.javaSparkCtx);
         initSqlContext(this.javaSparkCtx);
@@ -157,7 +160,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private void registerUDFs(SQLContext sqlCtx)
             throws IllegalAccessException, InvocationTargetException, InstantiationException,
-                   ClassNotFoundException, NoSuchMethodException {
+            ClassNotFoundException, NoSuchMethodException {
         Class<?> udf = Class.forName("org.wso2.carbon.analytics.spark.core.udf.StringLengthUDF");
         Object instance = udf.newInstance();
         sqlCtx.udf().register("stringLengthTest", (org.apache.spark.sql.api.java.UDF1<?, ?>) instance, DataTypes.IntegerType);
@@ -170,9 +173,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private void startMaster(String host, String port, String webUIport, String propsFile,
                              SparkConf sc) {
         String[] argsArray = new String[]{"-h", host,
-                                          "-p", port,
-                                          "--webui-port", webUIport,
-                                          "--properties-file", propsFile //CarbonUtils.getCarbonHome() + File.separator + AnalyticsConstants.SPARK_DEFAULTS_PATH
+                "-p", port,
+                "--webui-port", webUIport,
+                "--properties-file", propsFile //CarbonUtils.getCarbonHome() + File.separator + AnalyticsConstants.SPARK_DEFAULTS_PATH
         };
         MasterArguments args = new MasterArguments(argsArray, sc);
         this.masterActorSystem = Master.startSystemAndActor(args.host(), args.port(), args.webUiPort(), sc)._1();
@@ -185,24 +188,25 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                              String propFile, SparkConf sc) {
         String master = "spark://" + masterHost + ":" + masterPort;
         String[] argsArray = new String[]{master,
-                                          "-h", workerHost,
-                                          "-p", workerPort,
-                                          "--webui-port", workerUiPort,
-                                          "-c", workerCores,
-                                          "-m", workerMemory,
-                                          "-d", workerDir,
-                                          "--properties-file", propFile //CarbonUtils.getCarbonHome() + File.separator + AnalyticsConstants.SPARK_DEFAULTS_PATH
+                "-h", workerHost,
+                "-p", workerPort,
+                "--webui-port", workerUiPort,
+                "-c", workerCores,
+                "-m", workerMemory,
+                "-d", workerDir,
+                "--properties-file", propFile //CarbonUtils.getCarbonHome() + File.separator + AnalyticsConstants.SPARK_DEFAULTS_PATH
         };
         WorkerArguments args = new WorkerArguments(argsArray, this.sparkConf);
         this.workerActorSystem = Worker.startSystemAndActor(args.host(), args.port(), args.webUiPort(),
-                                                            args.cores(), args.memory(), args.masters(),
-                                                            args.workDir(), (Option) None$.MODULE$, sc)._1();
+                args.cores(), args.memory(), args.masters(),
+                args.workDir(), (Option) None$.MODULE$, sc)._1();
     }
 
     private SparkConf initSparkConf(String masterUrl, String appName) {
         SparkConf conf = new SparkConf();
         conf.setIfMissing("spark.master", masterUrl);
         conf.setIfMissing("spark.app.name", appName);
+        conf.set("spark.ui.port", String.valueOf(DEFAULT_SPARK_UI_PORT + portOffset));
         return conf;
     }
 
@@ -225,10 +229,10 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         perms.add(PosixFilePermission.GROUP_EXECUTE);
         try {
             Files.setPosixFilePermissions(Paths.get(CarbonUtils.getCarbonHome() + File.separator +
-                                                    AnalyticsConstants.SPARK_COMPUTE_CLASSPATH_SCRIPT_PATH), perms);
+                    AnalyticsConstants.SPARK_COMPUTE_CLASSPATH_SCRIPT_PATH), perms);
         } catch (IOException e) {
             log.warn("Error while checking the permission for " + AnalyticsConstants.SPARK_COMPUTE_CLASSPATH_SCRIPT_PATH
-                     + ". " + e.getMessage());
+                    + ". " + e.getMessage());
         }
     }
 
@@ -250,7 +254,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         if (acm.isClusteringEnabled() && !acm.isLeader(CLUSTER_GROUP_NAME)) {
             try {
                 return acm.executeOne(CLUSTER_GROUP_NAME, acm.getLeader(CLUSTER_GROUP_NAME),
-                                      new AnalyticsExecutionCall(tenantId, query));
+                        new AnalyticsExecutionCall(tenantId, query));
             } catch (AnalyticsClusterException e) {
                 throw new AnalyticsExecutionException("Error executing analytics query: " + e.getMessage(), e);
             }
@@ -287,8 +291,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
 
         Pattern p = Pattern.compile("(?i)(?<=(" + AnalyticsConstants.TERM_CREATE +
-                                    "\\s" + AnalyticsConstants.TERM_TEMPORARY +
-                                    "\\s" + AnalyticsConstants.TERM_TABLE + "))\\s+\\w+");
+                "\\s" + AnalyticsConstants.TERM_TEMPORARY +
+                "\\s" + AnalyticsConstants.TERM_TABLE + "))\\s+\\w+");
         Matcher m = p.matcher(query.trim());
         if (m.find()) {
             //this is a create table query
@@ -296,7 +300,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             String tempTableName = m.group().trim();
             if (tempTableName.matches("(?i)if")) {
                 throw new AnalyticsExecutionException("Malformed query: CREATE TEMPORARY TABLE IF NOT " +
-                                                      "EXISTS is not supported");
+                        "EXISTS is not supported");
             } else {
                 if (this.isClustered) {
                     this.sparkTableNames.put(tenantId, tempTableName);
@@ -306,7 +310,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                 //replace the CA shorthand string in the query
                 boolean carbonQuery = false;
                 query = query.replaceFirst("\\b" + AnalyticsConstants.SPARK_SHORTHAND_STRING + "\\b",
-                                           AnalyticsRelationProvider.class.getName());
+                        AnalyticsRelationProvider.class.getName());
                 if (query.length() > result.length()) {
                     carbonQuery = true;
                 }
@@ -319,8 +323,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                 String options;
                 if (carbonQuery) {
                     options = query.substring(optStrStart, bracketsOpen + 1)
-                              + addTenantIdToOptions(tenantId, query.substring(bracketsOpen + 1, bracketsClose))
-                              + ")";
+                            + addTenantIdToOptions(tenantId, query.substring(bracketsOpen + 1, bracketsClose))
+                            + ")";
                 } else {
                     options = query.substring(optStrStart, bracketsClose + 1);
                 }
@@ -345,7 +349,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             hasTenantId = splits[0].equals(AnalyticsConstants.TENANT_ID);
             if (hasTenantId && tenantId != Integer.parseInt(splits[1].replaceAll("^\"|\"$", ""))) {
                 throw new AnalyticsExecutionException("Mismatching tenants : " + tenantId +
-                                                      " and " + splits[1].replaceAll("^\"|\"$", ""));
+                        " and " + splits[1].replaceAll("^\"|\"$", ""));
             }
         }
         // if tenatId is not present, add it as another field
@@ -367,7 +371,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
         for (String name : tableNames) {
             result = result.replaceAll("\\b" + name + "\\b",
-                                       AnalyticsCommonUtils.encodeTableNameWithTenantId(tenantId, name));
+                    AnalyticsCommonUtils.encodeTableNameWithTenantId(tenantId, name));
         }
         return result;
     }
@@ -375,7 +379,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private static AnalyticsQueryResult toResult(DataFrame dataFrame)
             throws AnalyticsExecutionException {
         return new AnalyticsQueryResult(dataFrame.schema().fieldNames(),
-                                        convertRowsToObjects(dataFrame.collect()));
+                convertRowsToObjects(dataFrame.collect()));
     }
 
     private static List<List<Object>> convertRowsToObjects(Row[] rows) {
@@ -394,7 +398,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     @Override
     public void onBecomingLeader() {
         String propsFile = CarbonUtils.getCarbonHome() + File.separator
-                           + AnalyticsConstants.SPARK_DEFAULTS_PATH;
+                + AnalyticsConstants.SPARK_DEFAULTS_PATH;
         Utils.loadDefaultSparkProperties(new SparkConf(), propsFile);
         log.info("Spark defaults loaded from " + propsFile);
 
@@ -428,7 +432,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     @Override
     public void onLeaderUpdate() {
         String propsFile = CarbonUtils.getCarbonHome() + File.separator
-                           + AnalyticsConstants.SPARK_DEFAULTS_PATH;
+                + AnalyticsConstants.SPARK_DEFAULTS_PATH;
         Utils.loadDefaultSparkProperties(new SparkConf(), propsFile);
         log.info("Spark defaults loaded from " + propsFile);
 
@@ -468,10 +472,10 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
 
         this.startWorker(this.myHost, masterHost, masterPort, workerPort, workerUiPort, workerCores,
-                         workerMem, workerDir, propsFile, this.sparkConf);
+                workerMem, workerDir, propsFile, this.sparkConf);
 
         log.info("Analytics worker started: [" + this.myHost + ":" + workerPort + ":" + workerUiPort + "] "
-                 + "Master [" + masterHost + ":" + masterPort + "]");
+                + "Master [" + masterHost + ":" + masterPort + "]");
 
         if (acm.isLeader(CLUSTER_GROUP_NAME)) {
             this.initClient("spark://" + masterHost + ":" + masterPort, appName);

@@ -27,16 +27,6 @@
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.application.deployer</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>${gson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.json.wso2</groupId>
-            <artifactId>json</artifactId>
-            <version>${orbit.version.json}</version>
-        </dependency>
     </dependencies>
 
     <build>

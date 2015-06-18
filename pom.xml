@@ -693,6 +693,11 @@
                 <artifactId>netty-all</artifactId>
                 <version>${netty-all.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.noggit</groupId>
+                <artifactId>noggit</artifactId>
+                <version>${version.noggit}</version>
+            </dependency>
 
             <!-- Note:-
                     groupId "org.wso2.orbit.org.apache.hadoop" for Hadoop client 2.6.0
@@ -998,6 +1003,19 @@
                 <artifactId>org.wso2.carbon.analytics.stream.persistence</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.wso2.siddhi</groupId>
+                <artifactId>siddhi-core</artifactId>
+                <version>${siddhi.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.wso2.siddhi</groupId>
+                <artifactId>siddhi-query-api</artifactId>
+                <version>${siddhi.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -1348,6 +1366,8 @@
         <roaringbitmap.import.version>[0.4.5, 0.5.0)</roaringbitmap.import.version>
         <objenesis.orbit.version>2.1.wso2v1</objenesis.orbit.version>
 
+        <siddhi.version>3.0.0-SNAPSHOT</siddhi.version>
+        <version.noggit>0.6.wso2v1</version.noggit>
 
     </properties>
 
