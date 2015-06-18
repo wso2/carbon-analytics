@@ -61,6 +61,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -635,6 +636,70 @@ public class GenericUtils {
     
     public static String streamToTableName(String streamName) {
         return streamName.replace('.', '_');
+    }
+
+    public static Iterator<Record> recordGroupsToIterator(AnalyticsRecordReader reader,
+                                                      RecordGroup[] rgs) throws AnalyticsException {
+        return new RecordGroupIterator(reader, rgs);
+    }
+
+    /**
+     * This class exposes an array of RecordGroup objects as an Iterator.
+     */
+    public static class RecordGroupIterator implements Iterator<Record> {
+
+        private AnalyticsRecordReader reader;
+
+        private RecordGroup[] rgs;
+
+        private Iterator<Record> itr;
+
+        private int index = -1;
+
+        public RecordGroupIterator(AnalyticsRecordReader reader, RecordGroup[] rgs)
+                throws AnalyticsException {
+            this.reader = reader;
+            this.rgs = rgs;
+        }
+
+        @Override
+        public boolean hasNext() {
+            boolean result;
+            if (this.itr == null) {
+                result = false;
+            } else {
+                result = this.itr.hasNext();
+            }
+            if (result) {
+                return true;
+            } else {
+                if (rgs.length > this.index + 1) {
+                    try {
+                        this.index++;
+                        this.itr = this.reader.readRecords(rgs[index]);
+                    } catch (AnalyticsException e) {
+                        throw new IllegalStateException("Error in traversing record group: " + e.getMessage(), e);
+                    }
+                    return this.hasNext();
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        @Override
+        public Record next() {
+            if (this.hasNext()) {
+                return this.itr.next();
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        public void remove() {
+            /* ignored */
+        }
     }
     
 }

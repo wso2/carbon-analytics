@@ -20,7 +20,7 @@ import com.google.gson.Gson;
 import org.apache.axiom.om.util.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
+import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
@@ -119,7 +119,7 @@ public class AnalyticsResource extends AbstractResource {
 			logger.debug("Invoking createTable tableName : " +
 			             tableBean.getTableName());
 		}
-		SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+		AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         if (tableBean != null) {
             if (analyticsDataService.tableExists(username, tableBean.getTableName())) {
@@ -148,7 +148,7 @@ public class AnalyticsResource extends AbstractResource {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking listTables");
 		}
-		SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         boolean tableExists = analyticsDataService.tableExists(username, tableName);
         if (logger.isDebugEnabled()) {
@@ -175,7 +175,7 @@ public class AnalyticsResource extends AbstractResource {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking listTables");
 		}
-		SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         List<String> tables = analyticsDataService.listTables(username);
         if (logger.isDebugEnabled()) {
@@ -200,7 +200,7 @@ public class AnalyticsResource extends AbstractResource {
 			logger.debug("Invoking deleteTable for tableName : " +
 			             tableBean.getTableName());
 		}
-		SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         if (tableBean != null) {
             if (analyticsDataService.tableExists(username, tableBean.getTableName())) {
@@ -221,7 +221,7 @@ public class AnalyticsResource extends AbstractResource {
 	 * @return the response
 	 * @throws AnalyticsException
 	 */
-	/*@POST
+	@POST
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("tables/{tableName}")
@@ -231,7 +231,7 @@ public class AnalyticsResource extends AbstractResource {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking insertRecordsToTable");
 		}
-		SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         if (recordBeans != null) {
             if (logger.isDebugEnabled()) {
@@ -262,7 +262,7 @@ public class AnalyticsResource extends AbstractResource {
         } else {
             throw new AnalyticsException("List of records is empty");
         }
-    }*/
+    }
 
 	/**
 	 * Delete records either the time range, but not both
@@ -341,7 +341,7 @@ public class AnalyticsResource extends AbstractResource {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking getRecordCount for tableName: " + tableName);
         }
-        SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         long recordCount = analyticsDataService.getRecordCount(username, tableName,
                                                                Long.MIN_VALUE, Long.MAX_VALUE);
@@ -372,7 +372,7 @@ public class AnalyticsResource extends AbstractResource {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking getRecords for tableName: " + tableName);
 		}
-		SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         final RecordGroup[] recordGroups;
         recordGroups = analyticsDataService.get(username, tableName, 1, null, timeFrom, timeTo, recordsFrom, count);
@@ -494,7 +494,7 @@ public class AnalyticsResource extends AbstractResource {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking getWithkeyValues for tableName: " + tableName);
         }
-        SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         final RecordGroup[] recordGroups;
         recordGroups = analyticsDataService.getWithKeyValues(username, tableName, 1, columnKeyValueBean.getColumns(),
@@ -591,7 +591,7 @@ public class AnalyticsResource extends AbstractResource {
             logger.debug("Invoking clearIndexData for tableName : " +
                          tableName);
         }
-        SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         analyticsDataService.clearIndexData(username, tableName);
         return handleResponse(ResponseStatus.SUCCESS, "Successfully cleared indices in table: " +
@@ -613,7 +613,7 @@ public class AnalyticsResource extends AbstractResource {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking search for tableName : " + queryBean.getTableName());
         }
-        SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         if (queryBean != null) {
             List<SearchResultEntry> searchResults = analyticsDataService.search(username,
@@ -653,7 +653,7 @@ public class AnalyticsResource extends AbstractResource {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking drilldown for tableName : " + requestBean.getTableName());
         }
-        SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         if (requestBean != null) {
             AnalyticsDrillDownRequest request = Utils.createDrilldownRequest(requestBean);
@@ -686,7 +686,7 @@ public class AnalyticsResource extends AbstractResource {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking drilldownCount for tableName : " + requestBean.getTableName());
         }
-        SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         if (requestBean != null) {
             AnalyticsDrillDownRequest request = Utils.createDrilldownRequest(requestBean);
@@ -714,7 +714,7 @@ public class AnalyticsResource extends AbstractResource {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking drilldownRangeCount for tableName : " + requestBean.getTableName());
         }
-        SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         if (requestBean != null) {
             AnalyticsDrillDownRequest request = Utils.createDrilldownRequest(requestBean);
@@ -743,7 +743,7 @@ public class AnalyticsResource extends AbstractResource {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking drilldownCategories for tableName : " + requestBean.getTableName());
         }
-        SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         if (requestBean != null) {
             CategoryDrillDownRequest request = Utils.createDrilldownRequest(requestBean);
@@ -771,7 +771,7 @@ public class AnalyticsResource extends AbstractResource {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking search count for tableName : " + queryBean.getTableName());
 		}
-		SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         if (queryBean != null) {
             int result = analyticsDataService.searchCount(username, queryBean.getTableName(), queryBean.getQuery());
@@ -800,7 +800,7 @@ public class AnalyticsResource extends AbstractResource {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking waiting for indexing - timeout : " + seconds + " seconds");
         }
-        SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         analyticsDataService.waitForIndexing(seconds * Constants.MILLISECONDSPERSECOND);
         return handleResponse(ResponseStatus.SUCCESS, "Indexing Completed successfully");
 	}
@@ -812,7 +812,7 @@ public class AnalyticsResource extends AbstractResource {
      * @return the {@link Response} response
      * @throws AnalyticsException
      */
-    /*@POST
+    @POST
     @Consumes({MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_JSON})
     @Path("tables/{tableName}/schema")
@@ -823,7 +823,7 @@ public class AnalyticsResource extends AbstractResource {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking setTableSchema for tableName : " + tableName);
         }
-        SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         if (analyticsSchemaBean != null) {
             AnalyticsSchema analyticsSchema = Utils.createAnalyticsSchema(analyticsSchemaBean);
@@ -833,7 +833,7 @@ public class AnalyticsResource extends AbstractResource {
         } else {
             throw new AnalyticsException("Table schema is not provided");
         }
-    }*/
+    }
 
     /**
      * Gets the analytics schema of a table
@@ -850,7 +850,7 @@ public class AnalyticsResource extends AbstractResource {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking getTableSchema for table : " + tableName);
         }
-        SecureAnalyticsDataService analyticsDataService = Utils.getAnalyticsDataAPIs();
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         AnalyticsSchema analyticsSchema = analyticsDataService.getTableSchema(username, tableName);
         AnalyticsSchemaBean analyticsSchemaBean = Utils.createTableSchemaBean(analyticsSchema);

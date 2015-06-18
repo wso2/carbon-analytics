@@ -18,6 +18,7 @@
  */
 package org.wso2.carbon.analytics.dataservice.indexing;
 
+import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
@@ -99,6 +100,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -120,7 +122,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     private static final int INDEXING_SCHEDULE_PLAN_RETRY_COUNT = 3;
 
     public static final String DISABLE_INDEXING_ENV_PROP = "disableIndexing";
-    
+
     private static final int WAIT_INDEX_TIME_INTERVAL = 1000;
 
     private static final String INDEX_OP_DATA_ATTRIBUTE = "__INDEX_OP_DATA__";
@@ -147,8 +149,10 @@ public class AnalyticsDataIndexer implements GroupEventListener {
 
     private static final String EMPTY_FACET_VALUE = "EMPTY_FACET_VALUE!";
 
-    private static final java.lang.String DEFAULT_SCORE = "1";
-    
+    private static final String DEFAULT_SCORE = "1";
+
+    private static final int INDEX_BATCH_SIZE = 1;
+
     private Map<String, Directory> indexDirs = new HashMap<>();
 
     private Map<String, Directory> indexTaxonomyDirs = new HashMap<>();
@@ -293,25 +297,43 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return (List<IndexOperation>) GenericUtils.deserializeObject(data);
     }
     
-    private List<IndexOperation> checkAndExtractIndexOperations(List<Record> indexOpRecords) throws AnalyticsException {
+    private List<IndexOperation> checkAndExtractIndexOperations(Record indexOpRecord) throws AnalyticsException {
         List<IndexOperation> indexOps = new ArrayList<>();
-        for (Record indexOpRecord : indexOpRecords) {
-            try {
-                indexOps.addAll(this.extractIndexOperations(indexOpRecord));
-            } catch (AnalyticsDataCorruptionException e) {
-                this.removeIndexOperationRecord(indexOpRecord);
-                log.error("Corrupted index operation record deleted, id: " + indexOpRecord.getId() + 
-                        " shard index: " + indexOpRecord.getTimestamp());
-            }
+        try {
+            indexOps.addAll(this.extractIndexOperations(indexOpRecord));
+        } catch (AnalyticsDataCorruptionException e) {
+            this.removeIndexOperationRecord(indexOpRecord);
+            log.error("Corrupted index operation record deleted, id: " + indexOpRecord.getId() +
+                    " shard index: " + indexOpRecord.getTimestamp());
         }
         return indexOps;
     }
     
-    private Collection<List<IndexOperation>> extractIndexOpBatches(List<IndexOperation> indexOps) {
+    private Collection<List<IndexOperation>> extractIndexOpBatches(Iterator<IndexOperation> indexOpItr, int count) {
         Map<String, List<IndexOperation>> opBatches = new HashMap<>();
         List<IndexOperation> opBatch;
         String identity;
-        for (IndexOperation indexOp : indexOps) {
+        IndexOperation indexOp;
+        for (int i = 0; i < count && indexOpItr.hasNext(); i++) {
+            indexOp = indexOpItr.next();
+            identity = this.generateTableId(indexOp.getTenantId(), indexOp.getTableName());
+            opBatch = opBatches.get(identity);
+            if (opBatch == null) {
+                opBatch = new ArrayList<IndexOperation>();
+                opBatches.put(identity, opBatch);
+            }
+            opBatch.add(indexOp);
+        }
+        return opBatches.values();
+    }
+
+    private Collection<List<IndexOperation>> extractIndexOpBatches(Iterator<IndexOperation> indexOps) {
+        Map<String, List<IndexOperation>> opBatches = new HashMap<>();
+        List<IndexOperation> opBatch;
+        String identity;
+        IndexOperation indexOp;
+        while (indexOps.hasNext()) {
+            indexOp = indexOps.next();
             identity = this.generateTableId(indexOp.getTenantId(), indexOp.getTableName());
             opBatch = opBatches.get(identity);
             if (opBatch == null) {
@@ -391,21 +413,94 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             }
         }
     }
-    
+
     private void processIndexUpdateOperations(int shardIndex) throws AnalyticsException {
-        List<Record> indexUpdateOpRecords = this.loadIndexOperationUpdateRecords(shardIndex);
-        List<IndexOperation> indexUpdateOps = this.checkAndExtractIndexOperations(indexUpdateOpRecords);
-        Collection<List<IndexOperation>> indexUpdateOpBatches = this.extractIndexOpBatches(indexUpdateOps);
-        this.processIndexUpdateOpBatches(shardIndex, indexUpdateOpBatches);
-        this.removeIndexOperationRecords(indexUpdateOpRecords);
+        Iterator<Record> indexMetaRecordItr = this.loadIndexOperationUpdateRecords(shardIndex);
+        IndexMetaRecordIndexOperationIterator indexOperationRecordItr = new IndexMetaRecordIndexOperationIterator(indexMetaRecordItr);
+        int i = 0;
+        while (indexOperationRecordItr.hasNext()) {
+            Collection<List<IndexOperation>> indexUpdateOpBatches = this.extractIndexOpBatches(
+                    indexOperationRecordItr);
+            this.processIndexUpdateOpBatches(shardIndex, indexUpdateOpBatches);
+            this.removeIndexOperationRecords(indexOperationRecordItr.getRecordLog());
+            indexOperationRecordItr.resetRecordLog();
+        }
     }
-    
+
     private void processIndexDeleteOperations(int shardIndex) throws AnalyticsException {
-        List<Record> indexDeleteOpRecords = this.loadIndexOperationDeleteRecords(shardIndex);
-        List<IndexOperation> indexDeleteOps = this.checkAndExtractIndexOperations(indexDeleteOpRecords);
-        Collection<List<IndexOperation>> indexDeleteOpBatches = this.extractIndexOpBatches(indexDeleteOps);
-        this.processIndexDeleteOpBatches(shardIndex, indexDeleteOpBatches);
-        this.removeIndexOperationRecords(indexDeleteOpRecords);
+        Iterator<Record> indexMetaRecordItr = this.loadIndexOperationDeleteRecords(shardIndex);
+        IndexMetaRecordIndexOperationIterator indexOperationRecordItr = new IndexMetaRecordIndexOperationIterator(indexMetaRecordItr);
+        while (indexOperationRecordItr.hasNext()) {
+            Collection<List<IndexOperation>> indexDeleteOpBatches = this.extractIndexOpBatches(
+                    indexOperationRecordItr);
+            this.processIndexDeleteOpBatches(shardIndex, indexDeleteOpBatches);
+            this.removeIndexOperationRecords(indexOperationRecordItr.getRecordLog());
+            indexOperationRecordItr.resetRecordLog();
+        }
+    }
+
+    /**
+     * This class represents an iterator to process an iterator of meta records and from the iterator
+     * return IndexOperation objects one by one.
+     */
+    public class IndexMetaRecordIndexOperationIterator implements Iterator<IndexOperation> {
+
+        private Iterator<Record> itr;
+
+        private Iterator<IndexOperation> currentOpsItr;
+
+        private List<Record> recordLog = new ArrayList<>();
+
+        public IndexMetaRecordIndexOperationIterator(Iterator<Record> itr) {
+            this.itr = itr;
+        }
+
+        @Override
+        public boolean hasNext() {
+            try {
+                if (this.currentOpsItr == null) {
+                    if (itr.hasNext()) {
+                        Record record = itr.next();
+                        this.recordLog.add(record);
+                        this.currentOpsItr = checkAndExtractIndexOperations(record).iterator();
+                    } else {
+                        return false;
+                    }
+                }
+                if (this.currentOpsItr.hasNext()) {
+                    return true;
+                } else {
+                    this.currentOpsItr = null;
+                    return this.hasNext();
+                }
+            } catch (AnalyticsException e) {
+                throw new IllegalStateException("Error in index meta record index operation iterator: " +
+                                                e.getMessage(), e);
+            }
+        }
+
+        @Override
+        public IndexOperation next() {
+            if (this.hasNext()) {
+                return this.currentOpsItr.next();
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        public void remove() {
+            /* ignored */
+        }
+
+        public List<Record> getRecordLog() {
+            return recordLog;
+        }
+
+        public void resetRecordLog() {
+            this.recordLog.clear();
+        }
+
     }
     
     private void processIndexOperations(int shardIndex) throws AnalyticsException {
@@ -432,39 +527,40 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return tableNamePrefix + shardIndex;
     }
     
-    private List<Record> loadIndexOperationUpdateRecords(int shardIndex) throws AnalyticsException {
+    private Iterator<Record> loadIndexOperationUpdateRecords(int shardIndex) throws AnalyticsException {
         return this.loadIndexOperationRecords(SHARD_INDEX_DATA_RECORD_TENANT_ID, 
                 this.generateShardedIndexDataTableName(SHARD_INDEX_DATA_UPDATE_RECORDS_TABLE_PREFIX, shardIndex));
     }
         
-    private List<Record> loadIndexOperationDeleteRecords(int shardIndex) throws AnalyticsException {
+    private Iterator<Record> loadIndexOperationDeleteRecords(int shardIndex) throws AnalyticsException {
         return this.loadIndexOperationRecords(SHARD_INDEX_DATA_RECORD_TENANT_ID, 
                 this.generateShardedIndexDataTableName(SHARD_INDEX_DATA_DELETE_RECORDS_TABLE_PREFIX, shardIndex));
     }
     
-    private List<Record> loadAllIndexOperationUpdateRecords() throws AnalyticsException {
-        List<Record> result = new ArrayList<>();
+    private Iterator<Record> loadAllIndexOperationUpdateRecords() throws AnalyticsException {
+        Iterator<Record>[] itrs = new Iterator[this.getShardCount()];
         for (int i = 0; i < this.getShardCount(); i++) {
-            result.addAll(this.loadIndexOperationUpdateRecords(i));
+            itrs[i] = this.loadIndexOperationUpdateRecords(i);
         }
-        return result;
+        return IteratorUtils.chainedIterator(itrs);
     }
     
-    private List<Record> loadAllIndexOperationDeleteRecords() throws AnalyticsException {
-        List<Record> result = new ArrayList<>();
+    private Iterator<Record> loadAllIndexOperationDeleteRecords() throws AnalyticsException {
+        Iterator<Record>[] itrs = new Iterator[this.getShardCount()];
         for (int i = 0; i < this.getShardCount(); i++) {
-            result.addAll(this.loadIndexOperationDeleteRecords(i));
+            itrs[i] = this.loadIndexOperationDeleteRecords(i);
         }
-        return result;
+        return IteratorUtils.chainedIterator(itrs);
     }
     
-    private List<Record> loadIndexOperationRecords(int tenantId, String tableName) throws AnalyticsException {
+    private Iterator<Record> loadIndexOperationRecords(int tenantId, String tableName) throws AnalyticsException {
         try {
-            return GenericUtils.listRecords(this.getAnalyticsRecordStore(), 
-                    this.getAnalyticsRecordStore().get(tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+            return GenericUtils.recordGroupsToIterator(this.analyticsDataService,
+                    this.getAnalyticsRecordStore().get(tenantId, tableName, 1, null,
+                                                       Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         } catch (AnalyticsTableNotAvailableException e) {
             /* ignore this scenario, before any indexes, this will happen */
-            return new ArrayList<Record>(0);
+            return new ArrayList<Record>(0).iterator();
         }
     }
     
@@ -1402,8 +1498,8 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         if (maxWait < 0) {
             maxWait = Long.MAX_VALUE;
         }
-        List<Record> updateRecords = this.loadAllIndexOperationUpdateRecords();
-        List<Record> deleteRecords = this.loadAllIndexOperationDeleteRecords();
+        Iterator<Record> updateRecords = this.loadAllIndexOperationUpdateRecords();
+        Iterator<Record> deleteRecords = this.loadAllIndexOperationDeleteRecords();
         long start = System.currentTimeMillis(), end;
         boolean updateDone = false, deleteDone = false;
         while (true) {
@@ -1428,11 +1524,13 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
     }
     
-    private Collection<List<Record>> groupRecordsByTable(List<Record> records) {
+    private Collection<List<Record>> groupRecordsByTable(Iterator<Record> itr, int count) {
         Map<String, List<Record>> result = new HashMap<String, List<Record>>();
         String identity;
         List<Record> group;
-        for (Record record : records) {
+        Record record;
+        for (int i = 0; i < count && itr.hasNext(); i++) {
+            record = itr.next();
             identity = record.getTenantId() + "_" + record.getTableName();
             group = result.get(identity);
             if (group == null) {
@@ -1443,9 +1541,18 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
         return result.values();
     }
-    
-    private boolean checkRecordsEmpty(List<Record> records) throws AnalyticsException {
-        Collection<List<Record>> groups = this.groupRecordsByTable(records);
+
+    private boolean checkRecordsEmpty(Iterator<Record> records) throws AnalyticsException {
+        while (records.hasNext()) {
+            if (!this.checkRecordsEmptyBatch(records)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean checkRecordsEmptyBatch(Iterator<Record> records) throws AnalyticsException {
+        Collection<List<Record>> groups = this.groupRecordsByTable(records, INDEX_BATCH_SIZE);
         Record firstRecord;
         for (List<Record> group : groups) {
             firstRecord = group.get(0);
@@ -1602,7 +1709,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     private class IndexWorker implements Runnable {
 
         private static final int INDEX_WORKER_SLEEP_TIME = 1000;
-        
+
         private int shardIndex;
         
         private boolean stop;
