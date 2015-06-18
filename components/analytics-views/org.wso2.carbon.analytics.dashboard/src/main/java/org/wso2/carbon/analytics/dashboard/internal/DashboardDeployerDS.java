@@ -21,8 +21,6 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.dashboard.deployment.DashboardDeployer;
-import org.wso2.carbon.analytics.dashboard.deployment.GadgetDeployer;
-import org.wso2.carbon.analytics.dashboard.deployment.LayoutDeployer;
 import org.wso2.carbon.application.deployer.AppDeployerConstants;
 import org.wso2.carbon.application.deployer.AppDeployerUtils;
 import org.wso2.carbon.application.deployer.Feature;
@@ -53,16 +51,9 @@ public class DashboardDeployerDS {
 
     protected void activate(ComponentContext ctxt) {
         try {
-            //dashboard definition deployer
+            //dashboard artifacts deployer
             appHandlerRegistration = ctxt.getBundleContext().registerService(
                     AppDeploymentHandler.class.getName(), new DashboardDeployer(), null);
-            //layouts deployer
-            //TODO: Commenting out as this needs be merged into one capp deployer
-//            appHandlerRegistration = ctxt.getBundleContext().registerService(
-//                    AppDeploymentHandler.class.getName(), new LayoutDeployer(), null);
-//            //layouts deployer
-//            appHandlerRegistration = ctxt.getBundleContext().registerService(
-//                    AppDeploymentHandler.class.getName(), new GadgetDeployer(), null);
 
             // read required-features.xml
             URL reqFeaturesResource = ctxt.getBundleContext().getBundle()
