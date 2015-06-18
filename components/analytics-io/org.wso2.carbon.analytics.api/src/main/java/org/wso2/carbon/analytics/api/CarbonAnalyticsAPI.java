@@ -227,7 +227,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
             AnalyticsAPIHttpClient.getInstance().clearIndices(MultitenantConstants.INVALID_TENANT_ID,
-                    username, tableName, false);
+                    username, tableName, true);
         }
     }
 

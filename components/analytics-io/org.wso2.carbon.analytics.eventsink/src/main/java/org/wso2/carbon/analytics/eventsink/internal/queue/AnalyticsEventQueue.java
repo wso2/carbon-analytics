@@ -55,6 +55,9 @@ public class AnalyticsEventQueue {
     }
 
     public void put(Event event) {
+        if (log.isDebugEnabled()){
+            log.debug("Adding an event to the event queue");
+        }
         long sequence = this.ringBuffer.next();
         Event bufferedEvent = this.ringBuffer.get(sequence);
         updateEvent(bufferedEvent, event);

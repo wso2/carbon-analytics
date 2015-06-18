@@ -205,11 +205,11 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
                 try {
                     RemoteRecordGroup remoteRecordGroupObj = (RemoteRecordGroup) GenericUtils.deserializeObject(servletInputStream);
                     Iterator<Record> records = ServiceHolder.getAnalyticsDataService().readRecords(remoteRecordGroupObj.getRecordGroupFromBinary());
-                    resp.setStatus(HttpServletResponse.SC_OK);
                     while (records.hasNext()) {
                         Record record = records.next();
                         GenericUtils.serializeObject(record, resp.getOutputStream());
                     }
+                    resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
                 }
