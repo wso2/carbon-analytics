@@ -693,6 +693,11 @@
                 <artifactId>netty-all</artifactId>
                 <version>${netty-all.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.noggit</groupId>
+                <artifactId>noggit</artifactId>
+                <version>${version.noggit}</version>
+            </dependency>
 
             <!-- Note:-
                     groupId "org.wso2.orbit.org.apache.hadoop" for Hadoop client 2.6.0
@@ -1362,6 +1367,7 @@
         <objenesis.orbit.version>2.1.wso2v1</objenesis.orbit.version>
 
         <siddhi.version>3.0.0-SNAPSHOT</siddhi.version>
+        <version.noggit>0.6.wso2v1</version.noggit>
 
     </properties>
 
