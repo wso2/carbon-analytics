@@ -102,11 +102,11 @@ public class GenericUtils {
     private static final byte DATA_TYPE_OBJECT = 0x10;
 
     private static final String DEFAULT_CHARSET = "UTF8";
-    
+
     public static final String WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP = "wso2_custom_conf_dir";
-    
+
     private static DataSourceRepository globalCustomRepo;
-    
+
 //    private static ThreadLocal<Kryo> kryoTL = new ThreadLocal<Kryo>() {
 //        protected Kryo initialValue() {
 //            return new Kryo();
@@ -416,7 +416,7 @@ public class GenericUtils {
             throw new RuntimeException(e);
         }
     }
-    
+
     /* do not touch, @see serializeObject(Object) */
     public static void serializeObject(Object obj, OutputStream out) throws IOException {
         byte[] data = serializeObject(obj);
@@ -444,15 +444,15 @@ public class GenericUtils {
             throw new RuntimeException(e);
         }
     }
-    
+
     /* do not touch, @see serializeObject(Object) */
     public static Object deserializeObject(InputStream in) throws IOException, EOFException {
         if (in == null) {
             return null;
         }
-        if (in.available() == 0) {
-            throw new EOFException();
-        }
+//        if (in.available() == 0) {
+//            throw new EOFException();
+//        }
 //        DataInputStream dataIn = new DataInputStream(in);
 //        int size = dataIn.readInt();
 //        byte[] buff = new byte[size];
@@ -467,40 +467,42 @@ public class GenericUtils {
         try {
             ObjectInputStream objIn = new ObjectInputStream(in);
             return objIn.readObject();
-        } catch (Exception e) {
+        } catch (EOFException ex){
+           throw ex;
+        }catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-    
+
     private static void addDataSourceProviders(List<String> providers) throws DataSourceException {
         DataSourceManager dsm = DataSourceManager.getInstance();
         try {
             Method method = DataSourceManager.class.getDeclaredMethod(ADD_DATA_SOURCE_PROVIDERS_METHOD, List.class);
             method.setAccessible(true);
             method.invoke(dsm, providers);
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | 
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException |
                 IllegalArgumentException | InvocationTargetException e) {
             throw new DataSourceException("Error in adding data source providers: " + e.getMessage(), e);
         }
     }
-    
-    private static Object createDataSourceObject(DataSourceRepository dsRepo, 
+
+    private static Object createDataSourceObject(DataSourceRepository dsRepo,
             DataSourceMetaInfo dsmInfo) throws DataSourceException {
         try {
             Method method = DataSourceRepository.class.getDeclaredMethod(CREATE_DATA_SOURCE_OBJECT_METHOD, DataSourceMetaInfo.class, boolean.class);
             method.setAccessible(true);
             return method.invoke(dsRepo, dsmInfo, false);
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | 
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException |
                 IllegalArgumentException | InvocationTargetException e) {
             throw new DataSourceException("Error in creating data source object: " + e.getMessage(), e);
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     private static void addDataSource(DataSourceRepository dsRepo, CarbonDataSource cds) throws DataSourceException {
         Field field;
         try {
-            field = DataSourceRepository.class.getDeclaredField(DATA_SOURCES_FIELD);            
+            field = DataSourceRepository.class.getDeclaredField(DATA_SOURCES_FIELD);
             field.setAccessible(true);
             Map<String, CarbonDataSource> dataSources = (Map<String, CarbonDataSource>) field.get(dsRepo);
             dataSources.put(cds.getDSMInfo().getName(), cds);
@@ -508,7 +510,7 @@ public class GenericUtils {
             throw new DataSourceException("Error in accessing data source map: " + e.getMessage(), e);
         }
     }
-    
+
     private static void populateSystemDataSource(DataSourceRepository dsRepo, File sysDSFile) throws DataSourceException {
         try {
             JAXBContext ctx = JAXBContext.newInstance(SystemDataSourcesConfiguration.class);
@@ -519,7 +521,7 @@ public class GenericUtils {
             CarbonDataSource cds;
             for (DataSourceMetaInfo dsmInfo : sysDS.getDataSources()) {
                 dsmInfo.setSystem(true);
-                cds = new CarbonDataSource(dsmInfo, new DataSourceStatus(DataSourceStatusModes.ACTIVE, null), 
+                cds = new CarbonDataSource(dsmInfo, new DataSourceStatus(DataSourceStatusModes.ACTIVE, null),
                         createDataSourceObject(dsRepo, dsmInfo));
                 addDataSource(dsRepo, cds);
             }
@@ -528,7 +530,7 @@ public class GenericUtils {
                     sysDSFile.getAbsolutePath() + "' - " + e.getMessage(), e);
         }
     }
-    
+
     public static String getAnalyticsConfDirectory() throws AnalyticsException {
         File confDir = null;
         try {
@@ -542,7 +544,7 @@ public class GenericUtils {
             return confDir.getAbsolutePath();
         }
     }
-    
+
     private static String getCustomAnalyticsConfDirectory() throws AnalyticsException {
         String path = System.getProperty(WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP);
         if (path == null) {
@@ -556,7 +558,7 @@ public class GenericUtils {
         }
         return confDir.getAbsolutePath();
     }
-    
+
     private static DataSourceRepository createGlobalCustomDataSourceRepo() throws DataSourceException {
         String confDir;
         try {
@@ -570,7 +572,7 @@ public class GenericUtils {
             throw new IllegalStateException("Invalid directory: " + dataSourcesFolder.getAbsolutePath());
         }
         DataSourceRepository repo = new DataSourceRepository(MultitenantConstants.SUPER_TENANT_ID);
-        File masterDSFile = new File(dataSourcesDir + File.separator + 
+        File masterDSFile = new File(dataSourcesDir + File.separator +
                 DataSourceConstants.MASTER_DS_FILE_NAME);
         /* initialize the master data sources first */
         if (masterDSFile.exists()) {
@@ -616,11 +618,11 @@ public class GenericUtils {
             return cds.getDSObject();
         }
     }
-    
+
     public static void clearGlobalCustomDataSourceRepo() {
         globalCustomRepo = null;
     }
-    
+
     public static boolean isCarbonServer() {
         try {
             return CarbonUtils.getCarbonHome() != null;
@@ -628,9 +630,9 @@ public class GenericUtils {
             return false;
         }
     }
-    
+
     public static String streamToTableName(String streamName) {
         return streamName.replace('.', '_');
     }
-    
+
 }

@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.analytics.eventsink.internal.queue;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.commons.Event;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * event arrival it can direct it to the relevant queues.
  */
 public class AnalyticsEventQueueManager {
-
+    private static final Log log = LogFactory.getLog(AnalyticsEventQueueManager.class);
     private static AnalyticsEventQueueManager instance = new AnalyticsEventQueueManager();
     private static ConcurrentHashMap<Integer, AnalyticsEventQueue> queueMap =
             new ConcurrentHashMap<Integer, AnalyticsEventQueue>();
@@ -49,6 +51,9 @@ public class AnalyticsEventQueueManager {
                     queueMap.put(tenantId, eventQueue);
                 }
             }
+        }
+        if (log.isDebugEnabled()){
+            log.debug("Adding event : " + event);
         }
         eventQueue.put(event);
     }

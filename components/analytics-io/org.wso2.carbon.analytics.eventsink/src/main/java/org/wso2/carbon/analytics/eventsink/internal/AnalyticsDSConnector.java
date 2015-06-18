@@ -18,6 +18,8 @@
 package org.wso2.carbon.analytics.eventsink.internal;
 
 import com.google.gson.Gson;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkConstants;
 import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkUtil;
 import org.wso2.carbon.analytics.eventsink.internal.util.ServiceHolder;
@@ -37,6 +39,8 @@ import java.util.*;
  * Analytics data service connector which actually makes the interacts with DS.
  */
 public class AnalyticsDSConnector {
+    private static final Log log = LogFactory.getLog(AnalyticsDSConnector.class);
+
     private Gson gson;
 
     public AnalyticsDSConnector() {
@@ -84,6 +88,9 @@ public class AnalyticsDSConnector {
             }
 
             Record record = new Record(tenantId, tableName, eventAttributes, timestamp);
+            if (log.isDebugEnabled()){
+                log.debug("Record being added: "+ record);
+            }
             records.add(record);
         }
         return records;
