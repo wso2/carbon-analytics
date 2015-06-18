@@ -91,6 +91,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     private static final String GLOBAL_DATA_PURGING = "GLOBAL_DATA_PURGING";
 
+    private static final int DELETE_BATCH_SIZE = 1000;
+
     private AnalyticsRecordStore analyticsRecordStore;
     
     private AnalyticsFileSystem analyticsFileSystem;
@@ -450,18 +452,19 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public void delete(int tenantId, String tableName, long timeFrom, long timeTo) throws AnalyticsException,
             AnalyticsTableNotAvailableException {
-        this.getIndexer().delete(tenantId, tableName, 
-                this.getRecordIdsFromTimeRange(tenantId, tableName, timeFrom, timeTo));
+        Iterator<Record> recordIterator = GenericUtils.recordGroupsToIterator(this.analyticsRecordStore,
+                                                       this.get(tenantId, tableName, 1, null, timeFrom, timeTo, 0, -1));
+        while (recordIterator.hasNext()) {
+            this.getIndexer().delete(tenantId, tableName,
+                                     this.getRecordIdsBatch(recordIterator));
+        }
         this.getAnalyticsRecordStore().delete(tenantId, tableName, timeFrom, timeTo);
     }
     
-    private List<String> getRecordIdsFromTimeRange(int tenantId, String tableName, long timeFrom, 
-            long timeTo) throws AnalyticsException {
-        List<Record> records = GenericUtils.listRecords(this,
-                                                        this.get(tenantId, tableName, 1, null, timeFrom, timeTo, 0, -1));
-        List<String> result = new ArrayList<>(records.size());
-        for (Record record : records) {
-            result.add(record.getId());
+    private List<String> getRecordIdsBatch(Iterator<Record> recordIterator) throws AnalyticsException {
+        List<String> result = new ArrayList<>();
+        for (int i = 0; i < DELETE_BATCH_SIZE & recordIterator.hasNext(); i++) {
+            result.add(recordIterator.next().getId());
         }
         return result;
     }
