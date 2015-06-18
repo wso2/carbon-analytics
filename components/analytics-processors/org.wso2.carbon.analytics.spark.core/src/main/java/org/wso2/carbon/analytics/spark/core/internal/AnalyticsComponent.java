@@ -27,12 +27,12 @@ import org.wso2.carbon.analytics.spark.core.CarbonAnalyticsProcessorService;
 import org.wso2.carbon.analytics.spark.core.SparkScriptCAppDeployer;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.application.deployer.handler.AppDeploymentHandler;
-import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
+import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.NetworkUtils;
 
 /**
@@ -62,7 +62,7 @@ public class AnalyticsComponent {
         }
         try {
             try {
-                int portOffset = Integer.parseInt(ServerConfiguration.getInstance().getFirstProperty(PORT_OFFSET_SERVER_PROP));
+                int portOffset = CarbonUtils.getPortFromServerConfig(PORT_OFFSET_SERVER_PROP)+1;
                 ServiceHolder.setAnalyticskExecutor(new SparkAnalyticsExecutor(
                         NetworkUtils.getLocalHostname(), portOffset));
             } catch (Throwable e) {
