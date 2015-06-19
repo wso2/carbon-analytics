@@ -48,6 +48,16 @@ public interface AnalyticsDataService extends AnalyticsRecordReader {
      * @throws AnalyticsException
      */
     void createTable(int tenantId, String tableName) throws AnalyticsException;
+    
+    /**
+     * Creates a table, if not already there, where the columns are not defined here, but can contain any arbitrary number
+     * of columns when data is added. The table names are not case sensitive.
+     * @param tenantId The tenant which this table belongs to
+     * @param recordStoreName The name of the target record store to store the table at
+     * @param tableName The name of the table to be created
+     * @throws AnalyticsException
+     */
+    void createTable(int tenantId, String recordStoreName, String tableName) throws AnalyticsException;
 
     /**
      * Clears the index data of the table. This will delete all the index information
