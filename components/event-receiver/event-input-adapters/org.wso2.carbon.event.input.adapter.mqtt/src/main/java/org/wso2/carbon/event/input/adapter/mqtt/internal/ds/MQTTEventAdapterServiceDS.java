@@ -36,15 +36,14 @@ public class MQTTEventAdapterServiceDS {
 
         try {
             InputEventAdapterFactory mqttEventAdapterFactory = new MQTTEventAdapterFactory();
-            context.getBundleContext().registerService(InputEventAdapterFactory.class.getName(), mqttEventAdapterFactory, null);
+            context.getBundleContext().registerService(InputEventAdapterFactory.class.getName(),
+                    mqttEventAdapterFactory, null);
             if (log.isDebugEnabled()) {
                 log.debug("Successfully deployed the input MQTT adapter service");
             }
 
         } catch (RuntimeException e) {
             log.error("Can not create the input MQTT adapter service ", e);
-        } catch (Exception ex) {
-            log.error(ex);
         }
     }
 

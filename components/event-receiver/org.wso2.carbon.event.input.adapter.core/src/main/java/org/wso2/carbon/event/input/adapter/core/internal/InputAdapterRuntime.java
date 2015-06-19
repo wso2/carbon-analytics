@@ -40,7 +40,7 @@ public class InputAdapterRuntime implements InputEventAdapterListener {
     private volatile long nextConnectionTime;
     private ExecutorService executorService;
     private boolean startedTriggered = false;
-    private boolean startPollingTriggered =false;
+    private boolean startPollingTriggered = false;
 
     public InputAdapterRuntime(InputEventAdapter inputEventAdapter, String name,
                                InputEventAdapterSubscription inputEventAdapterSubscription) throws InputEventAdapterException {
@@ -54,7 +54,7 @@ public class InputAdapterRuntime implements InputEventAdapterListener {
     }
 
     public void startPolling() {
-        startPollingTriggered =true;
+        startPollingTriggered = true;
         if (!connected && startedTriggered && isPolling()) {
             start();
         }
@@ -84,9 +84,14 @@ public class InputAdapterRuntime implements InputEventAdapterListener {
     public void destroy() {
         if (inputEventAdapter != null) {
             try {
-                inputEventAdapter.disconnect();
-            } finally {
-                inputEventAdapter.destroy();
+                try {
+                    inputEventAdapter.disconnect();
+                } finally {
+                    inputEventAdapter.destroy();
+                }
+            } catch (Throwable e) {
+                log.error("Error when destroying InputEventAdapter of '" + name + "'," +
+                        e.getMessage(), e);
             }
         }
     }
@@ -105,7 +110,7 @@ public class InputAdapterRuntime implements InputEventAdapterListener {
     public synchronized void connectionUnavailable(ConnectionUnavailableException connectionUnavailableException) {
         try {
             try {
-                if (!connected) {
+                if (!connected && connectionUnavailableException == null) {
                     if (nextConnectionTime <= System.currentTimeMillis()) {
                         inputEventAdapter.connect();
                         connected = true;
@@ -120,7 +125,7 @@ public class InputAdapterRuntime implements InputEventAdapterListener {
                         log.error("Connection unavailable on " + name + " reconnecting.", connectionUnavailableException);
                         inputEventAdapter.connect();
                     } else {
-                        log.error("Connection unavailable on " + name + " reconnection will be retried in" + (timer.returnTimeToWait()) + " milliseconds.", connectionUnavailableException);
+                        log.error("Connection unavailable on " + name + " . Reconnection will be retried in " + (timer.returnTimeToWait()) + " milliseconds.", connectionUnavailableException);
                         executorService.execute(new Runnable() {
                             @Override
                             public void run() {

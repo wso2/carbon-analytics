@@ -67,21 +67,23 @@ public class WebsocketEventAdapter implements InputEventAdapter {
         try {
             client.connectToServer(new WebsocketClient(eventAdapterListener), clientEndpointConfig, new URI(socketServerUrl));
         } catch (DeploymentException e) {
-            throw new ConnectionUnavailableException("The adapter "+eventAdapterConfiguration.getName()+" failed to connect to the websocket server "+
-                    socketServerUrl ,e);
+            throw new ConnectionUnavailableException("The adapter " + eventAdapterConfiguration.getName() + " failed to connect to the websocket server " +
+                    socketServerUrl, e);
         } catch (IOException e) {
-            throw new ConnectionUnavailableException("The adapter "+eventAdapterConfiguration.getName()+" failed to connect to the websocket server "+
-                    socketServerUrl ,e);
+            throw new ConnectionUnavailableException("The adapter " + eventAdapterConfiguration.getName() + " failed to connect to the websocket server " +
+                    socketServerUrl, e);
         } catch (URISyntaxException e) {
-            throw new ConnectionUnavailableException("The adapter "+eventAdapterConfiguration.getName()+" failed to connect to the websocket server "+
-                    socketServerUrl ,e);
+            throw new ConnectionUnavailableException("The adapter " + eventAdapterConfiguration.getName() + " failed to connect to the websocket server " +
+                    socketServerUrl, e);
         }
     }
 
     @Override
     public void disconnect() {
-        client.shutdown();
-        client = null;
+        if (client != null) {
+            client.shutdown();
+            client = null;
+        }
     }
 
     @Override

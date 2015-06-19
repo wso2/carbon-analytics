@@ -68,7 +68,7 @@ public class MQTTAdapterPublisher {
 
         } catch (MqttException e) {
             log.error("Error occurred when constructing MQTT client for broker url : "
-                    + mqttBrokerConnectionConfiguration.getBrokerUrl());
+                    + mqttBrokerConnectionConfiguration.getBrokerUrl(), e);
             handleException(e);
         }
 
@@ -87,7 +87,7 @@ public class MQTTAdapterPublisher {
 
         } catch (MqttException e) {
             log.error("Error occurred when publishing message for MQTT server : "
-                    + mqttClient.getServerURI());
+                    + mqttClient.getServerURI(), e);
             handleException(e);
         }
     }
@@ -99,7 +99,7 @@ public class MQTTAdapterPublisher {
             mqttClient.publish(topic, message);
         } catch (MqttException e) {
             log.error("Error occurred when publishing message for MQTT server : "
-                    + mqttClient.getServerURI());
+                    + mqttClient.getServerURI(), e);
             handleException(e);
         }
     }

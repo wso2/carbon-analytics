@@ -168,13 +168,13 @@ public class StreamDefinition {
 
         StreamDefinition that = (StreamDefinition) o;
 
-        if (correlationData != null ? !correlationData.equals(that.correlationData) : that.correlationData != null) {
+        if (correlationData != null && !correlationData.isEmpty() ? !correlationData.equals(that.correlationData) : that.correlationData != null && !that.correlationData.isEmpty()) {
             return false;
         }
-        if (metaData != null ? !metaData.equals(that.metaData) : that.metaData != null) {
+        if (metaData != null && !metaData.isEmpty() ? !metaData.equals(that.metaData) : that.metaData != null && !that.metaData.isEmpty()) {
             return false;
         }
-        if (payloadData != null ? !payloadData.equals(that.payloadData) : that.payloadData != null) {
+        if (payloadData != null && !payloadData.isEmpty() ? !payloadData.equals(that.payloadData) : that.payloadData != null && !that.payloadData.isEmpty()) {
             return false;
         }
         if (!name.equals(that.name)) {
