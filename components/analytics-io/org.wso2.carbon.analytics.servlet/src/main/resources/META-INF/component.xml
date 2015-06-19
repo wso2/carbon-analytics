@@ -18,6 +18,10 @@
 <component xmlns="http://products.wso2.org/carbon">
     <ManagementPermissions>
         <ManagementPermission>
+            <DisplayName>Analytics</DisplayName>
+            <ResourceId>/permission/admin/manage/analytics</ResourceId>
+        </ManagementPermission>
+        <ManagementPermission>
             <DisplayName>Analytics Remote API</DisplayName>
             <ResourceId>/permission/admin/manage/analytics/api</ResourceId>
         </ManagementPermission>

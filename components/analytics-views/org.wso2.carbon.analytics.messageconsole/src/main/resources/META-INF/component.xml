@@ -19,6 +19,10 @@
 <component xmlns="http://products.wso2.org/carbon">
     <ManagementPermissions>
         <ManagementPermission>
+            <DisplayName>Analytics</DisplayName>
+            <ResourceId>/permission/admin/manage/analytics</ResourceId>
+        </ManagementPermission>
+        <ManagementPermission>
             <DisplayName>Message Console</DisplayName>
             <ResourceId>/permission/admin/manage/analytics/messageconsole</ResourceId>
         </ManagementPermission>

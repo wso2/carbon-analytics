@@ -49,7 +49,7 @@ public class AnalyticsSearchProcessor extends HttpServlet {
     /**
      * Search the table
      *
-     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param req  HttpRequest which has the required parameters to do the operation.
      * @param resp HttpResponse which returns the result of the intended operation.
      * @throws ServletException
      * @throws IOException
@@ -79,7 +79,8 @@ public class AnalyticsSearchProcessor extends HttpServlet {
                     List<SearchResultEntry> searchResult;
                     if (!securityEnabled) searchResult = ServiceHolder.getAnalyticsDataService().search(tenantIdParam,
                             tableName, query, start, count);
-                    else searchResult = ServiceHolder.getSecureAnalyticsDataService().search(userName, tableName, query, start, count);
+                    else
+                        searchResult = ServiceHolder.getSecureAnalyticsDataService().search(userName, tableName, query, start, count);
                     //Have to do this because there is possibility of getting sublist which cannot be serialized
                     searchResult = new ArrayList<>(searchResult);
                     resp.getOutputStream().write(GenericUtils.serializeObject(searchResult));
@@ -110,7 +111,7 @@ public class AnalyticsSearchProcessor extends HttpServlet {
     /**
      * Send a drill down request and get the results.
      *
-     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param req  HttpRequest which has the required parameters to do the operation.
      * @param resp HttpResponse which returns the result of the intended operation.
      * @throws ServletException
      * @throws IOException
@@ -142,7 +143,7 @@ public class AnalyticsSearchProcessor extends HttpServlet {
             } else if (operation != null && operation.trim()
                     .equalsIgnoreCase(AnalyticsAPIConstants.DRILL_DOWN_SEARCH_RANGE_COUNT_OPERATION)) {
                 doDrillDownRangeCount(req, resp, securityEnabled, tenantIdParam, userName);
-            }  else {
+            } else {
                 resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : " + operation
                         + " with get request!");
             }
@@ -155,12 +156,13 @@ public class AnalyticsSearchProcessor extends HttpServlet {
         ServletInputStream servletInputStream = req.getInputStream();
         try {
             AnalyticsDrillDownRequest drillDownRequest = (AnalyticsDrillDownRequest) GenericUtils.deserializeObject(servletInputStream);
-            List<SearchResultEntry> drillDownResult;
+            List<SearchResultEntry> drillDownResult = new ArrayList<>();
             if (!securityEnabled) {
-                drillDownResult = ServiceHolder.getAnalyticsDataService().drillDownSearch(
-                        tenantIdParam, drillDownRequest);
+                drillDownResult.addAll(ServiceHolder.getAnalyticsDataService().drillDownSearch(
+                        tenantIdParam, drillDownRequest));
             } else {
-                drillDownResult = ServiceHolder.getSecureAnalyticsDataService().drillDownSearch(userName, drillDownRequest);
+                drillDownResult.addAll(ServiceHolder.getSecureAnalyticsDataService().drillDownSearch(userName,
+                        drillDownRequest));
             }
             GenericUtils.serializeObject(drillDownResult, resp.getOutputStream());
             resp.setStatus(HttpServletResponse.SC_OK);
@@ -170,7 +172,7 @@ public class AnalyticsSearchProcessor extends HttpServlet {
     }
 
     private void doDrillDownSearchCount(HttpServletRequest req, HttpServletResponse resp,
-                                   boolean securityEnabled, int tenantIdParam, String userName)
+                                        boolean securityEnabled, int tenantIdParam, String userName)
             throws IOException {
         ServletInputStream servletInputStream = req.getInputStream();
         try {
@@ -189,13 +191,13 @@ public class AnalyticsSearchProcessor extends HttpServlet {
     }
 
     private void doDrillDownCategories(HttpServletRequest req, HttpServletResponse resp,
-                                   boolean securityEnabled, int tenantIdParam, String userName)
+                                       boolean securityEnabled, int tenantIdParam, String userName)
             throws IOException {
         ServletInputStream servletInputStream = req.getInputStream();
         try {
             CategoryDrillDownRequest drillDownRequest = (CategoryDrillDownRequest) GenericUtils.deserializeObject(servletInputStream);
             SubCategories subCategories;
-            if (!securityEnabled) { 
+            if (!securityEnabled) {
                 subCategories = ServiceHolder.getAnalyticsDataService().drillDownCategories(tenantIdParam, drillDownRequest);
             } else {
                 subCategories = ServiceHolder.getSecureAnalyticsDataService().drillDownCategories(userName, drillDownRequest);
@@ -214,7 +216,7 @@ public class AnalyticsSearchProcessor extends HttpServlet {
         try {
             AnalyticsDrillDownRequest drillDownRequest = (AnalyticsDrillDownRequest) GenericUtils.deserializeObject(servletInputStream);
             List<AnalyticsDrillDownRange> ranges;
-            if (!securityEnabled) { 
+            if (!securityEnabled) {
                 ranges = ServiceHolder.getAnalyticsDataService().drillDownRangeCount(tenantIdParam, drillDownRequest);
             } else {
                 ranges = ServiceHolder.getSecureAnalyticsDataService().drillDownRangeCount(userName, drillDownRequest);

@@ -17,21 +17,14 @@
 -->
 
 <component xmlns="http://products.wso2.org/carbon">
-	<!-- <deployers>
-        <deployer>
-            <directory>eventstreams</directory>
-            <extension>json</extension>
-            <class>org.wso2.carbon.event.stream.core.EventStreamDeployer</class>
-        </deployer>
-    </deployers> -->
     <ManagementPermissions>
         <ManagementPermission>
             <DisplayName>Analytics</DisplayName>
             <ResourceId>/permission/admin/manage/analytics</ResourceId>
         </ManagementPermission>
         <ManagementPermission>
-            <DisplayName>Analytics Dashboard</DisplayName>
-            <ResourceId>/permission/admin/manage/analytics/dashboard</ResourceId>
+            <DisplayName>Analytics Web Service</DisplayName>
+            <ResourceId>/permission/admin/manage/analytics/webservice</ResourceId>
         </ManagementPermission>
     </ManagementPermissions>
 </component>

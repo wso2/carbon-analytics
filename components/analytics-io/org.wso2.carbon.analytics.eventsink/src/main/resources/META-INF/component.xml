@@ -22,6 +22,10 @@
     </deployers>
     <ManagementPermissions>
         <ManagementPermission>
+            <DisplayName>Analytics</DisplayName>
+            <ResourceId>/permission/admin/manage/analytics</ResourceId>
+        </ManagementPermission>
+        <ManagementPermission>
             <DisplayName>Event Sink</DisplayName>
             <ResourceId>/permission/admin/manage/analytics/event-sink/</ResourceId>
         </ManagementPermission>

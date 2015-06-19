@@ -29,7 +29,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * This servlet process the Indexing related operations for remote clients.
+ */
 public class AnalyticsIndexProcessor extends HttpServlet {
+    /**
+     * This focuses on changing the wait time for indexing for the given table.
+     *
+     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param resp HttpResponse which returns the result of the intended operation.
+     * @throws ServletException
+     * @throws IOException
+     */
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String sessionId = req.getHeader(AnalyticsAPIConstants.SESSION_ID);
         if (sessionId == null || sessionId.trim().isEmpty()) {
@@ -56,6 +67,14 @@ public class AnalyticsIndexProcessor extends HttpServlet {
         }
     }
 
+    /**
+     * This focuses on deleting the index data for the given table.
+     *
+     * @param req HttpRequest which has the required parameters to do the operation.
+     * @param resp HttpResponse which returns the result of the intended operation.
+     * @throws ServletException
+     * @throws IOException
+     */
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String sessionId = req.getHeader(AnalyticsAPIConstants.SESSION_ID);
         if (sessionId == null || sessionId.trim().isEmpty()) {
