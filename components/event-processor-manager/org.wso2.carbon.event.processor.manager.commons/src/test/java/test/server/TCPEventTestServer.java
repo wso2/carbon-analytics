@@ -32,14 +32,14 @@ public class TCPEventTestServer {
     public static void main(String[] args) throws Exception {
 
         StreamDefinition streamDefinition = new StreamDefinition();
-        streamDefinition.id("TestStream");
+        streamDefinition.setId("TestStream");
         streamDefinition.attribute("att1", Attribute.Type.INT);
         streamDefinition.attribute("att2", Attribute.Type.FLOAT);
         streamDefinition.attribute("att3", Attribute.Type.STRING);
         streamDefinition.attribute("att4", Attribute.Type.INT);
 
         StreamDefinition streamDefinition1 = new StreamDefinition();
-        streamDefinition1.id("TestStream1");
+        streamDefinition1.setId("TestStream1");
         streamDefinition1.attribute("att1", Attribute.Type.LONG);
         streamDefinition1.attribute("att2", Attribute.Type.FLOAT);
         streamDefinition1.attribute("att3", Attribute.Type.STRING);
@@ -51,7 +51,6 @@ public class TCPEventTestServer {
 
             public int count;
             public long start=System.currentTimeMillis();
-            private Object[] prev=null;
 
             /**
              * @param streamId the stream id for the incoming event
@@ -59,10 +58,7 @@ public class TCPEventTestServer {
              */
             @Override
             public void receive(String streamId, Object[] event) {
-                if (!event[2].equals("Abcdefghijklmnop")) {
-                    System.out.println(streamId + " prev: "+Arrays.deepToString(prev)+" current :  "+Arrays.deepToString(event));
-                }
-                prev=event;
+                    System.out.println(streamId +" :  "+Arrays.deepToString(event));
 
                 count++;
                 if (count % 2000000 == 0) {
@@ -85,5 +81,9 @@ public class TCPEventTestServer {
         eventServer.start();
 
         Thread.sleep(10000);
+
+        System.out.println("shutdown");
+        eventServer.shutdown();
+        Thread.sleep(2000);
     }
 }

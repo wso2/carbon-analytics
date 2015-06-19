@@ -31,14 +31,14 @@ public class TCPEventTestClient {
     public static void main(String[] args) throws Exception {
 
         StreamDefinition streamDefinition = new StreamDefinition();
-        streamDefinition.id("TestStream");
+        streamDefinition.setId("TestStream");
         streamDefinition.attribute("att1", Attribute.Type.INT);
         streamDefinition.attribute("att2", Attribute.Type.FLOAT);
         streamDefinition.attribute("att3", Attribute.Type.STRING);
         streamDefinition.attribute("att4", Attribute.Type.INT);
 
         StreamDefinition streamDefinition1 = new StreamDefinition();
-        streamDefinition1.id("TestStream1");
+        streamDefinition1.setId("TestStream1");
         streamDefinition1.attribute("att1", Attribute.Type.LONG);
         streamDefinition1.attribute("att2", Attribute.Type.FLOAT);
         streamDefinition1.attribute("att3", Attribute.Type.STRING);
@@ -59,10 +59,10 @@ public class TCPEventTestClient {
 //        }
         Thread thread = new Thread(new Runner(TCPEventPublisher));
         thread.start();
-        Thread thread1 = new Thread(new Runner(TCPEventPublisher));
-        thread1.start();
-        Thread thread2 = new Thread(new Runner(TCPEventPublisher));
-        thread2.start();
+//        Thread thread1 = new Thread(new Runner(TCPEventPublisher));
+//        thread1.start();
+//        Thread thread2 = new Thread(new Runner(TCPEventPublisher));
+//        thread2.start();
     }
 
     static class Runner implements Runnable {
@@ -87,15 +87,27 @@ public class TCPEventTestClient {
          */
         @Override
         public void run() {
-            for (int i = 0; i < 1000000000; i++) {
+//            for (int i = 0; i < 1000000000; i++) {
                 try {
                     tcpEventPublisher.sendEvent("TestStream", new Object[]{75, 45f, "Abcdefghijklmnop", 89,}, true);
+
+                    Thread.sleep(10000);
+                    System.out.println("next");
                     tcpEventPublisher.sendEvent("TestStream1", new Object[]{90l, 77f, "Abcdefghijklmnop", 4.5, true}, true);
+                    Thread.sleep(1000);
+                    System.out.println("next");
+                    tcpEventPublisher.sendEvent("TestStream1", new Object[]{90l, 77f, "Abcdefghijklmnop", 4.5, true}, true);
+                    Thread.sleep(1000);
+                    System.out.println("next");
+                    tcpEventPublisher.sendEvent("TestStream1", new Object[]{90l, 77f, "Abcdefghijklmnop", 4.5, true}, true);
+
                 } catch (IOException e) {
                     e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-
-            }
+//
+//            }
         }
     }
 }

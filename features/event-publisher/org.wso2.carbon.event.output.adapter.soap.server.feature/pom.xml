@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.event.output.adapter.soap.server.feature</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon - Output Soap Adapter Server Feature</name>
+    <name>WSO2 Carbon - Event Output SOAP Adapter Server Feature</name>
     <url>http://wso2.org</url>
     <description>This feature contains the bundles required for Output Soap Event Adapter functionality</description>
 
