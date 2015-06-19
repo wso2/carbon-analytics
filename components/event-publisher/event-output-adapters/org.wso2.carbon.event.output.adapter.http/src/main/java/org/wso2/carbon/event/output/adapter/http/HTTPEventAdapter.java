@@ -1,7 +1,7 @@
-/*
+/* NEW MultiThreaded Stat Host
 *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
-*  WSO2 Inc. licenses this file to you under the Apache License,
+*  WSO2 Indc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
 *  in compliance with the License.
 *  You may obtain a copy of the License at
@@ -37,6 +37,7 @@ import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupp
 import org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants;
 
 
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,12 +51,11 @@ public class HTTPEventAdapter implements OutputEventAdapter {
     private String clientMethod;
     private int tenantId;
 
-    private int defaultMaxConnectionsPerHost;
-    private int maxTotalConnections;
     private String contentType;
-    private HttpConnectionManager connectionManager;
-    private HttpClient httpClient;
+    private static HttpConnectionManager connectionManager;
+    private HttpClient httpClient = null;
     private Map<String, String> staticProperties;
+    private HostConfiguration hostConfiguration = null;
 
     public HTTPEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String,
             String> globalProperties) {
@@ -107,23 +107,44 @@ public class HTTPEventAdapter implements OutputEventAdapter {
             }
             executorService = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime, TimeUnit.MILLISECONDS,
                     new LinkedBlockingQueue<Runnable>(jobQueSize));
+
+            //configurations for the httpConnectionManager
+            int defaultMaxConnectionsPerHost;
+            int maxTotalConnections;
+
+            if(globalProperties.get(HTTPEventAdapterConstants.DEFAULT_MAX_CONNECTIONS_PER_HOST) != null){
+                defaultMaxConnectionsPerHost = Integer.parseInt(globalProperties.get(
+                        HTTPEventAdapterConstants.DEFAULT_MAX_CONNECTIONS_PER_HOST));
+            }else{
+                defaultMaxConnectionsPerHost = HTTPEventAdapterConstants.DEFAULT_DEFAULT_MAX_CONNECTIONS_PER_HOST;
+            }
+
+            if(globalProperties.get(HTTPEventAdapterConstants.MAX_TOTAL_CONNECTIONS) != null){
+                maxTotalConnections = Integer.parseInt(globalProperties.get(
+                        HTTPEventAdapterConstants.MAX_TOTAL_CONNECTIONS));
+            }else{
+                maxTotalConnections = HTTPEventAdapterConstants.DEFAULT_MAX_TOTAL_CONNECTIONS;
+            }
+
+            connectionManager = new MultiThreadedHttpConnectionManager();
+            connectionManager.getParams().setDefaultMaxConnectionsPerHost(defaultMaxConnectionsPerHost);
+            connectionManager.getParams().setMaxTotalConnections(maxTotalConnections);
+
         }
 
-        //configurations for the httpConnectionManager
-        if(globalProperties.get(HTTPEventAdapterConstants.DEFAULT_MAX_CONNECTIONS_PER_HOST) != null){
-            defaultMaxConnectionsPerHost = Integer.parseInt(globalProperties.get(
-                    HTTPEventAdapterConstants.DEFAULT_MAX_CONNECTIONS_PER_HOST));
-        }else{
-            defaultMaxConnectionsPerHost = HTTPEventAdapterConstants.DEFAULT_DEFAULT_MAX_CONNECTIONS_PER_HOST;
-        }
+        httpClient = new HttpClient(connectionManager);
 
-        if(globalProperties.get(HTTPEventAdapterConstants.MAX_TOTAL_CONNECTIONS) != null){
-            maxTotalConnections = Integer.parseInt(globalProperties.get(
-                    HTTPEventAdapterConstants.MAX_TOTAL_CONNECTIONS));
-        }else{
-            maxTotalConnections = HTTPEventAdapterConstants.DEFAULT_MAX_TOTAL_CONNECTIONS;
+        String proxyHost = staticProperties.get(HTTPEventAdapterConstants.ADAPTER_PROXY_HOST);
+        String proxyPort = staticProperties.get(HTTPEventAdapterConstants.ADAPTER_PROXY_PORT);
+        if (proxyHost != null && proxyHost.trim().length() > 0) {
+            try {
+                HttpHost host = new HttpHost(proxyHost, Integer.parseInt(proxyPort));
+                this.httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, host);
+            } catch (NumberFormatException e) {
+                log.error("Invalid proxy port: " + proxyPort + ", "
+                        + "ignoring proxy settings for HTTP output event adaptor...");
+            }
         }
-
     }
 
     @Override
@@ -173,19 +194,17 @@ public class HTTPEventAdapter implements OutputEventAdapter {
 
         this.staticProperties = staticProperties;
 
-        if(this.connectionManager != null){
+
+
+        if(this.hostConfiguration != null){
             return;
         }
 
         synchronized (HTTPEventAdapter.class) {
-            if (this.connectionManager != null) {
+            if (this.hostConfiguration != null) {
                 return;
             }
 
-            connectionManager = new MultiThreadedHttpConnectionManager();
-            connectionManager.getParams().setDefaultMaxConnectionsPerHost(defaultMaxConnectionsPerHost);
-            connectionManager.getParams().setMaxTotalConnections(maxTotalConnections);
-            httpClient = new HttpClient(connectionManager);
 
             String messageFormat = eventAdapterConfiguration.getMessageFormat();
             if(messageFormat.equalsIgnoreCase("json")){
@@ -195,6 +214,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
             }else{
                 contentType = "text/xml";
             }
+
         }
 
     }
@@ -276,22 +296,16 @@ public class HTTPEventAdapter implements OutputEventAdapter {
 
             try {
 
-                String proxyHost = staticProperties.get(HTTPEventAdapterConstants.ADAPTER_PROXY_HOST);
-                String proxyPort = staticProperties.get(HTTPEventAdapterConstants.ADAPTER_PROXY_PORT);
-                if (proxyHost != null && proxyHost.trim().length() > 0) {
-                    try {
-                        HttpHost host = new HttpHost(proxyHost, Integer.parseInt(proxyPort));
-                        httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, host);
-                    } catch (NumberFormatException e) {
-                        log.error("Invalid proxy port: " + proxyPort + ", "
-                                + "ignoring proxy settings for HTTP output event adaptor...");
-                    }
-                }
-
                 if (clientMethod.equalsIgnoreCase(HTTPEventAdapterConstants.CONSTANT_HTTP_PUT)) {
                     method = new PutMethod(this.getUrl());
                 } else {
                     method = new PostMethod(this.getUrl());
+                }
+
+                if(hostConfiguration == null) {
+                    URL hostUrl = new URL(this.getUrl());
+                    hostConfiguration = new HostConfiguration();
+                    hostConfiguration.setHost(hostUrl.getHost(), hostUrl.getPort(), hostUrl.getProtocol());
                 }
 
                 method.setRequestEntity(new StringRequestEntity(this.getPayload(), contentType, "UTF-8"));
@@ -308,8 +322,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                     }
                 }
 
-                this.getHttpClient().executeMethod(method);
-
+                this.getHttpClient().executeMethod(hostConfiguration, method);
 
             }catch (UnknownHostException e) {
                 EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), this.getPayload(),

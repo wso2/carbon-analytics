@@ -50,5 +50,5 @@ public class HTTPEventAdapterConstants {
     public static final String DEFAULT_MAX_CONNECTIONS_PER_HOST = "defaultMaxConnectionsPerHost";
     public static final int DEFAULT_DEFAULT_MAX_CONNECTIONS_PER_HOST = 2;
     public static final String MAX_TOTAL_CONNECTIONS = "maxTotalConnections";
-    public static final int DEFAULT_MAX_TOTAL_CONNECTIONS = 2;
+    public static final int DEFAULT_MAX_TOTAL_CONNECTIONS = 20;
 }
