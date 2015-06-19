@@ -1,7 +1,7 @@
-/* NEW MultiThreaded Stat Host
+/*
 *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
-*  WSO2 Indc. licenses this file to you under the Apache License,
+*  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
 *  in compliance with the License.
 *  You may obtain a copy of the License at
@@ -18,16 +18,14 @@
 package org.wso2.carbon.event.output.adapter.http;
 
 import org.apache.axiom.om.util.Base64;
-
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.http.HttpHost;
-
 import org.apache.http.conn.params.ConnRoutePNames;
+
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
@@ -35,7 +33,6 @@ import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants;
-
 
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -54,7 +51,6 @@ public class HTTPEventAdapter implements OutputEventAdapter {
     private String contentType;
     private static HttpConnectionManager connectionManager;
     private HttpClient httpClient = null;
-    private Map<String, String> staticProperties;
     private HostConfiguration hostConfiguration = null;
 
     public HTTPEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String,
@@ -108,7 +104,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
             executorService = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime, TimeUnit.MILLISECONDS,
                     new LinkedBlockingQueue<Runnable>(jobQueSize));
 
-            //configurations for the httpConnectionManager
+            //configurations for the httpConnectionManager which will be shared by every http adapter
             int defaultMaxConnectionsPerHost;
             int maxTotalConnections;
 
@@ -177,8 +173,6 @@ public class HTTPEventAdapter implements OutputEventAdapter {
 
     private void checkHTTPClientInit(
             Map<String, String> staticProperties) {
-
-        this.staticProperties = staticProperties;
 
         if(this.httpClient != null){
             return;
