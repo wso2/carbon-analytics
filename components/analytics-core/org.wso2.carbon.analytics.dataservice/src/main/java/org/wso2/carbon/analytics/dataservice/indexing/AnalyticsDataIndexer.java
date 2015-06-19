@@ -65,7 +65,7 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.TotalHitCountCollector;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.SingleInstanceLockFactory;
+import org.apache.lucene.store.NoLockFactory;
 import org.apache.lucene.util.Version;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceImpl;
@@ -1319,28 +1319,19 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
         return indices;
     }
-    
-    private String generateDirPath(String tableId) {
-        return INDEX_DATA_FS_BASE_PATH + tableId;
-    }
 
     private String generateDirPath(String basePath, String tableId) {
         return basePath + tableId;
     }
 
     private Directory createDirectory(String tableId) throws AnalyticsIndexException {
-        String path = this.generateDirPath(tableId);
-        try {
-            return new AnalyticsDirectory(this.getFileSystem(), new SingleInstanceLockFactory(), path);
-        } catch (AnalyticsException e) {
-            throw new AnalyticsIndexException("Error in creating directory: " + e.getMessage(), e);
-        }
+        return this.createDirectory(INDEX_DATA_FS_BASE_PATH, tableId);
     }
-    private Directory createDirectory(String basePath, String tableId) throws
-                                                                       AnalyticsIndexException {
+    
+    private Directory createDirectory(String basePath, String tableId) throws AnalyticsIndexException {
         String path = this.generateDirPath(basePath, tableId);
         try {
-            return new AnalyticsDirectory(this.getFileSystem(), new SingleInstanceLockFactory(), path);
+            return new AnalyticsDirectory(this.getFileSystem(), NoLockFactory.getNoLockFactory(), path);
         } catch (AnalyticsException e) {
             throw new AnalyticsIndexException("Error in creating directory: " + e.getMessage(), e);
         }
