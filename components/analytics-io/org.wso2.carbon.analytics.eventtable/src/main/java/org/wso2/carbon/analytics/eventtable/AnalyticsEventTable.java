@@ -203,8 +203,9 @@ public class AnalyticsEventTable implements EventTable {
         return finder.find(matchingEvent, null, null);
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    public void add(ComplexEventChunk<StreamEvent> addingEventChunk) {
+    public void add(ComplexEventChunk addingEventChunk) {
         this.checkAndProcessPostInit();
         addingEventChunk.reset();
         AnalyticsEventTableUtils.putEvents(this.tenantId, this.tableName, 
@@ -226,8 +227,9 @@ public class AnalyticsEventTable implements EventTable {
         return finder.contains(matchingEvent, null);
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
-    public void delete(ComplexEventChunk<StreamEvent> deletingEventChunk, Operator operator) {
+    public void delete(ComplexEventChunk deletingEventChunk, Operator operator) {
         operator.delete(deletingEventChunk, null);
     }
 
@@ -236,8 +238,9 @@ public class AnalyticsEventTable implements EventTable {
         return tableDefinition;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
-    public void update(ComplexEventChunk<StreamEvent> updatingEventChunk, Operator operator, int[] mappingPosition) {
+    public void update(ComplexEventChunk updatingEventChunk, Operator operator, int[] mappingPosition) {
         operator.update(updatingEventChunk, null, null);
     }
     
@@ -556,17 +559,17 @@ public class AnalyticsEventTable implements EventTable {
                 throw new IllegalStateException("Error in executing lucene query: " + e.getMessage(), e);
             }
         }
-    
+
+        @SuppressWarnings("rawtypes")
         @Override
-        public void delete(ComplexEventChunk<StreamEvent> deletingEventChunk, Object candidateEvents) {
-            throw new IllegalStateException("cannot delete records in analytics event tables.");
+        public void delete(ComplexEventChunk deletingEventChunk, Object candidateEvents) {            
         }
-    
+
+        @SuppressWarnings("rawtypes")
         @Override
-        public void update(ComplexEventChunk<StreamEvent> updatingEventChunk, Object candidateEvents, int[] mappingPosition) {
-            AnalyticsEventTableUtils.putEvents(this.tenantId, this.tableName, this.attrs, updatingEventChunk);
+        public void update(ComplexEventChunk updatingEventChunk, Object candidateEvents, int[] mappingPosition) {            
         }
     
     }
-    
+
 }
