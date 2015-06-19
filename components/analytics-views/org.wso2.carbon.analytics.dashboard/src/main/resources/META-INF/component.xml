@@ -26,6 +26,10 @@
     </deployers> -->
     <ManagementPermissions>
         <ManagementPermission>
+            <DisplayName>Analytics</DisplayName>
+            <ResourceId>/permission/admin/manage/analytics</ResourceId>
+        </ManagementPermission>
+        <ManagementPermission>
             <DisplayName>Analytics Dashboard</DisplayName>
             <ResourceId>/permission/admin/manage/analytics/dashboard</ResourceId>
         </ManagementPermission>

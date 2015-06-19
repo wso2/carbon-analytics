@@ -19,7 +19,7 @@
 <component xmlns="http://products.wso2.org/carbon">
     <ManagementPermissions>
         <ManagementPermission>
-            <DisplayName>Analytics Data</DisplayName>
+            <DisplayName>Analytics</DisplayName>
             <ResourceId>/permission/admin/manage/analytics</ResourceId>
         </ManagementPermission>
         <!--Table related permissions-->

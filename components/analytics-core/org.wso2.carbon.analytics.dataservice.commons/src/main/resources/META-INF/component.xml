@@ -22,5 +22,4 @@
             <ResourceId>/permission/admin/manage/analytics</ResourceId>
         </ManagementPermission>
     </ManagementPermissions>
-
 </component>
