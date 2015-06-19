@@ -121,10 +121,18 @@ public class AnalyticsProcessorAdminService extends AbstractAdmin {
     public void updateScript(String scriptName, String scriptContent, String cronExpression)
             throws AnalyticsProcessorAdminException {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        AnalyticsScriptDto scriptDto = getScript(scriptName);
         try {
-            ServiceHolder.getAnalyticsProcessorService().updateScript(tenantId, scriptName, scriptContent, cronExpression);
-        } catch (AnalyticsPersistenceException e) {
+            ServiceHolder.getAnalyticsProcessorService().updateScript(tenantId, scriptName, scriptContent,
+                    cronExpression);
+        } catch (Exception e) {
             log.error("Error while updating the script : " + scriptName, e);
+            try {
+                ServiceHolder.getAnalyticsProcessorService().updateScript(tenantId, scriptName,
+                        scriptDto.getScriptContent(), scriptDto.getCronExpression());
+            } catch (AnalyticsPersistenceException e1) {
+                throw new AnalyticsProcessorAdminException("Error while reverting to previous state for : " + scriptName, e);
+            }
             throw new AnalyticsProcessorAdminException("Error while updating the script : " + scriptName, e);
         }
     }
@@ -141,7 +149,7 @@ public class AnalyticsProcessorAdminService extends AbstractAdmin {
             List<AnalyticsScript> analyticsScripts = ServiceHolder.getAnalyticsProcessorService().getAllScripts(tenantId);
             AnalyticsScriptDto[] scriptDtos = new AnalyticsScriptDto[analyticsScripts.size()];
             int index = 0;
-            for (AnalyticsScript script :  analyticsScripts){
+            for (AnalyticsScript script : analyticsScripts) {
                 scriptDtos[index] = getAnalyticsScriptDto(script);
                 index++;
             }
@@ -170,7 +178,7 @@ public class AnalyticsProcessorAdminService extends AbstractAdmin {
         }
     }
 
-    private AnalyticsScriptDto getAnalyticsScriptDto(AnalyticsScript analyticsScript){
+    private AnalyticsScriptDto getAnalyticsScriptDto(AnalyticsScript analyticsScript) {
         AnalyticsScriptDto scriptDto = new AnalyticsScriptDto(analyticsScript.getName());
         scriptDto.setScriptContent(analyticsScript.getScriptContent());
         scriptDto.setCronExpression(analyticsScript.getCronExpression());

@@ -52,7 +52,7 @@ public class AnalyticsExecutionClient {
         option.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING, cookie);
     }
 
-    public AnalyticsExecutionClient(){
+    public AnalyticsExecutionClient() {
 
     }
 
@@ -94,11 +94,20 @@ public class AnalyticsExecutionClient {
 
     public void updateScript(String scriptName, String scriptContent, String cron) throws
             RemoteException, AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
+        String currentSavedContent = null;
         if (scriptContent != null) {
+            currentSavedContent = stub.getScript(scriptName).getScriptContent();
             stub.updateScriptContent(scriptName, scriptContent);
         }
         if (cron != null) {
-            stub.updateScriptTask(scriptName, cron);
+            try {
+                stub.updateScriptTask(scriptName, cron);
+            } catch (Exception ex) {
+                if (currentSavedContent != null && !currentSavedContent.trim().isEmpty()) {
+                    stub.updateScriptContent(scriptName, currentSavedContent);
+                }
+                throw new AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException(ex.getMessage(), ex);
+            }
         }
     }
 
@@ -110,7 +119,7 @@ public class AnalyticsExecutionClient {
         meta.addProperty("responseMessage", "EXECUTED QUERY : " + query);
         JsonArray colArray = new JsonArray();
 
-        if (res != null && res.getColumnNames()!= null) {
+        if (res != null && res.getColumnNames() != null) {
             for (String col : res.getColumnNames()) {
                 if (col != null) {
                     colArray.add(new JsonPrimitive(col));

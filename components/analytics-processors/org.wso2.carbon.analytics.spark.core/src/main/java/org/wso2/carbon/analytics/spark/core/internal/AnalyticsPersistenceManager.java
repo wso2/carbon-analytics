@@ -94,7 +94,12 @@ public class AnalyticsPersistenceManager {
                 resource.setContent(getConfiguration(script));
                 resource.setMediaType(AnalyticsConstants.ANALYTICS_MEDIA_TYPE);
                 userRegistry.put(scriptLocation, resource);
-                scheduleTask(tenantId, script);
+                try {
+                    scheduleTask(tenantId, script);
+                }catch (AnalyticsPersistenceException ex){
+                    deleteScript(tenantId, scriptName);
+                    throw ex;
+                }
             } else {
                 throw new AnalyticsPersistenceException("Already a script exists with same name : " + scriptName
                         + " for tenantId :" + tenantId);
@@ -168,7 +173,7 @@ public class AnalyticsPersistenceManager {
             try {
                 ServiceHolder.getTaskManager().registerTask(taskInfo);
                 ServiceHolder.getTaskManager().rescheduleTask(taskInfo.getName());
-            } catch (TaskException e) {
+            } catch (Exception e) {
                 throw new AnalyticsPersistenceException("Error while trying to schedule task for script : "
                         + script.getName() + " for tenant: " + tenantId + " with cron expression :"
                         + script.getCronExpression() + " ." + e.getMessage(), e);
