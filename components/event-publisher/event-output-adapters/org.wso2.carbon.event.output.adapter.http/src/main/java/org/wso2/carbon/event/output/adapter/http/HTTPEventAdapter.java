@@ -131,20 +131,6 @@ public class HTTPEventAdapter implements OutputEventAdapter {
             connectionManager.getParams().setMaxTotalConnections(maxTotalConnections);
 
         }
-
-        httpClient = new HttpClient(connectionManager);
-
-        String proxyHost = staticProperties.get(HTTPEventAdapterConstants.ADAPTER_PROXY_HOST);
-        String proxyPort = staticProperties.get(HTTPEventAdapterConstants.ADAPTER_PROXY_PORT);
-        if (proxyHost != null && proxyHost.trim().length() > 0) {
-            try {
-                HttpHost host = new HttpHost(proxyHost, Integer.parseInt(proxyPort));
-                this.httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, host);
-            } catch (NumberFormatException e) {
-                log.error("Invalid proxy port: " + proxyPort + ", "
-                        + "ignoring proxy settings for HTTP output event adaptor...");
-            }
-        }
     }
 
     @Override
@@ -194,17 +180,28 @@ public class HTTPEventAdapter implements OutputEventAdapter {
 
         this.staticProperties = staticProperties;
 
-
-
-        if(this.hostConfiguration != null){
+        if(this.httpClient != null){
             return;
         }
 
         synchronized (HTTPEventAdapter.class) {
-            if (this.hostConfiguration != null) {
+            if (this.httpClient != null) {
                 return;
             }
 
+            httpClient = new HttpClient(connectionManager);
+
+            String proxyHost = staticProperties.get(HTTPEventAdapterConstants.ADAPTER_PROXY_HOST);
+            String proxyPort = staticProperties.get(HTTPEventAdapterConstants.ADAPTER_PROXY_PORT);
+            if (proxyHost != null && proxyHost.trim().length() > 0) {
+                try {
+                    HttpHost host = new HttpHost(proxyHost, Integer.parseInt(proxyPort));
+                    this.httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, host);
+                } catch (NumberFormatException e) {
+                    log.error("Invalid proxy port: " + proxyPort + ", "
+                            + "ignoring proxy settings for HTTP output event adaptor...");
+                }
+            }
 
             String messageFormat = eventAdapterConfiguration.getMessageFormat();
             if(messageFormat.equalsIgnoreCase("json")){
