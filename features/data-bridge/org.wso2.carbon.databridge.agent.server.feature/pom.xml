@@ -79,7 +79,7 @@
                                     org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.agent:${carbon.analytics.common.version}
                                 </bundleDef>
                                 <bundleDef>commons-pool.wso2:commons-pool</bundleDef>
-                                <bundleDef>org.apache.httpcomponents.wso2:httpclient</bundleDef>
+                                <bundleDef>org.wso2.apache.httpcomponents:httpclient</bundleDef>
                                 <bundleDef>org.apache.httpcomponents.wso2:httpcore</bundleDef>
                                 <bundleDef>com.googlecode.disruptor.wso2:disruptor</bundleDef>
                             </bundles>
