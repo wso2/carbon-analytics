@@ -309,24 +309,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         }
         return indexOps;
     }
-    
-    private Collection<List<IndexOperation>> extractIndexOpBatches(Iterator<IndexOperation> indexOpItr, int count) {
-        Map<String, List<IndexOperation>> opBatches = new HashMap<>();
-        List<IndexOperation> opBatch;
-        String identity;
-        IndexOperation indexOp;
-        for (int i = 0; i < count && indexOpItr.hasNext(); i++) {
-            indexOp = indexOpItr.next();
-            identity = this.generateTableId(indexOp.getTenantId(), indexOp.getTableName());
-            opBatch = opBatches.get(identity);
-            if (opBatch == null) {
-                opBatch = new ArrayList<IndexOperation>();
-                opBatches.put(identity, opBatch);
-            }
-            opBatch.add(indexOp);
-        }
-        return opBatches.values();
-    }
 
     private Collection<List<IndexOperation>> extractIndexOpBatches(Iterator<IndexOperation> indexOps) {
         Map<String, List<IndexOperation>> opBatches = new HashMap<>();
@@ -418,7 +400,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     private void processIndexUpdateOperations(int shardIndex) throws AnalyticsException {
         Iterator<Record> indexMetaRecordItr = this.loadIndexOperationUpdateRecords(shardIndex);
         IndexMetaRecordIndexOperationIterator indexOperationRecordItr = new IndexMetaRecordIndexOperationIterator(indexMetaRecordItr);
-        int i = 0;
         while (indexOperationRecordItr.hasNext()) {
             Collection<List<IndexOperation>> indexUpdateOpBatches = this.extractIndexOpBatches(
                     indexOperationRecordItr);
@@ -538,6 +519,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
                 this.generateShardedIndexDataTableName(SHARD_INDEX_DATA_DELETE_RECORDS_TABLE_PREFIX, shardIndex));
     }
     
+    @SuppressWarnings("unchecked")
     private Iterator<Record> loadAllIndexOperationUpdateRecords() throws AnalyticsException {
         Iterator<Record>[] itrs = new Iterator[this.getShardCount()];
         for (int i = 0; i < this.getShardCount(); i++) {
@@ -546,6 +528,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         return IteratorUtils.chainedIterator(itrs);
     }
     
+    @SuppressWarnings("unchecked")
     private Iterator<Record> loadAllIndexOperationDeleteRecords() throws AnalyticsException {
         Iterator<Record>[] itrs = new Iterator[this.getShardCount()];
         for (int i = 0; i < this.getShardCount(); i++) {

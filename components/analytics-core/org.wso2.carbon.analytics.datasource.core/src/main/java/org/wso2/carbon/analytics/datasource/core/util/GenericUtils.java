@@ -164,7 +164,6 @@ public class GenericUtils {
         return secondaryBuffer.array();
     }
 
-    @SuppressWarnings("unchecked")
     public static byte[] encodeElement(String name, Object value) throws AnalyticsException {
         ByteBuffer buffer = ByteBuffer.allocate(calculateBufferSizePerElement(name, value));
         String strVal;
