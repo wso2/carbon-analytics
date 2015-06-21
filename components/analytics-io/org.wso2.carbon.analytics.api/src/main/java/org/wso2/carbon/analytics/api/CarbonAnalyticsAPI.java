@@ -89,6 +89,12 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
+    public void createTable(int tenantId, String recordStoreName, String tableName)
+            throws AnalyticsException {
+        //TODO : need to implement
+    }
+
+    @Override
     public void clearIndexData(int tenantId, String tableName) throws AnalyticsIndexException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             ServiceHolder.getAnalyticsDataService().clearIndexData(tenantId, tableName);
