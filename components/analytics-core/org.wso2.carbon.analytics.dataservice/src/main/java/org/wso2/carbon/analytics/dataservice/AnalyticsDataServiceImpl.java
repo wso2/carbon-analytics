@@ -225,6 +225,12 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     @Override
+    public void createTable(int tenantId, String recordStoreName, String tableName)
+            throws AnalyticsException {
+        //TODO : needs to be implemented.
+    }
+
+    @Override
     public void clearIndexData(int tenantId, String tableName) throws AnalyticsIndexException {
         this.getIndexer().clearIndexData(tenantId, tableName);
     }
