@@ -50,15 +50,15 @@ public class ManagementModeConfigurationLoader {
         while (iterator.hasNext()) {
             OMElement processingMode = iterator.next();
             if (processingMode.getAttribute(new QName(ConfigurationConstants.PROCESSING_MODE_NAME_ATTRIBUTE)) == null) {
-                throw new ManagementConfigurationException("Invalid Mode Element with no mode attribute " + ConfigurationConstants.PROCESSING_MODE_NAME_ATTRIBUTE + " in file " + ConfigurationConstants.CEP_MANAGEMENT_XML);
+                throw new ManagementConfigurationException("Invalid Mode Element with no mode attribute '" + ConfigurationConstants.PROCESSING_MODE_NAME_ATTRIBUTE + "' in file " + ConfigurationConstants.CEP_MANAGEMENT_XML);
             }
+            String attribute = processingMode.getAttribute(new QName(ConfigurationConstants.PROCESSING_MODE_NAME_ATTRIBUTE)).getAttributeValue();
 
             if (processingMode.getAttribute(new QName(ConfigurationConstants.ENABLE_ATTRIBUTE)) == null) {
-                throw new ManagementConfigurationException("Invalid Mode Element with no mode attribute " + ConfigurationConstants.ENABLE_ATTRIBUTE + " in file " + ConfigurationConstants.CEP_MANAGEMENT_XML);
+                throw new ManagementConfigurationException("Invalid Mode Element '"+attribute+"' with no mode attribute '" + ConfigurationConstants.ENABLE_ATTRIBUTE + "' in file " + ConfigurationConstants.CEP_MANAGEMENT_XML);
             }
-
-            String attribute = processingMode.getAttribute(new QName(ConfigurationConstants.PROCESSING_MODE_NAME_ATTRIBUTE)).getAttributeValue();
             String enabled = processingMode.getAttribute(new QName(ConfigurationConstants.ENABLE_ATTRIBUTE)).getAttributeValue();
+
             if (enabled.equalsIgnoreCase("true")) {
                 if (attribute.equalsIgnoreCase(ConfigurationConstants.PROCESSING_MODE_HA)) {
                     managementModeInfo.setMode(Mode.HA);

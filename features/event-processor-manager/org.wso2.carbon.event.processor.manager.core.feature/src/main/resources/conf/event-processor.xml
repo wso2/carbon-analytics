@@ -15,7 +15,7 @@
 
 <eventProcessorConfiguration>
 
-    <mode name="SingleNode">
+    <mode name="SingleNode"  enable="true">
         <persistence enable="false">
             <persistenceIntervalInMinutes>15</persistenceIntervalInMinutes>
             <persisterSchedulerPoolSize>10</persisterSchedulerPoolSize>
