@@ -33,7 +33,7 @@ public class StormReceiverCoordinator {
             ILock lock = hazelcastInstance.getLock("StormReceiverCoordinator");
             boolean isCoordinator = lock.tryLock();
             if(isCoordinator){
-                log.info(isCoordinator+"Node became Storm Receiver Coordinator");
+                log.info("Node became Storm Receiver Coordinator");
             }
             EventManagementServiceValueHolder.getCarbonEventManagementService().getEventReceiverManagementService().setReceiverCoordinator(isCoordinator);
         }
