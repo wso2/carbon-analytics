@@ -76,8 +76,8 @@ public class WSO2EventOutputMapper implements OutputMapper {
     }*/
 
     public WSO2EventOutputMapper(EventPublisherConfiguration eventPublisherConfiguration,
-            Map<String, Integer> propertyPositionMap,
-            int tenantId, StreamDefinition inputStreamDefinition) throws
+                                 Map<String, Integer> propertyPositionMap,
+                                 int tenantId, StreamDefinition inputStreamDefinition) throws
             EventPublisherConfigurationException {
         this.eventPublisherConfiguration = eventPublisherConfiguration;
         this.propertyPositionMap = propertyPositionMap;
@@ -86,7 +86,7 @@ public class WSO2EventOutputMapper implements OutputMapper {
 
         //try {
         wso2EventOutputMapping = (WSO2EventOutputMapping) eventPublisherConfiguration.getOutputMapping();
-        if(wso2EventOutputMapping.getToEventName()==null || wso2EventOutputMapping.getToEventName().isEmpty() || wso2EventOutputMapping.getToEventVersion()==null || wso2EventOutputMapping.getToEventVersion().isEmpty()){
+        if (wso2EventOutputMapping.getToEventName() == null || wso2EventOutputMapping.getToEventName().isEmpty() || wso2EventOutputMapping.getToEventVersion() == null || wso2EventOutputMapping.getToEventVersion().isEmpty()) {
             wso2EventOutputMapping.setToEventName(inputStreamDefinition.getName());
             wso2EventOutputMapping.setToEventVersion(inputStreamDefinition.getVersion());
         }
@@ -124,7 +124,7 @@ public class WSO2EventOutputMapper implements OutputMapper {
         for (; metaWSO2EventOutputPropertyConfigurationIterator.hasNext(); ) {
             EventOutputProperty wso2EventOutputProperty = metaWSO2EventOutputPropertyConfigurationIterator.next();
             if (!propertyPositionMap.containsKey(wso2EventOutputProperty.getValueOf())) {
-                throw new EventPublisherStreamValidationException("Property " + wso2EventOutputProperty.getValueOf() + " is not in the input stream definition. ",inputStreamDefinition.getStreamId());
+                throw new EventPublisherStreamValidationException("Property " + wso2EventOutputProperty.getValueOf() + " is not in the input stream definition. ", inputStreamDefinition.getStreamId());
             }
         }
 
@@ -133,7 +133,7 @@ public class WSO2EventOutputMapper implements OutputMapper {
         for (; correlationWSO2EventOutputPropertyConfigurationIterator.hasNext(); ) {
             EventOutputProperty wso2EventOutputProperty = correlationWSO2EventOutputPropertyConfigurationIterator.next();
             if (!propertyPositionMap.containsKey(wso2EventOutputProperty.getValueOf())) {
-                throw new EventPublisherStreamValidationException("Property " + wso2EventOutputProperty.getValueOf() + " is not in the input stream definition. ",inputStreamDefinition.getStreamId());
+                throw new EventPublisherStreamValidationException("Property " + wso2EventOutputProperty.getValueOf() + " is not in the input stream definition. ", inputStreamDefinition.getStreamId());
             }
         }
 
@@ -149,8 +149,8 @@ public class WSO2EventOutputMapper implements OutputMapper {
     }
 
     private void addAttributeToStreamDefinition(StreamDefinition streamDefinition,
-            List<EventOutputProperty> wso2EventOutputPropertyList,
-            String propertyType) {
+                                                List<EventOutputProperty> wso2EventOutputPropertyList,
+                                                String propertyType) {
 
         if (propertyType.equals("meta")) {
             for (EventOutputProperty wso2EventOutputProperty : wso2EventOutputPropertyList) {
@@ -170,9 +170,11 @@ public class WSO2EventOutputMapper implements OutputMapper {
     }
 
     @Override
-    public Object convertToMappedInputEvent(Object[] eventData)
+    public Object convertToMappedInputEvent(org.wso2.siddhi.core.event.Event event)
             throws EventPublisherConfigurationException {
         Event eventObject = new Event();
+        eventObject.setTimeStamp(event.getTimestamp());
+        Object[] eventData = event.getData();
         if (eventData.length > 0) {
 
             eventObject.setStreamId(wso2EventOutputMapping.getToEventName() + EventPublisherConstants.STREAM_ID_SEPERATOR + wso2EventOutputMapping.getToEventVersion());
@@ -212,11 +214,13 @@ public class WSO2EventOutputMapper implements OutputMapper {
     }
 
     @Override
-    public Object convertToTypedInputEvent(Object[] eventData) throws EventPublisherConfigurationException {
+    public Object convertToTypedInputEvent(org.wso2.siddhi.core.event.Event event) throws EventPublisherConfigurationException {
 
         Event eventObject = new Event();
         eventObject.setStreamId(wso2EventOutputMapping.getToEventName() + EventPublisherConstants.STREAM_ID_SEPERATOR + wso2EventOutputMapping.getToEventVersion());
+        eventObject.setTimeStamp(event.getTimestamp());
 
+        Object[] eventData = event.getData();
         if (noOfMetaData > 0) {
             List<Object> metaData = new ArrayList<Object>();
             metaData.addAll(Arrays.asList(eventData).subList(0, noOfMetaData));

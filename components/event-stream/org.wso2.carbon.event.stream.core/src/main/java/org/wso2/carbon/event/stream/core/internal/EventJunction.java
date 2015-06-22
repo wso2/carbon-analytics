@@ -53,7 +53,6 @@ public class EventJunction implements EventProducerCallback {
     listeners of this junction.
     output events can be towards both event formatter and siddhi runtime.
      */
-    private CopyOnWriteArrayList<RawEventConsumer> rawEventConsumers;
     private CopyOnWriteArrayList<SiddhiEventConsumer> siddhiEventConsumers;
     private CopyOnWriteArrayList<WSO2EventConsumer> wso2EventConsumers;
     private CopyOnWriteArrayList<WSO2EventListConsumer> wso2EventListConsumers;
@@ -61,7 +60,6 @@ public class EventJunction implements EventProducerCallback {
     public EventJunction(StreamDefinition streamDefinition) {
         this.streamDefinition = streamDefinition;
         this.producers = new CopyOnWriteArrayList<EventProducer>();
-        this.rawEventConsumers = new CopyOnWriteArrayList<RawEventConsumer>();
         this.siddhiEventConsumers = new CopyOnWriteArrayList<SiddhiEventConsumer>();
         this.wso2EventConsumers = new CopyOnWriteArrayList<WSO2EventConsumer>();
         this.wso2EventListConsumers = new CopyOnWriteArrayList<WSO2EventListConsumer>();
@@ -79,19 +77,6 @@ public class EventJunction implements EventProducerCallback {
 
     public boolean removeConsumer(SiddhiEventConsumer consumer) {
         return siddhiEventConsumers.remove(consumer);
-    }
-
-    public void addConsumer(RawEventConsumer consumer) {
-        if (!rawEventConsumers.contains(consumer)) {
-            log.info("Consumer added to the junction. Stream:" + getStreamDefinition().getStreamId());
-            rawEventConsumers.add(consumer);
-        } else {
-            log.error("Consumer already exist in the junction: " + streamDefinition.getStreamId());
-        }
-    }
-
-    public boolean removeConsumer(RawEventConsumer consumer) {
-        return rawEventConsumers.remove(consumer);
     }
 
     public void addConsumer(WSO2EventConsumer consumer) {
@@ -150,21 +135,11 @@ public class EventJunction implements EventProducerCallback {
 
 
     @Override
-    public void sendEventData(Object[] data) {
+    public void sendEvent(org.wso2.siddhi.core.event.Event event) {
         if (!siddhiEventConsumers.isEmpty()) {
             for (SiddhiEventConsumer consumer : siddhiEventConsumers) {
                 try {
-                    consumer.consumeEventData(data);
-                } catch (Exception e) {
-                    log.error("Error while dispatching events: " + e.getMessage(), e);
-                }
-            }
-        }
-
-        if (!rawEventConsumers.isEmpty()) {
-            for (RawEventConsumer consumer : rawEventConsumers) {
-                try {
-                    consumer.consumeEventData(data);
+                    consumer.consumeEvent(event);
                 } catch (Exception e) {
                     log.error("Error while dispatching events: " + e.getMessage(), e);
                 }
@@ -172,12 +147,12 @@ public class EventJunction implements EventProducerCallback {
         }
 
         if (!wso2EventConsumers.isEmpty() || !wso2EventListConsumers.isEmpty()) {
-            Event event = EventConverter.convertToWso2Event(data, streamDefinition);
+            Event convertedEvent = EventConverter.convertToWSO2Event(event, streamDefinition);
 
             if (!wso2EventConsumers.isEmpty()) {
                 for (WSO2EventConsumer consumer : wso2EventConsumers) {
                     try {
-                        consumer.onEvent(event);
+                        consumer.onEvent(convertedEvent);
                     } catch (Exception e) {
                         log.error("Error while dispatching events: " + e.getMessage(), e);
                     }
@@ -187,7 +162,7 @@ public class EventJunction implements EventProducerCallback {
             if (!wso2EventListConsumers.isEmpty()) {
                 for (WSO2EventListConsumer consumer : wso2EventListConsumers) {
                     try {
-                        consumer.onEvent(event);
+                        consumer.onEvent(convertedEvent);
                     } catch (Exception e) {
                         log.error("Error while dispatching events: " + e.getMessage(), e);
                     }
@@ -200,25 +175,13 @@ public class EventJunction implements EventProducerCallback {
     @Override
     public void sendEvent(Event event) {
 
-        if (!siddhiEventConsumers.isEmpty() || !rawEventConsumers.isEmpty()) {
-            Object[] eventData = EventConverter.convertToEventData(event, metaFlag, correlationFlag, payloadFlag, attributesCount);
-
-            if (!siddhiEventConsumers.isEmpty()) {
-                for (SiddhiEventConsumer consumer : siddhiEventConsumers) {
-                    try {
-                        consumer.consumeEventData(eventData);
-                    } catch (Exception e) {
-                        log.error("Error while dispatching events: " + e.getMessage(), e);
-                    }
-                }
-            }
-            if (!rawEventConsumers.isEmpty()) {
-                for (RawEventConsumer consumer : rawEventConsumers) {
-                    try {
-                        consumer.consumeEventData(eventData);
-                    } catch (Exception e) {
-                        log.error("Error while dispatching events: " + e.getMessage(), e);
-                    }
+        if (!siddhiEventConsumers.isEmpty()) {
+            org.wso2.siddhi.core.event.Event convertedEvent = EventConverter.convertToEvent(event, metaFlag, correlationFlag, payloadFlag, attributesCount);
+            for (SiddhiEventConsumer consumer : siddhiEventConsumers) {
+                try {
+                    consumer.consumeEvent(convertedEvent);
+                } catch (Exception e) {
+                    log.error("Error while dispatching events: " + e.getMessage(), e);
                 }
             }
         }
@@ -249,26 +212,13 @@ public class EventJunction implements EventProducerCallback {
     @Override
     public void sendEvents(List<Event> events) {
         for (Event event : events) {
-            if (!siddhiEventConsumers.isEmpty() || !rawEventConsumers.isEmpty()) {
-
-                Object[] eventData = EventConverter.convertToEventData(event, metaFlag, correlationFlag, payloadFlag, attributesCount);
-
-                if (!siddhiEventConsumers.isEmpty()) {
-                    for (SiddhiEventConsumer consumer : siddhiEventConsumers) {
-                        try {
-                            consumer.consumeEventData(eventData);
-                        } catch (Exception e) {
-                            log.error("Error while dispatching events: " + e.getMessage(), e);
-                        }
-                    }
-                }
-                if (!rawEventConsumers.isEmpty()) {
-                    for (RawEventConsumer consumer : rawEventConsumers) {
-                        try {
-                            consumer.consumeEventData(eventData);
-                        } catch (Exception e) {
-                            log.error("Error while dispatching events: " + e.getMessage(), e);
-                        }
+            if (!siddhiEventConsumers.isEmpty()) {
+                org.wso2.siddhi.core.event.Event convertedEvent = EventConverter.convertToEvent(event, metaFlag, correlationFlag, payloadFlag, attributesCount);
+                for (SiddhiEventConsumer consumer : siddhiEventConsumers) {
+                    try {
+                        consumer.consumeEvent(convertedEvent);
+                    } catch (Exception e) {
+                        log.error("Error while dispatching events: " + e.getMessage(), e);
                     }
                 }
             }
@@ -314,29 +264,19 @@ public class EventJunction implements EventProducerCallback {
 
         for (org.wso2.siddhi.core.event.Event event : events) {
 
-            if (!rawEventConsumers.isEmpty()) {
-                for (RawEventConsumer consumer : rawEventConsumers) {
-                    try {
-                        consumer.consumeEventData(event.getData());
-                    } catch (Exception e) {
-                        log.error("Error while dispatching events: " + e.getMessage(), e);
-                    }
-                }
-            }
-
             if (!wso2EventConsumers.isEmpty() || !wso2EventListConsumers.isEmpty()) {
-                Event outEvent = EventConverter.convertToWso2Event(event.getData(), streamDefinition);
+                Event convertedEvent = EventConverter.convertToWSO2Event(event, streamDefinition);
 
                 for (WSO2EventConsumer consumer : wso2EventConsumers) {
                     try {
-                        consumer.onEvent(outEvent);
+                        consumer.onEvent(convertedEvent);
                     } catch (Exception e) {
                         log.error("Error while dispatching events: " + e.getMessage(), e);
                     }
                 }
 
                 if (!wso2EventListConsumers.isEmpty()) {
-                    wso2EventList.add(outEvent);
+                    wso2EventList.add(convertedEvent);
                 }
             }
         }

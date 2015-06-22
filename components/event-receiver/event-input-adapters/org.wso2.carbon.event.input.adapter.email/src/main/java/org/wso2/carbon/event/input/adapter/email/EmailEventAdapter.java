@@ -63,10 +63,6 @@ public class EmailEventAdapter implements InputEventAdapter {
         throw new TestConnectionNotSupportedException("not-supported");
     }
 
-    public static void main(String[] args) {
-        new EmailEventAdapter(null, null).connect();
-    }
-
     @Override
     public void connect() {
 

@@ -33,6 +33,7 @@ import org.wso2.carbon.event.processor.manager.core.internal.ds.EventManagementS
 import org.wso2.carbon.event.processor.manager.core.internal.util.ConfigurationConstants;
 import org.wso2.carbon.event.processor.manager.core.internal.util.ManagementModeConfigurationLoader;
 import org.wso2.carbon.utils.ConfigurationContextService;
+import org.wso2.siddhi.core.event.Event;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -113,7 +114,7 @@ public class CarbonEventManagementService implements EventManagementService {
                     if (haManager != null) {
                         haManager.tryChangeState();
                     }
-                } else if(mode == mode.Distributed){
+                } else if (mode == mode.Distributed) {
                     if (stormReceiverCoordinator != null) {
                         stormReceiverCoordinator.tryBecomeCoordinator();
                     }
@@ -176,7 +177,7 @@ public class CarbonEventManagementService implements EventManagementService {
         if (executorService != null) {
             executorService.shutdown();
         }
-        if(persistenceManager!=null){
+        if (persistenceManager != null) {
             persistenceManager.shutdown();
         }
         if (members != null) {
@@ -222,7 +223,7 @@ public class CarbonEventManagementService implements EventManagementService {
     }
 
     @Override
-    public void syncEvent(String syncId, Manager.ManagerType type, Object[] data) {
+    public void syncEvent(String syncId, Manager.ManagerType type, Event event) {
         List<HostAndPort> members = null;
         if (type == Manager.ManagerType.Receiver) {
             members = receiverMembers;
@@ -234,7 +235,7 @@ public class CarbonEventManagementService implements EventManagementService {
                 TCPEventPublisher publisher = tcpEventPublisherPool.get(member);
                 if (publisher != null) {
                     try {
-                        publisher.sendEvent(syncId, data, true);
+                        publisher.sendEvent(syncId, event.getTimestamp(), event.getData(), true);
                     } catch (IOException e) {
                         log.error("Error sending sync events to " + syncId, e);
                     }
@@ -288,7 +289,7 @@ public class CarbonEventManagementService implements EventManagementService {
             tcpEventServerConfig.setNumberOfThreads(10); //todo fix
             tcpEventServer = new TCPEventServer(tcpEventServerConfig, new StreamCallback() {
                 @Override
-                public void receive(String streamId, Object[] data) {
+                public void receive(String streamId, long timestamp, Object[] data) {
                     int index = streamId.indexOf("/");
                     if (index != -1) {
                         int tenantId = Integer.parseInt(streamId.substring(0, index));
@@ -301,7 +302,7 @@ public class CarbonEventManagementService implements EventManagementService {
 
                             System.out.println("Event Received to :" + streamId);
                             if (eventSync != null) {
-                                eventSync.process(data);
+                                eventSync.process(new Event(timestamp, data));
                             }
 
                         } catch (Exception e) {
@@ -374,7 +375,6 @@ public class CarbonEventManagementService implements EventManagementService {
         receiverMembers.clear();
         receiverMembers.addAll(members);
     }
-
 
 
     private void checkMemberUpdate() {

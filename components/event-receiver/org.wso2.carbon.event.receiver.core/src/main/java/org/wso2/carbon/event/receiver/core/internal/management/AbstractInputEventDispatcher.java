@@ -19,6 +19,7 @@
 package org.wso2.carbon.event.receiver.core.internal.management;
 
 import org.wso2.carbon.event.stream.core.EventProducerCallback;
+import org.wso2.siddhi.core.event.Event;
 
 public abstract class AbstractInputEventDispatcher {
 
@@ -26,7 +27,7 @@ public abstract class AbstractInputEventDispatcher {
 
     protected EventProducerCallback callBack;
 
-    public abstract void onEvent(Object[] object);
+    public abstract void onEvent(Event event);
 
     public abstract void shutdown();
 

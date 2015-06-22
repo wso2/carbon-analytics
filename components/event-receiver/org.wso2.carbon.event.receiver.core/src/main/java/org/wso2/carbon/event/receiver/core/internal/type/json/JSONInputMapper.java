@@ -32,6 +32,7 @@ import org.wso2.carbon.event.receiver.core.exception.EventReceiverProcessingExce
 import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.exception.InvalidPropertyValueException;
 import org.wso2.carbon.event.receiver.core.internal.util.helper.EventReceiverConfigurationHelper;
+import org.wso2.siddhi.core.event.Event;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -102,25 +103,25 @@ public class JSONInputMapper implements InputMapper {
         return EventReceiverConfigurationHelper.getAttributes(inputMappingAttributes);
     }
 
-    private Object[][] processMultipleEvents(Object obj) throws EventReceiverProcessingException {
-        Object[][] objArray = null;
+    private Event[] processMultipleEvents(Object obj) throws EventReceiverProcessingException {
+        Event[] events = null;
         if (obj instanceof String) {
-            String events = (String) obj;
+            String stringEvents = (String) obj;
             JSONArray jsonArray;
             try {
-                jsonArray = new JSONArray(events);
-                objArray = new Object[jsonArray.length()][];
+                jsonArray = new JSONArray(stringEvents);
+                events = new Event[jsonArray.length()];
                 for (int i = 0; i < jsonArray.length(); i++) {
-                    objArray[i] = processSingleEvent(jsonArray.getJSONObject(i).toString());
+                    events[i] = processSingleEvent(jsonArray.getJSONObject(i).toString());
                 }
             } catch (JSONException e) {
                 throw new EventReceiverProcessingException("Error in parsing JSON: ", e);
             }
         }
-        return objArray;
+        return events;
     }
 
-    private Object[] processSingleEvent(Object obj) throws EventReceiverProcessingException {
+    private Event processSingleEvent(Object obj) throws EventReceiverProcessingException {
         Object[] outObjArray = null;
         if (obj instanceof String) {
             String jsonString = (String) obj;
@@ -142,10 +143,10 @@ public class JSONInputMapper implements InputMapper {
                     } else {
                         try {
                             returnedObj = getPropertyValue(resultObject, type);
-                        }catch (NumberFormatException e){
-                            if((! AttributeType.STRING.equals(type)) && jsonPathData.getDefaultValue() != null){
+                        } catch (NumberFormatException e) {
+                            if ((!AttributeType.STRING.equals(type)) && jsonPathData.getDefaultValue() != null) {
                                 returnedObj = getPropertyValue(jsonPathData.getDefaultValue(), type);
-                            }else {
+                            } else {
                                 throw e;
                             }
                         }
@@ -164,27 +165,27 @@ public class JSONInputMapper implements InputMapper {
             }
             outObjArray = objList.toArray(new Object[objList.size()]);
         }
-        return outObjArray;
+        return new Event(System.currentTimeMillis(), outObjArray);
     }
 
-    private Object[][] processTypedMultipleEvents(Object obj)
+    private Event[] processTypedMultipleEvents(Object obj)
             throws EventReceiverProcessingException {
-        Object[][] objArray = null;
+        Event[] eventArray = null;
         String events = (String) obj;
         JSONArray jsonArray;
         try {
             jsonArray = new JSONArray(events);
-            objArray = new Object[jsonArray.length()][];
+            eventArray = new Event[jsonArray.length()];
             for (int i = 0; i < jsonArray.length(); i++) {
-                objArray[i] = processTypedSingleEvent(jsonArray.getJSONObject(i).toString());
+                eventArray[i] = processTypedSingleEvent(jsonArray.getJSONObject(i).toString());
             }
         } catch (JSONException e) {
             throw new EventReceiverProcessingException("Error in parsing JSON: ", e);
         }
-        return objArray;
+        return eventArray;
     }
 
-    private Object[] processTypedSingleEvent(Object obj)
+    private Event processTypedSingleEvent(Object obj)
             throws EventReceiverProcessingException {
 
         Object attributeArray[] = new Object[noMetaData + noCorrelationData + noPayloadData];
@@ -256,7 +257,7 @@ public class JSONInputMapper implements InputMapper {
                     throw new EventReceiverProcessingException("Event attributes are not matching with the stream : " + this.eventReceiverConfiguration.getToStreamName() + ":" + eventReceiverConfiguration.getToStreamVersion());
                 }
             }
-            return attributeArray;
+            return new Event(System.currentTimeMillis(), attributeArray);
         } catch (InvalidPropertyValueException e) {
             log.error(e.getMessage() + "Dropping Event : " + obj.toString());
             return null;

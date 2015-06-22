@@ -23,6 +23,7 @@ import org.wso2.carbon.event.publisher.core.config.mapping.MapOutputMapping;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherStreamValidationException;
 import org.wso2.carbon.event.publisher.core.internal.OutputMapper;
+import org.wso2.siddhi.core.event.Event;
 
 import java.util.Iterator;
 import java.util.List;
@@ -71,9 +72,11 @@ public class MapOutputMapper implements OutputMapper {
     }
 
     @Override
-    public Object convertToMappedInputEvent(Object[] eventData)
+    public Object convertToMappedInputEvent(Event event)
             throws EventPublisherConfigurationException {
         Map<Object, Object> eventMapObject = new TreeMap<Object, Object>();
+        Object[] eventData = event.getData();
+
         MapOutputMapping mapOutputMapping = (MapOutputMapping) eventPublisherConfiguration.getOutputMapping();
         List<EventOutputProperty> outputPropertyConfiguration = mapOutputMapping.getOutputPropertyConfiguration();
 
@@ -87,11 +90,11 @@ public class MapOutputMapper implements OutputMapper {
     }
 
     @Override
-    public Object convertToTypedInputEvent(Object[] eventData) throws EventPublisherConfigurationException {
+    public Object convertToTypedInputEvent(Event event) throws EventPublisherConfigurationException {
 
         Map<Object, Object> eventMapObject = new TreeMap<Object, Object>();
         int counter = 0;
-
+        Object[] eventData = event.getData();
         if (noOfMetaData > 0) {
             for (Attribute metaData : streamDefinition.getMetaData()) {
                 eventMapObject.put(EventPublisherConstants.PROPERTY_META_PREFIX + metaData.getName(), eventData[counter]);
@@ -114,8 +117,5 @@ public class MapOutputMapper implements OutputMapper {
         }
 
         return eventMapObject;
-
-
     }
-
 }

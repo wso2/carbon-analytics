@@ -57,7 +57,7 @@ public class WSO2EventInputMapper implements InputMapper {
 
         if (fromStreamName == null || fromStreamVersion == null || (fromStreamName.isEmpty()) || (fromStreamVersion.isEmpty())) {
             importedStreamDefinition = exportedStreamDefinition;
-        }else{
+        } else {
             try {
                 this.importedStreamDefinition = eventStreamService.getStreamDefinition(fromStreamName, fromStreamVersion);
             } catch (EventStreamConfigurationException e) {
@@ -190,7 +190,7 @@ public class WSO2EventInputMapper implements InputMapper {
     //TODO Profile performance of this method
     @Override
     public Object convertToMappedInputEvent(Object obj) throws EventReceiverProcessingException {
-        Object[] outObjArray = null;
+        Object[] outObjArray;
         if (obj instanceof Event) {
             Event event = (Event) obj;
             Map<String, String> arbitraryMap = event.getArbitraryDataMap();
@@ -221,27 +221,29 @@ public class WSO2EventInputMapper implements InputMapper {
                     outObjList.add(inEventArray[payloadPosition]);
                 }
                 outObjArray = outObjList.toArray();
-
-            }else{
+            } else {
                 return null;
             }
-
+            return new org.wso2.siddhi.core.event.Event(event.getTimeStamp(), outObjArray);
         }
-        return outObjArray;
+        return null;
     }
 
     @Override
     public Object convertToTypedInputEvent(Object obj) throws EventReceiverProcessingException {
-        Object[] outObjArray = null;
+        org.wso2.siddhi.core.event.Event event = null;
         if (obj instanceof Event) {
+            event = new org.wso2.siddhi.core.event.Event();
             Event inputEvent = (Event) obj;
-            Object[] metaCorrArray = ObjectArrays.concat( inputEvent.getMetaData() != null ? inputEvent.getMetaData() : new Object[0]
+            Object[] timeStamp = new Object[]{inputEvent.getTimeStamp()};
+            Object[] metaCorrArray = ObjectArrays.concat(inputEvent.getMetaData() != null ? inputEvent.getMetaData() : new Object[0]
                     , inputEvent.getCorrelationData() != null ? inputEvent.getCorrelationData() : new Object[0], Object.class);
-            Object[] payloadArray =  ObjectArrays.concat
-                    (metaCorrArray, inputEvent.getPayloadData() != null ? inputEvent.getPayloadData() : new Object[0], Object.class);
-            outObjArray = ObjectArrays.concat(payloadArray, new Object[]{"Timestamp:"+inputEvent.getTimeStamp()}, Object.class);
+            Object[] metaTimeStpArray = ObjectArrays.concat(timeStamp, metaCorrArray, Object.class);
+            event.setData(ObjectArrays.concat
+                    (metaTimeStpArray, inputEvent.getPayloadData() != null ? inputEvent.getPayloadData() : new Object[0], Object.class));
+            event.setTimestamp(inputEvent.getTimeStamp());
         }
-        return outObjArray;
+        return event;
     }
 
     @Override

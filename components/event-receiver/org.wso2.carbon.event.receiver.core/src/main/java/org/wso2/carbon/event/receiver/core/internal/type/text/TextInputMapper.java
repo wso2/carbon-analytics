@@ -29,6 +29,7 @@ import org.wso2.carbon.event.receiver.core.exception.EventReceiverProcessingExce
 import org.wso2.carbon.event.receiver.core.internal.type.text.config.RegexData;
 import org.wso2.carbon.event.receiver.core.internal.util.EventReceiverUtil;
 import org.wso2.carbon.event.receiver.core.internal.util.helper.EventReceiverConfigurationHelper;
+import org.wso2.siddhi.core.event.Event;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -110,8 +111,6 @@ public class TextInputMapper implements InputMapper {
                     }
                 }
             }
-
-
         }
 
     }
@@ -150,7 +149,7 @@ public class TextInputMapper implements InputMapper {
                 }
             }
         }
-        return attributeArray;
+        return new Event(System.currentTimeMillis(), attributeArray);
     }
 
     @Override
@@ -167,31 +166,30 @@ public class TextInputMapper implements InputMapper {
                 String[] textEvent = eventAttribute.split(EventReceiverConstants.EVENT_ATTRIBUTE_SEPARATOR);
 
                 try {
-                    if (textEvent != null && textEvent.length == 2) {
+                    if (textEvent.length == 2) {
                         AttributeType attributeType = attributeDescriptionMap.get(textEvent[0].trim());
                         attributeArray[attributeCount++] = getPropertyValue(textEvent[1], attributeType);
-                    } else if (textEvent == null || textEvent.length == 0) {
+                    } else if (textEvent.length == 0) {
                         throw new EventReceiverProcessingException("Invalid attribute value found for event ,hence dropping the event " + eventAttribute);
-                    } else if(textEvent.length == 1){
+                    } else if (textEvent.length == 1) {
                         AttributeType attributeType = attributeDescriptionMap.get(textEvent[0].trim());
-                        if(AttributeType.STRING.equals(attributeType)){
+                        if (AttributeType.STRING.equals(attributeType)) {
                             attributeArray[attributeCount++] = "";
                         } else {
-                            throw new EventReceiverProcessingException("Attribute value not found in the event hence Dropping event "+eventAttribute);
+                            throw new EventReceiverProcessingException("Attribute value not found in the event hence Dropping event " + eventAttribute);
                         }
                     }
 
                 } catch (NumberFormatException e) {
                     throw new NumberFormatException("Unable to cast the input data to required type ,hence dropping the event " + eventAttribute);
                 }
-
             }
 
             if (noMetaData + noCorrelationData + noPayloadData != attributeCount) {
                 throw new EventReceiverProcessingException("Event attributes are not matching with the stream : " + this.eventReceiverConfiguration.getToStreamName() + ":" + eventReceiverConfiguration.getToStreamVersion());
             }
         }
-        return attributeArray;
+        return new Event(System.currentTimeMillis(), attributeArray);
     }
 
     @Override

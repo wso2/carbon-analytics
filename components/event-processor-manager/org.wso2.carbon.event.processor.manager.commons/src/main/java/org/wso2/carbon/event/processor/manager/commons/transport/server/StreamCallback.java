@@ -21,9 +21,9 @@ package org.wso2.carbon.event.processor.manager.commons.transport.server;
 public interface StreamCallback {
 
     /**
-     *
-     * @param streamId the stream id for the incoming event
+     *  @param streamId the stream id for the incoming event
+     * @param timestamp
      * @param event the event as an object array of attributes
      */
-    public void receive(String streamId, Object[] event);
+    public void receive(String streamId, long timestamp, Object[] event);
 }

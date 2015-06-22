@@ -99,19 +99,21 @@ public class TCPEventPublisher {
      * Send Events to the remote server. In synchronous mode this method call returns only after writing data to the socket
      * in asynchronous mode disruptor pattern is used
      *
-     * @param streamId ID of the stream
-     * @param event    event to send
+     * @param streamId  ID of the stream
+     * @param timestamp timestamp of the event
+     * @param eventData data to send
      * @throws java.io.IOException
      */
-    public void sendEvent(String streamId, Object[] event, boolean flush) throws IOException {
+    public void sendEvent(String streamId, long timestamp, Object[] eventData, boolean flush) throws IOException {
         StreamRuntimeInfo streamRuntimeInfo = streamRuntimeInfoMap.get(streamId);
 
         ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
 
         int streamIdSize = (streamRuntimeInfo.getStreamId()).getBytes(DEFAULT_CHARSET).length;
-        ByteBuffer buf = ByteBuffer.allocate(streamRuntimeInfo.getFixedMessageSize() + streamIdSize + 4);
+        ByteBuffer buf = ByteBuffer.allocate(streamRuntimeInfo.getFixedMessageSize() + streamIdSize + 12);
         buf.putInt(streamIdSize);
         buf.put((streamRuntimeInfo.getStreamId()).getBytes(DEFAULT_CHARSET));
+        buf.putLong(timestamp);
 
         int[] stringDataIndex = new int[streamRuntimeInfo.getNoOfStringAttributes()];
         int stringIndex = 0;
@@ -121,22 +123,22 @@ public class TCPEventPublisher {
             Attribute.Type type = types[i];
             switch (type) {
                 case INT:
-                    buf.putInt((Integer) event[i]);
+                    buf.putInt((Integer) eventData[i]);
                     continue;
                 case LONG:
-                    buf.putLong((Long) event[i]);
+                    buf.putLong((Long) eventData[i]);
                     continue;
                 case BOOL:
-                    buf.put((byte) (((Boolean) event[i]) ? 1 : 0));
+                    buf.put((byte) (((Boolean) eventData[i]) ? 1 : 0));
                     continue;
                 case FLOAT:
-                    buf.putFloat((Float) event[i]);
+                    buf.putFloat((Float) eventData[i]);
                     continue;
                 case DOUBLE:
-                    buf.putDouble((Double) event[i]);
+                    buf.putDouble((Double) eventData[i]);
                     continue;
                 case STRING:
-                    int length = ((String) event[i]).getBytes(DEFAULT_CHARSET).length;
+                    int length = ((String) eventData[i]).getBytes(DEFAULT_CHARSET).length;
                     buf.putInt(length);
                     stringDataIndex[stringIndex] = i;
                     stringIndex++;
@@ -147,7 +149,7 @@ public class TCPEventPublisher {
 
         buf = ByteBuffer.allocate(stringSize);
         for (int aStringIndex : stringDataIndex) {
-            buf.put(((String) event[aStringIndex]).getBytes(DEFAULT_CHARSET));
+            buf.put(((String) eventData[aStringIndex]).getBytes(DEFAULT_CHARSET));
         }
         arrayOutputStream.write(buf.array());
 
