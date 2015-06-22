@@ -401,13 +401,6 @@ function changeCronType() {
     }
 }
 
-//contains the code for the initialization of the page
-function setUpPage(dPReceiverConnectionTyp, dPSecureUrlConnectionType) {
-    jQuery('#pubConnType').val(dPReceiverConnectionTyp);
-    jQuery('#pubSecureConnType').val(dPSecureUrlConnectionType);
-
-}
-
 jQuery(document).ready(function(){
 	
 	var cronValueArray = [];
@@ -434,7 +427,7 @@ jQuery(document).ready(function(){
 <h2>Edit Profile - <%=profile.getName()%> (Current version:<%=profile.getVersion()%>.0.0)
 </h2>
 <%--set the value of the connection type on startup --%>
-<body onload="setUpPage('<%out.print(profile.getDpReceiverConnectionType());%>','<%out.print(profile.getDpSecureUrlConnectionType());%>')"></body>
+<body></body>
 <div id="workArea">
 <!--  Page content goes here -->
 <form action="submitProfile.jsp" method="post" id="editProfileForm">

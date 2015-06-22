@@ -31,33 +31,9 @@ public class Profile {
     private String name;
     private boolean active;
     private String cronExpression;
-    private String dpReceiverAddress;
-    private String dpSecureAddress;
-    private String dpUserName;
-    private String dpPassword;
-    private String dpReceiverConnectionType;
-    private String dpSecureUrlConnectionType;
     private int version;
 
     private MBean[] selectedMBeans;
-
-    public String getDpUserName() {
-        return dpUserName;
-    }
-
-    @XmlElement
-    public void setDpUserName(String dpUserName) {
-        this.dpUserName = dpUserName;
-    }
-
-    public String getDpPassword() {
-        return dpPassword;
-    }
-
-    @XmlElement
-    public void setDpPassword(String dpPassword) {
-        this.dpPassword = dpPassword;
-    }
 
     public String getUrl() {
         return url;
@@ -120,42 +96,6 @@ public class Profile {
     @XmlElement
     public void setVersion(int version) {
         this.version = version;
-    }
-
-    public String getDpReceiverAddress() {
-        return dpReceiverAddress;
-    }
-
-    @XmlElement
-    public void setDpReceiverAddress(String dpReceiverAddress) {
-        this.dpReceiverAddress = dpReceiverAddress;
-    }
-
-    public String getDpSecureAddress() {
-        return dpSecureAddress;
-    }
-
-    @XmlElement
-    public void setDpSecureAddress(String dpSecureAddress) {
-        this.dpSecureAddress = dpSecureAddress;
-    }
-
-    public String getDpReceiverConnectionType() {
-        return dpReceiverConnectionType;
-    }
-
-    @XmlElement
-    public void setDpReceiverConnectionType(String dpReceiverConnectionType) {
-        this.dpReceiverConnectionType = dpReceiverConnectionType;
-    }
-
-    public String getDpSecureUrlConnectionType() {
-        return dpSecureUrlConnectionType;
-    }
-
-    @XmlElement
-    public void setDpSecureUrlConnectionType(String dpSecureUrlConnectionType) {
-        this.dpSecureUrlConnectionType = dpSecureUrlConnectionType;
     }
 
     public MBean[] getSelectedMBeans() {

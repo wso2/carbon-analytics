@@ -42,13 +42,6 @@
         } catch (JmxAgentJmxProfileExceptionException e) {
             return;
         }
-        //set Data publisher data
-        profile.setDpReceiverAddress(request.getParameter("pubAddress"));
-        profile.setDpUserName(request.getParameter("pubUserName"));
-        profile.setDpPassword(request.getParameter("pubUserPass"));
-        profile.setDpReceiverConnectionType(request.getParameter("pubConnType"));
-        profile.setDpSecureUrlConnectionType(request.getParameter("pubSecureConnType"));
-        profile.setDpSecureAddress(request.getParameter("pubSecureAddress"));
 
         //get the cron expression
         if (request.getParameter("presetCronExpr").equalsIgnoreCase("custom")) {
@@ -98,14 +91,6 @@
         profile.setUserName(request.getParameter("jmxUserName"));
         profile.setPass(request.getParameter("jmxUserPass"));
         profile.setUrl(request.getParameter("jmxServerUrl"));
-
-        //set Data publisher data
-        profile.setDpReceiverAddress(request.getParameter("pubAddress"));
-        profile.setDpUserName(request.getParameter("pubUserName"));
-        profile.setDpPassword(request.getParameter("pubUserPass"));
-        profile.setDpReceiverConnectionType(request.getParameter("pubConnType"));
-        profile.setDpSecureUrlConnectionType(request.getParameter("pubSecureConnType"));
-        profile.setDpSecureAddress(request.getParameter("pubSecureAddress"));
 
         // get the cron expression
         if (request.getParameter("presetCronExpr").equalsIgnoreCase("custom")) {

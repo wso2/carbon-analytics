@@ -81,17 +81,8 @@ public class ProfileManager {
         String password = profile.getPass();
 
         //encrypt the password
-        String cipherT =
-                CryptoUtil.getDefaultCryptoUtil().encryptAndBase64Encode(password.getBytes());
+        String cipherT = CryptoUtil.getDefaultCryptoUtil().encryptAndBase64Encode(password.getBytes());
         profile.setPass(cipherT);
-
-        //encrypt the data publisher password
-        String dpPassword = profile.getDpPassword();
-
-        //encrypt the password
-        String dpCipherT =
-                CryptoUtil.getDefaultCryptoUtil().encryptAndBase64Encode(dpPassword.getBytes());
-        profile.setDpPassword(dpCipherT);
 
         return profile;
 
@@ -113,16 +104,6 @@ public class ProfileManager {
         String password = new String(passwordBArr);
 
         profile.setPass(password);
-
-        //decrypt the data publisher password
-        String dpCipherT = profile.getDpPassword();
-
-        byte[] decodedDPBArr = Base64.decodeBase64(dpCipherT.getBytes());
-        byte[] passwordDPBArr = CryptoUtil.getDefaultCryptoUtil().decrypt(decodedDPBArr);
-        String dpPassword = new String(passwordDPBArr);
-
-        profile.setDpPassword(dpPassword);
-
         return profile;
     }
 
@@ -405,18 +386,6 @@ public class ProfileManager {
         //set basic information
         tbProfile.setName("toolbox");
         tbProfile.setVersion(1);
-
-
-        //set the data publisher info
-        tbProfile.setDpReceiverConnectionType("tcp://");
-        int receiverPort = 7611 + getPortOffset();
-        tbProfile.setDpReceiverAddress("127.0.0.1:" + receiverPort);
-        tbProfile.setDpSecureUrlConnectionType("ssl://");
-        int secureReceiverPort = 7711 + getPortOffset();
-        tbProfile.setDpSecureAddress("127.0.0.1:" + secureReceiverPort);
-
-        tbProfile.setDpUserName("admin");
-        tbProfile.setDpPassword("admin");
 
         tbProfile.setCronExpression("0/2 * * ? * *");
 
