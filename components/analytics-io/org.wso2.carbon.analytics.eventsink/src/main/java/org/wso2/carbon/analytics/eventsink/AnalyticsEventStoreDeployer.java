@@ -86,8 +86,8 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
             throws AnalyticsEventStoreException {
         try {
             AnalyticsEventStoreManager.getInstance().addEventStoreConfiguration(tenantId, eventStore);
-            ServiceHolder.getAnalyticsDataAPI().createTable(tenantId, eventStore.getName());
-            ServiceHolder.getAnalyticsDataAPI().setTableSchema(tenantId, eventStore.getName(),
+            ServiceHolder.getAnalyticsDataService().createTable(tenantId, eventStore.getName());
+            ServiceHolder.getAnalyticsDataService().setTableSchema(tenantId, eventStore.getName(),
                     AnalyticsEventSinkUtil.getAnalyticsSchema(eventStore.getAnalyticsTableSchema()));
             for (String streamId : eventStore.getEventSource().getStreamIds()) {
                 if (ServiceHolder.getStreamDefinitionStoreService().getStreamDefinition(streamId, tenantId) != null) {

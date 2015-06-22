@@ -177,6 +177,7 @@ public class AnalyticsAPIHttpClient {
                     log.warn("Error while closing the connection! " + e.getMessage());
                 }
             }
+            EntityUtils.consumeQuietly(httpResponse.getEntity());
         }
     }
 
@@ -453,6 +454,7 @@ public class AnalyticsAPIHttpClient {
                 throw new AnalyticsServiceException("Unable to put the records. " + response);
             } else {
                 Object recordIdsObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                EntityUtils.consumeQuietly(httpResponse.getEntity());
                 if (recordIdsObj != null && recordIdsObj instanceof List) {
                     List<String> recordIds = (List<String>) recordIdsObj;
                     int index = 0;
@@ -790,7 +792,7 @@ public class AnalyticsAPIHttpClient {
     }
 
     public RecordGroup[] getWithKeyValues(int tenantId, String username, String tableName, int numPartitionsHint,
-                                        List<String> columns, List<Map<String, Object>> valuesBatch, boolean securityEnabled) throws AnalyticsServiceException {
+                                          List<String> columns, List<Map<String, Object>> valuesBatch, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.ANALYTIC_RECORD_READ_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.GET_RECORDS_WITH_KEY_VALUES_OPERATION)
@@ -811,21 +813,21 @@ public class AnalyticsAPIHttpClient {
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to destroy the process . "
-                                                    + response);
+                        + response);
             } else {
                 Object remoteRecordGroupObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
                 if (remoteRecordGroupObj != null && remoteRecordGroupObj instanceof RemoteRecordGroup[]) {
                     return (RecordGroup[]) remoteRecordGroupObj;
                 } else {
                     throw new AnalyticsServiceAuthenticationException(getUnexpectedResponseReturnedErrorMsg("getting " +
-                          "the record group", tableName, "Array of RemoteRecordGroup", remoteRecordGroupObj));
+                            "the record group", tableName, "Array of RemoteRecordGroup", remoteRecordGroupObj));
                 }
             }
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceAuthenticationException("Malformed URL provided. " + e.getMessage(), e);
         } catch (IOException e) {
             throw new AnalyticsServiceAuthenticationException("Error while connecting to the remote service. "
-                                                              + e.getMessage(), e);
+                    + e.getMessage(), e);
         }
     }
 
@@ -1060,7 +1062,7 @@ public class AnalyticsAPIHttpClient {
                 String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to read the Analytics drilldown object. "
                         + response);
-            }else {
+            } else {
                 Object listOfReangeObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
                 if (listOfReangeObj != null && listOfReangeObj instanceof List) {
                     return (List<AnalyticsDrillDownRange>) listOfReangeObj;

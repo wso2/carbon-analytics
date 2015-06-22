@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.analytics.eventsink.internal.util;
 
-import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkService;
 import org.wso2.carbon.analytics.eventsink.internal.AnalyticsDSConnector;
 import org.wso2.carbon.analytics.eventsink.subscriber.AnalyticsEventStreamListener;
@@ -32,11 +32,9 @@ public class ServiceHolder {
     private static EventStreamService eventStreamService;
     private static AnalyticsEventStreamListener analyticsEventStreamListener;
     private static AnalyticsDSConnector analyticsDSConnector;
-    private static AnalyticsDataAPI analyticsDataAPI;
+    private static AnalyticsDataService analyticsDataService;
     private static AbstractStreamDefinitionStore streamDefinitionStoreService;
     private static AnalyticsEventSinkService analyticsEventSinkService;
-
-    private ServiceHolder(){}
 
     public static AbstractStreamDefinitionStore getStreamDefinitionStoreService() {
         return streamDefinitionStoreService;
@@ -70,12 +68,12 @@ public class ServiceHolder {
         ServiceHolder.analyticsDSConnector = analyticsDSConnector;
     }
 
-    public static AnalyticsDataAPI getAnalyticsDataAPI() {
-        return analyticsDataAPI;
+    public static AnalyticsDataService getAnalyticsDataService() {
+        return analyticsDataService;
     }
 
-    public static void setAnalyticsDataAPI(AnalyticsDataAPI analyticsDataAPI1) {
-        ServiceHolder.analyticsDataAPI = analyticsDataAPI1;
+    public static void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {
+        ServiceHolder.analyticsDataService = analyticsDataService;
     }
 
     public static AnalyticsEventSinkService getAnalyticsEventSinkService() {
