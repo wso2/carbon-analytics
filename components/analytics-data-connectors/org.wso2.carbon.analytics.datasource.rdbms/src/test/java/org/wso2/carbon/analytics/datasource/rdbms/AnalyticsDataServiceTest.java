@@ -21,6 +21,7 @@ package org.wso2.carbon.analytics.datasource.rdbms;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterException;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
@@ -33,7 +34,6 @@ import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.base.MultitenantConstants;
 
 import java.io.Serializable;
@@ -97,7 +97,6 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
             this.service.deleteTable(tenantId, tableName);
         }
         this.service.clearIndexData(tenantId, tableName);
-        this.service.setTableSchema(tenantId, tableName, new AnalyticsSchema());
     }
     
     private List<Record> generateIndexRecords(int tenantId, String tableName, int n, long startTimestamp) {
@@ -279,7 +278,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         ids.add(records.get(5).getId());
         ids.add(records.get(50).getId());
         ids.add(records.get(97).getId());
-        Assert.assertEquals(GenericUtils.listRecords(this.service, this.service.get(tenantId, tableName, 2, null, ids)).size(), 4);
+        Assert.assertEquals(AnalyticsDataServiceUtils.listRecords(this.service, this.service.get(tenantId, tableName, 2, null, ids)).size(), 4);
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
         List<SearchResultEntry> result = this.service.search(tenantId, tableName, "STR1:S*", 0, 150);
         Assert.assertEquals(result.size(), 98);
@@ -287,7 +286,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
         result = this.service.search(tenantId, tableName, "STR1:S*", 0, 150);
         Assert.assertEquals(result.size(), 94);
-        Assert.assertEquals(GenericUtils.listRecords(this.service, this.service.get(tenantId, tableName, 3, null, ids)).size(), 0);
+        Assert.assertEquals(AnalyticsDataServiceUtils.listRecords(this.service, this.service.get(tenantId, tableName, 3, null, ids)).size(), 0);
         this.cleanupTable(tenantId, tableName);
     }
     
@@ -304,11 +303,11 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.setTableSchema(tenantId, tableName, new AnalyticsSchema(columns, null));
         List<Record> records = this.generateIndexRecords(tenantId, tableName, n, 1000);
         this.service.put(records);
-        List<Record> recordsIn = GenericUtils.listRecords(this.service,
+        List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), n);
         this.service.delete(tenantId, tableName, 1030, 1060);
-        recordsIn = GenericUtils.listRecords(this.service,
+        recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(tenantId, tableName, 5, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), n - 3);
         /* lets test table name case-insensitiveness too */
@@ -346,7 +345,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         System.out.println("* Records: " + (n * batch));
         System.out.println("* Write Time: " + (end - start) + " ms.");
         System.out.println("* Write Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
-        List<Record> recordsIn = GenericUtils.listRecords(this.service,
+        List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(tenantId, tableName, 7, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), (n * batch));
         end = System.currentTimeMillis();
@@ -397,17 +396,17 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.setTableSchema(tenantId, tableName, schema);
         List<Record> records = AnalyticsRecordStoreTest.generateRecords(tenantId, tableName, 1, 75, -1, -1, false);
         this.service.put(records);
-        List<Record> recordsIn = GenericUtils.listRecords(this.service,
+        List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(new HashSet<Record>(recordsIn), new HashSet<Record>(records));
         records = AnalyticsRecordStoreTest.generateRecords(tenantId, tableName, 1, 74, -1, -1, false);
         this.service.put(records);
-        recordsIn = GenericUtils.listRecords(this.service,
+        recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(tenantId, tableName, 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 75);
         records = AnalyticsRecordStoreTest.generateRecords(tenantId, tableName, 1, 77, -1, -1, false);
         this.service.put(records);
-        recordsIn = GenericUtils.listRecords(this.service,
+        recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(tenantId, tableName, 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 77);
         Assert.assertEquals(new HashSet<Record>(recordsIn), new HashSet<Record>(records));
@@ -416,14 +415,14 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.setTableSchema(tenantId, tableName, schema);
         records = AnalyticsRecordStoreTest.generateRecords(tenantId, tableName, 1, 10, -1, -1, false);
         this.service.put(records);
-        recordsIn = GenericUtils.listRecords(this.service,
+        recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(tenantId, tableName, 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 87);
         schema = new AnalyticsSchema(columns, null);
         this.service.setTableSchema(tenantId, tableName, schema);
         records = AnalyticsRecordStoreTest.generateRecords(tenantId, tableName, 1, 10, -1, -1, false);
         this.service.put(records);
-        recordsIn = GenericUtils.listRecords(this.service,
+        recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(tenantId, tableName, 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 97);
         this.cleanupTable(tenantId, tableName);
@@ -475,7 +474,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         values.put("log", "log statement 2");
         values.put("some_other_field", "xxxxxxxx zzzzzz");
         valuesBatch.add(values);
-        List<Record> recordsIn = GenericUtils.listRecords(this.service,
+        List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.getWithKeyValues(tenantId, tableName, 1, null, valuesBatch));
         Set<Record> matchRecords = new HashSet<Record>();
         matchRecords.add(record1);
@@ -508,7 +507,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         System.out.println("* Write Time: " + (end - start) + " ms.");
         System.out.println("* Write Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
         start = System.currentTimeMillis();
-        List<Record> recordsIn = GenericUtils.listRecords(this.service,
+        List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                                                           this.service.get(tenantId, tableName, 3, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), (n * batch));
         end = System.currentTimeMillis();
@@ -548,7 +547,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         System.out.println("* Write Time: " + (end - start) + " ms.");
         System.out.println("* Write Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
         start = System.currentTimeMillis();
-        List<Record> recordsIn = GenericUtils.listRecords(this.service,
+        List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                                                           this.service.get(tenantId, tableName, 3, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), (n * batch));
         end = System.currentTimeMillis();
@@ -599,7 +598,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         start = System.currentTimeMillis();
         List<Record> recordsIn = new ArrayList<>();
         for (String tableName : tableNames) {
-            recordsIn.addAll(GenericUtils.listRecords(this.service,
+            recordsIn.addAll(AnalyticsDataServiceUtils.listRecords(this.service,
                                                               this.service.get(tenantId, tableName, 3, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1)));
         }
         Assert.assertEquals(recordsIn.size(), (n * batch));
@@ -711,7 +710,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         System.out.println("* Write Time: " + (end - start) + " ms.");
         System.out.println("* Write Throughput (TPS): " + (n * batch * nThreads) / (double) (end - start) * 1000.0);
         start = System.currentTimeMillis();
-        List<Record> recordsIn = GenericUtils.listRecords(this.service,
+        List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), (n * batch * nThreads));
         end = System.currentTimeMillis();
@@ -751,7 +750,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         System.out.println("* Write Time: " + (end - start) + " ms.");
         System.out.println("* Write Throughput (TPS): " + (n * batch * nThreads) / (double) (end - start) * 1000.0);
         start = System.currentTimeMillis();
-        List<Record> recordsIn = GenericUtils.listRecords(this.service,
+        List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                                                           this.service.get(tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), (n * batch * nThreads));
         end = System.currentTimeMillis();
@@ -806,7 +805,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         start = System.currentTimeMillis();
         List<Record> recordsIn = new ArrayList<>();
         for (String tableName : tableNames) {
-            recordsIn.addAll(GenericUtils.listRecords(this.service,
+            recordsIn.addAll(AnalyticsDataServiceUtils.listRecords(this.service,
                                                       this.service.get(tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1)));
         }
 

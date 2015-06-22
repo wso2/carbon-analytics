@@ -36,6 +36,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
@@ -218,11 +219,11 @@ public class AnalyticsDataBackupTool {
             }
             AnalyticsSchema schema = service.getTableSchema(tenantId, table);
             writeTableSchema(schema, myDir.getAbsolutePath());
-            RecordGroup[] rgs = service.get(tenantId, table, 1, null, timeFrom, timeTo, 0, -1);
+            AnalyticsDataResponse resp = service.get(tenantId, table, 1, null, timeFrom, timeTo, 0, -1);
             Iterator<Record> recordItr;
             int count = 0;
-            for (RecordGroup rg : rgs) {
-                recordItr = service.readRecords(rg);
+            for (RecordGroup rg : resp.getRecordGroups()) {
+                recordItr = service.readRecords(resp.getRecordStoreName(), rg);
                 Record record;
                 while (recordItr.hasNext()) {
                     if (count % 5000 == 0) {

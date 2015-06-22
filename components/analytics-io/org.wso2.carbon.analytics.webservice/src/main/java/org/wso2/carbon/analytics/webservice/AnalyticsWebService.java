@@ -21,6 +21,7 @@ package org.wso2.carbon.analytics.webservice;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
@@ -28,7 +29,7 @@ import org.wso2.carbon.analytics.dataservice.commons.CategorySearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.datasource.commons.Record;
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsDrillDownRangeBean;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsDrillDownRequestBean;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsSchemaBean;
@@ -256,7 +257,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             if (columns != null && columns.length != 0) {
                 columnList = Arrays.asList(columns);
             }
-            List<Record> records = GenericUtils.listRecords(analyticsDataAPI,
+            List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI,
                                                             analyticsDataAPI.get(getUsername(), tableName, numPartitionsHint, columnList, timeFrom, timeTo, recordsFrom,
                                                                                  recordsCount));
             List<RecordBean> recordBeans = Utils.createRecordBeans(records);
@@ -289,7 +290,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             }
             List<Map<String, Object>> valuesBatch = Utils.getValuesBatch(valuesBatchBeans,
                                                                          analyticsDataAPI.getTableSchema(getUsername(), tableName));
-            List<Record> records = GenericUtils.listRecords(analyticsDataAPI,
+            List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI,
                                                             analyticsDataAPI.getWithKeyValues(getUsername(), tableName, numPartitionsHint,
                                                                                               columnList, valuesBatch));
             List<RecordBean> recordBeans = Utils.createRecordBeans(records);
@@ -324,7 +325,7 @@ public class AnalyticsWebService extends AbstractAdmin {
                 idList = Arrays.asList(ids);
             }
 
-            List<Record> records = GenericUtils.listRecords(analyticsDataAPI, analyticsDataAPI.get(getUsername(), tableName,
+            List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, analyticsDataAPI.get(getUsername(), tableName,
                                                                                                    numPartitionsHint, columnList, idList));
             List<RecordBean> recordBeans = Utils.createRecordBeans(records);
             RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
@@ -385,7 +386,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             List<SearchResultEntry> searchResults = analyticsDataAPI.search(getUsername(), tableName, query,
                                                                             start, count);
             List<String> recordIds = Utils.getRecordIds(searchResults);
-            List<Record> records = GenericUtils.listRecords(analyticsDataAPI, analyticsDataAPI.get(getUsername(), tableName, DEFAULT_NUM_PARTITIONS_HINT, null, recordIds));
+            List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, analyticsDataAPI.get(getUsername(), tableName, DEFAULT_NUM_PARTITIONS_HINT, null, recordIds));
             List<RecordBean> recordBeans = Utils.createRecordBeans(records);
             RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
             return recordBeans.toArray(resultRecordBeans);
@@ -449,8 +450,8 @@ public class AnalyticsWebService extends AbstractAdmin {
      *
      * @return boolean true or false based on under laying data layer implementation
      */
-    public boolean isPaginationSupported() {
-        return analyticsDataAPI.isPaginationSupported();
+    public boolean isPaginationSupported(String recordStoreName) throws AnalyticsException {
+        return analyticsDataAPI.isPaginationSupported(recordStoreName);
     }
 
     /**
@@ -516,7 +517,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             List<SearchResultEntry> searchResults = analyticsDataAPI.drillDownSearch(getUsername(),
                                                                                      getAnalyticsDrillDownRequest(drillDownRequest));
             List<String> recordIds = Utils.getRecordIds(searchResults);
-            List<Record> records = GenericUtils.listRecords(analyticsDataAPI,
+            List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI,
                                                             analyticsDataAPI.get(getUsername(), drillDownRequest.getTableName(),
                                                                                  DEFAULT_NUM_PARTITIONS_HINT, null, recordIds));
             List<RecordBean> recordBeans = Utils.createRecordBeans(records);

@@ -32,6 +32,7 @@ import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataPurgingConfigur
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataPurgingIncludeTable;
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfigProperty;
 import org.wso2.carbon.analytics.dataservice.config.AnalyticsDataServiceConfiguration;
+import org.wso2.carbon.analytics.dataservice.config.AnalyticsRecordStoreConfiguration;
 import org.wso2.carbon.analytics.dataservice.indexing.AnalyticsDataIndexer;
 import org.wso2.carbon.analytics.dataservice.tasks.AnalyticsGlobalDataPurgingTask;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
@@ -92,32 +93,38 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private static final String GLOBAL_DATA_PURGING = "GLOBAL_DATA_PURGING";
 
     private static final int DELETE_BATCH_SIZE = 1000;
+    
+    private static final int TABLE_INFO_TENANT_ID = -1000;
+    
+    private static final String TABLE_INFO_TABLE_NAME = "__TABLE_INFO__";
+    
+    private static final String TABLE_INFO_DATA_COLUMN = "TABLE_INFO_DATA";
 
-    private AnalyticsRecordStore analyticsRecordStore;
+    private Map<String, AnalyticsRecordStore> analyticsRecordStores;
     
     private AnalyticsFileSystem analyticsFileSystem;
         
     private AnalyticsDataIndexer indexer;
     
-    private Map<String, AnalyticsSchema> schemaMap = new HashMap<String, AnalyticsSchema>();
+    private Map<String, AnalyticsTableInfo> tableInfoMap = new HashMap<String, AnalyticsTableInfo>();
+    
+    private String primaryARSName;
     
     public AnalyticsDataServiceImpl() throws AnalyticsException {
         AnalyticsDataServiceConfiguration config = this.loadAnalyticsDataServiceConfig();
         Analyzer luceneAnalyzer;
+        this.initARS(config);
         try {
-            String arsClass = config.getAnalyticsRecordStoreConfiguration().getImplementation();
             String afsClass = config.getAnalyticsFileSystemConfiguration().getImplementation();
             String analyzerClass = config.getLuceneAnalyzerConfiguration().getImplementation();
-            this.analyticsRecordStore = (AnalyticsRecordStore) Class.forName(arsClass).newInstance();
             this.analyticsFileSystem = (AnalyticsFileSystem) Class.forName(afsClass).newInstance();
-            this.analyticsRecordStore.init(this.convertToMap(config.getAnalyticsRecordStoreConfiguration().getProperties()));
             this.analyticsFileSystem.init(this.convertToMap(config.getAnalyticsFileSystemConfiguration().getProperties()));
             luceneAnalyzer = (Analyzer) Class.forName(analyzerClass).newInstance();
         } catch (Exception e) {
             throw new AnalyticsException("Error in creating analytics data service from configuration: " + 
                     e.getMessage(), e);
         }
-        this.indexer = new AnalyticsDataIndexer(this.analyticsRecordStore, this.analyticsFileSystem, this,
+        this.indexer = new AnalyticsDataIndexer(this.getPrimaryAnalyticsRecordStore(), this.analyticsFileSystem, this,
                                                 config.getShardCount(), luceneAnalyzer);
         AnalyticsServiceHolder.setAnalyticsDataService(this);
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
@@ -141,7 +148,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
                     dataPurgingTaskManager.scheduleTask(GLOBAL_DATA_PURGING);
 
                 } catch (TaskException e) {
-                    logger.error("Unable to schedule global data puring task: " + e.getMessage(), e);
+                    logger.error("Unable to schedule global data purging task: " + e.getMessage(), e);
                 }
             } else {
                 Set<String> registeredTaskTypes = taskService.getRegisteredTaskTypes();
@@ -158,6 +165,34 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
                 }
             }
         }
+    }
+    
+    private void initARS(AnalyticsDataServiceConfiguration config) throws AnalyticsException {
+        this.primaryARSName = config.getPrimaryRecordStore().trim();
+        if (this.primaryARSName.length() == 0) {
+            throw new AnalyticsException("Primary record store name cannot be empty.");
+        }
+        this.analyticsRecordStores = new HashMap<String, AnalyticsRecordStore>();
+        for (AnalyticsRecordStoreConfiguration arsConfig : config.getAnalyticsRecordStoreConfigurations()) {
+            String name = arsConfig.getName().trim();
+            String arsClass = arsConfig.getImplementation();
+            AnalyticsRecordStore ars;
+            try {
+                ars = (AnalyticsRecordStore) Class.forName(arsClass).newInstance();
+            } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+                throw new AnalyticsException("Error in creating analytics record store with name '" + name + 
+                        "': " + e.getMessage(), e);
+            }
+            ars.init(this.convertToMap(arsConfig.getProperties()));
+            this.analyticsRecordStores.put(name, ars);
+        }
+        if (!this.analyticsRecordStores.containsKey(this.primaryARSName)) {
+            throw new AnalyticsException("The primary record store with name '" + this.primaryARSName + "' cannot be found.");
+        }
+    }
+    
+    private AnalyticsRecordStore getPrimaryAnalyticsRecordStore() {
+        return this.analyticsRecordStores.get(this.primaryARSName);
     }
 
     private TaskInfo createDataPurgingTask(AnalyticsDataPurgingConfiguration analyticsDataPurgingConfiguration) {
@@ -215,19 +250,46 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         return indexer;
     }
     
-    public AnalyticsRecordStore getAnalyticsRecordStore() {
-        return analyticsRecordStore;
+    public AnalyticsRecordStore getAnalyticsRecordStore(String name) throws AnalyticsException {
+        AnalyticsRecordStore ars = this.analyticsRecordStores.get(name);
+        if (ars == null) {
+            throw new AnalyticsException("Analytics record store with the name '" + name + "' cannot be found.");
+        }
+        return ars;
     }
     
     @Override
     public void createTable(int tenantId, String tableName) throws AnalyticsException {
-        this.getAnalyticsRecordStore().createTable(tenantId, tableName);
+        this.createTable(tenantId, this.primaryARSName, tableName);
     }
 
     @Override
     public void createTable(int tenantId, String recordStoreName, String tableName)
             throws AnalyticsException {
-        //TODO : needs to be implemented.
+        recordStoreName = recordStoreName.trim();
+        this.getAnalyticsRecordStore(recordStoreName).createTable(tenantId, tableName);
+        AnalyticsTableInfo tableInfo = null;
+        try {
+            tableInfo = this.lookupTableInfo(tenantId, tableName);
+        } catch (AnalyticsTableNotAvailableException ignore) {
+            /* ignore */
+        }
+        if (tableInfo == null || !tableInfo.getRecordStoreName().equals(recordStoreName)) {
+            tableInfo = new AnalyticsTableInfo(recordStoreName, new AnalyticsSchema());
+        }
+        this.writeTableInfo(tenantId, tableName, tableInfo);
+        this.invalidateAnalyticsTableInfo(tenantId, tableName);
+    }
+
+    @Override
+    public List<String> listRecordStoreNames() {
+        return new ArrayList<String>(this.analyticsRecordStores.keySet());
+    }
+
+    @Override
+    public String getRecordStoreNameByTable(int tenantId, String tableName) 
+            throws AnalyticsException, AnalyticsTableNotAvailableException {
+        return this.lookupTableInfo(tenantId, tableName).getRecordStoreName();
     }
 
     @Override
@@ -240,18 +302,24 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             throws AnalyticsTableNotAvailableException, AnalyticsException {
         this.checkInvalidIndexNames(schema.getColumns());
         this.checkInvalidScoreParams(schema.getColumns());
-        this.getAnalyticsRecordStore().setTableSchema(tenantId, tableName, schema);
+        AnalyticsTableInfo tableInfo = this.lookupTableInfo(tenantId, tableName);
+        tableInfo.setSchema(schema);
+        this.writeTableInfo(tenantId, tableName, tableInfo);
+        this.checkAndInvalidateTableInfo(tenantId, tableName);
+    }
+    
+    private void checkAndInvalidateTableInfo(int tenantId, String tableName) throws AnalyticsException {
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         if (acm.isClusteringEnabled()) {
             /* send cluster message to invalidate */
-            acm.executeAll(ANALYTICS_DATASERVICE_GROUP, new AnalyticsSchemaChangeMessage(tenantId, tableName));
+            acm.executeAll(ANALYTICS_DATASERVICE_GROUP, new AnalyticsTableInfoChangeMessage(tenantId, tableName));
         } else {
-            this.invalidateAnalyticsSchema(tenantId, tableName);
+            this.invalidateAnalyticsTableInfo(tenantId, tableName);
         }
     }
     
-    private void invalidateAnalyticsSchema(int tenantId, String tableName) {
-        this.schemaMap.remove(GenericUtils.calculateTableIdentity(tenantId, tableName));
+    private void invalidateAnalyticsTableInfo(int tenantId, String tableName) {
+        this.tableInfoMap.remove(GenericUtils.calculateTableIdentity(tenantId, tableName));
     }
 
     private void checkInvalidIndexNames(Map<String, ColumnDefinition> columns) throws AnalyticsIndexException {
@@ -301,30 +369,52 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public AnalyticsSchema getTableSchema(int tenantId, String tableName) throws AnalyticsTableNotAvailableException,
             AnalyticsException {
-        return this.lookupSchema(tenantId, tableName);
+        return this.lookupTableInfo(tenantId, tableName).getSchema();
     }
 
     @Override
     public boolean tableExists(int tenantId, String tableName) throws AnalyticsException {
-        return this.getAnalyticsRecordStore().tableExists(tenantId, tableName);
+        try {
+            return this.getRecordStoreNameByTable(tenantId, tableName) != null;
+        } catch (AnalyticsTableNotAvailableException e) {
+            return false;
+        }
     }
 
     @Override
     public void deleteTable(int tenantId, String tableName) throws AnalyticsException {
-        this.getAnalyticsRecordStore().deleteTable(tenantId, tableName);
-        this.setTableSchema(tenantId, tableName, new AnalyticsSchema());
+        String arsName;
+        try {
+            arsName = this.getRecordStoreNameByTable(tenantId, tableName);
+        } catch (AnalyticsTableNotAvailableException e) {
+            return;
+        }
+        if (arsName == null) {
+            return;
+        }
+        this.deleteTableInfo(tenantId, tableName);
+        this.checkAndInvalidateTableInfo(tenantId, tableName);
+        this.getAnalyticsRecordStore(arsName).deleteTable(tenantId, tableName);
         this.clearIndices(tenantId, tableName);
     }
 
     @Override
     public List<String> listTables(int tenantId) throws AnalyticsException {
-        return this.getAnalyticsRecordStore().listTables(tenantId);
+        List<String> result = new ArrayList<String>();
+        for (AnalyticsRecordStore ars : this.analyticsRecordStores.values()) {
+            result.addAll(ars.listTables(tenantId));
+        }
+        return result;
     }
 
     @Override
     public long getRecordCount(int tenantId, String tableName, long timeFrom, long timeTo) 
             throws AnalyticsException, AnalyticsTableNotAvailableException {
-        return this.getAnalyticsRecordStore().getRecordCount(tenantId, tableName, timeFrom, timeTo);
+        String arsName = this.getRecordStoreNameByTable(tenantId, tableName);
+        if (arsName == null) {
+            throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+        }
+        return this.getAnalyticsRecordStore(arsName).getRecordCount(tenantId, tableName, timeFrom, timeTo);
     }
     
     /**
@@ -339,14 +429,65 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         }
     }
     
-    private AnalyticsSchema lookupSchema(int tenantId, String tableName) throws AnalyticsException {
-        String tableIdentity = GenericUtils.calculateTableIdentity(tenantId, tableName);
-        AnalyticsSchema schema = this.schemaMap.get(tableIdentity);
-        if (schema == null) {
-            schema = this.getAnalyticsRecordStore().getTableSchema(tenantId, tableName);
-            this.schemaMap.put(tableIdentity, schema);
+    private AnalyticsTableInfo readTableInfo(int tenantId, 
+            String tableName) throws AnalyticsTableNotAvailableException, AnalyticsException {
+        AnalyticsRecordStore ars = this.getPrimaryAnalyticsRecordStore();
+        List<String> ids = new ArrayList<String>();
+        ids.add(GenericUtils.calculateTableIdentity(tenantId, tableName));
+        List<Record> records;
+        try {
+            records = GenericUtils.listRecords(ars, ars.get(TABLE_INFO_TENANT_ID, TABLE_INFO_TABLE_NAME, 1, null, ids));            
+        } catch (AnalyticsTableNotAvailableException e) {
+            throw new AnalyticsTableNotAvailableException(tenantId, tableName);
         }
-        return schema;
+        if (records.size() == 0) {
+            throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+        } else {
+            byte[] data = (byte[]) records.get(0).getValue(TABLE_INFO_DATA_COLUMN);
+            if (data == null) {
+                throw new AnalyticsException("Corrupted table info for tenant id: " + tenantId + " table: " + tableName);
+            }
+            return (AnalyticsTableInfo) GenericUtils.deserializeObject(data);
+        }
+    }
+    
+    private void deleteTableInfo(int tenantId, String tableName) throws AnalyticsException {
+        AnalyticsRecordStore ars = this.getPrimaryAnalyticsRecordStore();
+        List<String> ids = new ArrayList<String>(1);
+        ids.add(GenericUtils.calculateTableIdentity(tenantId, tableName));
+        try {
+            ars.delete(TABLE_INFO_TENANT_ID, TABLE_INFO_TABLE_NAME, ids);
+        } catch (AnalyticsTableNotAvailableException ignore) {
+            /* ignore */
+        }
+    }
+    
+    private void writeTableInfo(int tenantId, 
+            String tableName, AnalyticsTableInfo tableInfo) throws AnalyticsException {
+        AnalyticsRecordStore ars = this.getPrimaryAnalyticsRecordStore();
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put(TABLE_INFO_DATA_COLUMN, GenericUtils.serializeObject(tableInfo));
+        Record record = new Record(GenericUtils.calculateTableIdentity(tenantId, tableName), 
+                TABLE_INFO_TENANT_ID, TABLE_INFO_TABLE_NAME, values);
+        List<Record> records = new ArrayList<Record>();
+        records.add(record);
+        try {
+            ars.put(records);
+        } catch (AnalyticsTableNotAvailableException e) {
+            ars.createTable(TABLE_INFO_TENANT_ID, TABLE_INFO_TABLE_NAME);
+            ars.put(records);
+        }
+    }
+    
+    private AnalyticsTableInfo lookupTableInfo(int tenantId, 
+            String tableName) throws AnalyticsException, AnalyticsTableNotAvailableException {
+        String tableIdentity = GenericUtils.calculateTableIdentity(tenantId, tableName);
+        AnalyticsTableInfo tableInfo = this.tableInfoMap.get(tableIdentity);
+        if (tableInfo == null) {
+            tableInfo = this.readTableInfo(tenantId, tableName);
+            this.tableInfoMap.put(tableIdentity, tableInfo);
+        }
+        return tableInfo;
     }
     
     private void populateWithGenerateIds(List<Record> records) {
@@ -393,7 +534,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     
     private void preprocessRecordBatch(List<Record> recordBatch) throws AnalyticsException {
         Record firstRecord = recordBatch.get(0);
-        AnalyticsSchema schema = this.lookupSchema(firstRecord.getTenantId(), firstRecord.getTableName());
+        AnalyticsSchema schema = this.lookupTableInfo(firstRecord.getTenantId(), 
+                firstRecord.getTableName()).getSchema();
         List<String> primaryKeys = schema.getPrimaryKeys();
         if (primaryKeys != null && primaryKeys.size() > 0) {
             this.populateRecordsWithPrimaryKeyAwareIds(recordBatch, primaryKeys);
@@ -406,29 +548,42 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     public void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
         Collection<List<Record>> recordBatches = GenericUtils.generateRecordBatches(records);
         this.preprocessRecords(recordBatches);
-        this.getAnalyticsRecordStore().put(records);
         for (List<Record> recordsBatch : recordBatches) {
-            Record record = recordsBatch.get(0);
-            AnalyticsSchema schema = this.lookupSchema(record.getTenantId(), record.getTableName());
-            Map<String, ColumnDefinition> indexedColumns = schema.getIndexedColumns();
-            if (indexedColumns.size() > 0) {
-                this.getIndexer().put(records);
-            }
+            this.putSimiarRecordBatch(recordsBatch);
+        }
+    }
+    
+    private void putSimiarRecordBatch(List<Record> recordsBatch) 
+            throws AnalyticsException, AnalyticsTableNotAvailableException {
+        Record firstRecord = recordsBatch.get(0);
+        int tenantId = firstRecord.getTenantId();
+        String tableName = firstRecord.getTableName();
+        String arsName = this.getRecordStoreNameByTable(tenantId, tableName);
+        this.getAnalyticsRecordStore(arsName).put(recordsBatch);
+        AnalyticsSchema schema = this.lookupTableInfo(tenantId, tableName).getSchema();
+        Map<String, ColumnDefinition> indexedColumns = schema.getIndexedColumns();
+        if (indexedColumns.size() > 0) {
+            this.getIndexer().put(recordsBatch);
         }
     }
     
     @Override
-    public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns,
+    public AnalyticsDataResponse get(int tenantId, String tableName, int numPartitionsHint, List<String> columns,
             long timeFrom, long timeTo, int recordsFrom, 
             int recordsCount) throws AnalyticsException, AnalyticsTableNotAvailableException {
-        return this.getAnalyticsRecordStore().get(tenantId, tableName, numPartitionsHint, columns, timeFrom, 
+        String arsName = this.getRecordStoreNameByTable(tenantId, tableName);
+        if (arsName == null) {
+            throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+        }
+        RecordGroup[] rgs = this.getAnalyticsRecordStore(arsName).get(tenantId, tableName, numPartitionsHint, columns, timeFrom, 
                 timeTo, recordsFrom, recordsCount);
+        return new AnalyticsDataResponse(arsName, rgs);
     }
     
-    public RecordGroup[] getWithKeyValues(int tenantId, String tableName, int numPartitionsHint, List<String> columns,
+    public AnalyticsDataResponse getWithKeyValues(int tenantId, String tableName, int numPartitionsHint, List<String> columns,
             List<Map<String, Object>> valuesBatch) throws AnalyticsException, AnalyticsTableNotAvailableException {
         List<String> ids = new ArrayList<String>();
-        AnalyticsSchema schema = this.lookupSchema(tenantId, tableName);
+        AnalyticsSchema schema = this.lookupTableInfo(tenantId, tableName).getSchema();
         List<String> primaryKeys = schema.getPrimaryKeys();
         if (primaryKeys != null && primaryKeys.size() > 0) {
             for (Map<String, Object> values : valuesBatch) {
@@ -439,32 +594,41 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     }
 
     @Override
-    public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint,
+    public AnalyticsDataResponse get(int tenantId, String tableName, int numPartitionsHint,
             List<String> columns, List<String> ids)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
-        return this.getAnalyticsRecordStore().get(tenantId, tableName, numPartitionsHint, columns, ids);
+        String arsName = this.getRecordStoreNameByTable(tenantId, tableName);
+        if (arsName == null) {
+            throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+        }
+        RecordGroup[] rgs = this.getAnalyticsRecordStore(arsName).get(tenantId, tableName, numPartitionsHint, columns, ids);
+        return new AnalyticsDataResponse(arsName, rgs);
     }
     
     @Override
-    public Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException {
-        return this.getAnalyticsRecordStore().readRecords(recordGroup);
+    public Iterator<Record> readRecords(String recordStoreName, RecordGroup recordGroup) throws AnalyticsException {
+        return this.getAnalyticsRecordStore(recordStoreName).readRecords(recordGroup);
     }
     
     @Override
-    public boolean isPaginationSupported() {
-        return this.getAnalyticsRecordStore().isPaginationSupported();
+    public boolean isPaginationSupported(String recordStoreName) throws AnalyticsException {
+        return this.getAnalyticsRecordStore(recordStoreName).isPaginationSupported();
     }
 
     @Override
     public void delete(int tenantId, String tableName, long timeFrom, long timeTo) throws AnalyticsException,
             AnalyticsTableNotAvailableException {
-        Iterator<Record> recordIterator = GenericUtils.recordGroupsToIterator(this.analyticsRecordStore,
-                                                       this.get(tenantId, tableName, 1, null, timeFrom, timeTo, 0, -1));
-        while (recordIterator.hasNext()) {
-            this.getIndexer().delete(tenantId, tableName,
-                                     this.getRecordIdsBatch(recordIterator));
+        String arsName = this.getRecordStoreNameByTable(tenantId, tableName);
+        if (arsName == null) {
+            throw new AnalyticsTableNotAvailableException(tenantId, tableName);
         }
-        this.getAnalyticsRecordStore().delete(tenantId, tableName, timeFrom, timeTo);
+        AnalyticsRecordStore ars = this.getAnalyticsRecordStore(arsName);
+        Iterator<Record> recordIterator = GenericUtils.recordGroupsToIterator(ars, this.get(tenantId, tableName, 
+                1, null, timeFrom, timeTo, 0, -1).getRecordGroups());
+        while (recordIterator.hasNext()) {
+            this.getIndexer().delete(tenantId, tableName, this.getRecordIdsBatch(recordIterator));
+        }
+        ars.delete(tenantId, tableName, timeFrom, timeTo);
     }
     
     private List<String> getRecordIdsBatch(Iterator<Record> recordIterator) throws AnalyticsException {
@@ -478,8 +642,12 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public void delete(int tenantId, String tableName, List<String> ids) throws AnalyticsException,
             AnalyticsTableNotAvailableException {
+        String arsName = this.getRecordStoreNameByTable(tenantId, tableName);
+        if (arsName == null) {
+            throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+        }
         this.getIndexer().delete(tenantId, tableName, ids);
-        this.getAnalyticsRecordStore().delete(tenantId, tableName, ids);
+        this.getAnalyticsRecordStore(arsName).delete(tenantId, tableName, ids);
     }
 
     @Override
@@ -534,18 +702,20 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         if (this.indexer != null) {
             this.indexer.close();
         }
-        this.analyticsRecordStore.destroy();
+        for (AnalyticsRecordStore ars : this.analyticsRecordStores.values()) {
+            ars.destroy();
+        }
         try {
             this.analyticsFileSystem.destroy();
         } catch (IOException e) {
-            throw new AnalyticsException("Error in ADS destroy: " + e.getMessage(), e);
+            throw new AnalyticsException("Error in analytics data service destroy: " + e.getMessage(), e);
         }
     }
     
     /**
-     * This is executed to invalidate the specific analytics schema information at the current node.
+     * This is executed to invalidate the specific analytics table information at the current node.
      */
-    public static class AnalyticsSchemaChangeMessage implements Callable<String>, Serializable {
+    public static class AnalyticsTableInfoChangeMessage implements Callable<String>, Serializable {
 
         private static final long serialVersionUID = 299364639589319379L;
 
@@ -553,7 +723,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         
         private String tableName;
         
-        public AnalyticsSchemaChangeMessage(int tenantId, String tableName) {
+        public AnalyticsTableInfoChangeMessage(int tenantId, String tableName) {
             this.tenantId = tenantId;
             this.tableName = tableName;
         }
@@ -567,9 +737,39 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             /* these cluster messages are specific to AnalyticsDataServiceImpl */
             if (ads instanceof AnalyticsDataServiceImpl) {
                 AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
-                adsImpl.invalidateAnalyticsSchema(this.tenantId, this.tableName);
+                adsImpl.invalidateAnalyticsTableInfo(this.tenantId, this.tableName);
             }
             return "OK";
+        }
+        
+    }
+    
+    /**
+     * This class represents meta information about an analytics table.
+     */
+    public static class AnalyticsTableInfo implements Serializable {
+        
+        private static final long serialVersionUID = -9100036429450395707L;
+
+        private String recordStoreName;
+        
+        private AnalyticsSchema schema;
+        
+        public AnalyticsTableInfo(String recordStoreName, AnalyticsSchema schema) {
+            this.recordStoreName = recordStoreName;
+            this.schema = schema;
+        }
+        
+        public String getRecordStoreName() {
+            return recordStoreName;
+        }
+        
+        public AnalyticsSchema getSchema() {
+            return schema;
+        }
+        
+        public void setSchema(AnalyticsSchema schema) {
+            this.schema = schema;
         }
         
     }

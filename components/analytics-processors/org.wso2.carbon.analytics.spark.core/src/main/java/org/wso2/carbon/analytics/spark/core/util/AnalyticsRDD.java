@@ -28,10 +28,12 @@ import org.apache.spark.TaskContext;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.RowFactory;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
+
 import scala.collection.JavaConversions;
 import scala.collection.Seq;
 import scala.reflect.ClassTag;
@@ -76,7 +78,8 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
     public scala.collection.Iterator<Row> compute(Partition split, TaskContext context) {
         AnalyticsPartition partition = (AnalyticsPartition) split;
         try {
-            Iterator<Record> recordsItr = ServiceHolder.getAnalyticsDataService().readRecords(partition.getRecordGroup());
+            Iterator<Record> recordsItr = ServiceHolder.getAnalyticsDataService().readRecords(
+                    partition.getRecordStoreName(), partition.getRecordGroup());
             return new InterruptibleIterator(context, asScalaIterator(new RowRecordIteratorAdaptor(recordsItr)));
         } catch (AnalyticsException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -102,16 +105,17 @@ public class AnalyticsRDD extends RDD<Row> implements Serializable {
 
     @Override
     public Partition[] getPartitions() {
-        RecordGroup[] rgs;
+        AnalyticsDataResponse resp;
         try {
-            rgs = ServiceHolder.getAnalyticsDataService().get(this.tenantId, this.tableName,
+            resp = ServiceHolder.getAnalyticsDataService().get(this.tenantId, this.tableName,
                     computePartitions(), this.columns, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
         } catch (AnalyticsException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+        RecordGroup[] rgs = resp.getRecordGroups();
         Partition[] result = new Partition[rgs.length];
         for (int i = 0; i < result.length; i++) {
-            result[i] = new AnalyticsPartition(rgs[i], i);
+            result[i] = new AnalyticsPartition(resp.getRecordStoreName(), rgs[i], i);
         }
         return result;
     }

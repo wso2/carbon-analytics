@@ -26,6 +26,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -89,7 +90,7 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "IBM", 75.6f, 100l });
         stockStream.send(new Object[] { "WSO2", 57.6f, 100l });
         Thread.sleep(2000);
-        List<Record> recordsIn = GenericUtils.listRecords(this.service,
+        List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(-1, "stocks", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 2);
         this.service.deleteTable(-1, "stocks");
@@ -114,7 +115,7 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "IBM", 75.6f, 100l });
         stockStream.send(new Object[] { "WSO2", 57.6f, 100l });
         Thread.sleep(2000);
-        List<Record> recordsIn = GenericUtils.listRecords(this.service,
+        List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(-1, "stocks", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 2);
         Assert.assertEquals(this.service.search(-1, "stocks", "symbol: 'WSO2'", 0, 10).size(), 1);
@@ -140,7 +141,7 @@ public class AnalyticsEventTableTest {
         stockStream.send(new Object[] { "IBM", 75.6f, 100l });
         stockStream.send(new Object[] { "WSO2", 57.6f, 100l });
         Thread.sleep(2000);
-        List<Record> recordsIn = GenericUtils.listRecords(this.service,
+        List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(-1, "stocks", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 2);
         Assert.assertEquals(this.service.search(-1, "stocks", "price: [60 TO 80]", 0, 10).size(), 1);

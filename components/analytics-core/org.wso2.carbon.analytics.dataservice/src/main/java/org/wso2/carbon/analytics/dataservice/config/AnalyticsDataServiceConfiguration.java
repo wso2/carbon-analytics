@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement (name = "analytics-dataservice-configuration")
 public class AnalyticsDataServiceConfiguration {
     
-    private AnalyticsRecordStoreConfiguration analyticsRecordStoreConfiguration;
+    private AnalyticsRecordStoreConfiguration[] analyticsRecordStoreConfigurations;
     
     private AnalyticsFileSystemConfiguration analyticsFileSystem;
     
@@ -35,15 +35,17 @@ public class AnalyticsDataServiceConfiguration {
 
     private AnalyticsDataPurgingConfiguration analyticsDataPurgingConfiguration;
     
+    private String primaryRecordStore;
+    
     private int shardCount;
     
     @XmlElement (name = "analytics-record-store", nillable = false)
-    public AnalyticsRecordStoreConfiguration getAnalyticsRecordStoreConfiguration() {
-        return analyticsRecordStoreConfiguration;
+    public AnalyticsRecordStoreConfiguration[] getAnalyticsRecordStoreConfigurations() {
+        return analyticsRecordStoreConfigurations;
     }
 
-    public void setAnalyticsRecordStoreConfiguration(AnalyticsRecordStoreConfiguration analyticsRecordStoreConfiguration) {
-        this.analyticsRecordStoreConfiguration = analyticsRecordStoreConfiguration;
+    public void setAnalyticsRecordStoreConfigurations(AnalyticsRecordStoreConfiguration[] analyticsRecordStoreConfigurations) {
+        this.analyticsRecordStoreConfigurations = analyticsRecordStoreConfigurations;
     }
 
     @XmlElement (name = "analytics-file-system", nillable = false)
@@ -64,14 +66,21 @@ public class AnalyticsDataServiceConfiguration {
 		this.luceneAnalyzerConfiguration = luceneAnalyzerConfiguration;
 	}
 
-    
     public AnalyticsFileSystemConfiguration getAnalyticsFileSystem() {
         return analyticsFileSystem;
     }
 
-    
     public void setAnalyticsFileSystem(AnalyticsFileSystemConfiguration analyticsFileSystem) {
         this.analyticsFileSystem = analyticsFileSystem;
+    }
+    
+    @XmlElement (nillable = false, required = true)
+    public String getPrimaryRecordStore() {
+        return primaryRecordStore;
+    }
+
+    public void setPrimaryRecordStore(String primaryRecordStore) {
+        this.primaryRecordStore = primaryRecordStore;
     }
     
     @XmlElement (name = "shardCount", defaultValue = "6")
@@ -92,4 +101,5 @@ public class AnalyticsDataServiceConfiguration {
             AnalyticsDataPurgingConfiguration analyticsDataPurgingConfiguration) {
         this.analyticsDataPurgingConfiguration = analyticsDataPurgingConfiguration;
     }
+    
 }

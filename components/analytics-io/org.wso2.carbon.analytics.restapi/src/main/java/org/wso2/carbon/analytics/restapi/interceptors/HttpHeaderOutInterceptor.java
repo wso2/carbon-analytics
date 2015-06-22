@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This class represents the interceptor which add headers for outgoing responses
+ * This class represents the intercepter which add headers for outgoing responses
  */
 public class HttpHeaderOutInterceptor extends AbstractPhaseInterceptor<Message> {
     private static final Log logger = LogFactory.getLog(HttpHeaderOutInterceptor.class);
@@ -37,9 +37,10 @@ public class HttpHeaderOutInterceptor extends AbstractPhaseInterceptor<Message> 
         super(Phase.POST_PROTOCOL);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void handleMessage(Message message) throws Fault {
-        Map<String, List> headers = (Map<String, List>) message.get(Message.PROTOCOL_HEADERS);
+        Map<String, List<?>> headers = (Map<String, List<?>>) message.get(Message.PROTOCOL_HEADERS);
         try {
             headers.put("Cache-Control", Collections.singletonList("no-cache,must-revalidate"));
             headers.put("Cache-Control", Collections.singletonList("post-check=0,pre-check=0"));

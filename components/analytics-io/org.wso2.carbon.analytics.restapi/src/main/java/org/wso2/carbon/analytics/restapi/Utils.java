@@ -17,6 +17,7 @@
 package org.wso2.carbon.analytics.restapi;
 
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
@@ -197,22 +198,20 @@ public class Utils {
     }
 
     /**
-     * Returns the list of iterators given RecordGroups as a parameter
+     * Returns the list of iterators given the {@link AnalyticsDataResponse} as a parameter
      *
-     * @param recordGroups         the recordGroup array of which the iterators to be returned
+     * @param resp The analytics data response
      * @param analyticsDataService the AnalyticsDataService instance
      * @return list of Iterators of Records
      * @throws AnalyticsException
      */
-    public static List<Iterator<Record>> getRecordIterators(RecordGroup[] recordGroups,
+    public static List<Iterator<Record>> getRecordIterators(AnalyticsDataResponse resp,
                                                             SecureAnalyticsDataService analyticsDataService)
             throws AnalyticsException {
-
         List<Iterator<Record>> iterators = new ArrayList<>();
-        for (RecordGroup recordGroup : recordGroups) {
-            iterators.add(analyticsDataService.readRecords(recordGroup));
+        for (RecordGroup recordGroup : resp.getRecordGroups()) {
+            iterators.add(analyticsDataService.readRecords(resp.getRecordStoreName(), recordGroup));
         }
-
         return iterators;
     }
 

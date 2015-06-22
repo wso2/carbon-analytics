@@ -23,6 +23,7 @@ import org.wso2.carbon.analytics.api.exception.AnalyticsServiceException;
 import org.wso2.carbon.analytics.api.internal.AnalyticsDataConfiguration;
 import org.wso2.carbon.analytics.api.internal.ServiceHolder;
 import org.wso2.carbon.analytics.api.internal.client.AnalyticsAPIHttpClient;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
@@ -187,7 +188,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, long timeFrom,
+    public AnalyticsDataResponse get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, long timeFrom,
                              long timeTo, int recordsFrom, int recordsCount) throws AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             return ServiceHolder.getAnalyticsDataService().get(tenantId, tableName, numPartitionsHint, columns,
@@ -195,21 +196,25 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
-            return AnalyticsAPIHttpClient.getInstance().getRecordGroup(tenantId, null, tableName, numPartitionsHint,
-                    columns, timeFrom, timeTo, recordsFrom, recordsCount, false);
+            //return AnalyticsAPIHttpClient.getInstance().getRecordGroup(tenantId, null, tableName, numPartitionsHint,
+              //      columns, timeFrom, timeTo, recordsFrom, recordsCount, false);
+            //TODO
+            return null;
         }
     }
 
     @Override
-    public RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, List<String> ids)
+    public AnalyticsDataResponse get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, List<String> ids)
             throws AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             return ServiceHolder.getAnalyticsDataService().get(tenantId, tableName, numPartitionsHint, columns, ids);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
-            return AnalyticsAPIHttpClient.getInstance().getRecordGroup(tenantId, null, tableName, numPartitionsHint, columns,
-                    ids, false);
+//            return AnalyticsAPIHttpClient.getInstance().getRecordGroup(tenantId, null, tableName, numPartitionsHint, columns,
+//                    ids, false);
+            return null;
+            //TODO
         }
     }
 
@@ -321,7 +326,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public RecordGroup[] get(String username, String tableName, int numPartitionsHint, List<String> columns,
+    public AnalyticsDataResponse get(String username, String tableName, int numPartitionsHint, List<String> columns,
                              long timeFrom, long timeTo, int recordsFrom, int recordsCount) throws AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             return ServiceHolder.getSecureAnalyticsDataService().get(username, tableName, numPartitionsHint, columns,
@@ -329,26 +334,30 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
-            return AnalyticsAPIHttpClient.getInstance().getRecordGroup(MultitenantConstants.INVALID_TENANT_ID, username,
-                    tableName, numPartitionsHint, columns, timeFrom, timeTo, recordsFrom, recordsCount, true);
+//            return AnalyticsAPIHttpClient.getInstance().getRecordGroup(MultitenantConstants.INVALID_TENANT_ID, username,
+//                    tableName, numPartitionsHint, columns, timeFrom, timeTo, recordsFrom, recordsCount, true);
+            return null;
+            //TODO
         }
     }
 
     @Override
-    public RecordGroup[] get(String username, String tableName, int numPartitionsHint, List<String> columns,
+    public AnalyticsDataResponse get(String username, String tableName, int numPartitionsHint, List<String> columns,
                              List<String> ids) throws AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             return ServiceHolder.getSecureAnalyticsDataService().get(username, tableName, numPartitionsHint, columns, ids);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
-            return AnalyticsAPIHttpClient.getInstance().getRecordGroup(MultitenantConstants.INVALID_TENANT_ID, username,
-                    tableName, numPartitionsHint, columns, ids, true);
+//            return AnalyticsAPIHttpClient.getInstance().getRecordGroup(MultitenantConstants.INVALID_TENANT_ID, username,
+//                    tableName, numPartitionsHint, columns, ids, true);
+            return null;
+            //TODO
         }
     }
 
     @Override
-    public RecordGroup[] getWithKeyValues(String username, String tableName, int numPartitionsHint,
+    public AnalyticsDataResponse getWithKeyValues(String username, String tableName, int numPartitionsHint,
                                           List<String> columns,
                                           List<Map<String, Object>> valuesBatch)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
@@ -357,19 +366,23 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
-            return AnalyticsAPIHttpClient.getInstance().getWithKeyValues(MultitenantConstants.INVALID_TENANT_ID, username,
-                    tableName, numPartitionsHint, columns, valuesBatch, true);
+//            return AnalyticsAPIHttpClient.getInstance().getWithKeyValues(MultitenantConstants.INVALID_TENANT_ID, username,
+//                    tableName, numPartitionsHint, columns, valuesBatch, true);
+            return null;
+            //TODO
         }
     }
 
     @Override
-    public boolean isPaginationSupported() {
+    public boolean isPaginationSupported(String recordStoreName) throws AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
-            return ServiceHolder.getAnalyticsDataService().isPaginationSupported();
+            return ServiceHolder.getAnalyticsDataService().isPaginationSupported(recordStoreName);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
-            return AnalyticsAPIHttpClient.getInstance().isPaginationSupported();
+            //return AnalyticsAPIHttpClient.getInstance().isPaginationSupported();
+            return false;
+            //TODO
         }
     }
 
@@ -476,13 +489,15 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException {
+    public Iterator<Record> readRecords(String recordStoreName, RecordGroup recordGroup) throws AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
-            return ServiceHolder.getAnalyticsDataService().readRecords(recordGroup);
+            return ServiceHolder.getAnalyticsDataService().readRecords(recordStoreName, recordGroup);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
-            return AnalyticsAPIHttpClient.getInstance().readRecords(recordGroup);
+            //return AnalyticsAPIHttpClient.getInstance().readRecords(recordGroup);
+            return null;
+            //TODO
         }
     }
 
@@ -604,7 +619,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public RecordGroup[] getWithKeyValues(int tenantId, String tableName, int numPartitionsHint, List<String> columns,
+    public AnalyticsDataResponse getWithKeyValues(int tenantId, String tableName, int numPartitionsHint, List<String> columns,
                                           List<Map<String, Object>> valuesBatch) throws AnalyticsException, AnalyticsTableNotAvailableException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             return ServiceHolder.getAnalyticsDataService().getWithKeyValues(tenantId, tableName, numPartitionsHint,
@@ -614,8 +629,10 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
                     analyticsDataConfiguration.getPassword());
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
-            return AnalyticsAPIHttpClient.getInstance().getWithKeyValues(tenantId, null, tableName, numPartitionsHint,
-                    columns, valuesBatch, false);
+//            return AnalyticsAPIHttpClient.getInstance().getWithKeyValues(tenantId, null, tableName, numPartitionsHint,
+//                    columns, valuesBatch, false);
+            return null;
+            //TODO
         }
     }
 
@@ -646,5 +663,18 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
                 }
             }
         }
+    }
+
+    @Override
+    public String getRecordStoreNameByTable(int arg0, String arg1) throws AnalyticsException,
+            AnalyticsTableNotAvailableException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<String> listRecordStoreNames() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

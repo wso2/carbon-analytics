@@ -22,10 +22,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataResponse;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.datasource.commons.Record;
-import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.eventtable.internal.ServiceHolder;
 import org.wso2.siddhi.core.event.ComplexEvent;
 import org.wso2.siddhi.core.event.ComplexEventChunk;
@@ -82,8 +82,9 @@ public class AnalyticsEventTableUtils {
             Map<String, Object> values = streamEventToRecordValues(tenantId, tableName, attrs, event);
             List<Map<String, Object>> valuesBatch = new ArrayList<Map<String,Object>>();
             valuesBatch.add(values);
-            RecordGroup rgs[] = ServiceHolder.getAnalyticsDataService().getWithKeyValues(tenantId, tableName, 1, null, valuesBatch);
-            List<Record> records = GenericUtils.listRecords(ServiceHolder.getAnalyticsDataService(), rgs);
+            AnalyticsDataResponse resp = ServiceHolder.getAnalyticsDataService().getWithKeyValues(
+                    tenantId, tableName, 1, null, valuesBatch);
+            List<Record> records = AnalyticsDataServiceUtils.listRecords(ServiceHolder.getAnalyticsDataService(), resp);
             if (records.size() > 0) {
                 return records.get(0);
             } else {
@@ -96,8 +97,9 @@ public class AnalyticsEventTableUtils {
     
     public static List<Record> getAllRecords(int tenantId, String tableName) {
         try {
-            RecordGroup rgs[] = ServiceHolder.getAnalyticsDataService().get(tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
-            return GenericUtils.listRecords(ServiceHolder.getAnalyticsDataService(), rgs);
+            AnalyticsDataResponse resp = ServiceHolder.getAnalyticsDataService().get(
+                    tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
+            return AnalyticsDataServiceUtils.listRecords(ServiceHolder.getAnalyticsDataService(), resp);
         } catch (AnalyticsException e) {
             throw new IllegalStateException("Error in getting event records: " + e.getMessage(), e);
         }

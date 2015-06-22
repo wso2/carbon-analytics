@@ -17,10 +17,13 @@
 package org.wso2.carbon.analytics.restapi.resources;
 
 import com.google.gson.Gson;
+
 import org.apache.axiom.om.util.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataResponse;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
@@ -28,9 +31,7 @@ import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
-import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.restapi.Constants;
 import org.wso2.carbon.analytics.restapi.UnauthenticatedUserException;
 import org.wso2.carbon.analytics.restapi.Utils;
@@ -66,6 +67,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -374,10 +376,9 @@ public class AnalyticsResource extends AbstractResource {
 		}
         AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
-        final RecordGroup[] recordGroups;
-        recordGroups = analyticsDataService.get(username, tableName, 1, null, timeFrom, timeTo, recordsFrom, count);
+        final AnalyticsDataResponse resp = analyticsDataService.get(username, tableName, 1, null, timeFrom, timeTo, recordsFrom, count);
 
-        final List<Iterator<Record>> iterators = Utils.getRecordIterators(recordGroups, analyticsDataService);
+        final List<Iterator<Record>> iterators = Utils.getRecordIterators(resp, analyticsDataService);
         return new StreamingOutput() {
             @Override
             public void write(OutputStream outputStream)
@@ -496,11 +497,9 @@ public class AnalyticsResource extends AbstractResource {
         }
         AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
-        final RecordGroup[] recordGroups;
-        recordGroups = analyticsDataService.getWithKeyValues(username, tableName, 1, columnKeyValueBean.getColumns(),
+        final AnalyticsDataResponse resp = analyticsDataService.getWithKeyValues(username, tableName, 1, columnKeyValueBean.getColumns(),
                                                              columnKeyValueBean.getValueBatches());
-
-        final List<Iterator<Record>> iterators = Utils.getRecordIterators(recordGroups, analyticsDataService);
+        final List<Iterator<Record>> iterators = Utils.getRecordIterators(resp, analyticsDataService);
         return new StreamingOutput() {
             @Override
             public void write(OutputStream outputStream)
@@ -620,10 +619,10 @@ public class AnalyticsResource extends AbstractResource {
                      queryBean.getTableName(), queryBean.getQuery(),
                      queryBean.getStart(), queryBean.getCount());
             List<String> ids = Utils.getRecordIds(searchResults);
-            RecordGroup[] recordGroups = analyticsDataService.get(username,
+            AnalyticsDataResponse resp = analyticsDataService.get(username,
                                                                   queryBean.getTableName(), 1, null, ids);
-            List<RecordBean> recordBeans = Utils.createRecordBeans(GenericUtils.listRecords(analyticsDataService,
-                                                                                            recordGroups));
+            List<RecordBean> recordBeans = Utils.createRecordBeans(AnalyticsDataServiceUtils.listRecords(analyticsDataService,
+                                                                                            resp));
             if (logger.isDebugEnabled()) {
                 for (RecordBean recordBean : recordBeans) {
                     logger.debug("Search Result -- Record Id: " + recordBean.getId() + " values :" +
@@ -659,10 +658,10 @@ public class AnalyticsResource extends AbstractResource {
             AnalyticsDrillDownRequest request = Utils.createDrilldownRequest(requestBean);
             List<SearchResultEntry> result= analyticsDataService.drillDownSearch(username, request);
             List<String> ids = Utils.getRecordIds(result);
-            RecordGroup[] recordGroups = analyticsDataService.get(username,
+            AnalyticsDataResponse resp = analyticsDataService.get(username,
                                                                   requestBean.getTableName(), 1, null, ids);
-            List<RecordBean> recordBeans = Utils.createRecordBeans(GenericUtils.listRecords(analyticsDataService,
-                                                                                            recordGroups));
+            List<RecordBean> recordBeans = Utils.createRecordBeans(AnalyticsDataServiceUtils.listRecords(analyticsDataService,
+                                                                                            resp));
             return Response.ok(recordBeans).build();
         } else {
             throw new AnalyticsException("Drilldown parameters not provided");

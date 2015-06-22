@@ -30,13 +30,20 @@ public class AnalyticsPartition implements Partition, Serializable {
     
     private static final long serialVersionUID = -5286081735740660738L;
     
+    private String recordStoreName;
+    
     private RecordGroup recordGroup;
     
     private int index;
     
-    public AnalyticsPartition(RecordGroup recordGroup, int index) {
+    public AnalyticsPartition(String recordStoreName, RecordGroup recordGroup, int index) {
+        this.recordStoreName = recordStoreName;
         this.recordGroup = recordGroup;
         this.index = index;
+    }
+    
+    public String getRecordStoreName() {
+        return recordStoreName;
     }
     
     public RecordGroup getRecordGroup() {

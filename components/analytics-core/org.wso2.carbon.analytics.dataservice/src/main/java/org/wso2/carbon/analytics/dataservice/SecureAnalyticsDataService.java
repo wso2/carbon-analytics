@@ -29,15 +29,15 @@ import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutException;
-import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordReader;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 /**
  * This interface validate user permissions before execute analytics data service operations.
  */
-public interface SecureAnalyticsDataService extends AnalyticsRecordReader {
+public interface SecureAnalyticsDataService {
 
     /**
      * Creates a table, if not already there, where the columns are not defined here, but can contain any arbitrary number
@@ -158,11 +158,11 @@ public interface SecureAnalyticsDataService extends AnalyticsRecordReader {
      *                          Long.MAX_VALUE should signal, this restriction to be disregarded
      * @param recordsFrom       The paginated index from value, zero based, inclusive
      * @param recordsCount      The paginated records count to be read, -1 for infinity
-     * @return An array of {@link org.wso2.carbon.analytics.datasource.commons.RecordGroup} objects, which represents individual data sets in their local location
+     * @return The analytics data response
      * @throws AnalyticsException
      * @throws AnalyticsTableNotAvailableException
      */
-    RecordGroup[] get(String username, String tableName, int numPartitionsHint, List<String> columns, long timeFrom,
+    AnalyticsDataResponse get(String username, String tableName, int numPartitionsHint, List<String> columns, long timeFrom,
                       long timeTo, int recordsFrom, int recordsCount)
             throws AnalyticsException, AnalyticsTableNotAvailableException;
 
@@ -174,11 +174,11 @@ public interface SecureAnalyticsDataService extends AnalyticsRecordReader {
      * @param numPartitionsHint The best effort number of splits this should return
      * @param columns           The list of columns to required in results, null if all needs to be returned
      * @param ids               The list of ids of the records to be read
-     * @return An array of {@link RecordGroup} objects, which contains individual data sets in their local location
+     * @return The analytics data response
      * @throws AnalyticsException
      * @throws AnalyticsTableNotAvailableException
      */
-    RecordGroup[] get(String username, String tableName, int numPartitionsHint, List<String> columns,
+    AnalyticsDataResponse get(String username, String tableName, int numPartitionsHint, List<String> columns,
                       List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException;
 
     /**
@@ -188,21 +188,33 @@ public interface SecureAnalyticsDataService extends AnalyticsRecordReader {
      * @param numPartitionsHint The best effort number of splits this should return
      * @param columns The list of columns to required in results, null if all needs to be returned
      * @param valuesBatch A batch of key/values which contains the primary keys values to match the data in the table
-     * @return An array of {@link RecordGroup} objects, which contains individual data sets in their local location
+     * @return The analytics data response
      * @throws AnalyticsException
      * @throws AnalyticsTableNotAvailableException
      */
-    RecordGroup[] getWithKeyValues(String username, String tableName, int numPartitionsHint, List<String> columns,
+    AnalyticsDataResponse getWithKeyValues(String username, String tableName, int numPartitionsHint, List<String> columns,
                                    List<Map<String, Object>> valuesBatch) throws AnalyticsException, AnalyticsTableNotAvailableException;
-
+    
+    /**
+     * Reads in the records from a given record group at a given record store, the records will be streamed in.
+     *
+     * @param recordStoreName The record store name
+     * @param recordGroup The record group which represents the local data set
+     * @return An iterator of type {@link org.wso2.carbon.analytics.datasource.commons.Record} in the local record group
+     * @throws org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
+     */
+    Iterator<Record> readRecords(String recordStoreName, RecordGroup recordGroup) throws AnalyticsException;
+    
     /**
      * Checks whether or not pagination (i.e. jumping to record n and then retrieving k further records)
      * is supported by the underlying record store implementation.
      * Also returns false if the total record count in a table cannot be determined.
      *
+     * @param recordStoreName The record store name
      * @return Pagination/row-count support
+     * @throws AnalyticsException
      */
-    boolean isPaginationSupported();
+    boolean isPaginationSupported(String recordStoreName) throws AnalyticsException;
 
     /**
      * Deletes a set of records in the table.
@@ -306,7 +318,7 @@ public interface SecureAnalyticsDataService extends AnalyticsRecordReader {
      * with score property not-null
      * @throws AnalyticsIndexException
      */
-    List<AnalyticsDrillDownRange> drillDownRangeCount(String username, AnalyticsDrillDownRequest drillDownRequest)
+    List<AnalyticsDrillDownRange> drillDownRangeCount(String usernamAnalyticsRecordReadere, AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException;
     /**
      * Destroys and frees any resources taken up by the analytics data service implementation.

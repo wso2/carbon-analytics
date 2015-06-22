@@ -84,24 +84,25 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
                 long timeTo = Long.parseLong(req.getParameter(AnalyticsAPIConstants.TIME_TO_PARAM));
                 int recordFrom = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.RECORD_FROM_PARAM));
                 int recordsCount = Integer.parseInt(req.getParameter(AnalyticsAPIConstants.COUNT_PARAM));
-                try {
-                    RecordGroup[] recordGroups;
-                    if (!securityEnabled)
-                        recordGroups = ServiceHolder.getAnalyticsDataService().get(tenantId, tableName, partitionHint,
-                                list, timeFrom, timeTo, recordFrom, recordsCount);
-                    else recordGroups = ServiceHolder.getSecureAnalyticsDataService().get(userName, tableName,
-                            partitionHint, list, timeFrom, timeTo, recordFrom, recordsCount);
-                    RemoteRecordGroup[] remoteRecordGroup = new RemoteRecordGroup[recordGroups.length];
-                    for (int i = 0; i < recordGroups.length; i++) {
-                        remoteRecordGroup[i] = new RemoteRecordGroup();
-                        remoteRecordGroup[i].setBinaryRecordGroup(GenericUtils.serializeObject(recordGroups[i]));
-                        remoteRecordGroup[i].setLocations(recordGroups[i].getLocations());
-                    }
-                    resp.setStatus(HttpServletResponse.SC_OK);
-                    GenericUtils.serializeObject(remoteRecordGroup, resp.getOutputStream());
-                } catch (AnalyticsException e) {
-                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-                }
+//                try {
+//                    RecordGroup[] recordGroups;
+//                    if (!securityEnabled)
+//                        recordGroups = ServiceHolder.getAnalyticsDataService().get(tenantId, tableName, partitionHint,
+//                                list, timeFrom, timeTo, recordFrom, recordsCount);
+//                    else recordGroups = ServiceHolder.getSecureAnalyticsDataService().get(userName, tableName,
+//                            partitionHint, list, timeFrom, timeTo, recordFrom, recordsCount);
+//                    RemoteRecordGroup[] remoteRecordGroup = new RemoteRecordGroup[recordGroups.length];
+//                    for (int i = 0; i < recordGroups.length; i++) {
+//                        remoteRecordGroup[i] = new RemoteRecordGroup();
+//                        remoteRecordGroup[i].setBinaryRecordGroup(GenericUtils.serializeObject(recordGroups[i]));
+//                        remoteRecordGroup[i].setLocations(recordGroups[i].getLocations());
+//                    }
+//                    resp.setStatus(HttpServletResponse.SC_OK);
+//                    GenericUtils.serializeObject(remoteRecordGroup, resp.getOutputStream());
+                    //TODO
+//                } catch (AnalyticsException e) {
+//                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+//                }
             } else if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.GET_IDS_RECORD_GROUP_OPERATION)) {
                 int tenantId = MultitenantConstants.INVALID_TENANT_ID;
                 if (!securityEnabled)
@@ -113,24 +114,25 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
                 }.getType();
                 List<String> columns = gson.fromJson(req.getParameter(AnalyticsAPIConstants.COLUMNS_PARAM), columnsList);
                 List<String> ids = gson.fromJson(req.getParameter(AnalyticsAPIConstants.RECORD_IDS_PARAM), columnsList);
-                try {
-                    RecordGroup[] recordGroups;
-                    if (!securityEnabled)
-                        recordGroups = ServiceHolder.getAnalyticsDataService().get(tenantId, tableName,
-                                partitionHint, columns, ids);
-                    else recordGroups = ServiceHolder.getSecureAnalyticsDataService().get(userName, tableName,
-                            partitionHint, columns, ids);
-                    RemoteRecordGroup[] remoteRecordGroup = new RemoteRecordGroup[recordGroups.length];
-                    for (int i = 0; i < recordGroups.length; i++) {
-                        remoteRecordGroup[i] = new RemoteRecordGroup();
-                        remoteRecordGroup[i].setBinaryRecordGroup(GenericUtils.serializeObject(recordGroups[i]));
-                        remoteRecordGroup[i].setLocations(recordGroups[i].getLocations());
-                    }
-                    resp.setStatus(HttpServletResponse.SC_OK);
-                    GenericUtils.serializeObject(remoteRecordGroup, resp.getOutputStream());
-                } catch (AnalyticsException e) {
-                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-                }
+//                try {
+//                    RecordGroup[] recordGroups;
+//                    if (!securityEnabled)
+//                        recordGroups = ServiceHolder.getAnalyticsDataService().get(tenantId, tableName,
+//                                partitionHint, columns, ids);
+//                    else recordGroups = ServiceHolder.getSecureAnalyticsDataService().get(userName, tableName,
+//                            partitionHint, columns, ids);
+//                    RemoteRecordGroup[] remoteRecordGroup = new RemoteRecordGroup[recordGroups.length];
+//                    for (int i = 0; i < recordGroups.length; i++) {
+//                        remoteRecordGroup[i] = new RemoteRecordGroup();
+//                        remoteRecordGroup[i].setBinaryRecordGroup(GenericUtils.serializeObject(recordGroups[i]));
+//                        remoteRecordGroup[i].setLocations(recordGroups[i].getLocations());
+//                    }
+//                    resp.setStatus(HttpServletResponse.SC_OK);
+//                    GenericUtils.serializeObject(remoteRecordGroup, resp.getOutputStream());
+                    //TODO
+//                } catch (AnalyticsException e) {
+//                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+//                }
             } else if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.GET_RECORDS_WITH_KEY_VALUES_OPERATION)) {
                 int tenantId = MultitenantConstants.INVALID_TENANT_ID;
                 if (!securityEnabled)
@@ -143,38 +145,40 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
                 Type keyValueList = new TypeToken<List<Map<String, Object>>>() {}.getType();
                 List<String> columns = gson.fromJson(req.getParameter(AnalyticsAPIConstants.COLUMNS_PARAM), columnsList);
                 List<Map<String, Object>> valuesBatch = gson.fromJson(req.getParameter(AnalyticsAPIConstants.KEY_VALUE_PARAM), keyValueList);
-                try {
-                    RecordGroup[] recordGroups;
-                    if (!securityEnabled)
-                        recordGroups = ServiceHolder.getAnalyticsDataService().getWithKeyValues(tenantId, tableName,
-                                                                                   partitionHint, columns, valuesBatch);
-                    else recordGroups = ServiceHolder.getSecureAnalyticsDataService().getWithKeyValues(userName, tableName,
-                                                                                          partitionHint, columns, valuesBatch);
-                    RemoteRecordGroup[] remoteRecordGroup = new RemoteRecordGroup[recordGroups.length];
-                    for (int i = 0; i < recordGroups.length; i++) {
-                        remoteRecordGroup[i] = new RemoteRecordGroup();
-                        remoteRecordGroup[i].setBinaryRecordGroup(GenericUtils.serializeObject(recordGroups[i]));
-                        remoteRecordGroup[i].setLocations(recordGroups[i].getLocations());
-                    }
-                    resp.setStatus(HttpServletResponse.SC_OK);
-                    GenericUtils.serializeObject(remoteRecordGroup, resp.getOutputStream());
-                } catch (AnalyticsException e) {
-                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-                }
+//                try {
+//                    RecordGroup[] recordGroups;
+//                    if (!securityEnabled)
+//                        recordGroups = ServiceHolder.getAnalyticsDataService().getWithKeyValues(tenantId, tableName,
+//                                                                                   partitionHint, columns, valuesBatch);
+//                    else recordGroups = ServiceHolder.getSecureAnalyticsDataService().getWithKeyValues(userName, tableName,
+//                                                                                          partitionHint, columns, valuesBatch);
+//                    RemoteRecordGroup[] remoteRecordGroup = new RemoteRecordGroup[recordGroups.length];
+//                    for (int i = 0; i < recordGroups.length; i++) {
+//                        remoteRecordGroup[i] = new RemoteRecordGroup();
+//                        remoteRecordGroup[i].setBinaryRecordGroup(GenericUtils.serializeObject(recordGroups[i]));
+//                        remoteRecordGroup[i].setLocations(recordGroups[i].getLocations());
+//                    }
+//                    resp.setStatus(HttpServletResponse.SC_OK);
+//                    GenericUtils.serializeObject(remoteRecordGroup, resp.getOutputStream());
+                    //TODO
+//                } catch (AnalyticsException e) {
+//                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+//                }
             } else if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.READ_RECORD_OPERATION)) {
                 ServletInputStream servletInputStream = req.getInputStream();
-                try {
-                    RemoteRecordGroup remoteRecordGroupObj = (RemoteRecordGroup) GenericUtils.deserializeObject(servletInputStream);
-                    Iterator<Record> records = ServiceHolder.getAnalyticsDataService().readRecords(remoteRecordGroupObj.
-                            getRecordGroupFromBinary());
-                    resp.setStatus(HttpServletResponse.SC_OK);
-                    while (records.hasNext()) {
-                        Record record = records.next();
-                        GenericUtils.serializeObject(record, resp.getOutputStream());
-                    }
-                } catch (AnalyticsException e) {
-                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-                }
+//                try {
+//                    RemoteRecordGroup remoteRecordGroupObj = (RemoteRecordGroup) GenericUtils.deserializeObject(servletInputStream);
+//                    Iterator<Record> records = ServiceHolder.getAnalyticsDataService().readRecords(remoteRecordGroupObj.
+//                            getRecordGroupFromBinary());
+//                    resp.setStatus(HttpServletResponse.SC_OK);
+//                    while (records.hasNext()) {
+//                        Record record = records.next();
+//                        GenericUtils.serializeObject(record, resp.getOutputStream());
+//                    }
+//                } catch (AnalyticsException e) {
+//                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+//                }
+                //TODO
             } else {
                 resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : " + operation
                         + " with get request!");
@@ -202,17 +206,18 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
             String operation = req.getParameter(AnalyticsAPIConstants.OPERATION);
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.READ_RECORD_OPERATION)) {
                 ServletInputStream servletInputStream = req.getInputStream();
-                try {
-                    RemoteRecordGroup remoteRecordGroupObj = (RemoteRecordGroup) GenericUtils.deserializeObject(servletInputStream);
-                    Iterator<Record> records = ServiceHolder.getAnalyticsDataService().readRecords(remoteRecordGroupObj.getRecordGroupFromBinary());
-                    while (records.hasNext()) {
-                        Record record = records.next();
-                        GenericUtils.serializeObject(record, resp.getOutputStream());
-                    }
-                    resp.setStatus(HttpServletResponse.SC_OK);
-                } catch (AnalyticsException e) {
-                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-                }
+//                try {
+//                    RemoteRecordGroup remoteRecordGroupObj = (RemoteRecordGroup) GenericUtils.deserializeObject(servletInputStream);
+//                    Iterator<Record> records = ServiceHolder.getAnalyticsDataService().readRecords(remoteRecordGroupObj.getRecordGroupFromBinary());
+//                    while (records.hasNext()) {
+//                        Record record = records.next();
+//                        GenericUtils.serializeObject(record, resp.getOutputStream());
+//                    }
+//                    resp.setStatus(HttpServletResponse.SC_OK);
+//                } catch (AnalyticsException e) {
+//                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+//                }
+                //TODO
             } else {
                 resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "unsupported operation performed : " + operation
                         + " with get request!");

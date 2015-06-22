@@ -72,7 +72,9 @@ public class AnalyticsManagementProcessor extends HttpServlet {
                     resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
                 }
             }
-            boolean isSupported = ServiceHolder.getAnalyticsDataService().isPaginationSupported();
+            //boolean isSupported = ServiceHolder.getAnalyticsDataService().isPaginationSupported();
+            boolean isSupported = true;
+            //TODO
             PrintWriter writer = resp.getWriter();
             writer.print(AnalyticsAPIConstants.PAGINATION_SUPPORT + AnalyticsAPIConstants.SEPARATOR + isSupported);
             resp.setStatus(HttpServletResponse.SC_OK);

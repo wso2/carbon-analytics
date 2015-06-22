@@ -24,13 +24,14 @@ import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 /**
  * This interface represents all the analytic record related operations.
  */
-public interface AnalyticsRecordStore extends AnalyticsRecordReader {
+public interface AnalyticsRecordStore {
 
     /**
      * This method initializes the AnalyticsRecordStore implementation, and is called once before any other method.
@@ -166,6 +167,15 @@ public interface AnalyticsRecordStore extends AnalyticsRecordReader {
      */
     RecordGroup[] get(int tenantId, String tableName, int numPartitionsHint, List<String> columns, 
             List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException;
+    
+    /**
+     * Reads in the records from a given record group, the records will be streamed in.
+     *
+     * @param recordGroup The record group which represents the local data set
+     * @return An iterator of type {@link org.wso2.carbon.analytics.datasource.commons.Record} in the local record group
+     * @throws org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
+     */
+    Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException;
 
     /**
      * Deletes a set of records in the table.

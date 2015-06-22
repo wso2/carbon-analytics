@@ -8,8 +8,9 @@
             <property name="datasource">WSO2_ANALYTICS_FS_DB</property>
       </properties>
    </analytics-file-system>
+   <primaryRecordStore>EVENT_STORE</primaryRecordStore>
    <!-- Analytics Record Store - properties related to record storage implementation -->
-   <analytics-record-store>
+   <analytics-record-store name = "EVENT_STORE">
       <implementation>org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore</implementation>
       <properties>
             <property name="datasource">WSO2_ANALYTICS_RS_DB</property>

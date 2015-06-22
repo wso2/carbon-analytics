@@ -23,16 +23,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.dataservice.commons.Constants;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
-import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema.ColumnType;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.eventtable.internal.ServiceHolder;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.siddhi.core.config.ExecutionPlanContext;
@@ -553,8 +553,8 @@ public class AnalyticsEventTable implements EventTable {
                 for (SearchResultEntry entry : searchResults) {
                     ids.add(entry.getId());
                 }
-                RecordGroup[] rgs = service.get(this.tenantId, this.tableName, 1, null, ids);
-                return GenericUtils.listRecords(service, rgs);
+                AnalyticsDataResponse resp = service.get(this.tenantId, this.tableName, 1, null, ids);
+                return AnalyticsDataServiceUtils.listRecords(service, resp);
             } catch (AnalyticsException e) {
                 throw new IllegalStateException("Error in executing lucene query: " + e.getMessage(), e);
             }

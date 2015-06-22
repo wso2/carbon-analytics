@@ -142,7 +142,7 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     }
 
     @Override
-    public RecordGroup[] get(String username, String tableName, int numPartitionsHint, List<String> columns,
+    public AnalyticsDataResponse get(String username, String tableName, int numPartitionsHint, List<String> columns,
                              long timeFrom, long timeTo, int recordsFrom, int recordsCount)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
         int tenantId = getTenantId(username);
@@ -152,11 +152,10 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
         }
         return analyticsDataService.get(tenantId, tableName, numPartitionsHint, columns, timeFrom, timeTo,
                                         recordsFrom, recordsCount);
-
     }
 
     @Override
-    public RecordGroup[] get(String username, String tableName, int numPartitionsHint, List<String> columns,
+    public AnalyticsDataResponse get(String username, String tableName, int numPartitionsHint, List<String> columns,
                              List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
         int tenantId = getTenantId(username);
         if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_GET_RECORD)) {
@@ -167,7 +166,7 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     }
 
     @Override
-    public RecordGroup[] getWithKeyValues(String username, String tableName, int numPartitionsHint,
+    public AnalyticsDataResponse getWithKeyValues(String username, String tableName, int numPartitionsHint,
                                           List<String> columns,
                                           List<Map<String, Object>> valuesBatch)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
@@ -180,13 +179,14 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     }
 
     @Override
-    public Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException {
-        return analyticsDataService.readRecords(recordGroup);
+    public Iterator<Record> readRecords(String recordStoreName, RecordGroup recordGroup) throws AnalyticsException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @Override
-    public boolean isPaginationSupported() {
-        return analyticsDataService.isPaginationSupported();
+    public boolean isPaginationSupported(String recordStoreName) throws AnalyticsException {
+        return analyticsDataService.isPaginationSupported(recordStoreName);
     }
 
     @Override

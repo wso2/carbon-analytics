@@ -24,7 +24,7 @@ import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.internal.ServiceHolder;
-import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordReader;
+import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.ndatasource.common.DataSourceConstants;
 import org.wso2.carbon.ndatasource.common.DataSourceConstants.DataSourceStatusModes;
@@ -41,6 +41,7 @@ import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.xml.bind.JAXBContext;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -333,7 +334,7 @@ public class GenericUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static List<Record> listRecords(AnalyticsRecordReader rs,
+    public static List<Record> listRecords(AnalyticsRecordStore rs,
                                            RecordGroup[] rgs) throws AnalyticsException {
         List<Record> result = new ArrayList<Record>();
         for (RecordGroup rg : rgs) {
@@ -634,7 +635,7 @@ public class GenericUtils {
         return streamName.replace('.', '_');
     }
 
-    public static Iterator<Record> recordGroupsToIterator(AnalyticsRecordReader reader,
+    public static Iterator<Record> recordGroupsToIterator(AnalyticsRecordStore reader,
                                                       RecordGroup[] rgs) throws AnalyticsException {
         return new RecordGroupIterator(reader, rgs);
     }
@@ -644,7 +645,7 @@ public class GenericUtils {
      */
     public static class RecordGroupIterator implements Iterator<Record> {
 
-        private AnalyticsRecordReader reader;
+        private AnalyticsRecordStore reader;
 
         private RecordGroup[] rgs;
 
@@ -652,7 +653,7 @@ public class GenericUtils {
 
         private int index = -1;
 
-        public RecordGroupIterator(AnalyticsRecordReader reader, RecordGroup[] rgs)
+        public RecordGroupIterator(AnalyticsRecordStore reader, RecordGroup[] rgs)
                 throws AnalyticsException {
             this.reader = reader;
             this.rgs = rgs;

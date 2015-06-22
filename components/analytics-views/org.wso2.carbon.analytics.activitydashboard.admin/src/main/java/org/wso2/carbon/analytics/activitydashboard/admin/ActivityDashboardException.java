@@ -21,6 +21,9 @@ package org.wso2.carbon.analytics.activitydashboard.admin;
  * This is the exception class to be thrown for any unexpected behaviour.
  */
 public class ActivityDashboardException extends Exception {
+
+    private static final long serialVersionUID = 7202313799291327635L;
+    
     private String errorMessage;
 
     public ActivityDashboardException(String message, Exception exception) {

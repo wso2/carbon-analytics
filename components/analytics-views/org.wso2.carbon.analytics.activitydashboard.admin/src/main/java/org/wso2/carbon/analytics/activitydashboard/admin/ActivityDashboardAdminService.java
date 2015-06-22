@@ -28,6 +28,7 @@ import org.wso2.carbon.analytics.activitydashboard.commons.Operation;
 import org.wso2.carbon.analytics.activitydashboard.commons.Query;
 import org.wso2.carbon.analytics.activitydashboard.commons.SearchExpressionTree;
 import org.wso2.carbon.analytics.activitydashboard.admin.internal.ServiceHolder;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategorySearchResultEntry;
@@ -163,10 +164,12 @@ public class ActivityDashboardAdminService extends AbstractAdmin {
         List<String> recordIds = new ArrayList<>();
         recordIds.add(id.getRecordId());
         try {
-            RecordGroup[] recordGroups = ServiceHolder.getAnalyticsDataAPI().get(userName, id.getTableName(),
+            AnalyticsDataResponse resp = ServiceHolder.getAnalyticsDataAPI().get(userName, id.getTableName(),
                     1, null, recordIds);
+            RecordGroup[] recordGroups = resp.getRecordGroups();
             if (recordGroups.length == 1) {
-                Iterator<Record> recordIterator = ServiceHolder.getAnalyticsDataAPI().readRecords(recordGroups[0]);
+                Iterator<Record> recordIterator = ServiceHolder.getAnalyticsDataAPI().readRecords(
+                        resp.getRecordStoreName(), recordGroups[0]);
                 if (recordIterator.hasNext()) {
                     Record record = recordIterator.next();
                     return getRecordBean(record);

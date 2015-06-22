@@ -539,7 +539,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     
     private Iterator<Record> loadIndexOperationRecords(int tenantId, String tableName) throws AnalyticsException {
         try {
-            return GenericUtils.recordGroupsToIterator(this.analyticsDataService,
+            return GenericUtils.recordGroupsToIterator(this.getAnalyticsRecordStore(),
                     this.getAnalyticsRecordStore().get(tenantId, tableName, 1, null,
                                                        Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         } catch (AnalyticsTableNotAvailableException e) {
