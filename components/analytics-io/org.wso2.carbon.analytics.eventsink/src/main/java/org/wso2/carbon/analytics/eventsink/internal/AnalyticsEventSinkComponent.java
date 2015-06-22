@@ -20,7 +20,7 @@ package org.wso2.carbon.analytics.eventsink.internal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkService;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkServiceImpl;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventStoreCAppDeployer;
@@ -44,8 +44,8 @@ import org.wso2.carbon.event.stream.core.EventStreamService;
  * cardinality="1..1" policy="dynamic" bind="setStreamDefinitionStoreService" unbind="unsetStreamDefinitionStoreService"
  * @scr.reference name="event.stream.service" interface="org.wso2.carbon.event.stream.core.EventStreamService"
  * cardinality="1..1" policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
- * @scr.reference name="analytics.component" interface="org.wso2.carbon.analytics.dataservice.AnalyticsDataService"
- * cardinality="1..1" policy="dynamic" bind="setAnalyticsDataservice" unbind="unsetAnalyticsDataservice"
+ * @scr.reference name="analytics.component" interface="org.wso2.carbon.analytics.api.AnalyticsDataAPI"
+ * cardinality="1..1" policy="dynamic" bind="setAnalyticsDataAPI" unbind="unsetAnalyticsDataAPI"
  */
 
 public class AnalyticsEventSinkComponent {
@@ -94,11 +94,11 @@ public class AnalyticsEventSinkComponent {
         ServiceHolder.setEventStreamService(null);
     }
 
-    protected void setAnalyticsDataservice(AnalyticsDataService analyticsDataservice) {
-        ServiceHolder.setAnalyticsDataService(analyticsDataservice);
+    protected void setAnalyticsDataAPI(AnalyticsDataAPI analyticsDataAPI) {
+        ServiceHolder.setAnalyticsDataAPI(analyticsDataAPI);
     }
 
-    protected void unsetAnalyticsDataservice(AnalyticsDataService analyticsDataservice) {
-        ServiceHolder.setAnalyticsDataService(null);
+    protected void unsetAnalyticsDataAPI(AnalyticsDataAPI analyticsDataAPI) {
+        ServiceHolder.setAnalyticsDataAPI(null);
     }
 }
