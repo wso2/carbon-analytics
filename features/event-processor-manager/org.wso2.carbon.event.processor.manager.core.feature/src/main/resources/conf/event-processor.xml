@@ -27,8 +27,7 @@
 
 
     <!-- HA Mode Config -->
-
-    <!--<mode name="HA" enable="false">
+    <mode name="HA" enable="false">
         <eventSync>
             <hostName>localhost</hostName>
             <port>11224</port>
@@ -39,12 +38,12 @@
             <hostName>localhost</hostName>
             <port>10005</port>
         </management>
-    </mode>-->
+    </mode>
 
 
     <!-- Distributed Mode Config -->
 
-    <!--<mode name="Distributed" enable="false">
+    <mode name="Distributed" enable="false">
 
         <nodeType>
             <worker enable="true"/>
@@ -82,6 +81,7 @@
 
         <distributedUIUrl></distributedUIUrl>
 
-    </mode>-->
+    </mode>
+
 </eventProcessorConfiguration>
 

@@ -44,37 +44,46 @@ public class ManagementModeConfigurationLoader {
     public static ManagementModeInfo loadManagementModeInfo() throws ManagementConfigurationException {
         ManagementModeInfo managementModeInfo = new ManagementModeInfo();
         OMElement omElement = ManagementModeConfigurationLoader.loadConfigXML();
-        String attribute;
-        OMElement processing = omElement.getFirstChildWithName(
-                new QName(ConfigurationConstants.MODE_ELEMENT));
-        if (processing == null) {
-            throw new ManagementConfigurationException("Invalid XML. No element with name "  + ConfigurationConstants.MODE_ELEMENT + " found in file CEP_MANAGEMENT_XML");
-        }
-        if (processing.getAttribute(new QName(ConfigurationConstants.PROCESSING_MODE_NAME_ATTRIBUTE)) == null) {
-            throw new ManagementConfigurationException("Invalid XML. No attribute with name "   + ConfigurationConstants.PROCESSING_MODE_NAME_ATTRIBUTE + " found in file "+ConfigurationConstants.CEP_MANAGEMENT_XML);
-        }
-        attribute = processing.getAttribute(new QName(ConfigurationConstants.PROCESSING_MODE_NAME_ATTRIBUTE))
-                .getAttributeValue();
-        managementModeInfo.setMode(Mode.SingleNode);
-        if (attribute.equalsIgnoreCase(ConfigurationConstants.PROCESSING_MODE_HA) && nodeType(ConfigurationConstants.ENABLE_ATTRIBUTE, processing)) {
-            managementModeInfo.setMode(Mode.HA);
-            log.info("CEP started in HA mode");
-            managementModeInfo.setHaConfiguration(getHAConfiguration(processing));
-        } else if (attribute.equalsIgnoreCase(ConfigurationConstants.PROCESSING_MODE_SN)) {
-            managementModeInfo.setMode(Mode.SingleNode);
-            OMElement nodeConfig = processing.getFirstChildWithName(
-                    new QName(ConfigurationConstants.SN_PERSISTENCE_ELEMENT));
-            if (nodeConfig != null && nodeType(ConfigurationConstants.ENABLE_ATTRIBUTE, nodeConfig)) {
-                managementModeInfo.setPersistenceConfiguration(getPersistConfigurations(nodeConfig));
-                log.info("CEP started in Persistence mode");
-            }
-        } else if (attribute.equalsIgnoreCase(ConfigurationConstants.PROCESSING_MODE_DISTRIBUTED) && nodeType(ConfigurationConstants.ENABLE_ATTRIBUTE, processing)) {
-            managementModeInfo.setMode(Mode.Distributed);
-            log.info("CEP started in Distributed mode");
-            managementModeInfo.setDistributedConfiguration(getDistributedConfiguration(processing));
 
+        Iterator<OMElement> iterator = omElement.getChildrenWithName(new QName(ConfigurationConstants.MODE_ELEMENT));
+
+        while (iterator.hasNext()) {
+            OMElement processingMode = iterator.next();
+            if (processingMode.getAttribute(new QName(ConfigurationConstants.PROCESSING_MODE_NAME_ATTRIBUTE)) == null) {
+                throw new ManagementConfigurationException("Invalid Mode Element with no mode attribute " + ConfigurationConstants.PROCESSING_MODE_NAME_ATTRIBUTE + " in file " + ConfigurationConstants.CEP_MANAGEMENT_XML);
+            }
+
+            if (processingMode.getAttribute(new QName(ConfigurationConstants.ENABLE_ATTRIBUTE)) == null) {
+                throw new ManagementConfigurationException("Invalid Mode Element with no mode attribute " + ConfigurationConstants.ENABLE_ATTRIBUTE + " in file " + ConfigurationConstants.CEP_MANAGEMENT_XML);
+            }
+
+            String attribute = processingMode.getAttribute(new QName(ConfigurationConstants.PROCESSING_MODE_NAME_ATTRIBUTE)).getAttributeValue();
+            String enabled = processingMode.getAttribute(new QName(ConfigurationConstants.ENABLE_ATTRIBUTE)).getAttributeValue();
+            if (enabled.equalsIgnoreCase("true")) {
+                if (attribute.equalsIgnoreCase(ConfigurationConstants.PROCESSING_MODE_HA)) {
+                    managementModeInfo.setMode(Mode.HA);
+                    log.info("CEP started in HA mode");
+                    managementModeInfo.setHaConfiguration(getHAConfiguration(processingMode));
+                } else if (attribute.equalsIgnoreCase(ConfigurationConstants.PROCESSING_MODE_SN)) {
+                    managementModeInfo.setMode(Mode.SingleNode);
+                    OMElement nodeConfig = processingMode.getFirstChildWithName(
+                            new QName(ConfigurationConstants.SN_PERSISTENCE_ELEMENT));
+                    if (nodeConfig != null && nodeType(ConfigurationConstants.ENABLE_ATTRIBUTE, nodeConfig)) {
+                        managementModeInfo.setPersistenceConfiguration(getPersistConfigurations(nodeConfig));
+                        log.info("CEP started in Persistence mode");
+                    }
+                } else if (attribute.equalsIgnoreCase(ConfigurationConstants.PROCESSING_MODE_DISTRIBUTED)) {
+                    managementModeInfo.setMode(Mode.Distributed);
+                    log.info("CEP started in Distributed mode");
+                    managementModeInfo.setDistributedConfiguration(getDistributedConfiguration(processingMode));
+                } else {
+                    managementModeInfo.setMode(Mode.SingleNode);
+                    log.info("CEP started in Single node mode");
+                }
+                return managementModeInfo;
+            }
         }
-        return managementModeInfo;
+        throw new ManagementConfigurationException("Invalid XML. No element with name " + ConfigurationConstants.MODE_ELEMENT + " found in file CEP_MANAGEMENT_XML");
     }
 
     private static OMElement loadConfigXML() throws ManagementConfigurationException {
@@ -94,7 +103,7 @@ public class ManagementModeConfigurationLoader {
         } catch (FileNotFoundException e) {
             throw new ManagementConfigurationException(ConfigurationConstants.CEP_MANAGEMENT_XML + "cannot be found in the path : " + path, e);
         } catch (XMLStreamException e) {
-            throw new ManagementConfigurationException("Invalid XML for " + ConfigurationConstants.CEP_MANAGEMENT_XML  + " located in the path : " + path, e);
+            throw new ManagementConfigurationException("Invalid XML for " + ConfigurationConstants.CEP_MANAGEMENT_XML + " located in the path : " + path, e);
         } finally {
             try {
                 if (inputStream != null) {
@@ -111,11 +120,11 @@ public class ManagementModeConfigurationLoader {
         if (attribute != null) {
             return attribute.getAttributeValue().equalsIgnoreCase("True");
         } else {
-            throw new ManagementConfigurationException("Invalid XML. No attribute with name " + ConfigurationConstants.PROCESSING_MODE_NAME_ATTRIBUTE + " found in file "+ConfigurationConstants.CEP_MANAGEMENT_XML);
+            throw new ManagementConfigurationException("Invalid XML. No attribute with name " + ConfigurationConstants.PROCESSING_MODE_NAME_ATTRIBUTE + " found in file " + ConfigurationConstants.CEP_MANAGEMENT_XML);
         }
     }
 
-    private static  PersistenceConfiguration getPersistConfigurations(OMElement persistence) {
+    private static PersistenceConfiguration getPersistConfigurations(OMElement persistence) {
         OMElement classElement = persistence.getFirstChildWithName(new QName(ConfigurationConstants.SN_PERSISTENCE_PERSIST_CLASS_ELEMENT));
         Map propertiesMap = new HashMap();
         String className;
@@ -136,10 +145,10 @@ public class ManagementModeConfigurationLoader {
         long timeInterval;
         if (timeElement == null) {
             timeInterval = ConfigurationConstants.SN_DEFAULT_PERSISTENCE_INTERVAL;
-        }  else {
+        } else {
             try {
                 timeInterval = Long.parseLong(persistence.getFirstChildWithName(new QName(ConfigurationConstants.SN_PERSISTENCE_INTERVAL_ELEMENT)).getText());
-            } catch (NumberFormatException ex){
+            } catch (NumberFormatException ex) {
                 log.warn("Invalid persistenceInterval. Using default persistenceInterval");
                 timeInterval = ConfigurationConstants.SN_DEFAULT_PERSISTENCE_INTERVAL;
             }
@@ -147,18 +156,18 @@ public class ManagementModeConfigurationLoader {
 
         int poolSize;
         OMElement omElement = persistence.getFirstChildWithName(new QName(ConfigurationConstants.SN_PERSISTENCE_THREAD_POOL_SIZE));
-        if(omElement == null){
+        if (omElement == null) {
             poolSize = ConfigurationConstants.SN_DEFAULT_PERSISTENCE_THREAD_POOL_SIZE;
         } else {
             try {
                 poolSize = Integer.parseInt(persistence.getFirstChildWithName(
                         new QName(ConfigurationConstants.SN_PERSISTENCE_THREAD_POOL_SIZE)).getText());
-            } catch (NumberFormatException ex){
+            } catch (NumberFormatException ex) {
                 log.warn("Invalid persisterSchedulerPoolSize. Using default persisterSchedulerPoolSize");
                 poolSize = ConfigurationConstants.SN_DEFAULT_PERSISTENCE_THREAD_POOL_SIZE;
             }
         }
-        return new PersistenceConfiguration(className,timeInterval, poolSize,propertiesMap);
+        return new PersistenceConfiguration(className, timeInterval, poolSize, propertiesMap);
 
     }
 
@@ -196,7 +205,7 @@ public class ManagementModeConfigurationLoader {
         } else {
             log.info("No heartbeat interval provided. Hence using default heartbeat interval");
         }
-        if (management.getFirstChildWithName(new QName(ConfigurationConstants.RECONNECTION_INTERVAL_ELEMENT)) != null){
+        if (management.getFirstChildWithName(new QName(ConfigurationConstants.RECONNECTION_INTERVAL_ELEMENT)) != null) {
             stormDeploymentConfig.setManagementReconnectInterval(Integer.parseInt(management.getFirstChildWithName
                     (new QName(ConfigurationConstants.RECONNECTION_INTERVAL_ELEMENT)).getText()));
         } else {
@@ -212,16 +221,16 @@ public class ManagementModeConfigurationLoader {
         //Reading transport
         OMElement transport = processingElement.getFirstChildWithName(new QName(ConfigurationConstants.TRANSPORT_ELEMENT));
         OMElement portRange = transport.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_PORT_RANGE_ELEMENT));
-        if(portRange != null) {
+        if (portRange != null) {
             stormDeploymentConfig.setTransportMaxPort(Integer.parseInt(portRange.getFirstChildWithName(new QName("max")).getText()));
             stormDeploymentConfig.setTransportMinPort(Integer.parseInt(portRange.getFirstChildWithName(new QName("min")).getText()));
         } else {
             log.info("No port information provided. Hence using default port settings");
         }
-        if(transport.getFirstChildWithName(new QName(ConfigurationConstants.RECONNECTION_INTERVAL_ELEMENT))!=null) {
+        if (transport.getFirstChildWithName(new QName(ConfigurationConstants.RECONNECTION_INTERVAL_ELEMENT)) != null) {
             stormDeploymentConfig.setTransportReconnectInterval(Integer.parseInt(transport.getFirstChildWithName(
                     new QName(ConfigurationConstants.RECONNECTION_INTERVAL_ELEMENT)).getText()));
-        }else{
+        } else {
             log.info("No transport reconnection interval provided. Hence using default topology resubmit interval");
         }
 
@@ -246,7 +255,7 @@ public class ManagementModeConfigurationLoader {
         }
 
         OMElement distributedUI = processingElement.getFirstChildWithName(new QName(ConfigurationConstants.DISTRIBUTED_NODE_CONFIG_DISTRIBUTED_UI_URL_ELEMENT));
-        if(distributedUI != null){
+        if (distributedUI != null) {
             String url = distributedUI.getText();
             stormDeploymentConfig.setDistributedUIUrl(url);
         }
