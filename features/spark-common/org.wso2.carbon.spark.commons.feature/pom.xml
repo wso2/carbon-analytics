@@ -141,6 +141,14 @@
 			<groupId>org.wso2.orbit.com.esotericsoftware.minlog</groupId>
 			<artifactId>minlog</artifactId>
 		</dependency>
+		<dependency>
+                                <groupId>org.wso2.uncommons.maths</groupId>
+                                <artifactId>uncommons-maths</artifactId>
+                </dependency>
+		<dependency>
+                                <groupId>org.spark-project.protobuf</groupId>
+                                <artifactId>protobuf-java</artifactId>
+                        </dependency>
 
 	</dependencies>
 
@@ -200,6 +208,8 @@
 								<bundleDef>com.fasterxml.jackson.core:jackson-core</bundleDef>
 								<bundleDef>com.fasterxml.jackson.core:jackson-annotations</bundleDef>
 								<bundleDef>com.typesafe:config</bundleDef>
+								<bundleDef>org.spark-project.protobuf:protobuf-java</bundleDef>
+								<bundleDef>org.wso2.uncommons.maths:uncommons-maths</bundleDef>
 								<bundleDef>org.wso2.orbit.com.esotericsoftware.minlog:minlog</bundleDef>
 							</bundles>
 						</configuration>
