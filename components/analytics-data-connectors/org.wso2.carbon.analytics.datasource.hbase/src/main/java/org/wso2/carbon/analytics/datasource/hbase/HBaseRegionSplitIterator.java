@@ -36,8 +36,6 @@ import java.util.*;
  */
 public class HBaseRegionSplitIterator implements Iterator<Record> {
 
-    byte[] startRow, endRow;
-
     private int tenantId;
 
     private String tableName;
@@ -50,8 +48,6 @@ public class HBaseRegionSplitIterator implements Iterator<Record> {
                                     byte[] startRow, byte[] endRow) throws AnalyticsException, AnalyticsTableNotAvailableException {
         this.tenantId = tenantId;
         this.tableName = tableName;
-        this.startRow = startRow;
-        this.endRow = endRow;
         Admin admin = null;
         TableName finalName = TableName.valueOf(
                 HBaseUtils.generateTableName(tenantId, tableName, HBaseAnalyticsDSConstants.TableType.DATA));
@@ -68,8 +64,8 @@ public class HBaseRegionSplitIterator implements Iterator<Record> {
             GenericUtils.closeQuietly(admin);
         }
         Scan splitScan = new Scan();
-        splitScan.setStartRow(this.startRow);
-        splitScan.setStopRow(this.endRow);
+        splitScan.setStartRow(startRow);
+        splitScan.setStopRow(endRow);
 
         if (columns != null && columns.size() > 0) {
             this.colSet = new HashSet<>(columns);

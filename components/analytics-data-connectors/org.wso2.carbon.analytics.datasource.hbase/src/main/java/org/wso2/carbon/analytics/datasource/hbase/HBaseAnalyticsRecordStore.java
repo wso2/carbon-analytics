@@ -261,15 +261,15 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         Map<String, List<Record>> recordBatches = this.generateRecordBatches(records);
         try {
             /* iterating over record batches */
-            for (String genericTableName : recordBatches.keySet()) {
-                tenantId = HBaseUtils.inferTenantId(genericTableName);
-                tableName = HBaseUtils.inferTableName(genericTableName);
+            for (Map.Entry<String, List<Record>> entry : recordBatches.entrySet()) {
+                tenantId = HBaseUtils.inferTenantId(entry.getKey());
+                tableName = HBaseUtils.inferTableName(entry.getKey());
                 table = this.conn.getTable(TableName.valueOf(HBaseUtils.generateTableName(tenantId, tableName,
                         HBaseAnalyticsDSConstants.TableType.DATA)));
                 indexTable = this.conn.getTable(TableName.valueOf(HBaseUtils.generateTableName(tenantId, tableName,
                         HBaseAnalyticsDSConstants.TableType.INDEX)));
                 /* Populating batched Put instances from records in a single batch */
-                List<List<Put>> allPuts = this.populatePuts(recordBatches.get(genericTableName));
+                List<List<Put>> allPuts = this.populatePuts(recordBatches.get(entry.getKey()));
                 /* Using Table.put(List<Put>) method to minimise network calls per table */
                 try {
                     indexTable.put(allPuts.get(0));
@@ -287,7 +287,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         }
     }
 
-    private List<List<Put>> populatePuts(List<Record> records) throws AnalyticsException{
+    private List<List<Put>> populatePuts(List<Record> records) throws AnalyticsException {
         byte[] data;
         List<Put> puts = new ArrayList<>();
         List<Put> indexPuts = new ArrayList<>();
@@ -608,7 +608,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         return timestamps;
     }
 
-    public class HBaseUnsupportedOperationException extends AnalyticsException {
+    public static class HBaseUnsupportedOperationException extends AnalyticsException {
 
         private static final long serialVersionUID = -380641886204128313L;
 

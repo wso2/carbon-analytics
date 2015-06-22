@@ -165,6 +165,15 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
         }
     }
 
+    @Override
+    public void renameFileInDirectory(String dirPath, String nameFrom, String nameTo) throws IOException {
+        if (!dirPath.endsWith("/")) {
+            dirPath += "/";
+        }
+        this.fileSystem.rename(HBaseUtils.createPath(dirPath + nameFrom),
+                HBaseUtils.createPath(dirPath + nameTo));
+    }
+
     /**
      * HDFS Implementation of {@link org.wso2.carbon.analytics.datasource.core.fs.AnalyticsFileSystem.DataInput}
      */
@@ -212,22 +221,13 @@ public class HDFSAnalyticsFileSystem implements AnalyticsFileSystem {
         }
     }
 
-    public class HDFSRuntimeException extends RuntimeException {
+    public static class HDFSRuntimeException extends RuntimeException {
 
         private static final long serialVersionUID = 9089866389463879488L;
 
         HDFSRuntimeException(String s, Throwable t) {
             super(s, t);
         }
-    }
-
-    @Override
-    public void renameFileInDirectory(String dirPath, String nameFrom, String nameTo) throws IOException {
-        if (!dirPath.endsWith("/")) {
-            dirPath += "/";
-        }
-        this.fileSystem.rename(HBaseUtils.createPath(dirPath + nameFrom), 
-                HBaseUtils.createPath(dirPath + nameTo));
     }
 
 }
