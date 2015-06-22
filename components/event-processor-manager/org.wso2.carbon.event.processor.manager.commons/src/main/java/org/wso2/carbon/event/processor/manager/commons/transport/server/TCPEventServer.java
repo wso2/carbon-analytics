@@ -102,7 +102,10 @@ public class TCPEventServer {
                 if (isRunning) {
                     log.error("Error while the server was listening for events: " + e.getMessage(), e);
                 } else {
-                    log.info("EventServer stopped listening for socket connections.", e);
+                    log.info("EventServer stopped listening for socket connections, " + e.getMessage(), e);
+                    if (log.isDebugEnabled()) {
+                        log.debug("EventServer stopped listening for socket connections", e);
+                    }
                 }
             } finally {
                 isRunning = false;
@@ -123,7 +126,7 @@ public class TCPEventServer {
                     BufferedInputStream in = new BufferedInputStream(connectionSocket.getInputStream());
                     while (true) {
 
-                        byte[] streamNameByteSize = loadData(in, new byte[4]) ;
+                        byte[] streamNameByteSize = loadData(in, new byte[4]);
                         ByteBuffer sizeBuf = ByteBuffer.wrap(streamNameByteSize);
                         int streamNameSize = sizeBuf.getInt();
                         byte[] streamNameData = loadData(in, new byte[streamNameSize]);
@@ -163,7 +166,7 @@ public class TCPEventServer {
                         int stringSizePosition = 0;
                         for (int i = 0; i < attributeTypes.length; i++) {
                             Attribute.Type type = attributeTypes[i];
-                            if(Attribute.Type.STRING == type) {
+                            if (Attribute.Type.STRING == type) {
                                 byte[] stringData = loadData(in, new byte[stringValueSizes.get(stringSizePosition)]);
                                 stringSizePosition++;
                                 event[i] = new String(stringData, 0, stringData.length);
