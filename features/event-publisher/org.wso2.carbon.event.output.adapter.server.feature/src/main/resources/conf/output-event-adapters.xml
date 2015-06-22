@@ -51,6 +51,9 @@
         <property key="maxThread">100</property>
         <property key="keepAliveTimeInMillis">20000</property>
         <property key="jobQueueSize">10000</property>
+        <!-- HTTP Client Pool Related Properties -->
+        <property key="defaultMaxConnectionsPerHost">50</property>
+        <property key="maxTotalConnections">1000</property>
     </adapterConfig>
 
     <adapterConfig type="jms">

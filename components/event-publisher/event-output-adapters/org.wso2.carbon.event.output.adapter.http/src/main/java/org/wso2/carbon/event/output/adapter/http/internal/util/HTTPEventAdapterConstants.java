@@ -45,4 +45,10 @@ public class HTTPEventAdapterConstants {
     public static final String ADAPTER_HTTP_CLIENT_METHOD = "http.client.method";
     public static final String CONSTANT_HTTP_POST = "HttpPost";
     public static final String CONSTANT_HTTP_PUT = "HttpPut";
+
+    //configurations for the httpConnectionManager
+    public static final String DEFAULT_MAX_CONNECTIONS_PER_HOST = "defaultMaxConnectionsPerHost";
+    public static final int DEFAULT_DEFAULT_MAX_CONNECTIONS_PER_HOST = 2;
+    public static final String MAX_TOTAL_CONNECTIONS = "maxTotalConnections";
+    public static final int DEFAULT_MAX_TOTAL_CONNECTIONS = 20;
 }
