@@ -18,6 +18,7 @@
 <%@ page import="org.wso2.carbon.analytics.stream.persistence.stub.EventStreamPersistenceAdminServiceStub" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <fmt:bundle basename="org.wso2.carbon.event.stream.ui.i18n.Resources">
 <script type="text/javascript" src="../eventstream/js/event_stream.js"></script>
