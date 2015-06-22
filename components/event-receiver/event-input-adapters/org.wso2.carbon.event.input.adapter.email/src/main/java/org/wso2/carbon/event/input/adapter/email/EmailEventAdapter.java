@@ -374,7 +374,7 @@ public class EmailEventAdapter implements InputEventAdapter {
             if (mailSubject.equalsIgnoreCase(expectedSubject)) {
                 Object content = msg.getContent();
                 if (content instanceof String) {
-                    pushEvent(msg);
+                    pushEvent(content);
                 } else {
                     if (log.isDebugEnabled()) {
                         log.debug("Skipping message because content type is not accepted " + msg);
