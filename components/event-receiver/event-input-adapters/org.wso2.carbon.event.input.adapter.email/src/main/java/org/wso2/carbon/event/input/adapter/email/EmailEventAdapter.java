@@ -390,8 +390,6 @@ public class EmailEventAdapter implements InputEventAdapter {
             log.error("Exception when trying to identify the content type", e);
         } catch (IOException e) {
             log.error("Exception when trying to read the mail content", e);
-        } finally {
-            PrivilegedCarbonContext.endTenantFlow();
         }
     }
 
