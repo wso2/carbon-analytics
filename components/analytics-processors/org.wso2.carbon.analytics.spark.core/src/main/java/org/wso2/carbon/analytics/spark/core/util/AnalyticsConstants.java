@@ -85,8 +85,19 @@ public class AnalyticsConstants {
     public static final String STREAM_NAME = "streamName";
     public static final String PRIMARY_KEYS = "primaryKeys";
     public static final String SPARK_SHORTHAND_STRING = "CarbonAnalytics";
+    public static final String CARBON_STRING = "carbon";
     public static final String TENANT_ID_AND_TABLES_MAP = "tenantIdTablesMap";
     public static final int MAX_RECORDS = 1000;
+
+    //EventStream relation constants
+    public static final String VERSION = "version";
+    public static final String DESCRIPTION = "description";
+    public static final String NICKNAME = "nickname";
+    public static final String PAYLOAD = "payload";
+
+    //Carbon Spark properties strings
+    public static final String CARBON_SPARK_MASTER_COUNT = "carbon.spark.master.count";
+    public static final String CARBON_SPARK_CLIENT_MODE = "carbon.spark.client.mode";
 
     //Spark default properties strings
     public static final String SPARK_MASTER_IP = "spark.master.ip";
@@ -113,6 +124,10 @@ public class AnalyticsConstants {
     public static final String SPARK_LOCAL_DIR = "spark.local.dir";
     public static final String SPARK_LOGCONF = "spark.logConf";
     public static final String SPARK_MASTER = "spark.master";
+
+    public static final String SPARK_UI_PORT = "spark.ui.port";
+
+    public static final String SPARK_RECOVERY_MODE = "spark.deploy.recoveryMode";
 
     //Extra constants available for Spark
 /*  public static final String SPARK_DRIVER_EXTRACLASSPATH = "spark.driver.extraClassPath";
@@ -145,7 +160,6 @@ public class AnalyticsConstants {
     public static final String SPARK_EVENTLOG_DIR = "spark.eventLog.dir";
     public static final String SPARK_EVENTLOG_ENABLED = "spark.eventLog.enabled";
     public static final String SPARK_UI_KILLENABLED = "spark.ui.killEnabled";
-    public static final String SPARK_UI_PORT = "spark.ui.port";
     public static final String SPARK_UI_RETAINEDJOBS = "spark.ui.retainedJobs";
     public static final String SPARK_UI_RETAINEDSTAGES = "spark.ui.retainedStages";
     public static final String SPARK_BROADCAST_COMPRESS = "spark.broadcast.compress";
