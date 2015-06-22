@@ -191,6 +191,11 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
         sendEvent(event);
     }
 
+    @Override
+    public void shutdown() {
+
+    }
+
     private List<String> getDynamicOutputMessageProperties(String messagePropertyValue) {
 
         String text = messagePropertyValue;
