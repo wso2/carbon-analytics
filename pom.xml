@@ -1305,7 +1305,7 @@
         <hadoop.client.orbit.version>2.2.0.wso2v1</hadoop.client.orbit.version>
         <typesafe.version>1.2.0</typesafe.version>
         <akka.version>2.3.4-spark</akka.version>
-        <codahale.metrics.version>3.1.0</codahale.metrics.version>
+        <codahale.metrics.version>3.1.2</codahale.metrics.version>
         <jackson.version>2.4.4</jackson.version>
         <json4s.orbit.version>3.2.10.wso2v1</json4s.orbit.version>
         <kryo.orbit.version>2.24.0.wso2v1</kryo.orbit.version>

@@ -295,55 +295,13 @@
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.core</bundleDef>
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.admin</bundleDef>
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.utils</bundleDef>
-                                <bundleDef>org.wso2.orbit.org.apache.spark:spark-core_2.10</bundleDef>
-                                <bundleDef>org.wso2.orbit.org.apache.spark:spark-sql_2.10</bundleDef>
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.patch</bundleDef>
-                                <bundleDef>org.apache.commons:commons-lang3</bundleDef>
-                                <bundleDef>org.apache.commons:commons-math3</bundleDef>
-                                <bundleDef>org.scala-lang:scala-library</bundleDef>
-                                <bundleDef>org.scala-lang:scala-reflect</bundleDef>
-                                <bundleDef>io.dropwizard.metrics:metrics-json</bundleDef>
-                                <bundleDef>io.dropwizard.metrics:metrics-jvm</bundleDef>
-                                <bundleDef>io.dropwizard.metrics:metrics-core</bundleDef>
-                                <bundleDef>io.dropwizard.metrics:metrics-graphite</bundleDef>
-                                <bundleDef>com.fasterxml.jackson.core:jackson-databind</bundleDef>
-                                <bundleDef>com.fasterxml.jackson.core:jackson-core</bundleDef>
-                                <bundleDef>com.fasterxml.jackson.core:jackson-annotations</bundleDef>
-                                <!--<bundleDef>com.esotericsoftware.kryo:kryo</bundleDef>-->
-                                <bundleDef>org.wso2.orbit.com.esotericsoftware.kryo:kryo</bundleDef>
-                                <bundleDef>org.xerial.snappy:snappy-java</bundleDef>
-                                <bundleDef>io.netty.wso2:netty-all</bundleDef>
-                                <bundleDef>javax.servlet.jsp:javax.servlet.jsp-api</bundleDef>
-                                <bundleDef>org.apache.tomcat.wso2:tomcat-servlet-api</bundleDef>
-                                <bundleDef>org.wso2.orbit.org.apache.hadoop:hadoop-client</bundleDef>
-                                <bundleDef>org.wso2.json4s:json4s-jackson_2.10</bundleDef>
-                                <bundleDef>org.eclipse.jetty:jetty-continuation</bundleDef>
-                                <bundleDef>org.eclipse.jetty:jetty-http</bundleDef>
-                                <bundleDef>org.eclipse.jetty:jetty-io</bundleDef>
-                                <bundleDef>org.eclipse.jetty:jetty-jndi</bundleDef>
-                                <bundleDef>org.eclipse.jetty:jetty-security</bundleDef>
-                                <bundleDef>org.eclipse.jetty:jetty-server</bundleDef>
-                                <bundleDef>org.eclipse.jetty:jetty-servlet</bundleDef>
-                                <bundleDef>org.eclipse.jetty:jetty-util</bundleDef>
-                                <bundleDef>org.eclipse.jetty:jetty-webapp</bundleDef>
-                                <bundleDef>org.eclipse.jetty:jetty-xml</bundleDef>
-                                <bundleDef>io.netty:netty</bundleDef>
-                                <bundleDef>org.wso2.uncommons.maths:uncommons-maths</bundleDef>
-                                <bundleDef>com.ning:compress-lzf</bundleDef>
-                                <bundleDef>com.google.guava:guava</bundleDef>
-                                <bundleDef>org.slf4j:slf4j-api</bundleDef>
-                                <bundleDef>org.slf4j:slf4j-log4j12</bundleDef>
-                                <bundleDef>org.wso2.twitter:chill_2.10</bundleDef>
-                                <bundleDef>org.wso2.clearspring.analytics:stream</bundleDef>
-                                <bundleDef>org.wso2.orbit.org.apache.mesos:mesos</bundleDef>
-                                <bundleDef>com.google.protobuf:protobuf-java</bundleDef>
-                                <bundleDef>org.spark-project.protobuf:protobuf-java</bundleDef>
-                                <bundleDef>commons-configuration.wso2:commons-configuration</bundleDef>
                                 <bundleDef>org.roaringbitmap:RoaringBitmap</bundleDef>
-                                <bundleDef>org.wso2.orbit.org.objenesis:objenesis</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}
+                                </importFeatureDef>
+				<importFeatureDef>org.wso2.carbon.spark.commons:${carbon.analytics.common.version}
                                 </importFeatureDef>
                             </importFeatures>
                         </configuration>
