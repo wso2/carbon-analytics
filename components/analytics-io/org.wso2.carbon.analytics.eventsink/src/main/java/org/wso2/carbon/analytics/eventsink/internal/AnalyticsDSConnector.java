@@ -49,7 +49,7 @@ public class AnalyticsDSConnector {
 
     public void insertEvents(int tenantId, List<Event> events) throws StreamDefinitionStoreException,
             AnalyticsException {
-        ServiceHolder.getAnalyticsDataService().put(convertEventsToRecord(tenantId, events));
+        ServiceHolder.getAnalyticsDataAPI().put(convertEventsToRecord(tenantId, events));
     }
 
 
@@ -61,7 +61,7 @@ public class AnalyticsDSConnector {
             StreamDefinition streamDefinition = ServiceHolder.getStreamDefinitionStoreService().
                     getStreamDefinition(event.getStreamId(), tenantId);
             String tableName = AnalyticsEventSinkUtil.generateAnalyticsTableName(streamDefinition.getName());
-            AnalyticsSchema analyticsSchema = ServiceHolder.getAnalyticsDataService().getTableSchema(tenantId, tableName);
+            AnalyticsSchema analyticsSchema = ServiceHolder.getAnalyticsDataAPI().getTableSchema(tenantId, tableName);
             Map<String, Object> eventAttributes = new HashMap<>();
             populateCommonAttributes(streamDefinition, analyticsSchema, eventAttributes);
             populateTypedAttributes(analyticsSchema, AnalyticsEventSinkConstants.EVENT_META_DATA_TYPE,

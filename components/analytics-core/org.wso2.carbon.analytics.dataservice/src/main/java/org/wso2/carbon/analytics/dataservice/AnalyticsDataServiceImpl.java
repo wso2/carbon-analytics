@@ -200,6 +200,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private TaskInfo createDataPurgingTask(AnalyticsDataPurgingConfiguration analyticsDataPurgingConfiguration) {
         String taskName = GLOBAL_DATA_PURGING;
         TaskInfo.TriggerInfo triggerInfo = new TaskInfo.TriggerInfo(analyticsDataPurgingConfiguration.getCronExpression());
+        triggerInfo.setDisallowConcurrentExecution(true);
         Map<String, String> taskProperties = new HashMap<>(2);
         taskProperties.put(Constants.RETENTION_PERIOD, String.valueOf(analyticsDataPurgingConfiguration.getRetentionDays()));
         taskProperties.put(Constants.INCLUDE_TABLES, getIncludeTables(analyticsDataPurgingConfiguration

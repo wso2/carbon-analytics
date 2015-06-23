@@ -44,6 +44,7 @@ import org.wso2.carbon.analytics.api.RemoteRecordIterator;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceAuthenticationException;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceException;
 import org.wso2.carbon.analytics.api.internal.AnalyticsDataConfiguration;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
@@ -125,8 +126,10 @@ public class AnalyticsAPIHttpClient {
                             + password).getBytes()));
             HttpResponse httpResponse = httpClient.execute(getMethod);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                String response = httpResponse.getStatusLine().toString();
                 EntityUtils.consume(httpResponse.getEntity());
-                throw new AnalyticsServiceAuthenticationException("Authentication failed for user : " + username);
+                throw new AnalyticsServiceAuthenticationException("Authentication failed for user : " + username + " ."
+                        + "Response received from remote instance : " + response);
             }
             String response = getResponseString(httpResponse);
             if (response.startsWith(AnalyticsAPIConstants.SESSION_ID)) {
@@ -170,6 +173,7 @@ public class AnalyticsAPIHttpClient {
             throw new AnalyticsServiceException("Error while reading the response from the remote service. "
                     + e.getMessage(), e);
         } finally {
+            EntityUtils.consumeQuietly(httpResponse.getEntity());
             if (br != null) {
                 try {
                     br.close();
@@ -180,7 +184,7 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public void createTable(int tenantId, String username, String tableName, boolean securityEnabled) throws AnalyticsServiceException {
+    public void createTable(int tenantId, String username, String recordStoreName, String tableName, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants
                 .TABLE_PROCESSOR_SERVICE_URI);
@@ -194,6 +198,9 @@ public class AnalyticsAPIHttpClient {
                 params.add(new BasicNameValuePair(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId)));
             } else {
                 params.add(new BasicNameValuePair(AnalyticsAPIConstants.USERNAME_PARAM, username));
+            }
+            if (recordStoreName != null) {
+                params.add(new BasicNameValuePair(AnalyticsAPIConstants.RECORD_STORE_NAME_PARAM, recordStoreName));
             }
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled)));
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName));
@@ -268,6 +275,7 @@ public class AnalyticsAPIHttpClient {
                         + " for tenant id : " + tenantId + ". " + response);
             } else {
                 Object analyticsSchemaObject = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                EntityUtils.consumeQuietly(httpResponse.getEntity());
                 if (analyticsSchemaObject != null && analyticsSchemaObject instanceof AnalyticsSchema) {
                     return (AnalyticsSchema) analyticsSchemaObject;
                 } else {
@@ -347,6 +355,7 @@ public class AnalyticsAPIHttpClient {
                         + tenantId + ". " + response);
             } else {
                 Object listOfTablesObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                EntityUtils.consumeQuietly(httpResponse.getEntity());
                 if (listOfTablesObj != null && listOfTablesObj instanceof List) {
                     return (List<String>) listOfTablesObj;
                 } else {
@@ -453,6 +462,7 @@ public class AnalyticsAPIHttpClient {
                 throw new AnalyticsServiceException("Unable to put the records. " + response);
             } else {
                 Object recordIdsObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                EntityUtils.consumeQuietly(httpResponse.getEntity());
                 if (recordIdsObj != null && recordIdsObj instanceof List) {
                     List<String> recordIds = (List<String>) recordIdsObj;
                     int index = 0;
@@ -523,43 +533,6 @@ public class AnalyticsAPIHttpClient {
                 throw new AnalyticsServiceException("Unable to delete the record count for the table - " + tableName
                         + ", records - " + recordIds
                         + " for tenant id : " + tenantId + ". " + response);
-            }
-        } catch (URISyntaxException e) {
-            throw new AnalyticsServiceAuthenticationException("Malformed URL provided. " + e.getMessage(), e);
-        } catch (IOException e) {
-            throw new AnalyticsServiceAuthenticationException("Error while connecting to the remote service. " + e.getMessage(), e);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<String> getScoreParams(int tenantId, String username, String tableName, boolean securityEnabled)
-            throws AnalyticsServiceException {
-        URIBuilder builder = new URIBuilder();
-        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI)
-                .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.GET_SCORE_PARAMS_OPERATION)
-                .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
-                .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
-        if (!securityEnabled) {
-            builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
-        } else {
-            builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
-        }
-        try {
-            HttpGet getMethod = new HttpGet(builder.build().toString());
-            getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
-            HttpResponse httpResponse = httpClient.execute(getMethod);
-            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
-                String response = getResponseString(httpResponse);
-                throw new AnalyticsServiceException("Unable to get the index for table - " + tableName
-                        + " for tenant id : " + tenantId + ". " + response);
-            } else {
-                Object scoreParamsObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
-                if (scoreParamsObj != null && scoreParamsObj instanceof List) {
-                    return (List<String>) scoreParamsObj;
-                } else {
-                    throw new AnalyticsServiceException(getUnexpectedResponseReturnedErrorMsg("getting score params",
-                            tableName, "list of strings for score params", scoreParamsObj));
-                }
             }
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceAuthenticationException("Malformed URL provided. " + e.getMessage(), e);
@@ -643,6 +616,7 @@ public class AnalyticsAPIHttpClient {
                         + response);
             } else {
                 Object searchResultObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                EntityUtils.consumeQuietly(httpResponse.getEntity());
                 if (searchResultObj != null && searchResultObj instanceof List) {
                     return (List<SearchResultEntry>) searchResultObj;
                 } else {
@@ -745,7 +719,7 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public RecordGroup[] getRecordGroup(int tenantId, String username, String tableName, int numPartitionsHint,
+    public AnalyticsDataResponse getRecordGroup(int tenantId, String username, String tableName, int numPartitionsHint,
                                         List<String> columns, long timeFrom, long timeTo, int recordsFrom,
                                         int recordsCount, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
@@ -773,12 +747,20 @@ public class AnalyticsAPIHttpClient {
                 throw new AnalyticsServiceException("Unable to destroy the process . "
                         + response);
             } else {
-                Object remoteRecordGroupObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
-                if (remoteRecordGroupObj != null && remoteRecordGroupObj instanceof RemoteRecordGroup[]) {
-                    return (RecordGroup[]) remoteRecordGroupObj;
+                Object analyticsDataResponseObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                EntityUtils.consumeQuietly(httpResponse.getEntity());
+                if (analyticsDataResponseObj != null && analyticsDataResponseObj instanceof AnalyticsDataResponse) {
+                  AnalyticsDataResponse analyticsDataResponse = (AnalyticsDataResponse) analyticsDataResponseObj;
+                    if (analyticsDataResponse.getRecordGroups() instanceof RemoteRecordGroup[]){
+                        return analyticsDataResponse;
+                    }else {
+                        throw new AnalyticsServiceAuthenticationException(getUnexpectedResponseReturnedErrorMsg("getting " +
+                                "the record group", tableName, "Analytics Data Response object consist of" +
+                                " array of remote record group", analyticsDataResponseObj));
+                    }
                 } else {
                     throw new AnalyticsServiceAuthenticationException(getUnexpectedResponseReturnedErrorMsg("getting " +
-                            "the record group", tableName, "Array of RemoteRecordGroup", remoteRecordGroupObj));
+                            "the record group", tableName, "Analytics Data Response object", analyticsDataResponseObj));
                 }
             }
         } catch (URISyntaxException e) {
@@ -789,8 +771,8 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public RecordGroup[] getWithKeyValues(int tenantId, String username, String tableName, int numPartitionsHint,
-                                        List<String> columns, List<Map<String, Object>> valuesBatch, boolean securityEnabled) throws AnalyticsServiceException {
+    public AnalyticsDataResponse getWithKeyValues(int tenantId, String username, String tableName, int numPartitionsHint,
+                                          List<String> columns, List<Map<String, Object>> valuesBatch, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.ANALYTIC_RECORD_READ_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.GET_RECORDS_WITH_KEY_VALUES_OPERATION)
@@ -810,26 +792,34 @@ public class AnalyticsAPIHttpClient {
             HttpResponse httpResponse = httpClient.execute(getMethod);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponseString(httpResponse);
-                throw new AnalyticsServiceException("Unable to destroy the process . "
-                                                    + response);
+                throw new AnalyticsServiceException("Unable to get with key values . "
+                        + response);
             } else {
-                Object remoteRecordGroupObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
-                if (remoteRecordGroupObj != null && remoteRecordGroupObj instanceof RemoteRecordGroup[]) {
-                    return (RecordGroup[]) remoteRecordGroupObj;
+                Object analyticsDataResponseObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                EntityUtils.consumeQuietly(httpResponse.getEntity());
+                if (analyticsDataResponseObj != null && analyticsDataResponseObj instanceof AnalyticsDataResponse) {
+                    AnalyticsDataResponse analyticsDataResponse = (AnalyticsDataResponse) analyticsDataResponseObj;
+                    if (analyticsDataResponse.getRecordGroups() instanceof RemoteRecordGroup[]){
+                        return analyticsDataResponse;
+                    }else {
+                        throw new AnalyticsServiceAuthenticationException(getUnexpectedResponseReturnedErrorMsg("getting " +
+                                "with key values", tableName, "Analytics Data Response object consist of" +
+                                " array of remote record group", analyticsDataResponseObj));
+                    }
                 } else {
                     throw new AnalyticsServiceAuthenticationException(getUnexpectedResponseReturnedErrorMsg("getting " +
-                          "the record group", tableName, "Array of RemoteRecordGroup", remoteRecordGroupObj));
+                            "with key value", tableName, "Analytics Data Response object", analyticsDataResponseObj));
                 }
             }
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceAuthenticationException("Malformed URL provided. " + e.getMessage(), e);
         } catch (IOException e) {
             throw new AnalyticsServiceAuthenticationException("Error while connecting to the remote service. "
-                                                              + e.getMessage(), e);
+                    + e.getMessage(), e);
         }
     }
 
-    public RecordGroup[] getRecordGroup(int tenantId, String username, String tableName, int numPartitionsHint, List<String> columns,
+    public AnalyticsDataResponse getRecordGroup(int tenantId, String username, String tableName, int numPartitionsHint, List<String> columns,
                                         List<String> ids, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         Gson gson = new Gson();
@@ -854,12 +844,20 @@ public class AnalyticsAPIHttpClient {
                 throw new AnalyticsServiceException("Unable to destroy the process . "
                         + response);
             } else {
-                Object remoteRecordGroupObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
-                if (remoteRecordGroupObj != null && remoteRecordGroupObj instanceof RemoteRecordGroup[]) {
-                    return (RecordGroup[]) remoteRecordGroupObj;
+                Object analyticsDataResponseObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                EntityUtils.consumeQuietly(httpResponse.getEntity());
+                if (analyticsDataResponseObj != null && analyticsDataResponseObj instanceof AnalyticsDataResponse) {
+                    AnalyticsDataResponse analyticsDataResponse = (AnalyticsDataResponse) analyticsDataResponseObj;
+                    if (analyticsDataResponse.getRecordGroups() instanceof RemoteRecordGroup[]){
+                        return analyticsDataResponse;
+                    }else {
+                        throw new AnalyticsServiceAuthenticationException(getUnexpectedResponseReturnedErrorMsg("getting " +
+                                "the record group", tableName, "Analytics Data Response object consist of" +
+                                " array of remote record group", analyticsDataResponseObj));
+                    }
                 } else {
                     throw new AnalyticsServiceAuthenticationException(getUnexpectedResponseReturnedErrorMsg("getting " +
-                            "the record group", tableName, "Array of RemoteRecordGroup", remoteRecordGroupObj));
+                            "the record group", tableName, "Analytics Data Response object", analyticsDataResponseObj));
                 }
             }
         } catch (URISyntaxException e) {
@@ -870,10 +868,11 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsServiceException {
+    public Iterator<Record> readRecords(String recordStoreName, RecordGroup recordGroup) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.ANALYTIC_RECORD_READ_PROCESSOR_SERVICE_URI)
-                .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.READ_RECORD_OPERATION);
+                .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.READ_RECORD_OPERATION)
+                .addParameter(AnalyticsAPIConstants.RECORD_STORE_NAME_PARAM, recordStoreName);
         try {
             HttpPost postMethod = new HttpPost(builder.build().toString());
             postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
@@ -892,10 +891,11 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public boolean isPaginationSupported() {
+    public boolean isPaginationSupported(String recordStoreName) {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(this.protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.MANAGEMENT_SERVICE_URI)
-                .setParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.IS_PAGINATION_SUPPORTED_OPERATION);
+                .setParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.IS_PAGINATION_SUPPORTED_OPERATION)
+                .addParameter(AnalyticsAPIConstants.RECORD_STORE_NAME_PARAM, recordStoreName);
         try {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
@@ -948,6 +948,7 @@ public class AnalyticsAPIHttpClient {
                 throw new AnalyticsServiceException("Unable to process the DrillDown Request. " + response);
             } else {
                 Object searchResultListObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                EntityUtils.consumeQuietly(httpResponse.getEntity());
                 if (searchResultListObj != null && searchResultListObj instanceof List) {
                     return (List<SearchResultEntry>) searchResultListObj;
                 } else {
@@ -986,6 +987,7 @@ public class AnalyticsAPIHttpClient {
                         + response);
             } else {
                 Object searchCountObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                EntityUtils.consumeQuietly(httpResponse.getEntity());
                 if (searchCountObj != null && searchCountObj instanceof Integer) {
                     return (Integer) searchCountObj;
                 } else {
@@ -1023,6 +1025,7 @@ public class AnalyticsAPIHttpClient {
                         + response);
             } else {
                 Object drillDownCategoriesObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                EntityUtils.consumeQuietly(httpResponse.getEntity());
                 if (drillDownCategoriesObj != null && drillDownCategoriesObj instanceof SubCategories) {
                     return (SubCategories) drillDownCategoriesObj;
                 } else {
@@ -1060,8 +1063,9 @@ public class AnalyticsAPIHttpClient {
                 String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to read the Analytics drilldown object. "
                         + response);
-            }else {
+            } else {
                 Object listOfReangeObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                EntityUtils.consumeQuietly(httpResponse.getEntity());
                 if (listOfReangeObj != null && listOfReangeObj instanceof List) {
                     return (List<AnalyticsDrillDownRange>) listOfReangeObj;
                 } else {

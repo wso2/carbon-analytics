@@ -310,6 +310,32 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
         analyticsDataService.destroy();
     }
 
+    @Override
+    public List<String> listRecordStoreNames() {
+        return analyticsDataService.listRecordStoreNames();
+    }
+
+    @Override
+    public void createTable(String username, String recordStoreName, String tableName) throws AnalyticsException {
+        int tenantId = getTenantId(username);
+        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_CREATE_TABLE)) {
+            throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                           "permission to create table");
+        }
+        analyticsDataService.createTable(tenantId, recordStoreName, tableName);
+    }
+
+    @Override
+    public String getRecordStoreNameByTable(String username, String tableName)
+            throws AnalyticsException, AnalyticsTableNotAvailableException {
+        int tenantId = getTenantId(username);
+        if (!AuthorizationUtils.isUserAuthorized(tenantId, username, Constants.PERMISSION_LIST_TABLE)) {
+            throw new AnalyticsUnauthorizedAccessException("User[" + username + "] does not have required " +
+                                                           "permission to list tables");
+        }
+        return analyticsDataService.getRecordStoreNameByTable(tenantId, tableName);
+    }
+
     private int getTenantId(String username) throws AnalyticsException {
         try {
             String tenantDomain = MultitenantUtils.getTenantDomain(username);

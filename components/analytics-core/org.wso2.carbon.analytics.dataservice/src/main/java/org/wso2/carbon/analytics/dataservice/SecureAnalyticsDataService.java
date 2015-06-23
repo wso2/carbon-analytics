@@ -318,10 +318,36 @@ public interface SecureAnalyticsDataService {
      * with score property not-null
      * @throws AnalyticsIndexException
      */
-    List<AnalyticsDrillDownRange> drillDownRangeCount(String usernamAnalyticsRecordReadere, AnalyticsDrillDownRequest drillDownRequest)
+    List<AnalyticsDrillDownRange> drillDownRangeCount(String username, AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException;
     /**
      * Destroys and frees any resources taken up by the analytics data service implementation.
      */
     void destroy() throws AnalyticsException;
+
+    /**
+     * Lists all the record stores available in the system.
+     * @return The list of record store names
+     */
+    List<String> listRecordStoreNames();
+
+    /**
+     * Creates a table, if not already there, where the columns are not defined here, but can contain any arbitrary number
+     * of columns when data is added. The table names are not case sensitive.
+     * @param username The username
+     * @param recordStoreName The name of the target record store to store the table at
+     * @param tableName The name of the table to be created
+     * @throws AnalyticsException
+     */
+    void createTable(String username, String recordStoreName, String tableName) throws AnalyticsException;
+
+    /**
+     * Returns the record store name given the table information.
+     * @param username The username
+     * @param tableName The table name
+     * @return The record store name
+     * @throws AnalyticsException
+     * @throws AnalyticsTableNotAvailableException
+     */
+    String getRecordStoreNameByTable(String username, String tableName) throws AnalyticsException, AnalyticsTableNotAvailableException;
 }

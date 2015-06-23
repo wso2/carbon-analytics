@@ -29,6 +29,7 @@ public class AnalyticsAPIConstants {
     public static final String ANALYTIC_RECORD_READ_PROCESSOR_SERVICE_URI = DATASERVICE_API_URI+"AnalyticsRecordReadProcessor";
 
     public static final String TENANT_ID_PARAM = "tenant_id";
+    public static final String RECORD_STORE_NAME_PARAM = "record_store_name";
     public static final String USERNAME_PARAM = "username";
     public static final String ENABLE_SECURITY_PARAM = "enableSecurity";
     public static final String TABLE_NAME_PARAM = "table_name";

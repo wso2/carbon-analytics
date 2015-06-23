@@ -52,7 +52,9 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
         File deployementDir = new File(MultitenantUtils.getAxis2RepositoryPath(CarbonContext.getThreadLocalCarbonContext().
                 getTenantId()) + AnalyticsEventSinkConstants.DEPLOYMENT_DIR_NAME);
         if (!deployementDir.exists()) {
-            deployementDir.mkdir();
+            if (!deployementDir.mkdir()){
+                log.warn("Unable to create the deployment dir at : "+ deployementDir.getPath());
+            }
         }
     }
 
@@ -75,6 +77,10 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
                 String errMsg = "Error while deploying file : " + deploymentFileData.getName() + " for tenant id : " + tenantId;
                 log.error(errMsg, e);
                 throw new AnalyticsEventStoreDeploymentException(errMsg, e);
+            } catch (Throwable throwable){
+                String errorMsg = "Unable to deploy the event store : "+ deploymentFileData.getName()+". "+ throwable.getMessage();
+                log.error(errorMsg, throwable);
+                throw new AnalyticsEventStoreDeploymentException(errorMsg, throwable);
             }
             log.info("Deployed successfully analytics event store :" + deploymentFileData.getName());
         } else {
@@ -86,8 +92,8 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
             throws AnalyticsEventStoreException {
         try {
             AnalyticsEventStoreManager.getInstance().addEventStoreConfiguration(tenantId, eventStore);
-            ServiceHolder.getAnalyticsDataService().createTable(tenantId, eventStore.getName());
-            ServiceHolder.getAnalyticsDataService().setTableSchema(tenantId, eventStore.getName(),
+            ServiceHolder.getAnalyticsDataAPI().createTable(tenantId, eventStore.getName());
+            ServiceHolder.getAnalyticsDataAPI().setTableSchema(tenantId, eventStore.getName(),
                     AnalyticsEventSinkUtil.getAnalyticsSchema(eventStore.getAnalyticsTableSchema()));
             for (String streamId : eventStore.getEventSource().getStreamIds()) {
                 if (ServiceHolder.getStreamDefinitionStoreService().getStreamDefinition(streamId, tenantId) != null) {
@@ -95,10 +101,13 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
                 }
             }
         } catch (AnalyticsException e) {
-            throw new AnalyticsEventStoreException("Error while creating the table Or setting the " +
-                    "schema for table :" + eventStore.getName(), e);
+            String errorMsg = "Error while creating the table Or setting the schema for table :" + eventStore.getName();
+            log.error(errorMsg, e);
+            throw new AnalyticsEventStoreException(errorMsg, e);
         } catch (StreamDefinitionStoreException e) {
-            throw new AnalyticsEventStoreException("Error when subscribing to the streams. ", e);
+            String errorMsg = "Error when subscribing to the stream." + e.getMessage();
+            log.error(errorMsg, e);
+            throw new AnalyticsEventStoreException(errorMsg, e);
         }
     }
 

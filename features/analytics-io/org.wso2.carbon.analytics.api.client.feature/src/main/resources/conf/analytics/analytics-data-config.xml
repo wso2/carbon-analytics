@@ -22,7 +22,7 @@
     <MaxConnections>200</MaxConnections>
 
     <!--The maximum number of connections per given route from this node to the remote instances to perform the operations.-->
-    <MaxConnectionsPerRoute>100</MaxConnectionsPerRoute>
+    <MaxConnectionsPerRoute>200</MaxConnectionsPerRoute>
 
     <!--The socket connection timeout when trying to connect the remote service-->
     <SocketConnectionTimeout>60000</SocketConnectionTimeout>
