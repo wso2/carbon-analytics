@@ -869,8 +869,8 @@ public class AnalyticsAPIHttpClient {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
             HttpResponse httpResponse = httpClient.execute(getMethod);
-            String response = getResponseString(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                String response = getResponseString(httpResponse);
                 throw new AnalyticsServiceException("Unable to list the record stores." +
                         response);
             } else {
