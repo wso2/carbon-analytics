@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -59,17 +58,15 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         this.session = cluster.connect();
         this.session.execute("CREATE KEYSPACE IF NOT EXISTS ARS WITH REPLICATION = "
                 + "{'class':'SimpleStrategy', 'replication_factor':3};");
-        this.session.execute("CREATE TABLE IF NOT EXISTS ARS.META (tenantId INT, "
-                + "tableName VARCHAR, tableSchema BLOB, PRIMARY KEY (tenantId, tableName))");
         this.session.execute("CREATE TABLE IF NOT EXISTS ARS.TS (tenantId INT, "
                 + "tableName VARCHAR, timestamp BIGINT, id VARCHAR, PRIMARY KEY ((tenantId, tableName), timestamp))");
     }
     
     private String generateTargetDataTableName(int tenantId, String tableName) {
         if (tenantId < 0) {
-            return "DATA_X" + Math.abs(tenantId) + "_" + GenericUtils.normalizeTableName(tableName);
+            return "DATA_X" + Math.abs(tenantId) + "_" + tableName;
         } else {
-            return "DATA_" + tenantId + "_" + GenericUtils.normalizeTableName(tableName);
+            return "DATA_" + tenantId + "_" + tableName;
         }
     }
 
@@ -78,14 +75,11 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         String dataTable = this.generateTargetDataTableName(tenantId, tableName);
         this.session.execute("CREATE TABLE IF NOT EXISTS ARS." + dataTable +
                 " (id VARCHAR, timestamp BIGINT, data MAP<VARCHAR, BLOB>, PRIMARY KEY (id))");
-        this.session.execute("INSERT INTO ARS.META (tenantId, tableName) VALUES (?, ?)", 
-                tenantId, GenericUtils.normalizeTableName(tableName));
     }
 
     @Override
     public void delete(int tenantId, String tableName, long timeFrom, long timeTo) 
             throws AnalyticsException, AnalyticsTableNotAvailableException {
-        tableName = GenericUtils.normalizeTableName(tableName);
         ResultSet rs = this.session.execute("SELECT id FROM ARS.TS WHERE tenantId = ? AND tableName = ? AND timestamp >= ? AND timestamp < ?",
                 tenantId, tableName, timeFrom == Long.MIN_VALUE ? timeFrom : timeFrom * TS_MULTIPLIER, 
                         timeTo == Long.MAX_VALUE ? timeTo : timeTo * TS_MULTIPLIER);
@@ -106,8 +100,6 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
 
     @Override
     public void deleteTable(int tenantId, String tableName) throws AnalyticsException {
-        tableName = GenericUtils.normalizeTableName(tableName);
-        this.session.execute("DELETE FROM ARS.META WHERE tenantId = ? AND tableName = ?", tenantId, tableName);
         String dataTable = this.generateTargetDataTableName(tenantId, tableName);
         this.session.execute("DELETE FROM ARS.TS WHERE tenantId = ? AND tableName = ?", tenantId, tableName);
         this.session.execute("DROP TABLE IF EXISTS ARS." + dataTable);
@@ -160,7 +152,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
             return this.lookupRecordsByRS(tenantId, tableName, rs, columns);
         } else {
             ResultSet tsrs = this.session.execute("SELECT id FROM ARS.TS WHERE tenantId = ? AND tableName = ? AND timestamp >= ? AND timestamp < ?",
-                    tenantId, GenericUtils.normalizeTableName(tableName), 
+                    tenantId, tableName, 
                     recordGroup.getTimeFrom() == Long.MIN_VALUE ? recordGroup.getTimeFrom() : recordGroup.getTimeFrom() * TS_MULTIPLIER, 
                     recordGroup.getTimeTo() == Long.MAX_VALUE ? recordGroup.getTimeTo() : recordGroup.getTimeTo() * TS_MULTIPLIER);
             List<String> ids = this.resultSetToIds(tsrs);
@@ -198,42 +190,11 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         return -1;
     }
 
-    //@Override
-    public AnalyticsSchema getTableSchema(int tenantId, String tableName) throws AnalyticsTableNotAvailableException,
-            AnalyticsException {
-        ResultSet rs = this.session.execute("SELECT tableSchema FROM ARS.META WHERE tenantId = ? AND tableName = ?", 
-                tenantId, GenericUtils.normalizeTableName(tableName));
-        Row row = rs.one();
-        if (row == null) {
-            throw new AnalyticsTableNotAvailableException(tenantId, tableName);
-        }
-        ByteBuffer byteBuffer = row.getBytes(0);
-        if (byteBuffer == null || byteBuffer.remaining() == 0) {
-            return new AnalyticsSchema();
-        }
-        byte[] data = new byte[byteBuffer.remaining()];
-        byteBuffer.get(data);
-        return (AnalyticsSchema) GenericUtils.deserializeObject(data);
-    }
-
     @Override
     public boolean isPaginationSupported() {
         return false;
     }
-
-    //@Override
-    public List<String> listTables(int tenantId) throws AnalyticsException {
-        ResultSet rs = this.session.execute("SELECT tableName FROM ARS.META WHERE tenantId = ?", tenantId);
-        List<String> result = new ArrayList<String>();
-        Iterator<Row> itr = rs.iterator();
-        Row row;
-        while (itr.hasNext()) {
-            row = itr.next();
-            result.add(row.getString(0));
-        }
-        return result;
-    }
-
+    
     @Override
     public void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
         Collection<List<Record>> batches = GenericUtils.generateRecordBatches(records);
@@ -257,7 +218,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     private void addBatch(List<Record> batch) throws AnalyticsException, AnalyticsTableNotAvailableException {
         Record firstRecord = batch.get(0);
         int tenantId = firstRecord.getTenantId();
-        String tableName = GenericUtils.normalizeTableName(firstRecord.getTableName());
+        String tableName = firstRecord.getTableName();
         try {                
             String dataTable = this.generateTargetDataTableName(tenantId, tableName);
             PreparedStatement ps = session.prepare("INSERT INTO ARS." + dataTable +" (id, timestamp, data) VALUES (?, ?, ?)");
@@ -281,28 +242,14 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         }
     }
 
-    //@Override
-    public void setTableSchema(int tenantId, String tableName, AnalyticsSchema schema) throws AnalyticsTableNotAvailableException,
-            AnalyticsException {
-        tableName = GenericUtils.normalizeTableName(tableName);
+    private boolean tableExists(int tenantId, String tableName) throws AnalyticsException {
+        String dataTable = this.generateTargetDataTableName(tenantId, tableName);
         try {
-            this.session.execute("UPDATE ARS.META SET tableSchema = ? WHERE tenantId = ? AND tableName = ?", 
-                ByteBuffer.wrap(GenericUtils.serializeObject(schema)), tenantId, tableName);
+            ResultSet rs = this.session.execute("SELECT COUNT(*) FROM ARS." + dataTable);
+            return rs.iterator().hasNext();
         } catch (Exception e) {
-            if (!tableExists(tenantId, tableName)) {
-                throw new AnalyticsTableNotAvailableException(tenantId, tableName);
-            } else {
-                throw new AnalyticsException("Error in setting table schema: " + e.getMessage(), e);
-            }
+            return false;
         }
-    }
-
-    //@Override
-    public boolean tableExists(int tenantId, String tableName) throws AnalyticsException {
-        tableName = GenericUtils.normalizeTableName(tableName);
-        ResultSet rs = this.session.execute("SELECT tableSchema FROM ARS.META WHERE tenantId = ? AND tableName = ?", 
-                tenantId, tableName);
-        return rs.iterator().hasNext();
     }
     
     /**
