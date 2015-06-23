@@ -44,6 +44,7 @@ import org.wso2.carbon.analytics.api.RemoteRecordIterator;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceAuthenticationException;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceException;
 import org.wso2.carbon.analytics.api.internal.AnalyticsDataConfiguration;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
@@ -128,7 +129,7 @@ public class AnalyticsAPIHttpClient {
                 String response = httpResponse.getStatusLine().toString();
                 EntityUtils.consume(httpResponse.getEntity());
                 throw new AnalyticsServiceAuthenticationException("Authentication failed for user : " + username + " ."
-                        + "Response received from remote instance : "+ response);
+                        + "Response received from remote instance : " + response);
             }
             String response = getResponseString(httpResponse);
             if (response.startsWith(AnalyticsAPIConstants.SESSION_ID)) {
@@ -183,7 +184,7 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public void createTable(int tenantId, String username, String tableName, boolean securityEnabled) throws AnalyticsServiceException {
+    public void createTable(int tenantId, String username, String recordStoreName, String tableName, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants
                 .TABLE_PROCESSOR_SERVICE_URI);
@@ -197,6 +198,9 @@ public class AnalyticsAPIHttpClient {
                 params.add(new BasicNameValuePair(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId)));
             } else {
                 params.add(new BasicNameValuePair(AnalyticsAPIConstants.USERNAME_PARAM, username));
+            }
+            if (recordStoreName != null) {
+                params.add(new BasicNameValuePair(AnalyticsAPIConstants.RECORD_STORE_NAME_PARAM, recordStoreName));
             }
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled)));
             params.add(new BasicNameValuePair(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName));
@@ -715,7 +719,7 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public RecordGroup[] getRecordGroup(int tenantId, String username, String tableName, int numPartitionsHint,
+    public AnalyticsDataResponse getRecordGroup(int tenantId, String username, String tableName, int numPartitionsHint,
                                         List<String> columns, long timeFrom, long timeTo, int recordsFrom,
                                         int recordsCount, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
@@ -743,13 +747,20 @@ public class AnalyticsAPIHttpClient {
                 throw new AnalyticsServiceException("Unable to destroy the process . "
                         + response);
             } else {
-                Object remoteRecordGroupObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                Object analyticsDataResponseObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
                 EntityUtils.consumeQuietly(httpResponse.getEntity());
-                if (remoteRecordGroupObj != null && remoteRecordGroupObj instanceof RemoteRecordGroup[]) {
-                    return (RecordGroup[]) remoteRecordGroupObj;
+                if (analyticsDataResponseObj != null && analyticsDataResponseObj instanceof AnalyticsDataResponse) {
+                  AnalyticsDataResponse analyticsDataResponse = (AnalyticsDataResponse) analyticsDataResponseObj;
+                    if (analyticsDataResponse.getRecordGroups() instanceof RemoteRecordGroup[]){
+                        return analyticsDataResponse;
+                    }else {
+                        throw new AnalyticsServiceAuthenticationException(getUnexpectedResponseReturnedErrorMsg("getting " +
+                                "the record group", tableName, "Analytics Data Response object consist of" +
+                                " array of remote record group", analyticsDataResponseObj));
+                    }
                 } else {
                     throw new AnalyticsServiceAuthenticationException(getUnexpectedResponseReturnedErrorMsg("getting " +
-                            "the record group", tableName, "Array of RemoteRecordGroup", remoteRecordGroupObj));
+                            "the record group", tableName, "Analytics Data Response object", analyticsDataResponseObj));
                 }
             }
         } catch (URISyntaxException e) {
@@ -760,7 +771,7 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public RecordGroup[] getWithKeyValues(int tenantId, String username, String tableName, int numPartitionsHint,
+    public AnalyticsDataResponse getWithKeyValues(int tenantId, String username, String tableName, int numPartitionsHint,
                                           List<String> columns, List<Map<String, Object>> valuesBatch, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.ANALYTIC_RECORD_READ_PROCESSOR_SERVICE_URI)
@@ -781,16 +792,23 @@ public class AnalyticsAPIHttpClient {
             HttpResponse httpResponse = httpClient.execute(getMethod);
             if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
                 String response = getResponseString(httpResponse);
-                throw new AnalyticsServiceException("Unable to destroy the process . "
+                throw new AnalyticsServiceException("Unable to get with key values . "
                         + response);
             } else {
-                Object remoteRecordGroupObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                Object analyticsDataResponseObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
                 EntityUtils.consumeQuietly(httpResponse.getEntity());
-                if (remoteRecordGroupObj != null && remoteRecordGroupObj instanceof RemoteRecordGroup[]) {
-                    return (RecordGroup[]) remoteRecordGroupObj;
+                if (analyticsDataResponseObj != null && analyticsDataResponseObj instanceof AnalyticsDataResponse) {
+                    AnalyticsDataResponse analyticsDataResponse = (AnalyticsDataResponse) analyticsDataResponseObj;
+                    if (analyticsDataResponse.getRecordGroups() instanceof RemoteRecordGroup[]){
+                        return analyticsDataResponse;
+                    }else {
+                        throw new AnalyticsServiceAuthenticationException(getUnexpectedResponseReturnedErrorMsg("getting " +
+                                "with key values", tableName, "Analytics Data Response object consist of" +
+                                " array of remote record group", analyticsDataResponseObj));
+                    }
                 } else {
                     throw new AnalyticsServiceAuthenticationException(getUnexpectedResponseReturnedErrorMsg("getting " +
-                            "the record group", tableName, "Array of RemoteRecordGroup", remoteRecordGroupObj));
+                            "with key value", tableName, "Analytics Data Response object", analyticsDataResponseObj));
                 }
             }
         } catch (URISyntaxException e) {
@@ -801,7 +819,7 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public RecordGroup[] getRecordGroup(int tenantId, String username, String tableName, int numPartitionsHint, List<String> columns,
+    public AnalyticsDataResponse getRecordGroup(int tenantId, String username, String tableName, int numPartitionsHint, List<String> columns,
                                         List<String> ids, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         Gson gson = new Gson();
@@ -826,13 +844,20 @@ public class AnalyticsAPIHttpClient {
                 throw new AnalyticsServiceException("Unable to destroy the process . "
                         + response);
             } else {
-                Object remoteRecordGroupObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                Object analyticsDataResponseObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
                 EntityUtils.consumeQuietly(httpResponse.getEntity());
-                if (remoteRecordGroupObj != null && remoteRecordGroupObj instanceof RemoteRecordGroup[]) {
-                    return (RecordGroup[]) remoteRecordGroupObj;
+                if (analyticsDataResponseObj != null && analyticsDataResponseObj instanceof AnalyticsDataResponse) {
+                    AnalyticsDataResponse analyticsDataResponse = (AnalyticsDataResponse) analyticsDataResponseObj;
+                    if (analyticsDataResponse.getRecordGroups() instanceof RemoteRecordGroup[]){
+                        return analyticsDataResponse;
+                    }else {
+                        throw new AnalyticsServiceAuthenticationException(getUnexpectedResponseReturnedErrorMsg("getting " +
+                                "the record group", tableName, "Analytics Data Response object consist of" +
+                                " array of remote record group", analyticsDataResponseObj));
+                    }
                 } else {
                     throw new AnalyticsServiceAuthenticationException(getUnexpectedResponseReturnedErrorMsg("getting " +
-                            "the record group", tableName, "Array of RemoteRecordGroup", remoteRecordGroupObj));
+                            "the record group", tableName, "Analytics Data Response object", analyticsDataResponseObj));
                 }
             }
         } catch (URISyntaxException e) {
@@ -843,10 +868,11 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsServiceException {
+    public Iterator<Record> readRecords(String recordStoreName, RecordGroup recordGroup) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.ANALYTIC_RECORD_READ_PROCESSOR_SERVICE_URI)
-                .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.READ_RECORD_OPERATION);
+                .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.READ_RECORD_OPERATION)
+                .addParameter(AnalyticsAPIConstants.RECORD_STORE_NAME_PARAM, recordStoreName);
         try {
             HttpPost postMethod = new HttpPost(builder.build().toString());
             postMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
@@ -865,10 +891,11 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public boolean isPaginationSupported() {
+    public boolean isPaginationSupported(String recordStoreName) {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(this.protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.MANAGEMENT_SERVICE_URI)
-                .setParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.IS_PAGINATION_SUPPORTED_OPERATION);
+                .setParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.IS_PAGINATION_SUPPORTED_OPERATION)
+                .addParameter(AnalyticsAPIConstants.RECORD_STORE_NAME_PARAM, recordStoreName);
         try {
             HttpGet getMethod = new HttpGet(builder.build().toString());
             getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
