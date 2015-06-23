@@ -63,6 +63,8 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
     private boolean sendToOther = false;
     private org.wso2.siddhi.query.api.definition.StreamDefinition streamDefinition;
 
+    private Queue<Event> eventQueue = new LinkedList<>();
+
 
     public EventPublisher(EventPublisherConfiguration eventPublisherConfiguration)
             throws EventPublisherConfigurationException {
@@ -144,6 +146,33 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
         }
         if (isPolled || !EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()) {
             process(event);
+        }
+
+        if(EventPublisherServiceValueHolder.getEventManagementService().isHAMode()){
+            if(!isPolled && EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()){
+                //add to Queue
+                event.setTimestamp(EventPublisherServiceValueHolder.getEventManagementService().getHazelcastClusterTime());
+                eventQueue.add(event);
+
+                // get last processed time and remove old events from the queue
+                long timestamp = EventPublisherServiceValueHolder.getEventManagementService().getLatestSentEventTimeForPublisher(
+                        tenantId + "-" + eventPublisherConfiguration.getEventPublisherName());
+
+                while (!eventQueue.isEmpty() && eventQueue.peek().getTimestamp() <= timestamp) {
+                    eventQueue.remove();
+                }
+
+            }else if(!isPolled && !EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()){
+                //is queue not empty send events from last time
+                long timestamp = EventPublisherServiceValueHolder.getEventManagementService().getHazelcastClusterTime();
+                if(!eventQueue.isEmpty()) {
+                    while (!eventQueue.isEmpty()) {
+                        process(eventQueue.poll());
+                    }
+                }
+                EventPublisherServiceValueHolder.getEventManagementService().updateLatestSentEventTime(
+                        tenantId + "-" + eventPublisherConfiguration.getEventPublisherName(), timestamp);
+            }
         }
     }
 

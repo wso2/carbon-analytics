@@ -66,6 +66,7 @@ public class CarbonEventManagementService implements EventManagementService {
     private CopyOnWriteArrayList<HostAndPort> receiverMembers = new CopyOnWriteArrayList<HostAndPort>();
     private CopyOnWriteArrayList<HostAndPort> publisherMembers = new CopyOnWriteArrayList<HostAndPort>();
 
+    private IMap<String, Long> stormEventPublisherSyncMap = null;
 
     public CarbonEventManagementService() {
         try {
@@ -392,5 +393,38 @@ public class CarbonEventManagementService implements EventManagementService {
                 cleanReceiverAndPublisherMembers(memberList);
             }
         }
+    }
+
+    @Override
+    public void updateLatestSentEventTime(String publisherAndTenantId, long timestamp){
+        if(stormEventPublisherSyncMap == null){
+            stormEventPublisherSyncMap = EventManagementServiceValueHolder.getHazelcastInstance()
+                    .getMap(ConfigurationConstants.STORM_EVENT_PUBLISHER_SYNC_MAP);
+        }
+        stormEventPublisherSyncMap.putAsync(publisherAndTenantId,
+                EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getClusterTime());
+    }
+
+    @Override
+    public long getLatestSentEventTimeForPublisher(String publisherAndTenantId){
+        if(stormEventPublisherSyncMap == null){
+            stormEventPublisherSyncMap = EventManagementServiceValueHolder.getHazelcastInstance()
+                    .getMap(ConfigurationConstants.STORM_EVENT_PUBLISHER_SYNC_MAP);
+        }
+        Object latestTimePublished = stormEventPublisherSyncMap.get(publisherAndTenantId);
+        if (latestTimePublished != null) {
+            return (Long)latestTimePublished;
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean isHAMode(){
+        return mode == Mode.HA;
+    }
+
+    @Override
+    public long getHazelcastClusterTime(){
+        return EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getClusterTime();
     }
 }
