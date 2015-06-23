@@ -17,7 +17,6 @@
     try {
         Permissions permissions = connector.getAvailablePermissionForUser();
         pageContext.setAttribute("permissions", permissions, PageContext.PAGE_SCOPE);
-        pageContext.setAttribute("isPaginationSupported", connector.isPaginationSupported(), PageContext.APPLICATION_SCOPE);
     } catch (MessageConsoleException e) {
         pageContext.setAttribute("permissionError", e, PageContext.PAGE_SCOPE);
     }
@@ -202,28 +201,34 @@
                 $(this).parent().parent().remove();
             });
         });
-        function createMainJTable(fields) {
-            $('#AnalyticsTableContainer').jtable({
-                title: $("#tableSelect").val(),
-                <c:choose>
-                <c:when test="${isPaginationSupported}">
-                paging: true,
-                pageSize: 25,
-                </c:when>
-                <c:otherwise>
-                paging: false,
-                pageSize: 500,
-                </c:otherwise>
-                </c:choose>
-                actions: {
-                    // For Details: http://jtable.org/Demo/FunctionsAsActions
-                    listAction: function (postData, jtParams) {
-                        return listActionMethod(jtParams);
-                    }
-                },
-                fields: fields
-
-            });
+        function createMainJTable(fields, paginationSupport) {
+            if (paginationSupport) {
+                $('#AnalyticsTableContainer').jtable({
+                    title: $("#tableSelect").val(),
+                    paging: true,
+                    pageSize: 25,
+                    actions: {
+                        // For Details: http://jtable.org/Demo/FunctionsAsActions
+                        listAction: function (postData, jtParams) {
+                            return listActionMethod(jtParams);
+                        }
+                    },
+                    fields: fields
+                });
+            } else {
+                $('#AnalyticsTableContainer').jtable({
+                    title: $("#tableSelect").val(),
+                    paging: false,
+                    pageSize: 50,
+                    actions: {
+                        // For Details: http://jtable.org/Demo/FunctionsAsActions
+                        listAction: function (postData, jtParams) {
+                            return listActionMethod(jtParams);
+                        }
+                    },
+                    fields: fields
+                });
+            }
             $('#AnalyticsTableContainer').jtable('load');
             tableLoaded = true;
             $("#resultsTable").show();
@@ -339,7 +344,7 @@
                                       $('#AnalyticsTableContainer').jtable('destroy');
                                       tableLoaded = false;
                                   }
-                                  createMainJTable(fields);
+                                  createMainJTable(fields, data.paginationSupport);
                               }
                           }
                 );

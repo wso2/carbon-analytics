@@ -712,8 +712,10 @@ public class AnalyticsWebServiceConnector {
             logger.debug("Invoking isPaginationSupported");
         }
         try {
-            return handleResponse(ResponseStatus.SUCCESS, gson.toJson(analyticsWebServiceStub.isPaginationSupported()));
-        } catch (RemoteException e) {
+            // TODO: fix this **********************************88
+            return handleResponse(ResponseStatus.SUCCESS, gson.toJson(analyticsWebServiceStub.isPaginationSupported
+                    ("test")));
+        } catch (Exception e) {
             logger.error("Failed to check pagination support" + e.getMessage(), e);
             return handleResponse(ResponseStatus.FAILED,
                                   "Failed to check pagination support: " + e.getMessage());

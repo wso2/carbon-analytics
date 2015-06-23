@@ -326,7 +326,7 @@ public class AnalyticsWebService extends AbstractAdmin {
             }
 
             List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI, analyticsDataAPI.get(getUsername(), tableName,
-                                                                                                   numPartitionsHint, columnList, idList));
+                                                                                                                numPartitionsHint, columnList, idList));
             List<RecordBean> recordBeans = Utils.createRecordBeans(records);
             RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
             return recordBeans.toArray(resultRecordBeans);
@@ -575,6 +575,55 @@ public class AnalyticsWebService extends AbstractAdmin {
             logger.error("Unable to get drill down search count information due to " + e.getMessage(), e);
             throw new AnalyticsWebServiceException("Unable to get drill down search count information due to " + e
                     .getMessage(), e);
+        }
+    }
+
+    /**
+     * Lists all the record stores available in the system.
+     *
+     * @return The list of record store names
+     */
+    public List<String> listRecordStoreNames() throws AnalyticsWebServiceException {
+        try {
+            return analyticsDataAPI.listRecordStoreNames();
+        } catch (Exception e) {
+            logger.error("Unable to get record store names: " + e.getMessage(), e);
+            throw new AnalyticsWebServiceException("Unable to get record store names: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Creates a table, if not already there, where the columns are not defined here, but can contain any arbitrary number
+     * of columns when data is added. The table names are not case sensitive.
+     *
+     * @param recordStoreName The name of the target record store to store the table at
+     * @param tableName       The name of the table to be created
+     * @throws AnalyticsWebServiceException
+     */
+    public void createTable(String recordStoreName, String tableName) throws AnalyticsWebServiceException {
+        try {
+            analyticsDataAPI.createTable(getUsername(), recordStoreName, tableName);
+        } catch (Exception e) {
+            logger.error("Unable to create table[" + tableName + "] in record store[" + recordStoreName +
+                         "]: " + e.getMessage(), e);
+            throw new AnalyticsWebServiceException("Unable to create table[" + tableName +
+                                                   "] in record store[" + recordStoreName + "]: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Returns the record store name given the table information.
+     *
+     * @param tableName The table name
+     * @return The record store name
+     * @throws AnalyticsWebServiceException
+     */
+    public String getRecordStoreNameByTable(String tableName) throws AnalyticsWebServiceException {
+        try {
+            return analyticsDataAPI.getRecordStoreNameByTable(getUsername(), tableName);
+        } catch (Exception e) {
+            logger.error("Unable to get record store name for table[" + tableName + "]: " + e.getMessage(), e);
+            throw new AnalyticsWebServiceException("Unable to get record store name for table[" + tableName + "]: " + e.getMessage(), e);
         }
     }
 }

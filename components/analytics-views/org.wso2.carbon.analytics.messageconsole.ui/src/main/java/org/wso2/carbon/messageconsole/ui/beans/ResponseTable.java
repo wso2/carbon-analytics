@@ -27,6 +27,7 @@ import java.util.List;
 public class ResponseTable {
 
     private String name;
+    private boolean paginationSupport;
     private List<Column> columns = new ArrayList<>();
 
     public ResponseTable() {
@@ -38,6 +39,14 @@ public class ResponseTable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isPaginationSupport() {
+        return paginationSupport;
+    }
+
+    public void setPaginationSupport(boolean paginationSupport) {
+        this.paginationSupport = paginationSupport;
     }
 
     public List<Column> getColumns() {
