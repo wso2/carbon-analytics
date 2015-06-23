@@ -21,8 +21,6 @@ package org.wso2.carbon.analytics.datasource.core;
 import org.apache.commons.collections.IteratorUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
-import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -154,21 +152,29 @@ public class AnalyticsRecordStoreTest {
     private void cleanupT1() throws AnalyticsException {
         this.analyticsRS.deleteTable(7, "T1");
         this.analyticsRS.deleteTable(15, "T1");
-        Assert.assertFalse(this.analyticsRS.tableExists(7, "T1"));
-        Assert.assertFalse(this.analyticsRS.tableExists(15, "T1"));
     }
 
     @Test
-    public void testTableCreateDeleteList() throws AnalyticsException {
+    public void testTableCreateDelete() throws AnalyticsException {
         this.analyticsRS.deleteTable(250035, "TABLE1");
+        boolean ok;
+        try {
+            this.analyticsRS.get(250035, "TABLE1", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
+            ok = false;
+        } catch (AnalyticsTableNotAvailableException e) {
+            ok = true;
+        }
+        Assert.assertTrue(ok);
         this.analyticsRS.deleteTable(250035, "TABLE2");
-        this.analyticsRS.deleteTable(8830, "TABLEX");
+        this.analyticsRS.deleteTable(-8830, "TABLEX");
         this.analyticsRS.createTable(250035, "TABLE1");
-        List<String> tables = this.analyticsRS.listTables(250035);
-        Assert.assertEquals(tables.size(), 1);
-        Assert.assertTrue(new HashSet<String>(tables).contains("TABLE1"));
-        Assert.assertTrue(this.analyticsRS.tableExists(250035, "table1"));
-        Assert.assertTrue(this.analyticsRS.tableExists(250035, "TABLE1"));
+        try {
+            this.analyticsRS.get(250035, "TABLE1", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
+            ok = true;
+        } catch (AnalyticsTableNotAvailableException e) {
+            ok = false;
+        }
+        Assert.assertTrue(ok);
         /* this should not throw an exception */
         this.analyticsRS.createTable(250035, "Table1");
         Record record = this.createRecord(250035, "TABLE2", "S1", "10.0.0.1", 1, "LOG");
@@ -177,69 +183,15 @@ public class AnalyticsRecordStoreTest {
         this.analyticsRS.deleteTable(250035, "TABLE2");
         this.analyticsRS.deleteTable(250035, "TABLE1");
         this.analyticsRS.deleteTable(8830, "TABLEX");
-        Assert.assertEquals(this.analyticsRS.listTables(250035).size(), 0);
-        Assert.assertEquals(this.analyticsRS.listTables(8830).size(), 0);
+        try {
+            this.analyticsRS.get(250035, "TABLE1", 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1);
+            ok = false;
+        } catch (AnalyticsTableNotAvailableException e) {
+            ok = true;
+        }
+        Assert.assertTrue(ok);
     }
-
-    @Test
-    public void testTableSetGetSchema() throws AnalyticsException {
-        int tenantId = 105;
-        String tableName = "T1";
-        this.analyticsRS.deleteTable(tenantId, tableName);
-        this.analyticsRS.createTable(tenantId, tableName);
-        AnalyticsSchema schema = this.analyticsRS.getTableSchema(tenantId, tableName);
-        /* for an empty schema, still the schema object must be returned */
-        Assert.assertNotNull(schema);
-        List<ColumnDefinition> columns = new ArrayList<>();
-        ColumnDefinition cd1 = new ColumnDefinition("name", AnalyticsSchema.ColumnType.STRING);
-        cd1.setType(AnalyticsSchema.ColumnType.STRING);
-        columns.add(cd1);
-        ColumnDefinition cd2 = new ColumnDefinition("age", AnalyticsSchema.ColumnType.INTEGER);
-        columns.add(cd2);
-        ColumnDefinition cd3 = new ColumnDefinition("weight", AnalyticsSchema.ColumnType.DOUBLE);
-        columns.add(cd3);
-        ColumnDefinition cd4 = new ColumnDefinition("something1", AnalyticsSchema.ColumnType.FLOAT);
-        columns.add(cd4);
-        ColumnDefinition cd5 = new ColumnDefinition("something2", AnalyticsSchema.ColumnType.BOOLEAN);
-        columns.add(cd5);
-        ColumnDefinition cd6 = new ColumnDefinition("something3", AnalyticsSchema.ColumnType.LONG);
-        columns.add(cd6);
-        List<String> primaryKeys = new ArrayList<String>();
-        primaryKeys.add("name");
-        primaryKeys.add("age");
-        schema = new AnalyticsSchema(columns, primaryKeys);
-        this.analyticsRS.setTableSchema(tenantId, tableName, schema);
-        AnalyticsSchema schemaIn = this.analyticsRS.getTableSchema(tenantId, tableName);
-        Assert.assertEquals(schema, schemaIn);
-        this.analyticsRS.deleteTable(tenantId, tableName);
-    }
-
-    @Test (expectedExceptions = AnalyticsTableNotAvailableException.class)
-    public void testTableGetNoSchema() throws AnalyticsTableNotAvailableException, AnalyticsException {
-        this.analyticsRS.deleteTable(105, "T1");
-        this.analyticsRS.getTableSchema(105, "T1");
-    }
-
-    @Test
-    public void testTableCreateDeleteListNegativeTenantIds() throws AnalyticsException {
-        this.analyticsRS.deleteTable(-1234, "TABLE1");
-        this.analyticsRS.deleteTable(-1234, "TABLE2");
-        this.analyticsRS.createTable(-1234, "TABLE1");
-        List<String> tables = this.analyticsRS.listTables(-1234);
-        Assert.assertEquals(tables.size(), 1);
-        Assert.assertTrue(new HashSet<String>(tables).contains("TABLE1"));
-        Assert.assertTrue(this.analyticsRS.tableExists(-1234, "table1"));
-        Assert.assertTrue(this.analyticsRS.tableExists(-1234, "TABLE1"));
-        /* this should not throw an exception */
-        this.analyticsRS.createTable(-1234, "Table1");
-        Record record = this.createRecord(-1234, "TABLE2", "S1", "10.0.0.1", 1, "LOG");
-        List<Record> records = new ArrayList<Record>();
-        records.add(record);
-        this.analyticsRS.deleteTable(-1234, "TABLE2");
-        this.analyticsRS.deleteTable(-1234, "TABLE1");
-        Assert.assertEquals(this.analyticsRS.listTables(-1234).size(), 0);
-    }
-
+    
     @Test
     @SuppressWarnings("unchecked")
     public void testDataRecordAddRetrieve() throws AnalyticsException {

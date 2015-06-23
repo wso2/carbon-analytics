@@ -6,6 +6,7 @@
         <paginationSecondInclusive>false</paginationSecondInclusive>
         <paginationSecondLength>true</paginationSecondLength>
         <paginationSecondZeroIndexed>false</paginationSecondZeroIndexed>
+        <recordTableCheckQuery>SELECT 1 FROM {{TABLE_NAME}}</recordTableCheckQuery>        
         <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
         <recordDeletionQuery>DELETE FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordDeletionQuery>
         <recordDeletionWithIdsQuery>DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordDeletionWithIdsQuery>
@@ -19,12 +20,6 @@
         <recordMetaTableInitQueries>
             <query>CREATE TABLE AN_TABLE_META (tenantId INTEGER, tableName VARCHAR(256), tableSchema BINARY, PRIMARY KEY(tenantId, tableName))</query>
         </recordMetaTableInitQueries>
-        <recordMetaTableSelectQuery>SELECT tableSchema FROM AN_TABLE_META WHERE tenantId = ? AND tableName = ?</recordMetaTableSelectQuery>
-        <recordMetaTablesSelectByTenantQuery>SELECT tableName FROM AN_TABLE_META WHERE tenantId = ?</recordMetaTablesSelectByTenantQuery>
-        <recordMetaTableInsertQuery>INSERT INTO AN_TABLE_META (tenantId, tableName) VALUES (?, ?)</recordMetaTableInsertQuery>
-        <recordMetaTableUpdateQuery>UPDATE AN_TABLE_META SET tableSchema = ? WHERE tenantId = ? AND tableName = ?</recordMetaTableUpdateQuery>
-        <recordMetaTableDeleteQuery>DELETE FROM AN_TABLE_META WHERE tenantId = ? AND tableName = ?</recordMetaTableDeleteQuery>
-        <recordMetaTableCheckQuery>SELECT * FROM AN_TABLE_META WHERE tenantId = -1 AND tableName = '_X_'</recordMetaTableCheckQuery>
         <recordTableInitQueries>
             <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50), timestamp BIGINT, data BINARY, PRIMARY KEY(record_id))</query>
             <query>CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)</query>

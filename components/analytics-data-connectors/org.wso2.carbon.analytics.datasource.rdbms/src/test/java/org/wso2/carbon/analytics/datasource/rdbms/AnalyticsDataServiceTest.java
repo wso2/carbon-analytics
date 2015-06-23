@@ -33,7 +33,9 @@ import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema.ColumnType;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsRecordStoreTest;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.base.MultitenantConstants;
 
 import java.io.Serializable;
@@ -90,6 +92,99 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         AnalyticsSchema schemaIn = this.service.getTableSchema(tenantId, "T1");
         Assert.assertEquals(schemaIn, schemaIn);
         this.cleanupTable(tenantId, "T1");
+    }
+    
+    @Test
+    public void testTableCreateDeleteList() throws AnalyticsException {
+        this.service.deleteTable(250035, "TABLE1");
+        this.service.deleteTable(250035, "TABLE2");
+        this.service.deleteTable(8830, "TABLEX");
+        this.service.createTable(250035, "TABLE1");
+        List<String> tables = this.service.listTables(250035);
+        Assert.assertEquals(tables.size(), 1);
+        Assert.assertTrue(new HashSet<String>(tables).contains("TABLE1"));
+        Assert.assertTrue(this.service.tableExists(250035, "table1"));
+        Assert.assertTrue(this.service.tableExists(250035, "TABLE1"));
+        /* this should not throw an exception */
+        this.service.createTable(250035, "Table1");
+        Record record = this.createRecord(250035, "TABLE2", "S1", "10.0.0.1", 1, "LOG");
+        List<Record> records = new ArrayList<Record>();
+        records.add(record);
+        this.service.deleteTable(250035, "TABLE2");
+        this.service.deleteTable(250035, "TABLE1");
+        this.service.deleteTable(8830, "TABLEX");
+        Assert.assertEquals(this.service.listTables(250035).size(), 0);
+        Assert.assertEquals(this.service.listTables(8830).size(), 0);
+    }
+    
+    @Test
+    public void testTableSetGetSchema() throws AnalyticsException {
+        int tenantId = 105;
+        String tableName = "T1";
+        this.service.deleteTable(tenantId, tableName);
+        this.service.createTable(tenantId, tableName);
+        AnalyticsSchema schema = this.service.getTableSchema(tenantId, tableName);
+        /* for an empty schema, still the schema object must be returned */
+        Assert.assertNotNull(schema);
+        List<ColumnDefinition> columns = new ArrayList<>();
+        ColumnDefinition cd1 = new ColumnDefinition("name", AnalyticsSchema.ColumnType.STRING);
+        cd1.setType(AnalyticsSchema.ColumnType.STRING);
+        columns.add(cd1);
+        ColumnDefinition cd2 = new ColumnDefinition("age", AnalyticsSchema.ColumnType.INTEGER);
+        columns.add(cd2);
+        ColumnDefinition cd3 = new ColumnDefinition("weight", AnalyticsSchema.ColumnType.DOUBLE);
+        columns.add(cd3);
+        ColumnDefinition cd4 = new ColumnDefinition("something1", AnalyticsSchema.ColumnType.FLOAT);
+        columns.add(cd4);
+        ColumnDefinition cd5 = new ColumnDefinition("something2", AnalyticsSchema.ColumnType.BOOLEAN);
+        columns.add(cd5);
+        ColumnDefinition cd6 = new ColumnDefinition("something3", AnalyticsSchema.ColumnType.LONG);
+        columns.add(cd6);
+        List<String> primaryKeys = new ArrayList<String>();
+        primaryKeys.add("name");
+        primaryKeys.add("age");
+        schema = new AnalyticsSchema(columns, primaryKeys);
+        this.service.setTableSchema(tenantId, tableName, schema);
+        AnalyticsSchema schemaIn = this.service.getTableSchema(tenantId, tableName);
+        Assert.assertEquals(schema, schemaIn);
+        this.service.deleteTable(tenantId, tableName);
+    }
+
+    @Test (expectedExceptions = AnalyticsTableNotAvailableException.class)
+    public void testTableGetNoSchema() throws AnalyticsTableNotAvailableException, AnalyticsException {
+        this.service.deleteTable(105, "T1");
+        this.service.getTableSchema(105, "T1");
+    }
+
+    @Test
+    public void testTableCreateDeleteListNegativeTenantIds() throws AnalyticsException {
+        this.service.deleteTable(-1234, "TABLE1");
+        this.service.deleteTable(-1234, "TABLE2");
+        this.service.createTable(-1234, "TABLE1");
+        List<String> tables = this.service.listTables(-1234);
+        Assert.assertEquals(tables.size(), 1);
+        Assert.assertTrue(new HashSet<String>(tables).contains("TABLE1"));
+        Assert.assertTrue(this.service.tableExists(-1234, "table1"));
+        Assert.assertTrue(this.service.tableExists(-1234, "TABLE1"));
+        /* this should not throw an exception */
+        this.service.createTable(-1234, "Table1");
+        Record record = this.createRecord(-1234, "TABLE2", "S1", "10.0.0.1", 1, "LOG");
+        List<Record> records = new ArrayList<Record>();
+        records.add(record);
+        this.service.deleteTable(-1234, "TABLE2");
+        this.service.deleteTable(-1234, "TABLE1");
+        Assert.assertEquals(this.service.listTables(-1234).size(), 0);
+    }
+    
+    private Record createRecord(int tenantId, String tableName, String serverName, String ip, int tenant, String log) {
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put("server_name", serverName);
+        values.put("ip", ip);
+        values.put("tenant", tenant);
+        values.put("log", log);
+        values.put("sequence", null);
+        values.put("summary2", null);
+        return new Record(GenericUtils.generateRecordID(), tenantId, tableName, values, System.currentTimeMillis());
     }
     
     private void cleanupTable(int tenantId, String tableName) throws AnalyticsException {

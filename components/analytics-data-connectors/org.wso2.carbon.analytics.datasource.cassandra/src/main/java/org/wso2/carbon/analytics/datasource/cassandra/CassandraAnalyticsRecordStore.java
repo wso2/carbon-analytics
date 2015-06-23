@@ -198,7 +198,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         return -1;
     }
 
-    @Override
+    //@Override
     public AnalyticsSchema getTableSchema(int tenantId, String tableName) throws AnalyticsTableNotAvailableException,
             AnalyticsException {
         ResultSet rs = this.session.execute("SELECT tableSchema FROM ARS.META WHERE tenantId = ? AND tableName = ?", 
@@ -221,7 +221,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         return false;
     }
 
-    @Override
+    //@Override
     public List<String> listTables(int tenantId) throws AnalyticsException {
         ResultSet rs = this.session.execute("SELECT tableName FROM ARS.META WHERE tenantId = ?", tenantId);
         List<String> result = new ArrayList<String>();
@@ -281,7 +281,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         }
     }
 
-    @Override
+    //@Override
     public void setTableSchema(int tenantId, String tableName, AnalyticsSchema schema) throws AnalyticsTableNotAvailableException,
             AnalyticsException {
         tableName = GenericUtils.normalizeTableName(tableName);
@@ -297,7 +297,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         }
     }
 
-    @Override
+    //@Override
     public boolean tableExists(int tenantId, String tableName) throws AnalyticsException {
         tableName = GenericUtils.normalizeTableName(tableName);
         ResultSet rs = this.session.execute("SELECT tableSchema FROM ARS.META WHERE tenantId = ? AND tableName = ?", 

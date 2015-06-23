@@ -138,7 +138,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         }
     }
 
-    @Override
+    //@Override
     public boolean tableExists(int tenantId, String tableName) throws AnalyticsException {
         boolean isExist;
         Admin admin = null;
@@ -208,7 +208,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         }
     }
 
-    @Override
+    //@Override
     public List<String> listTables(int tenantId) throws AnalyticsException {
         Admin admin = null;
         List<String> tables = new ArrayList<>();
@@ -342,7 +342,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         return HBaseUtils.generateGenericTableName(record.getTenantId(), record.getTableName());
     }
 
-    @Override
+    //@Override
     public void setTableSchema(int tenantId, String tableName, AnalyticsSchema schema) throws AnalyticsException {
         byte[] encodedSchema = this.serializeSchema(schema);
         if (!this.tableExists(tenantId, tableName)) {
@@ -367,7 +367,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         }
     }
 
-    @Override
+    //@Override
     public AnalyticsSchema getTableSchema(int tenantId, String tableName) throws AnalyticsException {
         Table metaTable = null;
         byte[] resultSchema;

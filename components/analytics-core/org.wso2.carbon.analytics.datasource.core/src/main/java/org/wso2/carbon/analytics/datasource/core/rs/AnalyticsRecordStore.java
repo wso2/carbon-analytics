@@ -18,7 +18,6 @@
  */
 package org.wso2.carbon.analytics.datasource.core.rs;
 
-import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -42,44 +41,14 @@ public interface AnalyticsRecordStore {
     
     /**
      * Creates a table, if not already there, where the columns are not defined here, but can contain any arbitrary number
-     * of columns when data is added. The table names are not case sensitive.
+     * of columns when data is added. The table names are given already normalized case wise, i.e. the same table will not
+     * be referenced with the name just having case mismatches. This allows, record store implementation to ignore case
+     * sensitiveness and to normalize the table name itself for storing/retrieving.
      * @param tenantId The tenant which this table belongs to
      * @param tableName The name of the table to be created
      * @throws AnalyticsException
      */
     void createTable(int tenantId, String tableName) throws AnalyticsException;
-    
-    /**
-     * Sets the schema for the target analytics table, if there is already one assigned, it will be 
-     * overwritten.
-     * @param tenantId The tenant id
-     * @param tableName The table name
-     * @param schema The schema to be applied to the table
-     * @throws AnalyticsTableNotAvailableException
-     * @throws AnalyticsException
-     */
-    void setTableSchema(int tenantId, String tableName, 
-            AnalyticsSchema schema) throws AnalyticsTableNotAvailableException, AnalyticsException;
-    
-    /**
-     * Retrieves the table schema for the given table.
-     * @param tenantId The tenant id
-     * @param tableName The table name
-     * @return The schema of the table
-     * @throws AnalyticsTableNotAvailableException
-     * @throws AnalyticsException
-     */
-    AnalyticsSchema getTableSchema(int tenantId, String tableName) 
-            throws AnalyticsTableNotAvailableException, AnalyticsException;
-    
-    /**
-     * Checks if the specified table with the given category and name exists.
-     * @param tenantId The tenant which this table belongs to
-     * @param tableName The table name
-     * @return true if the table exists, false otherwise
-     * @throws AnalyticsException
-     */
-    boolean tableExists(int tenantId, String tableName) throws AnalyticsException;
     
     /**
      * Deletes the table with the given category and name if a table exists already.
@@ -90,14 +59,6 @@ public interface AnalyticsRecordStore {
      */
     void deleteTable(int tenantId, String tableName) throws AnalyticsException;
     
-    /**
-     * Lists all the current tables with the given category.
-     * @param tenantId The tenant which this table belongs to
-     * @return The list of table names
-     * @throws AnalyticsException
-     */
-    List<String> listTables(int tenantId) throws AnalyticsException;
-
     /**
      * Checks whether or not pagination (i.e. jumping to record n and then retrieving k further records)
      * is supported by the underlying record store implementation.

@@ -268,6 +268,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public void createTable(int tenantId, String recordStoreName, String tableName)
             throws AnalyticsException {
+        tableName = GenericUtils.normalizeTableName(tableName);
         recordStoreName = recordStoreName.trim();
         this.getAnalyticsRecordStore(recordStoreName).createTable(tenantId, tableName);
         AnalyticsTableInfo tableInfo = null;
@@ -324,17 +325,20 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public String getRecordStoreNameByTable(int tenantId, String tableName) 
             throws AnalyticsException, AnalyticsTableNotAvailableException {
+        tableName = GenericUtils.normalizeTableName(tableName);
         return this.lookupTableInfo(tenantId, tableName).getRecordStoreName();
     }
 
     @Override
     public void clearIndexData(int tenantId, String tableName) throws AnalyticsIndexException {
+        tableName = GenericUtils.normalizeTableName(tableName);
         this.getIndexer().clearIndexData(tenantId, tableName);
     }
     
     @Override
     public void setTableSchema(int tenantId, String tableName, AnalyticsSchema schema)
             throws AnalyticsTableNotAvailableException, AnalyticsException {
+        tableName = GenericUtils.normalizeTableName(tableName);
         this.checkInvalidIndexNames(schema.getColumns());
         this.checkInvalidScoreParams(schema.getColumns());
         AnalyticsTableInfo tableInfo = this.lookupTableInfo(tenantId, tableName);
@@ -404,12 +408,14 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public AnalyticsSchema getTableSchema(int tenantId, String tableName) throws AnalyticsTableNotAvailableException,
             AnalyticsException {
+        tableName = GenericUtils.normalizeTableName(tableName);
         return this.lookupTableInfo(tenantId, tableName).getSchema();
     }
 
     @Override
     public boolean tableExists(int tenantId, String tableName) throws AnalyticsException {
         try {
+            tableName = GenericUtils.normalizeTableName(tableName);
             return this.getRecordStoreNameByTable(tenantId, tableName) != null;
         } catch (AnalyticsTableNotAvailableException e) {
             return false;
@@ -418,6 +424,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     @Override
     public void deleteTable(int tenantId, String tableName) throws AnalyticsException {
+        tableName = GenericUtils.normalizeTableName(tableName);
         String arsName;
         try {
             arsName = this.getRecordStoreNameByTable(tenantId, tableName);
@@ -454,6 +461,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public long getRecordCount(int tenantId, String tableName, long timeFrom, long timeTo) 
             throws AnalyticsException, AnalyticsTableNotAvailableException {
+        tableName = GenericUtils.normalizeTableName(tableName);
         String arsName = this.getRecordStoreNameByTable(tenantId, tableName);
         if (arsName == null) {
             throw new AnalyticsTableNotAvailableException(tenantId, tableName);
@@ -590,7 +598,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     @Override
     public void put(List<Record> records) throws AnalyticsException, AnalyticsTableNotAvailableException {
-        Collection<List<Record>> recordBatches = GenericUtils.generateRecordBatches(records);
+        Collection<List<Record>> recordBatches = GenericUtils.generateRecordBatches(records, true);
         this.preprocessRecords(recordBatches);
         for (List<Record> recordsBatch : recordBatches) {
             this.putSimiarRecordBatch(recordsBatch);
@@ -615,6 +623,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     public AnalyticsDataResponse get(int tenantId, String tableName, int numPartitionsHint, List<String> columns,
             long timeFrom, long timeTo, int recordsFrom, 
             int recordsCount) throws AnalyticsException, AnalyticsTableNotAvailableException {
+        tableName = GenericUtils.normalizeTableName(tableName);
         String arsName = this.getRecordStoreNameByTable(tenantId, tableName);
         if (arsName == null) {
             throw new AnalyticsTableNotAvailableException(tenantId, tableName);
@@ -626,6 +635,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     
     public AnalyticsDataResponse getWithKeyValues(int tenantId, String tableName, int numPartitionsHint, List<String> columns,
             List<Map<String, Object>> valuesBatch) throws AnalyticsException, AnalyticsTableNotAvailableException {
+        tableName = GenericUtils.normalizeTableName(tableName);
         List<String> ids = new ArrayList<String>();
         AnalyticsSchema schema = this.lookupTableInfo(tenantId, tableName).getSchema();
         List<String> primaryKeys = schema.getPrimaryKeys();
@@ -641,6 +651,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     public AnalyticsDataResponse get(int tenantId, String tableName, int numPartitionsHint,
             List<String> columns, List<String> ids)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
+        tableName = GenericUtils.normalizeTableName(tableName);
         String arsName = this.getRecordStoreNameByTable(tenantId, tableName);
         if (arsName == null) {
             throw new AnalyticsTableNotAvailableException(tenantId, tableName);
@@ -662,6 +673,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public void delete(int tenantId, String tableName, long timeFrom, long timeTo) throws AnalyticsException,
             AnalyticsTableNotAvailableException {
+        tableName = GenericUtils.normalizeTableName(tableName);
         String arsName = this.getRecordStoreNameByTable(tenantId, tableName);
         if (arsName == null) {
             throw new AnalyticsTableNotAvailableException(tenantId, tableName);
@@ -686,6 +698,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public void delete(int tenantId, String tableName, List<String> ids) throws AnalyticsException,
             AnalyticsTableNotAvailableException {
+        tableName = GenericUtils.normalizeTableName(tableName);
         String arsName = this.getRecordStoreNameByTable(tenantId, tableName);
         if (arsName == null) {
             throw new AnalyticsTableNotAvailableException(tenantId, tableName);
@@ -697,11 +710,13 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     @Override
     public List<SearchResultEntry> search(int tenantId, String tableName, String query,
             int start, int count) throws AnalyticsIndexException, AnalyticsException {
+        tableName = GenericUtils.normalizeTableName(tableName);
         return this.getIndexer().search(tenantId, tableName, query, start, count);
     }
     
     @Override
     public int searchCount(int tenantId, String tableName, String query) throws AnalyticsIndexException {
+        tableName = GenericUtils.normalizeTableName(tableName);
         return this.getIndexer().searchCount(tenantId, tableName, query);
     }
 
@@ -721,6 +736,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     public SubCategories drillDownCategories(int tenantId,
                                              CategoryDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
+        drillDownRequest.setTableName(GenericUtils.normalizeTableName(drillDownRequest.getTableName()));
         return this.getIndexer().drilldownCategories(tenantId, drillDownRequest);
     }
 
@@ -728,10 +744,12 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     public List<AnalyticsDrillDownRange> drillDownRangeCount(int tenantId,
                                                              AnalyticsDrillDownRequest drillDownRequest)
             throws AnalyticsIndexException {
+        drillDownRequest.setTableName(GenericUtils.normalizeTableName(drillDownRequest.getTableName()));
         return this.getIndexer().drillDownRangeCount(tenantId, drillDownRequest);
     }
 
     private void clearIndices(int tenantId, String tableName) throws AnalyticsIndexException, AnalyticsException {
+        tableName = GenericUtils.normalizeTableName(tableName);
         this.getIndexer().clearIndexData(tenantId, tableName);
     }
 

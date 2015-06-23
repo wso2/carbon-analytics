@@ -81,6 +81,10 @@ public class Record implements Serializable {
         return tableName;
     }
     
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+    
     public Map<String, Object> getValues() {
         return values;
     }
