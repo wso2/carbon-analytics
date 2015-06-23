@@ -37,10 +37,10 @@ public class EmailEventAdapter implements InputEventAdapter {
     private InputEventAdapterListener eventAdaptorListener;
     private final String id = UUID.randomUUID().toString();
     private static final Logger log = Logger.getLogger(EmailEventAdapter.class);
-    private long pollInterval = EmailEventAdapterConstants.DEFAULT_EMAIL_POLL_INTERVAL_IN_MILLIS;
+    private long pollIntervalInSeconds = EmailEventAdapterConstants.DEFAULT_EMAIL_POLL_INTERVAL_IN_MINS;
     private String moveToFolderName;
     private Timer timer;
-    private boolean isThreadOccupied;
+    private volatile boolean isThreadOccupied;
     private int tenantId;
 
     public EmailEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration,
@@ -69,9 +69,9 @@ public class EmailEventAdapter implements InputEventAdapter {
         String interval = eventAdapterConfiguration.getProperties().get(EmailEventAdapterConstants.ADAPTER_CONF_RECEIVING_EMAIL_POLL_INTERVAL);
         if (interval != null) {
             try {
-                pollInterval = Long.parseLong(interval);
+                pollIntervalInSeconds = Long.parseLong(interval);
             } catch (NumberFormatException e) {
-                pollInterval = EmailEventAdapterConstants.DEFAULT_EMAIL_POLL_INTERVAL_IN_MILLIS;
+                pollIntervalInSeconds = EmailEventAdapterConstants.DEFAULT_EMAIL_POLL_INTERVAL_IN_MINS;
             }
         }
         TimerTask timerTask = new TimerTask() {
@@ -81,7 +81,7 @@ public class EmailEventAdapter implements InputEventAdapter {
             }
         };
 
-        timer.scheduleAtFixedRate(timerTask, pollInterval, pollInterval);
+        timer.scheduleAtFixedRate(timerTask, pollIntervalInSeconds * 1000, pollIntervalInSeconds * 1000);
 
     }
 
@@ -172,36 +172,34 @@ public class EmailEventAdapter implements InputEventAdapter {
             boolean mailProcessingStarted = false;
             Session session = Session.getDefaultInstance(properties);
 
-            while (!connected) {
-                try {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Attempting to connect to POP3/IMAP server for : " +
-                                emailAddress + " using " + session.getProperties());
-                    }
-
-                    store = session.getStore(protocol);
-
-                    if (userName != null && password != null) {
-                        store.connect(userName, password);
-                    } else {
-                        log.error("Unable to locate username and password for mail login");
-                    }
-
-                    // were we able to connect?
-                    connected = store.isConnected();
-
-                    if (connected && folder == null) {
-                        folder = store.getFolder("INBOX");
-                    }
-
-                } catch (Exception e) {
-                    log.error("Error connecting to mail server for address : " + emailAddress, e);
+            try {
+                if (log.isDebugEnabled()) {
+                    log.debug("Attempting to connect to POP3/IMAP server for : " +
+                            emailAddress + " using " + session.getProperties());
                 }
 
-                if (!connected) {
-                    log.warn("Connection to mail server for account : " + emailAddress +
-                            " failed. Retrying in : " + pollInterval / 1000 + " seconds");
+                store = session.getStore(protocol);
+
+                if (userName != null && password != null) {
+                    store.connect(userName, password);
+                } else {
+                    log.error("Unable to locate username and password for mail login");
                 }
+
+                // were we able to connect?
+                connected = store.isConnected();
+
+                if (connected) {
+                    folder = store.getFolder("INBOX");
+                }
+
+            } catch (Exception e) {
+                log.error("Error connecting to mail server for address : " + emailAddress, e);
+            }
+
+            if (!connected) {
+                log.warn("Connection to mail server for account : " + emailAddress +
+                        " failed. Retrying in : " + pollIntervalInSeconds + " seconds");
             }
 
             if (connected && folder != null) {
