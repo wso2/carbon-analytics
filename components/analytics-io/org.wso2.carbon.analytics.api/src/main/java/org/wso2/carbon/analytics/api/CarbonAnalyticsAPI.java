@@ -635,8 +635,6 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
-            AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
-                    analyticsDataConfiguration.getPassword());
             return AnalyticsAPIHttpClient.getInstance().getWithKeyValues(tenantId, null, tableName, numPartitionsHint,
                     columns, valuesBatch, false);
         }
@@ -677,8 +675,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             return ServiceHolder.getAnalyticsDataService().getRecordStoreNameByTable(tenantId, tableName);
         } else {
-           //TODO
-            return null;
+          return AnalyticsAPIHttpClient.getInstance().getRecordStoreNameByTable(tenantId, null, tableName, false);
         }
     }
 
@@ -687,8 +684,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             return ServiceHolder.getAnalyticsDataService().listRecordStoreNames();
         } else {
-            //TODO
-            return null;
+            return AnalyticsAPIHttpClient.getInstance().listRecordStoreNames();
         }
     }
 
@@ -698,8 +694,8 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             return ServiceHolder.getSecureAnalyticsDataService().getRecordStoreNameByTable(username, tableName);
         } else {
-            //TODO
-            return null;
+            return AnalyticsAPIHttpClient.getInstance().getRecordStoreNameByTable(MultitenantConstants.INVALID_TENANT_ID,
+                    username, tableName, true);
         }
     }
 }

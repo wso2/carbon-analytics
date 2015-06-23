@@ -720,8 +720,8 @@ public class AnalyticsAPIHttpClient {
     }
 
     public AnalyticsDataResponse getRecordGroup(int tenantId, String username, String tableName, int numPartitionsHint,
-                                        List<String> columns, long timeFrom, long timeTo, int recordsFrom,
-                                        int recordsCount, boolean securityEnabled) throws AnalyticsServiceException {
+                                                List<String> columns, long timeFrom, long timeTo, int recordsFrom,
+                                                int recordsCount, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.ANALYTIC_RECORD_READ_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.GET_RANGE_RECORD_GROUP_OPERATION)
@@ -750,10 +750,10 @@ public class AnalyticsAPIHttpClient {
                 Object analyticsDataResponseObj = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
                 EntityUtils.consumeQuietly(httpResponse.getEntity());
                 if (analyticsDataResponseObj != null && analyticsDataResponseObj instanceof AnalyticsDataResponse) {
-                  AnalyticsDataResponse analyticsDataResponse = (AnalyticsDataResponse) analyticsDataResponseObj;
-                    if (analyticsDataResponse.getRecordGroups() instanceof RemoteRecordGroup[]){
+                    AnalyticsDataResponse analyticsDataResponse = (AnalyticsDataResponse) analyticsDataResponseObj;
+                    if (analyticsDataResponse.getRecordGroups() instanceof RemoteRecordGroup[]) {
                         return analyticsDataResponse;
-                    }else {
+                    } else {
                         throw new AnalyticsServiceAuthenticationException(getUnexpectedResponseReturnedErrorMsg("getting " +
                                 "the record group", tableName, "Analytics Data Response object consist of" +
                                 " array of remote record group", analyticsDataResponseObj));
@@ -772,7 +772,7 @@ public class AnalyticsAPIHttpClient {
     }
 
     public AnalyticsDataResponse getWithKeyValues(int tenantId, String username, String tableName, int numPartitionsHint,
-                                          List<String> columns, List<Map<String, Object>> valuesBatch, boolean securityEnabled) throws AnalyticsServiceException {
+                                                  List<String> columns, List<Map<String, Object>> valuesBatch, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.ANALYTIC_RECORD_READ_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.GET_RECORDS_WITH_KEY_VALUES_OPERATION)
@@ -799,9 +799,9 @@ public class AnalyticsAPIHttpClient {
                 EntityUtils.consumeQuietly(httpResponse.getEntity());
                 if (analyticsDataResponseObj != null && analyticsDataResponseObj instanceof AnalyticsDataResponse) {
                     AnalyticsDataResponse analyticsDataResponse = (AnalyticsDataResponse) analyticsDataResponseObj;
-                    if (analyticsDataResponse.getRecordGroups() instanceof RemoteRecordGroup[]){
+                    if (analyticsDataResponse.getRecordGroups() instanceof RemoteRecordGroup[]) {
                         return analyticsDataResponse;
-                    }else {
+                    } else {
                         throw new AnalyticsServiceAuthenticationException(getUnexpectedResponseReturnedErrorMsg("getting " +
                                 "with key values", tableName, "Analytics Data Response object consist of" +
                                 " array of remote record group", analyticsDataResponseObj));
@@ -819,8 +819,80 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
+    public String getRecordStoreNameByTable(int tenantId, String username, String tableName, boolean securityEnabled) {
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.ANALYTIC_RECORD_STORE_PROCESSOR_SERVICE_URI)
+                .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.GET_RECORD_STORE_OF_TABLE_OPERATION)
+                .addParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM, tableName)
+                .addParameter(AnalyticsAPIConstants.ENABLE_SECURITY_PARAM, String.valueOf(securityEnabled));
+        if (!securityEnabled) {
+            builder.addParameter(AnalyticsAPIConstants.TENANT_ID_PARAM, String.valueOf(tenantId));
+        } else {
+            builder.addParameter(AnalyticsAPIConstants.USERNAME_PARAM, username);
+        }
+        try {
+            HttpGet getMethod = new HttpGet(builder.build().toString());
+            getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
+            HttpResponse httpResponse = httpClient.execute(getMethod);
+            String response = getResponseString(httpResponse);
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                throw new AnalyticsServiceException("Unable to get the record store for the table : " + tableName + " ." +
+                        response);
+            } else {
+                if (response.startsWith(AnalyticsAPIConstants.RECORD_STORE_NAME)) {
+                    String[] reponseElements = response.split(AnalyticsAPIConstants.SEPARATOR);
+                    if (reponseElements.length == 2) {
+                        return reponseElements[1].trim();
+                    } else {
+                        throw new AnalyticsServiceException("Invalid response returned, cannot find record store name" +
+                                " message. Response:" + response);
+                    }
+                } else {
+                    throw new AnalyticsServiceException("Invalid response returned, record store name message not found!"
+                            + response);
+                }
+            }
+        } catch (URISyntaxException e) {
+            throw new AnalyticsServiceAuthenticationException("Malformed URL provided. " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new AnalyticsServiceAuthenticationException("Error while connecting to the remote service. "
+                    + e.getMessage(), e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<String> listRecordStoreNames() {
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.ANALYTIC_RECORD_STORE_PROCESSOR_SERVICE_URI)
+                .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.LIST_RECORD_STORES_OPERATION);
+        try {
+            HttpGet getMethod = new HttpGet(builder.build().toString());
+            getMethod.addHeader(AnalyticsAPIConstants.SESSION_ID, sessionId);
+            HttpResponse httpResponse = httpClient.execute(getMethod);
+            String response = getResponseString(httpResponse);
+            if (httpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                throw new AnalyticsServiceException("Unable to list the record stores." +
+                        response);
+            } else {
+                Object listOfRecordStores = GenericUtils.deserializeObject(httpResponse.getEntity().getContent());
+                EntityUtils.consumeQuietly(httpResponse.getEntity());
+                if (listOfRecordStores != null && listOfRecordStores instanceof List) {
+                    return (List<String>) listOfRecordStores;
+                } else {
+                    throw new AnalyticsServiceException(getUnexpectedResponseReturnedErrorMsg("getting list of record stores",
+                            null, "list of record store", listOfRecordStores));
+                }
+            }
+        } catch (URISyntaxException e) {
+            throw new AnalyticsServiceAuthenticationException("Malformed URL provided. " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new AnalyticsServiceAuthenticationException("Error while connecting to the remote service. "
+                    + e.getMessage(), e);
+        }
+    }
+
     public AnalyticsDataResponse getRecordGroup(int tenantId, String username, String tableName, int numPartitionsHint, List<String> columns,
-                                        List<String> ids, boolean securityEnabled) throws AnalyticsServiceException {
+                                                List<String> ids, boolean securityEnabled) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         Gson gson = new Gson();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.ANALYTIC_RECORD_READ_PROCESSOR_SERVICE_URI)
@@ -848,9 +920,9 @@ public class AnalyticsAPIHttpClient {
                 EntityUtils.consumeQuietly(httpResponse.getEntity());
                 if (analyticsDataResponseObj != null && analyticsDataResponseObj instanceof AnalyticsDataResponse) {
                     AnalyticsDataResponse analyticsDataResponse = (AnalyticsDataResponse) analyticsDataResponseObj;
-                    if (analyticsDataResponse.getRecordGroups() instanceof RemoteRecordGroup[]){
+                    if (analyticsDataResponse.getRecordGroups() instanceof RemoteRecordGroup[]) {
                         return analyticsDataResponse;
-                    }else {
+                    } else {
                         throw new AnalyticsServiceAuthenticationException(getUnexpectedResponseReturnedErrorMsg("getting " +
                                 "the record group", tableName, "Analytics Data Response object consist of" +
                                 " array of remote record group", analyticsDataResponseObj));

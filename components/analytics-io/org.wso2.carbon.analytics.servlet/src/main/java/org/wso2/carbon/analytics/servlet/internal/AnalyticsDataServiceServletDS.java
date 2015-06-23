@@ -82,6 +82,9 @@ public class AnalyticsDataServiceServletDS {
             ServiceHolder.getHttpService().registerServlet(AnalyticsAPIConstants.INDEX_PROCESSOR_SERVICE_URI,
                     new AnalyticsIndexProcessor(), new Hashtable(),
                     ServiceHolder.getHttpService().createDefaultHttpContext());
+            ServiceHolder.getHttpService().registerServlet(AnalyticsAPIConstants.ANALYTIC_RECORD_STORE_PROCESSOR_SERVICE_URI,
+                    new AnalyticsRecordStoreProcessor(), new Hashtable(),
+                    ServiceHolder.getHttpService().createDefaultHttpContext());
         } catch (ServletException | NamespaceException e) {
             log.error("Error while registering the servlet. " + e.getMessage(), e);
         }

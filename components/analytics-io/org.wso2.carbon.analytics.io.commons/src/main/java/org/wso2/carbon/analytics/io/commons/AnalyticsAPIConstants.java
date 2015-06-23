@@ -27,6 +27,7 @@ public class AnalyticsAPIConstants {
     public static final String SEARCH_PROCESSOR_SERVICE_URI = DATASERVICE_API_URI+"AnalyticsSearchProcessor";
     public static final String ANALYTICS_SERVICE_PROCESSOR_URI = DATASERVICE_API_URI+"AnalyticsServiceProcessor";
     public static final String ANALYTIC_RECORD_READ_PROCESSOR_SERVICE_URI = DATASERVICE_API_URI+"AnalyticsRecordReadProcessor";
+    public static final String ANALYTIC_RECORD_STORE_PROCESSOR_SERVICE_URI = DATASERVICE_API_URI+"AnalyticsRecordStoreProcessor";
 
     public static final String TENANT_ID_PARAM = "tenant_id";
     public static final String RECORD_STORE_NAME_PARAM = "record_store_name";
@@ -36,8 +37,6 @@ public class AnalyticsAPIConstants {
     public static final String TIME_FROM_PARAM = "timeFrom";
     public static final String TIME_TO_PARAM = "timeTo";
     public static final String RECORD_IDS_PARAM = "recordIds";
-    public static final String INDEX_PARAM = "index";
-    public static final String SCORE_PARAM = "score";
     public static final String QUERY = "query";
     public static final String START_PARAM = "start";
     public static final String COUNT_PARAM = "count";
@@ -55,6 +54,7 @@ public class AnalyticsAPIConstants {
     public static final String SEPARATOR = ":";
     public static final String RECORD_COUNT = "__recordCount";
     public static final String SEARCH_COUNT = "__searchCount";
+    public static final String RECORD_STORE_NAME = "__recordStoreName";
     public static final String LIST_TABLES_OPERATION = "__list_tables_opr";
     public static final String CREATE_TABLE_OPERATION = "__create_table_opr";
     public static final String DELETE_TABLE_OPERATION = "__delete_table_opr";
@@ -67,9 +67,6 @@ public class AnalyticsAPIConstants {
     public static final String LOGIN_OPERATION = "__login_opr";
     public static final String DELETE_RECORDS_RANGE_OPERATION = "__delete_records_range_opr";
     public static final String DELETE_RECORDS_IDS_OPERATION = "__delete_records_ids_opr";
-    public static final String SET_INDICES_OPERATION = "__set_indices_opr";
-    public static final String GET_INDICES_OPERATION ="__get_indices_opr";
-    public static final String GET_SCORE_PARAMS_OPERATION = "__get_score_params_opr";
     public static final String DELETE_INDICES_OPERATION = "__delete_indices_opr";
     public static final String SEARCH_OPERATION = "__search_opr";
     public static final String DRILL_DOWN_SEARCH_OPERATION = "__drillDownSearch_opr";
@@ -84,5 +81,7 @@ public class AnalyticsAPIConstants {
     public static final String GET_RECORDS_WITH_KEY_VALUES_OPERATION = "__get_records_with_key_values_opr";
     public static final String GET_IDS_RECORD_GROUP_OPERATION = "__get_ids_record_group_opr";
     public static final String IS_PAGINATION_SUPPORTED_OPERATION = "__is_pagination_supported_opr";
+    public static final String GET_RECORD_STORE_OF_TABLE_OPERATION = "__get_record_store_opr";
+    public static final String LIST_RECORD_STORES_OPERATION = "__list_record_stores_opr";
     public static final String ANALYTICS_REMOTE_API_INVOCATION_PERMISSION = "/permission/admin/manage/analytics/api";
 }
