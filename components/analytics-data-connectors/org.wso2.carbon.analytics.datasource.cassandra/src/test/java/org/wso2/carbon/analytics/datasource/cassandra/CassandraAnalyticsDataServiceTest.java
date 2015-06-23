@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.rdbms;
+package org.wso2.carbon.analytics.datasource.cassandra;
 
 import java.io.IOException;
 
@@ -24,35 +24,30 @@ import javax.naming.NamingException;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceImpl;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
-import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManagerImpl;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataServiceTest;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
-import com.hazelcast.core.Hazelcast;
-
 /**
- * Clustered test implementation of {@link AnalyticsDataServiceTest}.
+ * Cassandra implementation of {@link AnalyticsDataServiceTest}.
  */
-public class AnalyticsDataServiceClusteredTest extends AnalyticsDataServiceTest {
+public class CassandraAnalyticsDataServiceTest extends AnalyticsDataServiceTest {
 
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException, IOException {
         GenericUtils.clearGlobalCustomDataSourceRepo();
         System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");
-        Hazelcast.shutdownAll();
-        AnalyticsServiceHolder.setHazelcastInstance(Hazelcast.newHazelcastInstance());
-        AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
-        this.init(new AnalyticsDataServiceImpl());
+        AnalyticsServiceHolder.setHazelcastInstance(null);
+        AnalyticsServiceHolder.setAnalyticsClusterManager(null);
+        System.setProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP, Boolean.TRUE.toString());
+        this.init(AnalyticsServiceHolder.getAnalyticsDataService());
     }
     
     @AfterClass
     public void done() throws NamingException, AnalyticsException, IOException {
         this.service.destroy();
-        Hazelcast.shutdownAll();
-        AnalyticsServiceHolder.setHazelcastInstance(null);
+        System.clearProperty(AnalyticsServiceHolder.FORCE_INDEXING_ENV_PROP);
         AnalyticsServiceHolder.setAnalyticsDataService(null);
     }
     
