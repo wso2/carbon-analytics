@@ -75,7 +75,7 @@ public class AnalyticsConstants {
     public static final String OBJECT = "OBJECT";
     public static final String DEFAULT_CHARSET = "UTF8";
     public static final String SCRIPT_DEPLOYMENT_DIR = "spark-scripts";
-    public static final String SPARK_DEFAULTS_PATH = "repository/conf/spark/spark-defaults.conf";
+    public static final String SPARK_DEFAULTS_PATH = "spark/spark-defaults.conf";
     public static final int SPARK_DEFAULT_PARTITION_COUNT = 6;
 
     //Analytics relation strings
@@ -128,6 +128,8 @@ public class AnalyticsConstants {
     public static final String SPARK_UI_PORT = "spark.ui.port";
 
     public static final String SPARK_RECOVERY_MODE = "spark.deploy.recoveryMode";
+
+    public static final String SPARK_RECOVERY_MODE_FACTORY = "spark.deploy.recoveryMode.factory";
 
     //Extra constants available for Spark
 /*  public static final String SPARK_DRIVER_EXTRACLASSPATH = "spark.driver.extraClassPath";

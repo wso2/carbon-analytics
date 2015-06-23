@@ -20,14 +20,25 @@ package org.wso2.carbon.analytics.spark.core.util.master;
 
 import org.apache.spark.deploy.master.LeaderElectable;
 import org.apache.spark.deploy.master.LeaderElectionAgent;
+import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 
 /**
  * Created by niranda on 6/9/15.
  */
 public class AnalyticsLeaderElectionAgent implements LeaderElectionAgent {
+
+    private static final String CLUSTER_GROUP_NAME = "CARBON_ANALYTICS_EXECUTION";
+    private LeaderElectable master;
+
+    public AnalyticsLeaderElectionAgent(LeaderElectable master) {
+        this.master = master;
+        ServiceHolder.getAnalyticskExecutor().processLeaderElectable(master);
+
+    }
+
     @Override
     public LeaderElectable masterActor() {
-        return null;
+        return master;
     }
 
     @Override

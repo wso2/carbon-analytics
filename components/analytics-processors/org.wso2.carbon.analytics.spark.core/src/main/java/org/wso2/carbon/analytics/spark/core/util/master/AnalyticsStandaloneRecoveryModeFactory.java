@@ -30,8 +30,8 @@ import org.apache.spark.deploy.master.StandaloneRecoveryModeFactory;
  */
 public class AnalyticsStandaloneRecoveryModeFactory extends StandaloneRecoveryModeFactory {
 
-    SparkConf conf;
-    Serialization serializer;
+    private SparkConf conf;
+    private Serialization serializer;
 
     public AnalyticsStandaloneRecoveryModeFactory(SparkConf conf,
                                                   Serialization serializer) {
@@ -56,6 +56,6 @@ public class AnalyticsStandaloneRecoveryModeFactory extends StandaloneRecoveryMo
      */
     @Override
     public LeaderElectionAgent createLeaderElectionAgent(LeaderElectable master) {
-        return null;
+        return new AnalyticsLeaderElectionAgent(master);
     }
 }
