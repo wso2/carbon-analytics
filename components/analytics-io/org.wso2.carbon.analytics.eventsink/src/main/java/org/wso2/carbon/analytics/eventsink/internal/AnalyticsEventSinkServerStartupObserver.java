@@ -55,28 +55,42 @@ public class AnalyticsEventSinkServerStartupObserver implements ServerStartupObs
 
     @Override
     public void completedServerStartup() {
-        try {
-            started.set(true);
-            AnalyticsEventStoreDeployer deployer = (AnalyticsEventStoreDeployer)
-                    CarbonUtils.getDeployer(AnalyticsEventStoreDeployer.class.getName());
-            if (AnalyticsEventStoreDeployer.getPausedDeployments() != null) {
-                List<DeploymentFileData> pausedDeployment = AnalyticsEventStoreDeployer.getPausedDeployments();
-                for (DeploymentFileData deploymentFileData : pausedDeployment) {
-                    try {
-                        deployer.deploy(deploymentFileData);
-                    } catch (DeploymentException e) {
-                        log.error("Error while  deploying analytics event store the file : "
-                                + deploymentFileData.getName(), e);
-                    }
-                }
-                AnalyticsEventStoreDeployer.clearPausedDeployments();
-            }
-        } catch (CarbonException e) {
-            log.error("Error when getting the deployer for evn store to proceed the initialization of deployments. ", e);
-        }
+        PausedDeploymentHandler pausedDeploymentHandler = new PausedDeploymentHandler();
+        pausedDeploymentHandler.start();
     }
 
     public boolean isServerStarted() {
         return started.get();
+    }
+
+    private class PausedDeploymentHandler extends Thread {
+
+        public void run() {
+            try {
+                AnalyticsEventStoreDeployer deployer = (AnalyticsEventStoreDeployer)
+                        CarbonUtils.getDeployer(AnalyticsEventStoreDeployer.class.getName());
+                if (AnalyticsEventStoreDeployer.getPausedDeployments() != null) {
+                    List<DeploymentFileData> pausedDeployment = AnalyticsEventStoreDeployer.getPausedDeployments();
+                    if (pausedDeployment.size() > 0) {
+                        try {
+                            Thread.sleep(10000);
+                        } catch (InterruptedException e) {
+                        }
+                    }
+                    started.set(true);
+                    for (DeploymentFileData deploymentFileData : pausedDeployment) {
+                        try {
+                            deployer.deploy(deploymentFileData);
+                        } catch (DeploymentException e) {
+                            log.error("Error while  deploying analytics event store the file : "
+                                    + deploymentFileData.getName(), e);
+                        }
+                    }
+                    AnalyticsEventStoreDeployer.clearPausedDeployments();
+                }
+            } catch (CarbonException e) {
+                log.error("Error when getting the deployer for evn store to proceed the initialization of deployments. ", e);
+            }
+        }
     }
 }

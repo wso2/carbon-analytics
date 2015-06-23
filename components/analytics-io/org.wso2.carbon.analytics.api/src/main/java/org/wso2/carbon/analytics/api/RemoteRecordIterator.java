@@ -22,10 +22,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 public class RemoteRecordIterator<T> implements Iterator<T> {
-    
+    private static final Log log = LogFactory.getLog(RemoteRecordIterator.class);
+
     private InputStream inputStream;
     private T nextObject;
     private boolean completed;
@@ -49,6 +52,9 @@ public class RemoteRecordIterator<T> implements Iterator<T> {
                         this.nextObject = null;
                         completed = true;
                         this.inputStream.close();
+                        if (log.isDebugEnabled()) {
+                            log.debug("Closing the HTTP connection created!");
+                        }
                     }
                 }
                 return nextObject != null;
