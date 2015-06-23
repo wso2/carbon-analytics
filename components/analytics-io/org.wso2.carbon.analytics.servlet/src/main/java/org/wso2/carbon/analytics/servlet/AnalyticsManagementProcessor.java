@@ -18,6 +18,7 @@
 package org.wso2.carbon.analytics.servlet;
 
 import org.apache.axiom.om.util.Base64;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
 import org.wso2.carbon.analytics.servlet.exception.AnalyticsAPIAuthenticationException;
 import org.wso2.carbon.analytics.servlet.internal.ServiceHolder;
@@ -72,12 +73,16 @@ public class AnalyticsManagementProcessor extends HttpServlet {
                     resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No session id found, Please login first!");
                 }
             }
-            //boolean isSupported = ServiceHolder.getAnalyticsDataService().isPaginationSupported();
-            boolean isSupported = true;
-            //TODO
-            PrintWriter writer = resp.getWriter();
-            writer.print(AnalyticsAPIConstants.PAGINATION_SUPPORT + AnalyticsAPIConstants.SEPARATOR + isSupported);
-            resp.setStatus(HttpServletResponse.SC_OK);
+            String recordStoreName = req.getParameter(AnalyticsAPIConstants.RECORD_STORE_NAME_PARAM);
+
+            try {
+                boolean isSupported = ServiceHolder.getAnalyticsDataService().isPaginationSupported(recordStoreName);
+                PrintWriter writer = resp.getWriter();
+                writer.print(AnalyticsAPIConstants.PAGINATION_SUPPORT + AnalyticsAPIConstants.SEPARATOR + isSupported);
+                resp.setStatus(HttpServletResponse.SC_OK);
+            } catch (AnalyticsException e) {
+                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+            }
         } else {
             resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Unavailable operation - " + operation + " provided!");
         }

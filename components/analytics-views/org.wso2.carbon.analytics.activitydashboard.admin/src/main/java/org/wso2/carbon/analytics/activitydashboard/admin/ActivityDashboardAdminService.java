@@ -28,7 +28,7 @@ import org.wso2.carbon.analytics.activitydashboard.commons.Operation;
 import org.wso2.carbon.analytics.activitydashboard.commons.Query;
 import org.wso2.carbon.analytics.activitydashboard.commons.SearchExpressionTree;
 import org.wso2.carbon.analytics.activitydashboard.admin.internal.ServiceHolder;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataResponse;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategorySearchResultEntry;

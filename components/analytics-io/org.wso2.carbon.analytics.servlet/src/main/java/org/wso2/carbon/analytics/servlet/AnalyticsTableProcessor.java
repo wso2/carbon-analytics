@@ -17,7 +17,6 @@
 */
 package org.wso2.carbon.analytics.servlet;
 
-import com.google.gson.GsonBuilder;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.io.commons.AnalyticsAPIConstants;
 import org.wso2.carbon.analytics.servlet.exception.AnalyticsAPIAuthenticationException;
@@ -121,9 +120,22 @@ public class AnalyticsTableProcessor extends HttpServlet {
             String userName = req.getParameter(AnalyticsAPIConstants.USERNAME_PARAM);
             if (operation != null && operation.trim().equalsIgnoreCase(AnalyticsAPIConstants.CREATE_TABLE_OPERATION)) {
                 String tableName = req.getParameter(AnalyticsAPIConstants.TABLE_NAME_PARAM);
+                String recordStoreName = req.getParameter(AnalyticsAPIConstants.RECORD_STORE_NAME_PARAM);
                 try {
-                    if (!securityEnabled) ServiceHolder.getAnalyticsDataService().createTable(tenantId, tableName);
-                    else ServiceHolder.getSecureAnalyticsDataService().createTable(userName, tableName);
+                    if (!securityEnabled){
+                        if (recordStoreName == null){
+                            ServiceHolder.getAnalyticsDataService().createTable(tenantId, tableName);
+                        }else {
+                            ServiceHolder.getAnalyticsDataService().createTable(tenantId, recordStoreName, tableName);
+                        }
+                    }
+                    else {
+                        if (recordStoreName == null){
+                            ServiceHolder.getSecureAnalyticsDataService().createTable(userName, tableName);
+                        }else {
+                            ServiceHolder.getSecureAnalyticsDataService().createTable(userName, recordStoreName, tableName);
+                        }
+                    }
                     resp.setStatus(HttpServletResponse.SC_OK);
                 } catch (AnalyticsException e) {
                     resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, e.getMessage());

@@ -44,7 +44,7 @@ import org.wso2.carbon.analytics.api.RemoteRecordIterator;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceAuthenticationException;
 import org.wso2.carbon.analytics.api.exception.AnalyticsServiceException;
 import org.wso2.carbon.analytics.api.internal.AnalyticsDataConfiguration;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataResponse;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
