@@ -98,6 +98,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     
     private static final String TABLE_INFO_TABLE_NAME = "__TABLE_INFO__";
     
+    private static final String TENANT_TABLE_MAPPING_TABLE_PREFIX = "__TENANT_MAPPING";
+    
     private static final String TABLE_INFO_DATA_COLUMN = "TABLE_INFO_DATA";
 
     private Map<String, AnalyticsRecordStore> analyticsRecordStores;
@@ -278,7 +280,40 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             tableInfo = new AnalyticsTableInfo(recordStoreName, new AnalyticsSchema());
         }
         this.writeTableInfo(tenantId, tableName, tableInfo);
+        this.writeToTenantTableMapping(tenantId, tableName);
         this.invalidateAnalyticsTableInfo(tenantId, tableName);
+    }
+    
+    private String generateTenantTableMappingTableName(int tenantId) {
+        if (tenantId < 0) {
+            return TENANT_TABLE_MAPPING_TABLE_PREFIX + "_X" + Math.abs(tenantId);
+        } else {
+            return TENANT_TABLE_MAPPING_TABLE_PREFIX + "_" + tenantId;
+        }
+    }
+    
+    private void writeToTenantTableMapping(int tenantId, String tableName) throws AnalyticsException {
+        String targetTableName = this.generateTenantTableMappingTableName(tenantId);
+        Record record = new Record(tableName, TABLE_INFO_TENANT_ID, targetTableName, new HashMap<String, Object>(0));
+        List<Record> records = new ArrayList<Record>(1);
+        records.add(record);
+        try {
+            this.getPrimaryAnalyticsRecordStore().put(records);
+        } catch (AnalyticsTableNotAvailableException e) {
+            this.getPrimaryAnalyticsRecordStore().createTable(TABLE_INFO_TENANT_ID, targetTableName);
+            this.getPrimaryAnalyticsRecordStore().put(records);
+        }
+    }
+    
+    private void deleteTenantTableMapping(int tenantId, String tableName) throws AnalyticsException {
+        String targetTableName = this.generateTenantTableMappingTableName(tenantId);
+        List<String> ids = new ArrayList<String>(1);
+        ids.add(tableName);
+        try {
+            this.getPrimaryAnalyticsRecordStore().delete(TABLE_INFO_TENANT_ID, targetTableName, ids);
+        } catch (AnalyticsTableNotAvailableException ignore) {
+            /* ignore */
+        }
     }
 
     @Override
@@ -392,6 +427,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         if (arsName == null) {
             return;
         }
+        this.deleteTenantTableMapping(tenantId, tableName);
         this.deleteTableInfo(tenantId, tableName);
         this.checkAndInvalidateTableInfo(tenantId, tableName);
         this.getAnalyticsRecordStore(arsName).deleteTable(tenantId, tableName);
@@ -400,11 +436,19 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     @Override
     public List<String> listTables(int tenantId) throws AnalyticsException {
-        List<String> result = new ArrayList<String>();
-        for (AnalyticsRecordStore ars : this.analyticsRecordStores.values()) {
-            result.addAll(ars.listTables(tenantId));
+        String targetTableName = this.generateTenantTableMappingTableName(tenantId);
+        try {
+            List<Record> records = GenericUtils.listRecords(this.getPrimaryAnalyticsRecordStore(), 
+                    this.getPrimaryAnalyticsRecordStore().get(TABLE_INFO_TENANT_ID, 
+                            targetTableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+            List<String> result = new ArrayList<String>();
+            for (Record record : records) {
+                result.add(record.getId());
+            }
+            return result;
+        } catch (AnalyticsTableNotAvailableException e) {
+            return new ArrayList<String>(0);
         }
-        return result;
     }
 
     @Override
