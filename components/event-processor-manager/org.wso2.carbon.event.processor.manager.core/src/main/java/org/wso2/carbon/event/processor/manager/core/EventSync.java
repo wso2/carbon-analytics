@@ -22,7 +22,7 @@ import org.wso2.siddhi.query.api.definition.StreamDefinition;
  */
 public interface EventSync {
 
-    void process(Object[] data);
+    void process(org.wso2.siddhi.core.event.Event event);
 
     public StreamDefinition getStreamDefinition();
 }

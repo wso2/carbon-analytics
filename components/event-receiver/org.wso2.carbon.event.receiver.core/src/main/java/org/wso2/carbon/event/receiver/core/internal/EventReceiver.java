@@ -41,8 +41,8 @@ import org.wso2.carbon.event.receiver.core.internal.util.helper.EventReceiverCon
 import org.wso2.carbon.event.statistics.EventStatisticsMonitor;
 import org.wso2.carbon.event.stream.core.EventProducer;
 import org.wso2.carbon.event.stream.core.EventProducerCallback;
+import org.wso2.siddhi.core.event.Event;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 
@@ -172,15 +172,15 @@ public class EventReceiver implements EventProducer {
             } else {
                 Object convertedEvent = this.inputMapper.convertToMappedInputEvent(object);
                 if (convertedEvent != null) {
-                    if (convertedEvent instanceof Object[][]) {
-                        Object[][] arrayOfEvents = (Object[][]) convertedEvent;
-                        for (Object[] outObjArray : arrayOfEvents) {
-                            if (outObjArray != null) {
-                                sendEvent(outObjArray);
+                    if (convertedEvent instanceof Event[]) {
+                        Event[] arrayOfEvents = (Event[]) convertedEvent;
+                        for (Event event : arrayOfEvents) {
+                            if (event != null) {
+                                sendEvent(event);
                             }
                         }
                     } else {
-                        sendEvent((Object[]) convertedEvent);
+                        sendEvent((Event) convertedEvent);
                     }
                 } else {
                     log.warn("Dropping the empty/null event, Event does not matched with mapping");
@@ -204,15 +204,15 @@ public class EventReceiver implements EventProducer {
             } else {
                 Object convertedEvent = this.inputMapper.convertToTypedInputEvent(obj);
                 if (convertedEvent != null) {
-                    if (convertedEvent instanceof Object[][]) {
-                        Object[][] arrayOfEvents = (Object[][]) convertedEvent;
-                        for (Object[] outObjArray : arrayOfEvents) {
-                            if (outObjArray != null) {
-                                sendEvent(outObjArray);
+                    if (convertedEvent instanceof Event[]) {
+                        Event[] arrayOfEvents = (Event[]) convertedEvent;
+                        for (Event event : arrayOfEvents) {
+                            if (event != null) {
+                                sendEvent(event);
                             }
                         }
                     } else {
-                        sendEvent((Object[]) convertedEvent);
+                        sendEvent((Event) convertedEvent);
                     }
                 }
             }
@@ -221,16 +221,16 @@ public class EventReceiver implements EventProducer {
         }
     }
 
-    protected void sendEvent(Object[] outObjArray) {
+    protected void sendEvent(Event event) {
         if (traceEnabled) {
-            trace.info(afterTracerPrefix + Arrays.toString(outObjArray));
+            trace.info(afterTracerPrefix + event);
         }
         if (statisticsEnabled) {
             statisticsMonitor.incrementRequest();
         }
         //in distributed mode if events are duplicated in cluster, send event only if the node is receiver coordinator
         if (!(mode == Mode.Distributed) || !isEventDuplicatedInCluster || EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().isReceiverCoordinator()) {
-            this.inputEventDispatcher.onEvent(outObjArray);
+            this.inputEventDispatcher.onEvent(event);
         }
 
     }

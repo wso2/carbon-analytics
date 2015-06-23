@@ -20,17 +20,14 @@ package org.wso2.carbon.event.receiver.core.internal.management;
 
 import org.apache.log4j.Logger;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.event.processor.manager.core.EventManagementUtil;
 import org.wso2.carbon.event.processor.manager.core.EventSync;
 import org.wso2.carbon.event.processor.manager.core.Manager;
 import org.wso2.carbon.event.receiver.core.internal.ds.EventReceiverServiceValueHolder;
+import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.util.snapshot.ByteSerializer;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -42,7 +39,7 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
 
     private final StreamDefinition streamDefinition;
     private Logger log = Logger.getLogger(AbstractInputEventDispatcher.class);
-    private final BlockingQueue<Object[]> eventQueue = new LinkedBlockingQueue<Object[]>();
+    private final BlockingQueue<Event> eventQueue = new LinkedBlockingQueue<Event>();
     private Lock readLock;
     private String syncId;
     private int tenantId;
@@ -58,7 +55,7 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
     }
 
     @Override
-    public void onEvent(Object[] event) {
+    public void onEvent(Event event) {
         try {
             threadBarrier.lock();
             eventQueue.put(event);
@@ -83,9 +80,9 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
 
     @Override
     public void syncState(byte[] bytes) {
-        BlockingQueue<Object[]> events = (BlockingQueue<Object[]>) ByteSerializer.BToO(bytes);
-        for (Object object : events) {
-            if (Arrays.deepEquals((Object[]) object, eventQueue.peek())) {
+        BlockingQueue<Event> events = (BlockingQueue<Event>) ByteSerializer.BToO(bytes);
+        for (Event event : events) {
+            if (event.equals(eventQueue.peek())) {
                 eventQueue.poll();
             } else {
                 break;
@@ -94,10 +91,10 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
     }
 
     @Override
-    public void process(Object[] data) {
+    public void process(Event event) {
         readLock.lock();
         readLock.unlock();
-        callBack.sendEventData(data);
+        callBack.sendEvent(event);
     }
 
     @Override
@@ -128,10 +125,10 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
                     try {
                         readLock.lock();
                         readLock.unlock();
-                        Object[] event = eventQueue.take();
+                        Event event = eventQueue.take();
                         readLock.lock();
                         readLock.unlock();
-                        callBack.sendEventData(event);
+                        callBack.sendEvent(event);
                         if (isSendToOther()) {
                             EventReceiverServiceValueHolder.getEventManagementService().syncEvent(syncId, Manager.ManagerType.Receiver, event);
                         }

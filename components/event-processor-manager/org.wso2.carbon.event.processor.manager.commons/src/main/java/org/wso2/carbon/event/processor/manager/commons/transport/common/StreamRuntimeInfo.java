@@ -23,7 +23,6 @@ import org.wso2.siddhi.query.api.definition.Attribute;
 public class StreamRuntimeInfo {
 
     private String streamId;
-    private byte streamIdSize;
     private int fixedMessageSize;
     private int noOfStringAttributes;
     private int noOfAttributes;

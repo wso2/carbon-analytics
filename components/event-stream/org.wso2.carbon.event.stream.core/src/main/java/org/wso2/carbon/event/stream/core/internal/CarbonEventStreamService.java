@@ -254,11 +254,6 @@ public class CarbonEventStreamService implements EventStreamService {
     }
 
     @Override
-    public void subscribe(RawEventConsumer rawEventConsumer) throws EventStreamConfigurationException {
-        EventStreamServiceValueHolder.getEventStreamRuntime().subscribe(rawEventConsumer);
-    }
-
-    @Override
     public void subscribe(EventProducer eventProducer) throws EventStreamConfigurationException {
         EventStreamServiceValueHolder.getEventStreamRuntime().subscribe(eventProducer);
     }
@@ -276,11 +271,6 @@ public class CarbonEventStreamService implements EventStreamService {
     @Override
     public void unsubscribe(SiddhiEventConsumer siddhiEventConsumer) {
         EventStreamServiceValueHolder.getEventStreamRuntime().unsubscribe(siddhiEventConsumer);
-    }
-
-    @Override
-    public void unsubscribe(RawEventConsumer rawEventConsumer) {
-        EventStreamServiceValueHolder.getEventStreamRuntime().unsubscribe(rawEventConsumer);
     }
 
     @Override

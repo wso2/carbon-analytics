@@ -49,6 +49,7 @@
         <module>features/event-receiver</module>
         <module>features/event-publisher</module>
         <module>features/event-processor-manager</module>
+        <module>features/spark-common</module>
     </modules>
 
     <dependencyManagement>
@@ -184,6 +185,11 @@
             <dependency>
                 <groupId>org.wso2.siddhi</groupId>
                 <artifactId>siddhi-core</artifactId>
+                <version>${siddhi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.siddhi</groupId>
+                <artifactId>siddhi-query-api</artifactId>
                 <version>${siddhi.version}</version>
             </dependency>
             <!--siddhi dependencies stop-->
@@ -537,7 +543,161 @@
                 <artifactId>org.wso2.carbon.event.publisher.admin</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
-            <!--carbon analytics common dependencies stop-->
+		            <!--carbon analytics common dependencies stop-->
+		
+			<!-- spark commons dependencies start -->
+		
+			<dependency>
+				<groupId>org.wso2.orbit.org.apache.spark</groupId>
+				<artifactId>spark-core_2.10</artifactId>
+				<version>${spark.core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.wso2.orbit.org.apache.spark</groupId>
+				<artifactId>spark-sql_2.10</artifactId>
+				<version>${spark.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.wso2.orbit.org.apache.spark</groupId>
+				<artifactId>spark-streaming_2.10</artifactId>
+				<version>${spark.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.scala-lang</groupId>
+				<artifactId>scala-reflect</artifactId>
+				<version>${scala.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.wso2.orbit.org.apache.hadoop</groupId>
+				<artifactId>hadoop-client</artifactId>
+				<version>${hadoop.client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.wso2.json4s</groupId>
+				<artifactId>json4s-jackson_2.10</artifactId>
+				<version>${json4s.jackson.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.wso2.twitter</groupId>
+				<artifactId>chill_2.10</artifactId>
+				<version>${twitter.chill.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.wso2.clearspring.analytics</groupId>
+				<artifactId>stream</artifactId>
+				<version>${clearspring.analytics.stream.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.netty.wso2</groupId>
+				<artifactId>netty-all</artifactId>
+				<version>${orbit.version.netty-all}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.esotericsoftware.kryo</groupId>
+				<artifactId>kryo</artifactId>
+				<version>${kyro.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.spark-project.akka</groupId>
+				<artifactId>akka-remote_2.10</artifactId>
+				<version>${akka.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.spark-project.akka</groupId>
+				<artifactId>akka-actor_2.10</artifactId>
+				<version>${akka.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.scala-lang</groupId>
+				<artifactId>scala-library</artifactId>
+				<version>${scala.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.jetty.orbit</groupId>
+				<artifactId>javax.transaction</artifactId>
+				<version>${javax.transaction.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.ning</groupId>
+				<artifactId>compress-lzf</artifactId>
+				<version>${compress.lzf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.wso2.orbit.org.apache.htrace</groupId>
+				<artifactId>htrace-core-apache</artifactId>
+				<version>${orbit.version.htrace}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-math3</artifactId>
+				<version>${commons.math.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>${commons-lang3.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-databind</artifactId>
+				<version>${jackson.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-core</artifactId>
+				<version>${jackson.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-annotations</artifactId>
+				<version>${jackson.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.dropwizard.metrics</groupId>
+				<artifactId>metrics-core</artifactId>
+				<version>${codahale.metrics.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.dropwizard.metrics</groupId>
+				<artifactId>metrics-graphite</artifactId>
+				<version>${codahale.metrics.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.dropwizard.metrics</groupId>
+				<artifactId>metrics-json</artifactId>
+				<version>${codahale.metrics.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.dropwizard.metrics</groupId>
+				<artifactId>metrics-jvm</artifactId>
+				<version>${codahale.metrics.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.xerial.snappy</groupId>
+				<artifactId>snappy-java</artifactId>
+				<version>${snappy.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.typesafe</groupId>
+				<artifactId>config</artifactId>
+				<version>${typesafe.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.wso2.orbit.com.esotericsoftware.minlog</groupId>
+				<artifactId>minlog</artifactId>
+				<version>${minlog.version}</version>
+			</dependency>
+			<dependency>
+                                <groupId>org.wso2.uncommons.maths</groupId>
+                                <artifactId>uncommons-maths</artifactId>
+                                <version>${uncommons.maths.version}</version>
+                        </dependency>
+			<dependency>
+                                <groupId>org.spark-project.protobuf</groupId>
+                                <artifactId>protobuf-java</artifactId>
+                                <version>${spark.protobuf.version}</version>
+                        </dependency>
+			<!-- spark commons dependencies stop -->
 
             <!--features start-->
             <dependency>
@@ -680,6 +840,12 @@
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.event.output.adapter.server.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.spark.commons.feature</artifactId>
                 <version>${carbon.analytics.common.version}</version>
                 <type>zip</type>
             </dependency>
@@ -950,6 +1116,33 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.scm.id>my-scm-server</project.scm.id>
 
+		<!-- Spark dependency versions -->
+		<spark.version>1.3.0.wso2v1</spark.version>
+		<spark.imp.pkg.version>[1.3.0,1.4.0)</spark.imp.pkg.version>
+		<spark.core.version>1.3.0.wso2v1</spark.core.version>
+		<hadoop.client.version>2.6.0.wso2v1</hadoop.client.version>
+		<json4s.jackson.version>3.2.10.wso2v1</json4s.jackson.version>
+		<twitter.chill.version>0.5.0.wso2v1</twitter.chill.version>
+		<clearspring.analytics.stream.version>2.2.0.wso2v1</clearspring.analytics.stream.version>
+		<kyro.version>2.24.0</kyro.version>
+		<akka.version>2.3.4-spark</akka.version>
+		<jackson.version>2.4.4</jackson.version>
+		<jackson-annotations.version>2.4.4</jackson-annotations.version>
+		<snappy.version>1.1.1.6</snappy.version>
+		<org.jboss.netty.version>3.9.0.Final</org.jboss.netty.version>
+		<commons.io.version>2.4.0.wso2v1</commons.io.version>
+		<orbit.version.htrace>3.1.0-incubating.wso2v1</orbit.version.htrace>
+		<commons.math.version>3.1.1</commons.math.version>
+		<commons-lang3.version>3.3.2</commons-lang3.version>
+		<orbit.version.netty-all>4.0.23.wso2v1</orbit.version.netty-all>
+		<compress.lzf.version>1.0.0</compress.lzf.version>
+		<jackson.version>2.4.4</jackson.version>
+		<codahale.metrics.version>3.1.2</codahale.metrics.version>
+		<scala.version>2.10.4</scala.version>
+		<typesafe.version>1.2.0</typesafe.version>
+		<minlog.version>1.2.wso2v1</minlog.version>
+		<uncommons.maths.version>1.2.2.wso2v1</uncommons.maths.version>
+		<spark.protobuf.version>2.5.0-spark</spark.protobuf.version>
     </properties>
 
 </project>

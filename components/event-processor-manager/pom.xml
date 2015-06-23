@@ -13,6 +13,7 @@
     <name>WSO2 Carbon - Event Processor Manager Aggregator Module</name>
     <description>WSO2 Carbon Event Processor Manager</description>
     <url>http://wso2.org</url>
+
     <modules>
         <module>org.wso2.carbon.event.processor.manager.commons</module>
         <module>org.wso2.carbon.event.processor.manager.core</module>

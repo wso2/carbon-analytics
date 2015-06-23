@@ -19,7 +19,7 @@ import org.wso2.carbon.databridge.commons.StreamDefinition;
 
 public class EventConverter {
 
-    public static Event convertToWso2Event(Object[] objArray, StreamDefinition streamDefinition) {
+    public static Event convertToWSO2Event(org.wso2.siddhi.core.event.Event event, StreamDefinition streamDefinition) {
         int metaSize;
         int correlationSize;
         int payloadSize;
@@ -28,7 +28,8 @@ public class EventConverter {
         Object[] correlationAttributes = null;
         Object[] payloadAttributes = null;
 
-        long timeStamp = System.currentTimeMillis();
+        long timeStamp = event.getTimestamp();
+        Object[] objArray = event.getData();
 
         int attributeIndex = 0;
 
@@ -54,18 +55,10 @@ public class EventConverter {
             }
         }
 
-        if (objArray.length - 1 == attributeIndex) {
-            //If timestamp is added
-            String timeStampData = (String) objArray[attributeIndex++];
-            if (timeStampData.startsWith("Timestamp:")) {
-                timeStamp = Long.parseLong(timeStampData.replace("Timestamp:", ""));
-            }
-        }
-
         return new Event(streamDefinition.getStreamId(), timeStamp, metaAttributes, correlationAttributes, payloadAttributes);
     }
 
-    public static Object[] convertToEventData(Event event, boolean metaFlag, boolean correlationFlag, boolean payloadFlag, int size) {
+    public static org.wso2.siddhi.core.event.Event convertToEvent(Event event, boolean metaFlag, boolean correlationFlag, boolean payloadFlag, int size) {
 
         Object[] eventObject = new Object[size];
         int count = 0;
@@ -88,7 +81,7 @@ public class EventConverter {
             count += payloadData.length;
         }
 
-        return eventObject;
+        return new org.wso2.siddhi.core.event.Event(event.getTimeStamp(), eventObject);
     }
 
 }

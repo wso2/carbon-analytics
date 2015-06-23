@@ -54,10 +54,11 @@ public class TCPEventTestServer {
 
             /**
              * @param streamId the stream id for the incoming event
+             * @param timestamp
              * @param event    the event as an object array of attributes
              */
             @Override
-            public void receive(String streamId, Object[] event) {
+            public void receive(String streamId, long timestamp, Object[] event) {
                     System.out.println(streamId +" :  "+Arrays.deepToString(event));
 
                 count++;

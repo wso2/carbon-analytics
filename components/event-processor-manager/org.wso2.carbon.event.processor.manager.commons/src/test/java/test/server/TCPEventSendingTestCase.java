@@ -124,7 +124,7 @@ public class TCPEventSendingTestCase {
             TCPEventServer.addStreamDefinition(streamDefinition);
             TCPEventServer.start();
             Thread.sleep(5000);
-            Assert.assertTrue(streamCallback.getEventCount()>0);
+            Assert.assertTrue(streamCallback.getEventCount() > 0);
             log.info("Shutting down server...");
             TCPEventServer.shutdown();
         } catch (InterruptedException e) {
@@ -136,7 +136,7 @@ public class TCPEventSendingTestCase {
         AtomicInteger eventCount = new AtomicInteger(0);
 
         @Override
-        public void receive(String streamId, Object[] event) {
+        public void receive(String streamId, long timestamp, Object[] event) {
             log.info("Event count:" + eventCount.incrementAndGet() + ", Stream ID: " + streamId + ", Event: " + Arrays.deepToString(event));
         }
 
@@ -170,7 +170,7 @@ public class TCPEventSendingTestCase {
                 log.info("Starting event client to send events to localhost:7612");
 
                 for (int i = 0; i < eventsToSend; i++) {
-                    TCPEventPublisher.sendEvent(streamDefinition.getId(), dataProvider.getEvent(), true);
+                    TCPEventPublisher.sendEvent(streamDefinition.getId(), System.currentTimeMillis(), dataProvider.getEvent(), true);
                     if (delay > 0) {
                         Thread.sleep(delay);
                     }

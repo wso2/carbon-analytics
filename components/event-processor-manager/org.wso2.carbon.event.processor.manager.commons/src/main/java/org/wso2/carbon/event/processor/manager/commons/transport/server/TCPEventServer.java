@@ -102,7 +102,10 @@ public class TCPEventServer {
                 if (isRunning) {
                     log.error("Error while the server was listening for events: " + e.getMessage(), e);
                 } else {
-                    log.info("EventServer stopped listening for socket connections.", e);
+                    log.info("EventServer stopped listening for socket connections, " + e.getMessage(), e);
+                    if (log.isDebugEnabled()) {
+                        log.debug("EventServer stopped listening for socket connections", e);
+                    }
                 }
             } finally {
                 isRunning = false;
@@ -123,36 +126,38 @@ public class TCPEventServer {
                     BufferedInputStream in = new BufferedInputStream(connectionSocket.getInputStream());
                     while (true) {
 
-                        byte[] streamNameByteSize = loadData(in, new byte[4]) ;
+                        byte[] streamNameByteSize = loadData(in, new byte[4]);
                         ByteBuffer sizeBuf = ByteBuffer.wrap(streamNameByteSize);
                         int streamNameSize = sizeBuf.getInt();
                         byte[] streamNameData = loadData(in, new byte[streamNameSize]);
                         String streamId = new String(streamNameData, 0, streamNameData.length);
                         StreamRuntimeInfo streamRuntimeInfo = streamRuntimeInfoMap.get(streamId);
 
-                        Object[] event = new Object[streamRuntimeInfo.getNoOfAttributes()];
-                        byte[] fixedMessageData = loadData(in, new byte[streamRuntimeInfo.getFixedMessageSize()]);
+                        Object[] eventData = new Object[streamRuntimeInfo.getNoOfAttributes()];
+                        byte[] fixedMessageData = loadData(in, new byte[8 + streamRuntimeInfo.getFixedMessageSize()]);
 
                         ByteBuffer bbuf = ByteBuffer.wrap(fixedMessageData, 0, fixedMessageData.length);
+                        long timestamp = bbuf.getLong();
+
                         List<Integer> stringValueSizes = new ArrayList<>();
                         Attribute.Type[] attributeTypes = streamRuntimeInfo.getAttributeTypes();
                         for (int i = 0; i < attributeTypes.length; i++) {
                             Attribute.Type type = attributeTypes[i];
                             switch (type) {
                                 case INT:
-                                    event[i] = bbuf.getInt();
+                                    eventData[i] = bbuf.getInt();
                                     continue;
                                 case LONG:
-                                    event[i] = bbuf.getLong();
+                                    eventData[i] = bbuf.getLong();
                                     continue;
                                 case BOOL:
-                                    event[i] = bbuf.get() == 1;
+                                    eventData[i] = bbuf.get() == 1;
                                     continue;
                                 case FLOAT:
-                                    event[i] = bbuf.getFloat();
+                                    eventData[i] = bbuf.getFloat();
                                     continue;
                                 case DOUBLE:
-                                    event[i] = bbuf.getDouble();
+                                    eventData[i] = bbuf.getDouble();
                                     continue;
                                 case STRING:
                                     int size = bbuf.getInt();
@@ -163,13 +168,13 @@ public class TCPEventServer {
                         int stringSizePosition = 0;
                         for (int i = 0; i < attributeTypes.length; i++) {
                             Attribute.Type type = attributeTypes[i];
-                            if(Attribute.Type.STRING == type) {
+                            if (Attribute.Type.STRING == type) {
                                 byte[] stringData = loadData(in, new byte[stringValueSizes.get(stringSizePosition)]);
                                 stringSizePosition++;
-                                event[i] = new String(stringData, 0, stringData.length);
+                                eventData[i] = new String(stringData, 0, stringData.length);
                             }
                         }
-                        streamCallback.receive(streamId, event);
+                        streamCallback.receive(streamId, timestamp, eventData);
                     }
                 } catch (EOFException e) {
                     log.info("Closing listener socket. " + e.getMessage());

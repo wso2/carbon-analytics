@@ -15,11 +15,12 @@
 package org.wso2.carbon.event.publisher.core.internal;
 
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
+import org.wso2.siddhi.core.event.Event;
 
 public interface OutputMapper {
 
-    public Object convertToMappedInputEvent(Object[] eventData) throws EventPublisherConfigurationException;
+    public Object convertToMappedInputEvent(Event event) throws EventPublisherConfigurationException;
 
-    public Object convertToTypedInputEvent(Object[] eventData) throws EventPublisherConfigurationException;
+    public Object convertToTypedInputEvent(Event event) throws EventPublisherConfigurationException;
 
 }

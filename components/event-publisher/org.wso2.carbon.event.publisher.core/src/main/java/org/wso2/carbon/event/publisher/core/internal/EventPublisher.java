@@ -32,12 +32,13 @@ import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfiguratio
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherStreamValidationException;
 import org.wso2.carbon.event.publisher.core.internal.ds.EventPublisherServiceValueHolder;
 import org.wso2.carbon.event.statistics.EventStatisticsMonitor;
-import org.wso2.carbon.event.stream.core.RawEventConsumer;
+import org.wso2.carbon.event.stream.core.SiddhiEventConsumer;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
+import org.wso2.siddhi.core.event.Event;
 
 import java.util.*;
 
-public class EventPublisher implements RawEventConsumer, EventSync {
+public class EventPublisher implements SiddhiEventConsumer, EventSync {
 
     private static final Log log = LogFactory.getLog(EventPublisher.class);
 
@@ -137,12 +138,12 @@ public class EventPublisher implements RawEventConsumer, EventSync {
         return eventPublisherConfiguration;
     }
 
-    public void sendEventData(Object[] data) {
+    public void sendEvent(Event event) {
         if (isPolled && sendToOther) {
-            EventPublisherServiceValueHolder.getEventManagementService().syncEvent(syncId, Manager.ManagerType.Publisher, data);
+            EventPublisherServiceValueHolder.getEventManagementService().syncEvent(syncId, Manager.ManagerType.Publisher, event);
         }
         if (isPolled || !EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()) {
-            process(data);
+            process(event);
         }
     }
 
@@ -179,8 +180,20 @@ public class EventPublisher implements RawEventConsumer, EventSync {
     }
 
     @Override
-    public void consumeEventData(Object[] eventData) {
-        sendEventData(eventData);
+    public void consumeEvents(Event[] events) {
+        for(Event event:events){
+            sendEvent(event);
+        }
+    }
+
+    @Override
+    public void consumeEvent(Event event) {
+        sendEvent(event);
+    }
+
+    @Override
+    public void shutdown() {
+
     }
 
     private List<String> getDynamicOutputMessageProperties(String messagePropertyValue) {
@@ -228,25 +241,25 @@ public class EventPublisher implements RawEventConsumer, EventSync {
     }
 
     @Override
-    public void process(Object[] data) {
+    public void process(Event event) {
 
         Map<String, String> dynamicProperties = new HashMap<String, String>(eventPublisherConfiguration.getToAdapterDynamicProperties());
 
         Object outObject;
         if (traceEnabled) {
-            trace.info(beforeTracerPrefix + Arrays.deepToString(data));
+            trace.info(beforeTracerPrefix + event);
         }
         if (statisticsEnabled) {
             statisticsMonitor.incrementResponse();
         }
         try {
             if (customMappingEnabled) {
-                outObject = outputMapper.convertToMappedInputEvent(data);
+                outObject = outputMapper.convertToMappedInputEvent(event);
             } else {
-                outObject = outputMapper.convertToTypedInputEvent(data);
+                outObject = outputMapper.convertToTypedInputEvent(event);
             }
         } catch (EventPublisherConfigurationException e) {
-            log.error("Cannot send event:" + Arrays.deepToString(data) + " from " + eventPublisherConfiguration.getEventPublisherName());
+            log.error("Cannot send " + event + " from " + eventPublisherConfiguration.getEventPublisherName());
             return;
         }
 
@@ -255,7 +268,7 @@ public class EventPublisher implements RawEventConsumer, EventSync {
         }
 
         if (dynamicMessagePropertyEnabled) {
-            changeDynamicEventAdapterMessageProperties(data, dynamicProperties);
+            changeDynamicEventAdapterMessageProperties(event.getData(), dynamicProperties);
         }
 
         OutputEventAdapterService eventAdapterService = EventPublisherServiceValueHolder.getOutputEventAdapterService();

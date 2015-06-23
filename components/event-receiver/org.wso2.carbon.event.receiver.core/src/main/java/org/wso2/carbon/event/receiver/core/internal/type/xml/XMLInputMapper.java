@@ -38,6 +38,7 @@ import org.wso2.carbon.event.receiver.core.internal.type.xml.config.ReflectionBa
 import org.wso2.carbon.event.receiver.core.internal.type.xml.config.XPathData;
 import org.wso2.carbon.event.receiver.core.internal.util.EventReceiverUtil;
 import org.wso2.carbon.event.receiver.core.internal.util.helper.EventReceiverConfigurationHelper;
+import org.wso2.siddhi.core.event.Event;
 
 import javax.xml.stream.XMLStreamException;
 import java.lang.reflect.InvocationTargetException;
@@ -165,7 +166,7 @@ public class XMLInputMapper implements InputMapper {
         return EventReceiverConfigurationHelper.getAttributes(inputMappingAttributes);
     }
 
-    private Object[][] processMultipleEvents(Object obj) throws EventReceiverProcessingException {
+    private Event[] processMultipleEvents(Object obj) throws EventReceiverProcessingException {
         if (obj instanceof String) {
             String textMessage = (String) obj;
             try {
@@ -182,7 +183,7 @@ public class XMLInputMapper implements InputMapper {
                     throw new RuntimeException("Parent Selector XPath \"" + parentSelectorXpath.toString() + "\" cannot be processed on event:" + obj.toString());
                 }
 
-                List<Object[]> objArrayList = new ArrayList<Object[]>();
+                List<Event> objArrayList = new ArrayList<Event>();
                 Iterator childIterator = events.getChildElements();
                 while (childIterator.hasNext()) {
                     Object eventObj = childIterator.next();
@@ -197,7 +198,7 @@ public class XMLInputMapper implements InputMapper {
                      */
                     childIterator.remove();
                 }
-                return objArrayList.toArray(new Object[objArrayList.size()][]);
+                return objArrayList.toArray(new Event[objArrayList.size()]);
             } catch (JaxenException e) {
                 throw new EventReceiverProcessingException("Unable to parse XPath for parent selector: " + e.getMessage(), e);
             }
@@ -205,7 +206,7 @@ public class XMLInputMapper implements InputMapper {
         return null;
     }
 
-    private Object[] processSingleEvent(Object obj) throws EventReceiverProcessingException {
+    private Event processSingleEvent(Object obj) throws EventReceiverProcessingException {
         Object[] outObjArray = null;
         OMElement eventOMElement = null;
         if (obj instanceof String) {
@@ -252,9 +253,9 @@ public class XMLInputMapper implements InputMapper {
                             }
                         } else if (!type.equals(EventReceiverConstants.CLASS_FOR_STRING)) {
                             if (omElementResult == null) {
-                                throw new EventReceiverProcessingException("Unable to parse XPath " + xpathData.getXpath() + " to retrieve required attribute, hence dropping the event "+obj.toString());
+                                throw new EventReceiverProcessingException("Unable to parse XPath " + xpathData.getXpath() + " to retrieve required attribute, hence dropping the event " + obj.toString());
                             } else {
-                                throw new EventReceiverProcessingException("Valid attribute value not found for "+xpathData.getXpath() + " ,hence dropping the event "+obj.toString());
+                                throw new EventReceiverProcessingException("Valid attribute value not found for " + xpathData.getXpath() + " ,hence dropping the event " + obj.toString());
                             }
                         }
                     }
@@ -271,6 +272,6 @@ public class XMLInputMapper implements InputMapper {
             }
             outObjArray = objList.toArray(new Object[objList.size()]);
         }
-        return outObjArray;
+        return new Event(System.currentTimeMillis(), outObjArray);
     }
 }

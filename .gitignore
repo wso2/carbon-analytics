@@ -15,3 +15,7 @@ hs_err_pid*
 #idea files
 .idea/
 *.iml
+
+#eclipse files
+.project
+.settings/

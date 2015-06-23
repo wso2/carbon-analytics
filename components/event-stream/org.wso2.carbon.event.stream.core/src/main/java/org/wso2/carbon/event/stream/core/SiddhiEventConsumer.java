@@ -14,6 +14,8 @@
  */
 package org.wso2.carbon.event.stream.core;
 
+import org.wso2.siddhi.core.event.Event;
+
 /**
  * Represents event sinks that fetch events from the junction.
  */
@@ -21,9 +23,9 @@ public interface SiddhiEventConsumer {
 
     public String getStreamId();
 
-    public void consumeEvents(org.wso2.siddhi.core.event.Event[] events);
+    public void consumeEvents(Event[] events);
 
-    public void consumeEventData(Object[] data);
+    public void consumeEvent(Event event);
 
     public void shutdown();
 }
