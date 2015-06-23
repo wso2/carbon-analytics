@@ -149,6 +149,11 @@ public class CarbonEventManagementService implements EventManagementService {
             log.warn("CEP started with clustering enabled, but SingleNode configuration given.");
         }
 
+        if(stormEventPublisherSyncMap == null){
+            stormEventPublisherSyncMap = EventManagementServiceValueHolder.getHazelcastInstance()
+                    .getMap(ConfigurationConstants.STORM_EVENT_PUBLISHER_SYNC_MAP);
+        }
+
     }
 
     public void init(ConfigurationContextService configurationContextService) {
@@ -396,22 +401,19 @@ public class CarbonEventManagementService implements EventManagementService {
     }
 
     @Override
-    public void updateLatestSentEventTime(String publisherAndTenantId, long timestamp){
-        if(stormEventPublisherSyncMap == null){
-            stormEventPublisherSyncMap = EventManagementServiceValueHolder.getHazelcastInstance()
-                    .getMap(ConfigurationConstants.STORM_EVENT_PUBLISHER_SYNC_MAP);
-        }
-        stormEventPublisherSyncMap.putAsync(publisherAndTenantId,
+    public void updateLatestEventSentTime(String publisherName, int tenantId, long timestamp){
+
+        stormEventPublisherSyncMap.putAsync(tenantId + "-" + publisherName,
                 EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getClusterTime());
     }
 
     @Override
-    public long getLatestSentEventTimeForPublisher(String publisherAndTenantId){
+    public long getLatestEventSentTime(String publisherName, int tenantId){
         if(stormEventPublisherSyncMap == null){
             stormEventPublisherSyncMap = EventManagementServiceValueHolder.getHazelcastInstance()
                     .getMap(ConfigurationConstants.STORM_EVENT_PUBLISHER_SYNC_MAP);
         }
-        Object latestTimePublished = stormEventPublisherSyncMap.get(publisherAndTenantId);
+        Object latestTimePublished = stormEventPublisherSyncMap.get(tenantId + "-" + publisherName);
         if (latestTimePublished != null) {
             return (Long)latestTimePublished;
         }
@@ -419,12 +421,7 @@ public class CarbonEventManagementService implements EventManagementService {
     }
 
     @Override
-    public boolean isHAMode(){
-        return mode == Mode.HA;
-    }
-
-    @Override
-    public long getHazelcastClusterTime(){
+    public long getClusterTimeInMilies(){
         return EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getClusterTime();
     }
 }

@@ -35,13 +35,10 @@ public interface EventManagementService {
 
     public void unregisterEventSync(String syncId);
 
-    public void updateLatestSentEventTime(String publisherAndTenantId, long timestamp);
+    public void updateLatestEventSentTime(String publisherName, int tenantId, long timestamp);
 
-    public long getLatestSentEventTimeForPublisher(String publisherAndTenantId);
+    public long getLatestEventSentTime(String publisherName, int tenantId);
 
-    public boolean isHAMode();
-
-    public long getHazelcastClusterTime();
-
+    public long getClusterTimeInMilies();
 
 }

@@ -63,7 +63,7 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
     private boolean sendToOther = false;
     private org.wso2.siddhi.query.api.definition.StreamDefinition streamDefinition;
 
-    private Queue<Event> eventQueue = new LinkedList<>();
+    private Queue<EventWrapper> eventQueue = new LinkedList<EventWrapper>();
 
 
     public EventPublisher(EventPublisherConfiguration eventPublisherConfiguration)
@@ -148,30 +148,30 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
             process(event);
         }
 
-        if(EventPublisherServiceValueHolder.getEventManagementService().isHAMode()){
+        if(EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode() == Mode.HA){
             if(!isPolled && EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()){
                 //add to Queue
-                event.setTimestamp(EventPublisherServiceValueHolder.getEventManagementService().getHazelcastClusterTime());
-                eventQueue.add(event);
+                EventWrapper eventWrapper = new EventWrapper(event, EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMilies());
+                eventQueue.add(eventWrapper);
 
                 // get last processed time and remove old events from the queue
-                long timestamp = EventPublisherServiceValueHolder.getEventManagementService().getLatestSentEventTimeForPublisher(
-                        tenantId + "-" + eventPublisherConfiguration.getEventPublisherName());
+                long timestamp = EventPublisherServiceValueHolder.getEventManagementService().getLatestEventSentTime(
+                        eventPublisherConfiguration.getEventPublisherName(), tenantId);
 
-                while (!eventQueue.isEmpty() && eventQueue.peek().getTimestamp() <= timestamp) {
+                while (!eventQueue.isEmpty() && eventQueue.peek().getTimestampInMilies() <= timestamp) {
                     eventQueue.remove();
                 }
 
             }else if(!isPolled && !EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()){
                 //is queue not empty send events from last time
-                long timestamp = EventPublisherServiceValueHolder.getEventManagementService().getHazelcastClusterTime();
+                long timestamp = EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMilies();
                 if(!eventQueue.isEmpty()) {
                     while (!eventQueue.isEmpty()) {
-                        process(eventQueue.poll());
+                        process(eventQueue.poll().getEvent());
                     }
                 }
-                EventPublisherServiceValueHolder.getEventManagementService().updateLatestSentEventTime(
-                        tenantId + "-" + eventPublisherConfiguration.getEventPublisherName(), timestamp);
+                EventPublisherServiceValueHolder.getEventManagementService().updateLatestEventSentTime(
+                        eventPublisherConfiguration.getEventPublisherName(), tenantId, timestamp);
             }
         }
     }
@@ -308,5 +308,22 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
     @Override
     public org.wso2.siddhi.query.api.definition.StreamDefinition getStreamDefinition() {
         return streamDefinition;
+    }
+
+    public class EventWrapper{
+
+        private Event event;
+        private long timestampInMilies;
+
+        public EventWrapper(Event event, long timestamp){
+            this.event = event;
+            this.timestampInMilies = timestamp;
+        }
+        public Event getEvent(){
+            return event;
+        }
+        public long getTimestampInMilies(){
+            return timestampInMilies;
+        }
     }
 }
