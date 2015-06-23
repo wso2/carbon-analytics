@@ -42,7 +42,7 @@ public final class EmailEventAdapterConstants {
     public static final String ADAPTER_MESSAGE_RECEIVING_EMAIL_SUBJECT = "email.in.subject";
     public static final String ADAPTER_MESSAGE_RECEIVING_EMAIL_SUBJECT_HINT = "email.in.subject.hint";
 
-    public static final long DEFAULT_EMAIL_POLL_INTERVAL_IN_MILLIS = 5000;
+    public static final long DEFAULT_EMAIL_POLL_INTERVAL_IN_MINS = 5;
     public static final String ADAPTER_CONF_MOVE_TO_FOLDER_NAME = "moveToFolderName";
 
 }

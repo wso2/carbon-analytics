@@ -14,7 +14,9 @@
  */
 package org.wso2.carbon.event.input.adapter.core;
 
+import org.wso2.carbon.event.input.adapter.core.exception.ConnectionUnavailableException;
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterException;
+import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterRuntimeException;
 import org.wso2.carbon.event.input.adapter.core.exception.TestConnectionNotSupportedException;
 
 /**
@@ -25,9 +27,9 @@ public interface InputEventAdapter {
 
     void init(InputEventAdapterListener eventAdaptorListener) throws InputEventAdapterException;
 
-    void testConnect() throws TestConnectionNotSupportedException;
+    void testConnect() throws TestConnectionNotSupportedException, InputEventAdapterRuntimeException, ConnectionUnavailableException;
 
-    void connect();
+    void connect() throws InputEventAdapterRuntimeException, ConnectionUnavailableException;
 
     void disconnect();
 
