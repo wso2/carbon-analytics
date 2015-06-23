@@ -17,6 +17,8 @@
 */
 package org.wso2.carbon.analytics.eventsink.internal;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventStore;
 import org.wso2.carbon.analytics.eventsink.exception.AnalyticsEventStoreException;
 import org.wso2.carbon.analytics.eventsink.internal.util.AnalyticsEventSinkConstants;
@@ -30,6 +32,8 @@ import java.util.*;
  * This is the manager class for the event store configuration.
  */
 public class AnalyticsEventStoreManager {
+
+    private static final Log log = LogFactory.getLog(AnalyticsEventStoreManager.class);
 
     private static AnalyticsEventStoreManager instance = new AnalyticsEventStoreManager();
 
@@ -79,7 +83,10 @@ public class AnalyticsEventStoreManager {
                 AnalyticsEventSinkConstants.DEPLOYMENT_DIR_NAME + File.separator + eventStoreName +
                 AnalyticsEventSinkConstants.DEPLOYMENT_FILE_EXT);
         if (eventStoreFile.exists()) {
-            eventStoreFile.delete();
+            if (!eventStoreFile.delete()) {
+                log.warn("Unable to successfully delete the file : " + eventStoreFile.getName() + " for tenant id : "
+                        + tenantId);
+            }
         }
     }
 

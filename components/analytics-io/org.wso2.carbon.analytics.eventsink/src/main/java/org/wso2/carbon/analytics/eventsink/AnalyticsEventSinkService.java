@@ -25,7 +25,8 @@ import org.wso2.carbon.analytics.eventsink.exception.AnalyticsEventStoreExceptio
  */
 public interface AnalyticsEventSinkService {
 
-    void putEventSink(int tenantId, String streamName, String version, AnalyticsSchema analyticsSchema) throws AnalyticsEventStoreException;
+    void putEventSink(int tenantId, String streamName, String version, AnalyticsSchema analyticsSchema,
+                      String recordStoreName) throws AnalyticsEventStoreException;
 
     void putEventStore(int tenantId, AnalyticsEventStore eventStore) throws AnalyticsEventStoreException;
 

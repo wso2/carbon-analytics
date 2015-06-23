@@ -29,15 +29,34 @@ import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 public class AnalyticsEventSinkServiceImpl implements AnalyticsEventSinkService {
 
     @Override
-    public void putEventSink(int tenantId, String streamName, String version, AnalyticsSchema analyticsSchema)
-            throws AnalyticsEventStoreException {
+    public void putEventSink(int tenantId, String streamName, String version, AnalyticsSchema analyticsSchema,
+                             String recordStoreName) throws AnalyticsEventStoreException {
         String streamId = DataBridgeCommonsUtils.generateStreamId(streamName, version);
         AnalyticsEventStore analyticsEventStore = AnalyticsEventSinkUtil.
-                getAnalyticsEventStore(streamName, version, analyticsSchema);
+                getAnalyticsEventStore(streamName, version, analyticsSchema, recordStoreName);
         AnalyticsEventStore existingEventStore = AnalyticsEventStoreManager.
                 getInstance().getAnalyticsEventStore(tenantId,
                 analyticsEventStore.getName());
         if (existingEventStore != null) {
+            if (existingEventStore.getRecordStore() == null) {
+                if (analyticsEventStore.getRecordStore() != null) {
+                    throw new AnalyticsEventStoreException("Already event store is configured with primary record store," +
+                            " therefore unable to proceed with new event sink for stream :" + streamName + " , version : "
+                            + version + " , record store name : " + recordStoreName + ".");
+                }
+            } else {
+                if (analyticsEventStore.getRecordStore() == null) {
+                    throw new AnalyticsEventStoreException("Already event store is configured with record store name : "
+                            + analyticsEventStore.getRecordStore() + "," +
+                            " therefore unable to proceed with new event sink for stream :" + streamName + " , version : "
+                            + version + " , with primary record store.");
+                }else if (!analyticsEventStore.getRecordStore().equals(existingEventStore.getRecordStore())){
+                    throw new AnalyticsEventStoreException("Already event store is configured with record store name : "
+                            + analyticsEventStore.getRecordStore() + "," +
+                            " therefore unable to proceed with new event sink for stream :" + streamName + " , version : "
+                            + version + " , with record store :" + analyticsEventStore.getRecordStore()+".");
+                }
+            }
             for (String aStream : existingEventStore.getEventSource().getStreamIds()) {
                 if (!aStream.equals(streamId)) {
                     analyticsEventStore.getEventSource().getStreamIds().add(aStream);

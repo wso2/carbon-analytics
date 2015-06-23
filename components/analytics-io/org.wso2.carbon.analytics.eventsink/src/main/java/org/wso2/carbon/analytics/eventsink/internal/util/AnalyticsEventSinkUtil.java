@@ -83,7 +83,8 @@ public class AnalyticsEventSinkUtil {
         return deploymentFileName;
     }
 
-    public static AnalyticsEventStore getAnalyticsEventStore(String streamName, String version, AnalyticsSchema schema)
+    public static AnalyticsEventStore getAnalyticsEventStore(String streamName, String version, AnalyticsSchema schema,
+                                                             String recordStoreName)
             throws AnalyticsEventStoreException {
         AnalyticsEventStore store = new AnalyticsEventStore();
         AnalyticsEventStore.EventSource eventSource = new AnalyticsEventStore.EventSource();
@@ -92,6 +93,7 @@ public class AnalyticsEventSinkUtil {
         eventSource.setStreamIds(streams);
         store.setEventSource(eventSource);
         store.setAnalyticsTableSchema(getAnalyticsTableSchema(schema));
+        store.setRecordStore(recordStoreName);
         return store;
     }
 

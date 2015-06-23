@@ -206,7 +206,7 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
                         AnalyticsSchema schema = new AnalyticsSchema(columnDefinitions, primaryKeys);
                         analyticsDataService.setTableSchema(getTenantId(), tableName, schema);
                         ServiceHolder.getAnalyticsEventSinkService().putEventSink(getTenantId(), analyticsTable
-                                .getTableName(), analyticsTable.getStreamVersion(), schema);
+                                .getTableName(), analyticsTable.getStreamVersion(), schema, null);
                     } catch (Exception e) {
                         log.error("Unable to save analytics schema[" + analyticsTable.getTableName() + "]: " + e.getMessage(), e);
                         throw new EventStreamPersistenceAdminServiceException("Unable to save analytics schema", e);

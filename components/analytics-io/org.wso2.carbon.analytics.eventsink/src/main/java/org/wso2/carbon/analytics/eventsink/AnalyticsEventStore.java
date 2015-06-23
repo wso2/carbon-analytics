@@ -32,12 +32,22 @@ import java.util.List;
 public class AnalyticsEventStore {
 
     private String name;
+    private String recordStore;
     private EventSource eventSource;
     private AnalyticsTableSchema analyticsTableSchema;
 
     @XmlElement(name = "Source")
     public EventSource getEventSource() {
         return eventSource;
+    }
+
+    @XmlElement(name = "RecordStoreName")
+    public String getRecordStore() {
+        return recordStore;
+    }
+
+    public void setRecordStore(String recordStore) {
+        this.recordStore = recordStore;
     }
 
     public void setEventSource(EventSource eventSource) throws AnalyticsEventStoreException {
