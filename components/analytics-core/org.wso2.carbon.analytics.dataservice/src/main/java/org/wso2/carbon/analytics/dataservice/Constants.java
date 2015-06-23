@@ -32,6 +32,6 @@ public class Constants {
     public static final String DEFAULT_CHARSET = "UTF8";
     public static final String ANALYTICS_SCHEMA_FILE_EXTENSION = "xml";
     public static final String RETENTION_PERIOD = "retentionPeriod";
-    public static final String INCLUDE_TABLES = "excludeTables";
+    public static final String INCLUDE_TABLES = "includeTables";
     public static final String INCLUDE_CLASS_SPLITTER = "###";
 }
