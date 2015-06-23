@@ -19,10 +19,10 @@
     <Password>admin</Password>
 
     <!--The maximum number of connections made from this node to the remote instances to perform the operations.-->
-    <MaxConnections>500</MaxConnections>
+    <MaxConnections>200</MaxConnections>
 
     <!--The maximum number of connections per given route from this node to the remote instances to perform the operations.-->
-    <MaxConnectionsPerRoute>500</MaxConnectionsPerRoute>
+    <MaxConnectionsPerRoute>200</MaxConnectionsPerRoute>
 
     <!--The socket connection timeout when trying to connect the remote service-->
     <SocketConnectionTimeout>60000</SocketConnectionTimeout>
