@@ -68,9 +68,9 @@ public class RDBMSEventAdapterFactory extends OutputEventAdapterFactory {
         Property executionMode = new Property(RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_EXECUTION_MODE);
         executionMode.setDisplayName(
                 resourceBundle.getString(RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_EXECUTION_MODE));
-        executionMode.setOptions(new String[] {
+        executionMode.setOptions(new String[]{
                 resourceBundle.getString(RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_EXECUTION_MODE_INSERT),
-                resourceBundle.getString(RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_EXECUTION_MODE_UPDATE) });
+                resourceBundle.getString(RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_EXECUTION_MODE_UPDATE)});
         executionMode.setHint(
                 resourceBundle.getString(RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_EXECUTION_MODE_HINT));
         executionMode.setRequired(true);
@@ -92,8 +92,12 @@ public class RDBMSEventAdapterFactory extends OutputEventAdapterFactory {
     }
 
     @Override
+    public String getDescription() {
+        return null;
+    }
+    @Override
     public OutputEventAdapter createEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
-            Map<String, String> globalProperties) {
-        return new RDBMSEventAdapter(eventAdapterConfiguration,globalProperties);
+                                                 Map<String, String> globalProperties) {
+        return new RDBMSEventAdapter(eventAdapterConfiguration, globalProperties);
     }
 }

@@ -118,6 +118,11 @@ public class CassandraEventAdapterFactory extends OutputEventAdapterFactory {
     }
 
     @Override
+    public String getDescription() {
+        return null;
+    }
+
+    @Override
     public OutputEventAdapter createEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String,
             String> globalProperties) {
         return new CassandraEventAdapter(eventAdapterConfiguration, globalProperties);

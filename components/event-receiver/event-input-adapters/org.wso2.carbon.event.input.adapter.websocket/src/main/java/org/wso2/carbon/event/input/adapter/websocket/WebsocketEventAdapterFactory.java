@@ -61,6 +61,11 @@ public class WebsocketEventAdapterFactory extends InputEventAdapterFactory {
     }
 
     @Override
+    public String getDescription() {
+        return null;
+    }
+
+    @Override
     public InputEventAdapter createEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration, Map<String, String> globalProperties) {
         return new WebsocketEventAdapter(eventAdapterConfiguration, globalProperties);
     }

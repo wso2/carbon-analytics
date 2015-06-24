@@ -23,12 +23,14 @@ import java.util.List;
 public class OutputEventAdapterSchema {
 
     private final String type;
+    private String description;
     private final List<String> supportedMessageFormats;
     private final List<Property> staticPropertyList;
     private final List<Property> dynamicPropertyList;
 
-    public OutputEventAdapterSchema(String type, List<String> supportedMessageFormats, List<Property> staticPropertyList, List<Property> dynamicPropertyList) {
+    public OutputEventAdapterSchema(String type, String description, List<String> supportedMessageFormats, List<Property> staticPropertyList, List<Property> dynamicPropertyList) {
         this.type = type;
+        this.description = description;
         this.supportedMessageFormats = supportedMessageFormats;
         this.staticPropertyList = staticPropertyList;
         this.dynamicPropertyList = dynamicPropertyList;
@@ -36,6 +38,10 @@ public class OutputEventAdapterSchema {
 
     public String getType() {
         return type;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public List<String> getSupportedMessageFormats() {

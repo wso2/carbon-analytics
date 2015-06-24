@@ -23,17 +23,23 @@ import java.util.List;
 public class InputEventAdapterSchema {
 
     private String type;
+    private String description;
     private List<String> supportedMessageFormats;
     private List<Property> propertyList;
 
-    public InputEventAdapterSchema(String type, List<String> supportedMessageFormats, List<Property> propertyList) {
+    public InputEventAdapterSchema(String type, String description, List<String> supportedMessageFormats, List<Property> propertyList) {
         this.type = type;
+        this.description = description;
         this.supportedMessageFormats = supportedMessageFormats;
         this.propertyList = propertyList;
     }
 
     public String getType() {
         return type;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public List<String> getSupportedMessageFormats() {

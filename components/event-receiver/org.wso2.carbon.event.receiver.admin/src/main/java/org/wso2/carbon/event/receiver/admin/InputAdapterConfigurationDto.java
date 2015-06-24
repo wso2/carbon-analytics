@@ -19,6 +19,8 @@ public class InputAdapterConfigurationDto {
 
     private String eventAdapterType;
 
+    private String eventAdapterDescription;
+
     private String[] supportedMessageFormats;
 
     private DetailInputAdapterPropertyDto[] inputEventAdapterProperties;
@@ -47,5 +49,15 @@ public class InputAdapterConfigurationDto {
     public void setSupportedMessageFormats(String[] supportedMessageFormats) {
         this.supportedMessageFormats = supportedMessageFormats;
     }
+
+    public String getEventAdapterDescription() {
+        return eventAdapterDescription;
+    }
+
+    public void setEventAdapterDescription(String eventAdapterDescription) {
+        this.eventAdapterDescription = eventAdapterDescription;
+    }
+
+
 
 }

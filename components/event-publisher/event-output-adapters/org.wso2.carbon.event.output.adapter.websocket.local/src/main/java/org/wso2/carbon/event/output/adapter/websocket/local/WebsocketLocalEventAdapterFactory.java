@@ -51,7 +51,12 @@ public class WebsocketLocalEventAdapterFactory extends OutputEventAdapterFactory
     }
 
     @Override
+    public String getDescription() {
+        return WebsocketLocalEventAdapterConstants.ADAPTER_DESCRIPTION_WEBSOCKET_LOCAL;
+    }
+
+    @Override
     public OutputEventAdapter createEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String, String> globalProperties) {
-        return new WebsocketLocalEventAdapter(eventAdapterConfiguration,globalProperties);
+        return new WebsocketLocalEventAdapter(eventAdapterConfiguration, globalProperties);
     }
 }

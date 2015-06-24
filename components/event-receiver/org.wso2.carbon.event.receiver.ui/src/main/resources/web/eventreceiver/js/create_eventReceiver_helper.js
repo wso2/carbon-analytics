@@ -36,7 +36,7 @@ function fillTextIn(obj) {
 function loadEventAdapterProperty(inputAdapterProperty, eventReceiverInputTable, propertyLoop) {
 
     var property = inputAdapterProperty.localDisplayName.trim();
-    var tableRow = eventReceiverInputTable.insertRow(4);
+    var tableRow = eventReceiverInputTable.insertRow(5);
     var textLabel = tableRow.insertCell(0);
     var displayName = inputAdapterProperty.localDisplayName.trim();
     textLabel.innerHTML = displayName;
@@ -113,27 +113,34 @@ function loadEventAdapterProperties(adapterSchema, propertiesHeading) {
     }
 
     var eventReceiverInputTable = document.getElementById("eventReceiverInputTable");
-// delete message properties related fields
-    for (i = eventReceiverInputTable.rows.length - 7; i > 2; i--) {
+    var eventReceiverDescriptionRow = document.getElementById("eventReceiverDescriptionRowId");
+
+    //adapter description
+    if (adapterSchema.localEventAdapterDescription != null) {
+        eventReceiverDescriptionRow.innerHTML = '<td>Usage Tip</td><td>' + adapterSchema.localEventAdapterDescription + '</td>';
+    } else {
+        eventReceiverDescriptionRow.innerHTML = '<td hidden></td><td hidden></td>';
+    }
+
+    // delete message properties related fields
+    for (i = eventReceiverInputTable.rows.length - 7; i > 3; i--) {
         eventReceiverInputTable.deleteRow(i);
     }
 
-    if(adapterSchema.localInputEventAdapterProperties != null){
-        if(adapterSchema.localInputEventAdapterProperties.length > 0){
-            var tableRow = eventReceiverInputTable.insertRow(3);
+    if (adapterSchema.localInputEventAdapterProperties != null) {
+        if (adapterSchema.localInputEventAdapterProperties.length > 0) {
+            var tableRow = eventReceiverInputTable.insertRow(4);
             var inputField = tableRow.insertCell(0);
-            inputField.innerHTML = '<b><i><span style="color: #666666; ">'+propertiesHeading+'</span></i></b>';
+            inputField.innerHTML = '<b><i><span style="color: #666666; ">' + propertiesHeading + '</span></i></b>';
 
         }
-        for (var i = adapterSchema.localInputEventAdapterProperties.length - 1 ; i >= 0; i--) {
+        for (var i = adapterSchema.localInputEventAdapterProperties.length - 1; i >= 0; i--) {
             // for each property, add a text and input field in a row
             loadEventAdapterProperty(adapterSchema.localInputEventAdapterProperties[i], eventReceiverInputTable, i);
         }
     }
-
-
-
 }
+
 function loadEventAdapterRelatedProperties(toPropertyHeader, propertiesHeading) {
 
     var selectedIndex = document.getElementById("eventAdapterTypeFilter").selectedIndex;

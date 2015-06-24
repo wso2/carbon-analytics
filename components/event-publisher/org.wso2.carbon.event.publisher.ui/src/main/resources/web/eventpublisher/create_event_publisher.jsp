@@ -209,6 +209,11 @@
         </table>
     </td>
 </tr>
+
+<tr id="eventPublisherDescriptionRowId"><td hidden><fmt:message key="event.adapter.description"/></td>
+    <td hidden></td>
+</tr>
+
 <%
     OutputAdapterConfigurationDto outputAdapterConfigurationDto = eventPublisherAdminServiceStub.getOutputAdapterConfigurationSchema(firstEventAdapterType);
     if (outputAdapterConfigurationDto != null) {

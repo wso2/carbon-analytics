@@ -28,6 +28,7 @@ public final class WSO2EventAdapterConstants {
     public static final String ADAPTER_CONF_WSO2EVENT_PROP_PUBLISHING_MODE = "publishingMode";
     public static final String ADAPTER_CONF_WSO2EVENT_PROP_PUBLISH_TIMEOUT_MS = "publishTimeout";
     public static final String ADAPTER_TYPE_WSO2EVENT = "wso2event";
+    public static final String ADAPTER_DESCRIPTION_WSO2EVENT = "wso2event.description";
 
     public static final String ADAPTER_CONF_WSO2EVENT_HINT_RECEIVER_URL = "enterReceiverUrl";
     public static final String ADAPTER_CONF_WSO2EVENT_HINT_AUTHENTICATOR_URL = "enterAuthenticatorUrl";

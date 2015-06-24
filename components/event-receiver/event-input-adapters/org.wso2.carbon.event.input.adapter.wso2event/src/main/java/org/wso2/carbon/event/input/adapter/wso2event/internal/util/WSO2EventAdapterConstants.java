@@ -21,5 +21,6 @@ public final class WSO2EventAdapterConstants {
     }
 
     public static final String ADAPTER_TYPE_WSO2EVENT = "wso2event";
+    public static final String ADAPTER_DESCRIPTION_WSO2EVENT = "wso2event.description";
     public static final String ADAPTER_IS_EVENTS_DUPLICATED_IN_CLUSTER_HINT = "events.duplicated.in.cluster.hint";
 }

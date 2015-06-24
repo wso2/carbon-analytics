@@ -107,6 +107,11 @@ public class MQTTEventAdapterFactory extends InputEventAdapterFactory {
     }
 
     @Override
+    public String getDescription() {
+        return null;
+    }
+
+    @Override
     public InputEventAdapter createEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration,
                                                 Map<String, String> globalProperties) {
         return new MQTTEventAdapter(eventAdapterConfiguration, globalProperties);

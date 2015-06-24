@@ -196,6 +196,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
                     toAdapterConfigurationDto.setSupportedMessageFormats(
                             outputEventAdapterSchema.getSupportedMessageFormats().
                                     toArray(new String[outputEventAdapterSchema.getSupportedMessageFormats().size()]));
+                    toAdapterConfigurationDto.setEventAdapterDescription(outputEventAdapterSchema.getDescription());
 
                     Map<String, String> outputAdapterProperties = new HashMap<String, String>();
                     outputAdapterProperties.putAll(toAdapterConfiguration.getStaticProperties());
@@ -693,6 +694,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
         outputAdapterConfigurationDto.setSupportedMessageFormats(
                 outputEventAdapterSchema.getSupportedMessageFormats().
                         toArray(new String[outputEventAdapterSchema.getSupportedMessageFormats().size()]));
+        outputAdapterConfigurationDto.setEventAdapterDescription(outputEventAdapterSchema.getDescription());
         return outputAdapterConfigurationDto;
     }
 

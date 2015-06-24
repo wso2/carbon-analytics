@@ -104,6 +104,11 @@ public class HTTPEventAdapterFactory extends OutputEventAdapterFactory {
     }
 
     @Override
+    public String getDescription() {
+        return null;
+    }
+
+    @Override
     public OutputEventAdapter createEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
                                                  Map<String, String> globalProperties) {
         return new HTTPEventAdapter(eventAdapterConfiguration, globalProperties);

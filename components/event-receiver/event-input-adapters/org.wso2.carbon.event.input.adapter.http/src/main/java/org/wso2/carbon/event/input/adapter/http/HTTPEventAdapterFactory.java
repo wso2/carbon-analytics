@@ -57,6 +57,11 @@ public class HTTPEventAdapterFactory extends InputEventAdapterFactory {
     }
 
     @Override
+    public String getDescription() {
+        return resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_DESCRIPTION_HTTP);
+    }
+
+    @Override
     public InputEventAdapter createEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration,
                                                 Map<String, String> globalProperties) {
         return new HTTPEventAdapter(eventAdapterConfiguration, globalProperties);

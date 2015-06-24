@@ -52,6 +52,11 @@ public class WSO2EventEventAdapterFactory extends InputEventAdapterFactory {
     }
 
     @Override
+    public String getDescription() {
+        return resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_DESCRIPTION_WSO2EVENT);
+    }
+
+    @Override
     public InputEventAdapter createEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration, Map<String, String> globalProperties) {
         return new WSO2EventAdapter(eventAdapterConfiguration,globalProperties);
     }

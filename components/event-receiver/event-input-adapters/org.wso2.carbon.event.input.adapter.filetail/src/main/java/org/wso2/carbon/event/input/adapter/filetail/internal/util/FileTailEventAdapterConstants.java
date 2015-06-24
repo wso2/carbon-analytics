@@ -22,6 +22,7 @@ public final class FileTailEventAdapterConstants {
     }
 
     public static final String EVENT_ADAPTER_TYPE_FILE = "file-tail";
+    public static final String EVENT_ADAPTER_DESCRIPTION_FILE = "file.description";
     public static final String EVENT_ADAPTER_CONF_FILEPATH = "filepath";
     public static final String EVENT_ADAPTER_CONF_FILEPATH_HINT = "filepathHint";
     public static final String EVENT_ADAPTER_DELAY_MILLIS = "delayInMillis";

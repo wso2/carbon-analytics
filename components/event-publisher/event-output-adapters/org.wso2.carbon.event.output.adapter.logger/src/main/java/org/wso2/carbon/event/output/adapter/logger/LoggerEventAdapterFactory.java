@@ -62,7 +62,12 @@ public class LoggerEventAdapterFactory extends OutputEventAdapterFactory {
     }
 
     @Override
+    public String getDescription() {
+        return null;
+    }
+
+    @Override
     public OutputEventAdapter createEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String, String> globalProperties) {
-        return new LoggerEventAdapter(eventAdapterConfiguration,globalProperties);
+        return new LoggerEventAdapter(eventAdapterConfiguration, globalProperties);
     }
 }

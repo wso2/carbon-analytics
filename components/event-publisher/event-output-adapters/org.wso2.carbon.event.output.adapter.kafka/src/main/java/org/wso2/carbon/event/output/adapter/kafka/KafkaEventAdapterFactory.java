@@ -79,6 +79,11 @@ public class KafkaEventAdapterFactory extends OutputEventAdapterFactory {
     }
 
     @Override
+    public String getDescription() {
+        return null;
+    }
+
+    @Override
     public OutputEventAdapter createEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String,
             String> globalProperties) {
         return new KafkaEventAdapter(eventAdapterConfiguration, globalProperties);
