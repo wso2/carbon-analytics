@@ -510,38 +510,48 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     }
     
     private Iterator<Record> loadIndexOperationUpdateRecords(int shardIndex) throws AnalyticsException {
+        return this.loadIndexOperationUpdateRecords(shardIndex, Long.MAX_VALUE);
+    }
+    
+    private Iterator<Record> loadIndexOperationUpdateRecords(int shardIndex, long toTime) throws AnalyticsException {
         return this.loadIndexOperationRecords(SHARD_INDEX_DATA_RECORD_TENANT_ID, 
-                this.generateShardedIndexDataTableName(SHARD_INDEX_DATA_UPDATE_RECORDS_TABLE_PREFIX, shardIndex));
+                this.generateShardedIndexDataTableName(SHARD_INDEX_DATA_UPDATE_RECORDS_TABLE_PREFIX, shardIndex), toTime);
     }
         
     private Iterator<Record> loadIndexOperationDeleteRecords(int shardIndex) throws AnalyticsException {
+        return this.loadIndexOperationDeleteRecords(shardIndex, Long.MAX_VALUE);
+    }
+    
+    private Iterator<Record> loadIndexOperationDeleteRecords(int shardIndex, long toTime) throws AnalyticsException {
         return this.loadIndexOperationRecords(SHARD_INDEX_DATA_RECORD_TENANT_ID, 
-                this.generateShardedIndexDataTableName(SHARD_INDEX_DATA_DELETE_RECORDS_TABLE_PREFIX, shardIndex));
+                this.generateShardedIndexDataTableName(SHARD_INDEX_DATA_DELETE_RECORDS_TABLE_PREFIX, shardIndex), toTime);
     }
     
     @SuppressWarnings("unchecked")
-    private Iterator<Record> loadAllIndexOperationUpdateRecords() throws AnalyticsException {
+    private Iterator<Record> loadAllIndexOperationUpdateRecordsForTime(long time) throws AnalyticsException {
         Iterator<Record>[] itrs = new Iterator[this.getShardCount()];
         for (int i = 0; i < this.getShardCount(); i++) {
-            itrs[i] = this.loadIndexOperationUpdateRecords(i);
+            /* time + 1, since we want current time inclusive */
+            itrs[i] = this.loadIndexOperationUpdateRecords(i, time + 1);
         }
         return IteratorUtils.chainedIterator(itrs);
     }
     
     @SuppressWarnings("unchecked")
-    private Iterator<Record> loadAllIndexOperationDeleteRecords() throws AnalyticsException {
+    private Iterator<Record> loadAllIndexOperationDeleteRecordsForTime(long time) throws AnalyticsException {
         Iterator<Record>[] itrs = new Iterator[this.getShardCount()];
         for (int i = 0; i < this.getShardCount(); i++) {
-            itrs[i] = this.loadIndexOperationDeleteRecords(i);
+            /* time + 1, since we want current time inclusive */
+            itrs[i] = this.loadIndexOperationDeleteRecords(i, time + 1);
         }
         return IteratorUtils.chainedIterator(itrs);
     }
     
-    private Iterator<Record> loadIndexOperationRecords(int tenantId, String tableName) throws AnalyticsException {
+    private Iterator<Record> loadIndexOperationRecords(int tenantId, String tableName, long toTime) throws AnalyticsException {
         try {
             return GenericUtils.recordGroupsToIterator(this.getAnalyticsRecordStore(),
                     this.getAnalyticsRecordStore().get(tenantId, tableName, 1, null,
-                                                       Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+                                                       Long.MIN_VALUE, toTime, 0, -1));
         } catch (AnalyticsTableNotAvailableException e) {
             /* ignore this scenario, before any indexes, this will happen */
             return new ArrayList<Record>(0).iterator();
@@ -1133,7 +1143,6 @@ public class AnalyticsDataIndexer implements GroupEventListener {
      * @throws AnalyticsException
      */
     public void put(List<Record> records) throws AnalyticsException {
-
         this.scheduleIndexUpdate(records);
     }
     
@@ -1474,11 +1483,13 @@ public class AnalyticsDataIndexer implements GroupEventListener {
         if (maxWait < 0) {
             maxWait = Long.MAX_VALUE;
         }
-        Iterator<Record> updateRecords = this.loadAllIndexOperationUpdateRecords();
-        Iterator<Record> deleteRecords = this.loadAllIndexOperationDeleteRecords();
+        long time = System.currentTimeMillis();
         long start = System.currentTimeMillis(), end;
         boolean updateDone = false, deleteDone = false;
+        Iterator<Record> updateRecords, deleteRecords;
         while (true) {
+            updateRecords = this.loadAllIndexOperationUpdateRecordsForTime(time);
+            deleteRecords = this.loadAllIndexOperationDeleteRecordsForTime(time);
             if (!updateDone && this.checkRecordsEmpty(updateRecords)) {
                 updateDone = true;
             }

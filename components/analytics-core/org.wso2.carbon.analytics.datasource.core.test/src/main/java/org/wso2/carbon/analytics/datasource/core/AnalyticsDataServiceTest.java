@@ -230,12 +230,6 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         List<Record> records = this.generateIndexRecords(tenantId, tableName, n, 0);
         this.service.put(records);
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            // TO FIX!
-            e.printStackTrace();
-        }
         List<SearchResultEntry> result = this.service.search(tenantId, tableName, "STR1:STRING0", 0, 10);
         Assert.assertEquals(result.size(), 1);
         result = this.service.search(tenantId, tableName, "str2:string0", 0, 10);
@@ -489,12 +483,6 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(tenantId, tableName, 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 97);
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            // TODO Fix it!
-            e.printStackTrace();
-        }
         this.cleanupTable(tenantId, tableName);
     }
     
