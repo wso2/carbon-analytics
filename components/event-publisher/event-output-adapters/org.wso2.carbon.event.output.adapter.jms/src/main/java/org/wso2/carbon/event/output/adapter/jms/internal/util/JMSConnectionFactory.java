@@ -19,6 +19,8 @@ package org.wso2.carbon.event.output.adapter.jms.internal.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.pool.PoolableObjectFactory;
+import org.apache.commons.pool.impl.GenericObjectPool;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterRuntimeException;
 
 import javax.jms.*;
@@ -54,37 +56,30 @@ public class JMSConnectionFactory {
      * The JMS ConnectionFactory this definition refers to
      */
     private ConnectionFactory conFactory = null;
-    /**
-     * The shared JMS Connection for this JMS connection factory
-     */
-    private Connection sharedConnection = null;
-    /**
-     * The shared JMS Session for this JMS connection factory
-     */
-    private Session sharedSession = null;
-    /**
-     * The shared JMS MessageProducer for this JMS connection factory
-     */
-    private MessageProducer sharedProducer = null;
+
     /**
      * The Shared Destination
      */
     private Destination sharedDestination = null;
-    /**
-     * The shared JMS connection for this JMS connection factory
-     */
-    private int cacheLevel = JMSConstants.CACHE_CONNECTION;
+
+    private int maxConnections;
+
+    private GenericObjectPool connectionPool;
+
+    private String destinationName;
 
     /**
      * Digest a JMS CF definition from an axis2.xml 'Parameter' and construct
-     *
-     * @param parameters the axis2.xml 'Parameter' that defined the JMS CF
      */
-    public JMSConnectionFactory(Hashtable<String, String> parameters, String name) {
+    public JMSConnectionFactory(Hashtable<String, String> parameters, String name, String destination, int maxConcurrentConnections) {
         this.parameters = parameters;
         this.name = name;
+        this.destinationName = destination;
 
-        digestCacheLevel();
+        if (maxConcurrentConnections > 1) {
+            this.maxConnections = maxConcurrentConnections;
+        }
+
         try {
             context = new InitialContext(parameters);
             conFactory = JMSUtils.lookup(context, ConnectionFactory.class,
@@ -94,71 +89,59 @@ public class JMSConnectionFactory {
         } catch (NamingException e) {
             throw new OutputEventAdapterRuntimeException("Cannot acquire JNDI context, JMS Connection factory : " +
                     parameters.get(JMSConstants.PARAM_CONFAC_JNDI_NAME) +
-                    " or default destination : " +
+                    " or default destinationName : " +
                     parameters.get(JMSConstants.PARAM_DESTINATION) +
                     " for JMS CF : " + name + " using : " + parameters, e);
         }
+
+        createConnectionPool();
     }
 
-    /**
-     * Digest, the cache value iff specified
-     */
-    private void digestCacheLevel() {
+    // need to initialize
+    private void createConnectionPool() {
+        GenericObjectPool.Config poolConfig = new GenericObjectPool.Config();
+        poolConfig.minEvictableIdleTimeMillis = 3000;
+        poolConfig.maxWait = 3000;
+        poolConfig.maxActive = maxConnections;
+        poolConfig.maxIdle = maxConnections;
+        poolConfig.minIdle = 0;
+        poolConfig.numTestsPerEvictionRun = Math.max(1, maxConnections / 10);
+        poolConfig.timeBetweenEvictionRunsMillis = 5000;
+        this.connectionPool = new GenericObjectPool(new PoolableJMSConnectionFactory(), poolConfig);
 
-        String key = JMSConstants.PARAM_CACHE_LEVEL;
-        String val = parameters.get(key);
+    }
 
-        if ("none".equalsIgnoreCase(val)) {
-            this.cacheLevel = JMSConstants.CACHE_NONE;
-        } else if ("connection".equalsIgnoreCase(val)) {
-            this.cacheLevel = JMSConstants.CACHE_CONNECTION;
-        } else if ("session".equals(val)) {
-            this.cacheLevel = JMSConstants.CACHE_SESSION;
-        } else if ("producer".equals(val)) {
-            this.cacheLevel = JMSConstants.CACHE_PRODUCER;
-        } else if (val != null) {
-            throw new OutputEventAdapterRuntimeException("Invalid cache level : " + val + " for JMS CF : " + name);
+
+    public void returnPooledConnection(JMSPooledConnectionHolder pooledConnection) {
+        try {
+            this.connectionPool.returnObject(pooledConnection);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
     }
 
     /**
-     * Close all connections, sessions etc.. and stop this connection factory
-     */
-    public synchronized void stop() {
-        if (sharedConnection != null) {
-            try {
-                sharedConnection.close();
-            } catch (JMSException e) {
-                log.warn("Error shutting down connection factory : " + name, e);
-            }
-        }
-
-        if (context != null) {
-            try {
-                context.close();
-            } catch (NamingException e) {
-                log.warn("Error while closing the InitialContext of factory : " + name, e);
-            }
-        }
-    }
-
-    /**
-     * Return the name assigned to this JMS CF definition
+     * Create a new MessageProducer
      *
-     * @return name of the JMS CF
+     * @param session     Session to be used
+     * @param destination Destination to be used
+     * @return a new MessageProducer
      */
-    public String getName() {
-        return name;
+    private MessageProducer createProducer(Session session, Destination destination) {
+        try {
+            if (log.isDebugEnabled()) {
+                log.debug("Creating a new JMS MessageProducer from JMS CF : " + name);
+            }
+
+            return JMSUtils.createProducer(
+                    session, destination, isQueue(), isJmsSpec11());
+
+        } catch (JMSException e) {
+            handleException("Error creating JMS producer from JMS CF : " + name, e);
+        }
+        return null;
     }
 
-    /**
-     * The list of properties (including JNDI and non-JNDI)
-     *
-     * @return properties defined on the JMS CF
-     */
-    public Hashtable<String, String> getParameters() {
-        return parameters;
-    }
 
     /**
      * Get cached InitialContext
@@ -170,34 +153,18 @@ public class JMSConnectionFactory {
     }
 
     /**
-     * Cache level applicable for this JMS CF
-     *
-     * @return applicable cache level
-     */
-    public int getCacheLevel() {
-        return cacheLevel;
-    }
-
-    /**
-     * Get the shared Destination - if defined
-     *
-     * @return
-     */
-    public Destination getSharedDestination() {
-        return sharedDestination;
-    }
-
-    /**
      * Lookup a Destination using this JMS CF definitions and JNDI name
      *
-     * @param destinationName JNDI name of the Destionation
      * @return JMS Destination for the given JNDI name or null
      */
-    public Destination getDestination(String destinationName) {
+    public synchronized Destination getDestination() {
         try {
-            return JMSUtils.lookupDestination(context, destinationName, parameters.get(JMSConstants.PARAM_DEST_TYPE));
+            if (sharedDestination == null) {
+                sharedDestination = JMSUtils.lookupDestination(context, destinationName, parameters.get(JMSConstants.PARAM_DEST_TYPE));
+            }
+            return sharedDestination;
         } catch (NamingException e) {
-            handleException("Error looking up the JMS destination with name " + destinationName
+            handleException("Error looking up the JMS destinationName with name " + destinationName
                     + " of type " + parameters.get(JMSConstants.PARAM_DEST_TYPE), e);
         }
 
@@ -208,16 +175,16 @@ public class JMSConnectionFactory {
     /**
      * Get the reply Destination from the PARAM_REPLY_DESTINATION parameter
      *
-     * @return reply destination defined in the JMS CF
+     * @return reply destinationName defined in the JMS CF
      */
     public String getReplyToDestination() {
         return parameters.get(JMSConstants.PARAM_REPLY_DESTINATION);
     }
 
     /**
-     * Get the reply destination type from the PARAM_REPLY_DEST_TYPE parameter
+     * Get the reply destinationName type from the PARAM_REPLY_DEST_TYPE parameter
      *
-     * @return reply destination defined in the JMS CF
+     * @return reply destinationName defined in the JMS CF
      */
     public String getReplyDestinationType() {
         return parameters.get(JMSConstants.PARAM_REPLY_DEST_TYPE) != null ?
@@ -293,12 +260,8 @@ public class JMSConnectionFactory {
         return parameters.get(JMSConstants.PARAM_DURABLE_SUB_CLIENT_ID);
     }
 
-    /**
-     * Create a new Connection
-     *
-     * @return a new Connection
-     */
-    private Connection createConnection() {
+
+    public Connection createConnection() {
 
         Connection connection = null;
         try {
@@ -311,7 +274,6 @@ public class JMSConnectionFactory {
             if (log.isDebugEnabled()) {
                 log.debug("New JMS Connection from JMS CF : " + name + " created");
             }
-
         } catch (JMSException e) {
             handleException("Error acquiring a Connection from the JMS CF : " + name +
                     " using properties : " + parameters, e);
@@ -319,134 +281,123 @@ public class JMSConnectionFactory {
         return connection;
     }
 
-    /**
-     * Create a new Session
-     *
-     * @param connection Connection to use
-     * @return A new Session
-     */
-    private Session createSession(Connection connection) {
+    public JMSPooledConnectionHolder getConnectionFromPool() {
         try {
-            if (log.isDebugEnabled()) {
-                log.debug("Creating a new JMS Session from JMS CF : " + name);
-            }
-            return JMSUtils.createSession(
-                    connection, isSessionTransacted(), Session.AUTO_ACKNOWLEDGE, isJmsSpec11(), isQueue());
-
-        } catch (JMSException e) {
-            handleException("Error creating JMS session from JMS CF : " + name, e);
+            return (JMSPooledConnectionHolder) this.connectionPool.borrowObject();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
         return null;
     }
 
-    /**
-     * Create a new MessageProducer
-     *
-     * @param session     Session to be used
-     * @param destination Destination to be used
-     * @return a new MessageProducer
-     */
-    private MessageProducer createProducer(Session session, Destination destination) {
+
+    public synchronized void close() {
+
         try {
-            if (log.isDebugEnabled()) {
-                log.debug("Creating a new JMS MessageProducer from JMS CF : " + name);
-            }
-
-            return JMSUtils.createProducer(
-                    session, destination, isQueue(), isJmsSpec11());
-
-        } catch (JMSException e) {
-            handleException("Error creating JMS producer from JMS CF : " + name, e);
+            connectionPool.close();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
-        return null;
-    }
 
-    /**
-     * Get a new Connection or shared Connection from this JMS CF
-     *
-     * @return new or shared Connection from this JMS CF
-     */
-    public Connection getConnection() {
-        if (cacheLevel > JMSConstants.CACHE_NONE) {
-            return getSharedConnection();
-        } else {
-            return createConnection();
-        }
-    }
-
-    /**
-     * Get a new Session or shared Session from this JMS CF
-     *
-     * @param connection the Connection to be used
-     * @return new or shared Session from this JMS CF
-     */
-    public Session getSession(Connection connection) {
-        if (cacheLevel > JMSConstants.CACHE_CONNECTION) {
-            return getSharedSession();
-        } else {
-            return createSession((connection == null ? getConnection() : connection));
-        }
-    }
-
-    /**
-     * Get a new MessageProducer or shared MessageProducer from this JMS CF
-     *
-     * @param connection  the Connection to be used
-     * @param session     the Session to be used
-     * @param destination the Destination to bind MessageProducer to
-     * @return new or shared MessageProducer from this JMS CF
-     */
-    public MessageProducer getMessageProducer(
-            Connection connection, Session session, Destination destination) {
-        if (cacheLevel > JMSConstants.CACHE_SESSION) {
-            return getSharedProducer();
-        } else {
-            return createProducer((session == null ? getSession(connection) : session), destination);
-        }
-    }
-
-    /**
-     * Get a new Connection or shared Connection from this JMS CF
-     *
-     * @return new or shared Connection from this JMS CF
-     */
-    private synchronized Connection getSharedConnection() {
-        if (sharedConnection == null) {
-            sharedConnection = createConnection();
-            if (log.isDebugEnabled()) {
-                log.debug("Created shared JMS Connection for JMS CF : " + name);
+        if (context != null) {
+            try {
+                context.close();
+            } catch (NamingException e) {
+                log.warn("Error while closing the InitialContext of factory : " + name, e);
             }
         }
-        return sharedConnection;
     }
 
     /**
-     * Get a shared Session from this JMS CF
-     *
-     * @return shared Session from this JMS CF
+     * Holder class for connections and its session/producer.
      */
-    private synchronized Session getSharedSession() {
-        if (sharedSession == null) {
-            sharedSession = createSession(getSharedConnection());
-            if (log.isDebugEnabled()) {
-                log.debug("Created shared JMS Session for JMS CF : " + name);
-            }
+    public static class JMSPooledConnectionHolder {
+        private Connection connection;
+        private Session session;
+        private MessageProducer producer;
+
+        public Connection getConnection() {
+            return connection;
         }
-        return sharedSession;
+
+        public void setConnection(Connection connection) {
+            this.connection = connection;
+        }
+
+        public Session getSession() {
+            return session;
+        }
+
+        public void setSession(Session session) {
+            this.session = session;
+        }
+
+        public MessageProducer getProducer() {
+            return producer;
+        }
+
+        public void setProducer(MessageProducer producer) {
+            this.producer = producer;
+        }
+
+
     }
 
+
     /**
-     * Get a shared MessageProducer from this JMS CF
-     *
-     * @return shared MessageProducer from this JMS CF
+     * JMSConnectionFactory used by the connection pool.
      */
-    private synchronized MessageProducer getSharedProducer() {
-        if (sharedProducer == null) {
-            sharedProducer = createProducer(getSharedSession(), sharedDestination);
-            if (log.isDebugEnabled()) {
-                log.debug("Created shared JMS MessageConsumer for JMS CF : " + name);
+    private class PoolableJMSConnectionFactory implements PoolableObjectFactory {
+
+        int count = 0;
+
+        @Override
+        public Object makeObject() throws Exception {
+            Connection con = createConnection();
+            try {
+                Session session = JMSUtils.createSession(
+                        con, isSessionTransacted(), Session.AUTO_ACKNOWLEDGE, isJmsSpec11(), isQueue());
+
+                MessageProducer producer = createProducer(session, getDestination());
+
+                JMSPooledConnectionHolder entry = new JMSPooledConnectionHolder();
+                entry.setConnection(con);
+                entry.setSession(session);
+                entry.setProducer(producer);
+                return entry;
+            } catch (JMSException e) {
+                log.error(e.getMessage(), e);
+                return null;
             }
+
         }
-        return sharedProducer;
+
+        @Override
+        public void destroyObject(Object o) throws Exception {
+
+            JMSPooledConnectionHolder entry = (JMSPooledConnectionHolder) o;
+            entry.getProducer().close();
+            entry.getSession().close();
+            entry.getConnection().close();
+
+        }
+
+        @Override
+        public boolean validateObject(Object o) {
+            return false;
+        }
+
+        @Override
+        public void activateObject(Object o) throws Exception {
+
+        }
+
+        @Override
+        public void passivateObject(Object o) throws Exception {
+
+        }
+
     }
+
+
 }
