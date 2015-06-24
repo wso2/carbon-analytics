@@ -78,7 +78,8 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
             throw new AnalyticsClusterException("This node has already joined the group: " + groupId);
         }
         // when joining the group, get the membership number
-        int membershipNumber = (int) this.hz.getAtomicLong(MEMBERSHIP_NUMBER_STRING).incrementAndGet();
+        int membershipNumber = (int) this.hz.getAtomicLong(groupId + "_" + MEMBERSHIP_NUMBER_STRING)
+                .incrementAndGet();
 
         this.checkAndCleanupGroups(groupId);
         this.groups.put(groupId, groupEventListener);

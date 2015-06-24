@@ -23,26 +23,25 @@ import org.apache.spark.deploy.master.LeaderElectionAgent;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
 
 /**
- * Created by niranda on 6/9/15.
+ * this class elects the new leader if the current leader goes down
  */
 public class AnalyticsLeaderElectionAgent implements LeaderElectionAgent {
 
-    private static final String CLUSTER_GROUP_NAME = "CARBON_ANALYTICS_EXECUTION";
     private LeaderElectable master;
 
     public AnalyticsLeaderElectionAgent(LeaderElectable master) {
         this.master = master;
         ServiceHolder.getAnalyticskExecutor().processLeaderElectable(master);
-
     }
 
     @Override
     public LeaderElectable masterActor() {
+        System.out.println("################ returning master");
         return master;
     }
 
     @Override
     public void stop() {
-
+        System.out.println("################ stopping agent");
     }
 }
