@@ -71,7 +71,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
 
     private static final String ANALYTICS_DATASERVICE_GROUP = "__ANALYTICS_DATASERVICE_GROUP__";
     
-    private static final String ANALYTICS_DS_CONFIG_FILE = "analytics-dataservice-config.xml";
+    private static final String ANALYTICS_DS_CONFIG_FILE = "analytics-config.xml";
 
     public static final String INDEX_ID_INTERNAL_FIELD = "_id";
 
