@@ -97,6 +97,7 @@ public final class EventPublisherConstants {
     public static final String DEFAULT_STREAM_VERSION = "1.0.0";
 
     public static final String EF_ATTR_ENCRYPTED = "encrypted";
+    public static final String DOUBLE_QUOTE = "\"";
 
 
     private EventPublisherConstants() {
