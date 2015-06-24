@@ -318,9 +318,11 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
     }
 
     public void prepareDestroy(){
-        EventPublisherServiceValueHolder.getEventManagementService().updateLatestEventSentTime(
-                eventPublisherConfiguration.getEventPublisherName(), tenantId,
-                EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMilies());
+        if(EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode() == Mode.HA) {
+            EventPublisherServiceValueHolder.getEventManagementService().updateLatestEventSentTime(
+                    eventPublisherConfiguration.getEventPublisherName(), tenantId,
+                    EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMilies());
+        }
     }
 
     public class EventWrapper{
