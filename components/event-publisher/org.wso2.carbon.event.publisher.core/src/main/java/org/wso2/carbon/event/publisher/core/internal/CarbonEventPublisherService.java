@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CarbonEventPublisherService implements EventPublisherService {
 
@@ -291,7 +292,7 @@ public class CarbonEventPublisherService implements EventPublisherService {
         List<EventPublisherConfigurationFile> eventPublisherConfigurationFileList = tenantSpecificEventPublisherConfigurationFileMap.get(tenantId);
 
         if (eventPublisherConfigurationFileList == null) {
-            eventPublisherConfigurationFileList = new ArrayList<EventPublisherConfigurationFile>();
+            eventPublisherConfigurationFileList = new CopyOnWriteArrayList<>();
         } else {
             for (EventPublisherConfigurationFile anEventPublisherConfigurationFileList : eventPublisherConfigurationFileList) {
                 if (anEventPublisherConfigurationFileList.getFileName().equals(eventPublisherConfigurationFile.getFileName())) {
