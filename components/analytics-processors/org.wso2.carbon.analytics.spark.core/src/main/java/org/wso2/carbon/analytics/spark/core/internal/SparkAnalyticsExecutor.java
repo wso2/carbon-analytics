@@ -155,7 +155,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private Object masterActorSystem;
 
     public SparkAnalyticsExecutor(String myHost, int portOffset) throws AnalyticsClusterException {
-        new SparkAnalyticsExecutor(myHost, portOffset, CarbonUtils.getCarbonConfigDirPath());
+        this(myHost, portOffset, CarbonUtils.getCarbonConfigDirPath());
     }
 
     public SparkAnalyticsExecutor(String myHost, int portOffset, String confPath)
@@ -238,6 +238,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             log.info("Starting SPARK CLIENT pointing to an external Spark Cluster");
         }
     }
+
 
     private String[] getSparkMastersFromCluster(AnalyticsClusterManager acm) {
         List<String> masters = new ArrayList<>(this.masterCount);
@@ -455,7 +456,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     }
 
-    public void startWorker(){
+    public void startWorker() {
         this.startWorker(this.myHost, BASE_WORKER_PORT, BASE_WORKER_UI_PORT, WORKER_CORES,
                          WORKER_MEMORY, this.getSparkMastersFromCluster(this.acm), WORK_DIR, this.sparkConf);
     }
@@ -676,7 +677,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     @Override
     public void onBecomingLeader() {
         System.out.println("############### became the leader : ");
-        for(LeaderElectable le: leaderElectable){
+        for (LeaderElectable le : leaderElectable) {
             le.electedLeader();
         }
 //        String propsFile = CarbonUtils.getCarbonHome() + File.separator
@@ -834,4 +835,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             addLeaderElectable(le);
         }
     }
+
+
 }
