@@ -131,7 +131,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
 
     @Override
     public void testConnect() throws TestConnectionNotSupportedException {
-        throw new TestConnectionNotSupportedException("Test connection test is not available");
+        throw new TestConnectionNotSupportedException("Test connection is not available");
     }
 
     @Override
