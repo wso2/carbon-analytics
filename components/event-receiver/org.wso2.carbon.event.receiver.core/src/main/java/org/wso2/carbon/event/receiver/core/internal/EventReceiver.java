@@ -191,6 +191,8 @@ public class EventReceiver implements EventProducer {
                 }
             } catch (EventReceiverProcessingException e) {
                 log.error("Dropping event. Error processing event : ", e);
+            } catch (RuntimeException e) {
+                log.error("Dropping event. Unexpected error while processing event : " + e.getMessage(), e);
             }
         }
 

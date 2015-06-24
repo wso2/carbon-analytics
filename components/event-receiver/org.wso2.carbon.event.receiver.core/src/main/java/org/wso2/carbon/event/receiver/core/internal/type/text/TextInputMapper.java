@@ -142,7 +142,6 @@ public class TextInputMapper implements InputMapper {
                             throw new EventReceiverProcessingException("Cannot convert " + value + " to type " + type, e);
                         } catch (InvocationTargetException e) {
                             log.warn("Cannot convert " + value + " to type " + type + ": " + e.getMessage() + "; Sending null value.");
-                            returnedAttribute = null;
                         }
                     }
                     attributeArray[attributePositions[attributeCount++]] = returnedAttribute;
@@ -183,9 +182,9 @@ public class TextInputMapper implements InputMapper {
                             throw new EventReceiverProcessingException("Attribute value not found in the event, hence dropping event " + eventAttribute);
                         }
                     }
-
                 } catch (NumberFormatException e) {
-                    throw new NumberFormatException("Unable to cast the input data to required type ,hence dropping the event " + eventAttribute);
+                    throw new EventReceiverProcessingException("Unable to cast the input data to required type for attribute "
+                            + eventAttribute + ", hence dropping the event.", e);
                 }
             }
 

@@ -183,7 +183,7 @@ public class XMLInputMapper implements InputMapper {
                 throw new EventReceiverProcessingException("Unable to parse XPath for parent selector: " + e.getMessage(), e);
             }
             if (events == null) {
-                throw new RuntimeException("Parent Selector XPath \"" + parentSelectorXpath.toString() + "\" cannot be processed on event:" + obj.toString());
+                throw new EventReceiverProcessingException("Parent Selector XPath \"" + parentSelectorXpath.toString() + "\" cannot be processed on event:" + obj.toString());
             }
 
             List<Event> objArrayList = new ArrayList<Event>();
