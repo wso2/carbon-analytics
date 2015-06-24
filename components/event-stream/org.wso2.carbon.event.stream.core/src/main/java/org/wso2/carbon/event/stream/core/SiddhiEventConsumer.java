@@ -27,4 +27,5 @@ public interface SiddhiEventConsumer {
 
     public void consumeEvent(Event event);
 
+    public void shutdown();
 }
