@@ -25,8 +25,8 @@
         <!--<TrustSorePassword>wso2carbon</TrustSorePassword>-->
         <QueueSize>32768</QueueSize>
         <BatchSize>200</BatchSize>
-        <CorePoolSize>5</CorePoolSize>
-        <MaxPoolSize>10</MaxPoolSize>
+        <CorePoolSize>1</CorePoolSize>
+        <MaxPoolSize>1</MaxPoolSize>
         <KeepAliveTimeInPool>20</KeepAliveTimeInPool>
         <ReconnectionInterval>30</ReconnectionInterval>
         <MaxTransportPoolSize>250</MaxTransportPoolSize>
@@ -46,8 +46,8 @@
         <!--<TrustSorePassword>wso2carbon</TrustSorePassword>-->
         <QueueSize>32768</QueueSize>
         <BatchSize>200</BatchSize>
-        <CorePoolSize>5</CorePoolSize>
-        <MaxPoolSize>10</MaxPoolSize>
+        <CorePoolSize>1</CorePoolSize>
+        <MaxPoolSize>1</MaxPoolSize>
         <KeepAliveTimeInPool>20</KeepAliveTimeInPool>
         <ReconnectionInterval>30</ReconnectionInterval>
         <MaxTransportPoolSize>250</MaxTransportPoolSize>
