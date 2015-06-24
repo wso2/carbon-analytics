@@ -959,6 +959,9 @@ public class EventPublisherAdminService extends AbstractAdmin {
         } catch (OutputEventAdapterException e) {
             log.error(e.getMessage(), e);
             throw new AxisFault(e.getMessage());
+        } catch (Throwable e) {
+            log.error(e.getMessage(), e);
+            throw new AxisFault(e.getMessage());
         }
     }
 

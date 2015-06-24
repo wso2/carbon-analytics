@@ -231,8 +231,6 @@
                                 onclick="resetConfiguration(document.getElementById('configform')); return false;">
                             <fmt:message
                                     key="reset"/></button>
-                        <button class="button" value="<fmt:message key="test.event.publisher"/>"
-                               onclick="testPublisherConnection()"/>
                     </td>
                 </tr>
                 </tbody>
