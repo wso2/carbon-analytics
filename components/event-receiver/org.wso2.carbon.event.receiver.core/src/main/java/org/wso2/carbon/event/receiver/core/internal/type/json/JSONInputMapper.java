@@ -23,13 +23,13 @@ import org.json.JSONException;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.AttributeType;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
+import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfiguration;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConstants;
 import org.wso2.carbon.event.receiver.core.config.InputMappingAttribute;
 import org.wso2.carbon.event.receiver.core.config.mapping.JSONInputMapping;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverConfigurationException;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverProcessingException;
-import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.exception.InvalidPropertyValueException;
 import org.wso2.carbon.event.receiver.core.internal.util.helper.EventReceiverConfigurationHelper;
 import org.wso2.siddhi.core.event.Event;
@@ -259,10 +259,10 @@ public class JSONInputMapper implements InputMapper {
             }
             return new Event(System.currentTimeMillis(), attributeArray);
         } catch (InvalidPropertyValueException e) {
-            log.error(e.getMessage() + "Dropping Event : " + obj.toString());
+            log.error(e.getMessage() + ", hence dropping the event : " + obj.toString());
             return null;
         } catch (NumberFormatException e) {
-            log.error("Unable to cast the input data to required type " + " ,hence dropping the event " + obj.toString(), e);
+            log.error("Unable to cast the input data to required type, hence dropping the event: " + obj.toString(), e);
             return null;
         }
     }
@@ -271,7 +271,7 @@ public class JSONInputMapper implements InputMapper {
     private Object getPropertyValue(Object propertyValue, AttributeType attributeType) throws InvalidPropertyValueException {
 
         if ((!AttributeType.STRING.equals(attributeType)) && propertyValue == null) {
-            throw new InvalidPropertyValueException("Found Invalid property value null for attribute ");
+            throw new InvalidPropertyValueException("Found Invalid property value 'null' for attribute of type " + attributeType);
         }
 
         if (AttributeType.BOOL.equals(attributeType)) {
@@ -285,7 +285,7 @@ public class JSONInputMapper implements InputMapper {
         } else if (AttributeType.LONG.equals(attributeType)) {
             return Long.parseLong(propertyValue.toString());
         } else {
-            return propertyValue.toString();
+            return propertyValue;
         }
 
     }

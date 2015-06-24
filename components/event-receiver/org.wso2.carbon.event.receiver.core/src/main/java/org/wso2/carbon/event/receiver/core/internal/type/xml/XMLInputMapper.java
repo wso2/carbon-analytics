@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.jaxen.JaxenException;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
+import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfiguration;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConstants;
 import org.wso2.carbon.event.receiver.core.config.InputMappingAttribute;
@@ -33,7 +34,6 @@ import org.wso2.carbon.event.receiver.core.config.mapping.XPathDefinition;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverConfigurationException;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverProcessingException;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverStreamValidationException;
-import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.internal.type.xml.config.ReflectionBasedObjectSupplier;
 import org.wso2.carbon.event.receiver.core.internal.type.xml.config.XPathData;
 import org.wso2.carbon.event.receiver.core.internal.util.EventReceiverUtil;
@@ -166,7 +166,7 @@ public class XMLInputMapper implements InputMapper {
         return EventReceiverConfigurationHelper.getAttributes(inputMappingAttributes);
     }
 
-    private Event[] processMultipleEvents(Object obj) throws EventReceiverProcessingException {
+    private Event[] processMultipleEvents(Object obj) {
         if (obj instanceof String) {
             String textMessage = (String) obj;
             try {
@@ -179,29 +179,33 @@ public class XMLInputMapper implements InputMapper {
             OMElement events;
             try {
                 events = (OMElement) this.parentSelectorXpath.selectSingleNode(obj);
-                if (events == null) {
-                    throw new RuntimeException("Parent Selector XPath \"" + parentSelectorXpath.toString() + "\" cannot be processed on event:" + obj.toString());
-                }
-
-                List<Event> objArrayList = new ArrayList<Event>();
-                Iterator childIterator = events.getChildElements();
-                while (childIterator.hasNext()) {
-                    Object eventObj = childIterator.next();
-                    objArrayList.add(processSingleEvent(eventObj));
-                    /**
-                     * Usually the global lookup '//' is used in the XPATH expression which works fine for 'single event mode'.
-                     * However, if global lookup is used, it will return the first element from the whole document as specified in
-                     * XPATH-2.0 Specification. Therefore the same XPATH expression that works fine in 'single event mode' will
-                     * always return the first element of a batch in 'batch mode'. Therefore to return what the
-                     * user expects, each child element is removed after sending to simulate an iteration for the
-                     * global lookup.
-                     */
-                    childIterator.remove();
-                }
-                return objArrayList.toArray(new Event[objArrayList.size()]);
             } catch (JaxenException e) {
                 throw new EventReceiverProcessingException("Unable to parse XPath for parent selector: " + e.getMessage(), e);
             }
+            if (events == null) {
+                throw new RuntimeException("Parent Selector XPath \"" + parentSelectorXpath.toString() + "\" cannot be processed on event:" + obj.toString());
+            }
+
+            List<Event> objArrayList = new ArrayList<Event>();
+            Iterator childIterator = events.getChildElements();
+            while (childIterator.hasNext()) {
+                Object eventObj = childIterator.next();
+                try {
+                    objArrayList.add(processSingleEvent(eventObj));
+                } catch (EventReceiverProcessingException e) {
+                    log.error("Dropping event. Error processing event : ", e);
+                }
+                /**
+                 * Usually the global lookup '//' is used in the XPATH expression which works fine for 'single event mode'.
+                 * However, if global lookup is used, it will return the first element from the whole document as specified in
+                 * XPATH-2.0 Specification. Therefore the same XPATH expression that works fine in 'single event mode' will
+                 * always return the first element of a batch in 'batch mode'. Therefore to return what the
+                 * user expects, each child element is removed after sending to simulate an iteration for the
+                 * global lookup.
+                 */
+                childIterator.remove();
+            }
+            return objArrayList.toArray(new Event[objArrayList.size()]);
         }
         return null;
     }
@@ -255,7 +259,7 @@ public class XMLInputMapper implements InputMapper {
                             if (omElementResult == null) {
                                 throw new EventReceiverProcessingException("Unable to parse XPath " + xpathData.getXpath() + " to retrieve required attribute, hence dropping the event " + obj.toString());
                             } else {
-                                throw new EventReceiverProcessingException("Valid attribute value not found for " + xpathData.getXpath() + " ,hence dropping the event " + obj.toString());
+                                throw new EventReceiverProcessingException("Valid attribute value not found for " + xpathData.getXpath() + ", hence dropping the event " + obj.toString());
                             }
                         }
                     }
