@@ -62,8 +62,8 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
      * @param version stream version
      * @return AnalyticsTable instance with column details
      */
-    public AnalyticsTable getAnalyticsTable(String streamName, String version) throws
-                                                                               EventStreamPersistenceAdminServiceException {
+    public AnalyticsTable getAnalyticsTable(String streamName, String version)
+            throws EventStreamPersistenceAdminServiceException {
         if (log.isDebugEnabled()) {
             log.debug("Getting analytics schema for stream: " + streamName);
         }
@@ -94,13 +94,17 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
                             tableColumns[i++] = analyticsTableRecord;
                         }
                         analyticsTable.setAnalyticsTableRecords(tableColumns);
-                        AnalyticsEventStore eventStore = ServiceHolder.getAnalyticsEventSinkService().getEventStore(getTenantId(), streamName);
+                        AnalyticsEventStore eventStore = ServiceHolder.getAnalyticsEventSinkService().
+                                getEventStore(getTenantId(), streamName);
                         if (eventStore != null && eventStore.getEventSource() != null) {
                             List<String> streamIds = eventStore.getEventSource().getStreamIds();
                             if (streamIds != null && streamIds.contains(streamName + ":" + version)) {
                                 analyticsTable.setPersist(true);
                             }
                         }
+                        analyticsTable.setRecordStoreName(analyticsDataService.getRecordStoreNameByTable(getTenantId(),
+                                                                                                         tableName));
+                        ;
                     }
                 } else {
                     log.warn("Analytics table does not exist for stream[" + streamName + "]");
@@ -213,7 +217,9 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
                     }
                 } else {
                     try {
-                        ServiceHolder.getAnalyticsEventSinkService().removeEventSink(getTenantId(), analyticsTable.getTableName(), analyticsTable.getStreamVersion());
+                        ServiceHolder.getAnalyticsEventSinkService().removeEventSink(getTenantId(),
+                                                                                     analyticsTable.getTableName(),
+                                                                                     analyticsTable.getStreamVersion());
                     } catch (AnalyticsEventStoreException e) {
                         log.error("Unable to save analytics schema[" + analyticsTable.getTableName() + "]: " + e.getMessage(), e);
                         throw new EventStreamPersistenceAdminServiceException("Unable to save analytics schema", e);
