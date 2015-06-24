@@ -43,7 +43,7 @@ public class DataPublisher {
      * List of group of endpoints where events needs to dispatched when
      * events are published using this API
      */
-    private ArrayList<DataEndpointGroup> endpointGroups = new ArrayList<DataEndpointGroup>();
+    private ArrayList<DataEndpointGroup> endpointGroups = new ArrayList<>();
 
     /**
      * The Agent for which the data publisher belongs to.
@@ -155,7 +155,10 @@ public class DataPublisher {
                         new DataEndpointConfiguration((String) receiverGroup[j],
                                 (String) authGroup[j], username, password, dataEndpointAgent.getTransportPool(),
                                 dataEndpointAgent.getSecuredTransportPool(), dataEndpointAgent.
-                                getAgentConfiguration().getBatchSize());
+                                getAgentConfiguration().getBatchSize(),
+                                dataEndpointAgent.getAgentConfiguration().getCorePoolSize(),
+                                dataEndpointAgent.getAgentConfiguration().getMaxPoolSize(),
+                                dataEndpointAgent.getAgentConfiguration().getKeepAliveTimeInPool());
                 DataEndpoint dataEndpoint = dataEndpointAgent.getNewDataEndpoint();
                 dataEndpoint.initialize(endpointConfiguration);
                 endpointGroup.addDataEndpoint(dataEndpoint);

@@ -34,6 +34,12 @@ public class AgentConfiguration {
 
     private String trustStore;
 
+    private int corePoolSize;
+
+    private int maxPoolSize;
+
+    private int keepAliveTimeInPool;
+
     private String trustStorePassword;
 
     private int reconnectionInterval;
@@ -183,6 +189,33 @@ public class AgentConfiguration {
 
     public void setSecureEvictionTimePeriod(int secureEvictionTimePeriod) {
         this.secureEvictionTimePeriod = secureEvictionTimePeriod;
+    }
+
+    @XmlElement(name = "CorePoolSize")
+    public int getCorePoolSize() {
+        return corePoolSize;
+    }
+
+    public void setCorePoolSize(int corePoolSize) {
+        this.corePoolSize = corePoolSize;
+    }
+
+    @XmlElement(name = "MaxPoolSize")
+    public int getMaxPoolSize() {
+        return maxPoolSize;
+    }
+
+    public void setMaxPoolSize(int maxPoolSize) {
+        this.maxPoolSize = maxPoolSize;
+    }
+
+    @XmlElement(name = "KeepAliveTimeInPool")
+    public int getKeepAliveTimeInPool() {
+        return keepAliveTimeInPool;
+    }
+
+    public void setKeepAliveTimeInPool(int keepAliveTimeInPool) {
+        this.keepAliveTimeInPool = keepAliveTimeInPool;
     }
 
     public void setDataEndpointName(String dataEndpointName) {

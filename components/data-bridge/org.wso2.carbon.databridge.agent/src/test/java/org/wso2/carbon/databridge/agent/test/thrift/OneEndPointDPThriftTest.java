@@ -188,6 +188,11 @@ public class OneEndPointDPThriftTest extends TestCase {
 
         dataPublisher.publish(event);
 
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+        }
+
         Assert.assertEquals(numberOfEventsSent, thriftTestServer.getNumberOfEventsReceived());
         thriftTestServer.resetReceivedEvents();
         thriftTestServer.stop();
