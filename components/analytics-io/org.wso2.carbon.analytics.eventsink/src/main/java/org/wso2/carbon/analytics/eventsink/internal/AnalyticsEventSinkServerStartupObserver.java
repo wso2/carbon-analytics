@@ -23,8 +23,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.CarbonException;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventStoreDeployer;
+import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.ServerStartupObserver;
 import org.wso2.carbon.utils.CarbonUtils;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -78,6 +81,8 @@ public class AnalyticsEventSinkServerStartupObserver implements ServerStartupObs
                         }
                     }
                     started.set(true);
+                    PrivilegedCarbonContext.startTenantFlow();
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(MultitenantConstants.SUPER_TENANT_ID);
                     for (DeploymentFileData deploymentFileData : pausedDeployment) {
                         try {
                             deployer.deploy(deploymentFileData);
@@ -87,6 +92,7 @@ public class AnalyticsEventSinkServerStartupObserver implements ServerStartupObs
                         }
                     }
                     AnalyticsEventStoreDeployer.clearPausedDeployments();
+                    PrivilegedCarbonContext.endTenantFlow();
                 }
             } catch (CarbonException e) {
                 log.error("Error when getting the deployer for evn store to proceed the initialization of deployments. ", e);
