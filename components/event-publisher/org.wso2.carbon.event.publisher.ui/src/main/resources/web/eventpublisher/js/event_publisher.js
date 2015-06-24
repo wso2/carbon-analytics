@@ -613,6 +613,7 @@ function testPublisherConnection() {
     var isFieldEmpty = false;
     var messageFormat = [document.getElementById("mappingTypeFilter").selectedIndex].text;
 
+    var reWhiteSpace = new RegExp("^[a-zA-Z0-9_\.]+$");
     // Check for white space
     if (!reWhiteSpace.test(eventPublisherName)) {
         CARBON.showErrorDialog("Invalid character found in event publisher name.");
