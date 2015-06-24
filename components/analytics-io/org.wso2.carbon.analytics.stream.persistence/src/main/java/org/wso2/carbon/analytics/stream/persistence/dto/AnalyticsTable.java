@@ -28,6 +28,7 @@ public class AnalyticsTable implements Serializable {
 
     private String tableName;
     private String streamVersion;
+    private String recordStoreName;
     private boolean persist;
     private AnalyticsTableRecord[] analyticsTableRecords;
 
@@ -52,6 +53,14 @@ public class AnalyticsTable implements Serializable {
 
     public AnalyticsTableRecord[] getAnalyticsTableRecords() {
         return analyticsTableRecords;
+    }
+
+    public String getRecordStoreName() {
+        return recordStoreName;
+    }
+
+    public void setRecordStoreName(String recordStoreName) {
+        this.recordStoreName = recordStoreName;
     }
 
     public boolean isPersist() {

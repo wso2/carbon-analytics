@@ -206,7 +206,7 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
                         AnalyticsSchema schema = new AnalyticsSchema(columnDefinitions, primaryKeys);
                         analyticsDataService.setTableSchema(getTenantId(), tableName, schema);
                         ServiceHolder.getAnalyticsEventSinkService().putEventSink(getTenantId(), analyticsTable
-                                .getTableName(), analyticsTable.getStreamVersion(), schema, null);
+                                .getTableName(), analyticsTable.getStreamVersion(), schema, analyticsTable.getRecordStoreName());
                     } catch (Exception e) {
                         log.error("Unable to save analytics schema[" + analyticsTable.getTableName() + "]: " + e.getMessage(), e);
                         throw new EventStreamPersistenceAdminServiceException("Unable to save analytics schema", e);
@@ -267,5 +267,16 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
             tableName = tableName.replace('.', '_');
         }
         return tableName;
+    }
+
+    /**
+     * This method will return all the available records store names;
+     *
+     * @return Array of String that contains the record store names
+     */
+    public String[] listRecordStoreNames() {
+        List<String> recordStoreNames = ServiceHolder.getAnalyticsDataService().listRecordStoreNames();
+        return ServiceHolder.getAnalyticsDataService().listRecordStoreNames().toArray(new String[recordStoreNames
+                .size()]);
     }
 }
