@@ -91,10 +91,10 @@ public class OutputAdapterRuntime {
                             timer.incrementPosition();
                             nextConnectionTime = System.currentTimeMillis() + timer.returnTimeToWait();
                             if (timer.returnTimeToWait() == 0) {
-                                log.error("Connection unavailable on " + name + " reconnecting.", e);
+                                log.error("Connection unavailable for Output Adopter '" + name + "' reconnecting.", e);
                                 publish(message, dynamicProperties);
                             } else {
-                                log.error("Connection unavailable on " + name + " reconnection will be retried in " + (timer.returnTimeToWait()) + " milliseconds.", e);
+                                log.error("Connection unavailable for Output Adopter '" + name + "' reconnection will be retried in " + (timer.returnTimeToWait()) + " milliseconds.", e);
                             }
                         } else {
                             logAndDrop(message);
