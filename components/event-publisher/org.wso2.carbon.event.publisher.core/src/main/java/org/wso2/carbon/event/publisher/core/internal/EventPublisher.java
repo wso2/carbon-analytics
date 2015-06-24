@@ -31,6 +31,7 @@ import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherStreamValidationException;
 import org.wso2.carbon.event.publisher.core.internal.ds.EventPublisherServiceValueHolder;
+import org.wso2.carbon.event.publisher.core.internal.util.EventPublisherUtil;
 import org.wso2.carbon.event.statistics.EventStatisticsMonitor;
 import org.wso2.carbon.event.stream.core.SiddhiEventConsumer;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
@@ -42,12 +43,11 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
 
     private static final Log log = LogFactory.getLog(EventPublisher.class);
 
-    private static final String EVENT_TRACE_LOGGER = "EVENT_TRACE_LOGGER";
     private final boolean traceEnabled;
     private final boolean statisticsEnabled;
 
     List<String> dynamicMessagePropertyList = new ArrayList<String>();
-    private Logger trace = Logger.getLogger(EVENT_TRACE_LOGGER);
+    private Logger trace = Logger.getLogger(EventPublisherConstants.EVENT_TRACE_LOGGER);
     private EventPublisherConfiguration eventPublisherConfiguration = null;
     private int tenantId;
     private Map<String, Integer> propertyPositionMap = new TreeMap<String, Integer>();
@@ -115,8 +115,9 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
             this.statisticsMonitor = EventPublisherServiceValueHolder.getEventStatisticsService().getEventStatisticMonitor(tenantId, EventPublisherConstants.EVENT_PUBLISHER, eventPublisherConfiguration.getEventPublisherName(), null);
         }
         if (traceEnabled) {
-            this.beforeTracerPrefix = "TenantId=" + tenantId + " : " + EventPublisherConstants.EVENT_PUBLISHER + " : " + eventPublisherConfiguration.getFromStreamName() + ", before processing " + System.getProperty("line.separator");
-            this.afterTracerPrefix = "TenantId=" + tenantId + " : " + EventPublisherConstants.EVENT_PUBLISHER + " : " + eventPublisherConfiguration.getFromStreamName() + ", after processing " + System.getProperty("line.separator");
+            this.beforeTracerPrefix = "TenantId : " + tenantId + ", " + EventPublisherConstants.EVENT_PUBLISHER + " : " + eventPublisherConfiguration.getFromStreamName() +", "+ EventPublisherConstants.EVENT_STREAM + " : "
+                    + EventPublisherUtil.getImportedStreamIdFrom(eventPublisherConfiguration) +  ", before processing " + System.getProperty("line.separator");
+            this.afterTracerPrefix = "TenantId : " + tenantId + ", " + EventPublisherConstants.EVENT_PUBLISHER + " : " + eventPublisherConfiguration.getFromStreamName() +  ", after processing " + System.getProperty("line.separator");
         }
 
         OutputEventAdapterService eventAdapterService = EventPublisherServiceValueHolder.getOutputEventAdapterService();

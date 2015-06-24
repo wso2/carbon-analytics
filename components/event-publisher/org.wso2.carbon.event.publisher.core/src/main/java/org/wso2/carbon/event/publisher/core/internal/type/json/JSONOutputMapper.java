@@ -75,9 +75,9 @@ public class JSONOutputMapper implements OutputMapper {
 
         mappingTextList.clear();
         while (text.contains(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) && text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) > 0) {
-            mappingTextList.add(text.substring(0, text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX)));
+            mappingTextList.add(text.substring(0, text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) - 1));
             mappingTextList.add(text.substring(text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) + 2, text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX)));
-            text = text.substring(text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) + 2);
+            text = text.substring(text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) + 3);
         }
         mappingTextList.add(text);
         this.mappingTextList = mappingTextList;
@@ -91,16 +91,18 @@ public class JSONOutputMapper implements OutputMapper {
             if (i % 2 == 0) {
                 eventText.append(mappingTextList.get(i));
             } else {
-                eventText.append(getPropertyValue(event.getData(), mappingTextList.get(i)));
+                String propertyValue = getPropertyValue(event.getData(), mappingTextList.get(i));
+                if (propertyValue == null) {
+                    eventText.append(propertyValue);
+                } else {
+                    eventText.append(EventPublisherConstants.DOUBLE_QUOTE)
+                            .append(propertyValue)
+                            .append(EventPublisherConstants.DOUBLE_QUOTE);
+                }
             }
         }
 
         String jsonEvent = eventText.toString();
-
-        if(jsonEvent.contains("\"null\"")){
-            jsonEvent = jsonEvent.replaceAll("\"null\"","null");
-        }
-
         try {
             JsonParser jsonParser = new JsonParser();
             return jsonParser.parse(jsonEvent).toString();

@@ -19,9 +19,9 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.AttributeType;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
+import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfiguration;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConstants;
-import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.config.InputMappingAttribute;
 import org.wso2.carbon.event.receiver.core.config.mapping.TextInputMapping;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverConfigurationException;
@@ -176,7 +176,7 @@ public class TextInputMapper implements InputMapper {
                         if (AttributeType.STRING.equals(attributeType)) {
                             attributeArray[attributeCount++] = "";
                         } else {
-                            throw new EventReceiverProcessingException("Attribute value not found in the event hence Dropping event " + eventAttribute);
+                            throw new EventReceiverProcessingException("Attribute value not found in the event, hence dropping event " + eventAttribute);
                         }
                     }
 

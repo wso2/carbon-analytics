@@ -94,7 +94,7 @@ public final class SMSEventAdapter implements OutputEventAdapter {
 
     @Override
     public void testConnect() throws TestConnectionNotSupportedException {
-        throw new TestConnectionNotSupportedException("not-available");
+        throw new TestConnectionNotSupportedException("Test connection is not available");
     }
 
     @Override

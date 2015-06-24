@@ -441,7 +441,7 @@
                     <tr>
                         <td class="buttonRow">
                             <input type="button" value="<fmt:message key="back"/>" onclick="back()"/>
-                            <input type="button" value="<fmt:message key="save.event.stream"/>"
+                            <input id="eventPersistButton" type="button" value="<fmt:message key="save.event.stream"/>"
                                    onclick="addEventStream(document.getElementById('editEventStream'),'edit', '<%=eventStreamWithVersion%>')"/>
                         </td>
                     </tr>

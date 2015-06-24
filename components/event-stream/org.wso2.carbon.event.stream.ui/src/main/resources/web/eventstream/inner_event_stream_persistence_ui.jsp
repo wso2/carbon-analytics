@@ -1,3 +1,5 @@
+<%@ page import="org.wso2.carbon.analytics.stream.persistence.stub.EventStreamPersistenceAdminServiceStub" %>
+<%@ page import="org.wso2.carbon.event.stream.ui.EventStreamUIUtils" %>
 <%--
   ~ Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
   ~
@@ -14,6 +16,7 @@
   --%>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <script type="text/javascript" src="../eventstream/js/event_stream.js"></script>
 <script type="text/javascript" src="../eventstream/js/registry-browser.js"></script>
 
@@ -27,6 +30,15 @@
         padding: 0;
     }
 </style>
+
+<%
+    EventStreamPersistenceAdminServiceStub persistenceAdminServiceStub =
+            EventStreamUIUtils.getEventStreamPersistenceAdminService(config, session, request);
+    if (EventStreamUIUtils.isEventStreamPersistenceAdminServiceAvailable(persistenceAdminServiceStub)) {
+        String[] recordStoreNames = persistenceAdminServiceStub.listRecordStoreNames();
+        pageContext.setAttribute("recordStoreNames", recordStoreNames, PageContext.PAGE_SCOPE);
+    }
+%>
 
 <fmt:bundle basename="org.wso2.carbon.event.stream.ui.i18n.Resources">
     <table class="styledLeft noBorders spacer-bot" style="width:100%">
@@ -44,6 +56,19 @@
         </tbody>
     </table>
     <fieldset id="attributeFieldSet">
+        <table class="styledLeft noBorders spacer-bot" style="width:100%">
+            <tbody>
+            <tr>
+                <td class="col-small"><h6><fmt:message key="recordstore.name"/></h6>
+                    <select id="recordStoreSelect">
+                        <c:forEach items="${recordStoreNames}" var="name">
+                            <option value="<c:out value="${name}" />"><c:out value="${name}"/></option>
+                        </c:forEach>
+                    </select>
+                </td>
+            </tr>
+            </tbody>
+        </table>
         <table class="styledLeft noBorders spacer-bot" style="width:100%">
             <tbody>
             <tr>
