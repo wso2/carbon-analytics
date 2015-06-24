@@ -18,6 +18,7 @@
  */
 package org.wso2.carbon.analytics.datasource.core.rs;
 
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -136,7 +137,7 @@ public interface AnalyticsRecordStore {
      * @return An iterator of type {@link org.wso2.carbon.analytics.datasource.commons.Record} in the local record group
      * @throws org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
      */
-    Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException;
+    AnalyticsIterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException;
 
     /**
      * Deletes a set of records in the table.

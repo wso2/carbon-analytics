@@ -20,6 +20,7 @@ package org.wso2.carbon.analytics.dataservice;
 
 import org.wso2.carbon.analytics.dataservice.commons.*;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
@@ -27,7 +28,6 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutException;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -213,7 +213,7 @@ public interface AnalyticsDataService {
      * @return An iterator of type {@link org.wso2.carbon.analytics.datasource.commons.Record} in the local record group
      * @throws org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException
      */
-    Iterator<Record> readRecords(String recordStoreName, RecordGroup recordGroup) throws AnalyticsException;
+    AnalyticsIterator<Record> readRecords(String recordStoreName, RecordGroup recordGroup) throws AnalyticsException;
     
     /**
      * Checks whether or not pagination (i.e. jumping to record n and then retrieving k further records)

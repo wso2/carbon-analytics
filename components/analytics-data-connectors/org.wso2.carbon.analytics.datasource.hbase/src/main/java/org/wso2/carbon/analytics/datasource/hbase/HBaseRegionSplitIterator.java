@@ -19,6 +19,7 @@ package org.wso2.carbon.analytics.datasource.hbase;
 
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
@@ -34,7 +35,7 @@ import java.util.*;
  * Subclass of java.util.Iterator used for streaming records contained within an HBase region boundary given the start
  * and end row keys of the region
  */
-public class HBaseRegionSplitIterator implements Iterator<Record> {
+public class HBaseRegionSplitIterator implements AnalyticsIterator<Record> {
 
     private int tenantId;
 
@@ -121,4 +122,8 @@ public class HBaseRegionSplitIterator implements Iterator<Record> {
         GenericUtils.closeQuietly(this.table);
     }
 
+    @Override
+    public void close() throws IOException {
+        cleanup();
+    }
 }

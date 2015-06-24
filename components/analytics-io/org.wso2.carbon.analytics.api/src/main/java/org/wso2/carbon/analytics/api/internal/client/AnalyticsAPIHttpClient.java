@@ -50,6 +50,7 @@ import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
@@ -66,7 +67,6 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -940,7 +940,7 @@ public class AnalyticsAPIHttpClient {
         }
     }
 
-    public Iterator<Record> readRecords(String recordStoreName, RecordGroup recordGroup) throws AnalyticsServiceException {
+    public AnalyticsIterator<Record> readRecords(String recordStoreName, RecordGroup recordGroup) throws AnalyticsServiceException {
         URIBuilder builder = new URIBuilder();
         builder.setScheme(protocol).setHost(hostname).setPort(port).setPath(AnalyticsAPIConstants.ANALYTIC_RECORD_READ_PROCESSOR_SERVICE_URI)
                 .addParameter(AnalyticsAPIConstants.OPERATION, AnalyticsAPIConstants.READ_RECORD_OPERATION)
@@ -955,7 +955,7 @@ public class AnalyticsAPIHttpClient {
                 throw new AnalyticsServiceException("Unable to read the record group. "
                         + response);
             }
-            return new RemoteRecordIterator<>(httpResponse.getEntity().getContent());
+            return new RemoteRecordIterator(httpResponse.getEntity().getContent());
         } catch (URISyntaxException e) {
             throw new AnalyticsServiceAuthenticationException("Malformed URL provided. " + e.getMessage(), e);
         } catch (IOException e) {

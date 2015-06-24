@@ -17,6 +17,7 @@
 */
 package org.wso2.carbon.analytics.datasource.cassandra;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,6 +26,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -132,7 +135,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     }
     
     @Override
-    public Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException {
+    public AnalyticsIterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException {
         CassandraRecordGroup crg = (CassandraRecordGroup) recordGroup;
         if (crg.isByIds()) {
             return this.readRecordsByIds(crg);
@@ -141,7 +144,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         }
     }
     
-    private Iterator<Record> readRecordsByRange(CassandraRecordGroup recordGroup) throws AnalyticsException {
+    private AnalyticsIterator<Record> readRecordsByRange(CassandraRecordGroup recordGroup) throws AnalyticsException {
         int tenantId = recordGroup.getTenantId();
         String tableName = recordGroup.getTableName();
         String dataTable = this.generateTargetDataTableName(tenantId, tableName);
@@ -169,18 +172,18 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         return ids;
     }
     
-    private Iterator<Record> readRecordsByIds(CassandraRecordGroup recordGroup) throws AnalyticsException {
+    private AnalyticsIterator<Record> readRecordsByIds(CassandraRecordGroup recordGroup) throws AnalyticsException {
         return this.lookupRecordsByIds(recordGroup.getTenantId(), 
                 recordGroup.getTableName(), recordGroup.getIds(), recordGroup.getColumns());
     }
     
-    private Iterator<Record> lookupRecordsByIds(int tenantId, String tableName, List<String> ids, List<String> columns) {
+    private AnalyticsIterator<Record> lookupRecordsByIds(int tenantId, String tableName, List<String> ids, List<String> columns) {
         String dataTable = this.generateTargetDataTableName(tenantId, tableName);
         ResultSet rs = this.session.execute("SELECT id, timestamp, data FROM ARS." + dataTable + " WHERE id IN ?", ids);
         return this.lookupRecordsByRS(tenantId, tableName, rs, columns);
     }
     
-    private Iterator<Record> lookupRecordsByRS(int tenantId, String tableName, ResultSet rs, List<String> columns) {
+    private AnalyticsIterator<Record> lookupRecordsByRS(int tenantId, String tableName, ResultSet rs, List<String> columns) {
         return new CassandraDataIterator(tenantId, tableName, rs, columns);
     }
 
@@ -255,7 +258,7 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
     /**
      * Cassandra data {@link Iterator} implementation for streaming.
      */
-    public static class CassandraDataIterator implements Iterator<Record> {
+    public static class CassandraDataIterator implements AnalyticsIterator<Record> {
 
         private int tenantId;
         
@@ -308,7 +311,11 @@ public class CassandraAnalyticsRecordStore implements AnalyticsRecordStore {
         public void remove() {
             throw new UnsupportedOperationException();
         }
-        
+
+        @Override
+        public void close() throws IOException {
+            /** Nothing to do **/
+        }
     }
     
     /**

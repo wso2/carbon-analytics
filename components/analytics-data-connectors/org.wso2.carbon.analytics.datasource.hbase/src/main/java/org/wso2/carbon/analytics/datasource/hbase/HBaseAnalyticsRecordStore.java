@@ -23,6 +23,7 @@ import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.Pair;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
@@ -432,7 +433,7 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
     }
 
     @Override
-    public Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException, AnalyticsTableNotAvailableException {
+    public AnalyticsIterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException, AnalyticsTableNotAvailableException {
         if (recordGroup instanceof HBaseIDRecordGroup) {
             HBaseIDRecordGroup idRecordGroup = (HBaseIDRecordGroup) recordGroup;
             return this.getRecords(idRecordGroup.getTenantId(), idRecordGroup.getTableName(),
@@ -450,19 +451,19 @@ public class HBaseAnalyticsRecordStore implements AnalyticsRecordStore {
         }
     }
 
-    public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns, List<String> ids)
+    public AnalyticsIterator<Record> getRecords(int tenantId, String tableName, List<String> columns, List<String> ids)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
         int batchSize = this.queryConfig.getBatchSize();
         return new HBaseRecordIterator(tenantId, tableName, columns, ids, this.conn, batchSize);
     }
 
-    public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns, long startTime, long endTime)
+    public AnalyticsIterator<Record> getRecords(int tenantId, String tableName, List<String> columns, long startTime, long endTime)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
         int batchSize = this.queryConfig.getBatchSize();
         return new HBaseTimestampIterator(tenantId, tableName, columns, startTime, endTime, this.conn, batchSize);
     }
 
-    public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns, byte[] startRow, byte[] endRow)
+    public AnalyticsIterator<Record> getRecords(int tenantId, String tableName, List<String> columns, byte[] startRow, byte[] endRow)
             throws AnalyticsException, AnalyticsTableNotAvailableException {
         return new HBaseRegionSplitIterator(tenantId, tableName, columns, this.conn, startRow, endRow);
     }

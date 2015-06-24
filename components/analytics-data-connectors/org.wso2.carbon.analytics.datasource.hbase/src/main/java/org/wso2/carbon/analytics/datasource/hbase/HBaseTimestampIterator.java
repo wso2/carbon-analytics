@@ -24,6 +24,7 @@ import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
@@ -39,7 +40,7 @@ import java.util.*;
 /**
  * Subclass of java.util.Iterator for streaming in records based on timestamp ranges
  */
-public class HBaseTimestampIterator implements Iterator<Record> {
+public class HBaseTimestampIterator implements AnalyticsIterator<Record> {
 
     private List<String> columns;
 
@@ -198,5 +199,10 @@ public class HBaseTimestampIterator implements Iterator<Record> {
     private void cleanup() {
         GenericUtils.closeQuietly(this.indexTable);
         GenericUtils.closeQuietly(this.table);
+    }
+
+    @Override
+    public void close() throws IOException {
+        cleanup();
     }
 }

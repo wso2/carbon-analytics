@@ -19,6 +19,7 @@
 package org.wso2.carbon.analytics.datasource.rdbms;
 
 import org.apache.axiom.om.util.Base64;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -314,7 +315,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     }
 
     @Override
-    public Iterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException {
+    public AnalyticsIterator<Record> readRecords(RecordGroup recordGroup) throws AnalyticsException {
         if (recordGroup instanceof RDBMSRangeRecordGroup) {
             RDBMSRangeRecordGroup recordRangeGroup = (RDBMSRangeRecordGroup) recordGroup;
             return this.getRecords(recordRangeGroup.getTenantId(), recordRangeGroup.getTableName(), 
@@ -330,9 +331,9 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         }
     }
     
-    public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns,
-            long timeFrom, long timeTo, int recordsFrom, 
-            int recordsCount) throws AnalyticsException, AnalyticsTableNotAvailableException {
+    public AnalyticsIterator<Record> getRecords(int tenantId, String tableName, List<String> columns,
+                                                long timeFrom, long timeTo, int recordsFrom,
+                                                int recordsCount) throws AnalyticsException, AnalyticsTableNotAvailableException {
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -381,10 +382,10 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         return recordsCount;
     }
 
-    public Iterator<Record> getRecords(int tenantId, String tableName, List<String> columns,
-            List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
+    public AnalyticsIterator<Record> getRecords(int tenantId, String tableName, List<String> columns,
+                                                List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
         if (ids.isEmpty()) {
-            return new ArrayList<Record>(0).iterator();
+            return new EmptyResultSetAnalyticsIterator();
         }
         String recordGetSQL = this.generateGetRecordRetrievalWithIdQuery(tenantId, tableName, ids.size());
         Connection conn = null;
@@ -655,7 +656,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     /**
      * This class represents the RDBMS result set iterator, which will stream the result records out.
      */
-    private class RDBMSResultSetIterator implements Iterator<Record> {
+    private class RDBMSResultSetIterator implements AnalyticsIterator<Record> {
 
         private int tenantId;
         
@@ -734,7 +735,37 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
              * we have to make sure the connection is cleaned up */
             RDBMSUtils.cleanupConnection(this.rs, this.stmt, this.conn);
         }
-        
+
+        @Override
+        public void close() throws IOException {
+            RDBMSUtils.cleanupConnection(this.rs, this.stmt, this.conn);
+            this.rs = null;
+            this.stmt = null;
+            this.conn = null;
+        }
+    }
+
+    public class EmptyResultSetAnalyticsIterator implements AnalyticsIterator<Record>{
+
+        @Override
+        public void close() throws IOException {
+            /* Nothing to do */
+        }
+
+        @Override
+        public boolean hasNext() {
+            return false;
+        }
+
+        @Override
+        public Record next() {
+            return null;
+        }
+
+        @Override
+        public void remove() {
+            /* Nothing to do */
+        }
     }
 
 }

@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
@@ -38,7 +39,7 @@ import java.util.*;
 /**
  * Subclass of java.util.Iterator for streaming in records from ID lookup
  */
-public class HBaseRecordIterator implements Iterator<Record> {
+public class HBaseRecordIterator implements AnalyticsIterator<Record> {
 
     private List<String> columns;
     private List<List<String>> batchedIds;
@@ -156,4 +157,8 @@ public class HBaseRecordIterator implements Iterator<Record> {
         GenericUtils.closeQuietly(this.table);
     }
 
+    @Override
+    public void close() throws IOException {
+       cleanup();
+    }
 }

@@ -23,6 +23,7 @@ import org.wso2.carbon.analytics.api.exception.AnalyticsServiceException;
 import org.wso2.carbon.analytics.api.internal.AnalyticsDataConfiguration;
 import org.wso2.carbon.analytics.api.internal.ServiceHolder;
 import org.wso2.carbon.analytics.api.internal.client.AnalyticsAPIHttpClient;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
@@ -49,7 +50,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -498,7 +498,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     }
 
     @Override
-    public Iterator<Record> readRecords(String recordStoreName, RecordGroup recordGroup) throws AnalyticsException {
+    public AnalyticsIterator<Record> readRecords(String recordStoreName, RecordGroup recordGroup) throws AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
             return ServiceHolder.getAnalyticsDataService().readRecords(recordStoreName, recordGroup);
         } else {

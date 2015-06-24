@@ -20,6 +20,7 @@ package org.wso2.carbon.analytics.servlet;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
@@ -209,12 +210,13 @@ public class AnalyticsRecordReadProcessor extends HttpServlet {
         ServletInputStream servletInputStream = req.getInputStream();
         try {
             RemoteRecordGroup remoteRecordGroupObj = (RemoteRecordGroup) GenericUtils.deserializeObject(servletInputStream);
-            Iterator<Record> records = ServiceHolder.getAnalyticsDataService().readRecords(recordStoreName,
+            AnalyticsIterator<Record> records = ServiceHolder.getAnalyticsDataService().readRecords(recordStoreName,
                     remoteRecordGroupObj.getRecordGroupFromBinary());
             while (records.hasNext()) {
                 Record record = records.next();
                 GenericUtils.serializeObject(record, resp.getOutputStream());
             }
+            records.close();
             resp.setStatus(HttpServletResponse.SC_OK);
         } catch (AnalyticsException e) {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
