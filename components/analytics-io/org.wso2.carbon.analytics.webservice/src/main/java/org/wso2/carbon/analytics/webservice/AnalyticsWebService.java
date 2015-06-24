@@ -22,13 +22,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceUtils;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategorySearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsDrillDownRangeBean;
 import org.wso2.carbon.analytics.webservice.beans.AnalyticsDrillDownRequestBean;
@@ -49,6 +52,7 @@ import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -62,6 +66,7 @@ import java.util.Map;
 public class AnalyticsWebService extends AbstractAdmin {
     private static final Log logger = LogFactory.getLog(AnalyticsWebService.class);
     private static final int DEFAULT_NUM_PARTITIONS_HINT = 1;
+    private static final int NON_PAGINATE_PAGE_SIZE = 100;
     private AnalyticsDataAPI analyticsDataAPI;
     private EventStreamService eventStreamService;
     private static final String AT_SIGN = "@";
@@ -257,9 +262,16 @@ public class AnalyticsWebService extends AbstractAdmin {
             if (columns != null && columns.length != 0) {
                 columnList = Arrays.asList(columns);
             }
-            List<Record> records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI,
-                                                            analyticsDataAPI.get(getUsername(), tableName, numPartitionsHint, columnList, timeFrom, timeTo, recordsFrom,
-                                                                                 recordsCount));
+            List<Record> records;
+            if (isPaginationSupported(analyticsDataAPI.getRecordStoreNameByTable(getUsername(), tableName))) {
+                records = AnalyticsDataServiceUtils.listRecords(analyticsDataAPI,
+                                                                analyticsDataAPI.get(getUsername(), tableName, numPartitionsHint, columnList, timeFrom, timeTo, recordsFrom,
+                                                                                     recordsCount));
+            } else {
+                AnalyticsDataResponse resp = analyticsDataAPI.get(getUsername(), tableName, numPartitionsHint, columnList,
+                                                                  timeFrom, timeTo, 0, -1);
+                records = getNonPaginateRecords(resp);
+            }
             List<RecordBean> recordBeans = Utils.createRecordBeans(records);
             RecordBean[] resultRecordBeans = new RecordBean[recordBeans.size()];
             return recordBeans.toArray(resultRecordBeans);
@@ -268,6 +280,25 @@ public class AnalyticsWebService extends AbstractAdmin {
             throw new AnalyticsWebServiceException("Unable to get record from table[" + tableName + "] due to " + e
                     .getMessage(), e);
         }
+    }
+
+    private List<Record> getNonPaginateRecords(AnalyticsDataResponse resp) throws AnalyticsException, IOException {
+        List<Record> records = new ArrayList<>(NON_PAGINATE_PAGE_SIZE);
+        int i = 0;
+        outer:
+        for (RecordGroup rg : resp.getRecordGroups()) {
+            AnalyticsIterator<Record> itr = analyticsDataAPI.readRecords(resp.getRecordStoreName(), rg);
+            while (itr.hasNext()) {
+                records.add(itr.next());
+                i++;
+                if (i == NON_PAGINATE_PAGE_SIZE) {
+                    itr.close();
+                    break outer;
+                }
+            }
+            itr.close();
+        }
+        return records;
     }
 
     /**

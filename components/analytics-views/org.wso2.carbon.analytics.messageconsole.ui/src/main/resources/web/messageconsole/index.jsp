@@ -7,6 +7,7 @@
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt" %>
 <%
     String serverURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);
     ConfigurationContext configContext = (ConfigurationContext) config.getServletContext().
@@ -344,7 +345,8 @@
                                       $('#AnalyticsTableContainer').jtable('destroy');
                                       tableLoaded = false;
                                   }
-                                  createMainJTable(fields, data.paginationSupport);
+                                  var paginateSupport = ($("#query").val() != '') || data.paginationSupport;
+                                  createMainJTable(fields, paginateSupport);
                               }
                           }
                 );
