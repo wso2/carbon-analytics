@@ -34,7 +34,7 @@
 <%
     EventStreamPersistenceAdminServiceStub persistenceAdminServiceStub =
             EventStreamUIUtils.getEventStreamPersistenceAdminService(config, session, request);
-    if (persistenceAdminServiceStub.isBackendServicePresent()) {
+    if (EventStreamUIUtils.isEventStreamPersistenceAdminServiceAvailable(persistenceAdminServiceStub)) {
         String[] recordStoreNames = persistenceAdminServiceStub.listRecordStoreNames();
         pageContext.setAttribute("recordStoreNames", recordStoreNames, PageContext.PAGE_SCOPE);
     }
