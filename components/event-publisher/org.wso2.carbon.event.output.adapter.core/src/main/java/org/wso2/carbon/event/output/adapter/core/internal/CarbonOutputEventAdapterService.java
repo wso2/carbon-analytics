@@ -35,8 +35,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CarbonOutputEventAdapterService implements OutputEventAdapterService {
 
     private static Log log = LogFactory.getLog(CarbonOutputEventAdapterService.class);
-    private static final String EVENT_TRACE_LOGGER = "EVENT_TRACE_LOGGER";
-    private Logger trace = Logger.getLogger(EVENT_TRACE_LOGGER);
 
     private final Map<String, OutputEventAdapterFactory> eventAdapterFactoryMap;
     private final ConcurrentHashMap<Integer, ConcurrentHashMap<String, OutputAdapterRuntime>> tenantSpecificEventAdapters;
