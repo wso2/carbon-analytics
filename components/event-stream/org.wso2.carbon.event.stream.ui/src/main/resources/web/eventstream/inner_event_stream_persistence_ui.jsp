@@ -32,10 +32,10 @@
 </style>
 
 <%
-    EventStreamPersistenceAdminServiceStub persistenceAdminServiceStub =
+    EventStreamPersistenceAdminServiceStub persistenceAdminServiceInnerStub =
             EventStreamUIUtils.getEventStreamPersistenceAdminService(config, session, request);
-    if (EventStreamUIUtils.isEventStreamPersistenceAdminServiceAvailable(persistenceAdminServiceStub)) {
-        String[] recordStoreNames = persistenceAdminServiceStub.listRecordStoreNames();
+    if (EventStreamUIUtils.isEventStreamPersistenceAdminServiceAvailable(persistenceAdminServiceInnerStub)) {
+        String[] recordStoreNames = persistenceAdminServiceInnerStub.listRecordStoreNames();
         pageContext.setAttribute("recordStoreNames", recordStoreNames, PageContext.PAGE_SCOPE);
     }
 %>
