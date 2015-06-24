@@ -32,8 +32,7 @@ import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -63,8 +62,6 @@ import java.util.List;
 public class EventPublisherServiceDS {
     private static final Log log = LogFactory.getLog(EventPublisherServiceDS.class);
 
-    public static List<String> outputEventAdapterTypes = new ArrayList<String>();
-
     protected void activate(ComponentContext context) {
         try {
             CarbonEventPublisherService carbonEventPublisherService = new CarbonEventPublisherService();
@@ -89,6 +86,7 @@ public class EventPublisherServiceDS {
     }
 
     private void activateInactiveEventPublisherConfigurations(CarbonEventPublisherService carbonEventPublisherService) {
+        Set<String> outputEventAdapterTypes = EventPublisherServiceValueHolder.getOutputEventAdapterTypes();
         outputEventAdapterTypes.addAll(EventPublisherServiceValueHolder.getOutputEventAdapterService().getOutputEventAdapterTypes());
         for (String type : outputEventAdapterTypes) {
             try {
@@ -97,7 +95,6 @@ public class EventPublisherServiceDS {
                 log.error(e.getMessage(), e);
             }
         }
-        outputEventAdapterTypes.clear();
     }
 
     protected void setEventAdapterService(
@@ -106,7 +103,8 @@ public class EventPublisherServiceDS {
     }
 
     protected void unsetEventAdapterService(
-            OutputEventAdapterService eventAdapterService) {
+            OutputEventAdapterService outputEventAdapterService) {
+        EventPublisherServiceValueHolder.getOutputEventAdapterTypes().clear();
         EventPublisherServiceValueHolder.registerEventAdapterService(null);
     }
 
@@ -135,21 +133,18 @@ public class EventPublisherServiceDS {
     }
 
     protected void setEventAdapterType(OutputEventAdapterFactory outputEventAdapterFactory) {
-
+        EventPublisherServiceValueHolder.addOutputEventAdapterType(outputEventAdapterFactory.getType());
         if (EventPublisherServiceValueHolder.getCarbonEventPublisherService() != null) {
             try {
                 EventPublisherServiceValueHolder.getCarbonEventPublisherService().activateInactiveEventPublisherConfigurationsForAdapter(outputEventAdapterFactory.getType());
             } catch (EventPublisherConfigurationException e) {
                 log.error(e.getMessage(), e);
             }
-        } else {
-            outputEventAdapterTypes.add(outputEventAdapterFactory.getType());
         }
-
     }
 
     protected void unSetEventAdapterType(OutputEventAdapterFactory outputEventAdapterFactory) {
-
+        EventPublisherServiceValueHolder.removeOutputEventAdapterType(outputEventAdapterFactory.getType());
         if (EventPublisherServiceValueHolder.getCarbonEventPublisherService() != null) {
             try {
                 EventPublisherServiceValueHolder.getCarbonEventPublisherService().deactivateActiveEventPublisherConfigurationsForAdapter(outputEventAdapterFactory.getType());

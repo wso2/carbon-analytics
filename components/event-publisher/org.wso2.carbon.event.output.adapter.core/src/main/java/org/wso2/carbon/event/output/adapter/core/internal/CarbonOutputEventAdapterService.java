@@ -52,7 +52,7 @@ public class CarbonOutputEventAdapterService implements OutputEventAdapterServic
         this.eventAdapterFactoryMap.put(outputEventAdapterSchema.getType(), outputEventAdapterFactory);
     }
 
-    public void unRegisterEventAdapter(OutputEventAdapterFactory outputEventAdapterFactory) {
+    public void unRegisterEventAdapterFactory(OutputEventAdapterFactory outputEventAdapterFactory) {
         OutputEventAdapterSchema outputEventAdapterSchema = outputEventAdapterFactory.getOutputEventAdapterSchema();
         this.eventAdapterFactoryMap.remove(outputEventAdapterSchema.getType());
     }

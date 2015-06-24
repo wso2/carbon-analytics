@@ -173,6 +173,10 @@ public class EventPublisherDeployer extends AbstractDeployer implements EventPro
                     mappingType = mappingType.toLowerCase();
                     EventPublisherConfiguration eventPublisherConfiguration = EventPublisherConfigurationBuilder.getEventPublisherConfiguration(eventPublisherOMElement, mappingType, isEditable, tenantId);
                     eventPublisherName = eventPublisherConfiguration.getEventPublisherName();
+                    String type = eventPublisherConfiguration.getToAdapterConfiguration().getType();
+                    if (!EventPublisherServiceValueHolder.getOutputEventAdapterTypes().contains(type)) {
+                        throw new EventPublisherValidationException("Event Adapter with type: " + type + " does not exist", type);
+                    }
 
                     if (!carbonEventPublisherService.isEventPublisherAlreadyExists(tenantId, eventPublisherName)) {
                         carbonEventPublisherService.addEventPublisherConfiguration(eventPublisherConfiguration);
