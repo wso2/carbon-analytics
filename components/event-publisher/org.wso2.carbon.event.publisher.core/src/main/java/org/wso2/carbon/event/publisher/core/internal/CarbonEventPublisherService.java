@@ -330,6 +330,7 @@ public class CarbonEventPublisherService implements EventPublisherService {
                         String eventPublisherName = eventPublisherConfigurationFile.getEventPublisherName();
                         EventPublisher eventPublisher = tenantSpecificEventPublisherConfigurationMap.get(tenantId).remove(eventPublisherName);
                         if (eventPublisher != null) {
+                            eventPublisher.prepareDestroy();
                             EventPublisherServiceValueHolder.getEventStreamService().unsubscribe(eventPublisher);
                             eventPublisher.destroy();
                         }

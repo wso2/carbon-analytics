@@ -152,27 +152,35 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
         if(EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode() == Mode.HA){
             if(!isPolled && EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()){
                 //add to Queue
-                EventWrapper eventWrapper = new EventWrapper(event, EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMilies());
+                long currentTime = EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMilies();
+                EventWrapper eventWrapper = new EventWrapper(event, currentTime);
                 eventQueue.add(eventWrapper);
 
                 // get last processed time and remove old events from the queue
-                long timestamp = EventPublisherServiceValueHolder.getEventManagementService().getLatestEventSentTime(
+                long lastProcessedTime = EventPublisherServiceValueHolder.getEventManagementService().getLatestEventSentTime(
                         eventPublisherConfiguration.getEventPublisherName(), tenantId);
 
-                while (!eventQueue.isEmpty() && eventQueue.peek().getTimestampInMilies() <= timestamp) {
+                log.info("in event: " + currentTime + "\nfrom map: " + lastProcessedTime);
+
+                while (!eventQueue.isEmpty() && eventQueue.peek().getTimestampInMilies() <= lastProcessedTime) {
                     eventQueue.remove();
                 }
 
             }else if(!isPolled && !EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()){
                 //is queue not empty send events from last time
-                long timestamp = EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMilies();
+                long currentTime = EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMilies();
                 if(!eventQueue.isEmpty()) {
+                    long lastProcessedTime = EventPublisherServiceValueHolder.getEventManagementService().getLatestEventSentTime(
+                            eventPublisherConfiguration.getEventPublisherName(), tenantId);
                     while (!eventQueue.isEmpty()) {
-                        process(eventQueue.poll().getEvent());
+                        EventWrapper eventWrapper = eventQueue.poll();
+                        if(eventWrapper.getTimestampInMilies() > lastProcessedTime){
+                            process(eventWrapper.getEvent());
+                        }
                     }
                 }
                 EventPublisherServiceValueHolder.getEventManagementService().updateLatestEventSentTime(
-                        eventPublisherConfiguration.getEventPublisherName(), tenantId, timestamp);
+                        eventPublisherConfiguration.getEventPublisherName(), tenantId, currentTime);
             }
         }
     }
@@ -219,11 +227,6 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
     @Override
     public void consumeEvent(Event event) {
         sendEvent(event);
-    }
-
-    @Override
-    public void shutdown() {
-
     }
 
     private List<String> getDynamicOutputMessageProperties(String messagePropertyValue) {
@@ -309,6 +312,12 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
     @Override
     public org.wso2.siddhi.query.api.definition.StreamDefinition getStreamDefinition() {
         return streamDefinition;
+    }
+
+    public void prepareDestroy(){
+        EventPublisherServiceValueHolder.getEventManagementService().updateLatestEventSentTime(
+                eventPublisherConfiguration.getEventPublisherName(), tenantId,
+                EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMilies());
     }
 
     public class EventWrapper{
