@@ -99,6 +99,12 @@ public class JMSEventAdapterFactory extends OutputEventAdapterFactory {
                 resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_JMS_DESTINATION));
         topicProperty.setRequired(true);
 
+        Property concurrentPublishers = new Property(JMSEventAdapterConstants.ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS);
+        concurrentPublishers.setDisplayName(resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS));
+        concurrentPublishers.setOptions(new String[]{JMSEventAdapterConstants.ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS_ALLOWED, JMSEventAdapterConstants.ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS_NOT_ALLOWED});
+        concurrentPublishers.setHint(resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS_HINT));
+
+
         staticPropertyList.add(initialContextProperty);
         staticPropertyList.add(javaNamingProviderUrlProperty);
         staticPropertyList.add(userNameProperty);
@@ -106,6 +112,7 @@ public class JMSEventAdapterFactory extends OutputEventAdapterFactory {
         staticPropertyList.add(connectionFactoryNameProperty);
         staticPropertyList.add(destinationTypeProperty);
         staticPropertyList.add(topicProperty);
+        staticPropertyList.add(concurrentPublishers);
 
         return staticPropertyList;
 

@@ -26,11 +26,12 @@ import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterRuntimeException;
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
-import org.wso2.carbon.event.output.adapter.jms.internal.util.*;
+import org.wso2.carbon.event.output.adapter.jms.internal.util.JMSConnectionFactory;
+import org.wso2.carbon.event.output.adapter.jms.internal.util.JMSConstants;
+import org.wso2.carbon.event.output.adapter.jms.internal.util.JMSEventAdapterConstants;
+import org.wso2.carbon.event.output.adapter.jms.internal.util.JMSMessageSender;
 
 import javax.jms.Connection;
-import javax.jms.JMSException;
-import javax.jms.Message;
 import javax.jms.Session;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -56,7 +57,7 @@ public class JMSEventAdapter implements OutputEventAdapter {
     @Override
     public void init() throws OutputEventAdapterException {
 
-        tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         //ExecutorService will be assigned  if it is null
         if (executorService == null) {
@@ -66,14 +67,20 @@ public class JMSEventAdapter implements OutputEventAdapter {
             int jobQueSize;
 
             //If global properties are available those will be assigned else constant values will be assigned
-            if (globalProperties.get(JMSEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE_NAME) != null) {
+            if (JMSEventAdapterConstants.ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS_NOT_ALLOWED.equals(
+                    eventAdapterConfiguration.getStaticProperties().get(JMSEventAdapterConstants.ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS)) ) {
+                minThread = 1;
+            } else if (globalProperties.get(JMSEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE_NAME) != null) {
                 minThread = Integer.parseInt(globalProperties.get(
                         JMSEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE_NAME));
             } else {
                 minThread = JMSEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE;
             }
 
-            if (globalProperties.get(JMSEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME) != null) {
+            if (JMSEventAdapterConstants.ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS_NOT_ALLOWED.equals(
+                    eventAdapterConfiguration.getStaticProperties().get(JMSEventAdapterConstants.ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS))) {
+                maxThread = 1;
+            } else if (globalProperties.get(JMSEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME) != null) {
                 maxThread = Integer.parseInt(globalProperties.get(
                         JMSEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME));
             } else {
@@ -96,6 +103,7 @@ public class JMSEventAdapter implements OutputEventAdapter {
 
             executorService = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime, TimeUnit.MILLISECONDS,
                     new LinkedBlockingQueue<Runnable>(jobQueSize));
+
         }
 
     }
@@ -106,11 +114,11 @@ public class JMSEventAdapter implements OutputEventAdapter {
         try {
             Hashtable<String, String> adaptorProperties = new Hashtable<String, String>();
             adaptorProperties.putAll(eventAdapterConfiguration.getStaticProperties());
-            JMSConnectionFactory jmsConnectionFactory = new JMSConnectionFactory(adaptorProperties, eventAdapterConfiguration.getName());
-            Connection connection = jmsConnectionFactory.getConnection();
+            JMSConnectionFactory jmsConnectionFactory = new JMSConnectionFactory(adaptorProperties, eventAdapterConfiguration.getName(), adaptorProperties.get(JMSEventAdapterConstants.ADAPTER_JMS_DESTINATION), 1);
+            Connection connection = jmsConnectionFactory.createConnection();
             connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             connection.close();
-            jmsConnectionFactory.stop();
+            jmsConnectionFactory.close();
         } catch (Exception e) {
             throw new OutputEventAdapterRuntimeException(e);
         }
@@ -130,21 +138,19 @@ public class JMSEventAdapter implements OutputEventAdapter {
     @Override
     public void publish(Object message, Map<String, String> dynamicProperties) {
 
-        Message jmsMessage = publisherDetails.getJmsMessageSender().convertToJMSMessage(message,
-                publisherDetails.getMessageConfig());
-        setJMSTransportHeaders(jmsMessage, dynamicProperties.get(JMSEventAdapterConstants.ADAPTER_JMS_HEADER));
         try {
-            executorService.submit(new JMSSender(jmsMessage));
+            executorService.submit(new JMSSender(message, dynamicProperties));
         } catch (RejectedExecutionException e) {
             EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
         }
     }
 
+
     @Override
     public void disconnect() {
         if (publisherDetails != null) {
             publisherDetails.getJmsMessageSender().close();
-            publisherDetails.getJmsConnectionFactory().stop();
+            publisherDetails.getJmsConnectionFactory().close();
         }
     }
 
@@ -165,42 +171,26 @@ public class JMSEventAdapter implements OutputEventAdapter {
         PublisherDetails publisherDetails;
         Hashtable<String, String> adaptorProperties =
                 convertMapToHashTable(outputEventAdaptorConfiguration.getStaticProperties());
-        JMSConnectionFactory jmsConnectionFactory = new JMSConnectionFactory(adaptorProperties, outputEventAdaptorConfiguration.getName());
-        JMSMessageSender jmsMessageSender = new JMSMessageSender(jmsConnectionFactory, messageConfig);
+
+        int maxConnections;
+        if (JMSEventAdapterConstants.ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS_NOT_ALLOWED.equals(
+            eventAdapterConfiguration.getStaticProperties().get(JMSEventAdapterConstants.ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS))) {
+            maxConnections = 1;
+        } else if (globalProperties.get(JMSEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME) != null) {
+            maxConnections = Integer.parseInt(globalProperties.get(
+                    JMSEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME));
+        } else {
+            maxConnections = JMSEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE;
+        }
+
+        JMSConnectionFactory jmsConnectionFactory = new JMSConnectionFactory(adaptorProperties, outputEventAdaptorConfiguration.getName(), messageConfig.get(JMSEventAdapterConstants.ADAPTER_JMS_DESTINATION), maxConnections);
+        JMSMessageSender jmsMessageSender = new JMSMessageSender(jmsConnectionFactory);
         publisherDetails = new PublisherDetails(jmsConnectionFactory, jmsMessageSender, messageConfig);
 
         return publisherDetails;
     }
 
-    private Message setJMSTransportHeaders(Message message, String headerProperty) {
-
-        Map<String, String> messageConfiguration = new HashMap<String, String>();
-
-        if (headerProperty != null && message != null) {
-            String[] headers = headerProperty.split(JMSEventAdapterConstants.HEADER_SEPARATOR);
-
-            if (headers != null && headers.length > 0) {
-                for (String header : headers) {
-                    try {
-                        String[] headerPropertyWithValue = header.split(JMSEventAdapterConstants.ENTRY_SEPARATOR, 2);
-                        messageConfiguration.put(headerPropertyWithValue[0], headerPropertyWithValue[1]);
-                    } catch (Exception e) {
-                        log.warn("Header property \" " + header + " \" is not defined in the correct format", e);
-                    }
-                }
-            }
-
-            try {
-                return JMSUtils.setTransportHeaders(messageConfiguration, message);
-            } catch (JMSException e) {
-                throw new OutputEventAdapterRuntimeException(e);
-            }
-        }
-
-        return message;
-    }
-
-    class PublisherDetails {
+    public static class PublisherDetails {
         private final JMSConnectionFactory jmsConnectionFactory;
         private final JMSMessageSender jmsMessageSender;
         private final Map<String, String> messageConfig;
@@ -244,16 +234,18 @@ public class JMSEventAdapter implements OutputEventAdapter {
 
     public class JMSSender implements Runnable {
 
-        private Message jmsMessage;
+        private Object jmsMessage;
+        private Map<String, String> dynamicProperties;
 
-        public JMSSender(Message jmsMessage) {
+        public JMSSender(Object jmsMessage, Map<String, String> dynamicProperties) {
             this.jmsMessage = jmsMessage;
+            this.dynamicProperties = dynamicProperties;
 
         }
 
         @Override
         public void run() {
-            publisherDetails.getJmsMessageSender().send(jmsMessage, publisherDetails.getMessageConfig());
+            publisherDetails.getJmsMessageSender().send(jmsMessage, publisherDetails, dynamicProperties.get(JMSEventAdapterConstants.ADAPTER_JMS_HEADER));
         }
     }
 

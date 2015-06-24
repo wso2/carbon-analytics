@@ -33,6 +33,10 @@ public class JMSEventAdapterConstants {
     public static final String ADAPTER_JMS_DESTINATION_TYPE = "transport.jms.DestinationType";
     public static final String ADAPTER_JMS_DESTINATION_TYPE_HINT = "transport.jms.DestinationType.hint";
     public static final String ADAPTER_JMS_DESTINATION = "transport.jms.Destination";
+    public static final String ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS = "transport.jms.ConcurrentPublishers";
+    public static final String ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS_HINT = "transport.jms.ConcurrentPublishers.hint";
+    public static final String ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS_ALLOWED = "allow";
+    public static final String ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS_NOT_ALLOWED = "disallow";
     public static final String ADAPTER_JMS_HEADER = "transport.jms.Header";
     public static final String ADAPTER_JMS_HEADER_HINT = "transport.jms.Header.Hint";
     public static final long DEFAULT_KEEP_ALIVE_TIME_IN_MILLIS = 20000;
