@@ -49,6 +49,7 @@
                     table.setAnalyticsTableRecords(tableColumns);
                 }
                 table.setPersist(schema.getPersist());
+                table.setRecordStoreName(schema.getRecordStoreName());
                 responseText = new Gson().toJson(table);
             }
         } catch (Exception e) {
