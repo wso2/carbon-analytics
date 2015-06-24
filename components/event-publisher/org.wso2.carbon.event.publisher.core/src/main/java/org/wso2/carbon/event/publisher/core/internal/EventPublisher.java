@@ -160,8 +160,6 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
                 long lastProcessedTime = EventPublisherServiceValueHolder.getEventManagementService().getLatestEventSentTime(
                         eventPublisherConfiguration.getEventPublisherName(), tenantId);
 
-                log.info("in event: " + currentTime + "\nfrom map: " + lastProcessedTime);
-
                 while (!eventQueue.isEmpty() && eventQueue.peek().getTimestampInMilies() <= lastProcessedTime) {
                     eventQueue.remove();
                 }
