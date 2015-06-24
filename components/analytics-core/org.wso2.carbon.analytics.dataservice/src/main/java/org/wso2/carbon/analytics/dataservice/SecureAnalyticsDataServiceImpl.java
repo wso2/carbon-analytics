@@ -19,6 +19,7 @@ package org.wso2.carbon.analytics.dataservice;
 
 import org.wso2.carbon.analytics.dataservice.commons.*;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsIndexException;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
@@ -28,7 +29,6 @@ import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTimeoutEx
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -175,9 +175,8 @@ public class SecureAnalyticsDataServiceImpl implements SecureAnalyticsDataServic
     }
 
     @Override
-    public Iterator<Record> readRecords(String recordStoreName, RecordGroup recordGroup) throws AnalyticsException {
-        // TODO Auto-generated method stub
-        return null;
+    public AnalyticsIterator<Record> readRecords(String recordStoreName, RecordGroup recordGroup) throws AnalyticsException {
+       return analyticsDataService.readRecords(recordStoreName, recordGroup);
     }
 
     @Override
