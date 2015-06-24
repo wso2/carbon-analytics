@@ -75,9 +75,9 @@ public class JSONOutputMapper implements OutputMapper {
 
         mappingTextList.clear();
         while (text.contains(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) && text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) > 0) {
-            mappingTextList.add(text.substring(0, text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) - 1));
+            mappingTextList.add(text.substring(0, text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX)));
             mappingTextList.add(text.substring(text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) + 2, text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX)));
-            text = text.substring(text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) + 3);
+            text = text.substring(text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) + 2);
         }
         mappingTextList.add(text);
         this.mappingTextList = mappingTextList;
@@ -91,13 +91,13 @@ public class JSONOutputMapper implements OutputMapper {
             if (i % 2 == 0) {
                 eventText.append(mappingTextList.get(i));
             } else {
-                String propertyValue = getPropertyValue(event.getData(), mappingTextList.get(i));
-                if (propertyValue == null) {
-                    eventText.append(propertyValue);
-                } else {
+                Object propertyValue = getPropertyValue(event.getData(), mappingTextList.get(i));
+                if (propertyValue!=null && propertyValue instanceof String) {
                     eventText.append(EventPublisherConstants.DOUBLE_QUOTE)
                             .append(propertyValue)
                             .append(EventPublisherConstants.DOUBLE_QUOTE);
+                } else {
+                    eventText.append(propertyValue);
                 }
             }
         }
@@ -139,13 +139,10 @@ public class JSONOutputMapper implements OutputMapper {
 
     }
 
-    private String getPropertyValue(Object[] eventData, String mappingProperty) {
+    private Object getPropertyValue(Object[] eventData, String mappingProperty) {
         if (eventData.length != 0) {
             int position = propertyPositionMap.get(mappingProperty);
-            Object data = eventData[position];
-            if (data != null) {
-                return data.toString();
-            }
+            return eventData[position];
         }
         return null;
     }
@@ -171,7 +168,12 @@ public class JSONOutputMapper implements OutputMapper {
         }
 
         jsonEventObject.add(EventPublisherConstants.EVENT_PARENT_TAG, innerParentObject);
-        setMappingTextList(jsonEventObject.toString());
+
+        String defaultMapping = jsonEventObject.toString();
+        defaultMapping = defaultMapping.replaceAll("\"\\{\\{", "{{");
+        defaultMapping = defaultMapping.replaceAll("\\}\\}\"", "}}");
+
+        setMappingTextList(defaultMapping);
 
     }
 

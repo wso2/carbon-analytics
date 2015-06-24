@@ -115,9 +115,9 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
             this.statisticsMonitor = EventPublisherServiceValueHolder.getEventStatisticsService().getEventStatisticMonitor(tenantId, EventPublisherConstants.EVENT_PUBLISHER, eventPublisherConfiguration.getEventPublisherName(), null);
         }
         if (traceEnabled) {
-            this.beforeTracerPrefix = "TenantId : " + tenantId + ", " + EventPublisherConstants.EVENT_PUBLISHER + " : " + eventPublisherConfiguration.getFromStreamName() +", "+ EventPublisherConstants.EVENT_STREAM + " : "
-                    + EventPublisherUtil.getImportedStreamIdFrom(eventPublisherConfiguration) +  ", before processing " + System.getProperty("line.separator");
-            this.afterTracerPrefix = "TenantId : " + tenantId + ", " + EventPublisherConstants.EVENT_PUBLISHER + " : " + eventPublisherConfiguration.getFromStreamName() +  ", after processing " + System.getProperty("line.separator");
+            this.beforeTracerPrefix = "TenantId : " + tenantId + ", " + EventPublisherConstants.EVENT_PUBLISHER + " : " + eventPublisherConfiguration.getFromStreamName() + ", " + EventPublisherConstants.EVENT_STREAM + " : "
+                    + EventPublisherUtil.getImportedStreamIdFrom(eventPublisherConfiguration) + ", before processing " + System.getProperty("line.separator");
+            this.afterTracerPrefix = "TenantId : " + tenantId + ", " + EventPublisherConstants.EVENT_PUBLISHER + " : " + eventPublisherConfiguration.getFromStreamName() + ", after processing " + System.getProperty("line.separator");
         }
 
         OutputEventAdapterService eventAdapterService = EventPublisherServiceValueHolder.getOutputEventAdapterService();
@@ -149,8 +149,8 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
             process(event);
         }
 
-        if(EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode() == Mode.HA){
-            if(!isPolled && EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()){
+        if (EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode() == Mode.HA) {
+            if (!isPolled && EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()) {
                 //add to Queue
                 long currentTime = EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMillis();
                 EventWrapper eventWrapper = new EventWrapper(event, currentTime);
@@ -164,15 +164,15 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
                     eventQueue.remove();
                 }
 
-            }else if(!isPolled && !EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()){
+            } else if (!isPolled && !EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()) {
                 //is queue not empty send events from last time
                 long currentTime = EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMillis();
-                if(!eventQueue.isEmpty()) {
+                if (!eventQueue.isEmpty()) {
                     long lastProcessedTime = EventPublisherServiceValueHolder.getEventManagementService().getLatestEventSentTime(
                             eventPublisherConfiguration.getEventPublisherName(), tenantId);
                     while (!eventQueue.isEmpty()) {
                         EventWrapper eventWrapper = eventQueue.poll();
-                        if(eventWrapper.getTimestampInMilies() > lastProcessedTime){
+                        if (eventWrapper.getTimestampInMilies() > lastProcessedTime) {
                             process(eventWrapper.getEvent());
                         }
                     }
@@ -217,7 +217,7 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
 
     @Override
     public void consumeEvents(Event[] events) {
-        for(Event event:events){
+        for (Event event : events) {
             sendEvent(event);
         }
     }
@@ -295,7 +295,7 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
                 outObject = outputMapper.convertToTypedInputEvent(event);
             }
         } catch (EventPublisherConfigurationException e) {
-            log.error("Cannot send " + event + " from " + eventPublisherConfiguration.getEventPublisherName());
+            log.error("Cannot send " + event + " from " + eventPublisherConfiguration.getEventPublisherName(), e);
             return;
         }
 
@@ -317,27 +317,29 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
         return streamDefinition;
     }
 
-    public void prepareDestroy(){
-        if(EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode() == Mode.HA) {
+    public void prepareDestroy() {
+        if (EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode() == Mode.HA) {
             EventPublisherServiceValueHolder.getEventManagementService().updateLatestEventSentTime(
                     eventPublisherConfiguration.getEventPublisherName(), tenantId,
                     EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMillis());
         }
     }
 
-    public class EventWrapper{
+    public class EventWrapper {
 
         private Event event;
         private long timestampInMilies;
 
-        public EventWrapper(Event event, long timestamp){
+        public EventWrapper(Event event, long timestamp) {
             this.event = event;
             this.timestampInMilies = timestamp;
         }
-        public Event getEvent(){
+
+        public Event getEvent() {
             return event;
         }
-        public long getTimestampInMilies(){
+
+        public long getTimestampInMilies() {
             return timestampInMilies;
         }
     }
