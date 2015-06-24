@@ -48,6 +48,7 @@ import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsRelationProvider;
 import org.wso2.carbon.analytics.spark.core.util.master.AnalyticsStandaloneRecoveryModeFactory;
+import org.wso2.carbon.analytics.spark.core.util.master.StartWorkerExecutionCall;
 import org.wso2.carbon.utils.CarbonUtils;
 import scala.None$;
 import scala.Option;
@@ -61,6 +62,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -105,7 +107,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private static final String CARBON_ANALYTICS_SPARK_APP_NAME = "CarbonAnalytics";
 
-    private static final String WORKER_CORES = "1";
+    private static final int WORKER_CORES = 1;
 
     private static final String WORKER_MEMORY = "1g";
 
@@ -147,6 +149,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private Set<LeaderElectable> leaderElectable = new HashSet<>();
 
+    private AnalyticsClusterManager acm;
+
     private Object workerActorSystem;
     private Object masterActorSystem;
 
@@ -160,87 +164,64 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         this.portOffset = portOffset;
         this.udfConfiguration = this.loadUDFConfiguration();
 
-        this.propertiesMap = loadCarbonSparkProperties(confPath + File.separator +
-                                                       AnalyticsConstants.SPARK_DEFAULTS_PATH);
-
-        if (this.propertiesMap.get(AnalyticsConstants.CARBON_SPARK_CLIENT_MODE) != null) {
-            this.clientMode = Boolean.parseBoolean(this.propertiesMap.get(
+        Map<String, String> propertiesMap = loadCarbonSparkProperties(confPath + File.separator +
+                                                                      AnalyticsConstants.SPARK_DEFAULTS_PATH);
+        if (propertiesMap.get(AnalyticsConstants.CARBON_SPARK_CLIENT_MODE) != null) {
+            this.clientMode = Boolean.parseBoolean(propertiesMap.get(
                     AnalyticsConstants.CARBON_SPARK_CLIENT_MODE));
         }
-
-        if (this.propertiesMap.get(AnalyticsConstants.CARBON_SPARK_MASTER_COUNT) != null) {
-            this.masterCount = Integer.parseInt(this.propertiesMap.get(
+        if (propertiesMap.get(AnalyticsConstants.CARBON_SPARK_MASTER_COUNT) != null) {
+            this.masterCount = Integer.parseInt(propertiesMap.get(
                     AnalyticsConstants.CARBON_SPARK_MASTER_COUNT));
         }
 
         if (!clientMode) {
-            // using carbon clustering for spark
-            AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
+            log.info("Using Carbon clustering for Spark");
+            this.acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
             if (acm.isClusteringEnabled()) {
                 // if clustering enabled, use the ACM
                 this.membershipNumber = acm.joinGroup(CLUSTER_GROUP_NAME, this);
                 log.info("Member joined the cluster with MEMBERSHIP NUMBER : " + this.membershipNumber);
 
-                /**
-                 * if memNum < m count,
-                 *      init master
-                 *      register the master url in the ACM
-                 *      in the recovery factory --> LE agent --> register the LE in the SparkEx
-                 *      if leader --> call elected leader in the LE
-                 *
-                 * else
-                 *      if member in the ACM set,
-                 *          init master
-                 *      init worker
-                 *
-                 */
                 String propsFile = confPath + File.separator
                                    + AnalyticsConstants.SPARK_DEFAULTS_PATH;
 
-                initSparkConf(this.myHost, BASE_MASTER_PORT, this.portOffset,
-                              CARBON_ANALYTICS_SPARK_APP_NAME);
+                this.sparkConf = initSparkConf(this.myHost, BASE_MASTER_PORT, this.portOffset,
+                                               CARBON_ANALYTICS_SPARK_APP_NAME, propsFile);
 
                 if (this.membershipNumber < this.masterCount) {
                     // start master and register the master URL in an ACM property
-                    String masterURL = startMaster(this.myHost, BASE_MASTER_PORT, BASE_WEBUI_PORT,
-                                                   propsFile, this.sparkConf, this.portOffset);
-                    acm.setProperty(CLUSTER_GROUP_NAME, MASTER_URL_PROP + "_" + this.membershipNumber
-                            , masterURL);
+                    log.info("Members are less than the REDUNDANT MASTER COUNT");
+                    startMaster();
 
                 } else if (this.membershipNumber == this.masterCount) {
+                    log.info("Members are equal to the REDUNDANT MASTER COUNT");
                     // start master and register the master URL in an ACM property
-                    String masterURL = startMaster(this.myHost, BASE_MASTER_PORT, BASE_WEBUI_PORT,
-                                                   propsFile, this.sparkConf, this.portOffset);
-                    acm.setProperty(CLUSTER_GROUP_NAME, MASTER_URL_PROP + "_" + this.membershipNumber
-                            , masterURL);
-
+                    startMaster();
                     // creating masters are done! send a cluster message to all masters to start workers
-                    // todo: send a cluster message to masters to start workers
+
+                    // send a cluster message to masters to start workers
+                    log.info("Sending a message to masters to start workers");
+                    this.acm.executeAll(CLUSTER_GROUP_NAME, new StartWorkerExecutionCall());
                 } else {
                     Utils.loadDefaultSparkProperties(this.sparkConf, propsFile);
 
                     int masterPort = BASE_MASTER_PORT + this.portOffset;
                     if (System.getProperty(AnalyticsConstants.SPARK_MASTER_PORT) != null) {
                         masterPort = Integer.parseInt(System.getProperty(AnalyticsConstants.SPARK_MASTER_PORT)
-                        + this.portOffset);
+                                                      + this.portOffset);
                     }
                     String thisMasterURL = "spark://" + this.myHost + ":" + masterPort;
 
-                    List<String> masterURLs = new ArrayList<>();
-                    for (int i = 1; i <= this.masterCount; i++) {
-                        String url = (String) acm.getProperty(CLUSTER_GROUP_NAME, MASTER_URL_PROP + "_" + i);
-                        if (url != null) {
-                            masterURLs.add(url);
-                        }
-                    }
+                    String[] masterURLs = this.getSparkMastersFromCluster(acm);
 
                     // if it was a previous master, start master
-                    if (masterURLs.contains(thisMasterURL)){
-                        thisMasterURL = startMaster(this.myHost, BASE_MASTER_PORT, BASE_WEBUI_PORT,
-                                                    propsFile, this.sparkConf, this.portOffset);
+                    if (Arrays.asList(masterURLs).contains(thisMasterURL)) {
+                        startMaster(this.myHost, BASE_MASTER_PORT, BASE_WEBUI_PORT,
+                                    this.sparkConf, this.acm);
                     }
 
-                    //todo: startWorker();
+                    //start Worker;
                     startWorker();
 
                     // todo: initClient (); in the active leader using a cluster message
@@ -253,7 +234,20 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             }
         } else {
             //clients points to an external spark master and makes the spark conf accordingly
+            log.info("Client mode enabled for Spark");
+            log.info("Starting SPARK CLIENT pointing to an external Spark Cluster");
         }
+    }
+
+    private String[] getSparkMastersFromCluster(AnalyticsClusterManager acm) {
+        List<String> masters = new ArrayList<>(this.masterCount);
+        for (int i = 1; i <= this.masterCount; i++) {
+            String url = (String) acm.getProperty(CLUSTER_GROUP_NAME, MASTER_URL_PROP + "_" + i);
+            if (url != null) {
+                masters.add(url);
+            }
+        }
+        return masters.toArray(new String[masters.size()]);
     }
 
     private UDFConfiguration loadUDFConfiguration() throws AnalyticsException {
@@ -326,46 +320,54 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
 
     /**
-     * this method starts a spark master with a given parameters. it reads the spark defaults from
-     * the given properties file and override parameters accordingly. it also adds the port offset
-     * to all the port configurations
+     * this method starts a spark master with a given parameters.
      *
      * @param host
      * @param port
      * @param webUIport
      * @param propsFile
      * @param sc
-     * @param portOffset
+     * @param acm
      * @return
      */
-    private String startMaster(String host, int port, int webUIport, String propsFile,
-                               SparkConf sc, int portOffset) {
-
-        log.info("Spark defaults loaded from " + propsFile);
-        // this will read configs from the file and export as system props
-        // NOTE: if properties are mentioned in the file, they take precedence over the defaults, except spark masterURL
-        Utils.loadDefaultSparkProperties(sc, propsFile);
-
-        sparkPropertiesWithPortOffset(sc, portOffset);
+    private void startMaster(String host, int port, int webUIport, SparkConf sc,
+                             AnalyticsClusterManager acm) {
+        log.info("Starting SPARK MASTER");
 
         if (System.getProperty(AnalyticsConstants.SPARK_MASTER_PORT) != null) {
             port = Integer.parseInt(System.getProperty(AnalyticsConstants.SPARK_MASTER_PORT));
         }
 
-        String masterURL = "spark://" + host + ":" + port;
-
-        sc.setMaster(masterURL);
-        // spark master ie explicitly set here because, when we are reading the data from the
+        // spark master is explicitly set here because, when we are reading the data from the
         // spark defaults file, it might have a master port. so, this overrides the spark master url
+        String masterURL = "spark://" + host + ":" + port;
+        sc.setMaster(masterURL);
 
         if (System.getProperty(AnalyticsConstants.SPARK_MASTER_WEBUI_PORT) != null) {
             webUIport = Integer.parseInt(System.getProperty(AnalyticsConstants.SPARK_MASTER_WEBUI_PORT));
         }
 
-        log.info("Starting MASTER in " + masterURL + " with webUI port : " + webUIport);
         this.masterActorSystem = Master.startSystemAndActor(host, port, webUIport, sc)._1();
+        log.info("Started SPARK MASTER in " + masterURL + " with webUI port : " + webUIport);
 
-        return masterURL;
+        acm.setProperty(CLUSTER_GROUP_NAME, MASTER_URL_PROP + "_" + this.membershipNumber
+                , masterURL);
+
+        updateMaster(acm, sc);
+    }
+
+    public void startMaster() {
+        this.startMaster(this.myHost, BASE_MASTER_PORT, BASE_WEBUI_PORT,
+                         this.sparkConf, this.acm);
+    }
+
+    private void updateMaster(AnalyticsClusterManager acm, SparkConf sc) {
+        String[] masters = getSparkMastersFromCluster(acm);
+        String url = "spark://";
+        for (String master : masters) {
+            url = url + "," + master.replace("spark://", "");
+        }
+        sc.setMaster(url);
     }
 
     /**
@@ -390,40 +392,87 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
             }
         }
     }
-    private void startWorker(){
-        System.out.println("##################### start worker ");
+
+    /**
+     * this starts a worker with given parameters. it reads the spark defaults from
+     * the given properties file and override parameters accordingly. it also adds the port offset
+     * to all the port configurations
+     *
+     * @param workerHost
+     * @param workerPort
+     * @param workerUiPort
+     * @param workerCores
+     * @param workerMemory
+     * @param workerDir
+     * @param masters
+     * @param sc
+     */
+    private void startWorker(String workerHost,
+                             int workerPort,
+                             int workerUiPort,
+                             int workerCores,
+                             String workerMemory,
+                             String[] masters,
+                             String workerDir,
+                             SparkConf sc) {
+
+        log.info("Starting SPARK WORKER");
+
+        //check worker port prop
+        if (System.getProperty(AnalyticsConstants.SPARK_WORKER_PORT) != null) {
+            workerPort = Integer.parseInt(System.getProperty(AnalyticsConstants.SPARK_WORKER_PORT));
+        }
+        //check worker web ui port prop
+        if (System.getProperty(AnalyticsConstants.SPARK_WORKER_WEBUI_PORT) != null) {
+            workerUiPort = Integer.parseInt(System.getProperty(AnalyticsConstants.SPARK_WORKER_WEBUI_PORT));
+        }
+        //check worker cores prop
+        if (System.getProperty(AnalyticsConstants.SPARK_WORKER_CORES) != null) {
+            workerCores = Integer.parseInt(System.getProperty(AnalyticsConstants.SPARK_WORKER_CORES));
+        }
+        //check worker mem prop
+        if (System.getProperty(AnalyticsConstants.SPARK_WORKER_MEMORY) != null) {
+            workerMemory = System.getProperty(AnalyticsConstants.SPARK_WORKER_MEMORY);
+        }
+        //check worker dir prop
+        if (System.getProperty(AnalyticsConstants.SPARK_WORKER_DIR) != null) {
+            workerDir = System.getProperty(AnalyticsConstants.SPARK_WORKER_DIR);
+        }
+
+        this.workerActorSystem = Worker.startSystemAndActor(workerHost,
+                                                            workerPort,
+                                                            workerUiPort,
+                                                            workerCores,
+                                                            Utils.memoryStringToMb(workerMemory),
+                                                            masters,
+                                                            workerDir,
+                                                            (Option) None$.MODULE$,
+                                                            sc)._1();
+
+        log.info("Started SPARK WORKER in " + workerHost + ":" + workerPort + " with webUI port "
+                 + workerUiPort
+                 + " with Masters " + Arrays.toString(masters));
+
     }
 
-
-    private void startWorker(String workerHost, String masterHost, String masterPort,
-                             String workerPort,
-                             String workerUiPort, String workerCores, String workerMemory,
-                             String workerDir,
-                             String propFile, SparkConf sc) {
-        String master = "spark://" + masterHost + ":" + masterPort;
-        String[] argsArray = new String[]{master,
-                                          "-h", workerHost,
-                                          "-p", workerPort,
-                                          "--webui-port", workerUiPort,
-                                          "-c", workerCores,
-                                          "-m", workerMemory,
-                                          "-d", workerDir,
-                                          "--properties-file", propFile //CarbonUtils.getCarbonHome() + File.separator + AnalyticsConstants.SPARK_DEFAULTS_PATH
-        };
-        WorkerArguments args = new WorkerArguments(argsArray, this.sparkConf);
-        this.workerActorSystem = Worker.startSystemAndActor(args.host(), args.port(), args.webUiPort(),
-                                                            args.cores(), args.memory(), args.masters(),
-                                                            args.workDir(), (Option) None$.MODULE$, sc)._1();
+    public void startWorker(){
+        this.startWorker(this.myHost, BASE_WORKER_PORT, BASE_WORKER_UI_PORT, WORKER_CORES,
+                         WORKER_MEMORY, this.getSparkMastersFromCluster(this.acm), WORK_DIR, this.sparkConf);
     }
 
     /**
      * this method initializes spark conf with default properties
+     * it also reads the spark defaults from
+     * the given properties file and override parameters accordingly. it also adds the port offset
+     * to all the port configurations
+     *
      * @param masterHost
      * @param masterPort
      * @param portOffset
      * @param appName
      */
-    private void initSparkConf(String masterHost, int masterPort, int portOffset, String appName) {
+    private SparkConf initSparkConf(String masterHost, int masterPort, int portOffset,
+                                    String appName, String propsFile) {
         SparkConf conf = new SparkConf();
         // setting defaults for analytics
         conf.setIfMissing(AnalyticsConstants.SPARK_MASTER, "spark://" + masterHost + ":" + (masterPort + portOffset));
@@ -436,7 +485,13 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         conf.setIfMissing("spark.driver.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
         conf.set(AnalyticsConstants.CARBON_TENANT_ID, String.valueOf(SPARK_TENANT));
 
-        this.sparkConf = conf;
+        log.info("Spark defaults loaded from " + propsFile);
+        // this will read configs from the file and export as system props
+        // NOTE: if properties are mentioned in the file, they take precedence over the defaults, except spark masterURL
+        Utils.loadDefaultSparkProperties(conf, propsFile);
+        sparkPropertiesWithPortOffset(conf, portOffset);
+
+        return conf;
     }
 
     private void validateSparkScriptPathPermission() {
@@ -621,6 +676,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     @Override
     public void onBecomingLeader() {
         System.out.println("############### became the leader : ");
+        for(LeaderElectable le: leaderElectable){
+            le.electedLeader();
+        }
 //        String propsFile = CarbonUtils.getCarbonHome() + File.separator
 //                           + AnalyticsConstants.SPARK_DEFAULTS_PATH;
 //        Utils.loadDefaultSparkProperties(new SparkConf(), propsFile);
@@ -767,10 +825,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private int addLeaderElectable(LeaderElectable le) {
         this.leaderElectable.add(le);
         return (leaderElectable.size());
-    }
-
-    private Set<LeaderElectable> getLeaderElectable() {
-        return leaderElectable;
     }
 
     public void processLeaderElectable(LeaderElectable le) {
