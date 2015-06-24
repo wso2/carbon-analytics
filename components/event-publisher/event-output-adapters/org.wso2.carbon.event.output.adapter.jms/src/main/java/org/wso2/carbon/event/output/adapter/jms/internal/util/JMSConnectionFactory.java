@@ -76,7 +76,7 @@ public class JMSConnectionFactory {
         this.name = name;
         this.destinationName = destination;
 
-        if (maxConcurrentConnections > 1) {
+        if (maxConcurrentConnections > 0) {
             this.maxConnections = maxConcurrentConnections;
         }
 

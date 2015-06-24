@@ -67,14 +67,20 @@ public class JMSEventAdapter implements OutputEventAdapter {
             int jobQueSize;
 
             //If global properties are available those will be assigned else constant values will be assigned
-            if (globalProperties.get(JMSEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE_NAME) != null) {
+            if (JMSEventAdapterConstants.ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS_NOT_ALLOWED.equals(
+                    eventAdapterConfiguration.getStaticProperties().get(JMSEventAdapterConstants.ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS)) ) {
+                minThread = 1;
+            } else if (globalProperties.get(JMSEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE_NAME) != null) {
                 minThread = Integer.parseInt(globalProperties.get(
                         JMSEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE_NAME));
             } else {
                 minThread = JMSEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE;
             }
 
-            if (globalProperties.get(JMSEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME) != null) {
+            if (JMSEventAdapterConstants.ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS_NOT_ALLOWED.equals(
+                    eventAdapterConfiguration.getStaticProperties().get(JMSEventAdapterConstants.ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS))) {
+                maxThread = 1;
+            } else if (globalProperties.get(JMSEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME) != null) {
                 maxThread = Integer.parseInt(globalProperties.get(
                         JMSEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME));
             } else {
@@ -167,7 +173,10 @@ public class JMSEventAdapter implements OutputEventAdapter {
                 convertMapToHashTable(outputEventAdaptorConfiguration.getStaticProperties());
 
         int maxConnections;
-        if (globalProperties.get(JMSEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME) != null) {
+        if (JMSEventAdapterConstants.ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS_NOT_ALLOWED.equals(
+            eventAdapterConfiguration.getStaticProperties().get(JMSEventAdapterConstants.ADAPTER_JMS_ALLOW_CONCURRENT_CONNECTIONS))) {
+            maxConnections = 1;
+        } else if (globalProperties.get(JMSEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME) != null) {
             maxConnections = Integer.parseInt(globalProperties.get(
                     JMSEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME));
         } else {
