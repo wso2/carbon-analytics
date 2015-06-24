@@ -46,6 +46,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CarbonEventReceiverService implements EventReceiverService {
 
@@ -279,7 +280,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
     public void addEventReceiverConfigurationFile(EventReceiverConfigurationFile eventReceiverConfigurationFile, int tenantId) {
         List<EventReceiverConfigurationFile> eventReceiverConfigurationFiles = tenantSpecificEventReceiverConfigurationFileMap.get(tenantId);
         if (eventReceiverConfigurationFiles == null) {
-            eventReceiverConfigurationFiles = new ArrayList<EventReceiverConfigurationFile>();
+            eventReceiverConfigurationFiles = new CopyOnWriteArrayList<>();
         } else {
             for (EventReceiverConfigurationFile anEventReceiverConfigurationFileList : eventReceiverConfigurationFiles) {
                 if (anEventReceiverConfigurationFileList.getFileName().equals(eventReceiverConfigurationFile.getFileName())) {
