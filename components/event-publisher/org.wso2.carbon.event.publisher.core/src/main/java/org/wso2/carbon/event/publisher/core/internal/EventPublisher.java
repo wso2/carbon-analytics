@@ -152,7 +152,7 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
         if(EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode() == Mode.HA){
             if(!isPolled && EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()){
                 //add to Queue
-                long currentTime = EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMilies();
+                long currentTime = EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMillis();
                 EventWrapper eventWrapper = new EventWrapper(event, currentTime);
                 eventQueue.add(eventWrapper);
 
@@ -166,7 +166,7 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
 
             }else if(!isPolled && !EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()){
                 //is queue not empty send events from last time
-                long currentTime = EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMilies();
+                long currentTime = EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMillis();
                 if(!eventQueue.isEmpty()) {
                     long lastProcessedTime = EventPublisherServiceValueHolder.getEventManagementService().getLatestEventSentTime(
                             eventPublisherConfiguration.getEventPublisherName(), tenantId);
@@ -321,7 +321,7 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
         if(EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode() == Mode.HA) {
             EventPublisherServiceValueHolder.getEventManagementService().updateLatestEventSentTime(
                     eventPublisherConfiguration.getEventPublisherName(), tenantId,
-                    EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMilies());
+                    EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMillis());
         }
     }
 

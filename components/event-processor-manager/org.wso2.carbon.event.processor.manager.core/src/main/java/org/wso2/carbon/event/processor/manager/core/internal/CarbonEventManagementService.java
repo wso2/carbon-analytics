@@ -421,7 +421,7 @@ public class CarbonEventManagementService implements EventManagementService {
     }
 
     @Override
-    public long getClusterTimeInMilies(){
+    public long getClusterTimeInMillis(){
         return EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getClusterTime();
     }
 }

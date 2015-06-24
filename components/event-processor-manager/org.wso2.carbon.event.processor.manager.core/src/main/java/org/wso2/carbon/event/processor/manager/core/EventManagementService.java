@@ -39,6 +39,6 @@ public interface EventManagementService {
 
     public long getLatestEventSentTime(String publisherName, int tenantId);
 
-    public long getClusterTimeInMilies();
+    public long getClusterTimeInMillis();
 
 }
