@@ -32,8 +32,7 @@ import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 /**
  * @scr.component name="eventReceiverService.component" immediate="true"
@@ -62,11 +61,8 @@ import java.util.List;
 public class EventReceiverServiceDS {
     private static final Log log = LogFactory.getLog(EventReceiverServiceDS.class);
 
-    public static List<String> inputEventAdapterTypes = new ArrayList<String>();
-
     protected void activate(ComponentContext context) {
         try {
-
 
             CarbonEventReceiverService carbonEventReceiverService = new CarbonEventReceiverService();
             EventReceiverServiceValueHolder.registerEventReceiverService(carbonEventReceiverService);
@@ -89,6 +85,7 @@ public class EventReceiverServiceDS {
     }
 
     private void activateInactiveEventReceiverConfigurations(CarbonEventReceiverService carbonEventReceiverService) {
+        Set<String> inputEventAdapterTypes = EventReceiverServiceValueHolder.getInputEventAdapterTypes();
         inputEventAdapterTypes.addAll(EventReceiverServiceValueHolder.getInputEventAdapterService().getInputEventAdapterTypes());
         for (String type : inputEventAdapterTypes) {
             try {
@@ -97,7 +94,6 @@ public class EventReceiverServiceDS {
                 log.error(e.getMessage(), e);
             }
         }
-        inputEventAdapterTypes.clear();
     }
 
     protected void setInputEventAdapterService(InputEventAdapterService inputEventAdapterService) {
@@ -106,6 +102,7 @@ public class EventReceiverServiceDS {
 
     protected void unsetInputEventAdapterService(
             InputEventAdapterService inputEventAdapterService) {
+        EventReceiverServiceValueHolder.getInputEventAdapterTypes().clear();
         EventReceiverServiceValueHolder.registerInputEventAdapterService(null);
     }
 
@@ -145,21 +142,18 @@ public class EventReceiverServiceDS {
     }
 
     protected void setEventAdapterType(InputEventAdapterFactory inputEventAdapterFactory) {
-
+        EventReceiverServiceValueHolder.addInputEventAdapterType(inputEventAdapterFactory.getType());
         if (EventReceiverServiceValueHolder.getCarbonEventReceiverService() != null) {
             try {
                 EventReceiverServiceValueHolder.getCarbonEventReceiverService().activateInactiveEventReceiverConfigurationsForAdapter(inputEventAdapterFactory.getType());
             } catch (EventReceiverConfigurationException e) {
                 log.error(e.getMessage(), e);
             }
-        } else {
-            inputEventAdapterTypes.add(inputEventAdapterFactory.getType());
         }
-
     }
 
     protected void unSetEventAdapterType(InputEventAdapterFactory inputEventAdapterFactory) {
-
+        EventReceiverServiceValueHolder.removeInputEventAdapterType(inputEventAdapterFactory.getType());
         if (EventReceiverServiceValueHolder.getCarbonEventReceiverService() != null) {
             try {
                 EventReceiverServiceValueHolder.getCarbonEventReceiverService().deactivateActiveEventReceiverConfigurationsForAdapter(inputEventAdapterFactory.getType());
