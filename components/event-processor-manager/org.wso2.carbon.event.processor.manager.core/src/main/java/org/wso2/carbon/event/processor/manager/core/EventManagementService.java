@@ -35,5 +35,10 @@ public interface EventManagementService {
 
     public void unregisterEventSync(String syncId);
 
+    public void updateLatestEventSentTime(String publisherName, int tenantId, long timestamp);
+
+    public long getLatestEventSentTime(String publisherName, int tenantId);
+
+    public long getClusterTimeInMilies();
 
 }
