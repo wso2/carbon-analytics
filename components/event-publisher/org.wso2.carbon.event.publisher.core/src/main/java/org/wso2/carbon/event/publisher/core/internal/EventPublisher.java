@@ -31,6 +31,7 @@ import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherStreamValidationException;
 import org.wso2.carbon.event.publisher.core.internal.ds.EventPublisherServiceValueHolder;
+import org.wso2.carbon.event.publisher.core.internal.util.EventPublisherUtil;
 import org.wso2.carbon.event.statistics.EventStatisticsMonitor;
 import org.wso2.carbon.event.stream.core.SiddhiEventConsumer;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
@@ -42,12 +43,11 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
 
     private static final Log log = LogFactory.getLog(EventPublisher.class);
 
-    private static final String EVENT_TRACE_LOGGER = "EVENT_TRACE_LOGGER";
     private final boolean traceEnabled;
     private final boolean statisticsEnabled;
 
     List<String> dynamicMessagePropertyList = new ArrayList<String>();
-    private Logger trace = Logger.getLogger(EVENT_TRACE_LOGGER);
+    private Logger trace = Logger.getLogger(EventPublisherConstants.EVENT_TRACE_LOGGER);
     private EventPublisherConfiguration eventPublisherConfiguration = null;
     private int tenantId;
     private Map<String, Integer> propertyPositionMap = new TreeMap<String, Integer>();
@@ -62,6 +62,8 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
     private String syncId;
     private boolean sendToOther = false;
     private org.wso2.siddhi.query.api.definition.StreamDefinition streamDefinition;
+
+    private Queue<EventWrapper> eventQueue = new LinkedList<EventWrapper>();
 
 
     public EventPublisher(EventPublisherConfiguration eventPublisherConfiguration)
@@ -113,8 +115,9 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
             this.statisticsMonitor = EventPublisherServiceValueHolder.getEventStatisticsService().getEventStatisticMonitor(tenantId, EventPublisherConstants.EVENT_PUBLISHER, eventPublisherConfiguration.getEventPublisherName(), null);
         }
         if (traceEnabled) {
-            this.beforeTracerPrefix = "TenantId=" + tenantId + " : " + EventPublisherConstants.EVENT_PUBLISHER + " : " + eventPublisherConfiguration.getFromStreamName() + ", before processing " + System.getProperty("line.separator");
-            this.afterTracerPrefix = "TenantId=" + tenantId + " : " + EventPublisherConstants.EVENT_PUBLISHER + " : " + eventPublisherConfiguration.getFromStreamName() + ", after processing " + System.getProperty("line.separator");
+            this.beforeTracerPrefix = "TenantId : " + tenantId + ", " + EventPublisherConstants.EVENT_PUBLISHER + " : " + eventPublisherConfiguration.getFromStreamName() +", "+ EventPublisherConstants.EVENT_STREAM + " : "
+                    + EventPublisherUtil.getImportedStreamIdFrom(eventPublisherConfiguration) +  ", before processing " + System.getProperty("line.separator");
+            this.afterTracerPrefix = "TenantId : " + tenantId + ", " + EventPublisherConstants.EVENT_PUBLISHER + " : " + eventPublisherConfiguration.getFromStreamName() +  ", after processing " + System.getProperty("line.separator");
         }
 
         OutputEventAdapterService eventAdapterService = EventPublisherServiceValueHolder.getOutputEventAdapterService();
@@ -144,6 +147,33 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
         }
         if (isPolled || !EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()) {
             process(event);
+        }
+
+        if(EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode() == Mode.HA){
+            if(!isPolled && EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()){
+                //add to Queue
+                EventWrapper eventWrapper = new EventWrapper(event, EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMilies());
+                eventQueue.add(eventWrapper);
+
+                // get last processed time and remove old events from the queue
+                long timestamp = EventPublisherServiceValueHolder.getEventManagementService().getLatestEventSentTime(
+                        eventPublisherConfiguration.getEventPublisherName(), tenantId);
+
+                while (!eventQueue.isEmpty() && eventQueue.peek().getTimestampInMilies() <= timestamp) {
+                    eventQueue.remove();
+                }
+
+            }else if(!isPolled && !EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()){
+                //is queue not empty send events from last time
+                long timestamp = EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMilies();
+                if(!eventQueue.isEmpty()) {
+                    while (!eventQueue.isEmpty()) {
+                        process(eventQueue.poll().getEvent());
+                    }
+                }
+                EventPublisherServiceValueHolder.getEventManagementService().updateLatestEventSentTime(
+                        eventPublisherConfiguration.getEventPublisherName(), tenantId, timestamp);
+            }
         }
     }
 
@@ -279,5 +309,22 @@ public class EventPublisher implements SiddhiEventConsumer, EventSync {
     @Override
     public org.wso2.siddhi.query.api.definition.StreamDefinition getStreamDefinition() {
         return streamDefinition;
+    }
+
+    public class EventWrapper{
+
+        private Event event;
+        private long timestampInMilies;
+
+        public EventWrapper(Event event, long timestamp){
+            this.event = event;
+            this.timestampInMilies = timestamp;
+        }
+        public Event getEvent(){
+            return event;
+        }
+        public long getTimestampInMilies(){
+            return timestampInMilies;
+        }
     }
 }

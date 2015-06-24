@@ -73,6 +73,7 @@ public final class EventPublisherConstants {
     public static final String ENABLE_CONST = "enable";
     public static final String TM_VALUE_DISABLE = "disable";
     public static final String EVENT_PUBLISHER = "Event Publisher";
+    public static final String EVENT_STREAM = "Event Stream";
     public static final String STREAM_ID_SEPERATOR = ":";
     public static final String EF_CONFIG_FILE_EXTENSION_WITH_DOT = ".xml";
     public static final String EF_ATTR_CUSTOM_MAPPING = "customMapping";
@@ -98,6 +99,8 @@ public final class EventPublisherConstants {
 
     public static final String EF_ATTR_ENCRYPTED = "encrypted";
     public static final String DOUBLE_QUOTE = "\"";
+
+    public static final String EVENT_TRACE_LOGGER = "EVENT_TRACE_LOGGER";
 
 
     private EventPublisherConstants() {

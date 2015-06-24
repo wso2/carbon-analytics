@@ -122,10 +122,10 @@ public class InputAdapterRuntime implements InputEventAdapterListener {
                     timer.incrementPosition();
                     nextConnectionTime = System.currentTimeMillis() + timer.returnTimeToWait();
                     if (timer.returnTimeToWait() == 0) {
-                        log.error("Connection unavailable on " + name + " reconnecting.", connectionUnavailableException);
+                        log.error("Connection unavailable for Input Adopter '" + name + "' reconnecting.", connectionUnavailableException);
                         inputEventAdapter.connect();
                     } else {
-                        log.error("Connection unavailable on " + name + " . Reconnection will be retried in " + (timer.returnTimeToWait()) + " milliseconds.", connectionUnavailableException);
+                        log.error("Connection unavailable for Input Adopter '" + name + "' . Reconnection will be retried in " + (timer.returnTimeToWait()) + " milliseconds.", connectionUnavailableException);
                         executorService.execute(new Runnable() {
                             @Override
                             public void run() {

@@ -137,6 +137,7 @@
 
             AnalyticsTable analyticsTable = new AnalyticsTable();
             analyticsTable.setTableName(request.getParameter("eventStreamName"));
+            analyticsTable.setRecordStoreName(request.getParameter("recordStream"));
             analyticsTable.setStreamVersion(request.getParameter("eventStreamVersion"));
             analyticsTable.setPersist(Boolean.parseBoolean(request.getParameter("eventPersist")));
             analyticsTable.setAnalyticsTableRecords(

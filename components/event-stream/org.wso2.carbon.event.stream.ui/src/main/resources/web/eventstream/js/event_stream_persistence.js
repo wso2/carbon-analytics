@@ -219,6 +219,7 @@ function populateAnalyticsIndexTable(eventStreamName, eventStreamVersion) {
                 var currentPayloadCount = payloadIndexTable.rows.length;
 
                 document.getElementById('eventPersistCheckbox').checked = resultJson.persist;
+                document.getElementById('recordStoreSelect').value = resultJson.recordStoreName;
                 document.getElementById('attributeFieldSet').disabled = !resultJson.persist;
                 if (resultJson.analyticsTableRecords != null) {
                     jQuery.each(resultJson.analyticsTableRecords, function (index, element) {
