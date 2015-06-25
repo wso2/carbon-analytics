@@ -45,10 +45,10 @@ public class UDF8Adaptor implements UDF8 {
     }
 
     @Override
-    public Object call(Object o, Object o2, Object o3, Object o4, Object o5, Object o6, Object o7, Object o8) throws Exception {
+    public Object call(Object o, Object o2, Object o3, Object o4, Object o5, Object o6, Object o7,
+                       Object o8) throws Exception {
         Object udfInstance = udfClass.newInstance();
-        Method udfMethod = udfClass.getDeclaredMethod(udfMethodName, parameterTypes );
+        Method udfMethod = udfClass.getDeclaredMethod(udfMethodName, parameterTypes);
         return udfMethod.invoke(udfInstance, o, o2, o3, o4, o5, o6, o7, o8);
     }
-
 }

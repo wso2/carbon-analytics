@@ -50,5 +50,4 @@ public class UDF5Adaptor implements UDF5 {
         Method udfMethod = udfClass.getDeclaredMethod(udfMethodName, parameterTypes);
         return udfMethod.invoke(udfInstance, o, o2, o3, o4, o5);
     }
-
 }
