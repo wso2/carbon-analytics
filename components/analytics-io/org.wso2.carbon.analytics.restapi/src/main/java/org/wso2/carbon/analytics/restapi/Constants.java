@@ -92,5 +92,7 @@ public class Constants {
         public static final String DRILLDOWNRANGECOUNT = "rangecount";
 
         public static final String DRILLDOWNCATEGORIES = "facets";
+
+        public static final String RECORDSTORES = "recordstores";
     }
 }

@@ -144,12 +144,15 @@ public class AnalyticsResource extends AbstractResource {
 	@GET
 	@Path(Constants.ResourcePath.TABLE_EXISTS)
 	@Produces({ MediaType.APPLICATION_JSON })
-	public Response tableExists(@QueryParam("tableName")String tableName,
+	public Response tableExists(@QueryParam("table")String tableName,
                                 @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
             throws AnalyticsException {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Invoking listTables");
 		}
+        if (tableName == null) {
+            throw  new AnalyticsException("Query param 'table' is not provided");
+        }
         AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         String username = authenticate(authHeader);
         boolean tableExists = analyticsDataService.tableExists(username, tableName);
@@ -162,6 +165,33 @@ public class AnalyticsResource extends AbstractResource {
         }
         return handleResponse(ResponseStatus.SUCCESS,
                               "Table : " + tableName + " exists.");
+    }
+
+    /**
+     * Check if the given recordstore support pagination
+     * @return the response
+     * @throws AnalyticsException
+     */
+    @GET
+    @Path("pagination/{recordStoreName}")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response paginationSupported(@PathParam("recordStoreName") String recordStoreName,
+                                @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
+            throws AnalyticsException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Invoking paginationSupported");
+        }
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
+        boolean paginationSupported = analyticsDataService.isPaginationSupported(recordStoreName);
+        if (logger.isDebugEnabled()) {
+            logger.debug("pagination support for record store : " + recordStoreName + " : " + paginationSupported);
+        }
+        if (!paginationSupported) {
+            return handleResponse(ResponseStatus.NON_EXISTENT,
+                                  "RecordStore : " + recordStoreName + " does not support pagination.");
+        }
+        return handleResponse(ResponseStatus.SUCCESS,
+                              "RecordStore : " + recordStoreName + " support pagination.");
     }
 
 	/**
@@ -184,6 +214,54 @@ public class AnalyticsResource extends AbstractResource {
             logger.debug("Table List : " + tables);
         }
         return Response.ok(tables).build();
+    }
+
+    /**
+     * List all the record stores in the system.
+     * @return the response
+     * @throws AnalyticsException
+     */
+    @GET
+    @Path(Constants.ResourcePath.RECORDSTORES)
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response listRecordStores(@HeaderParam(AUTHORIZATION_HEADER) String authHeader)
+            throws AnalyticsException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Invoking listRecordStores");
+        }
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
+    //    String username = authenticate(authHeader);
+        List<String> recordStoreNames = analyticsDataService.listRecordStoreNames();
+        if (logger.isDebugEnabled()) {
+            logger.debug("Record store List : " + recordStoreNames);
+        }
+        return Response.ok(recordStoreNames).build();
+    }
+
+    /**
+     * Get the record store which a table belongs to
+     * @return the response
+     * @throws AnalyticsException
+     */
+    @GET
+    @Path("recordstore")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response getRecordStoreByTableName(@QueryParam("table") String tableName,
+                                     @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
+            throws AnalyticsException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Invoking getRecordStoreByTableName");
+        }
+        if (tableName == null) {
+            throw new AnalyticsException("Query param 'table' is not provided");
+        }
+        AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
+            String username = authenticate(authHeader);
+        String recordStoreName = analyticsDataService.getRecordStoreNameByTable(username, tableName);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Record store is : " + recordStoreName + " for table: " + tableName);
+        }
+        return Response.ok(gson.toJson(recordStoreName)).build();
     }
 
 	/**
@@ -350,7 +428,7 @@ public class AnalyticsResource extends AbstractResource {
         if (logger.isDebugEnabled()) {
             logger.debug("RecordCount for tableName: " + tableName + " is " + recordCount);
         }
-        return Response.ok(recordCount).build();
+        return Response.ok(gson.toJson(recordCount)).build();
 	}
 
 	/**
