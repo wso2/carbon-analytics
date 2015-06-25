@@ -183,6 +183,7 @@ public class DashboardDeployer implements AppDeploymentHandler {
         sb.append("jaggeryapps").append(File.separator)
                 .append(DashboardConstants.APP_NAME).append(File.separator)
                 .append("store").append(File.separator)
+                .append("carbon.super").append(File.separator)
                 .append(artifactName).append(File.separator);
         return sb.toString();
     }
