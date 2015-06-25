@@ -93,7 +93,7 @@ public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
     public void createTable(int tenantId, String recordStoreName, String tableName)
             throws AnalyticsException {
         if (analyticsDataConfiguration.getOperationMode().equals(AnalyticsDataConfiguration.Mode.LOCAL)) {
-            ServiceHolder.getAnalyticsDataService().createTable(tenantId, tableName);
+            ServiceHolder.getAnalyticsDataService().createTable(tenantId, recordStoreName, tableName);
         } else {
             AnalyticsAPIHttpClient.getInstance().validateAndAuthenticate(analyticsDataConfiguration.getUsername(),
                     analyticsDataConfiguration.getPassword());
