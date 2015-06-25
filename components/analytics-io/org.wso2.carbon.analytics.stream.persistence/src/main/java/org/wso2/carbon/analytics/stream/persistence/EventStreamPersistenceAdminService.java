@@ -104,7 +104,6 @@ public class EventStreamPersistenceAdminService extends AbstractAdmin {
                         }
                         analyticsTable.setRecordStoreName(analyticsDataService.getRecordStoreNameByTable(getTenantId(),
                                                                                                          tableName));
-                        ;
                     }
                 } else {
                     log.warn("Analytics table does not exist for stream[" + streamName + "]");

@@ -43,6 +43,8 @@ public class EventStreamProvider implements RelationProvider, Serializable {
     private String nickname;
     private String payload;
 
+    public EventStreamProvider() {
+    }
 
     @Override
     public StreamRelation createRelation(SQLContext sqlContext, Map<String, String> parameters) {
