@@ -33,8 +33,7 @@ public class AnalyticsStandaloneRecoveryModeFactory extends StandaloneRecoveryMo
     private SparkConf conf;
     private Serialization serializer;
 
-    public AnalyticsStandaloneRecoveryModeFactory(SparkConf conf,
-                                                  Serialization serializer) {
+    public AnalyticsStandaloneRecoveryModeFactory(SparkConf conf, Serialization serializer) {
         super(conf, serializer);
         this.conf =  conf;
         this.serializer = serializer;

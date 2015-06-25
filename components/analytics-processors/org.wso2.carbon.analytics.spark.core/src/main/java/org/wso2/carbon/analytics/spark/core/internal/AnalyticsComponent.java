@@ -66,6 +66,7 @@ public class AnalyticsComponent {
                     int portOffset = CarbonUtils.getPortFromServerConfig(PORT_OFFSET_SERVER_PROP) + 1;
                     ServiceHolder.setAnalyticskExecutor(new SparkAnalyticsExecutor(
                             NetworkUtils.getLocalHostname(), portOffset));
+                    ServiceHolder.getAnalyticskExecutor().startSparkServer(CarbonUtils.getCarbonConfigDirPath());
                 } catch (Throwable e) {
                     String msg = "Error initializing analytics executor: " + e.getMessage();
                     log.error(msg, e);
@@ -82,7 +83,7 @@ public class AnalyticsComponent {
             if (log.isDebugEnabled()) {
                 log.debug("Finished activating Analytics Spark Core");
             }
-        } catch (Throwable throwable) {
+        }catch (Throwable throwable){
             log.error("Error in registering the analytics processor service! ", throwable);
         }
     }
