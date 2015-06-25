@@ -282,6 +282,48 @@ public class AnalyticsWebServiceConnector {
         return handleResponse(ResponseStatus.SUCCESS, gson.toJson(tableList));
     }
 
+    public ResponseBean getRecordStoreList() {
+        String[] recordStoreList;
+        try {
+            recordStoreList = analyticsWebServiceStub.listRecordStoreNames();
+        } catch (RemoteException e) {
+            logger.error("Unable to get recordStore list:" + e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED, "Unable to get recordStore list: " + e.getMessage());
+        } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
+            logger.error("Unable to get recordStore list:" + e.getFaultMessage(), e);
+            return handleResponse(ResponseStatus.FAILED, "Unable to get recordStore list: " + e.getFaultMessage());
+        }
+        if (recordStoreList == null) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Received an empty recordStore name list!");
+            }
+            recordStoreList = new String[0];
+        }
+        return handleResponse(ResponseStatus.SUCCESS, gson.toJson(recordStoreList));
+    }
+
+    public ResponseBean getRecordStoreByTable(String tableName) {
+        String recordStore;
+        try {
+            recordStore = analyticsWebServiceStub.getRecordStoreNameByTable(tableName);
+        } catch (RemoteException e) {
+            logger.error("Unable to get recordStore for table '" + tableName + "': " + e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED, "Unable to get recordStore for table '" + tableName +
+                                                         "': " + e.getMessage());
+        } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
+            logger.error("Unable to get recordStore for table '" + tableName + "': " + e.getFaultMessage(), e);
+            return handleResponse(ResponseStatus.FAILED, "Unable to get recordStore for table '" + tableName +
+                                                         "': " + e.getFaultMessage());
+        }
+        if (recordStore == null) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Received an empty recordStore name list!");
+            }
+            recordStore = "";
+        }
+        return handleResponse(ResponseStatus.SUCCESS, gson.toJson(recordStore));
+    }
+
     /*public String deleteTable(String tableName) {
         if (logger.isDebugEnabled()) {
             logger.debug("Invoking deleteTable for tableName : " +
@@ -707,16 +749,26 @@ public class AnalyticsWebServiceConnector {
         }
     }
 
-    public ResponseBean isPaginationSupported() {
+    public ResponseBean isPaginationSupported(String recordStoreName) {
         if (logger.isDebugEnabled()) {
-            logger.debug("Invoking isPaginationSupported");
+            logger.debug("Invoking isPaginationSupported for recordStore: " + recordStoreName);
         }
         try {
-            // TODO: fix this **********************************88
+            if (recordStoreName == null) {
+                throw new JSServiceException("RecordStoreName is not mentioned");
+            }
             return handleResponse(ResponseStatus.SUCCESS, gson.toJson(analyticsWebServiceStub.isPaginationSupported
-                    ("test")));
-        } catch (Exception e) {
-            logger.error("Failed to check pagination support" + e.getMessage(), e);
+                    (recordStoreName)));
+        } catch (RemoteException e) {
+            logger.error("Failed to check pagination support: " + e.getMessage(), e);
+            return handleResponse(ResponseStatus.FAILED,
+                                  "Failed to check pagination support: " + e.getMessage());
+        } catch (AnalyticsWebServiceAnalyticsWebServiceExceptionException e) {
+            logger.error("Failed to check pagination support: " + e.getFaultMessage(), e);
+            return handleResponse(ResponseStatus.FAILED,
+                                  "Failed to check pagination support: " + e.getFaultMessage());
+        } catch (JSServiceException e) {
+            logger.error("Failed to check pagination support: " + e.getMessage(), e);
             return handleResponse(ResponseStatus.FAILED,
                                   "Failed to check pagination support: " + e.getMessage());
         }

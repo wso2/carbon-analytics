@@ -148,7 +148,7 @@ public class AnalyticsResource extends AbstractResource {
                                 @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
             throws AnalyticsException {
 		if (logger.isDebugEnabled()) {
-			logger.debug("Invoking listTables");
+			logger.debug("Invoking tableExists for table: " + tableName);
 		}
         if (tableName == null) {
             throw  new AnalyticsException("Query param 'table' is not provided");
@@ -179,7 +179,7 @@ public class AnalyticsResource extends AbstractResource {
                                 @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
             throws AnalyticsException {
         if (logger.isDebugEnabled()) {
-            logger.debug("Invoking paginationSupported");
+            logger.debug("Invoking paginationSupported for recordStore: " + recordStoreName);
         }
         AnalyticsDataAPI analyticsDataService = Utils.getAnalyticsDataAPIs();
         boolean paginationSupported = analyticsDataService.isPaginationSupported(recordStoreName);
@@ -250,7 +250,7 @@ public class AnalyticsResource extends AbstractResource {
                                      @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
             throws AnalyticsException {
         if (logger.isDebugEnabled()) {
-            logger.debug("Invoking getRecordStoreByTableName");
+            logger.debug("Invoking getRecordStoreByTableName for table: " + tableName);
         }
         if (tableName == null) {
             throw new AnalyticsException("Query param 'table' is not provided");

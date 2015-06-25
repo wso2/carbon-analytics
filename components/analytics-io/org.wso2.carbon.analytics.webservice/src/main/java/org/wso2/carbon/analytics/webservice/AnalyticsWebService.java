@@ -481,8 +481,13 @@ public class AnalyticsWebService extends AbstractAdmin {
      *
      * @return boolean true or false based on under laying data layer implementation
      */
-    public boolean isPaginationSupported(String recordStoreName) throws AnalyticsException {
-        return analyticsDataAPI.isPaginationSupported(recordStoreName);
+    public boolean isPaginationSupported(String recordStoreName) throws AnalyticsWebServiceException {
+        try {
+            return analyticsDataAPI.isPaginationSupported(recordStoreName);
+        } catch (Exception e) {
+            logger.error("An exception occurred: " + e.getMessage(), e);
+            throw new AnalyticsWebServiceException("An exception occurred: " + e.getMessage(), e);
+        }
     }
 
     /**
