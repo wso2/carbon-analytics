@@ -11,7 +11,7 @@
             <description>The datasource used for analytics file system</description>
             <definition type="RDBMS">
                 <configuration>
-                    <url>jdbc:h2:mem:bam_test_afs_db</url>
+                    <url>jdbc:h2:mem:analytics_test_afs_db</url>
                     <username>wso2carbon</username>
                     <password>wso2carbon</password>
                     <driverClassName>org.h2.Driver</driverClassName>
@@ -30,7 +30,7 @@
             <description>The datasource used for analytics record store</description>
             <definition type="RDBMS">
                 <configuration>
-                    <url>jdbc:h2:mem:bam_test_ars_db</url>
+                    <url>jdbc:h2:mem:analytics_test_ars_db</url>
                     <username>wso2carbon</username>
                     <password>wso2carbon</password>
                     <driverClassName>org.h2.Driver</driverClassName>

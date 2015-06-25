@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
-import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;

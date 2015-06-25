@@ -42,7 +42,7 @@ public class H2FileDBAnalyticsRecordStoreTest extends AnalyticsRecordStoreTest {
         System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");
         AnalyticsRecordStore ars = new RDBMSAnalyticsRecordStore();
         Map<String, String> props = new HashMap<String, String>();
-        props.put("datasource", "WSO2_ANALYTICS_RS_DB");
+        props.put("datasource", "WSO2_ANALYTICS_EVENT_STORE_DB");
         ars.init(props);
         this.init("H2FileDBAnalyticsDataSource", ars);
     }

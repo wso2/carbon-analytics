@@ -68,6 +68,29 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
     }
     
     @Test
+    public void testMultipleRecordStores() throws AnalyticsException {
+        this.cleanupTable(1, "T1");        
+        List<String> recordStoreNames = this.service.listRecordStoreNames();
+        Assert.assertTrue(recordStoreNames.size() > 0);
+        this.service.createTable(1, "T1");
+        Assert.assertTrue(recordStoreNames.contains(this.service.getRecordStoreNameByTable(1, "T1")));
+        if (recordStoreNames.size() > 1) {
+            System.out.println("** Multiple Record Stores Found **");
+            this.cleanupTable(2, "T1");
+            this.cleanupTable(2, "T2");            
+            this.service.createTable(2, recordStoreNames.get(0), "T1");
+            this.service.createTable(2, recordStoreNames.get(1), "T2");
+            Assert.assertTrue(this.service.tableExists(2, "T1"));
+            Assert.assertTrue(this.service.tableExists(2, "T2"));
+            Assert.assertEquals(this.service.getRecordStoreNameByTable(2, "T1"), recordStoreNames.get(0));
+            Assert.assertEquals(this.service.getRecordStoreNameByTable(2, "T2"), recordStoreNames.get(1));
+            this.cleanupTable(2, "T1");
+            this.cleanupTable(2, "T2");
+        }
+        this.cleanupTable(1, "T1");        
+    }
+    
+    @Test (dependsOnMethods = "testMultipleRecordStores")
     public void testIndexAddRetrieve() throws AnalyticsException {
         this.indexAddRetrieve(MultitenantConstants.SUPER_TENANT_ID);
         this.indexAddRetrieve(1);
