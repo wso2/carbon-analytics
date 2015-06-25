@@ -33,15 +33,18 @@ import org.apache.spark.deploy.worker.WorkerArguments;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
-import org.apache.spark.sql.api.java.UDF3;
-import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.util.Utils;
 import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterException;
 import org.wso2.carbon.analytics.dataservice.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.clustering.GroupEventListener;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.analytics.spark.core.AnalyticsExecutionCall;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
+import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
+import org.wso2.carbon.analytics.spark.core.udf.AnalyticsUDFsRegister;
+import org.wso2.carbon.analytics.spark.core.udf.config.UDFConfiguration;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsCommonUtils;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
@@ -50,9 +53,12 @@ import org.wso2.carbon.utils.CarbonUtils;
 import scala.None$;
 import scala.Option;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
@@ -117,18 +123,40 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private boolean isClustered = false;
 
+    private UDFConfiguration udfConfiguration;
+
     private Object workerActorSystem;
     private Object masterActorSystem;
 
-    public SparkAnalyticsExecutor(String myHost, int portOffset) throws AnalyticsClusterException {
+    public SparkAnalyticsExecutor(String myHost, int portOffset) throws AnalyticsException {
         this.myHost = myHost;
         this.portOffset = portOffset;
+        this.udfConfiguration = this.loadUDFConfiguration();
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         if (acm.isClusteringEnabled()) {
             this.initSparkDataListener();
             acm.joinGroup(CLUSTER_GROUP_NAME, this);
         } else {
             this.initLocalClient();
+        }
+    }
+
+    private UDFConfiguration loadUDFConfiguration() throws AnalyticsException {
+        try {
+            File confFile = new File(GenericUtils.getAnalyticsConfDirectory() +
+                                     File.separator + AnalyticsConstants.SPARK_CONF_DIR +
+                                     File.separator + AnalyticsConstants.SPARK_UDF_CONF_FILE);
+            if (!confFile.exists()) {
+                throw new AnalyticsUDFException("Cannot load UDFs, " +
+                                                "the UDF configuration file cannot be found at: " +
+                                                confFile.getPath());
+            }
+            JAXBContext ctx = JAXBContext.newInstance(UDFConfiguration.class);
+            Unmarshaller unmarshaller = ctx.createUnmarshaller();
+            return (UDFConfiguration) unmarshaller.unmarshal(confFile);
+        } catch (JAXBException e) {
+            throw new AnalyticsUDFException(
+                    "Error in processing UDF configuration: " + e.getMessage(), e);
         }
     }
 
@@ -152,22 +180,31 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         this.sqlCtx = new SQLContext(jsc);
         try {
             registerUDFs(this.sqlCtx);
-        } catch (IllegalAccessException | InvocationTargetException | InstantiationException
-                | ClassNotFoundException | NoSuchMethodException e) {
-            log.error("Error while registering UDFs: ", e);
+        } catch (AnalyticsUDFException e) {
+            log.error("Error while Initializing Spark SQL Context: ", e);
         }
     }
 
     private void registerUDFs(SQLContext sqlCtx)
-            throws IllegalAccessException, InvocationTargetException, InstantiationException,
-            ClassNotFoundException, NoSuchMethodException {
-        Class<?> udf = Class.forName("org.wso2.carbon.analytics.spark.core.udf.StringLengthUDF");
-        Object instance = udf.newInstance();
-        sqlCtx.udf().register("stringLengthTest", (org.apache.spark.sql.api.java.UDF1<?, ?>) instance, DataTypes.IntegerType);
-
-        Class<?> udf1 = Class.forName("org.wso2.carbon.analytics.spark.core.udf.CompositeID");
-        Object instance1 = udf1.newInstance();
-        sqlCtx.udf().register("compositeID", (UDF3<?, ?, ?, ?>) instance1, DataTypes.createArrayType(DataTypes.StringType));
+            throws AnalyticsUDFException {
+        String[] udfClassesNames = this.udfConfiguration.getCustomUDFClass();
+        if (udfClassesNames != null && udfClassesNames.length > 0) {
+            AnalyticsUDFsRegister udfAdaptorBuilder = new AnalyticsUDFsRegister();
+            try {
+                for (String udfClassName : udfClassesNames) {
+                    udfClassName = udfClassName.trim();
+                    if (!udfClassName.isEmpty()) {
+                        Class udf = Class.forName(udfClassName);
+                        Method[] methods = udf.getDeclaredMethods();
+                        for (Method method : methods) {
+                            udfAdaptorBuilder.registerUDF(udf, method, sqlCtx);
+                        }
+                    }
+                }
+            } catch (ClassNotFoundException e) {
+                throw new AnalyticsUDFException("Error While registering UDFs: " + e.getMessage(), e);
+            }
+        }
     }
 
     private void startMaster(String host, String port, String webUIport, String propsFile,

@@ -25,7 +25,14 @@ import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructType;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.spark.core.exception.AnalyticsUDFException;
 
+import javax.lang.model.type.NullType;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -37,6 +44,59 @@ import java.util.Set;
  * This class contains the common methods used by the Analytics Spark Core
  */
 public class AnalyticsCommonUtils {
+
+    public static DataType getDataType(Type returnType) throws AnalyticsUDFException {
+        DataType udfReturnType = null;
+        if (returnType == Integer.TYPE || returnType == Integer.class) {
+            udfReturnType = DataTypes.IntegerType;
+        } else if (returnType == Double.TYPE || returnType == Double.class) {
+            udfReturnType = DataTypes.DoubleType;
+        } else if (returnType == Float.TYPE || returnType == Float.class) {
+            udfReturnType = DataTypes.FloatType;
+        } else if (returnType == Long.TYPE || returnType == Long.class) {
+            udfReturnType = DataTypes.LongType;
+        } else if (returnType == Boolean.TYPE || returnType == Boolean.class) {
+            udfReturnType = DataTypes.BooleanType;
+        } else if (returnType == String.class) {
+            udfReturnType = DataTypes.StringType;
+        } else if (returnType == Short.TYPE || returnType == Short.class) {
+            udfReturnType = DataTypes.ShortType;
+        } else if (returnType == NullType.class) {
+            udfReturnType = DataTypes.NullType;
+        } else if (returnType == Byte.TYPE || returnType == Byte.class) {
+            udfReturnType = DataTypes.ByteType;
+        } else if (returnType == byte[].class || returnType == Byte[].class) {
+            udfReturnType = DataTypes.BinaryType;
+        } else if (returnType == Date.class) {
+            udfReturnType = DataTypes.DateType;
+        } else if (returnType == Timestamp.class) {
+            udfReturnType = DataTypes.TimestampType;
+        } else if (returnType == BigDecimal.class) {
+            udfReturnType = DataTypes.createDecimalType();
+        } else if (returnType instanceof ParameterizedType) {
+            ParameterizedType type = (ParameterizedType) returnType;
+            /*if return type is a List types will contain only 1 element, if return type is Map it will have
+            2 elements types representing key and the value.*/
+            Type[] types = type.getActualTypeArguments();
+            if (types != null && types.length > 0) {
+                switch (types.length) {
+                    case 1: {
+                        udfReturnType = DataTypes.createArrayType(getDataType(types[0]));
+                        break;
+                    }
+                    case 2: {
+                        udfReturnType = DataTypes.createMapType(getDataType(types[0]), getDataType(types[1]));
+                        break;
+                    }
+                    default:
+                        throw new AnalyticsUDFException("Cannot Map the return type either to ArrayType or MapType");
+                }
+            }
+        } else {
+            throw new AnalyticsUDFException("Cannot determine the return DataType");
+        }
+        return udfReturnType;
+    }
 
     public static DataType stringToDataType(String strType) {
         switch (strType.toLowerCase()) {

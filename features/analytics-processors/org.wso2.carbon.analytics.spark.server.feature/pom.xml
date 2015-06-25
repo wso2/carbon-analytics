@@ -266,6 +266,7 @@
                     <include>build.properties</include>
                     <include>protobuf-java-2.5.0.jar</include>
                     <include>spark-defaults.conf</include>
+                    <include>spark-udf-config.xml</include>
                 </includes>
             </resource>
         </resources>
@@ -301,7 +302,7 @@
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}
                                 </importFeatureDef>
-				<importFeatureDef>org.wso2.carbon.spark.commons:${carbon.analytics.common.version}
+				                <importFeatureDef>org.wso2.carbon.spark.commons:${carbon.analytics.common.version}
                                 </importFeatureDef>
                             </importFeatures>
                         </configuration>

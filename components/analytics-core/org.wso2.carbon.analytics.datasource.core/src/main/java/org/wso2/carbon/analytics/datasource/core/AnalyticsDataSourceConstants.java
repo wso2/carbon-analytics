@@ -24,5 +24,4 @@ package org.wso2.carbon.analytics.datasource.core;
 public class AnalyticsDataSourceConstants {
 
     public static final String ANALYTICS_CONF_DIR = "analytics";
-    
 }
