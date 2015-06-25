@@ -48,7 +48,7 @@ public class UDF12Adaptor implements UDF12 {
     public Object call(Object o, Object o2, Object o3, Object o4, Object o5, Object o6, Object o7,
                        Object o8, Object o9, Object o10, Object o11, Object o12) throws Exception {
         Object udfInstance = udfClass.newInstance();
-        Method udfMethod = udfClass.getDeclaredMethod(udfMethodName, parameterTypes );
+        Method udfMethod = udfClass.getDeclaredMethod(udfMethodName, parameterTypes);
         return udfMethod.invoke(udfInstance, o, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12);
     }
 }

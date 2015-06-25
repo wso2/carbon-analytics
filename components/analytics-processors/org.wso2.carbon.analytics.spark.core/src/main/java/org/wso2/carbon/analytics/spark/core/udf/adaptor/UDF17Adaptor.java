@@ -47,7 +47,7 @@ public class UDF17Adaptor implements UDF17 {
                        Object o8, Object o9, Object o10, Object o11, Object o12, Object o13,
                        Object o14, Object o15, Object o16, Object o17) throws Exception {
         Object udfInstance = udfClass.newInstance();
-        Method udfMethod = udfClass.getDeclaredMethod(udfMethodName, parameterTypes );
+        Method udfMethod = udfClass.getDeclaredMethod(udfMethodName, parameterTypes);
         return udfMethod.invoke(udfInstance, o, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14,
                                 o15, o16, o17);
     }

@@ -46,7 +46,7 @@ public class UDF2Adaptor implements UDF2 {
     @Override
     public Object call(Object o, Object o2) throws Exception {
         Object udfInstance = udfClass.newInstance();
-        Method udfMethod = udfClass.getDeclaredMethod(udfMethodName, parameterTypes );
+        Method udfMethod = udfClass.getDeclaredMethod(udfMethodName, parameterTypes);
         return udfMethod.invoke(udfInstance, o, o2);
     }
 }

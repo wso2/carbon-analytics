@@ -44,7 +44,7 @@ public class UDF3Adaptor implements UDF3 {
     @Override
     public Object call(Object o, Object o2, Object o3) throws Exception {
         Object udfInstance = udfClass.newInstance();
-        Method udfMethod = udfClass.getDeclaredMethod(udfMethodName, parameterTypes );
+        Method udfMethod = udfClass.getDeclaredMethod(udfMethodName, parameterTypes);
         return udfMethod.invoke(udfInstance, o, o2, o3);
     }
 }

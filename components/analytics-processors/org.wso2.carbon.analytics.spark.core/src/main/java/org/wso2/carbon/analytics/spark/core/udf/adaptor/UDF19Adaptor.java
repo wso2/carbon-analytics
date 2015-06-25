@@ -48,7 +48,7 @@ public class UDF19Adaptor implements UDF19 {
                        Object o14, Object o15, Object o16, Object o17, Object o18, Object o19)
             throws Exception {
         Object udfInstance = udfClass.newInstance();
-        Method udfMethod = udfClass.getDeclaredMethod(udfMethodName, parameterTypes );
+        Method udfMethod = udfClass.getDeclaredMethod(udfMethodName, parameterTypes);
         return udfMethod.invoke(udfInstance, o, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14,
                                 o15, o16, o17, o18, o19);
     }

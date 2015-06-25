@@ -49,7 +49,7 @@ public class UDF13Adaptor implements UDF13 {
                        Object o8, Object o9, Object o10, Object o11, Object o12, Object o13)
             throws Exception {
         Object udfInstance = udfClass.newInstance();
-        Method udfMethod = udfClass.getDeclaredMethod(udfMethodName, parameterTypes );
+        Method udfMethod = udfClass.getDeclaredMethod(udfMethodName, parameterTypes);
         return udfMethod.invoke(udfInstance, o, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13);
     }
 }
