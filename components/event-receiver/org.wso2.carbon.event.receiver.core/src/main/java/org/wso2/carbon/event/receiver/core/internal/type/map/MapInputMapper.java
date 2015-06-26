@@ -15,10 +15,11 @@
 package org.wso2.carbon.event.receiver.core.internal.type.map;
 
 import org.wso2.carbon.databridge.commons.Attribute;
+import org.wso2.carbon.databridge.commons.AttributeType;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
+import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfiguration;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConstants;
-import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.config.InputMappingAttribute;
 import org.wso2.carbon.event.receiver.core.config.mapping.MapInputMapping;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverConfigurationException;
@@ -102,8 +103,11 @@ public class MapInputMapper implements InputMapper {
             if (noMetaData > 0) {
                 for (Attribute metaData : streamDefinition.getMetaData()) {
                     Object mapAttribute = eventMap.get(EventReceiverConstants.META_DATA_PREFIX + metaData.getName());
-                    if (mapAttribute != null) {
+                    if (mapAttribute != null || AttributeType.STRING.equals(metaData.getType())) {
                         attributeArray[attributeCount++] = mapAttribute;
+                    } else {
+                        throw new EventReceiverProcessingException("Non-string meta attribute '" + metaData.getName()
+                                + "' of type " + metaData.getType() + " is null.");
                     }
                 }
             }
@@ -111,8 +115,11 @@ public class MapInputMapper implements InputMapper {
             if (noCorrelationData > 0) {
                 for (Attribute correlationData : streamDefinition.getCorrelationData()) {
                     Object mapAttribute = eventMap.get(EventReceiverConstants.CORRELATION_DATA_PREFIX + correlationData.getName());
-                    if (mapAttribute != null) {
+                    if (mapAttribute != null || AttributeType.STRING.equals(correlationData.getType())) {
                         attributeArray[attributeCount++] = mapAttribute;
+                    } else {
+                        throw new EventReceiverProcessingException("Non-string correlation attribute '" + correlationData.getName()
+                                + "' of type " + correlationData.getType() + " is null.");
                     }
                 }
             }
@@ -120,8 +127,10 @@ public class MapInputMapper implements InputMapper {
             if (noPayloadData > 0) {
                 for (Attribute payloadData : streamDefinition.getPayloadData()) {
                     Object mapAttribute = eventMap.get(payloadData.getName());
-                    if (mapAttribute != null) {
+                    if (mapAttribute != null || AttributeType.STRING.equals(payloadData.getType())) {
                         attributeArray[attributeCount++] = mapAttribute;
+                    } else {
+                        throw new EventReceiverProcessingException("Non-string payload attribute '" + payloadData.getName() + "' of type " + payloadData.getType() + " is null.");
                     }
                 }
             }

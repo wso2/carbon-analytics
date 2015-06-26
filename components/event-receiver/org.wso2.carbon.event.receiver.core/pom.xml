@@ -101,13 +101,13 @@
                         <Private-Package>
                             org.wso2.carbon.event.receiver.core.internal,
                             org.wso2.carbon.event.receiver.core.internal.*,
-                            org.slf4j.*,
+                            <!--org.slf4j.*,-->
                             com.jayway.jsonpath.*
                         </Private-Package>
                         <Export-Package>
                             !org.wso2.carbon.event.receiver.core.internal,
                             !org.wso2.carbon.event.receiver.core.internal.*,
-                            !org.slf4j.*,
+                            <!--!org.slf4j.*,-->
                             !com.jayway.jsonpath.*,
                             org.wso2.carbon.event.receiver.*
                         </Export-Package>
@@ -115,7 +115,6 @@
                             !javax.xml.namespace,
                             javax.xml.namespace; version=0.0.0,
                             org.wso2.carbon.event.input.adapter.core.*,
-                            org.wso2.carbon.event.input.adapter.manager.core.*,
                             *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
