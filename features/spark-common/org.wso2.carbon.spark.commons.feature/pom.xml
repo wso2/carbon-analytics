@@ -74,6 +74,10 @@
 			<artifactId>netty-all</artifactId>
 		</dependency>
 		<dependency>
+            		<groupId>io.netty</groupId>
+            		<artifactId>netty</artifactId>
+        	</dependency>
+		<dependency>
 			<groupId>org.wso2.twitter</groupId>
 			<artifactId>chill_2.10</artifactId>
 		</dependency>
@@ -98,9 +102,9 @@
 			<artifactId>jackson-annotations</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.esotericsoftware.kryo</groupId>
-			<artifactId>kryo</artifactId>
-		</dependency>
+            		<groupId>org.wso2.orbit.com.esotericsoftware.kryo</groupId>
+            		<artifactId>kryo</artifactId>
+        	</dependency>
 		<dependency>
 			<groupId>io.dropwizard.metrics</groupId>
 			<artifactId>metrics-core</artifactId>
@@ -146,6 +150,22 @@
 			<artifactId>minlog</artifactId>
 		</dependency>
 		<dependency>
+            		<groupId>com.google.protobuf</groupId>
+            		<artifactId>protobuf-java</artifactId>
+        	</dependency>
+		<dependency>
+            		<groupId>commons-configuration.wso2</groupId>
+            		<artifactId>commons-configuration</artifactId>
+        	</dependency>
+        	<dependency>
+            		<groupId>org.wso2.orbit.org.objenesis</groupId>
+            		<artifactId>objenesis</artifactId>
+        	</dependency>
+		<dependency>
+            		<groupId>javax.servlet.jsp</groupId>
+            		<artifactId>javax.servlet.jsp-api</artifactId>
+        	</dependency>
+		<dependency>
                                 <groupId>org.wso2.uncommons.maths</groupId>
                                 <artifactId>uncommons-maths</artifactId>
                 </dependency>
@@ -189,7 +209,7 @@
 								<bundleDef>org.wso2.json4s:json4s-jackson_2.10</bundleDef>
 								<bundleDef>org.wso2.twitter:chill_2.10</bundleDef>
 								<bundleDef>org.wso2.clearspring.analytics:stream</bundleDef>
-								<bundleDef>com.esotericsoftware.kryo:kryo</bundleDef>
+								<bundleDef>org.wso2.orbit.com.esotericsoftware.kryo:kryo</bundleDef>
 								<bundleDef>org.spark-project.akka:akka-remote_2.10</bundleDef>
 								<bundleDef>org.spark-project.akka:akka-actor_2.10</bundleDef>
 								<bundleDef>org.apache.commons:commons-lang3</bundleDef>
@@ -216,6 +236,11 @@
 								<bundleDef>org.wso2.uncommons.maths:uncommons-maths</bundleDef>
 								<bundleDef>org.wso2.orbit.com.esotericsoftware.minlog:minlog</bundleDef>
 								<bundleDef>org.wso2.orbit.org.apache.mesos:mesos</bundleDef>
+								<bundleDef>com.google.protobuf:protobuf-java</bundleDef>
+								<bundleDef>commons-configuration.wso2:commons-configuration</bundleDef>
+								<bundleDef>org.wso2.orbit.org.objenesis:objenesis</bundleDef>
+								<bundleDef>javax.servlet.jsp:javax.servlet.jsp-api</bundleDef>
+								<bundleDef>io.netty:netty</bundleDef>
 							</bundles>
 						</configuration>
 					</execution>
