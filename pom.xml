@@ -588,10 +588,10 @@
 				<version>${orbit.version.netty-all}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.esotericsoftware.kryo</groupId>
-				<artifactId>kryo</artifactId>
-				<version>${kyro.version}</version>
-			</dependency>
+            			<groupId>org.wso2.orbit.com.esotericsoftware.kryo</groupId>
+            			<artifactId>kryo</artifactId>
+				<version>${kryo.orbit.version}</version>
+        		</dependency>
 			<dependency>
 				<groupId>org.spark-project.akka</groupId>
 				<artifactId>akka-remote_2.10</artifactId>
@@ -693,10 +693,25 @@
                                 <version>${spark.protobuf.version}</version>
                         </dependency>
 			<dependency>
+                		<groupId>com.google.protobuf</groupId>
+                		<artifactId>protobuf-java</artifactId>
+                		<version>${google.protobuf.version}</version>
+            		</dependency>
+			<dependency>
 				<groupId>org.wso2.orbit.org.apache.mesos</groupId>
 				<artifactId>mesos</artifactId>
 				<version>${mesos.version}</version>
 			</dependency>
+			<dependency>
+                		<groupId>commons-configuration.wso2</groupId>
+                		<artifactId>commons-configuration</artifactId>
+                		<version>${commons.configuration.orbit.version}</version>
+            		</dependency>
+			<dependency>
+                		<groupId>org.wso2.orbit.org.objenesis</groupId>
+                		<artifactId>objenesis</artifactId>
+                		<version>${objenesis.orbit.version}</version>
+            		</dependency>
 			<!-- spark commons dependencies stop -->
 
             <!--features start-->
@@ -1144,6 +1159,10 @@
 		<uncommons.maths.version>1.2.2.wso2v1</uncommons.maths.version>
 		<spark.protobuf.version>2.5.0-spark</spark.protobuf.version>
 		<mesos.version>0.18.1.wso2v1</mesos.version>
+		<kryo.orbit.version>2.24.0.wso2v1</kryo.orbit.version>
+		<google.protobuf.version>2.5.0</google.protobuf.version>
+		<commons.configuration.orbit.version>1.6.0.wso2v1</commons.configuration.orbit.version>
+		<objenesis.orbit.version>2.1.wso2v1</objenesis.orbit.version>
 		<!-- Spark dependency versions end-->
     </properties>
 
