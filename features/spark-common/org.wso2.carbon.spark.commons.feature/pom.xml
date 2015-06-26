@@ -54,6 +54,10 @@
 			<artifactId>htrace-core-apache</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.wso2.orbit.org.apache.mesos</groupId>
+			<artifactId>mesos</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.wso2.json4s</groupId>
 			<artifactId>json4s-jackson_2.10</artifactId>
 		</dependency>
@@ -211,6 +215,7 @@
 								<bundleDef>org.spark-project.protobuf:protobuf-java</bundleDef>
 								<bundleDef>org.wso2.uncommons.maths:uncommons-maths</bundleDef>
 								<bundleDef>org.wso2.orbit.com.esotericsoftware.minlog:minlog</bundleDef>
+								<bundleDef>org.wso2.orbit.org.apache.mesos:mesos</bundleDef>
 							</bundles>
 						</configuration>
 					</execution>
