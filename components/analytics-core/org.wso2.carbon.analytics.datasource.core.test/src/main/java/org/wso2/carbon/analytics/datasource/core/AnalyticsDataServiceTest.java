@@ -570,7 +570,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         int tenantId = 51;
         String tableName = "TableX";
         this.cleanupTable(tenantId, tableName);
-        System.out.println("\n************** START ANALYTICS DS (WITHOUT INDEXING, H2-FILE) PERF TEST **************");
+        System.out.println("\n************** START ANALYTICS DS (WITHOUT INDEXING) PERF TEST **************");
         int n = 100, batch = 200;
         List<Record> records;
         
@@ -599,12 +599,12 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         System.out.println("* Read Time: " + (end - start) + " ms.");
         System.out.println("* Read Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
         this.cleanupTable(tenantId, tableName);
-        System.out.println("\n************** END ANALYTICS DS (WITHOUT INDEXING, H2-FILE) PERF TEST **************");
+        System.out.println("\n************** END ANALYTICS DS (WITHOUT INDEXING) PERF TEST **************");
     }
     
     @Test (dependsOnMethods = "testDataRecordAddReadPerformanceNonIndex")
     public void testDataRecordAddReadPerformanceIndex1C() throws AnalyticsException {
-        System.out.println("\n************** START ANALYTICS DS (WITH INDEXING - SINGLE THREAD, H2-FILE) PERF TEST **************");
+        System.out.println("\n************** START ANALYTICS DS (WITH INDEXING - SINGLE THREAD) PERF TEST **************");
 
         int tenantId = 50;
         String tableName = "TableX";
@@ -638,12 +638,12 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         System.out.println("* Search Result Count: " + results.size() + " Time: " + (end - start) + " ms.");
         
         this.cleanupTable(tenantId, tableName);
-        System.out.println("\n************** END ANALYTICS DS (WITH INDEXING, H2-FILE) PERF TEST **************");
+        System.out.println("\n************** END ANALYTICS DS (WITH INDEXING) PERF TEST **************");
     }
 
     @Test (dependsOnMethods = "testDataRecordAddReadPerformanceIndex1C")
     public void testFacetDataRecordAddReadPerformanceIndex1C() throws AnalyticsException {
-        System.out.println("\n************** START ANALYTICS DS (WITH FACET INDEXING - SINGLE THREAD, H2-FILE) PERF TEST **************");
+        System.out.println("\n************** START ANALYTICS DS (WITH FACET INDEXING - SINGLE THREAD) PERF TEST **************");
 
         int tenantId = 50;
         String tableName = "TableY";
@@ -685,12 +685,12 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         System.out.println("* Search Result Count: " + results.size() + " Time: " + (end - start) + " ms.");
 
         this.cleanupTable(tenantId, tableName);
-        System.out.println("\n************** END ANALYTICS DS (WITH FACET INDEXING - SINGLE THREAD, H2-FILE) PERF TEST **************");
+        System.out.println("\n************** END ANALYTICS DS (WITH FACET INDEXING - SINGLE THREAD) PERF TEST **************");
     }
 
     @Test (dependsOnMethods = "testFacetDataRecordAddReadPerformanceIndex1C")
     public void testFacetDataRecordAddReadPerformanceIndexMultipleTables1C() throws AnalyticsException {
-        System.out.println("\n************** START ANALYTICS DS (WITH FACET INDEXING - SINGLE THREAD, MULTIPLE TABLES, H2-FILE) PERF TEST **************");
+        System.out.println("\n************** START ANALYTICS DS (WITH FACET INDEXING - SINGLE THREAD, MULTIPLE TABLES) PERF TEST **************");
 
         int tenantId = 50;
         String[] tableNames = new String[]{"TableY", "TableYY"};
@@ -756,7 +756,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         for (String tableName : tableNames) {
             this.cleanupTable(tenantId, tableName);
         }
-        System.out.println("\n************** END ANALYTICS DS (WITH FACET INDEXING - SINGLE THREAD, MULTIPLE TABLES, H2-FILE) PERF TEST **************");
+        System.out.println("\n************** END ANALYTICS DS (WITH FACET INDEXING - SINGLE THREAD, MULTIPLE TABLES) PERF TEST **************");
     }
     
     private void writeIndexRecords(final int tenantId, final String tableName, final int n, 
@@ -807,7 +807,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
     
     @Test (dependsOnMethods = "testFacetDataRecordAddReadPerformanceIndexMultipleTables1C")
     public void testDataRecordAddReadPerformanceIndexNC() throws AnalyticsException {
-        System.out.println("\n************** START ANALYTICS DS (WITH INDEXING - MULTIPLE THREADS, H2-FILE) PERF TEST **************");
+        System.out.println("\n************** START ANALYTICS DS (WITH INDEXING - MULTIPLE THREADS) PERF TEST **************");
 
         int tenantId = 50;
         String tableName = "TableX";
@@ -841,12 +841,12 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         System.out.println("* Search Result Count: " + results.size() + " Time: " + (end - start) + " ms.");
         
         this.cleanupTable(tenantId, tableName);
-        System.out.println("\n************** END ANALYTICS DS (WITH INDEXING - MULTIPLE THREADS, H2-FILE) PERF TEST **************");
+        System.out.println("\n************** END ANALYTICS DS (WITH INDEXING - MULTIPLE THREADS) PERF TEST **************");
     }
 
     @Test (dependsOnMethods = "testDataRecordAddReadPerformanceIndexNC")
     public void testFacetDataRecordAddReadPerformanceIndexNC() throws AnalyticsException {
-        System.out.println("\n************** START ANALYTICS DS (WITH FACET INDEXING - MULTIPLE THREADS, H2-FILE) PERF TEST **************");
+        System.out.println("\n************** START ANALYTICS DS (WITH FACET INDEXING - MULTIPLE THREADS) PERF TEST **************");
 
         int tenantId = 50;
         String tableName = "TableZ";
@@ -892,12 +892,12 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         Assert.assertEquals(count, 50000.0);
         System.out.println("* DrilldownSearch Result Count: " + count + " Time: " + (end - start) + " ms.");
         this.cleanupTable(tenantId, tableName);
-        System.out.println("\n************** END ANALYTICS DS (WITH FACET INDEXING - MULTIPLE THREADS, H2-FILE) PERF TEST **************");
+        System.out.println("\n************** END ANALYTICS DS (WITH FACET INDEXING - MULTIPLE THREADS) PERF TEST **************");
     }
 
     @Test (dependsOnMethods = "testFacetDataRecordAddReadPerformanceIndexNC")
     public void testFacetDataRecordAddReadPerformanceIndexMultipleTablesNC() throws AnalyticsException {
-        System.out.println("\n************** START ANALYTICS DS (WITH FACET INDEXING - MULTIPLE THREADS, MULTIPLE TABLES, H2-FILE) PERF TEST **************");
+        System.out.println("\n************** START ANALYTICS DS (WITH FACET INDEXING - MULTIPLE THREADS, MULTIPLE TABLES) PERF TEST **************");
 
         int tenantId = 50;
         String[] tableNames = new String[]{"TableZ", "TableZZ"};
@@ -965,7 +965,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         for (String tableName: tableNames) {
             this.cleanupTable(tenantId, tableName);
         }
-        System.out.println("\n************** END ANALYTICS DS (WITH FACET INDEXING - MULTIPLE THREADS, MULTIPLE TABLES, H2-FILE) PERF TEST **************");
+        System.out.println("\n************** END ANALYTICS DS (WITH FACET INDEXING - MULTIPLE THREADS, MULTIPLE TABLES) PERF TEST **************");
     }
 
     private void resetClusterTestResults() {

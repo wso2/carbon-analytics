@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.datasource.rdbms;
+package org.wso2.carbon.analytics.datasource.rdbms.h2;
 
 import java.io.IOException;
 
@@ -32,7 +32,7 @@ import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 /**
  * Standalone test implementation of {@link AnalyticsDataServiceTest}.
  */
-public class AnalyticsDataServiceStandaloneTest extends AnalyticsDataServiceTest {
+public class H2AnalyticsDataServiceStandaloneTest extends AnalyticsDataServiceTest {
     
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException, IOException {

@@ -39,7 +39,6 @@ public class RemoteRecordIterator implements AnalyticsIterator<Record> {
         this.completed = false;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public synchronized boolean hasNext() {
         try {
