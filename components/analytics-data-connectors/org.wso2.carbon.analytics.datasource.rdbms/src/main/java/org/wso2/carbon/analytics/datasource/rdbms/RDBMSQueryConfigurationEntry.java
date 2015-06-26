@@ -57,15 +57,7 @@ public class RDBMSQueryConfigurationEntry {
     
     private String recordDeletionWithIdsQuery;
         
-    private boolean paginationFirstZeroIndexed;
-    
-    private boolean paginationFirstInclusive;
-    
-    private boolean paginationSecondLength;
-    
-    private boolean paginationSecondZeroIndexed;
-    
-    private boolean paginationSecondInclusive;
+    private PaginationMode paginationMode;
     
     private String fsPathRetrievalQuery;
     
@@ -203,46 +195,6 @@ public class RDBMSQueryConfigurationEntry {
     public void setRecordDeletionWithIdsQuery(String recordDeletionWithIdsQuery) {
         this.recordDeletionWithIdsQuery = recordDeletionWithIdsQuery;
     }
-
-    public boolean isPaginationFirstZeroIndexed() {
-        return paginationFirstZeroIndexed;
-    }
-    
-    public void setPaginationFirstZeroIndexed(boolean paginationFirstZeroIndexed) {
-        this.paginationFirstZeroIndexed = paginationFirstZeroIndexed;
-    }
-    
-    public boolean isPaginationFirstInclusive() {
-        return paginationFirstInclusive;
-    }
-    
-    public void setPaginationFirstInclusive(boolean paginationFirstInclusive) {
-        this.paginationFirstInclusive = paginationFirstInclusive;
-    }
-    
-    public boolean isPaginationSecondLength() {
-        return paginationSecondLength;
-    }
-    
-    public void setPaginationSecondLength(boolean paginationSecondLength) {
-        this.paginationSecondLength = paginationSecondLength;
-    }
-    
-    public boolean isPaginationSecondZeroIndexed() {
-        return paginationSecondZeroIndexed;
-    }
-    
-    public void setPaginationSecondZeroIndexed(boolean paginationSecondZeroIndexed) {
-        this.paginationSecondZeroIndexed = paginationSecondZeroIndexed;
-    }
-
-    public boolean isPaginationSecondInclusive() {
-        return paginationSecondInclusive;
-    }
-    
-    public void setPaginationSecondInclusive(boolean paginationSecondInclusive) {
-        this.paginationSecondInclusive = paginationSecondInclusive;
-    }
     
     public String getFsPathRetrievalQuery() {
         return fsPathRetrievalQuery;
@@ -354,6 +306,25 @@ public class RDBMSQueryConfigurationEntry {
     
     public void setRecordCountQuery(String recordCountQuery) {
         this.recordCountQuery = recordCountQuery;
+    }
+    
+    @XmlElement (required = true)
+    public PaginationMode getPaginationMode() {
+        return paginationMode;
+    }
+    
+    public void setPaginationMode(PaginationMode paginationMode) {
+        this.paginationMode = paginationMode;
+    }
+
+    /**
+     * Pagination mode to be used for a specific RDBMS.
+     */
+    public static enum PaginationMode {
+        /* MySQL, H2, MSSQL 2012 like */
+        MODE1,
+        /* Oracle, MSSQL ROWNUM like */
+        MODE2
     }
     
 }

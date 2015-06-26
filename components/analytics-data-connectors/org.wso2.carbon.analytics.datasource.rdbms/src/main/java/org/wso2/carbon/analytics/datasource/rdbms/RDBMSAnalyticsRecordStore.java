@@ -344,8 +344,9 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             }
             stmt.setLong(1, timeFrom);
             stmt.setLong(2, timeTo);
-            stmt.setInt(3, this.adjustRecordsFromForProvider(recordsFrom));
-            stmt.setInt(4, this.adjustRecordsCountForProvider(recordsFrom, recordsCount));            
+            int[] paginationIndices = this.calculateIndicesForPaginationMode(recordsFrom, recordsCount);
+            stmt.setInt(3, paginationIndices[0]);
+            stmt.setInt(4, paginationIndices[1]);            
             rs = stmt.executeQuery();
             return new RDBMSResultSetIterator(tenantId, tableName, columns, conn, stmt, rs);
         } catch (SQLException e) {
@@ -359,28 +360,20 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         }
     }
     
-    private int adjustRecordsFromForProvider(int recordsFrom) {
-        if (!this.getQueryConfiguration().isPaginationFirstZeroIndexed()) {
-            recordsFrom++;
+    private int[] calculateIndicesForPaginationMode(int recordsFrom, int recordsCount) {
+        switch (this.rdbmsQueryConfigurationEntry.getPaginationMode()) {
+        case MODE1:
+            /* MySQL, H2, MSSQL 2012 like */
+            return new int[] { recordsFrom, recordsCount };
+        case MODE2:
+            /* Oracle, MSSQL ROWNUM like */
+            return new int[] { recordsFrom, recordsFrom + recordsCount };
+        default:
+            throw new IllegalArgumentException("Invalid pagination mode: " + 
+                    this.rdbmsQueryConfigurationEntry.getPaginationMode());
         }
-        if (!this.getQueryConfiguration().isPaginationFirstInclusive()) {
-            recordsFrom++;
-        }
-        return recordsFrom;
     }
     
-    private int adjustRecordsCountForProvider(int recordsFrom, int recordsCount) {
-        if (!this.getQueryConfiguration().isPaginationSecondLength() && recordsCount != Integer.MAX_VALUE) {
-            if (!this.getQueryConfiguration().isPaginationSecondZeroIndexed()) {
-                recordsCount++;
-            }
-            if (!this.getQueryConfiguration().isPaginationSecondInclusive()) {
-                recordsCount++;
-            }
-        }
-        return recordsCount;
-    }
-
     public AnalyticsIterator<Record> getRecords(int tenantId, String tableName, List<String> columns,
                                                 List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
         if (ids.isEmpty()) {

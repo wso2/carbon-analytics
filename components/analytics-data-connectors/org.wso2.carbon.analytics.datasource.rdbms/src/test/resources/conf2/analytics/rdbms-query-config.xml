@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <query-configuration>
     <database name = "h2">
-        <paginationFirstInclusive>true</paginationFirstInclusive>
-        <paginationFirstZeroIndexed>true</paginationFirstZeroIndexed>
-        <paginationSecondInclusive>false</paginationSecondInclusive>
-        <paginationSecondLength>true</paginationSecondLength>
-        <paginationSecondZeroIndexed>false</paginationSecondZeroIndexed>
+        <paginationMode>MODE1</paginationMode>
         <recordTableCheckQuery>SELECT 1 FROM {{TABLE_NAME}}</recordTableCheckQuery>
         <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
         <recordDeletionQuery>DELETE FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordDeletionQuery>
