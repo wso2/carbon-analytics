@@ -123,9 +123,9 @@
 </tr>
 
 
-
 <%
     InputAdapterConfigurationDto fromPropertyConfigurationDto = eventReceiverConfigurationDto.getFromAdapterConfigurationDto();
+    if (fromPropertyConfigurationDto.getUsageTips() != null) {
 %>
 
 <tr>
@@ -133,7 +133,7 @@
     <td><%=fromPropertyConfigurationDto.getUsageTips()%></td>
 </tr>
 
-<%
+<%    }
     if (fromPropertyConfigurationDto != null) {
     if (fromPropertyConfigurationDto.getInputEventAdapterProperties()!=null && fromPropertyConfigurationDto.getInputEventAdapterProperties().length > 0) {
 %>

@@ -160,6 +160,7 @@
 
 <%
     OutputAdapterConfigurationDto toPropertyConfigurationDto = eventPublisherConfigurationDto.getToAdapterConfigurationDto();
+    if (toPropertyConfigurationDto.getUsageTips() != null) {
 %>
 
 <tr>
@@ -168,6 +169,7 @@
 </tr>
 
 <%
+    }
     if (toPropertyConfigurationDto != null) {
     if (toPropertyConfigurationDto.getOutputEventAdapterStaticProperties()!=null && toPropertyConfigurationDto.getOutputEventAdapterStaticProperties().length > 0) {
 %>
