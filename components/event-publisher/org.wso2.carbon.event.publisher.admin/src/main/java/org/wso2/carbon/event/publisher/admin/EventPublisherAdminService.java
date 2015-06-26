@@ -25,6 +25,8 @@ import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterSchema;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterService;
 import org.wso2.carbon.event.output.adapter.core.Property;
+import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
+import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.publisher.admin.internal.PropertyAttributeTypeConstants;
 import org.wso2.carbon.event.publisher.admin.internal.ds.EventPublisherAdminServiceValueHolder;
 import org.wso2.carbon.event.publisher.core.EventPublisherService;
@@ -35,6 +37,7 @@ import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
 import org.wso2.carbon.event.publisher.core.config.mapping.*;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
 
+import javax.naming.ConfigurationException;
 import java.util.*;
 
 public class EventPublisherAdminService extends AbstractAdmin {
@@ -72,7 +75,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
                     eventPublisherConfigurationInfoDtoArray[index].setEnableTracing(eventPublisherConfiguration.isTracingEnabled());
                     eventPublisherConfigurationInfoDtoArray[index].setEditable(eventPublisherConfiguration.isEditable());
                 }
-                Arrays.sort(eventPublisherConfigurationInfoDtoArray,new Comparator() {
+                Arrays.sort(eventPublisherConfigurationInfoDtoArray, new Comparator() {
 
                     @Override
                     public int compare(Object o1, Object o2) {
@@ -119,7 +122,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
                     eventPublisherConfigurationInfoDtoArray[index].setEnableTracing(eventPublisherConfiguration.isTracingEnabled());
                     eventPublisherConfigurationInfoDtoArray[index].setEditable(eventPublisherConfiguration.isEditable());
                 }
-                Arrays.sort(eventPublisherConfigurationInfoDtoArray,new Comparator() {
+                Arrays.sort(eventPublisherConfigurationInfoDtoArray, new Comparator() {
 
                     @Override
                     public int compare(Object o1, Object o2) {
@@ -158,7 +161,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
 
                 eventPublisherFileDtoArray[index] = new EventPublisherConfigurationFileDto(fileName, eventPublisherName, statusMsg);
             }
-            Arrays.sort(eventPublisherFileDtoArray,new Comparator() {
+            Arrays.sort(eventPublisherFileDtoArray, new Comparator() {
 
                 @Override
                 public int compare(Object o1, Object o2) {
@@ -329,7 +332,7 @@ public class EventPublisherAdminService extends AbstractAdmin {
     }
 
     public boolean editActiveEventPublisherConfiguration(String eventPublisherConfiguration,
-                                                      String eventPublisherName)
+                                                         String eventPublisherName)
             throws AxisFault {
         EventPublisherService eventPublisherService = EventPublisherAdminServiceValueHolder.getEventPublisherService();
         try {
@@ -369,14 +372,14 @@ public class EventPublisherAdminService extends AbstractAdmin {
     }
 
     public boolean deployWSO2EventPublisherConfiguration(String eventPublisherName,
-                                                      String streamNameWithVersion,
-                                                      String eventAdapterType,
-                                                      EventMappingPropertyDto[] metaData,
-                                                      EventMappingPropertyDto[] correlationData,
-                                                      EventMappingPropertyDto[] payloadData,
-                                                      BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
-                                                      boolean mappingEnabled,
-                                                      String toStreamNameWithVersion)
+                                                         String streamNameWithVersion,
+                                                         String eventAdapterType,
+                                                         EventMappingPropertyDto[] metaData,
+                                                         EventMappingPropertyDto[] correlationData,
+                                                         EventMappingPropertyDto[] payloadData,
+                                                         BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
+                                                         boolean mappingEnabled,
+                                                         String toStreamNameWithVersion)
             throws AxisFault {
 
         if (checkEventPublisherValidity(eventPublisherName)) {
@@ -450,11 +453,11 @@ public class EventPublisherAdminService extends AbstractAdmin {
     }
 
     public boolean deployTextEventPublisherConfiguration(String eventPublisherName,
-                                                      String streamNameWithVersion,
-                                                      String eventAdapterType,
-                                                      String textData,
-                                                      BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
-                                                      String dataFrom, boolean mappingEnabled)
+                                                         String streamNameWithVersion,
+                                                         String eventAdapterType,
+                                                         String textData,
+                                                         BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
+                                                         String dataFrom, boolean mappingEnabled)
             throws AxisFault {
 
         if (checkEventPublisherValidity(eventPublisherName)) {
@@ -504,11 +507,11 @@ public class EventPublisherAdminService extends AbstractAdmin {
     }
 
     public boolean deployXmlEventPublisherConfiguration(String eventPublisherName,
-                                                     String streamNameWithVersion,
-                                                     String eventAdapterType,
-                                                     String textData,
-                                                     BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
-                                                     String dataFrom, boolean mappingEnabled)
+                                                        String streamNameWithVersion,
+                                                        String eventAdapterType,
+                                                        String textData,
+                                                        BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
+                                                        String dataFrom, boolean mappingEnabled)
             throws AxisFault {
 
         if (checkEventPublisherValidity(eventPublisherName)) {
@@ -554,11 +557,11 @@ public class EventPublisherAdminService extends AbstractAdmin {
     }
 
     public boolean deployMapEventPublisherConfiguration(String eventPublisherName,
-                                                     String streamNameWithVersion,
-                                                     String eventAdapterType,
-                                                     EventMappingPropertyDto[] mapData,
-                                                     BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
-                                                     boolean mappingEnabled)
+                                                        String streamNameWithVersion,
+                                                        String eventAdapterType,
+                                                        EventMappingPropertyDto[] mapData,
+                                                        BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
+                                                        boolean mappingEnabled)
             throws AxisFault {
 
         if (checkEventPublisherValidity(eventPublisherName)) {
@@ -610,11 +613,11 @@ public class EventPublisherAdminService extends AbstractAdmin {
     }
 
     public boolean deployJsonEventPublisherConfiguration(String eventPublisherName,
-                                                      String streamNameWithVersion,
-                                                      String eventAdapterType,
-                                                      String jsonData,
-                                                      BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
-                                                      String dataFrom, boolean mappingEnabled)
+                                                         String streamNameWithVersion,
+                                                         String eventAdapterType,
+                                                         String jsonData,
+                                                         BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
+                                                         String dataFrom, boolean mappingEnabled)
             throws AxisFault {
 
         if (checkEventPublisherValidity(eventPublisherName)) {
@@ -936,6 +939,32 @@ public class EventPublisherAdminService extends AbstractAdmin {
 
         throw new AxisFault("Output Stream attributes are not matching with input stream definition");
 
+    }
+
+    public void testPublisherConnection(String eventPublisherName, String eventAdapterType,
+                             BasicOutputAdapterPropertyDto[] outputPropertyConfiguration,
+                             String messageFormat) throws AxisFault {
+
+        try {
+
+            EventPublisherConfiguration eventPublisherConfiguration = new EventPublisherConfiguration();
+
+            constructOutputAdapterRelatedConfigs(eventPublisherName, eventAdapterType, outputPropertyConfiguration,
+                    eventPublisherConfiguration, messageFormat);
+
+            EventPublisherAdminServiceValueHolder.getOutputEventAdapterService()
+                    .testConnection(eventPublisherConfiguration.getToAdapterConfiguration());
+
+        } catch (TestConnectionNotSupportedException e) {
+            log.error(e.getMessage(), e);
+            throw new AxisFault(e.getMessage());
+        } catch (OutputEventAdapterException e) {
+            log.error(e.getMessage(), e);
+            throw new AxisFault(e.getMessage());
+        } catch (Throwable e) {
+            log.error(e.getMessage(), e);
+            throw new AxisFault(e.getMessage());
+        }
     }
 
 }

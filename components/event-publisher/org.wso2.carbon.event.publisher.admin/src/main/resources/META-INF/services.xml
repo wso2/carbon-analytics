@@ -139,6 +139,11 @@
                 /permission/admin/manage/event-publish
             </parameter>
         </operation>
+        <operation name="testPublisherConnection">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/manage/event-publish
+            </parameter>
+        </operation>
 
 
     </service>

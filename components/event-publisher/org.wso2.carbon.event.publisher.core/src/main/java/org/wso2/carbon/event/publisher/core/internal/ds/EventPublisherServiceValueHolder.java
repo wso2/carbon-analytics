@@ -33,6 +33,8 @@ import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
+import java.util.Collections;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class EventPublisherServiceValueHolder {
@@ -43,8 +45,8 @@ public class EventPublisherServiceValueHolder {
     private static RegistryService registryService;
     private static CarbonEventPublisherManagementService carbonEventPublisherManagementService;
     private static EventManagementService eventManagementService;
-    private static ConcurrentHashMap<String, OutputMapperFactory> mappingFactoryMap = new ConcurrentHashMap<String, OutputMapperFactory>() {
-    };
+    private static ConcurrentHashMap<String, OutputMapperFactory> mappingFactoryMap = new ConcurrentHashMap<String, OutputMapperFactory>();
+    public static Set<String> outputEventAdapterTypes = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
 
     static {
         mappingFactoryMap.put(MessageType.MAP, new MapOutputMapperFactory());
@@ -139,5 +141,17 @@ public class EventPublisherServiceValueHolder {
 
     public static ConfigurationContextService getConfigurationContextService() {
         return configurationContextService;
+    }
+
+    public static Set<String> getOutputEventAdapterTypes() {
+        return outputEventAdapterTypes;
+    }
+
+    public static void addOutputEventAdapterType(String outputEventAdapterType) {
+        EventPublisherServiceValueHolder.outputEventAdapterTypes.add(outputEventAdapterType);
+    }
+
+    public static void removeOutputEventAdapterType(String outputEventAdapterType) {
+        EventPublisherServiceValueHolder.outputEventAdapterTypes.remove(outputEventAdapterType);
     }
 }

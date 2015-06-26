@@ -451,8 +451,12 @@
 </tr>
 <tr>
     <td class="buttonRow">
-        <input type="button" value="<fmt:message key="add.event.publisher"/>"
-               onclick="addEventPublisher(document.getElementById('addEventPublisher') ,document.getElementById('streamIdFilter')[document.getElementById('streamIdFilter').selectedIndex].value)"/>
+        <button class="button"
+               onclick="addEventPublisher(document.getElementById('addEventPublisher') ,document.getElementById('streamIdFilter')[document.getElementById('streamIdFilter').selectedIndex].value); return false;">
+        <fmt:message key="add.event.publisher"/></button>
+        <button class="button"
+                onclick="testPublisherConnection(); return false;">
+            <fmt:message key="test.event.publisher"/></button>
     </td>
 </tr>
 <tr style="display: none">

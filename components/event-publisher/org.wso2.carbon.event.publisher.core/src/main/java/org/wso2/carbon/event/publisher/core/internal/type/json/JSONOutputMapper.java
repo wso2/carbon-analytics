@@ -91,16 +91,18 @@ public class JSONOutputMapper implements OutputMapper {
             if (i % 2 == 0) {
                 eventText.append(mappingTextList.get(i));
             } else {
-                eventText.append(getPropertyValue(event.getData(), mappingTextList.get(i)));
+                Object propertyValue = getPropertyValue(event.getData(), mappingTextList.get(i));
+                if (propertyValue!=null && propertyValue instanceof String) {
+                    eventText.append(EventPublisherConstants.DOUBLE_QUOTE)
+                            .append(propertyValue)
+                            .append(EventPublisherConstants.DOUBLE_QUOTE);
+                } else {
+                    eventText.append(propertyValue);
+                }
             }
         }
 
         String jsonEvent = eventText.toString();
-
-        if(jsonEvent.contains("\"null\"")){
-            jsonEvent = jsonEvent.replaceAll("\"null\"","null");
-        }
-
         try {
             JsonParser jsonParser = new JsonParser();
             return jsonParser.parse(jsonEvent).toString();
@@ -137,13 +139,10 @@ public class JSONOutputMapper implements OutputMapper {
 
     }
 
-    private String getPropertyValue(Object[] eventData, String mappingProperty) {
+    private Object getPropertyValue(Object[] eventData, String mappingProperty) {
         if (eventData.length != 0) {
             int position = propertyPositionMap.get(mappingProperty);
-            Object data = eventData[position];
-            if (data != null) {
-                return data.toString();
-            }
+            return eventData[position];
         }
         return null;
     }
@@ -169,7 +168,12 @@ public class JSONOutputMapper implements OutputMapper {
         }
 
         jsonEventObject.add(EventPublisherConstants.EVENT_PARENT_TAG, innerParentObject);
-        setMappingTextList(jsonEventObject.toString());
+
+        String defaultMapping = jsonEventObject.toString();
+        defaultMapping = defaultMapping.replaceAll("\"\\{\\{", "{{");
+        defaultMapping = defaultMapping.replaceAll("\\}\\}\"", "}}");
+
+        setMappingTextList(defaultMapping);
 
     }
 

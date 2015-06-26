@@ -42,6 +42,12 @@ public class DataEndpointConfiguration {
 
     private String sessionId;
 
+    private int corePoolSize;
+
+    private int maxPoolSize;
+
+    private int keepAliveTimeInPool;
+
     public enum Protocol {
         TCP, SSL;
 
@@ -54,7 +60,7 @@ public class DataEndpointConfiguration {
     public DataEndpointConfiguration(String receiverURL, String authURL, String username, String password,
                                      GenericKeyedObjectPool transportPool,
                                      GenericKeyedObjectPool securedTransportPool,
-                                     int batchSize) {
+                                     int batchSize, int corePoolSize, int maxPoolSize, int keepAliveTimeInPool) {
         this.receiverURL = receiverURL;
         this.authURL = authURL;
         this.username = username;
@@ -66,6 +72,9 @@ public class DataEndpointConfiguration {
         this.authKey = this.authURL + DataEndpointConstants.SEPARATOR + username +
                 DataEndpointConstants.SEPARATOR + password;
         this.batchSize = batchSize;
+        this.corePoolSize = corePoolSize;
+        this.maxPoolSize = maxPoolSize;
+        this.keepAliveTimeInPool = keepAliveTimeInPool;
     }
 
     public String getReceiverURL() {
@@ -112,6 +121,18 @@ public class DataEndpointConfiguration {
 
     public GenericKeyedObjectPool getSecuredTransportPool() {
         return securedTransportPool;
+    }
+
+    public int getCorePoolSize() {
+        return corePoolSize;
+    }
+
+    public int getMaxPoolSize() {
+        return maxPoolSize;
+    }
+
+    public int getKeepAliveTimeInPool() {
+        return keepAliveTimeInPool;
     }
 
     public int getBatchSize() {

@@ -94,11 +94,11 @@ public class EventReceiver implements EventProducer {
                         tenantId, EventReceiverConstants.EVENT_RECEIVER, eventReceiverConfiguration.getEventReceiverName(), null);
             }
             if (traceEnabled) {
-                this.beforeTracerPrefix = "TenantId=" + tenantId + " : " + EventReceiverConstants.EVENT_RECEIVER + " : "
+                this.beforeTracerPrefix = "TenantId : " + tenantId + ", " + EventReceiverConstants.EVENT_RECEIVER + " : "
                         + eventReceiverConfiguration.getEventReceiverName() + ", before processing " + System.getProperty("line.separator");
-                this.afterTracerPrefix = "TenantId=" + tenantId + " : " + EventReceiverConstants.EVENT_RECEIVER + " : "
-                        + eventReceiverConfiguration.getEventReceiverName() + " : " + EventReceiverConstants.EVENT_STREAM + " : "
-                        + EventReceiverUtil.getExportedStreamIdFrom(eventReceiverConfiguration) + " , after processing " + System.getProperty("line.separator");
+                this.afterTracerPrefix = "TenantId : " + tenantId + ", " + EventReceiverConstants.EVENT_RECEIVER + " : "
+                        + eventReceiverConfiguration.getEventReceiverName() + ", " + EventReceiverConstants.EVENT_STREAM + " : "
+                        + EventReceiverUtil.getExportedStreamIdFrom(eventReceiverConfiguration) + ", after processing " + System.getProperty("line.separator");
             }
 
             String inputEventAdapterName = eventReceiverConfiguration.getFromAdapterConfiguration().getName();
@@ -164,12 +164,16 @@ public class EventReceiver implements EventProducer {
             trace.info(beforeTracerPrefix + object.toString());
         }
 
-        try {
-            if (object instanceof List) {
-                for (Object obj : (List) object) {
+        if (object instanceof List) {
+            for (Object obj : (List) object) {
+                try {
                     processMappedEvent(obj);
+                } catch (EventReceiverProcessingException e) {
+                    log.error("Dropping event. Error processing event : ", e);
                 }
-            } else {
+            }
+        } else {
+            try {
                 Object convertedEvent = this.inputMapper.convertToMappedInputEvent(object);
                 if (convertedEvent != null) {
                     if (convertedEvent instanceof Event[]) {
@@ -183,11 +187,11 @@ public class EventReceiver implements EventProducer {
                         sendEvent((Event) convertedEvent);
                     }
                 } else {
-                    log.warn("Dropping the empty/null event, Event does not matched with mapping");
+                    log.warn("Dropping the empty/null event, Event does not match with mapping");
                 }
+            } catch (EventReceiverProcessingException e) {
+                log.error("Dropping event. Error processing event : ", e);
             }
-        } catch (EventReceiverProcessingException e) {
-            log.error("Dropping event, Error processing event : " + e.getMessage(), e);
         }
 
     }
@@ -196,12 +200,16 @@ public class EventReceiver implements EventProducer {
         if (traceEnabled) {
             trace.info(beforeTracerPrefix + obj.toString());
         }
-        try {
-            if (obj instanceof List) {
-                for (Object object : (List) obj) {
+        if (obj instanceof List) {
+            for (Object object : (List) obj) {
+                try {
                     processTypedEvent(object);
+                } catch (EventReceiverProcessingException e) {
+                    log.error("Dropping event. Error processing event: " + e.getMessage(), e);
                 }
-            } else {
+            }
+        } else {
+            try {
                 Object convertedEvent = this.inputMapper.convertToTypedInputEvent(obj);
                 if (convertedEvent != null) {
                     if (convertedEvent instanceof Event[]) {
@@ -215,9 +223,9 @@ public class EventReceiver implements EventProducer {
                         sendEvent((Event) convertedEvent);
                     }
                 }
+            } catch (EventReceiverProcessingException e) {
+                log.error("Dropping event. Error processing event: " + e.getMessage(), e);
             }
-        } catch (EventReceiverProcessingException e) {
-            log.error("Dropping event, Error processing event: " + e.getMessage(), e);
         }
     }
 

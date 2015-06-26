@@ -24,6 +24,7 @@ package org.wso2.carbon.event.stream.ui.beans;
 public class AnalyticsTable {
 
     private boolean persist;
+    private String recordStoreName;
     private AnalyticsTableRecord[] analyticsTableRecords;
 
     public boolean isPersist() {
@@ -32,6 +33,14 @@ public class AnalyticsTable {
 
     public void setPersist(boolean persist) {
         this.persist = persist;
+    }
+
+    public String getRecordStoreName() {
+        return recordStoreName;
+    }
+
+    public void setRecordStoreName(String recordStoreName) {
+        this.recordStoreName = recordStoreName;
     }
 
     public AnalyticsTableRecord[] getAnalyticsTableRecords() {

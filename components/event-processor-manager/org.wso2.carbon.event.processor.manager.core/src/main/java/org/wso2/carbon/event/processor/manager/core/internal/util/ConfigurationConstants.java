@@ -78,4 +78,6 @@ public final class ConfigurationConstants {
     public static final long AXIS_TIME_INTERVAL_IN_MILLISECONDS = 10000;
     public static enum HAMode {Active, Passive, Backup}
 
+    public static final String STORM_EVENT_PUBLISHER_SYNC_MAP = "stormEventPublisherSyncMap";
+
 }
