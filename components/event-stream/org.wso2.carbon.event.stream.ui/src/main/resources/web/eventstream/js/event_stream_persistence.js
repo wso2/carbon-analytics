@@ -221,6 +221,7 @@ function populateAnalyticsIndexTable(eventStreamName, eventStreamVersion) {
                 document.getElementById('eventPersistCheckbox').checked = resultJson.persist;
                 document.getElementById('recordStoreSelect').value = resultJson.recordStoreName;
                 document.getElementById('attributeFieldSet').disabled = !resultJson.persist;
+                document.getElementById('recordStoreSelect').disabled = true;
                 if (resultJson.analyticsTableRecords != null) {
                     jQuery.each(resultJson.analyticsTableRecords, function (index, element) {
                         if (element.columnName.startsWith("meta_")) {
