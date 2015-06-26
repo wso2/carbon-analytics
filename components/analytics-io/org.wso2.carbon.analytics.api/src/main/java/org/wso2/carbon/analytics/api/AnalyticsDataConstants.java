@@ -17,6 +17,9 @@
 */
 package org.wso2.carbon.analytics.api;
 
+/**
+ * This class holds the constants used within analytics API client side implementation.
+ */
 public class AnalyticsDataConstants {
     private AnalyticsDataConstants() {
     }

@@ -53,6 +53,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This is the actual implementation of the AnalyticsDataAPI osgi service exposed.
+ */
 public class CarbonAnalyticsAPI implements AnalyticsDataAPI {
 
     private AnalyticsDataConfiguration analyticsDataConfiguration;

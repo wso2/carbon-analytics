@@ -20,6 +20,10 @@ package org.wso2.carbon.analytics.api.internal;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ * This class JAXB configuration object which represents the configuration from analytics-data-config.xml.
+ *
+ */
 @XmlRootElement(name = "AnalyticsDataConfiguration")
 public class AnalyticsDataConfiguration {
     private String mode;

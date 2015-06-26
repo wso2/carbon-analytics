@@ -70,6 +70,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This class represents the client implementation which uses the pool of http connection,
+ * and communicate between the remote instance.
+ */
+
 @SuppressWarnings("deprecation")
 public class AnalyticsAPIHttpClient {
     private static final Log log = LogFactory.getLog(AnalyticsAPIHttpClient.class);

@@ -22,8 +22,7 @@ import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 
 /**
  * This is the interface which expose the operations to perform on the Analytics.
- * The operations can be analytics data manipulation, managing streams, managing event publisher configs,
- * and managing the execution plans and spark queries.
+ * The operations can be analytics data manipulation in non-secured and secured manner.
  */
 public interface AnalyticsDataAPI extends AnalyticsDataService, SecureAnalyticsDataService {
 

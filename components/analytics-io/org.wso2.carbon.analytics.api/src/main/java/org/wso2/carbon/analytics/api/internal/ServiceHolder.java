@@ -20,6 +20,9 @@ package org.wso2.carbon.analytics.api.internal;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.SecureAnalyticsDataService;
 
+/**
+ * This class holds the OSGI services which was required for the analytics api operation.
+ */
 public class ServiceHolder {
     private static AnalyticsDataService analyticsDataService;
     private static SecureAnalyticsDataService secureAnalyticsDataService;

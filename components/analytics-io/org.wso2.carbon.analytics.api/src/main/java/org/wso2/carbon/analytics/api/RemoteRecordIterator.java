@@ -27,6 +27,11 @@ import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
+/**
+ * This is the iterator which is provided back to the caller of the analytics API to
+ * iterate through the result set,
+ */
+
 public class RemoteRecordIterator implements AnalyticsIterator<Record> {
     private static final Log log = LogFactory.getLog(RemoteRecordIterator.class);
 
