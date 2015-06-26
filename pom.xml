@@ -697,6 +697,11 @@
                                 <artifactId>protobuf-java</artifactId>
                                 <version>${spark.protobuf.version}</version>
                         </dependency>
+			<dependency>
+				<groupId>org.wso2.orbit.org.apache.mesos</groupId>
+				<artifactId>mesos</artifactId>
+				<version>${mesos.version}</version>
+			</dependency>
 			<!-- spark commons dependencies stop -->
 
             <!--features start-->
@@ -1116,7 +1121,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.scm.id>my-scm-server</project.scm.id>
 
-		<!-- Spark dependency versions -->
+		<!-- Spark dependency versions start-->
 		<spark.version>1.3.0.wso2v1</spark.version>
 		<spark.imp.pkg.version>[1.3.0,1.4.0)</spark.imp.pkg.version>
 		<spark.core.version>1.3.0.wso2v1</spark.core.version>
@@ -1143,6 +1148,8 @@
 		<minlog.version>1.2.wso2v1</minlog.version>
 		<uncommons.maths.version>1.2.2.wso2v1</uncommons.maths.version>
 		<spark.protobuf.version>2.5.0-spark</spark.protobuf.version>
+		<mesos.version>0.18.1.wso2v1</mesos.version>
+		<!-- Spark dependency versions end-->
     </properties>
 
 </project>
