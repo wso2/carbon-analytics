@@ -69,8 +69,8 @@ public class FileTailEventAdapterFactory extends InputEventAdapterFactory {
     }
 
     @Override
-    public String getDescription() {
-        return resourceBundle.getString(FileTailEventAdapterConstants.EVENT_ADAPTER_DESCRIPTION_FILE);
+    public String getUsageTips() {
+        return resourceBundle.getString(FileTailEventAdapterConstants.EVENT_ADAPTER_USAGE_TIPS_FILE);
     }
 
     @Override

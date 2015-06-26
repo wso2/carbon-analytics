@@ -57,8 +57,8 @@ public class HTTPEventAdapterFactory extends InputEventAdapterFactory {
     }
 
     @Override
-    public String getDescription() {
-        return resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_DESCRIPTION_HTTP);
+    public String getUsageTips() {
+        return resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_USAGE_TIPS_HTTP);
     }
 
     @Override

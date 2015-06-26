@@ -45,8 +45,8 @@ public class WebsocketLocalEventAdapterFactory extends InputEventAdapterFactory 
     }
 
     @Override
-    public String getDescription() {
-        return WebsocketLocalEventAdapterConstants.ADAPTOR_DESCRIPTION_WEBSOCKET_LOCAL;
+    public String getUsageTips() {
+        return WebsocketLocalEventAdapterConstants.ADAPTOR_USAGE_TIPS_WEBSOCKET_LOCAL;
     }
 
     @Override

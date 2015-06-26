@@ -210,7 +210,7 @@
     </td>
 </tr>
 
-<tr id="eventPublisherDescriptionRowId"><td hidden><fmt:message key="event.adapter.description"/></td>
+<tr id="eventPublisherUsageTipsRowId"><td hidden><fmt:message key="event.adapter.usage.tips"/></td>
     <td hidden></td>
 </tr>
 

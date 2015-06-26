@@ -88,7 +88,7 @@ public class KafkaEventAdapterFactory extends InputEventAdapterFactory {
  }
 
     @Override
-    public String getDescription() {
+    public String getUsageTips() {
         return null;
     }
 

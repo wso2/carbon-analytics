@@ -138,7 +138,7 @@ public class JMSEventAdapterFactory extends InputEventAdapterFactory {
     }
 
     @Override
-    public String getDescription() {
+    public String getUsageTips() {
         return null;
     }
 

@@ -125,7 +125,7 @@
     </td>
 </tr>
 
-<tr id="eventReceiverDescriptionRowId"><td hidden><fmt:message key="event.adapter.description"/></td>
+<tr id="eventReceiverUsageTipsRowId"><td hidden><fmt:message key="event.adapter.usage.tips"/></td>
     <td hidden></td>
 </tr>
 

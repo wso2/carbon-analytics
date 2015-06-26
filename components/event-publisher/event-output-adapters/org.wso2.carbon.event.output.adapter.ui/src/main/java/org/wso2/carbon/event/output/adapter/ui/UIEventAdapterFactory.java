@@ -60,8 +60,8 @@ public class UIEventAdapterFactory extends OutputEventAdapterFactory {
     }
 
     @Override
-    public String getDescription() {
-        return resourceBundle.getString(UIEventAdapterConstants.ADAPTER_DESCRIPTION_UI);
+    public String getUsageTips() {
+        return resourceBundle.getString(UIEventAdapterConstants.ADAPTER_USAGE_TIPS_UI);
     }
 
     @Override

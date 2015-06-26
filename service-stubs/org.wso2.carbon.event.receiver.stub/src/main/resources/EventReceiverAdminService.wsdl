@@ -143,35 +143,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="setTracingEnabled">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="eventReceiverName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="flag" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="setTracingEnabledResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getInactiveEventReceiverConfigurationContent">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getInactiveEventReceiverConfigurationContentResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
             <xs:element name="getActiveEventReceiverConfigurationContent">
                 <xs:complexType>
                     <xs:sequence>
@@ -186,45 +157,7 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getAllActiveEventReceiverConfigurations">
-                <xs:complexType>
-                    <xs:sequence/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getAllActiveEventReceiverConfigurationsResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2101:EventReceiverConfigurationInfoDto"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getAllInactiveEventReceiverConfigurations">
-                <xs:complexType>
-                    <xs:sequence/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getAllInactiveEventReceiverConfigurationsResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2101:EventReceiverConfigurationFileDto"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deployEventReceiverConfiguration">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="eventReceiverConfigXml" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deployEventReceiverConfigurationResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="setStatisticsEnabled">
+            <xs:element name="setTracingEnabled">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="eventReceiverName" nillable="true" type="xs:string"/>
@@ -232,7 +165,7 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="setStatisticsEnabledResponse">
+            <xs:element name="setTracingEnabledResponse">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" type="xs:boolean"/>
@@ -311,6 +244,73 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="getAllActiveEventReceiverConfigurations">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllActiveEventReceiverConfigurationsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2101:EventReceiverConfigurationInfoDto"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllInactiveEventReceiverConfigurations">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllInactiveEventReceiverConfigurationsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2101:EventReceiverConfigurationFileDto"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getInactiveEventReceiverConfigurationContent">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getInactiveEventReceiverConfigurationContentResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployEventReceiverConfiguration">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventReceiverConfigXml" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployEventReceiverConfigurationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setStatisticsEnabled">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventReceiverName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="flag" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setStatisticsEnabledResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
         </xs:schema>
         <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://admin.receiver.event.carbon.wso2.org/xsd">
             <xs:complexType name="EventReceiverConfigurationInfoDto">
@@ -340,10 +340,10 @@
             </xs:complexType>
             <xs:complexType name="InputAdapterConfigurationDto">
                 <xs:sequence>
-                    <xs:element minOccurs="0" name="eventAdapterDescription" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="eventAdapterType" nillable="true" type="xs:string"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="inputEventAdapterProperties" nillable="true" type="ax2100:DetailInputAdapterPropertyDto"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="supportedMessageFormats" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="usageTips" nillable="true" type="xs:string"/>
                 </xs:sequence>
             </xs:complexType>
             <xs:complexType name="DetailInputAdapterPropertyDto">
@@ -358,13 +358,6 @@
                     <xs:element minOccurs="0" name="value" nillable="true" type="xs:string"/>
                 </xs:sequence>
             </xs:complexType>
-            <xs:complexType name="EventReceiverConfigurationFileDto">
-                <xs:sequence>
-                    <xs:element minOccurs="0" name="deploymentStatusMsg" nillable="true" type="xs:string"/>
-                    <xs:element minOccurs="0" name="eventReceiverName" nillable="true" type="xs:string"/>
-                    <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"/>
-                </xs:sequence>
-            </xs:complexType>
             <xs:complexType name="EventReceiverConfigurationDto">
                 <xs:sequence>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="correlationMappingPropertyDtos" nillable="true" type="ax2100:EventMappingPropertyDto"/>
@@ -377,6 +370,13 @@
                     <xs:element minOccurs="0" name="parentSelectorXpath" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="toStreamNameWithVersion" nillable="true" type="xs:string"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="xpathDefinitionMappingPropertyDtos" nillable="true" type="ax2100:EventMappingPropertyDto"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="EventReceiverConfigurationFileDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="deploymentStatusMsg" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="eventReceiverName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"/>
                 </xs:sequence>
             </xs:complexType>
         </xs:schema>
@@ -1134,13 +1134,13 @@
     </wsdl:binding>
     <wsdl:service name="EventReceiverAdminService">
         <wsdl:port name="EventReceiverAdminServiceHttpsSoap11Endpoint" binding="ns:EventReceiverAdminServiceSoap11Binding">
-            <soap:address location="https://10.100.7.55:9443/services/EventReceiverAdminService.EventReceiverAdminServiceHttpsSoap11Endpoint/"/>
+            <soap:address location="https://192.168.1.4:9443/services/EventReceiverAdminService.EventReceiverAdminServiceHttpsSoap11Endpoint/"/>
         </wsdl:port>
         <wsdl:port name="EventReceiverAdminServiceHttpsSoap12Endpoint" binding="ns:EventReceiverAdminServiceSoap12Binding">
-            <soap12:address location="https://10.100.7.55:9443/services/EventReceiverAdminService.EventReceiverAdminServiceHttpsSoap12Endpoint/"/>
+            <soap12:address location="https://192.168.1.4:9443/services/EventReceiverAdminService.EventReceiverAdminServiceHttpsSoap12Endpoint/"/>
         </wsdl:port>
         <wsdl:port name="EventReceiverAdminServiceHttpsEndpoint" binding="ns:EventReceiverAdminServiceHttpBinding">
-            <http:address location="https://10.100.7.55:9443/services/EventReceiverAdminService.EventReceiverAdminServiceHttpsEndpoint/"/>
+            <http:address location="https://192.168.1.4:9443/services/EventReceiverAdminService.EventReceiverAdminServiceHttpsEndpoint/"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

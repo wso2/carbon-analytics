@@ -27,13 +27,13 @@ public abstract class InputEventAdapterFactory {
 
     public abstract List<Property> getPropertyList();
 
-    public abstract String getDescription();
+    public abstract String getUsageTips();
 
     public abstract InputEventAdapter createEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration, Map<String, String> globalProperties);
 
     public InputEventAdapterSchema getInputEventAdapterSchema() {
         if (inputEventAdapterSchema == null) {
-            inputEventAdapterSchema = new InputEventAdapterSchema(getType(), getDescription(),getSupportedMessageFormats(), getPropertyList());
+            inputEventAdapterSchema = new InputEventAdapterSchema(getType(), getUsageTips(),getSupportedMessageFormats(), getPropertyList());
         }
         return inputEventAdapterSchema;
     }

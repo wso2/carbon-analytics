@@ -181,7 +181,7 @@ public class EventReceiverAdminService extends AbstractAdmin {
                 fromAdapterConfigurationDto.setSupportedMessageFormats(
                         inputEventAdapterSchema.getSupportedMessageFormats().
                                 toArray(new String[inputEventAdapterSchema.getSupportedMessageFormats().size()]));
-                fromAdapterConfigurationDto.setEventAdapterDescription(inputEventAdapterSchema.getDescription());
+                fromAdapterConfigurationDto.setUsageTips(inputEventAdapterSchema.getUsageTips());
 
                 Map<String, String> inputAdapterProperties = new HashMap<String, String>();
                 inputAdapterProperties.putAll(fromAdapterConfiguration.getProperties());
@@ -660,7 +660,7 @@ public class EventReceiverAdminService extends AbstractAdmin {
         inputAdapterConfigurationDto.setSupportedMessageFormats(
                 inputEventAdapterSchema.getSupportedMessageFormats().
                         toArray(new String[inputEventAdapterSchema.getSupportedMessageFormats().size()]));
-        inputAdapterConfigurationDto.setEventAdapterDescription(inputEventAdapterSchema.getDescription());
+        inputAdapterConfigurationDto.setUsageTips(inputEventAdapterSchema.getUsageTips());
         return inputAdapterConfigurationDto;
     }
 

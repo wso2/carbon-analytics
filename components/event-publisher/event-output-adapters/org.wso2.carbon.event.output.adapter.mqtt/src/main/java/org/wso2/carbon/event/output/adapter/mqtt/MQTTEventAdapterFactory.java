@@ -121,7 +121,7 @@ public class MQTTEventAdapterFactory extends OutputEventAdapterFactory {
     }
 
     @Override
-    public String getDescription() {
+    public String getUsageTips() {
         return null;
     }
 

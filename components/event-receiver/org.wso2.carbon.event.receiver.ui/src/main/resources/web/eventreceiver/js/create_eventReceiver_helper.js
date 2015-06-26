@@ -113,13 +113,13 @@ function loadEventAdapterProperties(adapterSchema, propertiesHeading) {
     }
 
     var eventReceiverInputTable = document.getElementById("eventReceiverInputTable");
-    var eventReceiverDescriptionRow = document.getElementById("eventReceiverDescriptionRowId");
+    var eventReceiverUsageTipsRow = document.getElementById("eventReceiverUsageTipsRowId");
 
-    //adapter description
-    if (adapterSchema.localEventAdapterDescription != null) {
-        eventReceiverDescriptionRow.innerHTML = '<td>Usage Tip</td><td>' + adapterSchema.localEventAdapterDescription + '</td>';
+    //adapter usage tips
+    if (adapterSchema.localUsageTips != null) {
+        eventReceiverUsageTipsRow.innerHTML = '<td>Usage Tips</td><td>' + adapterSchema.localUsageTips + '</td>';
     } else {
-        eventReceiverDescriptionRow.innerHTML = '<td hidden></td><td hidden></td>';
+        eventReceiverUsageTipsRow.innerHTML = '<td hidden></td><td hidden></td>';
     }
 
     // delete message properties related fields

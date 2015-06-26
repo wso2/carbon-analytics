@@ -28,7 +28,7 @@ public class UIEventAdapterConstants {
     }
 
     public static final String ADAPTER_TYPE_UI = "ui";
-    public static final String ADAPTER_DESCRIPTION_UI = "ui.description";
+    public static final String ADAPTER_USAGE_TIPS_UI = "ui.usage.tips";
     public static final String ADAPTER_UI_DEFAULT_OUTPUT_STREAM_VERSION = "1.0.0";
     public static final String ADAPTER_UI_COLON = ":";
     public static final int INDEX_ZERO = 0;

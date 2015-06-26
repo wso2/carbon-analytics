@@ -126,7 +126,7 @@ public class EmailEventAdapterFactory extends InputEventAdapterFactory {
     }
 
     @Override
-    public String getDescription() {
+    public String getUsageTips() {
         return null;
     }
 

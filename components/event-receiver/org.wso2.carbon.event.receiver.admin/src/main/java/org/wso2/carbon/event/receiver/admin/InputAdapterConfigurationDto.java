@@ -19,7 +19,7 @@ public class InputAdapterConfigurationDto {
 
     private String eventAdapterType;
 
-    private String eventAdapterDescription;
+    private String usageTips;
 
     private String[] supportedMessageFormats;
 
@@ -50,12 +50,12 @@ public class InputAdapterConfigurationDto {
         this.supportedMessageFormats = supportedMessageFormats;
     }
 
-    public String getEventAdapterDescription() {
-        return eventAdapterDescription;
+    public String getUsageTips() {
+        return usageTips;
     }
 
-    public void setEventAdapterDescription(String eventAdapterDescription) {
-        this.eventAdapterDescription = eventAdapterDescription;
+    public void setUsageTips(String usageTips) {
+        this.usageTips = usageTips;
     }
 
 

@@ -25,5 +25,5 @@ public final class WebsocketLocalEventAdapterConstants {
     }
 
     public static final String ADAPTOR_TYPE_WEBSOCKET_LOCAL = "websocket-local";
-    public static final String ADAPTOR_DESCRIPTION_WEBSOCKET_LOCAL = "Following url formats are used to receive events:</br>&nbsp;&nbsp;&nbsp;<i>ws://localhost:9763/inputwebsocket/&lt;receiver_name&gt;</i></br>&nbsp;&nbsp;&nbsp;<i>wss://localhost:9443/inputwebsocket/&lt;receiver_name&gt;</i>";
+    public static final String ADAPTOR_USAGE_TIPS_WEBSOCKET_LOCAL = "Following url formats are used to receive events:</br>&nbsp;&nbsp;<i>ws://localhost:9763/inputwebsocket/&lt;receiver_name&gt;</i></br>&nbsp;&nbsp;<i>wss://localhost:9443/inputwebsocket/&lt;receiver_name&gt;</i>";
 }

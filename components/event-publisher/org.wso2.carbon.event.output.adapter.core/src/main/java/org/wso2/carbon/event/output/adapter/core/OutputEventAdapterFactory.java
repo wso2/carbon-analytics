@@ -29,13 +29,13 @@ public abstract class OutputEventAdapterFactory {
 
     public abstract List<Property> getDynamicPropertyList();
 
-    public abstract String getDescription();
+    public abstract String getUsageTips();
 
     public abstract OutputEventAdapter createEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String, String> globalProperties);
 
     public OutputEventAdapterSchema getOutputEventAdapterSchema() {
         if (outputEventAdapterSchema == null) {
-            outputEventAdapterSchema = new OutputEventAdapterSchema(getType(), getDescription(), getSupportedMessageFormats(), getStaticPropertyList(), getDynamicPropertyList());
+            outputEventAdapterSchema = new OutputEventAdapterSchema(getType(), getUsageTips(), getSupportedMessageFormats(), getStaticPropertyList(), getDynamicPropertyList());
         }
         return outputEventAdapterSchema;
     }

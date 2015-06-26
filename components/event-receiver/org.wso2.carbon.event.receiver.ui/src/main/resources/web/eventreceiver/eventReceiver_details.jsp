@@ -126,11 +126,18 @@
 
 <%
     InputAdapterConfigurationDto fromPropertyConfigurationDto = eventReceiverConfigurationDto.getFromAdapterConfigurationDto();
-    if (fromPropertyConfigurationDto != null) {
 %>
+
+<tr>
+    <td><fmt:message key="event.adapter.usage.tips"/></td>
+    <td><%=fromPropertyConfigurationDto.getUsageTips()%></td>
+</tr>
+
 <%
+    if (fromPropertyConfigurationDto != null) {
     if (fromPropertyConfigurationDto.getInputEventAdapterProperties()!=null && fromPropertyConfigurationDto.getInputEventAdapterProperties().length > 0) {
 %>
+
 <tr>
     <td>
         <b><i><span style="color: #666666; "><fmt:message key="properties.heading"/></span></i></b>

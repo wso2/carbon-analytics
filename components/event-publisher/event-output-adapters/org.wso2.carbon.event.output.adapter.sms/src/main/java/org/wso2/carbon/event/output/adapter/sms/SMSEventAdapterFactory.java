@@ -61,7 +61,7 @@ public class SMSEventAdapterFactory extends OutputEventAdapterFactory {
     }
 
     @Override
-    public String getDescription() {
+    public String getUsageTips() {
         return null;
     }
 

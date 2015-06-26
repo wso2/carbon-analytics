@@ -146,13 +146,13 @@ function loadEventAdapterData(adapterSchema) {
     }
 
     var eventPublisherInputTable = document.getElementById("eventPublisherInputTable");
-    var eventPublisherDescriptionRow = document.getElementById("eventPublisherDescriptionRowId");
+    var eventPublisherUsageTipsRow = document.getElementById("eventPublisherUsageTipsRowId");
 
-    //adapter description message
-    if (adapterSchema.localEventAdapterDescription != null) {
-        eventPublisherDescriptionRow.innerHTML = '<td>Usage Tip</td><td>' + adapterSchema.localEventAdapterDescription + '</td>';
+    //adapter usage tips
+    if (adapterSchema.localUsageTips != null) {
+        eventPublisherUsageTipsRow.innerHTML = '<td>Usage Tips</td><td>' + adapterSchema.localUsageTips + '</td>';
     } else {
-        eventPublisherDescriptionRow.innerHTML = '<td hidden></td><td hidden></td>';
+        eventPublisherUsageTipsRow.innerHTML = '<td hidden></td><td hidden></td>';
     }
 
     // delete message properties related fields

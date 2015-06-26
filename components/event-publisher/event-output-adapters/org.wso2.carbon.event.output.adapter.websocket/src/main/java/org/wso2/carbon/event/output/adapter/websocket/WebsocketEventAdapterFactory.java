@@ -62,7 +62,7 @@ public class WebsocketEventAdapterFactory extends OutputEventAdapterFactory {
     }
 
     @Override
-    public String getDescription() {
+    public String getUsageTips() {
         return null;
     }
 
