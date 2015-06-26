@@ -26,6 +26,7 @@ public final class WebsocketLocalEventAdapterConstants {
     }
 
     public static final String ADAPTER_TYPE_WEBSOCKET_LOCAL = "websocket-local";
+    public static final String ADAPTER_USAGE_TIPS_WEBSOCKET_LOCAL = "Following url formats are used to publish events:</br>&nbsp;&nbsp;<i>ws://localhost:9763/outputwebsocket/&lt;publisher_name&gt;</i></br>&nbsp;&nbsp;<i>wss://localhost:9443/outputwebsocket/&lt;publisher_name&gt;";
 
     public static final int ADAPTER_MIN_THREAD_POOL_SIZE = 8;
     public static final int ADAPTER_MAX_THREAD_POOL_SIZE = 100;

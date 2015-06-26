@@ -126,8 +126,14 @@ public class EmailEventAdapterFactory extends InputEventAdapterFactory {
     }
 
     @Override
+    public String getUsageTips() {
+        return null;
+    }
+
+    @Override
     public InputEventAdapter createEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration,
                                                 Map<String, String> globalProperties) {
         return new EmailEventAdapter(eventAdapterConfiguration, globalProperties);
     }
+
 }

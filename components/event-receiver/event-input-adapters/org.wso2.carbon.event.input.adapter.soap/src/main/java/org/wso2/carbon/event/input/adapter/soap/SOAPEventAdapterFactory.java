@@ -57,6 +57,11 @@ public class SOAPEventAdapterFactory extends InputEventAdapterFactory {
     }
 
     @Override
+    public String getUsageTips() {
+        return resourceBundle.getString(SOAPEventAdapterConstants.ADAPTER_USAGE_TIPS_SOAP);
+    }
+
+    @Override
     public InputEventAdapter createEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration, Map<String, String> globalProperties) {
         return new SOAPEventAdapter(eventAdapterConfiguration, globalProperties);
     }

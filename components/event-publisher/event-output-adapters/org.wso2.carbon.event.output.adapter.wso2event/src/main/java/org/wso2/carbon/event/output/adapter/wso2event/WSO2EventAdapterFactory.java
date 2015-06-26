@@ -114,7 +114,12 @@ public class WSO2EventAdapterFactory extends OutputEventAdapterFactory {
     }
 
     @Override
+    public String getUsageTips() {
+        return resourceBundle.getString(WSO2EventAdapterConstants.ADAPTER_USAGE_TIPS_WSO2EVENT);
+    }
+
+    @Override
     public OutputEventAdapter createEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String, String> globalProperties) {
-        return new WSO2EventAdapter(eventAdapterConfiguration,globalProperties);
+        return new WSO2EventAdapter(eventAdapterConfiguration, globalProperties);
     }
 }

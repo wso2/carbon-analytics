@@ -32,7 +32,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-public class UIEventAdapterFactory extends OutputEventAdapterFactory{
+public class UIEventAdapterFactory extends OutputEventAdapterFactory {
 
     private ResourceBundle resourceBundle = ResourceBundle.getBundle("org.wso2.carbon.event.output.adapter.ui.i18n" +
             ".Resources", Locale.getDefault());
@@ -60,8 +60,13 @@ public class UIEventAdapterFactory extends OutputEventAdapterFactory{
     }
 
     @Override
+    public String getUsageTips() {
+        return resourceBundle.getString(UIEventAdapterConstants.ADAPTER_USAGE_TIPS_UI);
+    }
+
+    @Override
     public OutputEventAdapter createEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
-            Map<String, String> globalProperties) {
-        return new UIEventAdapter(eventAdapterConfiguration,globalProperties);
+                                                 Map<String, String> globalProperties) {
+        return new UIEventAdapter(eventAdapterConfiguration, globalProperties);
     }
 }

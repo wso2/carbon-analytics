@@ -109,7 +109,6 @@ public class MQTTEventAdapterFactory extends OutputEventAdapterFactory {
         List<Property> dynamicPropertyList = new ArrayList<Property>();
 
 
-
         // set topic
         Property topicProperty = new Property(MQTTEventAdapterConstants.ADAPTER_MESSAGE_TOPIC);
         topicProperty.setDisplayName(
@@ -119,6 +118,11 @@ public class MQTTEventAdapterFactory extends OutputEventAdapterFactory {
         dynamicPropertyList.add(topicProperty);
 
         return dynamicPropertyList;
+    }
+
+    @Override
+    public String getUsageTips() {
+        return null;
     }
 
     @Override

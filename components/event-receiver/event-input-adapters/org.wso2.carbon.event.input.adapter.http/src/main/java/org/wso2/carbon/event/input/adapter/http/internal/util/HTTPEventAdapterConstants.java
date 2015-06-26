@@ -21,6 +21,7 @@ public final class HTTPEventAdapterConstants {
     }
 
     public static final String ADAPTER_TYPE_HTTP = "http";
+    public static final String ADAPTER_USAGE_TIPS_HTTP = "http.usage.tips";
     public static final int ADAPTER_MIN_THREAD_POOL_SIZE = 8;
     public static final int ADAPTER_MAX_THREAD_POOL_SIZE = 100;
     public static final int ADAPTER_EXECUTOR_JOB_QUEUE_SIZE = 10000;

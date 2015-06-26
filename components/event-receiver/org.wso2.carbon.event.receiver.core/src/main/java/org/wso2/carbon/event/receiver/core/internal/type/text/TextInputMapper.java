@@ -168,7 +168,11 @@ public class TextInputMapper implements InputMapper {
                 try {
                     if (textEvent.length == 2) {
                         AttributeType attributeType = attributeDescriptionMap.get(textEvent[0].trim());
-                        attributeArray[attributeCount++] = getPropertyValue(textEvent[1], attributeType);
+                        if (attributeType != null) {
+                            attributeArray[attributeCount++] = getPropertyValue(textEvent[1], attributeType);
+                        } else {
+                            throw new EventReceiverProcessingException("Event attributes are not matching with the stream, hence dropping event attribute " + eventAttribute);
+                        }
                     } else if (textEvent.length == 0) {
                         throw new EventReceiverProcessingException("Invalid attribute value found for event ,hence dropping the event " + eventAttribute);
                     } else if (textEvent.length == 1) {

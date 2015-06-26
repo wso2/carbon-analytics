@@ -90,6 +90,11 @@ public class SoapEventAdapterFactory extends OutputEventAdapterFactory {
         return dynamicPropertyList;
     }
 
+    @Override
+    public String getUsageTips() {
+        return null;
+    }
+
 
     @Override
     public OutputEventAdapter createEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String,

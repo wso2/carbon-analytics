@@ -35,7 +35,7 @@ function fillTextIn(obj) {
 
 
 function loadEventAdapterProperties(messageProperty, eventPublisherInputTable, propertyLoop,
-                                           propertyValue, requiredValue, insertRowCount) {
+                                    propertyValue, requiredValue, insertRowCount) {
 
     var tableRow = eventPublisherInputTable.insertRow(insertRowCount);
     var textLabel = tableRow.insertCell(0);
@@ -43,7 +43,7 @@ function loadEventAdapterProperties(messageProperty, eventPublisherInputTable, p
     textLabel.innerHTML = displayName;
     var requiredElementId = propertyValue;
     var textPasswordType = "text";
-    var hint = ""  ;
+    var hint = "";
     var defaultValue = "";
 
     if (messageProperty.localRequired) {
@@ -103,17 +103,17 @@ function showEventStreamDefinition() {
     var selectedIndex = document.getElementById("streamIdFilter").selectedIndex;
     var streamNameWithVersion = document.getElementById("streamIdFilter").options[selectedIndex].text;
     jQuery.ajax({
-                    type:"POST",
-                    url:"../eventpublisher/get_streamdefinition_ajaxprocessor.jsp?streamName=" + streamNameWithVersion + "",
-                    data:{},
-                    contentType:"application/json; charset=utf-8",
-                    dataType:"text",
-                    async:true,
-                    success:function (streamDefinition) {
+        type: "POST",
+        url: "../eventpublisher/get_streamdefinition_ajaxprocessor.jsp?streamName=" + streamNameWithVersion + "",
+        data: {},
+        contentType: "application/json; charset=utf-8",
+        dataType: "text",
+        async: true,
+        success: function (streamDefinition) {
 
-                        jQuery('#streamDefinitionText').val(streamDefinition.trim());
-                    }
-                });
+            jQuery('#streamDefinitionText').val(streamDefinition.trim());
+        }
+    });
 
     selectedIndex = document.getElementById("mappingTypeFilter").selectedIndex;
     var inputMappingType = document.getElementById("mappingTypeFilter").options[selectedIndex].text;
@@ -146,14 +146,23 @@ function loadEventAdapterData(adapterSchema) {
     }
 
     var eventPublisherInputTable = document.getElementById("eventPublisherInputTable");
+    var eventPublisherUsageTipsRow = document.getElementById("eventPublisherUsageTipsRowId");
+
+    //adapter usage tips
+    if (adapterSchema.localUsageTips != null) {
+        eventPublisherUsageTipsRow.innerHTML = '<td>Usage Tips</td><td>' + adapterSchema.localUsageTips + '</td>';
+    } else {
+        eventPublisherUsageTipsRow.innerHTML = '<td hidden></td><td hidden></td>';
+    }
+
     // delete message properties related fields
-    for (i = eventPublisherInputTable.rows.length - 5; i > 5; i--) {
+    for (i = eventPublisherInputTable.rows.length - 5; i > 6; i--) {
         eventPublisherInputTable.deleteRow(i);
     }
     var inputProperty = "property_";
     var inputRequiredProperty = "property_Required_";
-    var initialRowValue = 6;
-    var index=0;
+    var initialRowValue = 7;
+    var index = 0;
     if (adapterSchema.localOutputEventAdapterStaticProperties != undefined) {
 
         var tableRow = eventPublisherInputTable.insertRow(initialRowValue);
@@ -190,13 +199,13 @@ function loadEventAdapterRelatedProperties(toPropertyHeader) {
     var selected_text = document.getElementById("eventAdapterTypeFilter").options[selectedIndex].text;
 
     jQuery.ajax({
-        type:"POST",
-        url:"../eventpublisher/get_adapter_properties_ajaxprocessor.jsp?eventAdapterType=" + selected_text + "",
-        data:{},
-        contentType:"application/json; charset=utf-8",
-        dataType:"text",
-        async:false,
-        success:function (propertiesString) {
+        type: "POST",
+        url: "../eventpublisher/get_adapter_properties_ajaxprocessor.jsp?eventAdapterType=" + selected_text + "",
+        data: {},
+        contentType: "application/json; charset=utf-8",
+        dataType: "text",
+        async: false,
+        success: function (propertiesString) {
 
             if (propertiesString != null) {
                 var jsonObject = JSON.parse(propertiesString);

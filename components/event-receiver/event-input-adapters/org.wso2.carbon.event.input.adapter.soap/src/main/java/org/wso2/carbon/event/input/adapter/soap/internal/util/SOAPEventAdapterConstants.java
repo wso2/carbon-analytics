@@ -24,6 +24,7 @@ public final class SOAPEventAdapterConstants {
     }
 
     public static final String ADAPTER_TYPE_SOAP = "soap";
+    public static final String ADAPTER_USAGE_TIPS_SOAP = "soap.usage.tips";
     public static final String OPERATION_NAME = "receive";
     public static final String EXPOSED_TRANSPORTS = "transports";
     public static final String HTTPS = "https";

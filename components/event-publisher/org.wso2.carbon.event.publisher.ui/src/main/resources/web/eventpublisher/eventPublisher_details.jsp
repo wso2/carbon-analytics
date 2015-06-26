@@ -160,9 +160,15 @@
 
 <%
     OutputAdapterConfigurationDto toPropertyConfigurationDto = eventPublisherConfigurationDto.getToAdapterConfigurationDto();
-    if (toPropertyConfigurationDto != null) {
 %>
+
+<tr>
+    <td><fmt:message key="event.adapter.usage.tips"/></td>
+    <td><%=toPropertyConfigurationDto.getUsageTips()%></td>
+</tr>
+
 <%
+    if (toPropertyConfigurationDto != null) {
     if (toPropertyConfigurationDto.getOutputEventAdapterStaticProperties()!=null && toPropertyConfigurationDto.getOutputEventAdapterStaticProperties().length > 0) {
 %>
 <tr>
