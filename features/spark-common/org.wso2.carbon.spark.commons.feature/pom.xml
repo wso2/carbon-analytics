@@ -74,6 +74,10 @@
 			<artifactId>netty-all</artifactId>
 		</dependency>
 		<dependency>
+            		<groupId>io.netty</groupId>
+            		<artifactId>netty</artifactId>
+        	</dependency>
+		<dependency>
 			<groupId>org.wso2.twitter</groupId>
 			<artifactId>chill_2.10</artifactId>
 		</dependency>
@@ -158,6 +162,10 @@
             		<artifactId>objenesis</artifactId>
         	</dependency>
 		<dependency>
+            		<groupId>javax.servlet.jsp</groupId>
+            		<artifactId>javax.servlet.jsp-api</artifactId>
+        	</dependency>
+		<dependency>
                                 <groupId>org.wso2.uncommons.maths</groupId>
                                 <artifactId>uncommons-maths</artifactId>
                 </dependency>
@@ -231,6 +239,8 @@
 								<bundleDef>com.google.protobuf:protobuf-java</bundleDef>
 								<bundleDef>commons-configuration.wso2:commons-configuration</bundleDef>
 								<bundleDef>org.wso2.orbit.org.objenesis:objenesis</bundleDef>
+								<bundleDef>javax.servlet.jsp:javax.servlet.jsp-api</bundleDef>
+								<bundleDef>io.netty:netty</bundleDef>
 							</bundles>
 						</configuration>
 					</execution>

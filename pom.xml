@@ -712,6 +712,16 @@
                 		<artifactId>objenesis</artifactId>
                 		<version>${objenesis.orbit.version}</version>
             		</dependency>
+			<dependency>
+                		<groupId>javax.servlet.jsp</groupId>
+                		<artifactId>javax.servlet.jsp-api</artifactId>
+                		<version>${servelet.jsp.version}</version>
+            		</dependency>
+			<dependency>
+                		<groupId>io.netty</groupId>
+                		<artifactId>netty</artifactId>
+                		<version>${netty.version}</version>
+            		</dependency>
 			<!-- spark commons dependencies stop -->
 
             <!--features start-->
@@ -1163,6 +1173,8 @@
 		<google.protobuf.version>2.5.0</google.protobuf.version>
 		<commons.configuration.orbit.version>1.6.0.wso2v1</commons.configuration.orbit.version>
 		<objenesis.orbit.version>2.1.wso2v1</objenesis.orbit.version>
+		<servelet.jsp.version>2.2.1</servelet.jsp.version>
+		<netty.version>3.9.0.Final</netty.version>
 		<!-- Spark dependency versions end-->
     </properties>
 
