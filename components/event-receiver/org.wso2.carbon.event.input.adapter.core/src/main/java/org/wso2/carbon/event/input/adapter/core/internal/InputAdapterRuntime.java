@@ -17,6 +17,7 @@ package org.wso2.carbon.event.input.adapter.core.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapter;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterSubscription;
@@ -126,15 +127,22 @@ public class InputAdapterRuntime implements InputEventAdapterListener {
                         inputEventAdapter.connect();
                     } else {
                         log.error("Connection unavailable for Input Adopter '" + name + "' . Reconnection will be retried in " + (timer.returnTimeToWait()) + " milliseconds.", connectionUnavailableException);
+                        final int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
                         executorService.execute(new Runnable() {
                             @Override
                             public void run() {
                                 try {
-                                    Thread.sleep(timer.returnTimeToWait());
-                                } catch (InterruptedException e) {
-                                    //nothing to be done
+                                    PrivilegedCarbonContext.startTenantFlow();
+                                    PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
+                                    try {
+                                        Thread.sleep(timer.returnTimeToWait());
+                                    } catch (InterruptedException e) {
+                                        //nothing to be done
+                                    }
+                                    connectionUnavailable(null);
+                                } finally {
+                                    PrivilegedCarbonContext.endTenantFlow();
                                 }
-                                connectionUnavailable(null);
                             }
                         });
                     }
