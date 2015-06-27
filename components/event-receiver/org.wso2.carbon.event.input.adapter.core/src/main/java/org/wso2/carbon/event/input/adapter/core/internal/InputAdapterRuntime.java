@@ -42,12 +42,14 @@ public class InputAdapterRuntime implements InputEventAdapterListener {
     private ExecutorService executorService;
     private boolean startedTriggered = false;
     private boolean startPollingTriggered = false;
+    private int tenantId;
 
     public InputAdapterRuntime(InputEventAdapter inputEventAdapter, String name,
                                InputEventAdapterSubscription inputEventAdapterSubscription) throws InputEventAdapterException {
         this.inputEventAdapter = inputEventAdapter;
         this.name = name;
         this.inputEventAdapterSubscription = inputEventAdapterSubscription;
+        this.tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         executorService = Executors.newSingleThreadExecutor();
         synchronized (this) {
             inputEventAdapter.init(this);
@@ -127,7 +129,6 @@ public class InputAdapterRuntime implements InputEventAdapterListener {
                         inputEventAdapter.connect();
                     } else {
                         log.error("Connection unavailable for Input Adopter '" + name + "' . Reconnection will be retried in " + (timer.returnTimeToWait()) + " milliseconds.", connectionUnavailableException);
-                        final int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
                         executorService.execute(new Runnable() {
                             @Override
                             public void run() {
