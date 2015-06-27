@@ -36,11 +36,11 @@ public class WebsocketClient extends Endpoint {
 
     private static final Log log = LogFactory.getLog(WebsocketClient.class);
     private InputEventAdapterListener inputEventAdapterListener;
-    private int tenantID;
+    private int tenantId;
 
-    public WebsocketClient(InputEventAdapterListener inputEventAdapterListener) {
+    public WebsocketClient(InputEventAdapterListener inputEventAdapterListener, int tenantId) {
         this.inputEventAdapterListener = inputEventAdapterListener;
-        this.tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        this.tenantId = tenantId;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class WebsocketClient extends Endpoint {
             @Override
             public void onMessage(String message) {
                 PrivilegedCarbonContext.startTenantFlow();
-                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantID);
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
                     if (log.isDebugEnabled()){
                         log.debug("Received message: '" + message);
                     }

@@ -19,6 +19,7 @@
 package org.wso2.carbon.event.input.adapter.websocket;
 
 import org.glassfish.tyrus.client.ClientManager;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.input.adapter.core.EventAdapterConstants;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapter;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterConfiguration;
@@ -43,6 +44,7 @@ public class WebsocketEventAdapter implements InputEventAdapter {
     private final Map<String, String> globalProperties;
     private final String socketServerUrl;
     private ClientManager client;
+    private int tenantId;
 
     public WebsocketEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration, Map<String, String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
@@ -53,6 +55,7 @@ public class WebsocketEventAdapter implements InputEventAdapter {
     @Override
     public void init(InputEventAdapterListener eventAdaptorListener) throws InputEventAdapterException {
         this.eventAdapterListener = eventAdaptorListener;
+        this.tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
     }
 
     @Override
@@ -65,7 +68,7 @@ public class WebsocketEventAdapter implements InputEventAdapter {
         ClientEndpointConfig clientEndpointConfig = ClientEndpointConfig.Builder.create().build();
         client = ClientManager.createClient();
         try {
-            client.connectToServer(new WebsocketClient(eventAdapterListener), clientEndpointConfig, new URI(socketServerUrl));
+            client.connectToServer(new WebsocketClient(eventAdapterListener, tenantId), clientEndpointConfig, new URI(socketServerUrl));
         } catch (DeploymentException e) {
             throw new ConnectionUnavailableException("The adapter " + eventAdapterConfiguration.getName() + " failed to connect to the websocket server " +
                     socketServerUrl, e);
