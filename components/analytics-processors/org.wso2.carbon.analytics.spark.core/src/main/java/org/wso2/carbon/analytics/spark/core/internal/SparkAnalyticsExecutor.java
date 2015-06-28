@@ -161,7 +161,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
 
     private void initClient(String masterUrl, String appName) {
-        this.sparkConf = initSparkConf(masterUrl, appName);
+        if (this.sparkConf==null) {
+            this.sparkConf = initSparkConf(masterUrl, appName);
+        }
         this.javaSparkCtx = new JavaSparkContext(this.sparkConf);
 //        this.sqlCtx = new SQLContext(this.javaSparkCtx);
         initSqlContext(this.javaSparkCtx);
