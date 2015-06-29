@@ -29,7 +29,6 @@ import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 import org.wso2.carbon.ndatasource.common.DataSourceException;
 
 import javax.sql.DataSource;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -367,7 +366,7 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             return new int[] { recordsFrom, recordsCount };
         case MODE2:
             /* Oracle, MSSQL ROWNUM like */
-            return new int[] { recordsFrom, recordsFrom + recordsCount };
+            return new int[]{recordsFrom + recordsCount, recordsFrom};
         default:
             throw new IllegalArgumentException("Invalid pagination mode: " + 
                     this.rdbmsQueryConfigurationEntry.getPaginationMode());
@@ -700,7 +699,12 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
             try {
                 if (this.rs.next()) {
                     Blob blob = this.rs.getBlob(3);
-                    Map<String, Object> values = GenericUtils.decodeRecordValues(blob.getBytes(1, (int) blob.length()), colSet);
+                    Map<String, Object> values;
+                    if (blob != null) {
+                        values = GenericUtils.decodeRecordValues(blob.getBytes(1, (int) blob.length()), colSet);
+                    } else {
+                        values = new HashMap<>(0);
+                    }
                     return new Record(this.rs.getString(1), this.tenantId, this.tableName, values, this.rs.getLong(2));                
                 } else {
                     /* end of the result set, time to clean up.. */
