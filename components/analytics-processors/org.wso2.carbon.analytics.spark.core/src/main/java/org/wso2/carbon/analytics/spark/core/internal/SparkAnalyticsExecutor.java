@@ -164,9 +164,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         if (this.sparkConf==null) {
             this.sparkConf = initSparkConf(masterUrl, appName);
         }
-        this.javaSparkCtx = new JavaSparkContext(this.sparkConf);
+//        this.javaSparkCtx = new JavaSparkContext(this.sparkConf);
 //        this.sqlCtx = new SQLContext(this.javaSparkCtx);
-        initSqlContext(this.javaSparkCtx);
+        initSqlContext(new JavaSparkContext(this.sparkConf));
     }
 
     private void initLocalClient() {
@@ -278,7 +278,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     public void stop() {
         if (this.sqlCtx != null) {
             this.sqlCtx.sparkContext().stop();
-            this.javaSparkCtx.close();
+//            this.javaSparkCtx.close();
         }
     }
 

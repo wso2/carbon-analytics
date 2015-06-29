@@ -325,8 +325,7 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Export-Package>
-                            org.wso2.carbon.analytics.spark.core.*;version="${carbon.analytics.version}",
-                            org.apache.spark.sql.jdbc.wso2.*
+                            org.wso2.carbon.analytics.spark.core.*;version="${carbon.analytics.version}"
                         </Export-Package>
                         <Import-Package>
 
