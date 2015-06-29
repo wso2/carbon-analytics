@@ -16,6 +16,9 @@
        <class name="org.wso2.carbon.analytics.datasource.rdbms.h2.H2AnalyticsDataServiceClusteredTest"/>
        <!--class name="org.wso2.carbon.analytics.datasource.rdbms.AnalyticsSparkSQLTest"/-->
        <!--class name="org.wso2.carbon.analytics.datasource.rdbms.AnalyticsSparkSQLUITest"/-->
+         <!--<class name="org.wso2.carbon.analytics.datasource.rdbms.oracle.OracleAnalyticsFileSystemTest"/>-->
+         <!--<class name="org.wso2.carbon.analytics.datasource.rdbms.oracle.OracleAnalyticsRecordStoreTest"/>-->
+         <!--<class name="org.wso2.carbon.analytics.datasource.rdbms.oracle.OracleAnalyticsDataServiceTest"/>-->
      </classes>
    </test>
 </suite>

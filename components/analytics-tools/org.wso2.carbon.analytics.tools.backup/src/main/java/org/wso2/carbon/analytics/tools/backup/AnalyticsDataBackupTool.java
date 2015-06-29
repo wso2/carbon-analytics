@@ -18,6 +18,23 @@
  */
 package org.wso2.carbon.analytics.tools.backup;
 
+import org.apache.commons.cli.BasicParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
+import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
+import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
+import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,23 +45,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-
-import org.apache.commons.cli.BasicParser;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.Options;
-import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
-import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
-import org.wso2.carbon.analytics.dataservice.AnalyticsServiceHolder;
-import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
-import org.wso2.carbon.analytics.datasource.commons.Record;
-import org.wso2.carbon.analytics.datasource.commons.RecordGroup;
-import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 /**
  * This class represents a tool to backup and restore and re-index analytics data.
@@ -99,7 +99,7 @@ public class AnalyticsDataBackupTool {
             long timeTo = Long.MAX_VALUE;
             String ttStr = "+~";
             if (line.hasOption("timeto")) {
-                ttStr = line.getOptionValue("timetp");
+                ttStr = line.getOptionValue("timeto");
                 timeTo = dateFormat.parse(ttStr).getTime();
             }
             String[] specificTables = null;
@@ -168,8 +168,6 @@ public class AnalyticsDataBackupTool {
             AnalyticsSchema schema = readTableSchema(baseDir.getAbsolutePath());
             service.setTableSchema(tenantId, table, schema);
             File[] files = myDir.listFiles();
-            List<Record> recordBatch = new ArrayList<>(RECORD_BATCH_SIZE);
-            Record record;
             int count = 0;
             for (File file : files) {
                 if (file.getName().equalsIgnoreCase(TABLE_SCHEMA_FILE_NAME)) {
@@ -182,17 +180,19 @@ public class AnalyticsDataBackupTool {
                     System.out.println(file.getAbsolutePath() + "is a directory, which cannot contain record data, skipping.");
                 }
                 try {
-                    record = readRecordFromFile(file);
-                    if (!table.equals(record.getTableName())) {
-                        System.out.println("Invalid record, invalid table name in record compared to "
-                                + "current directory: " + record.getTableName());
-                    }
+                    List<Record> records= readRecordFromFile(file);
+                    for (Record record : records) {
+                        if (!table.equals(record.getTableName())) {
+                            System.out.println("Invalid record, invalid table name in record compared to "
+                                               + "current directory: " + record.getTableName());
+                        }
                     /* check timestamp range */
-                    if (record.getTimestamp() >= timeFrom && record.getTimestamp() < timeTo) {
-                        recordBatch.add(record);
+                        if (!(record.getTimestamp() >= timeFrom && record.getTimestamp() < timeTo)) {
+                            records.remove(record);
+                        }
                     }
-                    if (recordBatch.size() >= RECORD_BATCH_SIZE) {
-                        service.put(recordBatch);
+                    if (records.size() >= RECORD_BATCH_SIZE) {
+                        service.put(records);
                         service.waitForIndexing(INDEX_PROCESS_WAIT_TIME);
                     }
                 } catch (IOException e) {
@@ -200,8 +200,6 @@ public class AnalyticsDataBackupTool {
                 }
                 count++;
             }
-            service.put(recordBatch);
-            service.waitForIndexing(INDEX_PROCESS_WAIT_TIME);
             System.out.println();
         } catch (Exception e) {
             e.printStackTrace();
@@ -224,16 +222,20 @@ public class AnalyticsDataBackupTool {
             int count = 0;
             for (RecordGroup rg : resp.getRecordGroups()) {
                 recordItr = service.readRecords(resp.getRecordStoreName(), rg);
+                List<Record> records;
                 Record record;
                 while (recordItr.hasNext()) {
                     if (count % 5000 == 0) {
                         System.out.print(".");
                     }
-                    record = recordItr.next();
+                    records = new ArrayList<>();
+                    for (int i = 0; i < RECORD_BATCH_SIZE && recordItr.hasNext(); i++) {
+                        records.add(recordItr.next());
+                    }
                     try {
-                        writeRecordToFile(record, myDir.getAbsolutePath());
+                        writeRecordToFile(records, myDir.getAbsolutePath());
                     } catch (IOException e) {
-                        System.out.println("Error in writing record data to file, with id: " + record.getId() + ", skipping.");
+                        System.out.println("Error in writing record data to file, skipping.");
                     }
                     count++;
                 }
@@ -263,9 +265,10 @@ public class AnalyticsDataBackupTool {
         }
     }
     
-    private static void writeRecordToFile(Record record, String basePath) throws IOException {
+    private static void writeRecordToFile(List<Record> records, String basePath) throws IOException {
+        Record record = records.get(0);
         String filePath = basePath + File.separator + record.getId();
-        byte[] data = GenericUtils.serializeObject(record);
+        byte[] data = GenericUtils.serializeObject(records);
         FileOutputStream fileOut = null;
         DataOutputStream dataOut = null;
         try {
@@ -282,11 +285,11 @@ public class AnalyticsDataBackupTool {
         }
     }
     
-    private static Record readRecordFromFile(File file) throws IOException {
+    private static List<Record> readRecordFromFile(File file) throws IOException {
         FileInputStream fileIn = null;
         try {
             fileIn = new FileInputStream(file);
-            return (Record) GenericUtils.deserializeObject(fileIn);
+            return (List<Record>) GenericUtils.deserializeObject(fileIn);
         } finally {
             if (fileIn != null) {
                 fileIn.close();

@@ -30,7 +30,6 @@ import org.wso2.carbon.analytics.spark.core.util.AnalyticsScript;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.AbstractAdmin;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -241,8 +240,8 @@ public class AnalyticsProcessorAdminService extends AbstractAdmin {
         if (query != null && !query.trim().isEmpty()) {
             try {
                 int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-                AnalyticsQueryResultDto queryResult = AnalyticsResultConverter.convertResults(ServiceHolder.getAnalyticsProcessorService().
-                        executeQuery(tenantId, query));
+                AnalyticsQueryResultDto queryResult = AnalyticsResultConverter.convertResults(ServiceHolder.
+                        getAnalyticsProcessorService().executeQuery(tenantId, query));
                 if (queryResult != null) queryResult.setQuery(query);
                 return queryResult;
             } catch (AnalyticsExecutionException e) {
@@ -254,5 +253,14 @@ public class AnalyticsProcessorAdminService extends AbstractAdmin {
                     getThreadLocalCarbonContext().getTenantId());
             throw new AnalyticsProcessorAdminException("No queries provided to execute.");
         }
+    }
+
+    /**
+     * Checks and returns whether analytics execution is enabled for this node.
+     *
+     * @return
+     */
+    public boolean isAnalyticsExecutionEnabled() {
+        return ServiceHolder.getAnalyticsProcessorService().isAnalyticsExecutionEnabled();
     }
 }

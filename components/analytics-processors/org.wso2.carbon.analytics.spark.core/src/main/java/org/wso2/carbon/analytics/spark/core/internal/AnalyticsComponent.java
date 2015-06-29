@@ -56,19 +56,23 @@ public class AnalyticsComponent {
 
     private static final Log log = LogFactory.getLog(AnalyticsComponent.class);
 
+    private static boolean initialized;
+
     protected void activate(ComponentContext ctx) {
         if (log.isDebugEnabled()) {
             log.debug("Activating Analytics Spark Core");
         }
         try {
-            try {
-                int portOffset = CarbonUtils.getPortFromServerConfig(PORT_OFFSET_SERVER_PROP)+1;
-                ServiceHolder.setAnalyticskExecutor(new SparkAnalyticsExecutor(
-                        NetworkUtils.getLocalHostname(), portOffset));
-            } catch (Throwable e) {
-                String msg = "Error initializing analytics executor: " + e.getMessage();
-                log.error(msg, e);
-            //throw new RuntimeException(msg, e);
+            checkAnalyticsEnabled();
+            if (ServiceHolder.isAnalyticsEngineEnabled()) {
+                try {
+                    int portOffset = CarbonUtils.getPortFromServerConfig(PORT_OFFSET_SERVER_PROP) + 1;
+                    ServiceHolder.setAnalyticskExecutor(new SparkAnalyticsExecutor(
+                            NetworkUtils.getLocalHostname(), portOffset));
+                } catch (Throwable e) {
+                    String msg = "Error initializing analytics executor: " + e.getMessage();
+                    log.error(msg, e);
+                }
             }
             BundleContext bundleContext = ctx.getBundleContext();
             AnalyticsProcessorService analyticsProcessorService = new CarbonAnalyticsProcessorService();
@@ -81,7 +85,7 @@ public class AnalyticsComponent {
             if (log.isDebugEnabled()) {
                 log.debug("Finished activating Analytics Spark Core");
             }
-        }catch (Throwable throwable){
+        } catch (Throwable throwable) {
             log.error("Error in registering the analytics processor service! ", throwable);
         }
     }
@@ -91,11 +95,15 @@ public class AnalyticsComponent {
     }
 
     protected void setTaskService(TaskService taskService) {
+        checkAnalyticsEnabled();
         ServiceHolder.setTaskService(taskService);
-        try {
-            ServiceHolder.getTaskService().registerTaskType(AnalyticsConstants.SCRIPT_TASK_TYPE);
-        } catch (TaskException e) {
-            log.error("Error while registering the task type : " + AnalyticsConstants.SCRIPT_TASK_TYPE, e);
+        if (ServiceHolder.isAnalyticsExecutionEnabled()) {
+            //Analytics execution is disabled, therefore not joining the task cluster for the execution.
+            try {
+                ServiceHolder.getTaskService().registerTaskType(AnalyticsConstants.SCRIPT_TASK_TYPE);
+            } catch (TaskException e) {
+                log.error("Error while registering the task type : " + AnalyticsConstants.SCRIPT_TASK_TYPE, e);
+            }
         }
     }
 
@@ -133,5 +141,25 @@ public class AnalyticsComponent {
 
     protected void unsetEventStreamService(EventStreamService eventStreamService) {
         ServiceHolder.setEventStreamService(null);
+    }
+
+    private void checkAnalyticsEnabled() {
+        if (!initialized) {
+            initialized = true;
+            if (ServiceHolder.isAnalyticsExecutionEnabled()) {
+                if (System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_EXECUTION_JVM_OPTION) != null) {
+                    if (Boolean.parseBoolean(System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_EXECUTION_JVM_OPTION))) {
+                        ServiceHolder.setAnalyticsExecutionEnabled(false);
+                    }
+                }
+            }
+            if (ServiceHolder.isAnalyticsEngineEnabled()) {
+                if (System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_ENGINE_JVM_OPTION) != null) {
+                    if (Boolean.parseBoolean(System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_ENGINE_JVM_OPTION))) {
+                        ServiceHolder.setAnalyticsEngineEnabled(false);
+                    }
+                }
+            }
+        }
     }
 }
