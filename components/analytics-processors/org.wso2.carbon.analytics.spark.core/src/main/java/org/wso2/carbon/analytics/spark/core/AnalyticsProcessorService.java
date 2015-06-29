@@ -117,4 +117,11 @@ public interface AnalyticsProcessorService {
      * @throws AnalyticsExecutionException
      */
     AnalyticsQueryResult executeQuery(int tenantId, String query) throws AnalyticsExecutionException;
+
+    /**
+     * Checks whether the analytics execution is enabled for this node.
+     *
+     * @return
+     */
+    boolean isAnalyticsExecutionEnabled();
 }

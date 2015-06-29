@@ -1,3 +1,8 @@
+<%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
+<%@ page import="org.apache.axis2.context.ConfigurationContext" %>
+<%@ page import="org.wso2.carbon.CarbonConstants" %>
+<%@ page import="org.wso2.carbon.utils.ServerConstants" %>
+<%@ page import="org.wso2.carbon.analytics.spark.ui.client.AnalyticsExecutionClient" %>
 <!--
 ~ Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 ~
@@ -31,6 +36,16 @@
     <script src="js/jquery.dataTables.min.js"></script>
     <script src="js/Ptty.jquery.js"></script>
 
+    <%
+        String serverURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);
+        ConfigurationContext configContext =
+                (ConfigurationContext) config.getServletContext().getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
+        String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
+
+        AnalyticsExecutionClient client = new AnalyticsExecutionClient(cookie, serverURL, configContext);
+        try {
+            if (client.isAnalyticsExecutionEnabled()) {
+    %>
     <div id="middle">
         <h2>Interactive Analytics Console</h2>
 
@@ -53,7 +68,7 @@
                                 'ABOUT [no options]',
                                 function () {
                                     var about = '<p>This interactive shell lets you execute Spark SQL commands against a local Spark cluster.<br>' +
-                                                'Running on Spark v' + sparkVersion + '</p>';
+                                            'Running on Spark v' + sparkVersion + '</p>';
 
                                     return {
                                         type: 'print',
@@ -132,6 +147,16 @@
                     });
                 </script>
             </div>
+            <% } else {%>
+            Spark query execution is disabled in this node, therefore console is disabled!
+            <% }
+            } catch (Exception ex) {
+            %>
+            <script type="application/javascript">
+                CARBON.showErrorDialog("Error while checking the analytics execute operation in this node. "
+                + <%=ex.getMessage()%>);
+            </script>
+            <%} %>
         </div>
     </div>
 </fmt:bundle>

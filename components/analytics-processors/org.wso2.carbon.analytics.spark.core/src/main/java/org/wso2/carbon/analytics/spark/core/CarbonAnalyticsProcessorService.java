@@ -134,23 +134,30 @@ public class CarbonAnalyticsProcessorService implements AnalyticsProcessorServic
      */
     public AnalyticsQueryResult[] executeScript(int tenantId, String scriptName) throws AnalyticsExecutionException,
             AnalyticsPersistenceException {
-        try {
-            AnalyticsScript script = AnalyticsPersistenceManager.getInstance().getAnalyticsScript(tenantId, scriptName);
-            String[] queries = getQueries(script.getScriptContent());
-            if (queries == null) {
-                throw new AnalyticsExecutionException("No complete queries provided in the script. "
-                        + script.getScriptContent());
+        if (ServiceHolder.isAnalyticsExecutionEnabled()) {
+            try {
+                AnalyticsScript script = AnalyticsPersistenceManager.getInstance().getAnalyticsScript(tenantId, scriptName);
+                String[] queries = getQueries(script.getScriptContent());
+                if (queries == null) {
+                    throw new AnalyticsExecutionException("No complete queries provided in the script. "
+                            + script.getScriptContent());
+                }
+                AnalyticsQueryResult[] results = new AnalyticsQueryResult[queries.length];
+                int queryIndex = 0;
+                for (String query : queries) {
+                    results[queryIndex] = executeQuery(tenantId, query);
+                    queryIndex++;
+                }
+                return results;
+            } catch (AnalyticsPersistenceException e) {
+                log.error("Error while retrieving the script : " + scriptName, e);
+                throw e;
             }
-            AnalyticsQueryResult[] results = new AnalyticsQueryResult[queries.length];
-            int queryIndex = 0;
-            for (String query : queries) {
-                results[queryIndex] = executeQuery(tenantId, query);
-                queryIndex++;
-            }
-            return results;
-        } catch (AnalyticsPersistenceException e) {
-            log.error("Error while retrieving the script : " + scriptName, e);
-            throw e;
+        }else {
+            String errorMsg = "Analytics query execution is disabled in this node. Therefore cannot executed the script " +
+                    " - " + scriptName;
+            log.error(errorMsg);
+            throw new AnalyticsExecutionException(errorMsg);
         }
     }
 
@@ -184,16 +191,28 @@ public class CarbonAnalyticsProcessorService implements AnalyticsProcessorServic
      * @throws AnalyticsExecutionException
      */
     public AnalyticsQueryResult executeQuery(int tenantId, String query) throws AnalyticsExecutionException {
-        if (query != null && !query.trim().isEmpty()) {
-            try {
-                return ServiceHolder.getAnalyticskExecutor().executeQuery(tenantId, query);
-            } catch (AnalyticsExecutionException e) {
-                log.error("Error while executing query : " + query, e);
-                throw e;
+        if (ServiceHolder.isAnalyticsExecutionEnabled()) {
+            if (query != null && !query.trim().isEmpty()) {
+                try {
+                    return ServiceHolder.getAnalyticskExecutor().executeQuery(tenantId, query);
+                } catch (AnalyticsExecutionException e) {
+                    log.error("Error while executing query : " + query, e);
+                    throw e;
+                }
+            } else {
+                log.error("No queries provided to execute at tenant id :" + tenantId);
+                throw new AnalyticsExecutionException("No queries provided to execute.");
             }
         } else {
-            log.error("No queries provided to execute at tenant id :" + tenantId);
-            throw new AnalyticsExecutionException("No queries provided to execute.");
+            String errorMsg = "Spark query execution is disabled in this node. Therefore cannot executed the query " +
+                    "submitted - " + query;
+            log.error(errorMsg);
+            throw new AnalyticsExecutionException(errorMsg);
         }
+    }
+
+    @Override
+    public boolean isAnalyticsExecutionEnabled() {
+        return ServiceHolder.isAnalyticsExecutionEnabled();
     }
 }
