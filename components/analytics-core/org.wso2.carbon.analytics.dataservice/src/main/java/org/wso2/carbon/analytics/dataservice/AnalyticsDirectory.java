@@ -54,7 +54,7 @@ public class AnalyticsDirectory extends Directory {
         this.analyticsFileSystem = analyticsFileSystem;
         this.path = GenericUtils.normalizePath(path);
         this.lockFactory = lockFactory;
-        this.getLockFactory().setLockPrefix(this.getPath());
+    //    this.getLockFactory().setLockPrefix(this.getPath());
     }
     
     public AnalyticsFileSystem getFileSystem() {
@@ -78,17 +78,12 @@ public class AnalyticsDirectory extends Directory {
     public IndexOutput createOutput(String name, IOContext ctx) throws IOException {
         String path = this.generateFilePath(name);
         OutputStream out = this.analyticsFileSystem.createOutput(path);
-        return new OutputStreamIndexOutput(out, OUTPUT_STREAM_BUFFER_SIZE);
+        return new OutputStreamIndexOutput(name, out, OUTPUT_STREAM_BUFFER_SIZE);
     }
 
     @Override
     public void deleteFile(String name) throws IOException {
         this.analyticsFileSystem.delete(this.generateFilePath(name));
-    }
-
-    @Override
-    public boolean fileExists(String name) throws IOException {
-        return this.analyticsFileSystem.exists(this.generateFilePath(name));        
     }
 
     @Override
@@ -114,27 +109,32 @@ public class AnalyticsDirectory extends Directory {
             this.getFileSystem().sync(this.generateFilePath(name));            
         }
     }
-    
+
+    @Override
+    public void renameFile(String s, String s1) throws IOException {
+        this.getFileSystem().renameFileInDirectory(getPath(), s, s1);
+    }
+
     /**
      * Lucene {@link IndexInput} adaptor implementation using Carbon analytics {@link DataInput}.
      */
     private class AnalyticsIndexInputAdaptor extends IndexInput {
-        
+
         private DataInput dataInput;
-        
+
         private String path;
-        
+
         private long length;
-        
+
         private long offset;
-        
+
         private List<IndexInput> clonedInputs = new ArrayList<IndexInput>();
-        
+
         protected AnalyticsIndexInputAdaptor(String path, DataInput dataInput) throws IOException {
-            this(path, dataInput, 0, analyticsFileSystem.length(path), path);            
+            this(path, dataInput, 0, analyticsFileSystem.length(path), path);
         }
-        
-        protected AnalyticsIndexInputAdaptor(String path, DataInput dataInput, long offset, 
+
+        protected AnalyticsIndexInputAdaptor(String path, DataInput dataInput, long offset,
                 long length, String sliceDescription) throws IOException {
             super(sliceDescription);
             this.path = path;
@@ -164,14 +164,14 @@ public class AnalyticsDirectory extends Directory {
 
         @Override
         public void seek(long pos) throws IOException {
-            this.dataInput.seek(pos + this.offset);            
+            this.dataInput.seek(pos + this.offset);
         }
 
         @Override
         public byte readByte() throws IOException {
             byte[] buff = new byte[1];
             this.dataInput.read(buff, 0, buff.length);
-            return buff[0];            
+            return buff[0];
         }
 
         @Override
@@ -181,43 +181,32 @@ public class AnalyticsDirectory extends Directory {
 
         @Override
         public IndexInput slice(String sliceDescription, long offset, long length) throws IOException {
-            return new AnalyticsIndexInputAdaptor(this.path, this.dataInput.makeCopy(), 
+            return new AnalyticsIndexInputAdaptor(this.path, this.dataInput.makeCopy(),
                     this.offset + offset, length, sliceDescription);
         }
-        
+
         @Override
         public IndexInput clone() {
             IndexInput in;
             try {
-                in = new AnalyticsIndexInputAdaptor(this.path, this.dataInput.makeCopy(), 
+                in = new AnalyticsIndexInputAdaptor(this.path, this.dataInput.makeCopy(),
                         this.offset, this.length, this.toString());
                 this.clonedInputs.add(in);
                 return in;
             } catch (IOException e) {
                 throw new RuntimeException(e.getMessage(), e);
-            }            
+            }
         }
-        
-    }
-    
-    @Override
-    public void clearLock(String name) throws IOException {
-        this.getLockFactory().clearLock(name);
+
     }
 
-    @Override
     public LockFactory getLockFactory() {
         return lockFactory;
     }
 
     @Override
     public Lock makeLock(String name) {
-        return this.getLockFactory().makeLock(name);
-    }
-
-    @Override
-    public void setLockFactory(LockFactory lockFactory) throws IOException {
-        this.lockFactory = lockFactory;
+        return this.getLockFactory().makeLock(this, name);
     }
 
 }

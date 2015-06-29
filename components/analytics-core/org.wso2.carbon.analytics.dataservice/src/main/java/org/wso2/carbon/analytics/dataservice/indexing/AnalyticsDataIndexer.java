@@ -66,7 +66,6 @@ import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.TotalHitCountCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.NoLockFactory;
-import org.apache.lucene.util.Version;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceImpl;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDirectory;
@@ -644,7 +643,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
             if (count <= 0) {
                 log.warn("Record Count/Page size is ZERO!. Please set Record count/Page size.");
             }
-            TopScoreDocCollector collector = TopScoreDocCollector.create(count, true);
+            TopScoreDocCollector collector = TopScoreDocCollector.create(count);
             searcher.search(indexQuery, collector);
             ScoreDoc[] hits = collector.topDocs(start).scoreDocs;
             Document indexDoc;
@@ -1340,7 +1339,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     private Directory createDirectory(String basePath, String tableId) throws AnalyticsIndexException {
         String path = this.generateDirPath(basePath, tableId);
         try {
-            return new AnalyticsDirectory(this.getFileSystem(), NoLockFactory.getNoLockFactory(), path);
+            return new AnalyticsDirectory(this.getFileSystem(), NoLockFactory.INSTANCE, path);
         } catch (AnalyticsException e) {
             throw new AnalyticsIndexException("Error in creating directory: " + e.getMessage(), e);
         }
@@ -1376,7 +1375,7 @@ public class AnalyticsDataIndexer implements GroupEventListener {
     
     private IndexWriter createIndexWriter(String tableId) throws AnalyticsIndexException {
         Directory indexDir = this.lookupIndexDir(tableId);
-        IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_4_10_3, this.luceneAnalyzer);
+        IndexWriterConfig conf = new IndexWriterConfig(this.luceneAnalyzer);
         try {
             return new IndexWriter(indexDir, conf);
         } catch (IOException e) {

@@ -60,7 +60,27 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.orbit.org.apache.lucene</groupId>
-            <artifactId>lucene</artifactId>
+            <artifactId>lucene-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.apache.lucene</groupId>
+            <artifactId>lucene-queryparser</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.apache.lucene</groupId>
+            <artifactId>lucene-queries</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.apache.lucene</groupId>
+            <artifactId>lucene-expressions</artifactId>
+        </dependency>
+        <dependency>
+        <groupId>org.wso2.orbit.org.apache.lucene</groupId>
+        <artifactId>lucene-facet</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.orbit.asm4</groupId>
@@ -116,7 +136,12 @@
                                 </properties>
                             </adviceFile>
                             <bundles>
-                                <bundleDef>org.wso2.orbit.org.apache.lucene:lucene</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.apache.lucene:lucene-core</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.apache.lucene:lucene-analyzers-common</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.apache.lucene:lucene-queries</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.apache.lucene:lucene-queryparser</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.apache.lucene:lucene-expressions</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.apache.lucene:lucene-facet</bundleDef>
                                 <bundleDef>org.wso2.orbit.asm4:asm4-all</bundleDef>
                                 <bundleDef>com.datastax.cassandra:cassandra-driver-core</bundleDef>
                                 <bundleDef>org.wso2.orbit.org.objenesis:objenesis</bundleDef>

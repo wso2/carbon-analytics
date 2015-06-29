@@ -17,13 +17,12 @@
 package org.wso2.carbon.analytics.restapi.resources;
 
 import com.google.gson.Gson;
-
 import org.apache.axiom.om.util.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
-import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceUtils;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRange;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
 import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
@@ -67,7 +66,6 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -81,6 +79,7 @@ import java.util.List;
  * The Class AnalyticsResource represents the REST APIs for
  * AnalyticsDataService.
  */
+
 @Path(Constants.ResourcePath.ROOT_CONTEXT)
 public class AnalyticsResource extends AbstractResource {
 
@@ -99,7 +98,7 @@ public class AnalyticsResource extends AbstractResource {
 
     /**
      * Implements the OPTIONS HTTP method
-     * @return
+     * @return The response
      */
     @OPTIONS
     public Response options() {

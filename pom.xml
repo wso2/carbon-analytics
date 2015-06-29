@@ -159,7 +159,32 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.orbit.org.apache.lucene</groupId>
-                <artifactId>lucene</artifactId>
+                <artifactId>lucene-core</artifactId>
+                <version>${lucene.orbit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.orbit.org.apache.lucene</groupId>
+                <artifactId>lucene-analyzers-common</artifactId>
+                <version>${lucene.orbit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.orbit.org.apache.lucene</groupId>
+                <artifactId>lucene-queryparser</artifactId>
+                <version>${lucene.orbit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.orbit.org.apache.lucene</groupId>
+                <artifactId>lucene-queries</artifactId>
+                <version>${lucene.orbit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.orbit.org.apache.lucene</groupId>
+                <artifactId>lucene-facet</artifactId>
+                <version>${lucene.orbit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.orbit.org.apache.lucene</groupId>
+                <artifactId>lucene-expressions</artifactId>
                 <version>${lucene.orbit.version}</version>
             </dependency>
             <dependency>
@@ -187,11 +212,11 @@
                 <artifactId>lucene-queries</artifactId>
                 <version>${lucene.version}</version>
             </dependency>
-            <dependency>
+            <!--<dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-regex</artifactId>
                 <version>${lucene.regex.version}</version>
-            </dependency>
+            </dependency>-->
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-facet</artifactId>
@@ -1287,9 +1312,9 @@
         <!-- Javax-->
         <javax.servelet.version>3.0.1</javax.servelet.version>
 
-        <lucene.version>4.10.3</lucene.version>
+        <lucene.version>5.2.1</lucene.version>
         <lucene.regex.version>3.0.3</lucene.regex.version>
-        <lucene.orbit.version>4.10.3.wso2v2</lucene.orbit.version>
+        <lucene.orbit.version>5.2.1.wso2v1</lucene.orbit.version>
         <asm4.orbit.version>4.0.0.wso2v1</asm4.orbit.version>
         <carbon.commons.version>4.4.3</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.4.3, 4.5.0)</carbon.commons.imp.pkg.version>
