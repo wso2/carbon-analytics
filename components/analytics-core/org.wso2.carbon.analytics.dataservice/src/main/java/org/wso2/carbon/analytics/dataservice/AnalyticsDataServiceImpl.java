@@ -130,34 +130,39 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         if (config.getAnalyticsDataPurgingConfiguration() != null) {
             final AnalyticsDataPurgingConfiguration analyticsDataPurgingConfiguration = config.getAnalyticsDataPurgingConfiguration();
             TaskService taskService = AnalyticsServiceHolder.getTaskService();
-            if (analyticsDataPurgingConfiguration.isEnable()) {
-                try {
-                    if (analyticsDataPurgingConfiguration.isPurgeNode()) {
-                        taskService.registerTaskType(ANALYTICS_DATA_PURGING_GLOBAL);
-                    }
-                    TaskManager dataPurgingTaskManager = taskService.getTaskManager(ANALYTICS_DATA_PURGING_GLOBAL);
-                    if (dataPurgingTaskManager.isTaskScheduled(GLOBAL_DATA_PURGING)) {
-                        dataPurgingTaskManager.deleteTask(GLOBAL_DATA_PURGING);
-                    }
-                    dataPurgingTaskManager.registerTask(createDataPurgingTask(analyticsDataPurgingConfiguration));
-                    dataPurgingTaskManager.scheduleTask(GLOBAL_DATA_PURGING);
-
-                } catch (TaskException e) {
-                    logger.error("Unable to schedule global data purging task: " + e.getMessage(), e);
-                }
-            } else {
-                Set<String> registeredTaskTypes = taskService.getRegisteredTaskTypes();
-                if (registeredTaskTypes != null && registeredTaskTypes.contains(ANALYTICS_DATA_PURGING_GLOBAL)) {
+            if (taskService != null) {
+                if (analyticsDataPurgingConfiguration.isEnable()) {
                     try {
+                        if (analyticsDataPurgingConfiguration.isPurgeNode()) {
+                            taskService.registerTaskType(ANALYTICS_DATA_PURGING_GLOBAL);
+                        }
                         TaskManager dataPurgingTaskManager = taskService.getTaskManager(ANALYTICS_DATA_PURGING_GLOBAL);
                         if (dataPurgingTaskManager.isTaskScheduled(GLOBAL_DATA_PURGING)) {
                             dataPurgingTaskManager.deleteTask(GLOBAL_DATA_PURGING);
-                            logger.info("Global data purging task removed.");
                         }
+                        dataPurgingTaskManager.registerTask(createDataPurgingTask(analyticsDataPurgingConfiguration));
+                        dataPurgingTaskManager.scheduleTask(GLOBAL_DATA_PURGING);
+
                     } catch (TaskException e) {
-                        logger.error("Unable to get purging task related information: " + e.getMessage(), e);
+                        logger.error("Unable to schedule global data purging task: " + e.getMessage(), e);
+                    }
+                } else {
+                    Set<String> registeredTaskTypes = taskService.getRegisteredTaskTypes();
+                    if (registeredTaskTypes != null && registeredTaskTypes.contains(ANALYTICS_DATA_PURGING_GLOBAL)) {
+                        try {
+                            TaskManager dataPurgingTaskManager = taskService.getTaskManager(ANALYTICS_DATA_PURGING_GLOBAL);
+                            if (dataPurgingTaskManager.isTaskScheduled(GLOBAL_DATA_PURGING)) {
+                                dataPurgingTaskManager.deleteTask(GLOBAL_DATA_PURGING);
+                                logger.info("Global data purging task removed.");
+                            }
+                        } catch (TaskException e) {
+                            logger.error("Unable to get purging task related information: " + e.getMessage(), e);
+                        }
                     }
                 }
+            }else {
+                logger.warn("Ignoring the data purging related operation," +
+                        " since the task service is not registered in this context.");
             }
         }
     }

@@ -155,4 +155,7 @@ public class AnalyticsExecutionClient {
     }
 
 
+    public boolean isAnalyticsExecutionEnabled() throws RemoteException {
+        return stub.isAnalyticsExecutionEnabled();
+    }
 }

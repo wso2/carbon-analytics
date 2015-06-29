@@ -1,4 +1,3 @@
-
 <!--
 ~ Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 ~
@@ -48,8 +47,8 @@
         boolean isExistingScript = scriptName != null && !scriptName.trim().isEmpty();
         String scriptContent = "";
         String cronExp = "";
+        AnalyticsExecutionClient client = new AnalyticsExecutionClient(cookie, serverURL, configContext);
         if (isExistingScript) {
-            AnalyticsExecutionClient client = new AnalyticsExecutionClient(cookie, serverURL, configContext);
             try {
                 AnalyticsProcessorAdminServiceStub.AnalyticsScriptDto analyticsScript = client.getScriptContent(scriptName);
                 scriptContent = analyticsScript.getScriptContent();
@@ -72,11 +71,11 @@
                 id: "allcommands"
                 , syntax: "sql"
                 , start_highlight: true,
-                is_editable : editable
+                is_editable: editable
             });
         });
-//        editAreaLoader.set_editable(false);
-//        alert("edi")
+        //        editAreaLoader.set_editable(false);
+        //        alert("edi")
 
         function executeQuery() {
             var scriptContent = editAreaLoader.getValue("allcommands");
@@ -276,9 +275,13 @@
                        value="<%if (!isExistingScript){ %><fmt:message key="spark.script.save"/><% }else{ %> <fmt:message key="spark.script.update"/><%}%>"/>
                 <%
                     }
+                    if (client.isAnalyticsExecutionEnabled()) {
                 %>
                 <input class="button" type="button" onclick="executeQuery()"
                        value="<fmt:message key="spark.script.execute"/>"/>
+                <%
+                    }
+                %>
                 <input type="button"
                        value="<fmt:message key="spark.script.cancel"/>"
                        onclick="cancelScript()"
