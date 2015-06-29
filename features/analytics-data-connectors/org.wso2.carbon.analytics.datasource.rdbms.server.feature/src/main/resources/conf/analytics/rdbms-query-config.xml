@@ -38,6 +38,7 @@
         <fsMergeDataChunkQuery>MERGE INTO AN_FS_DATA (path,sequence,data) KEY (path,sequence) VALUES (?,?,?)</fsMergeDataChunkQuery>
     </database>
     <database name = "mysql">
+        <paginationMode>MODE1</paginationMode>
         <paginationFirstInclusive>true</paginationFirstInclusive>
         <paginationFirstZeroIndexed>true</paginationFirstZeroIndexed>
         <paginationSecondInclusive>false</paginationSecondInclusive>
