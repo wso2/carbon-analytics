@@ -468,8 +468,8 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.cleanupTable(tenantId, tableName);
         this.service.createTable(tenantId, tableName);
         List<ColumnDefinition> columns = new ArrayList<>();
-        columns.add(new ColumnDefinition("tenant", ColumnType.INTEGER, true, false));
-        columns.add(new ColumnDefinition("log", ColumnType.STRING, true, false));
+        columns.add(new ColumnDefinition("tenant", ColumnType.INTEGER, false, false));
+        columns.add(new ColumnDefinition("log", ColumnType.STRING, false, false));
         List<String> primaryKeys = new ArrayList<String>();
         primaryKeys.add("tenant");
         primaryKeys.add("log");
@@ -516,8 +516,8 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.cleanupTable(tenantId, tableName);
         this.service.createTable(tenantId, tableName);
         List<ColumnDefinition> columns = new ArrayList<>();
-        columns.add(new ColumnDefinition("tenant", ColumnType.INTEGER, true, false));
-        columns.add(new ColumnDefinition("log", ColumnType.STRING, true, false));
+        columns.add(new ColumnDefinition("tenant", ColumnType.INTEGER, false, false));
+        columns.add(new ColumnDefinition("log", ColumnType.STRING, false, false));
         List<String> primaryKeys = new ArrayList<String>();
         primaryKeys.add("tenant");
         primaryKeys.add("log");
