@@ -123,7 +123,8 @@ function addEventStream(form, option, eventStreamId) {
                             arbitraryIndex: arbitraryIndex,
                             eventPersist: document.getElementById("eventPersistCheckbox").checked,
                             eventStreamDescription: eventStreamDescription,
-                            eventStreamNickName: eventStreamNickName
+                            eventStreamNickName: eventStreamNickName,
+                            recordStream: document.getElementById("recordStoreSelect").value
                         }, onSuccess: function (event) {
                             if ("true" == event.responseText.trim()) {
                                 form.submit();

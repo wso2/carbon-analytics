@@ -71,7 +71,7 @@
         </table>
         <table class="styledLeft noBorders spacer-bot" style="width:100%">
             <tbody>
-            <tr>
+            <tr id="metaData">
                 <td>
                     <h6><fmt:message key="attribute.data.type.meta"/></h6>
 
@@ -96,7 +96,7 @@
                     </div>
                 </td>
             </tr>
-            <tr>
+            <tr id="correlationData">
                 <td>
                     <h6><fmt:message key="attribute.data.type.correlation"/></h6>
                     <table id="correlationIndexTable" class="styledLeft noBorders spacer-bot">
@@ -120,7 +120,7 @@
                     </div>
                 </td>
             </tr>
-            <tr>
+            <tr id="payloadData">
                 <td>
                     <h6><fmt:message key="attribute.data.type.payload"/></h6>
 
