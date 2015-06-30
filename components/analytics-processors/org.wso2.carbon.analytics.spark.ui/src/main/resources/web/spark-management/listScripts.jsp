@@ -67,7 +67,7 @@
                         <th class="leftCol-med">
                             <fmt:message key="spark.scripts"/>
                         </th>
-                        <th lass="leftCol-med">Actions</th>
+                        <th class="leftCol-med">Actions</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -85,10 +85,12 @@
                             <a class="icon-link"
                                style="background: url('../spark-management/images/edit.gif') no-repeat;"
                                href="addOrEditScript.jsp?scriptName=<%=aScript.getName()%>">Edit</a>
+                            <%if (client.isAnalyticsExecutionEnabled()) {%>
                             <a class="icon-link"
                                href="executeScript.jsp?scriptName=<%=aScript.getName()%>"
                                style="background: url('../spark-management/images/execute.gif') no-repeat;">
                                 Execute</a>
+                            <% }%>
                                 <%--<a class="icon-link" style="background: url('images/tasks-icon.gif') no-repeat;"--%>
                                 <%--href="">Schedule--%>
                                 <%--Script--%>
@@ -96,16 +98,18 @@
                             <a onclick="deleteRow('<%=aScript.getName()%>','Do you want to delete')"
                                class="delete-icon-link" href="#">Delete</a>
                             <%
-                                }else {
+                            } else {
                             %>
                             <a class="icon-link"
                                style="background: url('../spark-management/images/edit.gif') no-repeat;"
                                href="addOrEditScript.jsp?scriptName=<%=aScript.getName()%>&editable=false">View</a>
+                            <% if (client.isAnalyticsExecutionEnabled()) {%>
                             <a class="icon-link"
                                href="executeScript.jsp?scriptName=<%=aScript.getName()%>"
                                style="background: url('../spark-management/images/execute.gif') no-repeat;">
                                 Execute</a>
                             <%
+                                    }
                                 }
                             %>
                         </td>

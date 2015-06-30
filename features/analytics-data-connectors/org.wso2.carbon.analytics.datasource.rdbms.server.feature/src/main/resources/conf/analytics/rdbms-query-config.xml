@@ -2,7 +2,7 @@
 <query-configuration>
     <database name = "h2">
         <paginationMode>MODE1</paginationMode>
-        <recordTableCheckQuery>SELECT 1 FROM {{TABLE_NAME}}</recordTableCheckQuery>
+        <recordTableCheckQuery>SELECT 1 FROM {{TABLE_NAME}} LIMIT 1</recordTableCheckQuery>
         <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
         <recordDeletionQuery>DELETE FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordDeletionQuery>
         <recordDeletionWithIdsQuery>DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordDeletionWithIdsQuery>
@@ -38,12 +38,13 @@
         <fsMergeDataChunkQuery>MERGE INTO AN_FS_DATA (path,sequence,data) KEY (path,sequence) VALUES (?,?,?)</fsMergeDataChunkQuery>
     </database>
     <database name = "mysql">
+        <paginationMode>MODE1</paginationMode>
         <paginationFirstInclusive>true</paginationFirstInclusive>
         <paginationFirstZeroIndexed>true</paginationFirstZeroIndexed>
         <paginationSecondInclusive>false</paginationSecondInclusive>
         <paginationSecondLength>true</paginationSecondLength>
         <paginationSecondZeroIndexed>false</paginationSecondZeroIndexed>
-        <recordTableCheckQuery>SELECT 1 FROM {{TABLE_NAME}}</recordTableCheckQuery>
+        <recordTableCheckQuery>SELECT 1 FROM {{TABLE_NAME}} LIMIT 1</recordTableCheckQuery>
         <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
         <recordDeletionQuery>DELETE FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordDeletionQuery>
         <recordDeletionWithIdsQuery>DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordDeletionWithIdsQuery>

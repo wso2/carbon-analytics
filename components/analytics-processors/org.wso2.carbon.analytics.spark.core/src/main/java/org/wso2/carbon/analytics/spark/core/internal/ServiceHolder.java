@@ -56,6 +56,10 @@ public class ServiceHolder {
 
     private static EventStreamService eventStreamService;
 
+    private static boolean analyticsExecutionEnabled = true;
+
+    private static boolean analyticsEngineEnabled = true;
+
     public static void setTaskService(TaskService taskService) {
         ServiceHolder.taskService = taskService;
     }
@@ -118,5 +122,21 @@ public class ServiceHolder {
 
     public static void setEventStreamService(EventStreamService eventStreamService) {
         ServiceHolder.eventStreamService = eventStreamService;
+    }
+
+    public static boolean isAnalyticsExecutionEnabled() {
+        return analyticsExecutionEnabled;
+    }
+
+    public static void setAnalyticsExecutionEnabled(boolean analyticsExecutionEnabled) {
+        ServiceHolder.analyticsExecutionEnabled = analyticsExecutionEnabled;
+    }
+
+    public static boolean isAnalyticsEngineEnabled() {
+        return analyticsEngineEnabled;
+    }
+
+    public static void setAnalyticsEngineEnabled(boolean analyticsEngineEnabled) {
+        ServiceHolder.analyticsEngineEnabled = analyticsEngineEnabled;
     }
 }

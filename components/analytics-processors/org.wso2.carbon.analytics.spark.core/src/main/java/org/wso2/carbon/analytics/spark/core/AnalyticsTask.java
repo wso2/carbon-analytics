@@ -51,15 +51,19 @@ public class AnalyticsTask implements Task {
 
     @Override
     public void execute() {
-        try {
-            log.info("Executing the schedule task for :" + scriptName + " for tenant id :" + tenantId);
-            if (ServiceHolder.getAnalyticsProcessorService() != null) {
-                ServiceHolder.getAnalyticsProcessorService().executeScript(tenantId, this.scriptName);
-            } else {
-                log.warn("Analytics Processor inactive now, and hence ignoring the triggered execution");
+        if (ServiceHolder.isAnalyticsExecutionEnabled()) {
+            try {
+                log.info("Executing the schedule task for :" + scriptName + " for tenant id :" + tenantId);
+                if (ServiceHolder.getAnalyticsProcessorService() != null) {
+                    ServiceHolder.getAnalyticsProcessorService().executeScript(tenantId, this.scriptName);
+                } else {
+                    log.warn("Analytics Processor inactive now, and hence ignoring the triggered execution");
+                }
+            } catch (AnalyticsExecutionException | AnalyticsPersistenceException e) {
+                log.error("Error while executing the scheduled task for the script : " + scriptName, e);
             }
-        } catch (AnalyticsExecutionException | AnalyticsPersistenceException e) {
-            log.error("Error while executing the scheduled task for the script : " + scriptName, e);
+        }else {
+            log.warn("Analytics is disabled in this node, therefore ignoring the triggered execution.");
         }
     }
 }

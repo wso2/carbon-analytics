@@ -42,7 +42,8 @@ public class AnalyticsConstants {
     public static final String SPARK_COMPUTE_CLASSPATH_SCRIPT_PATH = "bin/compute-classpath.sh";
     public static final String SPARK_CONF_DIR = "spark";
     public static final String SPARK_UDF_CONF_FILE = "spark-udf-config.xml";
-
+    public static final String DISABLE_ANALYTICS_EXECUTION_JVM_OPTION = "disableAnalyticsExecution";
+    public static final String DISABLE_ANALYTICS_ENGINE_JVM_OPTION = "disableAnalyticsEngine";
 
     // spark DataType strings
     public static final String STRING_TYPE = "string";
