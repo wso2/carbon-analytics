@@ -22,6 +22,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.StructType;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.AnalyticsDataServiceImpl;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
@@ -60,13 +62,19 @@ public class AnalyticsFunction1 extends AbstractFunction1<Iterator<Row>, BoxedUn
     @Override
     public BoxedUnit apply(Iterator<Row> iterator) {
         List<Record> records = new ArrayList<>();
+        AnalyticsDataService ads = ServiceHolder.getAnalyticsDataService();
+        if (ads instanceof AnalyticsDataServiceImpl) {
+            /* we have to invalidate the table information, since here, if some other node
+            changes the table information, we cannot know about it (no cluster communication) */
+            ((AnalyticsDataServiceImpl) ads).invalidateAnalyticsTableInfo(this.tId, this.tName);
+        }
         while (iterator.hasNext()) {
             if (records.size() == AnalyticsConstants.MAX_RECORDS) {
                 try {
-                    ServiceHolder.getAnalyticsDataService().put(records);
+                    ads.put(records);
                 } catch (AnalyticsException e) {
-//                                log.error("Error while inserting data into table " + tableName, e);
-
+                    log.error("Error while inserting data into table " + this.tName, e);
+                    throw new RuntimeException("Error while inserting data into table " + this.tName, e);
                 }
                 records.clear();
             } else {
@@ -78,10 +86,10 @@ public class AnalyticsFunction1 extends AbstractFunction1<Iterator<Row>, BoxedUn
 
         if (!records.isEmpty()) {
             try {
-                ServiceHolder.getAnalyticsDataService().put(records);
+                ads.put(records);
             } catch (AnalyticsException e) {
                 log.error("Error while pushing data to the dataservice ", e);
-
+                throw new RuntimeException("Error while pushing data to the dataservice ", e);
             }
         }
         return BoxedUnit.UNIT;

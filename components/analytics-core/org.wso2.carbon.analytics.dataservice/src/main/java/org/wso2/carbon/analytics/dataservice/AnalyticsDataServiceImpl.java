@@ -366,7 +366,8 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         }
     }
     
-    private void invalidateAnalyticsTableInfo(int tenantId, String tableName) {
+    public void invalidateAnalyticsTableInfo(int tenantId, String tableName) {
+        tableName = GenericUtils.normalizeTableName(tableName);
         this.tableInfoMap.remove(GenericUtils.calculateTableIdentity(tenantId, tableName));
     }
 

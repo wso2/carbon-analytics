@@ -161,12 +161,12 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     }
 
     private void initClient(String masterUrl, String appName) {
-//        if (this.sparkConf==null) {
-//            this.sparkConf = initSparkConf(masterUrl, appName);
-//        }
-////        this.javaSparkCtx = new JavaSparkContext(this.sparkConf);
+        if (this.sparkConf==null) {
+            this.sparkConf = initSparkConf(masterUrl, appName);
+        }
+//        this.javaSparkCtx = new JavaSparkContext(this.sparkConf);
 ////        this.sqlCtx = new SQLContext(this.javaSparkCtx);
-//        initSqlContext(new JavaSparkContext(this.sparkConf));
+        initSqlContext(new JavaSparkContext(this.sparkConf));
     }
 
     private void initLocalClient() {
@@ -246,6 +246,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         conf.setIfMissing("spark.master", masterUrl);
         conf.setIfMissing("spark.app.name", appName);
         conf.set("spark.ui.port", String.valueOf(DEFAULT_SPARK_UI_PORT + portOffset));
+        conf.setIfMissing("spark.executor.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
+        conf.setIfMissing("spark.driver.extraJavaOptions", "-Dwso2_custom_conf_dir=" + CarbonUtils.getCarbonConfigDirPath());
         return conf;
     }
 

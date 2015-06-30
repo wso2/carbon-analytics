@@ -299,12 +299,12 @@
                                 <bundleDef>
                                     org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.admin
                                 </bundleDef>
-                                <bundleDef>
+                                <!--<bundleDef>
                                     org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.utils
                                 </bundleDef>
                                 <bundleDef>
                                     org.wso2.carbon.analytics:org.wso2.carbon.analytics.spark.patch
-                                </bundleDef>
+                                </bundleDef>-->
                                 <bundleDef>org.roaringbitmap:RoaringBitmap</bundleDef>
                             </bundles>
                             <importFeatures>
