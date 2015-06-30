@@ -483,7 +483,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
      * This method preprocesses the records before adding to the record store,
      * e.g. update the record ids if its not already set by using the table
      * schema's primary keys.
-     * @param records
+     * @param recordBatches
      */
     private void preprocessRecords(Collection<List<Record>> recordBatches) throws AnalyticsException {
         for (List<Record> recordBatch : recordBatches) {
