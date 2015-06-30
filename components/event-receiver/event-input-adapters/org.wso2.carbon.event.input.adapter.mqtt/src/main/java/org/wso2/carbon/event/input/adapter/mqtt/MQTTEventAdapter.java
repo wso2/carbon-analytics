@@ -30,6 +30,9 @@ import org.wso2.carbon.event.input.adapter.mqtt.internal.util.MQTTEventAdapterCo
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Input MQTTEventAdapter will be used to receive events with MQTT protocol using specified broker and topic.
+ */
 public class MQTTEventAdapter implements InputEventAdapter {
 
     private final InputEventAdapterConfiguration eventAdapterConfiguration;

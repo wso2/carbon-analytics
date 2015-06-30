@@ -35,6 +35,9 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Output MQTTEventAdapter will be used to publish events with MQTT protocol to specified broker and topic.
+ */
 public class MQTTEventAdapter implements OutputEventAdapter {
 
     private OutputEventAdapterConfiguration eventAdapterConfiguration;
