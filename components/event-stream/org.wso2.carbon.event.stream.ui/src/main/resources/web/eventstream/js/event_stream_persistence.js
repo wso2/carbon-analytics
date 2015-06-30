@@ -91,6 +91,8 @@ function createAnalyticsIndexTable() {
     if (metaDataTable.rows.length > 1) {
         populateAnalyticsTable(metaIndexTable, metaDataTable, 'meta');
         document.getElementById("noOutputMetaIndexData").style.display = 'none';
+    } else {
+        document.getElementById("metaData").style.display = 'none';
     }
 
     var correlationIndexTable = document.getElementById('correlationIndexTable');
@@ -101,6 +103,8 @@ function createAnalyticsIndexTable() {
     if (correlationDataTable.rows.length > 1) {
         populateAnalyticsTable(correlationIndexTable, correlationDataTable, 'correlation');
         document.getElementById("noOutputCorrelationIndexData").style.display = 'none';
+    } else {
+        document.getElementById("correlationData").style.display = 'none';
     }
 
     var payloadIndexTable = document.getElementById('payloadIndexTable');
@@ -111,6 +115,8 @@ function createAnalyticsIndexTable() {
     if (payloadDataTable.rows.length > 1) {
         populateAnalyticsTable(payloadIndexTable, payloadDataTable, 'payload');
         document.getElementById("noOutputPayloadIndexData").style.display = 'none';
+    } else {
+        document.getElementById("payloadData").style.display = 'none';
     }
 }
 
@@ -194,6 +200,10 @@ function setRowValuesForArbitrary(indexTable, element) {
 }
 function populateAnalyticsIndexTable(eventStreamName, eventStreamVersion) {
     createAnalyticsIndexTable();
+    document.getElementById('eventPersistCheckbox').checked = false;
+    document.getElementById('metaPersistCheckbox').checked = false;
+    document.getElementById('correlationPersistCheckbox').checked = false;
+    document.getElementById('payloadPersistCheckbox').checked = false;
     jQuery.ajax({
         type: "GET",
         url: "../eventstream/get_analytics_index_definitions_ajaxprocessor.jsp?eventStreamName=" + eventStreamName + "&eventStreamVersion=" + eventStreamVersion,
