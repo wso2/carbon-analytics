@@ -1,4 +1,5 @@
 var tableLoaded = false;
+var facetAvailable = false;
 var arbitraryColumnName;
 
 function getArbitraryFields(rowData) {
@@ -148,6 +149,7 @@ function listActionMethod(jtParams) {
 function tableSelectChange() {
     var table = $("#tableSelect").val();
     if (table != '-1') {
+        document.getElementById('searchControl').style.display = '';
         $("#purgeRecordButton").show();
         loadFacetNames();
         loadPrimaryKeys();
@@ -155,10 +157,16 @@ function tableSelectChange() {
         $("#purgeRecordButton").hide();
         $('#facetListSelect').find('option:gt(0)').remove();
         $('#query').val('');
-        document.getElementById('facetSearchCombo').style.display = 'none';
-        document.getElementById('facetSearchTableRow').style.display = 'none';
+        document.getElementById('searchControl').style.display = 'none';
     }
+    document.getElementById('dataRangeSearch').style.display = 'none';
+    document.getElementById('querySearch').style.display = 'none';
+    document.getElementById('primaryKeySearch').style.display = 'none';
+    document.getElementById('facetSearchCombo').style.display = 'none';
+    document.getElementById('facetSearchTableRow').style.display = 'none';
+
     try {
+        $('input[name=group1]').attr('checked',false);
         $('#DeleteAllButton').hide();
         if (tableLoaded == true) {
             $('#AnalyticsTableContainer').jtable('destroy');
@@ -187,12 +195,41 @@ function scheduleDataPurge() {
                label.innerHTML = result;
            }
     );
-    return true;
+    return false;
+}
+
+function updateSearchOption(ele) {
+    switch (ele.value) {
+        case 'time':
+            document.getElementById('dataRangeSearch').style.display = '';
+            document.getElementById('querySearch').style.display = 'none';
+            document.getElementById('facetSearchCombo').style.display = 'none';
+            document.getElementById('facetSearchTableRow').style.display = 'none';
+            document.getElementById('primaryKeySearch').style.display = 'none';
+            break;
+        case 'primary':
+            document.getElementById('primaryKeySearch').style.display = '';
+            document.getElementById('querySearch').style.display = 'none';
+            document.getElementById('facetSearchCombo').style.display = 'none';
+            document.getElementById('facetSearchTableRow').style.display = 'none';
+            document.getElementById('dataRangeSearch').style.display = 'none';
+            break;
+        case 'query':
+            document.getElementById('querySearch').style.display = '';
+            if (facetAvailable) {
+                document.getElementById('facetSearchCombo').style.display = '';
+                document.getElementById('facetSearchTableRow').style.display = '';
+            }
+            document.getElementById('primaryKeySearch').style.display = 'none';
+            document.getElementById('dataRangeSearch').style.display = 'none';
+            break;
+    }
 }
 
 function loadFacetNames() {
     $('#facetSearchTable tr').remove();
     $('#facetListSelect').find('option:gt(0)').remove();
+    document.getElementById('radioQuery').style.display = '';
     $.get('/carbon/messageconsole/messageconsole_ajaxprocessor.jsp?type=' + typeGetFacetNameList + '&tableName=' + $("#tableSelect").val(),
           function (result) {
               var resultObj = jQuery.parseJSON(result);
@@ -201,11 +238,9 @@ function loadFacetNames() {
                   facetNames += "<option value=" + tableName + ">" + tableName + "</option>";
               });
               if (resultObj.length > 0) {
-                  document.getElementById('facetSearchCombo').style.display = '';
-                  document.getElementById('facetSearchTableRow').style.display = '';
+                  facetAvailable = true;
               } else {
-                  document.getElementById('facetSearchCombo').style.display = 'none';
-                  document.getElementById('facetSearchTableRow').style.display = 'none';
+                  facetAvailable = false;
               }
               $("#facetListSelect").append(facetNames);
           }
@@ -225,20 +260,26 @@ function loadPrimaryKeys() {
                   );
               });
               if (resultObj.length > 0) {
-                  document.getElementById('primaryKeySearch').style.display = '';
+                  document.getElementById('radioPrimary').style.display = '';
+                  document.getElementById('radioLabelPrimary').style.display = '';
               } else {
-                  document.getElementById('primaryKeySearch').style.display = 'none';
+                  document.getElementById('radioPrimary').style.display = 'none';
+                  document.getElementById('radioLabelPrimary').style.display = 'none';
               }
           }
     );
 }
 
 function reset() {
+    $('input[name=group1]').attr('checked',false);
+    tableLoaded = false;
+    facetAvailable = false;
     $('#primaryKeyTable tr').remove();
+    loadTableSelect();
+    document.getElementById('searchControl').style.display = 'none';
+    document.getElementById('dataRangeSearch').style.display = 'none';
+    document.getElementById('querySearch').style.display = 'none';
     document.getElementById('primaryKeySearch').style.display = 'none';
-    $('#facetSearchTable tr').remove();
-    $('#facetListSelect').find('option:gt(0)').remove();
-    $('#query').val('');
     document.getElementById('facetSearchCombo').style.display = 'none';
     document.getElementById('facetSearchTableRow').style.display = 'none';
 }

@@ -394,9 +394,25 @@
                                     </c:if>
                                 </td>
                             </tr>
+                            <tr id="searchControl" style="display: none">
+                                <td>Search</td>
+                                <td>
+                                    <c:if test="${permissions != null && permissions.isListRecord()}">
+                                        <input type="radio" name="group1" value="time" id="radioDateRange"
+                                               onchange="updateSearchOption(this)" title="">By Date Range
+                                        <input type="radio" name="group1" value="primary" id="radioPrimary"
+                                               onchange="updateSearchOption(this)">
+                                        <label for="radioPrimary" id="radioLabelPrimary">By Primary Key</label>
+                                    </c:if>
+                                    <c:if test="${permissions != null && permissions.isSearchRecord()}">
+                                        <input type="radio" name="group1" value="query" id="radioQuery"
+                                               onchange="updateSearchOption(this)">By Query
+                                    </c:if>
+                                </td>
+                            </tr>
                             <c:if test="${permissions != null && permissions.isListRecord()}">
-                                <tr>
-                                    <td>By Date Range</td>
+                                <tr id="dataRangeSearch" style="display: none">
+                                    <td></td>
                                     <td>
                                         <label> From: <input id="timeFrom" type="text"> </label>
                                         <label> To: <input id="timeTo" type="text"> </label>
@@ -404,14 +420,14 @@
                                 </tr>
                             </c:if>
                             <c:if test="${permissions != null && permissions.isSearchRecord()}">
-                                <tr>
-                                    <td>By Query</td>
+                                <tr id="querySearch" style="display: none">
+                                    <td></td>
                                     <td>
                                         <textarea id="query" rows="4" cols="100" placeholder="Search Query"></textarea>
                                     </td>
                                 </tr>
                                 <tr id="facetSearchCombo" style="display: none">
-                                    <td>By Facet</td>
+                                    <td></td>
                                     <td>
                                         <select id="facetListSelect">
                                             <option value="-1">Select a Facet</option>
@@ -426,8 +442,10 @@
                                         </table>
                                     </td>
                                 </tr>
+                            </c:if>
+                            <c:if test="${permissions != null && permissions.isListRecord()}">
                                 <tr id="primaryKeySearch" style="display: none">
-                                    <td>By Primary Key</td>
+                                    <td></td>
                                     <td>
                                         <table id="primaryKeyTable" class="normal">
                                             <tbody></tbody>
